@@ -1,7 +1,7 @@
 import { promisify } from 'util';
 import { writeFile, exists, mkdir } from 'fs';
 import { join } from 'path';
-import * as sharp from 'sharp';
+import sharp from 'sharp';
 
 // TODO: move to 'core' ?
 export function uuid() {

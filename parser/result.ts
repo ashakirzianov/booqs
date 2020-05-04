@@ -1,4 +1,4 @@
-import { flatten } from 'booqs-core';
+import { flatten } from '../core';
 
 export type Diagnostic = {
     diag: string,

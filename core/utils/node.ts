@@ -10,7 +10,7 @@ export function nodeText(node: BooqNode): string {
     }
 }
 
-type BooqNodeIteratorValue = {
+export type BooqNodeIteratorValue = {
     node: BooqNode,
     path: BooqPath,
     position: number,

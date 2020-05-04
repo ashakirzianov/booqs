@@ -1,4 +1,6 @@
-import { BooqNode, TableOfContentsItem, iterateNodes, TableOfContents } from 'booqs-core';
+import {
+    BooqNode, TableOfContentsItem, iterateNodes, TableOfContents, BooqNodeIteratorValue,
+} from '../core';
 import { EpubFile } from './epubFile';
 import { Diagnostic, Result } from './result';
 
@@ -9,7 +11,7 @@ export async function buildToc(nodes: BooqNode[], file: EpubFile): Promise<Resul
     const iter = iterateNodes(nodes);
     let next = iter.next();
     while (!next.done) {
-        const { node, path, position } = next.value;
+        const { node, path, position } = next.value as BooqNodeIteratorValue;
         const epubItem = epubToc.find(i => i.href === node.id);
         if (epubItem) {
             items.push({

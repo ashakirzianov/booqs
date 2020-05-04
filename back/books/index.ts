@@ -1,8 +1,8 @@
 import { groupBy, flatten } from 'lodash';
-import { makeId, parseId, filterUndefined } from 'booqs-core';
+import { makeId, parseId, filterUndefined } from '../../core';
 import { sources, LibraryCard } from './sources';
 
-export { LibraryCard } from './sources';
+export * from './sources';
 export * from './content';
 
 export async function search(query: string, limit: number): Promise<LibraryCard[]> {

@@ -1,6 +1,6 @@
+import { assertNever } from '../core';
 import { regex, project, Parser, choice, sequence, oneOrMore } from './stringParser';
 import { Result } from './result';
-import { assertNever } from 'booqs-core';
 import { Xml } from './xmlTree';
 
 type UniversalSelector = {

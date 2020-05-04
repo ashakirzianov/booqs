@@ -1,6 +1,6 @@
 import { inspect } from 'util';
 import { flatten, uniq } from 'lodash';
-import { extractMetadata, ExtractedMetadata } from 'booqs-parser';
+import { extractMetadata, ExtractedMetadata } from '../../parser';
 import { makeBatches, resizeImage } from '../utils';
 import { listObjects, downloadAsset, Asset, uploadAsset } from '../s3';
 import { collection, DbPgCard, epubsBucket, coversBucket } from './schema';

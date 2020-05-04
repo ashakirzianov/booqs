@@ -1,4 +1,4 @@
-import { BooqMeta } from 'booqs-core';
+import { BooqMeta } from '../core';
 import { EpubFile } from './epubFile';
 
 export async function getMetadata(epub: EpubFile): Promise<BooqMeta> {

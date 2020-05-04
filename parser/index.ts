@@ -1,4 +1,4 @@
-import { Booq, BooqMeta } from 'booqs-core';
+import { Booq, BooqMeta } from '../core';
 import { Diagnoser } from './result';
 import { openEpub } from './epubFile';
 import { processEpub } from './book';

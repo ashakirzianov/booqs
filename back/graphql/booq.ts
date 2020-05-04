@@ -1,7 +1,7 @@
 import { IResolvers } from 'apollo-server';
+import { BooqNode, previewForPath } from '../../core';
 import { LibraryCard, booqForId } from '../books';
 import { userBookmarks, userHighlights } from '../data';
-import { BooqNode, previewForPath } from 'booqs-core';
 
 export type BooqParent = LibraryCard;
 export const booqResolver: IResolvers<BooqParent> = {

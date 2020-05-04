@@ -1,4 +1,4 @@
-import { BooqNode, BooqImages, unique } from 'booqs-core';
+import { BooqNode, BooqImages, unique } from '../core';
 import { EpubFile } from './epubFile';
 import { Diagnostic } from './result';
 

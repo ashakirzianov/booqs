@@ -1,4 +1,4 @@
-import { BooqNode, flatten, BooqNodeStyle } from 'booqs-core';
+import { BooqNode, flatten, BooqNodeStyle } from '../core';
 import {
     xmlStringParser, xml2string, XmlElement, XmlDocument, Xml, isWhitespaces,
 } from './xmlTree';

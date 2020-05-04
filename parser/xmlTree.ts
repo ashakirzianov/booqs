@@ -1,4 +1,4 @@
-import * as parseXmlLib from '@rgrove/parse-xml';
+import parseXmlLib from '@rgrove/parse-xml';
 import { Result } from './result';
 
 export type XmlStringParserInput = {

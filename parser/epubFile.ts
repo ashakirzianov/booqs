@@ -26,24 +26,26 @@ export type EpubFile = {
 export async function openEpub({ fileData }: {
     fileData: Buffer,
 }): Promise<Result<EpubFile>> {
+    let epub: FixedEpub;
+    function resolveHref(href: string) {
+        href = href.startsWith('../')
+            ? href.substr('../'.length)
+            : href;
+        const items = listItems(epub);
+        const idItem = items
+            .find(item => item.href && item.href.endsWith(href));
+        return idItem?.id;
+    }
+    function getFileName(href: string) {
+        // NOTE: couldn't find better solution
+        const comps = href.split('/');
+        const fileName = comps[comps.length - 1];
+        return fileName;
+    }
+
     try {
         const epub = await FixedEpub.createFromData(fileData) as FixedEpub;
 
-        function resolveHref(href: string) {
-            href = href.startsWith('../')
-                ? href.substr('../'.length)
-                : href;
-            const items = listItems(epub);
-            const idItem = items
-                .find(item => item.href && item.href.endsWith(href));
-            return idItem?.id;
-        }
-        function getFileName(href: string) {
-            // NOTE: couldn't find better solution
-            const comps = href.split('/');
-            const fileName = comps[comps.length - 1];
-            return fileName;
-        }
         const book: EpubFile = {
             rawMetadata: getRawData(epub.metadata),
             metadata: extractMetadata(epub),

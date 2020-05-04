@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "build-ts": "tsc",
     "dev": "next dev",
     "build": "next build",
     "start": "next start"
@@ -15,6 +16,12 @@
   "devDependencies": {
     "@types/node": "^13.13.4",
     "@types/react": "^16.9.34",
+    "@types/css": "0.0.31",
+    "@types/graphql-type-json": "^0.3.2",
+    "@types/jsonwebtoken": "^8.3.9",
+    "@types/lodash": "^4.14.150",
+    "@types/mongoose": "^5.7.14",
+    "@types/sharp": "^0.25.0",
     "typescript": "^3.8.3",
     "@rgrove/parse-xml": "^2.0.3",
     "booqs-core": "^0.2.1",

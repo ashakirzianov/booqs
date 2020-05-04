@@ -1,10 +1,10 @@
 import { IResolvers } from 'apollo-server';
-import { Context } from './context';
 import {
     addBookmark, addHighlight, addCurrent,
     deleteBookmark, deleteHighlight, deleteCurrent, addToCollection, removeFromCollection,
 } from '../data';
 import { uuid } from '../utils';
+import { Context } from './context';
 
 export const mutationResolver: IResolvers<any, Context> = {
     Mutation: {
