@@ -1,8 +1,12 @@
-import { NextApiHandler } from 'next';
+import { createHandler } from '../../back';
 
-const handler: NextApiHandler = (req, res) => {
-  res.statusCode = 200;
-  res.json({ data: 'GraphQL' });
+export const config = {
+  api: {
+    bodyParser: false,
+  },
 }
 
-export default handler;
+export default createHandler('/api/graphql');
+// export default (req: any, res: any) => {
+//   res.status(200).json({ data: 'oops' });
+// }
