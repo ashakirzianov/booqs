@@ -26,7 +26,7 @@ type CoverSizes = {
 };
 
 export type DbPgCard = TypeFromSchema<typeof schema>;
-export const collection = typedModel('pg-cards', schema);
+export const pgCards = typedModel('pg-cards', schema);
 
 export const epubsBucket = 'pg-epubs';
 export const coversBucket = 'pg-covers';

@@ -3,7 +3,7 @@ import { flatten, uniq } from 'lodash';
 import { extractMetadata, ExtractedMetadata } from '../../parser';
 import { makeBatches, resizeImage } from '../utils';
 import { listObjects, downloadAsset, Asset, uploadAsset } from '../s3';
-import { collection, DbPgCard, epubsBucket, coversBucket } from './schema';
+import { pgCards, DbPgCard, epubsBucket, coversBucket } from './schema';
 
 export async function syncWithS3() {
     report('Syncing with S3');
@@ -30,7 +30,7 @@ async function processAsset(asset: Asset) {
 }
 
 async function recordExists(assetId: string) {
-    return collection.exists({ assetId });
+    return pgCards.exists({ assetId });
 }
 
 async function* listEpubObjects() {
@@ -80,7 +80,7 @@ async function insertRecord({ metadata, cover }: ExtractedMetadata, assetId: str
         meta: rest,
         ...coverData,
     };
-    const [inserted] = await collection.insertMany([doc]);
+    const [inserted] = await pgCards.insertMany([doc]);
     report('inserted', inserted);
     return inserted;
 }

@@ -1,7 +1,7 @@
-import { collection } from './schema';
+import { pgCards } from './schema';
 
 export async function search(query: string, limit: number) {
-    return collection.aggregate([{
+    return pgCards.aggregate([{
         $searchBeta: {
             compound: {
                 should: [

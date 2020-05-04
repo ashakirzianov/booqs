@@ -1,8 +1,8 @@
-import { collection, epubsBucket } from './schema';
+import { pgCards, epubsBucket } from './schema';
 import { downloadAsset } from '../s3';
 
 export async function cards(ids: string[]) {
-    return collection
+    return pgCards
         .find(
             { index: { $in: ids } },
             {
@@ -25,7 +25,7 @@ export async function cards(ids: string[]) {
 }
 
 export async function fileForId(id: string) {
-    const doc = await collection.findOne({ index: id }).exec();
+    const doc = await pgCards.findOne({ index: id }).exec();
     if (!doc) {
         return undefined;
     } else {
