@@ -1,20 +1,23 @@
 import {
     Schema, model, Document, connect, Model,
 } from 'mongoose';
+import { config } from './config';
 
 let db: any;
 export async function connectDb() {
     if (!db) {
-        const dbUri = process.env.BACKEND_MONGODB_URI;
+        const dbUri = config().mongodbUri;
         if (dbUri) {
+            console.log('Connecting to db...');
             db = await connect(dbUri, {
                 useNewUrlParser: true,
                 useUnifiedTopology: true,
                 useCreateIndex: true,
                 useFindAndModify: false,
             });
+            console.log('Connected');
         } else {
-            console.warn('BACKEND_MONGODB_URI is not set');
+            console.warn('BOOQS_BACKEND_MONGODB_URI is not set');
         }
     }
     return db;
