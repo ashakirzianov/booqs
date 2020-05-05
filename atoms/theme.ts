@@ -4,9 +4,11 @@ export function usePalette(): Palette {
     return defaultPalette;
 }
 
+export const brandColor = 'orange';
+export const menuFont = 'Lato';
 const lightPalette = {
     primary: 'black',
-    highlight: 'orange',
+    highlight: brandColor,
 };
 
 const defaultPalette = lightPalette;

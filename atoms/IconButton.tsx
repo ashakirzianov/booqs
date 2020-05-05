@@ -1,3 +1,4 @@
+import React from 'react';
 import { Icon, IconName } from "./Icon";
 import { regularMeter } from "./meter";
 import { usePalette } from "./theme";
