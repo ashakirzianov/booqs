@@ -6,3 +6,4 @@ function point(p: number) {
 export const regularMeter = point(meter);
 
 export const buttonSize = 50;
+export const headerHeight = 75;
