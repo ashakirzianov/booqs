@@ -1,4 +1,5 @@
 {
+    "css.lint.emptyRules": "ignore",
     "files.exclude": {
         "**/.DS_Store": true,
         "**/node_modules/**": true,
