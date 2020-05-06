@@ -3,11 +3,13 @@ import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
     faPlus, faFontCase, faSignIn, faQuestion, faSearch,
+    faFileAlt,
 } from '@fortawesome/pro-light-svg-icons';
 import { assertNever } from '../core';
 
 export type IconName =
     | 'sign-in' | 'upload' | 'appearance' | 'search'
+    | 'pages'
     ;
 
 export function Icon({ name, size }: {
@@ -31,6 +33,8 @@ function iconForName(name: IconName) {
             return faPlus;
         case 'search':
             return faSearch;
+        case 'pages':
+            return faFileAlt;
         default:
             assertNever(name);
             return faQuestion;

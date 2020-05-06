@@ -1,6 +1,5 @@
 import React from 'react';
 import { brandColor } from './theme';
-import { megaMeter } from './meter';
 
 export function Logo() {
     return <div>

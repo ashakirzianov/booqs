@@ -1,6 +1,6 @@
 import React from 'react';
 import { Icon, IconName } from "./Icon";
-import { regularMeter, buttonSize } from "./meter";
+import { meter, buttonSize } from "./meter";
 import { usePalette } from "./theme";
 
 export function IconButton({ icon, onClick }: {
@@ -16,7 +16,7 @@ export function IconButton({ icon, onClick }: {
             button {
                 display: flex;
                 height: ${buttonSize};
-                margin: ${regularMeter};
+                margin: ${meter.regular};
                 color: ${primary};
                 border: none;
             }

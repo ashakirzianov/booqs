@@ -1,7 +1,7 @@
 import React from 'react';
 import Head from 'next/head';
 import { HasChildren } from './utils';
-import { megaMeter } from './meter';
+import { meter } from './meter';
 
 export function Page({ title, children }: HasChildren & {
     title: string,
@@ -14,13 +14,16 @@ export function Page({ title, children }: HasChildren & {
         </Head>
         {children}
         <style jsx global>{`
+            * {
+                box-sizing: border-box;
+            }
             .page {
                 display: flex;
                 flex-direction: column;
             }
             body {
                 margin: 0;
-                padding: ${megaMeter};
+                padding: 0;
                 font-family: Lato;
                 font-weight: 100;
             }

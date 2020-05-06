@@ -6,7 +6,7 @@ import { Featured } from "../atoms/Featured";
 export async function getStaticProps() {
   return {
     props: {
-      cards: [],
+      cards,
     },
   };
 }
@@ -32,21 +32,35 @@ const cards: BooqCardProps[] = [
     title: 'Republic',
     author: 'Plato',
     cover: 'https://booka-lib-images.s3.amazonaws.com/@cover@large@pg55201',
-    tags: [],
+    tags: [
+      { tag: 'language', value: 'en' },
+      { tag: 'subject', value: 'Philosophy' },
+      { tag: 'subject', value: 'Classic' },
+      { tag: 'pg-index', value: '5319' },
+    ],
     length: 312,
   },
   {
     title: 'Nausea',
     author: 'Sartre',
     cover: 'https://booqs-uploads-images.s3.amazonaws.com/@cover@large@nausea',
-    tags: [],
+    tags: [
+      { tag: 'language', value: 'fr' },
+      { tag: 'subject', value: 'Fiction' },
+      { tag: 'subject', value: 'Philosophy' },
+      { tag: 'subject', value: 'Classic' },
+    ],
     length: 102,
   },
   {
     title: 'Rayuela',
     author: 'Cortázar',
     cover: 'https://booqs-uploads-images.s3.amazonaws.com/@cover@large@igra-v-klassiki',
-    tags: [],
+    tags: [
+      { tag: 'language', value: 'es' },
+      { tag: 'subject', value: 'Fiction' },
+      { tag: 'subject', value: 'Classic' },
+    ],
     length: 1084,
   },
 ];

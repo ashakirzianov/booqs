@@ -1,5 +1,5 @@
 import React from 'react';
-import { headerHeight, regularMeter, megaMeter } from './meter';
+import { headerHeight, meter } from './meter';
 import { Logo } from './Logo';
 import { SearchInput } from './SearchInput';
 import { IconButton } from './IconButton';
@@ -26,6 +26,7 @@ export function AppBar() {
                 flex: 1 1;
                 height: ${headerHeight};
                 width: 100%;
+                padding: ${meter.xLarge};
                 align-items: center;
             }
             .logo {

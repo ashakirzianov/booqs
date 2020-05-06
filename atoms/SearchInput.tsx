@@ -1,6 +1,6 @@
 import React from 'react';
 import { usePalette } from './theme';
-import { megaMeter, regularMeter } from './meter';
+import { meter } from './meter';
 import { Icon } from './Icon';
 
 export function SearchInput() {
@@ -15,13 +15,13 @@ export function SearchInput() {
             display: flex;
             flex-direction: row;
             align-items: center;
-            margin: 0 ${megaMeter};
+            margin: 0 ${meter.xLarge};
             color: ${primary};
         }
         input {
             border: none;
             padding: 0;
-            margin: 0 ${regularMeter};
+            margin: 0 ${meter.regular};
             font: inherit;
             font-size: xx-large;
         }
