@@ -4,6 +4,8 @@ function point(p: number) {
 }
 
 export const regularMeter = point(meter);
+export const doubleMeter = point(2 * meter);
+export const megaMeter = point(3 * meter);
 
 export const buttonSize = 50;
 export const headerHeight = 75;

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Icon, IconName } from "./Icon";
-import { regularMeter } from "./meter";
+import { regularMeter, buttonSize } from "./meter";
 import { usePalette } from "./theme";
 
 export function IconButton({ icon, onClick }: {
@@ -8,18 +8,21 @@ export function IconButton({ icon, onClick }: {
     onClick?: () => void,
 }) {
     const { primary, highlight } = usePalette();
-    return <div
+    return <button
         onClick={onClick}
     >
-        <Icon name={icon} />
+        <Icon name={icon} size={25} />
         <style jsx>{`
-            div {
-            margin: ${regularMeter};
-            color: ${primary};
+            button {
+                display: flex;
+                height: ${buttonSize};
+                margin: ${regularMeter};
+                color: ${primary};
+                border: none;
             }
-            div:hover {
+            button:hover {
                 color: ${highlight};
             }
         `}</style>
-    </div>;
+    </button>;
 }

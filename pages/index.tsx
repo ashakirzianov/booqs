@@ -1,4 +1,4 @@
-import { PageHead } from "../atoms/PageHead";
+import { Page } from "../atoms/Page";
 import { AppBar } from "../atoms/AppBar";
 import { BooqCardProps } from "../atoms/BooqCard";
 import { Featured } from "../atoms/Featured";
@@ -6,7 +6,7 @@ import { Featured } from "../atoms/Featured";
 export async function getStaticProps() {
   return {
     props: {
-      cards,
+      cards: [],
     },
   };
 }
@@ -14,11 +14,17 @@ export async function getStaticProps() {
 export default function Home({ cards }: {
   cards: BooqCardProps[],
 }) {
-  return <div>
-    <PageHead title="Booqs" />
+  return <Page title="Booqs">
     <AppBar />
     <Featured cards={cards} />
-  </div>;
+    <style jsx>{`
+      div {
+        display: flex;
+        flex-direction: column;
+        border: 1px solid blue;
+      }
+      `}</style>
+  </Page>;
 }
 
 const cards: BooqCardProps[] = [

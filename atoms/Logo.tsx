@@ -1,13 +1,17 @@
 import React from 'react';
 import { brandColor } from './theme';
+import { megaMeter } from './meter';
 
 export function Logo() {
-    return <span>
+    return <div>
         BOOQS
         <style jsx>{`
-            span {
+            div {
                 color: ${brandColor};
+                font: inherit;
+                font-size: xx-large;
+                font-weight: bold;
             }
         `}</style>
-    </span>
+    </div>
 }

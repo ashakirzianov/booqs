@@ -18,7 +18,10 @@ export function BooqCard({
 }) {
     return <div>
         <div>
-            <img src={cover} />
+            <img
+                src={cover}
+                height={270}
+            />
         </div>
         <div>
             <span>{title}</span>

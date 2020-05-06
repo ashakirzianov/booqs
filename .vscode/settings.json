@@ -2,8 +2,7 @@
     "css.lint.emptyRules": "ignore",
     "files.exclude": {
         "**/.DS_Store": true,
-        "**/node_modules/**": true,
-        ".next": true
+        "**/node_modules/**": true
     },
     "cSpell.words": [
         "Booq",
