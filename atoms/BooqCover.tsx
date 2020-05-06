@@ -1,7 +1,7 @@
 import React from 'react';
 
-const coverWidth = 120;
-const coverHeight = 180;
+const coverWidth = 140;
+const coverHeight = 210;
 
 export function BooqCover({ cover, title, author }: {
     cover?: string,
@@ -21,7 +21,7 @@ export function BooqCover({ cover, title, author }: {
                 width: ${coverWidth}px;
                 height: ${coverHeight}px;
                 align-items: stretch;
-                border-radius: 5px;
+                // border-radius: 5px;
                 overflow: hidden;
             }
             `}</style>

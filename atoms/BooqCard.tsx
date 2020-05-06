@@ -11,6 +11,7 @@ export type BooqTag = {
 };
 
 const cardWidth = '40rem';
+const panelShadow = '0px 3px 10px rgba(0, 0, 0, 0.1)';
 
 export type BooqCardProps = PropsType<typeof BooqCard>;
 export function BooqCard({
@@ -44,12 +45,18 @@ export function BooqCard({
                 width: 100%;
                 max-width: ${cardWidth};
                 margin: ${meter.xLarge};
+                // padding: ${meter.xLarge};
+                // border: 1px solid #eee;
+                border-radius: 5px;
+                box-shadow: ${panelShadow};
+                overflow: hidden;
             }
             .details {
                 display: flex;
                 flex-direction: column;
                 justify-content: space-between;
-                margin-left: ${meter.xLarge};
+                margin-left: ${meter.large};
+                padding: ${meter.large};
                 width: 100%;
             }
             .title {
