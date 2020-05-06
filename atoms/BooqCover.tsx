@@ -21,7 +21,6 @@ export function BooqCover({ cover, title, author }: {
                 width: ${coverWidth}px;
                 height: ${coverHeight}px;
                 align-items: stretch;
-                // border-radius: 5px;
                 overflow: hidden;
             }
             `}</style>

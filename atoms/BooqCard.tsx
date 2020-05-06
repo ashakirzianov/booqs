@@ -45,8 +45,6 @@ export function BooqCard({
                 width: 100%;
                 max-width: ${cardWidth};
                 margin: ${meter.xLarge};
-                // padding: ${meter.xLarge};
-                // border: 1px solid #eee;
                 border-radius: 5px;
                 box-shadow: ${panelShadow};
                 overflow: hidden;
@@ -152,7 +150,6 @@ function Pill({ color, label, title }: {
             div {
                 font-size: small;
                 color: ${color};
-                // background: #fafafa;
                 border: 1px solid ${color};
                 border-radius: 100px;
                 padding: 0 ${meter.large};
