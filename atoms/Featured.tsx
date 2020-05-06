@@ -5,9 +5,10 @@ export function Featured({ cards }: {
     cards: BooqCardProps[],
 }) {
     return <div>
+        <span>Featured</span>
         {
             cards.map(
-                card => <BooqCard {...card} />
+                (card, idx) => <BooqCard key={idx} {...card} />
             )
         }
     </div>;
