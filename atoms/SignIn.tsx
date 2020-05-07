@@ -16,14 +16,15 @@ function SignInMenu() {
     return <div>
         <span>Sign In</span>
         <Menu>
-            <MenuItem icon="facebook" text="facebook" />
+            <MenuItem icon="facebook" text="Facebook" />
         </Menu>
         <style jsx>{`
         div {
             display: flex;
             flex-direction: column;
+            flex: 1;
             padding: ${meter.regular} 0;
-            align-items: center;
+            align-items: stretch;
         }
         span {
             width: 100%;

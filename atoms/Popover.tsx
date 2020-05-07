@@ -27,6 +27,13 @@ export function WithPopover({
             }>
             <div>{children}</div>
         </Tippy>
+        <style jsx>{`
+            .content {
+                display: flex;
+                min-width: 12rem;
+                flex: 1;
+            }
+            `}</style>
         <style jsx global>{`
         .tippy-box {
             color: ${primary};
