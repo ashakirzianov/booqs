@@ -33,34 +33,34 @@ const cards: BooqCardProps[] = [
     author: 'Plato',
     cover: 'https://booka-lib-images.s3.amazonaws.com/@cover@large@pg55201',
     tags: [
+      { tag: 'pages', value: '312' },
       { tag: 'language', value: 'en' },
       { tag: 'subject', value: 'Philosophy' },
       { tag: 'subject', value: 'Classic' },
       { tag: 'pg-index', value: '5319' },
     ],
-    length: 312,
   },
   {
     title: 'Nausea',
     author: 'Sartre',
     cover: 'https://booqs-uploads-images.s3.amazonaws.com/@cover@large@nausea',
     tags: [
+      { tag: 'pages', value: '102' },
       { tag: 'language', value: 'fr' },
       { tag: 'subject', value: 'Fiction' },
       { tag: 'subject', value: 'Philosophy' },
       { tag: 'subject', value: 'Classic' },
     ],
-    length: 102,
   },
   {
     title: 'Rayuela',
     author: 'Cortázar',
     cover: 'https://booqs-uploads-images.s3.amazonaws.com/@cover@large@igra-v-klassiki',
     tags: [
+      { tag: 'pages', value: '1084' },
       { tag: 'language', value: 'es' },
       { tag: 'subject', value: 'Fiction' },
       { tag: 'subject', value: 'Classic' },
     ],
-    length: 1084,
   },
 ];

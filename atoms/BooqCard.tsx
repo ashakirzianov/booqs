@@ -2,7 +2,6 @@ import React from 'react';
 import { PropsType } from './utils';
 import { BooqCover } from './BooqCover';
 import { meter } from './meter';
-import { Icon } from './Icon';
 import { usePalette } from './theme';
 
 export type BooqTag = {
@@ -11,17 +10,16 @@ export type BooqTag = {
 };
 
 const cardWidth = '40rem';
-const panelShadow = '0px 3px 10px rgba(0, 0, 0, 0.1)';
+const panelShadow = '0px 3px 7px rgba(0, 0, 0, 0.1)';
 
 export type BooqCardProps = PropsType<typeof BooqCard>;
 export function BooqCard({
-    title, author, cover, tags, length,
+    title, author, cover, tags,
 }: {
     title?: string,
     author?: string,
     cover?: string,
     tags: BooqTag[],
-    length: number,
 }) {
     return <div className="panel">
         <BooqCover
@@ -33,7 +31,6 @@ export function BooqCard({
             <div>
                 <Header title={title} author={author} />
                 <BooqTags tags={tags} />
-                <LengthInfo pages={length} />
             </div>
             <Actions />
         </div>
@@ -44,7 +41,7 @@ export function BooqCard({
                 flex: 0 1;
                 width: 100%;
                 max-width: ${cardWidth};
-                margin: ${meter.xLarge};
+                margin: ${meter.large};
                 border-radius: 5px;
                 box-shadow: ${panelShadow};
                 overflow: hidden;
@@ -56,13 +53,6 @@ export function BooqCard({
                 margin-left: ${meter.large};
                 padding: ${meter.large};
                 width: 100%;
-            }
-            .title {
-                font-size: x-large;
-            }
-            .author {
-                font-size: large;
-                font-style: italic;
             }
             `}</style>
     </div>;
@@ -78,16 +68,15 @@ function Header({ title, author }: {
         <style jsx>{`
             div {
                 display: flex;
-                flex-flow: row wrap;
+                flex-flow: column wrap;
                 align-items: baseline;
             }
             .title {
                 font-size: x-large;
+                font-weight: normal;
             }
             .author {
-                margin-left: ${meter.regular};
-                font-size: x-large;
-                font-style: italic;
+                font-size: large;
             }
             `}</style>
     </div>;
@@ -134,6 +123,11 @@ function BooqTagPill({ tag }: {
                 label="Project Gutenberg"
                 title={tag.value}
             />;
+        case 'pages':
+            return <Pill
+                color="black"
+                label={`${tag.value} pages`}
+            />;
         default:
             return null;
     }
@@ -150,27 +144,9 @@ function Pill({ color, label, title }: {
             div {
                 font-size: small;
                 color: ${color};
-                border: 1px solid ${color};
                 border-radius: 100px;
-                padding: 0 ${meter.large};
-                margin: 0 ${meter.small} 0 0;
-            }
-            `}</style>
-    </div>
-}
-
-function LengthInfo({ pages }: {
-    pages: number,
-}) {
-    return <div>
-        <Icon name='pages' size={14} />
-        <span>{`${pages} pages`}</span>
-        <style jsx>{`
-            div {
-                margin: ${meter.large} 0 0 0;
-            }
-            span {
-                margin-left: ${meter.regular};
+                padding: 0 ${meter.large} 0 0;
+                margin: ${meter.small} ${meter.small} 0 0;
             }
             `}</style>
     </div>
