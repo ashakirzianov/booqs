@@ -8,7 +8,7 @@ export function Logo() {
             div {
                 color: ${brandColor};
                 font: inherit;
-                font-size: xx-large;
+                font-size: x-large;
                 font-weight: bold;
             }
         `}</style>

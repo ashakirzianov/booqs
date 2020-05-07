@@ -11,7 +11,7 @@ export function IconButton({ icon, onClick }: {
     return <button
         onClick={onClick}
     >
-        <Icon name={icon} size={25} />
+        <Icon name={icon} />
         <style jsx>{`
             button {
                 display: flex;
@@ -19,6 +19,8 @@ export function IconButton({ icon, onClick }: {
                 margin: ${meter.regular};
                 color: ${primary};
                 border: none;
+                font-size: x-large;
+                cursor: pointer;
             }
             button:hover {
                 color: ${highlight};

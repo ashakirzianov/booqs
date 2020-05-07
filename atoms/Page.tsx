@@ -10,7 +10,7 @@ export function Page({ title, children }: HasChildren & {
         <Head>
             <title>{title}</title>
             <meta name="viewport" content="initial-scale=1.0, width=device-width" />
-            <FontLinks />;
+            <FontLinks />
         </Head>
         {children}
         <style jsx global>{`

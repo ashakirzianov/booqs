@@ -1,7 +1,6 @@
 import React from 'react';
 import { usePalette } from './theme';
 import { meter } from './meter';
-import { Icon } from './Icon';
 
 export function SearchInput() {
     const { primary } = usePalette();
@@ -23,7 +22,7 @@ export function SearchInput() {
             padding: 0;
             margin: 0 ${meter.regular};
             font: inherit;
-            font-size: xx-large;
+            font-size: x-large;
         }
         input::placeholder {
         }

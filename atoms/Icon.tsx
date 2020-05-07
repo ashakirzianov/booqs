@@ -1,25 +1,29 @@
 import React from 'react';
 
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { FontAwesomeIcon, FontAwesomeIconProps } from '@fortawesome/react-fontawesome';
 import {
     faPlus, faFontCase, faSignIn, faQuestion, faSearch,
     faFileAlt,
 } from '@fortawesome/pro-light-svg-icons';
+import {
+    faFacebookF,
+} from '@fortawesome/free-brands-svg-icons';
 import { assertNever } from '../core';
 
 export type IconName =
     | 'sign-in' | 'upload' | 'appearance' | 'search'
     | 'pages'
+    | 'facebook'
     ;
 
 export function Icon({ name, size }: {
     name: IconName,
-    size?: number,
+    size?: FontAwesomeIconProps['size'],
 }) {
     const icon = iconForName(name);
     return <FontAwesomeIcon
         icon={icon}
-        height={size}
+        size={size}
     />;
 }
 
@@ -35,6 +39,8 @@ function iconForName(name: IconName) {
             return faSearch;
         case 'pages':
             return faFileAlt;
+        case 'facebook':
+            return faFacebookF;
         default:
             assertNever(name);
             return faQuestion;
