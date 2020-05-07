@@ -1,18 +1,7 @@
-import { WithPopover } from "./Popover";
-import { IconButton } from "./IconButton";
 import { Menu, MenuItem } from "./Menu";
 import { meter } from "./meter";
 
-export function SignInButton() {
-    return <WithPopover
-        placement="bottom"
-        body={<SignInMenu />}
-    >
-        <IconButton icon="sign-in" />
-    </WithPopover>;
-}
-
-function SignInMenu() {
+export function SignInPanel() {
     return <div>
         <span>Sign In</span>
         <Menu>

@@ -1,18 +1,7 @@
-import { WithPopover } from "./Popover";
-import { IconButton } from "./IconButton";
 import { usePalette, bookFont, PaletteKey, palettes } from "./theme";
 import { meter } from "./meter";
 
-export function ThemerButton() {
-    return <WithPopover
-        placement="bottom"
-        body={<Themer />}
-    >
-        <IconButton icon="appearance" />
-    </WithPopover>;
-}
-
-function Themer() {
+export function ThemerPanel() {
     const { dimmed } = usePalette();
     return <div className="container">
         <FontSettings />

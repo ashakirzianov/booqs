@@ -3,8 +3,9 @@ import { headerHeight, meter } from './meter';
 import { Logo } from './Logo';
 import { SearchInput } from './SearchInput';
 import { IconButton } from './IconButton';
-import { SignInButton } from './SignIn';
-import { ThemerButton } from './Themer';
+import { SignInPanel } from './SignIn';
+import { ThemerPanel } from './Themer';
+import { Popovers } from './Popover';
 
 export function AppBar() {
     return <div className="container">
@@ -15,11 +16,7 @@ export function AppBar() {
             <SearchInput />
         </div>
         <div className="buttons">
-            <div className="buttons-row">
-                <IconButton icon="upload" />
-                <ThemerButton />
-                <SignInButton />
-            </div>
+            <AppButtons />
         </div>
         <style jsx>{`
             .container {
@@ -45,6 +42,29 @@ export function AppBar() {
                 flex-direction: column;
                 flex: 1 0;
             }
+            `}</style>
+    </div>;
+}
+
+function AppButtons() {
+    return <div className='buttons-row'>
+        <Popovers
+            items={[
+                {
+                    anchor: <IconButton icon='upload' />,
+                    body: null,
+                },
+                {
+                    anchor: <IconButton icon='appearance' />,
+                    body: <ThemerPanel />,
+                },
+                {
+                    anchor: <IconButton icon='sign-in' />,
+                    body: <SignInPanel />,
+                },
+            ]}
+        />
+        <style jsx>{`
             .buttons-row {
                 display: flex;
                 flex-direction: row;

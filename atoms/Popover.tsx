@@ -1,32 +1,43 @@
 import React, { ReactNode } from 'react';
 import { roundArrow } from 'tippy.js';
-import Tippy from '@tippyjs/react';
+import Tippy, { useSingleton } from '@tippyjs/react';
 import { HasChildren } from './utils';
 import { usePalette } from './theme';
 import { radius } from './meter';
 
-export function WithPopover({
-    body, placement, children,
-}: HasChildren & {
+export type PopoverItem = {
+    anchor: ReactNode,
     body: ReactNode,
-    placement: 'bottom',
+};
+export function Popovers({ items }: {
+    items: PopoverItem[],
 }) {
     const { primary, dimmed, background } = usePalette();
+    const [source, target] = useSingleton();
     return <>
         <Tippy
+            singleton={source}
             popperOptions={{ strategy: 'fixed' }}
             arrow={roundArrow + roundArrow}
-            placement={placement}
+            placement='bottom'
             interactive={true}
             hideOnClick={true}
             animation='shift-away'
-            content={
-                <div className="body">
-                    {body}
-                </div>
-            }>
-            <div>{children}</div>
-        </Tippy>
+        />
+        {
+            items.map(
+                ({ anchor, body }, idx) => body
+                    ? <Tippy
+                        key={idx}
+                        singleton={target}
+                        content={<div className="body">
+                            {body}
+                        </div>}
+                        children={<div>{anchor}</div>}
+                    />
+                    : anchor
+            )
+        }
         <style jsx>{`
             .body {
                 display: flex;
