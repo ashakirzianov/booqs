@@ -1,7 +1,6 @@
 import React from 'react';
 import Head from 'next/head';
 import { HasChildren } from './utils';
-import { meter } from './meter';
 
 export function Page({ title, children }: HasChildren & {
     title: string,
@@ -19,6 +18,7 @@ export function Page({ title, children }: HasChildren & {
             }
             .page {
                 display: flex;
+                flex: 1;
                 flex-direction: column;
             }
             body {

@@ -21,16 +21,16 @@ export function WithPopover({
             hideOnClick={true}
             animation='shift-away'
             content={
-                <div className="content">
+                <div className="body">
                     {body}
                 </div>
             }>
             <div>{children}</div>
         </Tippy>
         <style jsx>{`
-            .content {
+            .body {
                 display: flex;
-                min-width: 12rem;
+                min-width: 15rem;
                 flex: 1;
             }
             `}</style>
