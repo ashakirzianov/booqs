@@ -1,4 +1,5 @@
 import React from 'react';
+import { radius } from './meter';
 
 const coverWidth = 140;
 const coverHeight = 210;
@@ -21,6 +22,7 @@ export function BooqCover({ cover, title, author }: {
                 width: ${coverWidth}px;
                 height: ${coverHeight}px;
                 align-items: stretch;
+                border-radius: ${radius};
                 overflow: hidden;
             }
             `}</style>

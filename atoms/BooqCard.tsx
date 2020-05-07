@@ -1,18 +1,28 @@
 import React from 'react';
 import { PropsType } from './utils';
 import { BooqCover } from './BooqCover';
-import { meter, radius } from './meter';
-import { usePalette, panelShadow } from './theme';
+import { meter } from './meter';
+import { usePalette } from './theme';
+import { Panel } from './Panel';
 
 export type BooqTag = {
     tag: string,
     value?: string,
 };
 
-const cardWidth = '40rem';
-
 export type BooqCardProps = PropsType<typeof BooqCard>;
-export function BooqCard({
+export function BooqCard(props: {
+    title?: string,
+    author?: string,
+    cover?: string,
+    tags: BooqTag[],
+}) {
+    return <Panel>
+        <BooqCardContent {...props} />
+    </Panel>;
+}
+
+function BooqCardContent({
     title, author, cover, tags,
 }: {
     title?: string,
@@ -20,7 +30,7 @@ export function BooqCard({
     cover?: string,
     tags: BooqTag[],
 }) {
-    return <div className="panel">
+    return <div className="container">
         <BooqCover
             title={title}
             author={author}
@@ -34,24 +44,18 @@ export function BooqCard({
             <Actions />
         </div>
         <style jsx>{`
-            .panel {
+            .container {
                 display: flex;
                 flex-direction: row;
-                flex: 0 1;
-                width: 100%;
-                max-width: ${cardWidth};
-                margin: ${meter.large};
-                border-radius: ${radius};
-                box-shadow: ${panelShadow};
-                overflow: hidden;
+                flex: 1;
+                padding: ${meter.large};
             }
             .details {
                 display: flex;
                 flex-direction: column;
+                flex: 1;
                 justify-content: space-between;
-                margin-left: ${meter.large};
-                padding: ${meter.large};
-                width: 100%;
+                margin-left: ${meter.xxLarge};
             }
             `}</style>
     </div>;
