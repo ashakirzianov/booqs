@@ -1,8 +1,8 @@
 import React, { ReactNode } from 'react';
+import { roundArrow } from 'tippy.js';
 import Tippy from '@tippyjs/react';
-import 'tippy.js/animations/shift-away.css';
 import { HasChildren } from './utils';
-import { usePalette, panelShadow } from './theme';
+import { usePalette } from './theme';
 import { radius, meter } from './meter';
 
 export function WithPopover({
@@ -11,13 +11,11 @@ export function WithPopover({
     body: ReactNode,
     placement: 'bottom',
 }) {
-    const { primary } = usePalette();
+    const { primary, dimmed, background } = usePalette();
     return <>
         <Tippy
-            // popperOptions={{ strategy: 'fixed' }}
-            // arrow={true}
-            // offset={[0, -10]}
-            theme='custom'
+            popperOptions={{ strategy: 'fixed' }}
+            arrow={roundArrow + roundArrow}
             placement={placement}
             interactive={true}
             hideOnClick={true}
@@ -30,15 +28,23 @@ export function WithPopover({
             <div>{children}</div>
         </Tippy>
         <style jsx>{`
-        .tippy-box[data-theme~=\'custom\'] {
-            z-index: 100;
-            background-color: ${primary};
-            box-shadow: ${panelShadow};
-            border-radius: ${radius};
-        }
         .content {
-            z-index: 100;
             padding: ${meter.large};
+        }
+            `}</style>
+        <style jsx global>{`
+        .tippy-box {
+            color: ${primary};
+            background-color: ${background};
+            box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
+            border-radius: ${radius};
+            border: 1px solid ${dimmed};
+        }
+        .tippy-svg-arrow > svg:first-child {
+            fill: ${dimmed};
+        }
+        .tippy-svg-arrow > svg:last-child {
+            fill: ${background};
         }
             `}</style>
     </>;

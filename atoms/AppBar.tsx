@@ -3,6 +3,7 @@ import { headerHeight, meter } from './meter';
 import { Logo } from './Logo';
 import { SearchInput } from './SearchInput';
 import { IconButton } from './IconButton';
+import { SignInButton } from './SignIn';
 
 export function AppBar() {
     return <div className="container">
@@ -16,7 +17,7 @@ export function AppBar() {
             <div className="buttons-row">
                 <IconButton icon="upload" />
                 <IconButton icon="appearance" />
-                <IconButton icon="sign-in" />
+                <SignInButton />
             </div>
         </div>
         <style jsx>{`
