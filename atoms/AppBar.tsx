@@ -2,10 +2,11 @@ import React from 'react';
 import { headerHeight, meter } from './meter';
 import { Logo } from './Logo';
 import { SearchInput } from './SearchInput';
-import { IconButton } from './IconButton';
+import { IconButton } from './Buttons';
 import { SignInPanel } from './SignIn';
 import { ThemerPanel } from './Themer';
 import { Popovers } from './Popover';
+import { UploadPanel } from './Upload';
 
 export function AppBar() {
     return <div className="container">
@@ -52,7 +53,7 @@ function AppButtons() {
             items={[
                 {
                     anchor: <IconButton icon='upload' />,
-                    body: null,
+                    body: <UploadPanel />,
                 },
                 {
                     anchor: <IconButton icon='appearance' />,

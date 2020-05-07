@@ -2,7 +2,7 @@ import React, { ReactNode } from 'react';
 import { roundArrow } from 'tippy.js';
 import Tippy, { useSingleton } from '@tippyjs/react';
 import { HasChildren } from './utils';
-import { usePalette } from './theme';
+import { usePalette, panelShadow } from './theme';
 import { radius } from './meter';
 
 export type PopoverItem = {
@@ -49,7 +49,7 @@ export function Popovers({ items }: {
         .tippy-box {
             color: ${primary};
             background-color: ${background};
-            box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
+            box-shadow: ${panelShadow};
             border: 1px solid ${dimmed};
             border-radius: ${radius};
         }

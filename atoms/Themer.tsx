@@ -1,4 +1,6 @@
-import { usePalette, bookFont, PaletteKey, palettes } from "./theme";
+import {
+    usePalette, bookFont, PaletteKey, palettes, buttonShadow,
+} from "./theme";
 import { meter } from "./meter";
 
 export function ThemerPanel() {
@@ -104,7 +106,7 @@ function PaletteButton({ name, checked }: {
                 overflow: hidden;
                 background-color: ${background};
                 color: ${primary};
-                box-shadow: 0px 0px 5px rgba(0,0,0,0.3);
+                box-shadow: ${buttonShadow};
                 cursor: pointer;
             }
             .container:hover {

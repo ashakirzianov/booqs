@@ -1,9 +1,12 @@
-export const panelShadow = '0px 3px 7px rgba(0, 0, 0, 0.1)';
+export const panelShadow = '0px 0px 5px rgba(0, 0, 0, 0.1)';
+export const buttonShadow = '0px 3px 5px rgba(0,0,0,0.1)';
 export const brandColor = 'orange';
 export const menuFont = 'Lato';
 export const bookFont = 'Lora';
 
+export type Color = keyof Palette;
 export type Palette = {
+    light: string,
     background: string,
     primary: string,
     dimmed: string,
@@ -20,18 +23,21 @@ export function usePalette(): Palette {
 
 export const palettes: Palettes = {
     light: {
+        light: 'white',
         background: 'white',
         primary: 'black',
         dimmed: '#ddd',
         highlight: brandColor,
     },
     sepia: {
+        light: 'white',
         background: '#f9f3e9',
         primary: '#5f3e24',
         dimmed: '#ddd',
         highlight: brandColor,
     },
     dark: {
+        light: 'black',
         background: 'black',
         primary: '#999',
         dimmed: '#333',
