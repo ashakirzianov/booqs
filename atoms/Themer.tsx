@@ -51,6 +51,9 @@ function FontScaleButton({ scale }: {
     return <div>
         <span>Abc</span>
         <style jsx>{`
+            div {
+                cursor: pointer;
+            }
             span {
                 font-size: ${fontSize};
                 font-family: ${bookFont}
