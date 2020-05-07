@@ -1,8 +1,8 @@
 import React from 'react';
 import { PropsType } from './utils';
 import { BooqCover } from './BooqCover';
-import { meter } from './meter';
-import { usePalette } from './theme';
+import { meter, radius } from './meter';
+import { usePalette, panelShadow } from './theme';
 
 export type BooqTag = {
     tag: string,
@@ -10,7 +10,6 @@ export type BooqTag = {
 };
 
 const cardWidth = '40rem';
-const panelShadow = '0px 3px 7px rgba(0, 0, 0, 0.1)';
 
 export type BooqCardProps = PropsType<typeof BooqCard>;
 export function BooqCard({
@@ -42,7 +41,7 @@ export function BooqCard({
                 width: 100%;
                 max-width: ${cardWidth};
                 margin: ${meter.large};
-                border-radius: 5px;
+                border-radius: ${radius};
                 box-shadow: ${panelShadow};
                 overflow: hidden;
             }

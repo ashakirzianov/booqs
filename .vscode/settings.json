@@ -24,6 +24,7 @@
         "promisify",
         "rgrove",
         "srcs",
+        "tippyjs",
         "xmls"
     ]
 }

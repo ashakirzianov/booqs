@@ -12,3 +12,5 @@ export const meter = {
 
 export const buttonSize = 50;
 export const headerHeight = 75;
+
+export const radius = '5px';
