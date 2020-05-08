@@ -1,23 +1,11 @@
 import React from 'react';
-import { PropsType } from './utils';
 import { BooqCover } from './BooqCover';
 import { meter } from './meter';
-import { usePalette } from './theme';
 import { Panel } from './Panel';
 import { LinkButton } from './Buttons';
+import { BooqTag, BooqData } from './types';
 
-export type BooqTag = {
-    tag: string,
-    value?: string,
-};
-
-export type BooqCardProps = PropsType<typeof BooqCard>;
-export function BooqCard(props: {
-    title?: string,
-    author?: string,
-    cover?: string,
-    tags: BooqTag[],
-}) {
+export function BooqCard(props: BooqData) {
     return <Panel>
         <BooqCardContent {...props} />
     </Panel>;

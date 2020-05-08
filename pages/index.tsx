@@ -1,6 +1,6 @@
 import { Page } from "../atoms/Page";
 import { AppBar } from "../atoms/AppBar";
-import { BooqCardProps } from "../atoms/BooqCard";
+import { BooqData } from "../atoms/types";
 import { Featured } from "../atoms/Featured";
 import { Preview } from "../atoms/BooqPreview";
 import { Positions } from "../atoms/Positions";
@@ -15,7 +15,7 @@ export async function getStaticProps() {
 }
 
 export default function Home({ cards, previews }: {
-  cards: BooqCardProps[],
+  cards: BooqData[],
   previews: Preview[],
 }) {
   return <Page title="Booqs">
@@ -32,7 +32,7 @@ export default function Home({ cards, previews }: {
   </Page>;
 }
 
-const cards: BooqCardProps[] = [
+const cards: BooqData[] = [
   {
     title: 'Republic',
     author: 'Plato',
