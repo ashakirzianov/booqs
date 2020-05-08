@@ -90,7 +90,7 @@ export function Search() {
     </div>;
 }
 
-function SearchResult({ card }: {
+function SearchResult({ card, query }: {
     card: BooqData,
     query: string,
 }) {
@@ -103,8 +103,14 @@ function SearchResult({ card }: {
             size={20}
         />
         <div className='details'>
-            <span className='title'>{card.title}</span>
-            <span className='author'>{card.author}</span>
+            <EmphasizedSpan
+                text={card.title ?? ''}
+                emphasis={query}
+            />
+            <EmphasizedSpan
+                text={card.author ?? ''}
+                emphasis={query}
+            />
         </div>
         <style jsx>{`
             .container {
@@ -126,4 +132,55 @@ function SearchResult({ card }: {
             }
             `}</style>
     </div>
+}
+
+function EmphasizedSpan({ text, emphasis }: {
+    text: string,
+    emphasis: string,
+}) {
+    const spans = buildEmphasis(text, emphasis);
+    console.log(spans);
+    return <span>
+        {
+            spans.map(
+                (s, idx) => <span key={idx} style={{
+                    fontWeight: s.emphasized
+                        ? 'bold'
+                        : undefined,
+                }}>
+                    {s.text}
+                </span>
+            )
+        }
+    </span>;
+}
+
+type AttributedSpan = {
+    text: string,
+    emphasized: boolean,
+}
+function buildEmphasis(text: string, emphasis: string): AttributedSpan[] {
+    if (!emphasis.length) {
+        return [{ text, emphasized: false }];
+    }
+    const index = text.toLowerCase().indexOf(emphasis.toLowerCase());
+    if (index >= 0) {
+        const pre = text.substr(0, index);
+        const emp = text.substr(index, emphasis.length);
+        const next = text.substr(index + emphasis.length);
+        const nextSpans = buildEmphasis(next, emphasis);
+        return [
+            {
+                text: pre,
+                emphasized: false,
+            },
+            {
+                text: emp,
+                emphasized: true,
+            },
+            ...nextSpans,
+        ];
+    } else {
+        return [{ text, emphasized: false }];
+    }
 }
