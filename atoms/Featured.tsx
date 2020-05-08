@@ -1,8 +1,9 @@
 import React from 'react';
-import { BooqCardProps, BooqCard } from './BooqCard';
+import { BooqCard } from './BooqCard';
+import { BooqData } from './types';
 
 export function Featured({ cards }: {
-    cards: BooqCardProps[],
+    cards: BooqData[],
 }) {
     return <div>
         {
