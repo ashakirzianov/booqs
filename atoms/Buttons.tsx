@@ -22,6 +22,7 @@ export function IconButton({ icon, onClick }: {
                 font-size: x-large;
                 cursor: pointer;
                 transition: color 0.25s;
+                background-color: rgba(0, 0, 0, 0);
             }
             button:hover {
                 color: ${highlight};
