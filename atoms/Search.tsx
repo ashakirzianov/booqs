@@ -67,6 +67,9 @@ export function Search() {
         .results {
             display: none;
             flex-direction: column;
+            border-bottom-left-radius: ${radius};
+            border-bottom-right-radius: ${radius};
+            overflow: hidden;
         }
         input:focus + .results {
             display: flex;
