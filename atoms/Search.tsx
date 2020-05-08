@@ -139,7 +139,6 @@ function EmphasizedSpan({ text, emphasis }: {
     emphasis: string,
 }) {
     const spans = buildEmphasis(text, emphasis);
-    console.log(spans);
     return <span>
         {
             spans.map(

@@ -1,4 +1,5 @@
 import React from 'react';
+import { menuFont } from './theme';
 
 export function Logo() {
     return <div>
@@ -6,7 +7,7 @@ export function Logo() {
         <style jsx>{`
             div {
                 color: rgba(253,163,2,1);
-                font: inherit;
+                font-family: ${menuFont};
                 font-size: x-large;
                 font-weight: bold;
                 background: -webkit-linear-gradient(180deg, rgba(253,163,2,1) 50%, rgb(200, 145, 2) 100%);

@@ -1,6 +1,7 @@
 import React from 'react';
 import Head from 'next/head';
 import { HasChildren } from './utils';
+import { menuFont, bookFont } from './theme';
 
 export function Page({ title, children }: HasChildren & {
     title: string,
@@ -9,7 +10,6 @@ export function Page({ title, children }: HasChildren & {
         <Head>
             <title>{title}</title>
             <meta name="viewport" content="initial-scale=1.0, width=device-width" />
-            <FontLinks />
         </Head>
         {children}
         <style jsx global>{`
@@ -24,17 +24,11 @@ export function Page({ title, children }: HasChildren & {
             body {
                 margin: 0;
                 padding: 0;
-                font-family: Lato;
+                font-family: ${menuFont};
                 font-weight: 100;
                 overflow-x: hidden;
             }
+            @import url('https://fonts.googleapis.com/css2?family=${menuFont}&family=${bookFont}&display=swap');
         `}</style>
     </div>;
-}
-
-export function FontLinks() {
-    return <>
-        <link href="https://fonts.googleapis.com/css?family=Lato&display=swap" rel="stylesheet" />
-        <link href="https://fonts.googleapis.com/css?family=Lora&display=swap" rel="stylesheet" />
-    </>;
 }
