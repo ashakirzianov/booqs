@@ -26,6 +26,7 @@ export function Page({ title, children }: HasChildren & {
                 padding: 0;
                 font-family: Lato;
                 font-weight: 100;
+                overflow-x: hidden;
             }
         `}</style>
     </div>;

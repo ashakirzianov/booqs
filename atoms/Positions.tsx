@@ -6,32 +6,26 @@ export function Positions({ previews }: {
     previews: Preview[],
 }) {
     return <div className='container'>
-        <div className='content'>
-            {
-                previews.map(
-                    (p, idx) => <div className='preview-container'>
-                        <BooqPreview key={idx} {...p} />
-                    </div>
-                )
-            }
-        </div>
+        {
+            previews.map(
+                (p, idx) => <div className='preview'>
+                    <BooqPreview key={idx} {...p} />
+                </div>
+            )
+        }
         <style jsx>{`
             .container {
                 display: flex;
+                flex: 1 1;
                 flex-direction: row;
-                justify-content: center;
-                overflow: scroll;
                 padding: ${meter.xLarge};
+                overflow: scroll;
                 scroll-snap-type: x mandatory;
             }
-            .content {
-                display: flex;
-                max-width: 100%;
-            }
-            .preview-container {
+            .preview {
                 display: flex;
                 padding: 0 ${meter.large};
-                scroll-snap-align: start;
+                scroll-snap-align: center;
             }
             `}</style>
     </div>
