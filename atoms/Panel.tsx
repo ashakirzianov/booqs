@@ -3,7 +3,7 @@ import { HasChildren } from './utils';
 import { meter, radius } from './meter';
 import { panelShadow } from './theme';
 
-const panelWith = '40rem';
+export const panelWidth = '40rem';
 
 export function Panel({ children }: HasChildren) {
     return <div className="panel">
@@ -14,7 +14,7 @@ export function Panel({ children }: HasChildren) {
                 flex-direction: row;
                 flex: 0 1;
                 width: 100%;
-                max-width: ${panelWith};
+                max-width: ${panelWidth};
                 margin: ${meter.xLarge};
                 border-radius: ${radius};
                 overflow: hidden;

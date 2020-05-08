@@ -10,6 +10,7 @@ export type Palette = {
     background: string,
     primary: string,
     dimmed: string,
+    border: string,
     highlight: string,
 };
 export type PaletteKey = 'light' | 'sepia' | 'dark';
@@ -26,21 +27,24 @@ export const palettes: Palettes = {
         light: 'white',
         background: 'white',
         primary: 'black',
-        dimmed: '#ddd',
+        dimmed: '#888',
+        border: '#ddd',
         highlight: brandColor,
     },
     sepia: {
         light: 'white',
         background: '#f9f3e9',
         primary: '#5f3e24',
-        dimmed: '#ddd',
+        dimmed: '#888',
+        border: '#ddd',
         highlight: brandColor,
     },
     dark: {
         light: 'black',
         background: 'black',
         primary: '#999',
-        dimmed: '#333',
+        dimmed: '#888',
+        border: '#333',
         highlight: 'white',
     },
 }

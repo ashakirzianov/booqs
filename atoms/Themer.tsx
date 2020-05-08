@@ -4,7 +4,7 @@ import {
 import { meter } from "./meter";
 
 export function ThemerPanel() {
-    const { dimmed } = usePalette();
+    const { border } = usePalette();
     return <div className="container">
         <FontSettings />
         <hr />
@@ -21,7 +21,7 @@ export function ThemerPanel() {
                 margin: ${meter.xLarge} 0;
                 align-self: center;
                 border: none;
-                border-top: 1px solid ${dimmed};
+                border-top: 1px solid ${border};
             }
         `}</style>
     </div>;

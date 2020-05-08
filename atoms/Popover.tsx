@@ -12,7 +12,7 @@ export type PopoverItem = {
 export function Popovers({ items }: {
     items: PopoverItem[],
 }) {
-    const { primary, dimmed, background } = usePalette();
+    const { primary, border, background } = usePalette();
     const [source, target] = useSingleton();
     return <>
         <Tippy
@@ -50,7 +50,7 @@ export function Popovers({ items }: {
             color: ${primary};
             background-color: ${background};
             box-shadow: ${panelShadow};
-            border: 1px solid ${dimmed};
+            border: 1px solid ${border};
             border-radius: ${radius};
         }
         .tippy-content {
@@ -59,7 +59,7 @@ export function Popovers({ items }: {
             border-radius: ${radius};
         }
         .tippy-svg-arrow > svg:first-child {
-            fill: ${dimmed};
+            fill: ${border};
         }
         .tippy-svg-arrow > svg:last-child {
             fill: ${background};
