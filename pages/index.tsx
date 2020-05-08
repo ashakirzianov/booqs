@@ -2,7 +2,7 @@ import { Page } from "../atoms/Page";
 import { AppBar } from "../atoms/AppBar";
 import { BooqData, cards, previews, Preview } from "../atoms/data";
 import { Featured } from "../atoms/Featured";
-import { Positions } from "../atoms/Positions";
+import { ReadingHistory } from "../atoms/ReadingHistory";
 
 export async function getStaticProps() {
   return {
@@ -19,7 +19,7 @@ export default function Home({ cards, previews }: {
 }) {
   return <Page title="Booqs">
     <AppBar />
-    <Positions previews={previews} />
+    <ReadingHistory />
     <Featured cards={cards} />
     <style jsx>{`
       div {

@@ -1,10 +1,12 @@
 import { BooqPreview } from "./BooqPreview";
 import { meter } from "./meter";
-import { Preview } from "./data";
+import { previews } from "./data";
 
-export function Positions({ previews }: {
-    previews: Preview[],
-}) {
+export function ReadingHistory() {
+    return <Positions />;
+}
+
+function Positions() {
     return <div className='container'>
         {
             previews.map(
