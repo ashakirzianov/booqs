@@ -116,7 +116,7 @@ function SearchResult({ card, query }: {
             .container {
                 display: flex;
                 flex-direction: row;
-                font-size: small;
+                font-size: medium;
                 padding: ${meter.regular};
                 transition: background-color 0.25s, color 0.25s;
                 cursor: pointer;
