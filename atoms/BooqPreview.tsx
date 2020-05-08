@@ -20,11 +20,12 @@ export function BooqPreview({
         <style jsx>{`
             .container {
                 display: flex;
-                flex: 1;
+                flex: 1 0 auto;
+                width: 75vw;
                 max-width: ${panelWidth};
                 flex-direction: column;
                 align-items: center;
-                box-shadow: ${panelShadow};
+                box-shadow: 0px 5px 15px rgba(0,0,0,0.1);
                 font-family: ${bookFont};
                 font-size: large;
                 border-radius: ${radius};
