@@ -1,13 +1,7 @@
 import { usePalette, bookFont } from "./theme";
 import { meter, radius } from "./meter";
 import { panelWidth } from "./Panel";
-
-export type Preview = {
-    text: string,
-    title: string,
-    page: number,
-    length: number,
-};
+import { Preview } from "./data";
 
 export function BooqPreview({
     text, title, page,

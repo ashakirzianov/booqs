@@ -1,7 +1,7 @@
 import React from 'react';
 import { headerHeight, meter } from './meter';
 import { Logo } from './Logo';
-import { SearchInput } from './SearchInput';
+import { Search } from './Search';
 import { IconButton } from './Buttons';
 import { SignInPanel } from './SignIn';
 import { ThemerPanel } from './Themer';
@@ -14,7 +14,7 @@ export function AppBar() {
             <Logo />
         </div>
         <div className="search">
-            <SearchInput />
+            <Search />
         </div>
         <div className="buttons">
             <AppButtons />

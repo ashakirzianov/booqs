@@ -1,6 +1,6 @@
 import React from 'react';
 import { BooqCard } from './BooqCard';
-import { BooqData } from './types';
+import { BooqData } from './data';
 
 export function Featured({ cards }: {
     cards: BooqData[],

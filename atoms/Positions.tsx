@@ -1,6 +1,6 @@
-import { Preview, BooqPreview } from "./BooqPreview";
+import { BooqPreview } from "./BooqPreview";
 import { meter } from "./meter";
-import { panelWidth } from "./Panel";
+import { Preview } from "./data";
 
 export function Positions({ previews }: {
     previews: Preview[],

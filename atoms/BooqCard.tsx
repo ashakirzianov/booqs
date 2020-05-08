@@ -3,7 +3,7 @@ import { BooqCover } from './BooqCover';
 import { meter } from './meter';
 import { Panel } from './Panel';
 import { LinkButton } from './Buttons';
-import { BooqTag, BooqData } from './types';
+import { BooqTag, BooqData } from './data';
 
 export function BooqCard(props: BooqData) {
     return <Panel>
