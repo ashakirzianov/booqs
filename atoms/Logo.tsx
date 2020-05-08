@@ -1,15 +1,19 @@
 import React from 'react';
-import { brandColor } from './theme';
 
 export function Logo() {
     return <div>
         BOOQS
         <style jsx>{`
             div {
-                color: ${brandColor};
+                color: rgba(253,163,2,1);
                 font: inherit;
                 font-size: x-large;
                 font-weight: bold;
+                background: -webkit-linear-gradient(180deg, rgba(253,163,2,1) 50%, rgb(200, 145, 2) 100%);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                cursor: default;
+                user-select: none;
             }
         `}</style>
     </div>
