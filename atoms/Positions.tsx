@@ -18,7 +18,8 @@ export function Positions({ previews }: {
                 display: flex;
                 flex: 1 1;
                 flex-direction: row;
-                padding: ${meter.xLarge} 50vw;
+                box-sizing: border-box;
+                padding: ${meter.xLarge} 25vw;
                 overflow: scroll;
                 scroll-snap-type: x mandatory;
             }

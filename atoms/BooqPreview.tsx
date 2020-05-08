@@ -25,7 +25,7 @@ export function BooqPreview({
                 max-width: ${panelWidth};
                 flex-direction: column;
                 align-items: center;
-                box-shadow: 0px 5px 15px rgba(0,0,0,0.1);
+                box-shadow: 0px 5px 15px rgba(0,0,0,0.1), 0px 0px 5px rgba(0,0,0,0.05) inset;
                 font-family: ${bookFont};
                 font-size: large;
                 border-radius: ${radius};
