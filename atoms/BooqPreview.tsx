@@ -1,4 +1,4 @@
-import { panelShadow, usePalette, bookFont } from "./theme";
+import { usePalette, bookFont } from "./theme";
 import { meter, radius } from "./meter";
 import { panelWidth } from "./Panel";
 
@@ -25,11 +25,15 @@ export function BooqPreview({
                 max-width: ${panelWidth};
                 flex-direction: column;
                 align-items: center;
-                box-shadow: 0px 5px 15px rgba(0,0,0,0.1), 0px 0px 5px rgba(0,0,0,0.05) inset;
+                box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1), 0px 0px 5px rgba(0, 0, 0, 0.05) inset;
                 font-family: ${bookFont};
                 font-size: large;
                 border-radius: ${radius};
                 cursor: pointer;
+                transition: box-shadow 0.25s;
+            }
+            .container:hover {
+                box-shadow: 0px 5px 15px rgba(0,0,0,0.1), 0px 0px 5px rgba(0,0,0,0.05) inset;
             }
             .title {
                 display: flex;

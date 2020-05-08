@@ -19,9 +19,6 @@ export function Panel({ children }: HasChildren) {
                 border-radius: ${radius};
                 overflow: hidden;
             }
-            .panel:hover {
-                box-shadow: ${panelShadow};
-            }
             `}</style>
     </div>;
 }
