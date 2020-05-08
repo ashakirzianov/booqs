@@ -1,26 +1,27 @@
 import React from 'react';
 import { radius } from './meter';
 
-const coverWidth = 140;
-const coverHeight = 210;
+const defaultSize = 70;
 
-export function BooqCover({ cover, title, author }: {
+export function BooqCover({ cover, title, author, size }: {
     cover?: string,
     title?: string,
     author?: string,
+    size?: number,
 }) {
+    size = size ?? defaultSize;
     return <div>
         {
             cover
                 ? <BooqImageCover cover={cover} title={title} />
-                : <BooqDefaultCover title={title} author={author} />
+                : <BooqDefaultCover title={title} author={author} size={size} />
         }
         <style jsx>{`
             div {
                 display: flex;
                 flex-shrink: 0;
-                width: ${coverWidth}px;
-                height: ${coverHeight}px;
+                width: ${size * 2}px;
+                height: ${size * 3}px;
                 align-items: stretch;
                 border-radius: ${radius};
                 overflow: hidden;
@@ -47,27 +48,14 @@ function BooqImageCover({ cover, title }: {
     </div>;
 }
 
-function BooqDefaultCover({ title, author }: {
+function BooqDefaultCover({ title, author, size }: {
     title?: string,
     author?: string,
+    size: number,
 }) {
     const { back, text } = colorForString(title ?? 'no-title' + author);
     return <div title={title} className=".container">
-        <div style={{
-            display: 'flex',
-            flexGrow: 1,
-            flexDirection: 'column',
-            alignItems: 'center',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            textAlign: 'center',
-            paddingTop: 20,
-            paddingLeft: 5,
-            paddingRight: 5,
-            fontSize: calcFontSize(title ?? 'no-title'),
-            background: back,
-            color: text,
-        }}>
+        <div>
             {title}
         </div>
         <style jsx>{`
@@ -86,7 +74,7 @@ function BooqDefaultCover({ title, author }: {
                 text-overflow: ellipsis;
                 text-align: center;
                 padding: 20px 5px 0px 5px;
-                font-size: ${calcFontSize(title ?? 'no-title')};
+                font-size: ${calcFontSize(title ?? 'no-title', size)};
                 background: ${back};
                 color: text;
             }
@@ -95,16 +83,16 @@ function BooqDefaultCover({ title, author }: {
 }
 
 // TODO: rethink this
-function calcFontSize(title: string) {
+function calcFontSize(title: string, size: number) {
     const words = title
         .split(' ')
         .sort((a, b) => b.length - a.length);
     const maxLength = words[0]?.length ?? 0;
     const count = title.length / 10;
-    const width = coverWidth / maxLength;
-    const height = coverHeight / count * 0.75;
-    const size = Math.floor(Math.min(width, height));
-    return `${size}px`;
+    const width = (size * 2) / maxLength;
+    const height = (size * 3) / count * 0.75;
+    const result = Math.floor(Math.min(width, height));
+    return `${result}px`;
 }
 
 function colorForString(s: string) {
