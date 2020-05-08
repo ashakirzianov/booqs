@@ -4,6 +4,7 @@ import { meter } from './meter';
 import { Panel } from './Panel';
 import { LinkButton } from './Buttons';
 import { BooqTag, BooqData } from './data';
+import { boldWeight } from './theme';
 
 export function BooqCard(props: BooqData) {
     return <Panel>
@@ -65,7 +66,7 @@ function Header({ title, author }: {
             }
             .title {
                 font-size: x-large;
-                font-weight: normal;
+                font-weight: ${boldWeight};
             }
             .author {
                 font-size: large;

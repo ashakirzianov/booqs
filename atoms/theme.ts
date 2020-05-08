@@ -1,7 +1,12 @@
 export const panelShadow = '0px 0px 5px rgba(0, 0, 0, 0.1)';
 export const buttonShadow = '0px 3px 5px rgba(0,0,0,0.1)';
-export const menuFont = 'Lato';
+export const menuFontPrimary = 'Lato';
+export const logoFont = 'Lato';
+export const menuFont = `${menuFontPrimary}, Sans-Serif`;
 export const bookFont = 'Lora';
+export const normalWeight = 200;
+export const boldWeight = 400;
+export const extraBoldWeight = 700;
 
 export type Color = keyof Palette;
 export type Palette = {

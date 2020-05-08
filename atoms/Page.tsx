@@ -1,7 +1,7 @@
 import React from 'react';
 import Head from 'next/head';
 import { HasChildren } from './utils';
-import { menuFont, bookFont } from './theme';
+import { menuFont, bookFont, normalWeight, boldWeight, extraBoldWeight, menuFontPrimary, logoFont } from './theme';
 
 export function Page({ title, children }: HasChildren & {
     title: string,
@@ -25,10 +25,10 @@ export function Page({ title, children }: HasChildren & {
                 margin: 0;
                 padding: 0;
                 font-family: ${menuFont};
-                font-weight: 100;
+                font-weight: ${normalWeight};
                 overflow-x: hidden;
             }
-            @import url('https://fonts.googleapis.com/css2?family=${menuFont}&family=${bookFont}&display=swap');
+            @import url('https://fonts.googleapis.com/css2?family=${menuFontPrimary}:wght@${normalWeight};${boldWeight};${extraBoldWeight}&${logoFont}:wght@${normalWeight};${boldWeight};${extraBoldWeight}&family=${bookFont}&display=swap');
         `}</style>
     </div>;
 }

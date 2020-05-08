@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { usePalette } from './theme';
+import { usePalette, normalWeight } from './theme';
 import { meter, radius } from './meter';
 import { BooqData, cards } from './data';
 import { BooqCover } from './BooqCover';
@@ -55,6 +55,7 @@ export function Search() {
             margin: ${meter.regular} ${meter.regular} ${meter.regular} ${meter.large};
             font: inherit;
             font-size: x-large;
+            font-weight: ${normalWeight};
             background-color: rgba(0,0,0,0);
         }
         input:focus {

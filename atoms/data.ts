@@ -18,6 +18,17 @@ export type Preview = {
 
 export const cards: BooqData[] = [
     {
+        title: 'Война и Мир',
+        author: 'Лев Толстой',
+        cover: 'https://assets1.bmstatic.com/assets/books-covers/48/36/TXGRits7-ipad.jpg',
+        tags: [
+            { tag: 'pages', value: '934' },
+            { tag: 'language', value: 'ru' },
+            { tag: 'subject', value: 'Классика' },
+            { tag: 'subject', value: 'Художественная литература' },
+        ],
+    },
+    {
         title: 'Republic',
         author: 'Plato',
         cover: 'https://booka-lib-images.s3.amazonaws.com/@cover@large@pg55201',
