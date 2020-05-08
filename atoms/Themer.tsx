@@ -58,7 +58,8 @@ function FontScaleButton({ scale }: {
             }
             span {
                 font-size: ${fontSize};
-                font-family: ${bookFont}
+                font-family: ${bookFont};
+                transition: color 0.25s;
             }
             span:hover {
                 color: ${highlight};
@@ -108,6 +109,7 @@ function PaletteButton({ name, checked }: {
                 color: ${primary};
                 box-shadow: ${buttonShadow};
                 cursor: pointer;
+                transition: color 0.25s, border 0.25s;
             }
             .container:hover {
                 color: ${highlight};

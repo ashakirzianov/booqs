@@ -4,6 +4,7 @@ import { BooqCover } from './BooqCover';
 import { meter } from './meter';
 import { usePalette } from './theme';
 import { Panel } from './Panel';
+import { LinkButton } from './Buttons';
 
 export type BooqTag = {
     tag: string,
@@ -174,24 +175,4 @@ function Actions() {
         }
         `}</style>
     </div>;
-}
-
-function LinkButton({ text }: {
-    text: string,
-}) {
-    const { highlight } = usePalette();
-    return <>
-        <a>{text}</a>
-        <style jsx>{`
-        a {
-            color: ${highlight};
-            text-decoration: none;
-            font-size: large;
-            cursor: pointer;
-        }
-        a:hover {
-            text-decoration: underline;
-        }
-        `}</style>
-    </>;
 }

@@ -3,7 +3,7 @@ import { usePalette } from './theme';
 import { meter } from './meter';
 
 export function SearchInput() {
-    const { primary } = usePalette();
+    const { primary, dimmed } = usePalette();
     return <div>
         <input
             type="text"
@@ -25,6 +25,7 @@ export function SearchInput() {
             font-size: x-large;
         }
         input::placeholder {
+            color: ${dimmed};
         }
         `}</style>
     </div>;
