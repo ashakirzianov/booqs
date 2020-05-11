@@ -1,6 +1,6 @@
 import { inspect } from 'util';
 import { flatten, uniq } from 'lodash';
-import { BooqMeta, Booq } from '../../core';
+import { BooqMeta, Booq, booqLength } from '../../core';
 import { parseEpub } from '../../parser';
 import { makeBatches } from '../utils';
 import { listObjects, downloadAsset, Asset } from '../s3';
@@ -56,7 +56,7 @@ async function downloadAndInsert(assetId: string, uploader: ImageUploader) {
         report(`Couldn't parse epub: ${assetId}`);
         return;
     }
-    const document = await insertRecord(booq.meta, assetId);
+    const document = await insertRecord(booq, assetId);
     if (document) {
         await uploader(booq, document.index);
         return document.index;
@@ -65,7 +65,7 @@ async function downloadAndInsert(assetId: string, uploader: ImageUploader) {
     }
 }
 
-async function insertRecord(metadata: BooqMeta, assetId: string) {
+async function insertRecord(booq: Booq, assetId: string) {
     const index = indexFromAssetId(assetId);
     if (index === undefined) {
         report(`Invalid asset ig: ${assetId}`);
@@ -74,10 +74,12 @@ async function insertRecord(metadata: BooqMeta, assetId: string) {
     const {
         title, creator: author, subject, language, description, cover,
         ...rest
-    } = metadata;
+    } = booq.meta;
+    const length = booqLength(booq);
     const doc: DbPgCard = {
         assetId,
         index,
+        length,
         title: parseString(title),
         author: parseString(author),
         language: parseString(language),

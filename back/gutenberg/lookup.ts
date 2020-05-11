@@ -10,16 +10,17 @@ export async function cards(ids: string[]) {
                 title: true, author: true,
                 language: true, subjects: true, description: true,
                 meta: true, cover: true,
+                length: true,
             },
         )
         .exec()
         .then(docs => docs.map(({
             index, title, author, language, subjects,
-            description, meta, cover,
+            description, meta, cover, length,
         }) => ({
             id: index,
             title, author, language, subjects, description, meta,
-            cover,
+            cover, length,
         })));
 }
 

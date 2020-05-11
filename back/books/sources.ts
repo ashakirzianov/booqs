@@ -2,6 +2,7 @@ import { pgLib } from '../gutenberg';
 
 export type LibraryCard = {
     id: string,
+    length: number,
     title?: string,
     author?: string,
     language?: string,

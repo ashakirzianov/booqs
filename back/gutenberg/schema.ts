@@ -11,6 +11,10 @@ const schema = {
         index: true,
         unique: true,
     },
+    length: {
+        type: Number,
+        required: true,
+    },
     title: String,
     author: String,
     language: String,

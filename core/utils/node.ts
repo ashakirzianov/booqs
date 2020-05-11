@@ -1,4 +1,4 @@
-import { BooqNode, BooqPath } from '../model';
+import { BooqNode, BooqPath, Booq } from '../model';
 
 export function nodeText(node: BooqNode): string {
     if (node.children?.length) {
@@ -57,6 +57,10 @@ export async function processNodeAsync(node: BooqNode, f: (n: BooqNode) => Promi
             )
             : undefined,
     });
+}
+
+export function booqLength(booq: Booq): number {
+    return nodesLength(booq.nodes);
 }
 
 export function nodeLength(node: BooqNode): number {

@@ -3,7 +3,7 @@ import {
 } from 'css';
 import { Result, combineResults, Diagnostic } from './result';
 import { Selector, parseSelector } from './selectors';
-import { filterUndefined } from 'booqs-core';
+import { filterUndefined } from '../core';
 
 export type StyleDeclaration = {
     property: string,
