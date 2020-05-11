@@ -1,5 +1,5 @@
 import React from 'react';
-import { extraBoldWeight, logoFont } from './theme';
+import { extraBoldWeight, logoFont, normalWeight } from './theme';
 
 export function Logo() {
     return <div>
@@ -9,7 +9,7 @@ export function Logo() {
                 color: rgba(253,163,2,1);
                 font-family: ${logoFont};
                 font-size: x-large;
-                font-weight: ${extraBoldWeight};
+                font-weight: ${normalWeight};
                 background: -webkit-linear-gradient(180deg, rgba(253,163,2,1) 50%, rgb(200, 145, 2) 100%);
                 -webkit-background-clip: text;
                 -webkit-text-fill-color: transparent;
