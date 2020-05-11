@@ -40,7 +40,7 @@ export type BooqMeta = {
     [name in string]?: string | string[];
 };
 export type BooqImages = {
-    [src in string]: string | undefined;
+    [src: string]: string;
 };
 export type Booq = {
     nodes: BooqNode[],
