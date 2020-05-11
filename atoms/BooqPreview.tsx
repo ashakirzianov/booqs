@@ -6,7 +6,7 @@ import { Preview } from "./data";
 export function BooqPreview({
     text, title, page,
 }: Preview) {
-    const { dimmed } = usePalette();
+    const { dimmed, border } = usePalette();
     return <div className='container'>
         <div className='title'>{title}</div>
         <div className='preview'>{text}</div>
@@ -23,11 +23,12 @@ export function BooqPreview({
                 font-family: ${bookFont};
                 font-size: large;
                 border-radius: ${radius};
+                border: 1px solid ${border};
                 cursor: pointer;
                 transition: box-shadow 0.25s;
             }
             .container:hover {
-                box-shadow: 0px 5px 15px rgba(0,0,0,0.1), 0px 0px 5px rgba(0,0,0,0.05) inset;
+                box-shadow: 0px 5px 15px rgba(0,0,0,0.1);
             }
             .title {
                 display: flex;
