@@ -64,14 +64,12 @@ export function booqLength(booq: Booq): number {
 }
 
 export function nodeLength(node: BooqNode): number {
-    if (node.name) {
-        if (node.children?.length) {
-            return nodesLength(node.children);
-        } else {
-            return 1;
-        }
+    if (node.children?.length) {
+        return nodesLength(node.children);
+    } else if (node.content) {
+        return node.content.length;
     } else {
-        return node.content?.length ?? 0;
+        return 1;
     }
 }
 

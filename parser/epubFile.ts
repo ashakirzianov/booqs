@@ -44,7 +44,7 @@ export async function openEpub({ fileData }: {
     }
 
     try {
-        const epub = await FixedEpub.createFromData(fileData) as FixedEpub;
+        epub = await FixedEpub.createFromData(fileData) as FixedEpub;
 
         const book: EpubFile = {
             rawMetadata: getRawData(epub.metadata),
