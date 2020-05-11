@@ -1,9 +1,11 @@
 import { inspect } from 'util';
 import { flatten, uniq } from 'lodash';
-import { extractMetadata, ExtractedMetadata } from '../../parser';
-import { makeBatches, resizeImage } from '../utils';
-import { listObjects, downloadAsset, Asset, uploadAsset } from '../s3';
-import { pgCards, DbPgCard, epubsBucket, coversBucket } from './schema';
+import { BooqMeta } from '../core';
+import { parseEpub } from '../parser';
+import { pgCards, DbPgCard, epubsBucket } from './gutenberg/schema';
+import { makeBatches } from './utils';
+import { listObjects, downloadAsset, Asset } from './s3';
+import { uploadImages } from './images';
 
 export async function syncWithS3() {
     report('Syncing with S3');
@@ -44,27 +46,32 @@ async function downloadAndInsert(assetId: string) {
         report(`Couldn't load pg asset: ${asset}`);
         return;
     }
-    const meta = await extractMetadata({
+    const booq = await parseEpub({
         fileData: asset as any,
-        extractCover: true,
         diagnoser: diag => {
             report(diag.diag, diag.data);
         },
     });
-    if (!meta) {
-        report(`Couldn't parse metadata: ${assetId}`);
+    if (!booq) {
+        report(`Couldn't parse epub: ${assetId}`);
         return;
     }
-    return insertRecord(meta, assetId);
+    const document = await insertRecord(booq.meta, assetId);
+    if (document) {
+        const booqId = `pg/${document.index}`;
+        await uploadImages(booqId, booq);
+        return booqId;
+    } else {
+        return undefined;
+    }
 }
 
-async function insertRecord({ metadata, cover }: ExtractedMetadata, assetId: string) {
+async function insertRecord(metadata: BooqMeta, assetId: string) {
     const index = indexFromAssetId(assetId);
     if (index === undefined) {
         report(`Invalid asset ig: ${assetId}`);
         return undefined;
     }
-    const coverData = await uploadCover(cover, assetId);
     const {
         title, creator: author, subject, language, description,
         ...rest
@@ -78,40 +85,10 @@ async function insertRecord({ metadata, cover }: ExtractedMetadata, assetId: str
         description: parseString(description),
         subjects: parseSubject(subject),
         meta: rest,
-        ...coverData,
     };
     const [inserted] = await pgCards.insertMany([doc]);
     report('inserted', inserted);
     return inserted;
-}
-
-async function uploadCover(coverBase64: string | undefined, assetId: string) {
-    if (!coverBase64) {
-        return {};
-    }
-    const cover = Buffer.from(coverBase64, 'base64');
-    const originalId = `${assetId}-cover`;
-    const originalResult = await uploadAsset(coversBucket, originalId, cover);
-    if (originalResult.$response) {
-        const size = 270;
-        const resized = await resizeImage(cover, size);
-        const resizedId = `${originalId}@${size}`;
-        const resizedResult = await uploadAsset(coversBucket, resizedId, resized);
-        if (resizedResult.$response) {
-            return {
-                cover: originalId,
-                coverSizes: {
-                    [size]: resizedId,
-                },
-            };
-        } else {
-            report(`Can't upload resized cover: ${resizedId}`);
-            return { cover: originalId };
-        }
-    } else {
-        report(`Can't upload original cover: ${originalId}`);
-        return {};
-    }
 }
 
 function parseString(field: unknown) {
