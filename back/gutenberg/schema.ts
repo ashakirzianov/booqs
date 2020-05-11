@@ -16,9 +16,9 @@ const schema = {
     language: String,
     description: String,
     subjects: [String],
+    cover: String,
     meta: taggedObject<object>(),
 } as const;
-
 
 export type DbPgCard = TypeFromSchema<typeof schema>;
 export const pgCards = typedModel('pg-cards', schema);

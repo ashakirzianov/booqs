@@ -50,5 +50,6 @@ function addIdPrefix(prefix: string) {
     return (card: LibraryCard) => ({
         ...card,
         id: makeId(prefix, card.id),
+        cover: card.cover && makeId(prefix, card.cover),
     });
 }

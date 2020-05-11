@@ -8,9 +8,6 @@ export type LibraryCard = {
     description?: string,
     subjects?: string[],
     cover?: string,
-    coverSizes?: {
-        [n: number]: string,
-    },
 };
 export type BookFile = {
     kind: 'epub',

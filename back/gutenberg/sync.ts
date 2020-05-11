@@ -1,26 +1,26 @@
 import { inspect } from 'util';
 import { flatten, uniq } from 'lodash';
-import { BooqMeta } from '../core';
-import { parseEpub } from '../parser';
-import { pgCards, DbPgCard, epubsBucket } from './gutenberg/schema';
-import { makeBatches } from './utils';
-import { listObjects, downloadAsset, Asset } from './s3';
-import { uploadImages } from './images';
+import { BooqMeta, Booq } from '../../core';
+import { parseEpub } from '../../parser';
+import { makeBatches } from '../utils';
+import { listObjects, downloadAsset, Asset } from '../s3';
+import { pgCards, DbPgCard, epubsBucket } from './schema';
 
-export async function syncWithS3() {
+type ImageUploader = (booq: Booq, id: string) => Promise<any>;
+export async function syncWithS3(uploader: ImageUploader) {
     report('Syncing with S3');
 
     const batches = makeBatches(listEpubObjects(), 50);
     for await (const batch of batches) {
         await Promise.all(
-            batch.map(processAsset),
+            batch.map(obj => processAsset(obj, uploader)),
         );
     }
 
     report('done syncing with S3');
 }
 
-async function processAsset(asset: Asset) {
+async function processAsset(asset: Asset, uploader: ImageUploader) {
     if (!asset.Key) {
         report('bad asset', asset);
         return;
@@ -28,7 +28,7 @@ async function processAsset(asset: Asset) {
         report(`Skipping ${asset.Key}`);
         return;
     }
-    return downloadAndInsert(asset.Key);
+    return downloadAndInsert(asset.Key, uploader);
 }
 
 async function recordExists(assetId: string) {
@@ -39,7 +39,7 @@ async function* listEpubObjects() {
     yield* listObjects(epubsBucket);
 }
 
-async function downloadAndInsert(assetId: string) {
+async function downloadAndInsert(assetId: string, uploader: ImageUploader) {
     report(`Processing ${assetId}`);
     const asset = await downloadAsset(epubsBucket, assetId);
     if (!asset) {
@@ -58,9 +58,8 @@ async function downloadAndInsert(assetId: string) {
     }
     const document = await insertRecord(booq.meta, assetId);
     if (document) {
-        const booqId = `pg/${document.index}`;
-        await uploadImages(booqId, booq);
-        return booqId;
+        await uploader(booq, document.index);
+        return document.index;
     } else {
         return undefined;
     }
@@ -73,7 +72,7 @@ async function insertRecord(metadata: BooqMeta, assetId: string) {
         return undefined;
     }
     const {
-        title, creator: author, subject, language, description,
+        title, creator: author, subject, language, description, cover,
         ...rest
     } = metadata;
     const doc: DbPgCard = {
@@ -84,6 +83,7 @@ async function insertRecord(metadata: BooqMeta, assetId: string) {
         language: parseString(language),
         description: parseString(description),
         subjects: parseSubject(subject),
+        cover: parseString(cover),
         meta: rest,
     };
     const [inserted] = await pgCards.insertMany([doc]);
