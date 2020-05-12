@@ -1,8 +1,8 @@
 import { groupBy, flatten } from 'lodash';
 import { makeId, parseId, filterUndefined } from '../../core';
-import { sources, LibraryCard } from './sources';
+import { LibraryCard } from '../sources';
+import { sources } from './libSources';
 
-export * from './sources';
 export * from './content';
 
 export async function search(query: string, limit: number): Promise<LibraryCard[]> {
