@@ -1,4 +1,4 @@
-import { pgLib } from '../gutenberg';
+import { pgLib, pgImagesRoot } from '../gutenberg';
 
 export type LibraryCard = {
     id: string,
@@ -16,6 +16,7 @@ export type BookFile = {
 };
 export type LibrarySource = {
     prefix: string,
+    imagesRoot: string,
     search(query: string, limit: number): Promise<LibraryCard[]>,
     cards(ids: string[]): Promise<LibraryCard[]>,
     fileForId(id: string): Promise<BookFile | undefined>,
@@ -23,6 +24,7 @@ export type LibrarySource = {
 
 const gutenberg: LibrarySource = {
     prefix: 'pg',
+    imagesRoot: pgImagesRoot,
     search: pgLib.search,
     cards: pgLib.cards,
     fileForId: pgLib.fileForId,
