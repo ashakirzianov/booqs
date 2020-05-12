@@ -1,6 +1,7 @@
 import { typedModel, TypeFromSchema, taggedObject } from '../mongoose';
 
 export const userUploadedEpubsBucket = 'uu-epubs';
+export const userUploadedImagesBucket = 'uu-epub-images';
 
 const cardsSchema = {
     assetId: {

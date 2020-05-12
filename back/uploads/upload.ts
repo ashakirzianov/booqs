@@ -31,7 +31,8 @@ export async function uploadEpub(filePath: string, userId: string) {
         return;
     }
     const insertResult = await insertRecord(booq, assetId, fileHash);
-    const uploadImagesResult = await uploadImages(insertResult._id, booq);
+    const uploadImagesResult = await uploadImages(userUploadedEpubsBucket, insertResult._id, booq);
+    uploadImagesResult.map(id => report(`Uploaded image: ${id}`))
     return insertResult;
 }
 

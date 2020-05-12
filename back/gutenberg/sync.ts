@@ -4,23 +4,23 @@ import { BooqMeta, Booq, booqLength } from '../../core';
 import { parseEpub } from '../../parser';
 import { makeBatches } from '../utils';
 import { listObjects, downloadAsset, Asset } from '../s3';
-import { pgCards, DbPgCard, epubsBucket } from './schema';
+import { pgCards, DbPgCard, pgEpubsBucket } from './schema';
+import { uploadImages } from '../images';
 
-type ImageUploader = (booq: Booq, id: string) => Promise<any>;
-export async function syncWithS3(uploader: ImageUploader) {
+export async function syncWithS3() {
     report('Syncing with S3');
 
     const batches = makeBatches(listEpubObjects(), 50);
     for await (const batch of batches) {
         await Promise.all(
-            batch.map(obj => processAsset(obj, uploader)),
+            batch.map(processAsset),
         );
     }
 
     report('done syncing with S3');
 }
 
-async function processAsset(asset: Asset, uploader: ImageUploader) {
+async function processAsset(asset: Asset) {
     if (!asset.Key) {
         report('bad asset', asset);
         return;
@@ -28,7 +28,7 @@ async function processAsset(asset: Asset, uploader: ImageUploader) {
         report(`Skipping ${asset.Key}`);
         return;
     }
-    return downloadAndInsert(asset.Key, uploader);
+    return downloadAndInsert(asset.Key);
 }
 
 async function recordExists(assetId: string) {
@@ -36,12 +36,12 @@ async function recordExists(assetId: string) {
 }
 
 async function* listEpubObjects() {
-    yield* listObjects(epubsBucket);
+    yield* listObjects(pgEpubsBucket);
 }
 
-async function downloadAndInsert(assetId: string, uploader: ImageUploader) {
+async function downloadAndInsert(assetId: string) {
     report(`Processing ${assetId}`);
-    const asset = await downloadAsset(epubsBucket, assetId);
+    const asset = await downloadAsset(pgEpubsBucket, assetId);
     if (!asset) {
         report(`Couldn't load pg asset: ${asset}`);
         return;
@@ -58,7 +58,7 @@ async function downloadAndInsert(assetId: string, uploader: ImageUploader) {
     }
     const document = await insertRecord(booq, assetId);
     if (document) {
-        await uploader(booq, document.index);
+        await uploadImages(pgEpubsBucket, document.index, booq);
         return document.index;
     } else {
         return undefined;
