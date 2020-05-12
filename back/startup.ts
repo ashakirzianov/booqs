@@ -24,6 +24,6 @@ export async function startup() {
 async function runWorkers() {
     // eslint-disable-next-line no-constant-condition
     if (true) {
-        syncWithS3((booq, id) => uploadImages(`pg/${id}`, booq));
+        syncWithS3();
     }
 }
