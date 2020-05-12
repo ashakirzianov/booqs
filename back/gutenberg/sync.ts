@@ -4,7 +4,7 @@ import { BooqMeta, Booq, booqLength } from '../../core';
 import { parseEpub } from '../../parser';
 import { makeBatches } from '../utils';
 import { listObjects, downloadAsset, Asset } from '../s3';
-import { pgCards, DbPgCard, pgEpubsBucket } from './schema';
+import { pgCards, DbPgCard, pgEpubsBucket, pgImagesBucket } from './schema';
 import { uploadImages } from '../images';
 
 export async function syncWithS3() {
@@ -58,7 +58,7 @@ async function downloadAndInsert(assetId: string) {
     }
     const document = await insertRecord(booq, assetId);
     if (document) {
-        await uploadImages(pgEpubsBucket, document.index, booq);
+        await uploadImages(pgImagesBucket, document.index, booq);
         return document.index;
     } else {
         return undefined;

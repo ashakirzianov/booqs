@@ -1,6 +1,6 @@
 import { createHash } from 'crypto';
 import { createReadStream, readFile } from 'fs';
-import { uuCards, uuRegistry, DbUpload, DbUuCard, userUploadedEpubsBucket } from './schema';
+import { uuCards, uuRegistry, DbUpload, DbUuCard, userUploadedEpubsBucket, userUploadedImagesBucket } from './schema';
 import { promisify, inspect } from 'util';
 import { parseEpub } from '../../parser';
 import { booqLength, Booq } from '../../core';
@@ -31,7 +31,7 @@ export async function uploadEpub(filePath: string, userId: string) {
         return;
     }
     const insertResult = await insertRecord(booq, assetId, fileHash);
-    const uploadImagesResult = await uploadImages(userUploadedEpubsBucket, insertResult._id, booq);
+    const uploadImagesResult = await uploadImages(userUploadedImagesBucket, insertResult._id, booq);
     uploadImagesResult.map(id => report(`Uploaded image: ${id}`))
     return insertResult;
 }

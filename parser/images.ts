@@ -1,4 +1,5 @@
-import { BooqNode, BooqImages, unique } from '../core';
+import { uniq } from 'lodash';
+import { BooqNode, BooqImages } from '../core';
 import { EpubFile } from './epubFile';
 import { Diagnostic } from './result';
 
@@ -9,10 +10,11 @@ export async function buildImages(nodes: BooqNode[], file: EpubFile) {
     const allSrcs = typeof cover === 'string'
         ? [cover, ...srcs]
         : srcs;
-    const uniqueSrcs = unique(allSrcs);
+    const uniqueSrcs = uniq(allSrcs);
     const images: BooqImages = {};
     for (const src of uniqueSrcs) {
         if (isExternal(src)) {
+
             continue;
         }
         const buffer = await file.imageResolver(src);
