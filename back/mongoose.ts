@@ -37,7 +37,10 @@ export const ObjectId = Schema.Types.ObjectId;
 export type ObjectId = Schema.Types.ObjectId;
 type ObjectIdConstructor = typeof ObjectId;
 
-export type DocumentType<T extends SchemaDefinition> = Document & TypeFromSchema<T>;
+export type DocumentType<T extends SchemaDefinition> =
+    & TypeFromSchema<T>
+    & Document
+    ;
 export type TypeFromSchema<T extends SchemaDefinition> =
     & { [P in Extract<keyof T, RequiredProperties<T>>]: FieldType<T[P]>; }
     & { [P in Exclude<keyof T, RequiredProperties<T>>]?: FieldType<T[P]>; }

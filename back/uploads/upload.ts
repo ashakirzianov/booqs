@@ -1,39 +1,43 @@
 import { createHash } from 'crypto';
-import { createReadStream, readFile } from 'fs';
-import { uuCards, uuRegistry, DbUpload, DbUuCard, userUploadedEpubsBucket, userUploadedImagesBucket } from './schema';
-import { promisify, inspect } from 'util';
+import { ReadStream } from 'fs';
+import { inspect } from 'util';
+import {
+    uuCards, uuRegistry, DbUpload, DbUuCard,
+    userUploadedEpubsBucket, userUploadedImagesBucket, toLibraryCard,
+} from './schema';
 import { parseEpub } from '../../parser';
 import { booqLength, Booq } from '../../core';
 import { uploadAsset } from '../s3';
 import { uuid } from '../utils';
 import { uploadImages } from '../images';
+import { LibraryCard } from '../sources';
 
-export async function uploadEpub(filePath: string, userId: string) {
-    const fileHash = await buildFileHash(filePath);
-    const existing = await uuCards.findOne({ fileHash }).exec();
+export async function uploadEpub(fileStream: ReadStream, userId: string): Promise<LibraryCard | undefined> {
+    const { buffer, hash } = await buildFile(fileStream);
+    const existing = await uuCards.findOne({ fileHash: hash }).exec();
     if (existing) {
-        return addToRegistry(existing._id, userId);
+        await addToRegistry(existing._id, userId);
+        return toLibraryCard(existing);
     }
 
-    const file = await promisify(readFile)(filePath);
     const booq = await parseEpub({
-        fileData: file,
+        fileData: buffer,
         diagnoser: diag => report(diag.diag, diag.data),
     });
     if (!booq) {
         report(`Can't parse upload`);
-        return;
+        return undefined;
     }
     const assetId = uuid();
-    const uploadResult = await uploadAsset(userUploadedEpubsBucket, assetId, file);
+    const uploadResult = await uploadAsset(userUploadedEpubsBucket, assetId, buffer);
     if (!uploadResult.$response) {
         report(`Can't upload file to S3`);
-        return;
+        return undefined;
     }
-    const insertResult = await insertRecord(booq, assetId, fileHash);
+    const insertResult = await insertRecord(booq, assetId, hash);
     const uploadImagesResult = await uploadImages(userUploadedImagesBucket, insertResult._id, booq);
     uploadImagesResult.map(id => report(`Uploaded image: ${id}`))
-    return insertResult;
+    return toLibraryCard(insertResult);
 }
 
 async function insertRecord(booq: Booq, assetId: string, fileHash: string, ) {
@@ -71,14 +75,27 @@ async function addToRegistry(cardId: string, userId: string) {
     return result;
 }
 
-async function buildFileHash(filePath: string) {
-    return new Promise<string>((resolve, reject) => {
+type File = {
+    buffer: Buffer,
+    hash: string,
+};
+async function buildFile(fileStream: ReadStream) {
+    return new Promise<File>((resolve, reject) => {
         try {
             const hash = createHash('md5');
-            const stream = createReadStream(filePath);
+            const chunks: any[] = [];
 
-            stream.on('data', data => hash.update(data));
-            stream.on('end', () => resolve(hash.digest('base64')));
+            fileStream.on('data', chunk => {
+                hash.update(chunk);
+                chunks.push(chunk);
+            });
+            fileStream.on('end', () => {
+                const buffer = Buffer.concat(chunks);
+                resolve({
+                    buffer,
+                    hash: hash.digest('base64'),
+                });
+            });
         } catch (e) {
             reject(e);
         }
