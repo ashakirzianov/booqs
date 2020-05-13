@@ -29,6 +29,7 @@
         "rgrove",
         "srcs",
         "tippyjs",
+        "unfetch",
         "xmls"
     ]
 }
