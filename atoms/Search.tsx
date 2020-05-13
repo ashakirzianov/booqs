@@ -1,27 +1,63 @@
 import React, { useState } from 'react';
 import { usePalette, normalWeight } from './theme';
 import { meter, radius } from './meter';
-import { BooqData, cards } from './data';
 import { BooqCover } from './BooqCover';
+import { useQuery } from '@apollo/react-hooks';
+import { gql } from 'apollo-boost';
+
+type SearchResult = {
+    title?: string,
+    author?: string,
+    cover?: string,
+};
+type Search = {
+    query: string,
+    doQuery: (query: string) => void,
+    loading: boolean,
+    results: SearchResult[],
+};
+function useSearch(): Search {
+    const [query, setQuery] = useState('');
+    const { loading, data } = useQuery(
+        gql`query Search($query: String!) {
+            search(query: $query) {
+                title
+                author
+            }
+        }`,
+        {
+            variables: {
+                query,
+            },
+        });
+    console.log('---');
+    console.log(data);
+
+    return {
+        query,
+        doQuery: setQuery,
+        results: data?.search ?? [],
+        loading,
+    };
+}
 
 export function Search() {
-    const results = cards;
-    const [query, setQuery] = useState('');
     const { primary, dimmed, background } = usePalette();
+    const { query, doQuery, results } = useSearch();
     return <div className='container'>
         <div className='content'>
             <input
                 type="text"
                 placeholder="Search..."
                 value={query}
-                onChange={e => setQuery(e.target.value)}
+                onChange={e => doQuery(e.target.value)}
             />
             <div className='results'>
                 {
                     results.map(
-                        (card, idx) => <SearchResult
+                        (result, idx) => <SearchResult
                             key={idx}
-                            card={card}
+                            result={result}
                             query={query}
                         />
                     )
@@ -91,25 +127,25 @@ export function Search() {
     </div>;
 }
 
-function SearchResult({ card, query }: {
-    card: BooqData,
+function SearchResult({ result, query }: {
+    result: SearchResult,
     query: string,
 }) {
     const { highlight, light } = usePalette();
     return <div className='container'>
         <BooqCover
-            cover={card.cover}
-            title={card.title}
-            author={card.author}
+            cover={result.cover}
+            title={result.title}
+            author={result.author}
             size={20}
         />
         <div className='details'>
             <EmphasizedSpan
-                text={card.title ?? ''}
+                text={result.title ?? ''}
                 emphasis={query}
             />
             <EmphasizedSpan
-                text={card.author ?? ''}
+                text={result.author ?? ''}
                 emphasis={query}
             />
         </div>
