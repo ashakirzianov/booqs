@@ -1,12 +1,16 @@
-import { BooqPreview } from "../controls/BooqPreview";
+import { BooqPreview, BooqPreviewProps } from "../controls/BooqPreview";
 import { meter } from "../controls/meter";
-import { previews } from "../controls/data";
 
 export function ReadingHistory() {
-    return <Positions />;
+    return <Positions previews={[]} />;
 }
 
-function Positions() {
+function Positions({ previews }: {
+    previews: BooqPreviewProps[],
+}) {
+    if (!previews.length) {
+        return null;
+    }
     return <div className='container'>
         {
             previews.map(

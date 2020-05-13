@@ -1,11 +1,17 @@
 import { usePalette, bookFont } from "./theme";
 import { meter, radius } from "./meter";
 import { panelWidth } from "./Panel";
-import { Preview } from "./data";
+import { PropsType } from "./utils";
 
+export type BooqPreviewProps = PropsType<typeof BooqPreview>;
 export function BooqPreview({
     text, title, page,
-}: Preview) {
+}: {
+    text: string,
+    title: string,
+    page: number,
+    length: number,
+}) {
     const { dimmed, border } = usePalette();
     return <div className='container'>
         <div className='title'>{title}</div>
