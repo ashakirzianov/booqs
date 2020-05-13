@@ -4,6 +4,7 @@ import { meter, radius } from './meter';
 import { BooqCover } from './BooqCover';
 import { useQuery } from '@apollo/react-hooks';
 import { gql } from 'apollo-boost';
+import { Spinner } from './Spinner';
 
 type SearchResult = {
     title?: string,
@@ -30,8 +31,6 @@ function useSearch(): Search {
                 query,
             },
         });
-    console.log('---');
-    console.log(data);
 
     return {
         query,
@@ -43,7 +42,7 @@ function useSearch(): Search {
 
 export function Search() {
     const { primary, dimmed, background } = usePalette();
-    const { query, doQuery, results } = useSearch();
+    const { query, doQuery, results, loading } = useSearch();
     return <div className='container'>
         <div className='content'>
             <input
@@ -53,15 +52,11 @@ export function Search() {
                 onChange={e => doQuery(e.target.value)}
             />
             <div className='results'>
-                {
-                    results.map(
-                        (result, idx) => <SearchResult
-                            key={idx}
-                            result={result}
-                            query={query}
-                        />
-                    )
-                }
+                <SearchResults
+                    results={results}
+                    query={query}
+                    loading={loading}
+                />
             </div>
             <p className='shadow' />
         </div>
@@ -124,6 +119,41 @@ export function Search() {
             box-shadow: 0px 0px 7px rgba(0,0,0,0.1);
         }
         `}</style>
+    </div>;
+}
+
+function SearchResults({ loading, query, results }: {
+    results: SearchResult[],
+    query: string,
+    loading: boolean,
+}) {
+    return <div className='container'>
+        {
+            results.map(
+                (result, idx) => <div className='result'>
+                    <SearchResult
+                        key={idx}
+                        result={result}
+                        query={query}
+                    />
+                </div>
+            )
+        }
+        {
+            loading
+                ? <div className='spinner'><Spinner /></div>
+                : null
+        }
+        <style jsx>{`
+            .container {
+                display: flex;
+                flex-direction: column;
+            }
+            .spinner {
+                align-self: center;
+                margin: ${meter.large};
+            }
+            `}</style>
     </div>;
 }
 
