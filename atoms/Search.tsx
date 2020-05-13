@@ -130,9 +130,8 @@ function SearchResults({ loading, query, results }: {
     return <div className='container'>
         {
             results.map(
-                (result, idx) => <div className='result'>
+                (result, idx) => <div key={idx} className='result'>
                     <SearchResult
-                        key={idx}
                         result={result}
                         query={query}
                     />
@@ -141,7 +140,7 @@ function SearchResults({ loading, query, results }: {
         }
         {
             loading
-                ? <div className='spinner'><Spinner /></div>
+                ? <div key='spinner' className='spinner'><Spinner /></div>
                 : null
         }
         <style jsx>{`
