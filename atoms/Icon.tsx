@@ -8,7 +8,7 @@ import {
 import {
     faFacebookF,
 } from '@fortawesome/free-brands-svg-icons';
-import { assertNever } from '../core';
+import { assertNever } from '../lib';
 
 export type IconName =
     | 'sign-in' | 'upload' | 'appearance' | 'search'
