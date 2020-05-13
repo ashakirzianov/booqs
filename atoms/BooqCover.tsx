@@ -54,8 +54,8 @@ function BooqDefaultCover({ title, author, size }: {
     size: number,
 }) {
     const { back, text } = colorForString(title ?? 'no-title' + author);
-    return <div title={title} className=".container">
-        <div>
+    return <div title={title} className='container'>
+        <div className='cover'>
             {title}
         </div>
         <style jsx>{`
@@ -70,13 +70,14 @@ function BooqDefaultCover({ title, author, size }: {
                 flex: 1;
                 flex-direction: column;
                 align-items: center;
+                justify-content: center;
                 overflow: hidden;
                 text-overflow: ellipsis;
                 text-align: center;
-                padding: 20px 5px 0px 5px;
+                padding: 10%;
                 font-size: ${calcFontSize(title ?? 'no-title', size)};
                 background: ${back};
-                color: text;
+                color: ${text};
             }
             `}</style>
     </div>;
@@ -99,27 +100,27 @@ function colorForString(s: string) {
     // TODO: more & better colors
     const coverColors: Array<{ back: string, text: string }> = [
         {
-            back: 'linear-gradient(90deg, #FDBB2D 0%, #22C1C3 100%)',
+            back: 'linear-gradient(0deg, #FDBB2D 0%, #22C1C3 100%)',
             text: 'white',
         },
         {
-            back: 'linear-gradient(90deg, rgba(131,58,180,1) 0%, rgba(253,29,29,1) 50%, rgba(252,176,69,1) 100%)',
+            back: 'linear-gradient(0deg, rgba(131,58,180,1) 0%, rgba(253,29,29,1) 50%, rgba(252,176,69,1) 100%)',
             text: 'white',
         },
         {
-            back: 'linear-gradient(90deg, #e3ffe7 0%, #d9e7ff 100%)',
+            back: 'linear-gradient(0deg, #e3ffe7 0%, #d9e7ff 100%)',
             text: 'steelblue',
         },
         {
-            back: 'linear-gradient(90deg, #FC466B 0%, #3F5EFB 100%)',
+            back: 'linear-gradient(0deg, #FC466B 0%, #3F5EFB 100%)',
             text: 'white',
         },
         {
-            back: 'linear-gradient(90deg, #fcff9e 0%, #c67700 100%)',
+            back: 'linear-gradient(0deg, #fcff9e 0%, #c67700 100%)',
             text: 'white',
         },
         {
-            back: 'linear-gradient(90deg, #00d2ff 0%, #3a47d5 100%)',
+            back: 'linear-gradient(0deg, #00d2ff 0%, #3a47d5 100%)',
             text: 'white',
         },
     ];
