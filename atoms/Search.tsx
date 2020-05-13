@@ -24,6 +24,7 @@ function useSearch(): Search {
             search(query: $query) {
                 title
                 author
+                cover(size: 60)
             }
         }`,
         {
