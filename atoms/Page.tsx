@@ -10,6 +10,7 @@ export function Page({ title, children }: HasChildren & {
         <Head>
             <title>{title}</title>
             <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+            <link href={`https://fonts.googleapis.com/css2?family=${menuFontPrimary}:wght@${normalWeight};${boldWeight};${extraBoldWeight}&${logoFont}:wght@${normalWeight};${boldWeight};${extraBoldWeight}&family=${bookFont}&display=swap`} rel="stylesheet" />
         </Head>
         {children}
         <style jsx global>{`
@@ -28,7 +29,6 @@ export function Page({ title, children }: HasChildren & {
                 font-weight: ${normalWeight};
                 overflow-x: hidden;
             }
-            @import url('https://fonts.googleapis.com/css2?family=${menuFontPrimary}:wght@${normalWeight};${boldWeight};${extraBoldWeight}&${logoFont}:wght@${normalWeight};${boldWeight};${extraBoldWeight}&family=${bookFont}&display=swap');
         `}</style>
     </div>;
 }
