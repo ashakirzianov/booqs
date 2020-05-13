@@ -1,10 +1,33 @@
 import React from 'react';
-import { BooqCard } from '../controls/BooqCard';
-import { BooqData } from '../controls/data';
+import { useQuery } from '@apollo/react-hooks';
+import { gql } from 'apollo-boost';
+import { BooqCard, BooqCardProps } from '../controls/BooqCard';
 
-export function Featured({ cards }: {
-    cards: BooqData[],
-}) {
+type Featured = {
+    cards: BooqCardProps[],
+    loading: boolean,
+}
+function useFeatured(): Featured {
+    const { loading, data } = useQuery(
+        gql`query Featured {
+            featured(limit: 10) {
+                title
+                author
+                cover(size: 210)
+                tags {
+                    tag
+                    value
+                }
+            }
+        }`);
+    return {
+        loading,
+        cards: (data?.featured ?? []),
+    };
+}
+
+export function Featured() {
+    const { cards } = useFeatured();
     return <div>
         {
             cards.map(

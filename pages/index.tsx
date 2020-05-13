@@ -20,7 +20,7 @@ export default function Home({ cards, previews }: {
   return <Page title="Booqs">
     <AppBar />
     <ReadingHistory />
-    <Featured cards={cards} />
+    <Featured />
     <style jsx>{`
       div {
         display: flex;
