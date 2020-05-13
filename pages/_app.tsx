@@ -13,10 +13,9 @@ import { AppProps } from 'next/app';
 import ApolloClient from 'apollo-boost';
 import { ApolloProvider } from '@apollo/react-hooks';
 import fetch from 'isomorphic-unfetch';
-import { appConfig } from '../lib';
 
 const client = new ApolloClient({
-    uri: appConfig().apiUri,
+    uri: process.env.NEXT_PUBLIC_BACKEND,
     fetch: fetch,
 });
 
