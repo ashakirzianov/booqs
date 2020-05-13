@@ -1,8 +1,8 @@
-import { Page } from "../atoms/Page";
-import { AppBar } from "../atoms/AppBar";
-import { BooqData, cards, previews, Preview } from "../atoms/data";
-import { Featured } from "../atoms/Featured";
-import { ReadingHistory } from "../atoms/ReadingHistory";
+import { Page } from "../controls/Page";
+import { AppBar } from "../controls/AppBar";
+import { BooqData, cards, previews, Preview } from "../controls/data";
+import { Featured } from "../controls/Featured";
+import { ReadingHistory } from "../controls/ReadingHistory";
 
 export async function getStaticProps() {
   return {
