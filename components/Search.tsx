@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { usePalette, normalWeight } from './theme';
-import { meter, radius } from './meter';
-import { BooqCover } from './BooqCover';
+import { usePalette, normalWeight } from '../controls/theme';
+import { meter, radius } from '../controls/meter';
+import { BooqCover } from '../controls/BooqCover';
 import { useQuery } from '@apollo/react-hooks';
 import { gql } from 'apollo-boost';
-import { Spinner } from './Spinner';
+import { Spinner } from '../controls/Spinner';
 
 type SearchResult = {
     title?: string,

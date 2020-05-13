@@ -1,5 +1,5 @@
-import { ActionButton } from "./Buttons";
-import { meter } from "./meter";
+import { ActionButton } from "../controls/Buttons";
+import { meter } from "../controls/meter";
 
 export function UploadPanel() {
     return <div className='container'>

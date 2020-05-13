@@ -1,5 +1,5 @@
-import { Menu, MenuItem } from "./Menu";
-import { meter } from "./meter";
+import { Menu, MenuItem } from "../controls/Menu";
+import { meter } from "../controls/meter";
 
 export function SignInPanel() {
     return <div>

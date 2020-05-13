@@ -1,7 +1,7 @@
 import React from 'react';
 import Head from 'next/head';
-import { HasChildren } from './utils';
-import { menuFont, bookFont, normalWeight, boldWeight, extraBoldWeight, menuFontPrimary, logoFont } from './theme';
+import { HasChildren } from '../controls/utils';
+import { menuFont, bookFont, normalWeight, boldWeight, extraBoldWeight, menuFontPrimary, logoFont } from '../controls/theme';
 
 export function Page({ title, children }: HasChildren & {
     title: string,

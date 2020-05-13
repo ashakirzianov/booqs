@@ -1,8 +1,8 @@
-import { Page } from "../controls/Page";
-import { AppBar } from "../controls/AppBar";
+import { Page } from "../components/Page";
+import { AppBar } from "../components/AppBar";
 import { BooqData, cards, previews, Preview } from "../controls/data";
-import { Featured } from "../controls/Featured";
-import { ReadingHistory } from "../controls/ReadingHistory";
+import { Featured } from "../components/Featured";
+import { ReadingHistory } from "../components/ReadingHistory";
 
 export async function getStaticProps() {
   return {

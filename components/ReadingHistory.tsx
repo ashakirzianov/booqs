@@ -1,6 +1,6 @@
-import { BooqPreview } from "./BooqPreview";
-import { meter } from "./meter";
-import { previews } from "./data";
+import { BooqPreview } from "../controls/BooqPreview";
+import { meter } from "../controls/meter";
+import { previews } from "../controls/data";
 
 export function ReadingHistory() {
     return <Positions />;

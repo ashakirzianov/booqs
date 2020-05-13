@@ -1,11 +1,11 @@
 import React from 'react';
-import { headerHeight, meter } from './meter';
-import { Logo } from './Logo';
+import { headerHeight, meter } from '../controls/meter';
+import { Logo } from '../controls/Logo';
+import { Popovers } from '../controls/Popover';
+import { IconButton } from '../controls/Buttons';
 import { Search } from './Search';
-import { IconButton } from './Buttons';
 import { SignInPanel } from './SignIn';
 import { ThemerPanel } from './Themer';
-import { Popovers } from './Popover';
 import { UploadPanel } from './Upload';
 
 export function AppBar() {
