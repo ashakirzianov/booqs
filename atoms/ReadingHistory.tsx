@@ -10,8 +10,8 @@ function Positions() {
     return <div className='container'>
         {
             previews.map(
-                (p, idx) => <div className='preview'>
-                    <BooqPreview key={idx} {...p} />
+                (p, idx) => <div key={idx} className='preview'>
+                    <BooqPreview {...p} />
                 </div>
             )
         }
