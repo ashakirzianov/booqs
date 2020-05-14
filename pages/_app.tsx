@@ -9,18 +9,6 @@ import { config } from '@fortawesome/fontawesome-svg-core';
 import '@fortawesome/fontawesome-svg-core/styles.css';
 config.autoAddCss = false;
 
-import { AppProps } from 'next/app';
-import ApolloClient from 'apollo-boost';
-import { ApolloProvider } from '@apollo/react-hooks';
-import fetch from 'isomorphic-unfetch';
+import { App } from '../app';
 
-const client = new ApolloClient({
-    uri: process.env.NEXT_PUBLIC_BACKEND,
-    fetch: fetch,
-});
-
-export default function App({ Component, pageProps }: AppProps) {
-    return <ApolloProvider client={client}>
-        <Component {...pageProps} />
-    </ApolloProvider>;
-}
+export default App;
