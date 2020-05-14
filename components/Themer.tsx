@@ -2,7 +2,7 @@ import {
     bookFont, buttonShadow, meter,
 } from "../controls/theme";
 
-import { usePalette, PaletteName, palettes } from '../app';
+import { usePalette, PaletteName, palettes, useSetPalette } from '../app';
 
 export function ThemerPanel() {
     const { border } = usePalette();
@@ -70,10 +70,11 @@ function FontScaleButton({ scale }: {
 }
 
 function PalettePicker() {
+    const setPalette = useSetPalette();
     return <div>
-        <PaletteButton name='light' checked={true} />
-        <PaletteButton name='sepia' checked={false} />
-        <PaletteButton name='dark' checked={false} />
+        <PaletteButton name='light' checked={true} onSelect={setPalette} />
+        <PaletteButton name='sepia' checked={false} onSelect={setPalette} />
+        <PaletteButton name='dark' checked={false} onSelect={setPalette} />
         <style jsx>{`
             div {
                 display: flex;
@@ -86,12 +87,13 @@ function PalettePicker() {
 }
 
 const size = '3rem';
-function PaletteButton({ name, checked }: {
+function PaletteButton({ name, checked, onSelect }: {
     name: PaletteName,
     checked: boolean,
+    onSelect: (name: PaletteName) => void,
 }) {
     const { background, highlight, primary } = palettes[name];
-    return <div className="container">
+    return <div className="container" onClick={() => onSelect(name)}>
         <div className="label">{name.substr(0, 1).toUpperCase()}</div>
         <style jsx>{`
             .container {
