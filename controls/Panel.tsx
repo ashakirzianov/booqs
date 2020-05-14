@@ -1,7 +1,6 @@
 import React from 'react';
 import { HasChildren } from './utils';
-import { meter, radius } from './meter';
-import { panelShadow } from './theme';
+import { meter, radius } from './theme';
 
 export const panelWidth = '40rem';
 

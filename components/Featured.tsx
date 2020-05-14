@@ -29,7 +29,7 @@ type FeaturedData = {
         }[],
     }[],
 };
-type FeaturedItem = FeaturedData['featured'][number];
+
 function useFeatured() {
     const { loading, data } = useQuery<FeaturedData>(FeaturedQuery);
     return {
@@ -56,6 +56,7 @@ export function Featured() {
     </div>;
 }
 
+type FeaturedItem = FeaturedData['featured'][number];
 function FeaturedCard({
     title, author, cover, tags,
 }: FeaturedItem) {

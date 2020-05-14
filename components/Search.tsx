@@ -19,7 +19,6 @@ type SearchData = {
         cover?: string,
     }[],
 };
-type SearchResult = SearchData['search'][number];
 function useSearch() {
     const [query, setQuery] = useState('');
     const { loading, data } = useQuery<SearchData>(
@@ -117,6 +116,7 @@ export function Search() {
     </div>;
 }
 
+type SearchResult = SearchData['search'][number];
 function SearchResults({ loading, query, results }: {
     results: SearchResult[],
     query: string,

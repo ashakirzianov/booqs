@@ -1,5 +1,5 @@
 import React from 'react';
-import { radius } from './meter';
+import { radius } from './theme';
 
 const defaultSize = 70;
 

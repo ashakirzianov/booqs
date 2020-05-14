@@ -1,7 +1,6 @@
 import {
-    usePalette, bookFont, PaletteKey, palettes, buttonShadow,
+    usePalette, bookFont, PaletteKey, palettes, buttonShadow, meter,
 } from "../controls/theme";
-import { meter } from "../controls/meter";
 
 export function ThemerPanel() {
     const { border } = usePalette();

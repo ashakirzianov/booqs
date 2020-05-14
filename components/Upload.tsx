@@ -1,5 +1,5 @@
 import { ActionButton } from "../controls/Buttons";
-import { meter } from "../controls/meter";
+import { meter } from "../controls/theme";
 
 export function UploadPanel() {
     return <div className='container'>
