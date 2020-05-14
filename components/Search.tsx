@@ -1,37 +1,31 @@
 import React, { useState } from 'react';
-import { usePalette, normalWeight } from '../controls/theme';
-import { meter, radius } from '../controls/meter';
+import { gql } from 'apollo-boost';
+import { usePalette, normalWeight, meter, radius } from '../controls/theme';
 import { BooqCover } from '../controls/BooqCover';
 import { useQuery } from '@apollo/react-hooks';
-import { gql } from 'apollo-boost';
 import { Spinner } from '../controls/Spinner';
 
-type SearchResult = {
-    title?: string,
-    author?: string,
-    cover?: string,
+const SearchQuery = gql`query Search($query: String!) {
+    search(query: $query) {
+        title
+        author
+        cover(size: 60)
+    }
+}`;
+type SearchData = {
+    search: {
+        title?: string,
+        author?: string,
+        cover?: string,
+    }[],
 };
-type Search = {
-    query: string,
-    doQuery: (query: string) => void,
-    loading: boolean,
-    results: SearchResult[],
-};
-function useSearch(): Search {
+type SearchResult = SearchData['search'][number];
+function useSearch() {
     const [query, setQuery] = useState('');
-    const { loading, data } = useQuery(
-        gql`query Search($query: String!) {
-            search(query: $query) {
-                title
-                author
-                cover(size: 60)
-            }
-        }`,
-        {
-            variables: {
-                query,
-            },
-        });
+    const { loading, data } = useQuery<SearchData>(
+        SearchQuery,
+        { variables: { query } },
+    );
 
     return {
         query,
