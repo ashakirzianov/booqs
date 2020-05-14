@@ -157,7 +157,7 @@ function SearchResult({ result, query }: {
     result: SearchResult,
     query: string,
 }) {
-    const { highlight, light } = usePalette();
+    const { highlight, background } = usePalette();
     return <div className='container'>
         <BooqCover
             cover={result.cover}
@@ -186,7 +186,7 @@ function SearchResult({ result, query }: {
             }
             .container:hover {
                 background-color: ${highlight};
-                color: ${light};
+                color: ${background};
             }
             .details {
                 display: flex;

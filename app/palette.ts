@@ -3,7 +3,6 @@ import { gql } from "apollo-boost";
 
 type Color = keyof Palette;
 type Palette = {
-    light: string,
     background: string,
     action: string,
     primary: string,
@@ -44,7 +43,6 @@ export function useSetPalette() {
 export type PaletteName = 'light' | 'sepia' | 'dark';
 export const palettes: Palettes = {
     light: {
-        light: 'white',
         background: 'white',
         action: '#F57F17',
         primary: 'black',
@@ -53,7 +51,6 @@ export const palettes: Palettes = {
         highlight: 'orange',
     },
     sepia: {
-        light: 'white',
         background: '#f9f3e9',
         action: '#867b6c',
         primary: '#5f3e24',
@@ -62,7 +59,6 @@ export const palettes: Palettes = {
         highlight: 'orange',
     },
     dark: {
-        light: 'black',
         background: 'black',
         action: '#867b6c',
         primary: '#999',

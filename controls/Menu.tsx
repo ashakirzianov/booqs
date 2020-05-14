@@ -22,7 +22,7 @@ export function MenuItem({ icon, text }: {
     icon?: IconName,
     text: string,
 }) {
-    const { highlight } = usePalette();
+    const { highlight, background } = usePalette();
     return <div className='container'>
         {
             icon
@@ -41,7 +41,7 @@ export function MenuItem({ icon, text }: {
                 font-size: large;
             }
             .container:hover {
-                color: white;
+                color: ${background};
                 background-color: ${highlight};
             }
             .icon {
