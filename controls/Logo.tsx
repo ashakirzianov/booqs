@@ -1,5 +1,5 @@
 import React from 'react';
-import { extraBoldWeight, logoFont, normalWeight } from './theme';
+import { logoFont, normalWeight } from './theme';
 
 export function Logo() {
     return <div>

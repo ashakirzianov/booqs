@@ -1,7 +1,8 @@
 import React from 'react';
+import { usePalette } from '../app';
 import { Icon, IconName } from "./Icon";
 import {
-    usePalette, buttonShadow, meter, buttonSize, radius,
+    buttonShadow, meter, buttonSize, radius,
 } from "./theme";
 
 export function IconButton({ icon, onClick }: {

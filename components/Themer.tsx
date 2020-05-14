@@ -1,6 +1,8 @@
 import {
-    usePalette, bookFont, PaletteKey, palettes, buttonShadow, meter,
+    bookFont, buttonShadow, meter,
 } from "../controls/theme";
+
+import { usePalette, PaletteName, palettes } from '../app';
 
 export function ThemerPanel() {
     const { border } = usePalette();
@@ -85,7 +87,7 @@ function PalettePicker() {
 
 const size = '3rem';
 function PaletteButton({ name, checked }: {
-    name: PaletteKey,
+    name: PaletteName,
     checked: boolean,
 }) {
     const { background, highlight, primary } = palettes[name];

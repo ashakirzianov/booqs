@@ -1,7 +1,8 @@
 import React from 'react';
+import { usePalette } from '../app';
 import { IconName, Icon } from './Icon';
 import { HasChildren } from './utils';
-import { usePalette, meter } from './theme';
+import { meter } from './theme';
 
 export function Menu({ children }: HasChildren) {
     return <div>

@@ -1,7 +1,8 @@
 import React, { ReactNode } from 'react';
 import { roundArrow } from 'tippy.js';
 import Tippy, { useSingleton } from '@tippyjs/react';
-import { usePalette, panelShadow, radius } from './theme';
+import { usePalette } from '../app';
+import { panelShadow, radius } from './theme';
 
 export type PopoverItem = {
     anchor: ReactNode,

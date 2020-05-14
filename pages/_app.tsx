@@ -9,6 +9,11 @@ import { config } from '@fortawesome/fontawesome-svg-core';
 import '@fortawesome/fontawesome-svg-core/styles.css';
 config.autoAddCss = false;
 
-import { App } from '../app';
+import { AppProps } from 'next/app';
+import { AppProvider } from '../app';
 
-export default App;
+export default function App({ Component, pageProps }: AppProps) {
+    return <AppProvider>
+        <Component {...pageProps} />
+    </AppProvider>;
+}
