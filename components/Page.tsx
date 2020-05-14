@@ -5,10 +5,12 @@ import {
     menuFont, bookFont, normalWeight, boldWeight, extraBoldWeight,
     menuFontPrimary, logoFont,
 } from '../controls/theme';
+import { usePalette } from '../app';
 
 export function Page({ title, children }: HasChildren & {
     title: string,
 }) {
+    const { background, primary } = usePalette();
     return <div className="page">
         <Head>
             <title>{title}</title>
@@ -30,6 +32,8 @@ export function Page({ title, children }: HasChildren & {
                 padding: 0;
                 font-family: ${menuFont};
                 font-weight: ${normalWeight};
+                color: ${primary};
+                background: ${background};
                 overflow-x: hidden;
             }
         `}</style>

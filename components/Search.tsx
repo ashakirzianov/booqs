@@ -82,6 +82,7 @@ export function Search() {
             font: inherit;
             font-size: x-large;
             font-weight: ${normalWeight};
+            color: ${primary};
             background-color: rgba(0,0,0,0);
         }
         input:focus {

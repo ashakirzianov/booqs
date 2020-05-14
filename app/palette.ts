@@ -24,10 +24,13 @@ type PaletteData = {
 export const initialPaletteData: PaletteData = {
     palette: 'light',
 };
-export function usePalette(): Palette {
+export function usePalette(): Palette & { name: PaletteName } {
     const { data } = useQuery<PaletteData>(PaletteQuery);
-    const key = data?.palette ?? 'light';
-    return palettes[key];
+    const name = data?.palette ?? 'light';
+    return {
+        ...palettes[name],
+        name,
+    };
 }
 export function useSetPalette() {
     const client = useApolloClient();

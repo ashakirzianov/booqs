@@ -70,11 +70,12 @@ function FontScaleButton({ scale }: {
 }
 
 function PalettePicker() {
+    const { name } = usePalette();
     const setPalette = useSetPalette();
     return <div>
-        <PaletteButton name='light' checked={true} onSelect={setPalette} />
-        <PaletteButton name='sepia' checked={false} onSelect={setPalette} />
-        <PaletteButton name='dark' checked={false} onSelect={setPalette} />
+        <PaletteButton name='light' current={name} onSelect={setPalette} />
+        <PaletteButton name='sepia' current={name} onSelect={setPalette} />
+        <PaletteButton name='dark' current={name} onSelect={setPalette} />
         <style jsx>{`
             div {
                 display: flex;
@@ -87,11 +88,12 @@ function PalettePicker() {
 }
 
 const size = '3rem';
-function PaletteButton({ name, checked, onSelect }: {
+function PaletteButton({ name, current, onSelect }: {
     name: PaletteName,
-    checked: boolean,
+    current: PaletteName,
     onSelect: (name: PaletteName) => void,
 }) {
+    const checked = current === name;
     const { background, highlight, primary } = palettes[name];
     return <div className="container" onClick={() => onSelect(name)}>
         <div className="label">{name.substr(0, 1).toUpperCase()}</div>
