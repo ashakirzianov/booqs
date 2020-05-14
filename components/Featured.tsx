@@ -3,33 +3,35 @@ import { useQuery } from '@apollo/react-hooks';
 import { gql } from 'apollo-boost';
 import { LinkButton } from '../controls/Buttons';
 import { Panel } from '../controls/Panel';
-import { BooqTags, BooqTag } from '../controls/BooqTags';
+import { BooqTags } from '../controls/BooqTags';
 import { BooqCover } from '../controls/BooqCover';
 import { boldWeight, meter } from '../controls/theme';
 
-type BooqCard = {
-    title?: string,
-    author?: string,
-    cover?: string,
-    tags: BooqTag[],
-}
-type Featured = {
-    cards: BooqCard[],
-    loading: boolean,
-}
-function useFeatured(): Featured {
-    const { loading, data } = useQuery(
-        gql`query Featured {
-            featured(limit: 10) {
-                title
-                author
-                cover(size: 210)
-                tags {
-                    tag
-                    value
-                }
-            }
-        }`);
+const FeaturedQuery = gql`query Featured {
+    featured(limit: 10) {
+        title
+        author
+        cover(size: 210)
+        tags {
+            tag
+            value
+        }
+    }
+}`;
+type FeaturedData = {
+    featured: {
+        title?: string,
+        author?: string,
+        cover?: string,
+        tags: {
+            tag: string,
+            value?: string,
+        }[],
+    }[],
+};
+type FeaturedItem = FeaturedData['featured'][number];
+function useFeatured() {
+    const { loading, data } = useQuery<FeaturedData>(FeaturedQuery);
     return {
         loading,
         cards: (data?.featured ?? []),
@@ -56,7 +58,7 @@ export function Featured() {
 
 function FeaturedCard({
     title, author, cover, tags,
-}: BooqCard) {
+}: FeaturedItem) {
     return <Panel>
         <div className="container">
             <BooqCover
