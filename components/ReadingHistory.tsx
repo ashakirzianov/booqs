@@ -1,5 +1,5 @@
 import { BooqPreview, BooqPreviewProps } from "../controls/BooqPreview";
-import { meter } from "../controls/meter";
+import { meter } from "../controls/theme";
 
 export function ReadingHistory() {
     return <Positions previews={[]} />;

@@ -1,12 +1,11 @@
 import React from 'react';
 import { useQuery } from '@apollo/react-hooks';
 import { gql } from 'apollo-boost';
-import { meter } from '../controls/meter';
 import { LinkButton } from '../controls/Buttons';
 import { Panel } from '../controls/Panel';
 import { BooqTags, BooqTag } from '../controls/BooqTags';
 import { BooqCover } from '../controls/BooqCover';
-import { boldWeight } from '../controls/theme';
+import { boldWeight, meter } from '../controls/theme';
 
 type BooqCard = {
     title?: string,

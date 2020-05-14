@@ -1,5 +1,4 @@
-import { usePalette, bookFont } from "./theme";
-import { meter, radius } from "./meter";
+import { usePalette, bookFont, meter, radius } from "./theme";
 import { panelWidth } from "./Panel";
 import { PropsType } from "./utils";
 

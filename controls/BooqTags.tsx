@@ -1,5 +1,5 @@
 import React from 'react';
-import { meter } from './meter';
+import { meter } from './theme';
 
 export type BooqTag = {
     tag: string,
