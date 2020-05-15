@@ -1,37 +1,30 @@
 /*global globalThis*/
 
-export async function loginFb(): Promise<fb.StatusResponse> {
-    return new Promise(res => {
-        getFbSdk().then(sdk => {
-            sdk.getLoginStatus(status => {
-                if (status.status !== 'connected') {
-                    sdk.login(res);
-                } else {
-                    res(status);
-                }
-            })
-        });
-    });
+export async function facebookStatus() {
+    const sdk = await getFbSdk();
+    return new Promise<fb.StatusResponse>(
+        res => sdk.getLoginStatus(res),
+    );
 }
 
-export async function logoutFb(): Promise<fb.StatusResponse> {
-    return new Promise(res => {
-        getFbSdk().then(sdk => {
-            sdk.getLoginStatus(status => {
-                if (status.status === 'connected') {
-                    sdk.logout(res);
-                } else {
-                    res(status);
-                }
-            })
-        });
-    });
+export async function facebookLogin() {
+    const sdk = await getFbSdk();
+    return new Promise<fb.StatusResponse>(
+        res => sdk.login(res),
+    );
 }
 
-let fbSdk: fb.FacebookStatic | undefined = undefined;
-export async function getFbSdk(attempts = 10): Promise<fb.FacebookStatic> {
-    if (fbSdk) {
-        return fbSdk;
+export async function facebookLogout() {
+    const sdk = await getFbSdk();
+    return new Promise<fb.StatusResponse>(
+        res => sdk.logout(res),
+    );
+}
+
+let initialized: fb.FacebookStatic | undefined = undefined;
+async function getFbSdk(attempts = 10): Promise<fb.FacebookStatic> {
+    if (initialized) {
+        return initialized;
     } else if (globalThis.FB) {
         globalThis.FB.init({
             appId: process.env.NEXT_PUBLIC_FB_APP_ID || '',
@@ -39,8 +32,8 @@ export async function getFbSdk(attempts = 10): Promise<fb.FacebookStatic> {
             xfbml: true,
             version: 'v7.0'
         });
-        fbSdk = globalThis.FB;
-        return fbSdk;
+        initialized = globalThis.FB;
+        return getFbSdk();
     } else {
         addScriptTag();
         return new Promise((resolve, reject) => {

@@ -1,12 +1,10 @@
-import React, { useState } from "react";
-import { loginFb } from '../lib';
+import React from "react";
 import { useAuth, useSignInOption } from '../app';
 import { meter } from "../controls/theme";
 import { Menu, MenuItem } from "../controls/Menu";
 
 export function SignInPanel() {
     const state = useAuth();
-    console.log(state);
     switch (state.state) {
         case 'signed':
             return <UserMenu />;
@@ -42,21 +40,13 @@ function UserMenu() {
 
 function SignInMenu() {
     const { signWithFacebook } = useSignInOption();
-    function facebook() {
-        loginFb().then(
-            status =>
-                status.status === 'connected'
-                    ? signWithFacebook(status.authResponse.accessToken)
-                    : undefined
-        );
-    }
     return <div>
         <span>Sign In</span>
         <Menu>
             <MenuItem
                 icon="facebook"
                 text="Facebook"
-                callback={facebook}
+                callback={signWithFacebook}
             />
         </Menu>
         <style jsx>{`

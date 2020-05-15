@@ -8,7 +8,6 @@ import {
 import {
     faFacebookF,
 } from '@fortawesome/free-brands-svg-icons';
-import { assertNever } from '../lib';
 
 export type IconName =
     | 'sign-in' | 'upload' | 'appearance' | 'search'
@@ -45,4 +44,8 @@ function iconForName(name: IconName) {
             assertNever(name);
             return faQuestion;
     }
+}
+
+function assertNever(x: never) {
+    return x;
 }
