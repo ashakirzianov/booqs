@@ -1,15 +1,31 @@
 /*global globalThis*/
 
 export async function loginFb(): Promise<fb.StatusResponse> {
-    return new Promise(
-        res => getFbSdk().then(sdk => sdk.login(res)),
-    );
+    return new Promise(res => {
+        getFbSdk().then(sdk => {
+            sdk.getLoginStatus(status => {
+                if (status.status !== 'connected') {
+                    sdk.login(res);
+                } else {
+                    res(status);
+                }
+            })
+        });
+    });
 }
 
 export async function logoutFb(): Promise<fb.StatusResponse> {
-    return new Promise(
-        res => getFbSdk().then(sdk => sdk.logout(res)),
-    );
+    return new Promise(res => {
+        getFbSdk().then(sdk => {
+            sdk.getLoginStatus(status => {
+                if (status.status === 'connected') {
+                    sdk.logout(res);
+                } else {
+                    res(status);
+                }
+            })
+        });
+    });
 }
 
 let fbSdk: fb.FacebookStatic | undefined = undefined;

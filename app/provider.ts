@@ -3,6 +3,7 @@ import ApolloClient from 'apollo-boost';
 import { ApolloProvider } from '@apollo/react-hooks';
 import fetch from 'isomorphic-unfetch';
 import { initialPaletteData } from './palette';
+import { initialAuthData } from './auth';
 
 
 const client = new ApolloClient({
@@ -13,6 +14,7 @@ const client = new ApolloClient({
 client.cache.writeData({
     data: {
         ...initialPaletteData,
+        ...initialAuthData,
     },
 });
 

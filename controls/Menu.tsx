@@ -18,12 +18,13 @@ export function Menu({ children }: HasChildren) {
     </div>;
 }
 
-export function MenuItem({ icon, text }: {
-    icon?: IconName,
+export function MenuItem({ icon, text, callback }: {
     text: string,
+    icon?: IconName,
+    callback?: () => void,
 }) {
     const { highlight, background } = usePalette();
-    return <div className='container'>
+    return <div className='container' onClick={callback}>
         {
             icon
                 ? <div className="icon"><Icon name={icon} /></div>
