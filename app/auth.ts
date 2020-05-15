@@ -82,7 +82,6 @@ async function signIn(client: ApolloClient<object>, token: string, provider: str
                 name: auth.name,
             } as const
             : initialAuthData.authState;
-        console.log(authState);
         storeAuthToken(auth.token);
         client.writeData<AuthData>({
             data: { authState },

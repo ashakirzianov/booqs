@@ -21,19 +21,9 @@ export async function facebookLogout() {
     );
 }
 
-let initialized: fb.FacebookStatic | undefined = undefined;
 async function getFbSdk(attempts = 10): Promise<fb.FacebookStatic> {
-    if (initialized) {
-        return initialized;
-    } else if (globalThis.FB) {
-        globalThis.FB.init({
-            appId: process.env.NEXT_PUBLIC_FB_APP_ID || '',
-            autoLogAppEvents: true,
-            xfbml: true,
-            version: 'v7.0'
-        });
-        initialized = globalThis.FB;
-        return getFbSdk();
+    if (globalThis.FB) {
+        return globalThis.FB;
     } else {
         addScriptTag();
         return new Promise((resolve, reject) => {
@@ -50,6 +40,14 @@ async function getFbSdk(attempts = 10): Promise<fb.FacebookStatic> {
 }
 
 function addScriptTag() {
+    (window as any).fbAsyncInit = () => {
+        globalThis.FB.init({
+            appId: process.env.NEXT_PUBLIC_FB_APP_ID || '',
+            autoLogAppEvents: true,
+            xfbml: true,
+            version: 'v7.0'
+        });
+    };
     const id = 'facebook-jssdk';
     const scriptTag: any = document.getElementsByTagName('script')[0];
     if (document.getElementById(id)) {
