@@ -2,7 +2,9 @@ import { gql, ApolloClient } from "apollo-boost";
 import { useApolloClient, useQuery } from '@apollo/react-hooks';
 import { facebookSdk } from "./facebookSdk";
 
-const storage = sessionStorage;
+const storage = process.browser
+    ? sessionStorage
+    : undefined;
 export function restoreAuthToken() {
     return storage?.getItem('auth');
 }
