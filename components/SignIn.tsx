@@ -3,6 +3,7 @@ import { useSignInOptions, usePalette, useAuth } from '../app';
 import { meter } from "../controls/theme";
 import { Menu, MenuItem } from "../controls/Menu";
 import { IconButton } from "../controls/Buttons";
+import { PopoverSingleton, Popover } from "../controls/Popover";
 
 export function SignInMenu() {
     const { provider } = useAuth();
@@ -17,7 +18,17 @@ export function SignInMenu() {
     </Menu>;
 }
 
-export function SingInButton() {
+export function SignIn({ singleton }: {
+    singleton: PopoverSingleton,
+}) {
+    return <Popover
+        singleton={singleton}
+        anchor={<SingInButton />}
+        content={<SignInPanel />}
+    />;
+}
+
+function SingInButton() {
     const state = useAuth();
     if (state.state === 'signed') {
         return state.profilePicture
@@ -34,7 +45,7 @@ export function SingInButton() {
     }
 }
 
-export function SignInPanel() {
+function SignInPanel() {
     const state = useAuth();
     switch (state.state) {
         case 'signed':

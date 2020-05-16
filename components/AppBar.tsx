@@ -2,11 +2,10 @@ import React from 'react';
 import { headerHeight, meter } from '../controls/theme';
 import { Logo } from '../controls/Logo';
 import { Popovers } from '../controls/Popover';
-import { IconButton } from '../controls/Buttons';
 import { Search } from './Search';
-import { SignInPanel, SingInButton } from './SignIn';
-import { ThemerPanel } from './Themer';
-import { UploadPanel } from './Upload';
+import { SignIn } from './SignIn';
+import { Themer } from './Themer';
+import { Upload } from './Upload';
 
 export function AppBar() {
     return <div className="container">
@@ -59,22 +58,13 @@ export function AppBar() {
 
 function AppButtons() {
     return <div className='buttons-row'>
-        <Popovers
-            items={[
-                {
-                    anchor: <IconButton icon='upload' />,
-                    body: <UploadPanel />,
-                },
-                {
-                    anchor: <IconButton icon='appearance' />,
-                    body: <ThemerPanel />,
-                },
-                {
-                    anchor: <SingInButton />,
-                    body: <SignInPanel />,
-                },
-            ]}
-        />
+        <Popovers>
+            {singleton => <>
+                <Upload singleton={singleton} />
+                <Themer singleton={singleton} />
+                <SignIn singleton={singleton} />
+            </>}
+        </Popovers>
         <style jsx>{`
             .buttons-row {
                 display: flex;

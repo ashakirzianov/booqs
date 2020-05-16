@@ -4,12 +4,33 @@ import Tippy, { useSingleton } from '@tippyjs/react';
 import { usePalette } from '../app';
 import { panelShadow, radius } from './theme';
 
-export type PopoverItem = {
+export type PopoverSingleton = ReturnType<typeof useSingleton>[1];
+
+export function Popover({ singleton, anchor, content }: {
+    singleton: PopoverSingleton,
     anchor: ReactNode,
-    body: ReactNode,
-};
-export function Popovers({ items }: {
-    items: PopoverItem[],
+    content: ReactNode,
+}) {
+    return <>
+        <Tippy
+            singleton={singleton}
+            content={<div className='anchor'>
+                {content}
+            </div>}
+            children={<div>{anchor}</div>}
+        />
+        <style jsx>{`
+            .anchor {
+                display: flex;
+                min-width: 15rem;
+                flex: 1;
+            }
+        `}</style>
+    </>;
+}
+
+export function Popovers({ children }: {
+    children: (singleton: PopoverSingleton) => ReactNode,
 }) {
     const { primary, border, background } = usePalette();
     const [source, target] = useSingleton();
@@ -23,28 +44,7 @@ export function Popovers({ items }: {
             hideOnClick={true}
             animation='shift-away'
         />
-        {
-            items.map(
-                ({ anchor, body }, idx) => body
-                    ? <div key={idx}>
-                        <Tippy
-                            singleton={target}
-                            content={<div className="body">
-                                {body}
-                            </div>}
-                            children={<div>{anchor}</div>}
-                        />
-                    </div>
-                    : anchor
-            )
-        }
-        <style jsx>{`
-            .body {
-                display: flex;
-                min-width: 15rem;
-                flex: 1;
-            }
-            `}</style>
+        {children(target)}
         <style jsx global>{`
         .tippy-box {
             color: ${primary};

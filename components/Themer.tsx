@@ -1,10 +1,21 @@
 import {
     bookFont, buttonShadow, meter,
 } from "../controls/theme";
-
 import { usePalette, PaletteName, palettes, useSetPalette } from '../app';
+import { PopoverSingleton, Popover } from "../controls/Popover";
+import { IconButton } from "../controls/Buttons";
 
-export function ThemerPanel() {
+export function Themer({ singleton }: {
+    singleton: PopoverSingleton,
+}) {
+    return <Popover
+        singleton={singleton}
+        anchor={<IconButton icon='appearance' />}
+        content={<ThemerPanel />}
+    />;
+}
+
+function ThemerPanel() {
     const { border } = usePalette();
     return <div className="container">
         <FontSettings />
