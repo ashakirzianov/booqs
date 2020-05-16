@@ -28,6 +28,7 @@ export const initialAuthData: AuthData = {
     name: null,
     profilePicture: null,
 };
+export type Auth = ReturnType<typeof useAuth>;
 export function useAuth() {
     const { data } = useQuery<AuthData>(AuthStateQuery);
 

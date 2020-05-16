@@ -37,9 +37,9 @@ export function ActionButton({ text, onClick }: {
     text: string,
     onClick?: () => void,
 }) {
-    const { action, light, highlight } = usePalette();
+    const { action, background, highlight } = usePalette();
     return <>
-        <button>
+        <button onClick={onClick}>
             <span>{text}</span>
         </button>
         <style jsx>{`
@@ -47,7 +47,7 @@ export function ActionButton({ text, onClick }: {
                 border: none;
                 border-radius: ${radius};
                 background-color: ${action};
-                color: ${light};
+                color: ${background};
                 box-shadow: ${buttonShadow};
                 font-size: large;
                 padding: ${meter.regular};

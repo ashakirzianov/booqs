@@ -4,9 +4,10 @@ import { Logo } from '../controls/Logo';
 import { Popovers } from '../controls/Popover';
 import { IconButton } from '../controls/Buttons';
 import { Search } from './Search';
-import { SignInPanel } from './SignIn';
+import { SignInPanel, SingInButton } from './SignIn';
 import { ThemerPanel } from './Themer';
 import { UploadPanel } from './Upload';
+import { useAuth } from '../app';
 
 export function AppBar() {
     return <div className="container">
@@ -48,6 +49,7 @@ export function AppBar() {
 }
 
 function AppButtons() {
+    const auth = useAuth();
     return <div className='buttons-row'>
         <Popovers
             items={[
@@ -60,8 +62,8 @@ function AppButtons() {
                     body: <ThemerPanel />,
                 },
                 {
-                    anchor: <IconButton icon='sign-in' />,
-                    body: <SignInPanel />,
+                    anchor: <SingInButton state={auth} />,
+                    body: <SignInPanel state={auth} />,
                 },
             ]}
         />
@@ -70,6 +72,7 @@ function AppButtons() {
                 display: flex;
                 flex-direction: row;
                 justify-content: flex-end;
+                align-items: center;
             }
             `}</style>
     </div>;

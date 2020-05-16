@@ -3,14 +3,14 @@ import React from 'react';
 import { FontAwesomeIcon, FontAwesomeIconProps } from '@fortawesome/react-fontawesome';
 import {
     faPlus, faFontCase, faSignIn, faSignOut, faQuestion, faSearch,
-    faFileAlt,
+    faFileAlt, faUser,
 } from '@fortawesome/pro-light-svg-icons';
 import {
     faFacebookF,
 } from '@fortawesome/free-brands-svg-icons';
 
 export type IconName =
-    | 'sign-in' | 'sign-out' | 'upload' | 'appearance' | 'search'
+    | 'user' | 'sign-in' | 'sign-out' | 'upload' | 'appearance' | 'search'
     | 'pages'
     | 'facebook'
     ;
@@ -28,6 +28,8 @@ export function Icon({ name, size }: {
 
 function iconForName(name: IconName) {
     switch (name) {
+        case 'user':
+            return faUser;
         case 'sign-in':
             return faSignIn;
         case 'sign-out':
