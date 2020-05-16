@@ -2,11 +2,16 @@ import { gql, ApolloClient } from "apollo-boost";
 import { useApolloClient, useQuery } from '@apollo/react-hooks';
 import { facebookSdk } from "./facebookSdk";
 
+const storage = sessionStorage;
 export function restoreAuthToken() {
-    return window?.sessionStorage?.getItem('auth');
+    return storage?.getItem('auth');
 }
 function storeAuthToken(token: string) {
-    window?.sessionStorage?.setItem('auth', token);
+    storage?.setItem('auth', token);
+}
+
+function clearAuthToken() {
+    storage?.removeItem('auth');
 }
 
 export async function initAuth(client: ApolloClient<unknown>) {
@@ -71,6 +76,7 @@ export function useSignInOptions() {
             });
             await facebookSdk()?.logout();
             client.resetStore();
+            clearAuthToken();
         }
     };
 }
