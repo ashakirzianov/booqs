@@ -4,6 +4,7 @@ import { ApolloProvider } from '@apollo/react-hooks';
 import fetch from 'isomorphic-unfetch';
 import { initialPaletteData } from './palette';
 import { restoreAuthToken, initialAuthData, initAuth } from './auth';
+import { initialUploadStateData } from './upload';
 
 
 const client = new ApolloClient({
@@ -25,6 +26,7 @@ const initialData = {
     data: {
         ...initialPaletteData,
         ...initialAuthData,
+        ...initialUploadStateData,
     },
 };
 client.writeData(initialData);
