@@ -5,13 +5,13 @@ import {
     buttonShadow, meter, buttonSize, radius,
 } from "./theme";
 
-export function IconButton({ icon, callback }: {
+export function IconButton({ icon, onClick }: {
     icon: IconName,
-    callback?: () => void,
+    onClick?: () => void,
 }) {
     const { dimmed, highlight } = usePalette();
     return <button
-        onClick={callback}
+        onClick={onClick}
     >
         <Icon name={icon} />
         <style jsx>{`

@@ -22,7 +22,7 @@ export function Modal({
             <div className='close'>
                 <IconButton
                     icon='close'
-                    callback={close}
+                    onClick={close}
                 />
             </div>
             <div style={{

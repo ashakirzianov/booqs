@@ -2,6 +2,8 @@ import { ActionButton } from "../controls/Buttons";
 import { meter } from "../controls/theme";
 import { useAuth } from "../app";
 import { SignInMenu } from "./SignIn";
+import { useRef } from "react";
+import { SelectFileDialogRef, SelectFileDialog } from "../controls/SelectFileDialog";
 
 export function UploadPanel() {
     const state = useAuth();
@@ -13,9 +15,23 @@ export function UploadPanel() {
 }
 
 function UploadFile() {
+    const dialogRef = useRef<SelectFileDialogRef>();
+
     return <div className='container'>
-        <span>Upload .epub file</span>
-        <ActionButton text='Upload' />
+        <SelectFileDialog
+            accept='application/epub+zip'
+            refCallback={r => dialogRef.current = r}
+            onFilesSelected={() => undefined}
+        />
+        <span>Select .epub file</span>
+        <ActionButton
+            text='Select'
+            onClick={() => {
+                if (dialogRef.current) {
+                    dialogRef.current.show();
+                }
+            }}
+        />
         <style jsx>{`
         span {
             margin: ${meter.regular};
