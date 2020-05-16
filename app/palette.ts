@@ -34,7 +34,7 @@ export function usePalette(): Palette & { name: PaletteName } {
 export function useSetPalette() {
     const client = useApolloClient();
     return function (palette: PaletteName) {
-        client.writeData<PaletteData>({
+        client.cache.writeData<PaletteData>({
             data: { palette },
         });
     };

@@ -3,7 +3,7 @@ import ApolloClient from 'apollo-boost';
 import { ApolloProvider } from '@apollo/react-hooks';
 import fetch from 'isomorphic-unfetch';
 import { initialPaletteData } from './palette';
-import { restoreAuthToken } from './auth';
+import { restoreAuthToken, initialAuthData, initAuth } from './auth';
 
 
 const client = new ApolloClient({
@@ -21,11 +21,13 @@ const client = new ApolloClient({
         }
     },
 });
-client.cache.writeData({
+client.writeData({
     data: {
         ...initialPaletteData,
+        ...initialAuthData,
     },
 });
+initAuth(client);
 
 export function AppProvider({ children }: {
     children: ReactNode,

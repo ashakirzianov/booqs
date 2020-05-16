@@ -7,7 +7,9 @@ export function SignInPanel() {
     const state = useAuth();
     switch (state.state) {
         case 'signed':
-            return <UserMenu />;
+            return <UserMenu
+                name={state.name}
+            />;
         case 'not-signed':
             return <SignInMenu />;
         default:
@@ -15,9 +17,11 @@ export function SignInPanel() {
     }
 }
 
-function UserMenu() {
+function UserMenu({ name }: {
+    name: string,
+}) {
     return <div>
-        <span>Welcome</span>
+        <span>{name}</span>
         <Menu>
         </Menu>
         <style jsx>{`

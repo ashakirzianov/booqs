@@ -16,6 +16,7 @@ export function Page({ title, children }: HasChildren & {
             <title>{title}</title>
             <meta name="viewport" content="initial-scale=1.0, width=device-width" />
             <link href={`https://fonts.googleapis.com/css2?family=${menuFontPrimary}:wght@${normalWeight};${boldWeight};${extraBoldWeight}&${logoFont}:wght@${normalWeight};${boldWeight};${extraBoldWeight}&family=${bookFont}&display=swap`} rel="stylesheet" />
+            <script async defer src="https://connect.facebook.net/en_US/sdk.js"></script>
         </Head>
         {children}
         <style jsx global>{`

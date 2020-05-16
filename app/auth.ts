@@ -1,6 +1,6 @@
 import { gql, ApolloClient } from "apollo-boost";
 import { useApolloClient, useQuery } from '@apollo/react-hooks';
-import { facebookLogin, facebookStatus } from "./facebookSdk";
+import { facebookSdk } from "./facebookSdk";
 
 export function restoreAuthToken() {
     return window?.sessionStorage?.getItem('auth');
@@ -9,37 +9,37 @@ function storeAuthToken(token: string) {
     window?.sessionStorage?.setItem('auth', token);
 }
 
-export async function initAuth(client: ApolloClient<object>) {
-    const fbStatus = await facebookStatus();
-    if (fbStatus.status === 'connected') {
+export async function initAuth(client: ApolloClient<unknown>) {
+    const fbStatus = await facebookSdk()?.status();
+    if (fbStatus?.status === 'connected') {
         signIn(client, fbStatus.authResponse.accessToken, 'facebook');
     }
 }
 
-type AuthState =
-    | { state: 'not-signed' }
-    | { state: 'signed', name: string }
-    ;
 type AuthData = {
-    authState: AuthState & { __typename: 'AuthState' },
+    name: string | null,
+    profilePicture: string | null,
 };
-const AuthStateQuery = gql`query SignInState {
-    authState @client {
-        state
-        token
-        name
-    }
+const AuthStateQuery = gql`query AuthState {
+    name @client
+    profilePicture @client
 }`;
 export const initialAuthData: AuthData = {
-    authState: {
-        __typename: 'AuthState',
-        state: 'not-signed',
-    },
+    name: null,
+    profilePicture: null,
 };
 export function useAuth() {
     const { data } = useQuery<AuthData>(AuthStateQuery);
 
-    return (data ?? initialAuthData).authState;
+    const { name, profilePicture } = (data ?? initialAuthData);
+    if (name) {
+        return {
+            state: 'signed',
+            name, profilePicture,
+        } as const;
+    } else {
+        return { state: 'not-signed' } as const;
+    }
 }
 
 export function useSignInOption() {
@@ -47,8 +47,8 @@ export function useSignInOption() {
 
     return {
         async signWithFacebook() {
-            const status = await facebookLogin();
-            if (status.status === 'connected') {
+            const status = await facebookSdk()?.login();
+            if (status?.status === 'connected') {
                 return signIn(client, status.authResponse.accessToken, 'facebook');
             } else {
                 return undefined;
@@ -57,12 +57,12 @@ export function useSignInOption() {
     };
 }
 
-async function signIn(client: ApolloClient<object>, token: string, provider: string) {
+async function signIn(client: ApolloClient<unknown>, token: string, provider: string) {
     const { data: { auth } } = await client.query<{
         auth: {
             token: string,
             name: string,
-            profilePicture?: string,
+            profilePicture: string | null,
         },
     }>({
         query: gql`query Auth($token: String!, $provider: String!) {
@@ -75,17 +75,14 @@ async function signIn(client: ApolloClient<object>, token: string, provider: str
         variables: { token, provider },
     });
     if (auth) {
-        const authState = auth
+        const data: AuthData = auth
             ? {
-                __typename: 'AuthState',
-                state: 'signed',
                 name: auth.name,
-            } as const
-            : initialAuthData.authState;
+                profilePicture: auth.profilePicture,
+            }
+            : initialAuthData;
         storeAuthToken(auth.token);
-        client.writeData<AuthData>({
-            data: { authState },
-        });
+        client.cache.writeData<AuthData>({ data });
     }
 
     return auth;
