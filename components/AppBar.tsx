@@ -7,7 +7,6 @@ import { Search } from './Search';
 import { SignInPanel, SingInButton } from './SignIn';
 import { ThemerPanel } from './Themer';
 import { UploadPanel } from './Upload';
-import { useAuth } from '../app';
 
 export function AppBar() {
     return <div className="container">
@@ -59,7 +58,6 @@ export function AppBar() {
 }
 
 function AppButtons() {
-    const auth = useAuth();
     return <div className='buttons-row'>
         <Popovers
             items={[
@@ -72,8 +70,8 @@ function AppButtons() {
                     body: <ThemerPanel />,
                 },
                 {
-                    anchor: <SingInButton state={auth} />,
-                    body: <SignInPanel state={auth} />,
+                    anchor: <SingInButton />,
+                    body: <SignInPanel />,
                 },
             ]}
         />

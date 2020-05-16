@@ -1,5 +1,5 @@
 import React from "react";
-import { useSignInOptions, Auth, usePalette } from '../app';
+import { useSignInOptions, Auth, usePalette, useAuth } from '../app';
 import { meter, buttonSize } from "../controls/theme";
 import { Menu, MenuItem } from "../controls/Menu";
 import { IconButton } from "../controls/Buttons";
@@ -15,23 +15,38 @@ export function SignInMenu() {
     </Menu>;
 }
 
-export function SingInButton({ state: { name, profilePicture } }: {
-    state: Auth,
-}) {
-    if (profilePicture) {
-        return <ProfilePictureButton
-            picture={profilePicture}
-        />;
-    } else if (name) {
-        return <IconButton
-            icon='user'
-        />;
+export function SingInButton() {
+    const state = useAuth();
+    if (state.state === 'signed') {
+        return state.profilePicture
+            ? <ProfilePictureButton
+                picture={state.profilePicture}
+            />
+            : <IconButton
+                icon='user'
+            />
     } else {
         return <IconButton
             icon='sign-in'
         />;
     }
 }
+
+export function SignInPanel() {
+    const state = useAuth();
+    switch (state.state) {
+        case 'signed':
+            return <Signed
+                name={state.name}
+            />;
+        case 'not-signed':
+            return <NotSigned />;
+        default:
+            return null;
+    }
+}
+
+
 
 function ProfilePictureButton({ picture }: {
     picture: string,
@@ -58,21 +73,6 @@ function ProfilePictureButton({ picture }: {
             }
             `}</style>
     </div>;
-}
-
-export function SignInPanel({ state }: {
-    state: Auth,
-}) {
-    switch (state.state) {
-        case 'signed':
-            return <Signed
-                name={state.name}
-            />;
-        case 'not-signed':
-            return <NotSigned />;
-        default:
-            return null;
-    }
 }
 
 function Signed({ name }: {
