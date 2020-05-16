@@ -10,7 +10,8 @@ export function facebookSdk() {
         globalThis.FB.init({
             appId: process.env.NEXT_PUBLIC_FB_APP_ID ?? '',
             autoLogAppEvents: true,
-            xfbml: true,
+            xfbml: false,
+            status: true,
             version: 'v7.0'
         });
         initialized = true;
@@ -22,7 +23,7 @@ export function facebookSdk() {
         login: () => new Promise<fb.StatusResponse>(
             res => sdk.login(res),
         ),
-        logut: () => new Promise<fb.StatusResponse>(
+        logout: () => new Promise<fb.StatusResponse>(
             res => sdk.logout(res),
         ),
     };

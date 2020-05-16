@@ -2,7 +2,7 @@ import React from 'react';
 
 import { FontAwesomeIcon, FontAwesomeIconProps } from '@fortawesome/react-fontawesome';
 import {
-    faPlus, faFontCase, faSignIn, faQuestion, faSearch,
+    faPlus, faFontCase, faSignIn, faSignOut, faQuestion, faSearch,
     faFileAlt,
 } from '@fortawesome/pro-light-svg-icons';
 import {
@@ -10,7 +10,7 @@ import {
 } from '@fortawesome/free-brands-svg-icons';
 
 export type IconName =
-    | 'sign-in' | 'upload' | 'appearance' | 'search'
+    | 'sign-in' | 'sign-out' | 'upload' | 'appearance' | 'search'
     | 'pages'
     | 'facebook'
     ;
@@ -30,6 +30,8 @@ function iconForName(name: IconName) {
     switch (name) {
         case 'sign-in':
             return faSignIn;
+        case 'sign-out':
+            return faSignOut;
         case 'appearance':
             return faFontCase;
         case 'upload':

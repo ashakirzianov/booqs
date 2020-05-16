@@ -42,7 +42,7 @@ export function useAuth() {
     }
 }
 
-export function useSignInOption() {
+export function useSignInOptions() {
     const client = useApolloClient();
 
     return {
@@ -54,6 +54,10 @@ export function useSignInOption() {
                 return undefined;
             }
         },
+        async signOut() {
+            await facebookSdk()?.logout();
+            client.resetStore();
+        }
     };
 }
 

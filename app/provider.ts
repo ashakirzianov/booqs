@@ -21,11 +21,15 @@ const client = new ApolloClient({
         }
     },
 });
-client.writeData({
+const initialData = {
     data: {
         ...initialPaletteData,
         ...initialAuthData,
     },
+};
+client.writeData(initialData);
+client.onResetStore(async () => {
+    client.writeData(initialData);
 });
 initAuth(client);
 

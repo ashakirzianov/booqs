@@ -1,5 +1,5 @@
 import React from "react";
-import { useAuth, useSignInOption } from '../app';
+import { useAuth, useSignInOptions } from '../app';
 import { meter } from "../controls/theme";
 import { Menu, MenuItem } from "../controls/Menu";
 
@@ -20,9 +20,15 @@ export function SignInPanel() {
 function UserMenu({ name }: {
     name: string,
 }) {
+    const { signOut } = useSignInOptions();
     return <div>
         <span>{name}</span>
         <Menu>
+            <MenuItem
+                icon='sign-out'
+                text='Sing Out'
+                callback={signOut}
+            />
         </Menu>
         <style jsx>{`
         div {
@@ -43,7 +49,7 @@ function UserMenu({ name }: {
 }
 
 function SignInMenu() {
-    const { signWithFacebook } = useSignInOption();
+    const { signWithFacebook } = useSignInOptions();
     return <div>
         <span>Sign In</span>
         <Menu>
