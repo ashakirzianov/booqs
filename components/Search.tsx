@@ -62,7 +62,7 @@ export function Search() {
             flex: 0 1;
             align-items: flex-start;
             justify-content: flex-start;
-            margin: 0 ${meter.xLarge};
+            margin: 0;
             color: ${primary};
             max-height: 2rem;
             overflow: visible;
@@ -78,6 +78,8 @@ export function Search() {
         input {
             display: flex;
             border: none;
+            width: 100%;
+            min-width: 0px;
             margin: ${meter.regular} ${meter.regular} ${meter.regular} ${meter.large};
             font: inherit;
             font-size: x-large;

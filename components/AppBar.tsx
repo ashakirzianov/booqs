@@ -33,6 +33,15 @@ export function AppBar() {
                 display: flex;
                 flex-direction: column;
                 flex: 0 0;
+                margin: 0 ${meter.xLarge} 0 0;
+            }
+            @media (max-width: 40rem) {
+                .logo {
+                    display: none;
+                }
+                .container {
+                    padding: ${meter.xLarge} ${meter.regular};
+                }
             }
             .search {
                 display: flex;
@@ -43,6 +52,7 @@ export function AppBar() {
                 display: flex;
                 flex-direction: column;
                 flex: 1 0;
+                max-width: 10rem;
             }
             `}</style>
     </div>;
@@ -71,7 +81,7 @@ function AppButtons() {
             .buttons-row {
                 display: flex;
                 flex-direction: row;
-                justify-content: flex-end;
+                justify-content: space-around;
                 align-items: center;
             }
             `}</style>

@@ -18,7 +18,6 @@ export function IconButton({ icon, onClick }: {
             button {
                 display: flex;
                 height: ${buttonSize};
-                margin: ${meter.regular};
                 color: ${dimmed};
                 border: none;
                 font-size: x-large;
