@@ -26,14 +26,15 @@ export function Popovers({ items }: {
         {
             items.map(
                 ({ anchor, body }, idx) => body
-                    ? <Tippy
-                        key={idx}
-                        singleton={target}
-                        content={<div className="body">
-                            {body}
-                        </div>}
-                        children={<div>{anchor}</div>}
-                    />
+                    ? <div key={idx}>
+                        <Tippy
+                            singleton={target}
+                            content={<div className="body">
+                                {body}
+                            </div>}
+                            children={<div>{anchor}</div>}
+                        />
+                    </div>
                     : anchor
             )
         }
