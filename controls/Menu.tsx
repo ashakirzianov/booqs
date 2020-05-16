@@ -3,6 +3,7 @@ import { usePalette } from '../app';
 import { IconName, Icon } from './Icon';
 import { HasChildren } from './utils';
 import { meter } from './theme';
+import { Spinner } from './Spinner';
 
 export function Menu({ children }: HasChildren) {
     return <div>
@@ -18,10 +19,11 @@ export function Menu({ children }: HasChildren) {
     </div>;
 }
 
-export function MenuItem({ icon, text, callback }: {
+export function MenuItem({ icon, text, callback, spinner }: {
     text: string,
     icon?: IconName,
     callback?: () => void,
+    spinner?: boolean,
 }) {
     const { highlight, background } = usePalette();
     return <div className='container' onClick={callback}>
@@ -30,7 +32,12 @@ export function MenuItem({ icon, text, callback }: {
                 ? <div className="icon"><Icon name={icon} /></div>
                 : null
         }
-        <span>{text}</span>
+        <span className='text'>{text}</span>
+        {
+            spinner
+                ? <div className='spinner'><Spinner /></div>
+                : null
+        }
         <style jsx>{`
             .container {
                 display: flex;
@@ -50,6 +57,14 @@ export function MenuItem({ icon, text, callback }: {
                 justify-content: center;
                 align-items: center;
                 margin-right: ${meter.large};
+            }
+            .text {
+                display: flex;
+                flex: 1;
+            }
+            .spinner {
+                display: flex;
+                flex: 0;
             }
             `}</style>
     </div>;
