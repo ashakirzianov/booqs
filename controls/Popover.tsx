@@ -7,11 +7,11 @@ import { panelShadow, radius } from './theme';
 export type PopoverSingleton = ReturnType<typeof useSingleton>[1];
 
 export function Popover({ singleton, anchor, content }: {
-    singleton: PopoverSingleton,
+    singleton?: PopoverSingleton,
     anchor: ReactNode,
     content: ReactNode,
 }) {
-    return <>
+    return <div>
         <Tippy
             singleton={singleton}
             content={<div className='anchor'>
@@ -26,7 +26,7 @@ export function Popover({ singleton, anchor, content }: {
                 flex: 1;
             }
         `}</style>
-    </>;
+    </div>;
 }
 
 export function Popovers({ children }: {

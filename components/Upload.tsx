@@ -1,70 +1,101 @@
-import { ActionButton } from "../controls/Buttons";
+import { useRef, useState } from "react";
+import { ActionButton, IconButton } from "../controls/Buttons";
 import { meter } from "../controls/theme";
-import { useAuth } from "../app";
-import { SignInMenu } from "./SignIn";
-import { useRef } from "react";
-import { SelectFileDialogRef, SelectFileDialog } from "../controls/SelectFileDialog";
+import { useAuth, useUpload } from "../app";
+import {
+    SelectFileDialogRef, SelectFileDialog,
+} from "../controls/SelectFileDialog";
+import { Spinner } from "../controls/Spinner";
+import { PopoverSingleton, Popover } from "../controls/Popover";
+import { Modal } from "../controls/Modal";
 
-export function UploadPanel() {
-    const state = useAuth();
-    if (state.state !== 'signed') {
-        return <SingInToUpload />;
-    } else {
-        return <UploadFile />;
-    }
-}
-
-function UploadFile() {
+export function Upload({ singleton }: {
+    singleton: PopoverSingleton,
+}) {
+    const auth = useAuth();
+    const isSigned = auth.state === 'signed';
     const dialogRef = useRef<SelectFileDialogRef>();
+    const [file, setFile] = useState<File | undefined>(undefined);
 
-    return <div className='container'>
+    return <>
+        <Popover
+            singleton={singleton}
+            anchor={<>
+                <IconButton
+                    icon='upload'
+                    onClick={
+                        isSigned
+                            ? () => dialogRef.current?.show()
+                            : undefined
+                    }
+                />
+            </>}
+            content={<Label text={
+                isSigned
+                    ? 'Click to select epub'
+                    : 'Sign in to upload'
+            } />}
+        />
         <SelectFileDialog
             accept='application/epub+zip'
             refCallback={r => dialogRef.current = r}
-            onFilesSelected={() => undefined}
+            onFileChanged={setFile}
         />
-        <span>Select .epub file</span>
-        <ActionButton
-            text='Select'
-            onClick={() => {
-                if (dialogRef.current) {
-                    dialogRef.current.show();
+        <Modal
+            isOpen={!!file}
+            close={() => setFile(undefined)}
+        >
+            <div className='modal'>
+                <UploadModalContent file={file!} />
+            </div>
+            <style jsx>{`
+                .modal {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    width: 30rem;
+                    padding: 0 0 ${meter.regular} 0;
                 }
-            }}
-        />
-        <style jsx>{`
-        span {
-            margin: ${meter.regular};
-            font-size: large;
-        }
-        .container {
-            display: flex;
-            flex: 1;
-            flex-direction: column;
-            align-items: center;
-            padding: ${meter.xLarge} ${meter.large};
-        }
-        `}</style>
-    </div>;
+                `}</style>
+        </Modal>
+    </>;
 }
 
-function SingInToUpload() {
+function UploadModalContent({ file }: {
+    file: File,
+}) {
+    const {
+        uploaded, uploading, upload,
+    } = useUpload();
+    if (uploaded) {
+        return <Label text={`Successfully uploaded: ${uploaded}.`} />;
+    } else if (uploading) {
+        return <>
+            <Label text={`Uploading ${file.name}...`} />
+            <Spinner />
+        </>;
+    } else {
+        return <>
+            <Label text={`Upload ${file.name}`} />
+            <ActionButton
+                text='Upload'
+                onClick={() => upload(file)}
+            />
+        </>;
+    }
+}
+
+function Label({ text }: {
+    text: string,
+}) {
     return <div>
-        <span>Sing in to upload</span>
-        <SignInMenu />
+        {text}
         <style jsx>{`
         div {
-            display: flex;
-            flex-direction: column;
-            flex: 1;
-            padding: ${meter.regular} 0;
-            align-items: stretch;
-        }
-        span {
+            margin: ${meter.large};
             width: 100%;
             text-align: center;
             font-weight: bold;
-            padding: ${meter.regular};
         }
         `}</style>
     </div>;

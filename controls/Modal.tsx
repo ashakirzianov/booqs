@@ -1,6 +1,6 @@
 import React, { ReactNode } from 'react';
 import { usePalette } from '../app';
-import { panelShadow, radius } from './theme';
+import { panelShadow, radius, meter } from './theme';
 import { IconButton } from './Buttons';
 
 export function Modal({
@@ -10,13 +10,13 @@ export function Modal({
     close: () => void,
     children: ReactNode,
 }) {
-    const { primary } = usePalette();
+    const { background } = usePalette();
     if (!isOpen) {
         return null;
     }
     return <div className='screen' onClick={close}>
         <div
-            className='modal'
+            className='container'
             onClick={e => e.stopPropagation()}
         >
             <div className='close'>
@@ -25,13 +25,7 @@ export function Modal({
                     onClick={close}
                 />
             </div>
-            <div style={{
-                flexGrow: 1,
-                flexShrink: 1,
-                overflow: 'scroll',
-                justifyContent: 'flex-start',
-            }}
-            >
+            <div className='content'>
                 {children}
             </div>
         </div>
@@ -40,27 +34,28 @@ export function Modal({
                 display: flex;
                 flex-direction: column;
                 position: fixed;
+                top: 0; right: 0; bottom: 0; left: 0;
                 justify-content: center;
                 align-items: center;
                 background: rgba(0, 0, 0, 0.5);
                 z-index: 10;
             }
-            .modal {
-                display: flex;
-                flex-direction: column;
-                flex: 1 1;
-                width: 100%;
+            .container {
+                position: relative;
                 max-width: 50rem;
                 max-height: 100%;
-                overflow: scroll;
+                overflow-y: scroll;
+                overflow-x: hidden;
                 z-index: 10;
-                background: ${primary};
+                background: ${background};
                 box-shadow: ${panelShadow};
                 border-radius: ${radius};
                 pointer-events: auto;
             }
             .close {
-                float: right;
+                position: absolute;
+                top: ${meter.regular};
+                right: ${meter.regular};
             }
             `}</style>
     </div>;

@@ -28,6 +28,9 @@ export function IconButton({ icon, onClick }: {
             button:hover {
                 color: ${highlight};
             }
+            button:focus {
+                outline: 0;
+            }
         `}</style>
     </button>;
 }
