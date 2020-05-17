@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { gql } from 'apollo-boost';
+import gql from 'graphql-tag';
 import { usePalette } from '../app';
 import { normalWeight, meter, radius } from '../controls/theme';
 import { BooqCover } from '../controls/BooqCover';

@@ -1,5 +1,6 @@
-import { gql, ApolloClient } from "apollo-boost";
+import { ApolloClient } from "apollo-client";
 import { useApolloClient, useQuery } from '@apollo/react-hooks';
+import gql from 'graphql-tag';
 import { facebookSdk } from "./facebookSdk";
 
 const storage = process.browser

@@ -1,5 +1,5 @@
 import { useQuery, useApolloClient } from "@apollo/react-hooks";
-import { gql } from "apollo-boost";
+import gql from 'graphql-tag';
 
 type Color = keyof Palette;
 type Palette = {
