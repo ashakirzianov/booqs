@@ -68,7 +68,7 @@ function UploadModalContent({ file }: {
         uploaded, uploading, upload,
     } = useUpload();
     if (uploaded) {
-        return <Label text={`Successfully uploaded: ${uploaded}.`} />;
+        return <Label text={`Successfully uploaded: ${uploaded.title}.`} />;
     } else if (uploading) {
         return <>
             <Label text={`Uploading ${file.name}...`} />
