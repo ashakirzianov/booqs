@@ -2,10 +2,10 @@ import { ReactNode, createElement } from 'react';
 import { ApolloProvider } from '@apollo/react-hooks';
 import { ApolloClient } from 'apollo-client';
 import { InMemoryCache } from 'apollo-cache-inmemory';
-import { HttpLink } from 'apollo-link-http';
+import { ApolloLink } from 'apollo-link';
 import { onError } from 'apollo-link-error';
 import { setContext } from 'apollo-link-context';
-import { ApolloLink } from 'apollo-link';
+import { createUploadLink } from 'apollo-upload-client';
 import fetch from 'isomorphic-unfetch';
 import { initialPaletteData } from './palette';
 import { restoreAuthToken, initialAuthData, initAuth } from './auth';
@@ -29,9 +29,8 @@ const link = ApolloLink.from([
             );
         if (networkError) console.log(`[Network error]: ${networkError}`);
     }),
-    new HttpLink({
+    createUploadLink({
         uri: process.env.NEXT_PUBLIC_BACKEND,
-        credentials: 'same-origin',
         fetch,
     }),
 ]);
