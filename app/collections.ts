@@ -15,9 +15,9 @@ type CollectionData = {
     collection: {
         booqs: {
             id: string,
-            title: string | null,
-            author: string | null,
-            cover: string | null,
+            title?: string,
+            author?: string,
+            cover?: string,
         }[],
     },
 };
@@ -55,37 +55,11 @@ export function useAddToCollection() {
         }) {
             doAdd({
                 variables: { name, booqId },
-                optimisticResponse: { addToCollection: true },
-                update(cache, { data }) {
-                    if (data?.addToCollection) {
-                        const stored = cache.readQuery<CollectionData>({
-                            query: CollectionQuery,
-                            variables: { name },
-                        });
-                        if (stored) {
-                            const added = cache.readFragment<object>({
-                                id: `Booq:${booqId}`,
-                                fragment: gql`fragment booq on Booq {
-                                    title
-                                    author
-                                    cover(size: 210)
-                                }`,
-                            });
-                            stored.collection.booqs.push({
-                                id: booqId,
-                                title: null,
-                                author: null,
-                                cover: null,
-                                ...added,
-                            });
-                            cache.writeQuery<CollectionData>({
-                                query: CollectionQuery,
-                                variables: { name },
-                                data: stored,
-                            });
-                        }
-                    }
-                },
+                refetchQueries: [{
+                    query: CollectionQuery,
+                    variables: { name },
+                }],
+                awaitRefetchQueries: true,
             });
         },
     };

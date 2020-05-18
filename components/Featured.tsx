@@ -151,7 +151,7 @@ function AddToReadingListButton({ booqId, cover }: {
     cover?: string,
 }) {
     const { booqs } = useCollection('reading-list');
-    const { addToCollection } = useAddToCollection();
+    const { addToCollection, loading } = useAddToCollection();
     const { removeFromCollection } = useRemoveFromCollection();
     const isInReadingList = booqs.some(b => b.id === booqId);
     if (isInReadingList) {
@@ -169,6 +169,7 @@ function AddToReadingListButton({ booqId, cover }: {
                 booqId, cover,
                 name: 'reading-list',
             })}
+            loading={loading}
         />;
     }
 }

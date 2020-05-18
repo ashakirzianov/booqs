@@ -4,6 +4,7 @@ import { Icon, IconName } from "./Icon";
 import {
     buttonShadow, meter, buttonSize, radius,
 } from "./theme";
+import { Spinner } from './Spinner';
 
 export function IconButton({ icon, onClick }: {
     icon: IconName,
@@ -64,13 +65,21 @@ export function ActionButton({ text, onClick }: {
     </>;
 }
 
-export function LinkButton({ text, onClick }: {
+export function LinkButton({ text, onClick, loading }: {
     text: string,
     onClick?: () => void,
+    loading?: boolean,
 }) {
     const { action, highlight } = usePalette();
     return <>
-        <a onClick={onClick}>{text}</a>
+        <a onClick={onClick}>
+            {text}
+            {
+                loading
+                    ? <Spinner />
+                    : null
+            }
+        </a>
         <style jsx>{`
         a {
             color: ${action};
