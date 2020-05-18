@@ -6,9 +6,11 @@ import { Panel } from '../controls/Panel';
 import { BooqTags } from '../controls/BooqTags';
 import { BooqCover } from '../controls/BooqCover';
 import { boldWeight, meter } from '../controls/theme';
+import { useAddToCollection } from '../app/collections';
 
 const FeaturedQuery = gql`query Featured {
     featured(limit: 10) {
+        id
         title
         author
         cover(size: 210)
@@ -20,6 +22,7 @@ const FeaturedQuery = gql`query Featured {
 }`;
 type FeaturedData = {
     featured: {
+        id: string,
         title?: string,
         author?: string,
         cover?: string,
@@ -58,7 +61,7 @@ export function Featured() {
 
 type FeaturedItem = FeaturedData['featured'][number];
 function FeaturedCard({
-    title, author, cover, tags,
+    id, title, author, cover, tags,
 }: FeaturedItem) {
     return <Panel>
         <div className="container">
@@ -72,7 +75,7 @@ function FeaturedCard({
                     <Header title={title} author={author} />
                     <BooqTags tags={tags} />
                 </div>
-                <Actions />
+                <Actions booqId={id} />
             </div>
             <style jsx>{`
             .container {
@@ -117,10 +120,16 @@ function Header({ title, author }: {
     </div>;
 }
 
-function Actions() {
+function Actions({ booqId }: {
+    booqId: string,
+}) {
+    const { addToCollection } = useAddToCollection();
     return <div>
         <div>
-            <LinkButton text="Add +" />
+            <LinkButton
+                text="Add +"
+                onClick={() => addToCollection(booqId, 'reading-list')}
+            />
         </div>
         <div>
             <LinkButton text="Read &rarr;" />

@@ -64,12 +64,13 @@ export function ActionButton({ text, onClick }: {
     </>;
 }
 
-export function LinkButton({ text }: {
+export function LinkButton({ text, onClick }: {
     text: string,
+    onClick?: () => void,
 }) {
     const { action, highlight } = usePalette();
     return <>
-        <a>{text}</a>
+        <a onClick={onClick}>{text}</a>
         <style jsx>{`
         a {
             color: ${action};
