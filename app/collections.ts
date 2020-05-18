@@ -21,7 +21,8 @@ type CollectionData = {
         }[],
     },
 };
-type CollectionItem = CollectionData['collection']['booqs'][number];
+type CollectionItem = CollectionData['collection']['booqs'][number]
+    & { __typename: 'Booq' };
 
 export function useCollection(name: string) {
     const { loading, data } = useQuery<CollectionData>(
@@ -61,19 +62,71 @@ export function useAddToCollection() {
                             query: CollectionQuery,
                             variables: { name },
                         });
-                        const added: CollectionItem = {
-                            id: booqId,
-                            cover: cover ?? null,
-                            title: null,
-                            author: null,
-                        };
-                        const booqs = [...stored?.collection?.booqs ?? [], added];
-                        console.log(booqId, name, cover);
+                        if (stored) {
+                            const added = cache.readFragment<object>({
+                                id: `Booq:${booqId}`,
+                                fragment: gql`fragment booq on Booq {
+                                    title
+                                    author
+                                    cover(size: 210)
+                                }`,
+                            });
+                            stored.collection.booqs.push({
+                                id: booqId,
+                                title: null,
+                                author: null,
+                                cover: null,
+                                ...added,
+                            });
+                            cache.writeQuery<CollectionData>({
+                                query: CollectionQuery,
+                                variables: { name },
+                                data: stored,
+                            });
+                        }
+                    }
+                },
+            });
+        },
+    };
+}
+
+const RemoveFromCollectionMutation = gql`
+mutation RemoveFromCollection($name: String!, $booqId: ID!) {
+    removeFromCollection(name: $name, booqId: $booqId)
+}`;
+type RemoveFromCollectionData = {
+    removeFromCollection: boolean,
+};
+export function useRemoveFromCollection() {
+    const [doRemove, { loading }] = useMutation<RemoveFromCollectionData>(
+        RemoveFromCollectionMutation,
+    );
+    return {
+        loading,
+        removeFromCollection({ booqId, name }: {
+            booqId: string,
+            name: string,
+        }) {
+            doRemove({
+                variables: { name, booqId },
+                optimisticResponse: { removeFromCollection: true },
+                update(cache, { data }) {
+                    if (data?.removeFromCollection) {
+                        const stored = cache.readQuery<CollectionData>({
+                            query: CollectionQuery,
+                            variables: { name },
+                        });
+                        const booqs = (stored?.collection?.booqs ?? []).filter(b => b.id !== booqId);
                         cache.writeQuery<CollectionData>({
                             query: CollectionQuery,
                             variables: { name },
                             data: {
-                                collection: { booqs },
+                                ...stored,
+                                collection: {
+                                    ...stored?.collection,
+                                    booqs,
+                                },
                             },
                         });
                     }

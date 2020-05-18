@@ -6,7 +6,7 @@ import { Panel } from '../controls/Panel';
 import { BooqTags } from '../controls/BooqTags';
 import { BooqCover } from '../controls/BooqCover';
 import { boldWeight, meter } from '../controls/theme';
-import { useAddToCollection, useCollection } from '../app/collections';
+import { useAddToCollection, useCollection, useRemoveFromCollection } from '../app/collections';
 
 const FeaturedQuery = gql`query Featured {
     featured(limit: 10) {
@@ -152,9 +152,16 @@ function AddToReadingListButton({ booqId, cover }: {
 }) {
     const { booqs } = useCollection('reading-list');
     const { addToCollection } = useAddToCollection();
+    const { removeFromCollection } = useRemoveFromCollection();
     const isInReadingList = booqs.some(b => b.id === booqId);
     if (isInReadingList) {
-        return null;
+        return <LinkButton
+            text="Remove -"
+            onClick={() => removeFromCollection({
+                booqId,
+                name: 'reading-list',
+            })}
+        />;
     } else {
         return <LinkButton
             text="Add +"
