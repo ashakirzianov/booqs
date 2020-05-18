@@ -15,12 +15,13 @@ type CollectionData = {
     collection: {
         booqs: {
             id: string,
-            title?: string,
-            author?: string,
-            cover?: string,
+            title: string | null,
+            author: string | null,
+            cover: string | null,
         }[],
     },
 };
+type CollectionItem = CollectionData['collection']['booqs'][number];
 
 export function useCollection(name: string) {
     const { loading, data } = useQuery<CollectionData>(
@@ -46,13 +47,37 @@ export function useAddToCollection() {
     );
     return {
         loading,
-        addToCollection(booqId: string, name: string) {
+        addToCollection({ booqId, name, cover }: {
+            booqId: string,
+            name: string,
+            cover?: string,
+        }) {
             doAdd({
                 variables: { name, booqId },
-                refetchQueries: [{
-                    query: CollectionQuery,
-                    variables: { name },
-                }],
+                optimisticResponse: { addToCollection: true },
+                update(cache, { data }) {
+                    if (data?.addToCollection) {
+                        const stored = cache.readQuery<CollectionData>({
+                            query: CollectionQuery,
+                            variables: { name },
+                        });
+                        const added: CollectionItem = {
+                            id: booqId,
+                            cover: cover ?? null,
+                            title: null,
+                            author: null,
+                        };
+                        const booqs = [...stored?.collection?.booqs ?? [], added];
+                        console.log(booqId, name, cover);
+                        cache.writeQuery<CollectionData>({
+                            query: CollectionQuery,
+                            variables: { name },
+                            data: {
+                                collection: { booqs },
+                            },
+                        });
+                    }
+                },
             });
         },
     };

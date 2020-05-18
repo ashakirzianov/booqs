@@ -6,7 +6,7 @@ import { Panel } from '../controls/Panel';
 import { BooqTags } from '../controls/BooqTags';
 import { BooqCover } from '../controls/BooqCover';
 import { boldWeight, meter } from '../controls/theme';
-import { useAddToCollection } from '../app/collections';
+import { useAddToCollection, useCollection } from '../app/collections';
 
 const FeaturedQuery = gql`query Featured {
     featured(limit: 10) {
@@ -122,14 +122,13 @@ function Header({ title, author }: {
 
 function Actions({ booqId }: {
     booqId: string,
+    cover?: string,
 }) {
+    const { booqs } = useCollection('reading-list');
     const { addToCollection } = useAddToCollection();
     return <div>
         <div>
-            <LinkButton
-                text="Add +"
-                onClick={() => addToCollection(booqId, 'reading-list')}
-            />
+            <AddToReadingListButton booqId={booqId} />
         </div>
         <div>
             <LinkButton text="Read &rarr;" />
@@ -145,4 +144,24 @@ function Actions({ booqId }: {
         }
         `}</style>
     </div>;
+}
+
+function AddToReadingListButton({ booqId, cover }: {
+    booqId: string,
+    cover?: string,
+}) {
+    const { booqs } = useCollection('reading-list');
+    const { addToCollection } = useAddToCollection();
+    const isInReadingList = booqs.some(b => b.id === booqId);
+    if (isInReadingList) {
+        return null;
+    } else {
+        return <LinkButton
+            text="Add +"
+            onClick={() => addToCollection({
+                booqId, cover,
+                name: 'reading-list',
+            })}
+        />;
+    }
 }
