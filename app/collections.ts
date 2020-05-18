@@ -47,7 +47,13 @@ export function useAddToCollection() {
     return {
         loading,
         addToCollection(booqId: string, name: string) {
-            doAdd({ variables: { name, booqId } });
+            doAdd({
+                variables: { name, booqId },
+                refetchQueries: [{
+                    query: CollectionQuery,
+                    variables: { name },
+                }],
+            });
         },
     };
 }
