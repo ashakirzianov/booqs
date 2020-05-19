@@ -9,7 +9,7 @@ export default function Home() {
     <AppBar />
     <ReadingHistory />
     <Collection
-      name='reading-list'
+      name='my-books'
       title='Reading List'
     />
     <Featured />

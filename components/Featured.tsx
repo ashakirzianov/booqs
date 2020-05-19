@@ -125,7 +125,7 @@ function Header({ title, author }: {
 function Actions({ item }: {
     item: FeaturedItem,
 }) {
-    const { booqs } = useCollection('reading-list');
+    const { booqs } = useCollection('my-books');
     const { addToCollection } = useAddToCollection();
     return <div>
         <div>
@@ -150,7 +150,7 @@ function Actions({ item }: {
 function AddToReadingListButton({ item }: {
     item: FeaturedItem,
 }) {
-    const { booqs } = useCollection('reading-list');
+    const { booqs } = useCollection('my-books');
     const { addToCollection, loading } = useAddToCollection();
     const { removeFromCollection } = useRemoveFromCollection();
     const isInReadingList = booqs.some(b => b.id === item.id);
@@ -159,14 +159,14 @@ function AddToReadingListButton({ item }: {
             text="Remove -"
             onClick={() => removeFromCollection({
                 booqId: item.id,
-                name: 'reading-list',
+                name: 'my-books',
             })}
         />;
     } else {
         return <LinkButton
             text="Add +"
             onClick={() => addToCollection({
-                name: 'reading-list',
+                name: 'my-books',
                 booqId: item.id,
                 title: item.title,
                 author: item.author,
