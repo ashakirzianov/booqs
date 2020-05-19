@@ -9,12 +9,5 @@ export default function Home() {
     <AppBar />
     <ReadingHistory />
     <Featured />
-    <style jsx>{`
-      div {
-        display: flex;
-        flex-direction: column;
-        border: 1px solid blue;
-      }
-      `}</style>
   </Page>;
 }
