@@ -1,5 +1,5 @@
 import React from 'react';
-import { headerHeight, meter } from '../controls/theme';
+import { meter } from '../controls/theme';
 import { Logo } from '../controls/Logo';
 import { Popovers } from '../controls/Popover';
 import { Search } from './Search';
@@ -7,6 +7,7 @@ import { SignIn } from './SignIn';
 import { Themer } from './Themer';
 import { Upload } from './Upload';
 
+const headerHeight = '4rem';
 export function AppBar() {
     return <div className="container">
         <div className="logo">
@@ -22,10 +23,9 @@ export function AppBar() {
             .container {
                 display: flex;
                 flex-direction: row;
-                flex: 1 1;
-                height: ${headerHeight};
-                padding: ${meter.xLarge};
                 align-items: center;
+                height: ${headerHeight};
+                padding: 0 ${meter.large};
             }
             .logo {
                 display: flex;

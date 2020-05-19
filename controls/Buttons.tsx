@@ -2,10 +2,11 @@ import React from 'react';
 import { usePalette } from '../app';
 import { Icon, IconName } from "./Icon";
 import {
-    buttonShadow, meter, buttonSize, radius,
+    buttonShadow, meter, radius,
 } from "./theme";
 import { Spinner } from './Spinner';
 
+const buttonSize = 50;
 export function IconButton({ icon, onClick }: {
     icon: IconName,
     onClick?: () => void,

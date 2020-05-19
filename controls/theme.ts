@@ -9,6 +9,8 @@ export const normalWeight = 200;
 export const boldWeight = 400;
 export const extraBoldWeight = 700;
 
+export const radius = '4px';
+
 export const meter = {
     small: meterSize(0.5),
     regular: meterSize(1),
@@ -20,8 +22,3 @@ export const meter = {
 function meterSize(x: number) {
     return `${x * 0.5}rem`;
 }
-
-export const buttonSize = 50;
-export const headerHeight = 75;
-
-export const radius = '4px';
