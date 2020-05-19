@@ -46,7 +46,7 @@ export function Featured() {
     return <div>
         {
             cards.map(
-                (card, idx) => <FeaturedCard key={idx} {...card} />
+                (item, idx) => <FeaturedCard key={idx} item={item} />
             )
         }
         <style jsx>{`
@@ -61,21 +61,23 @@ export function Featured() {
 
 type FeaturedItem = FeaturedData['featured'][number];
 function FeaturedCard({
-    id, title, author, cover, tags,
-}: FeaturedItem) {
+    item,
+}: {
+    item: FeaturedItem,
+}) {
     return <Panel>
         <div className="container">
             <BooqCover
-                title={title}
-                author={author}
-                cover={cover}
+                title={item.title}
+                author={item.author}
+                cover={item.cover}
             />
             <div className="details">
                 <div>
-                    <Header title={title} author={author} />
-                    <BooqTags tags={tags} />
+                    <Header title={item.title} author={item.author} />
+                    <BooqTags tags={item.tags} />
                 </div>
-                <Actions booqId={id} />
+                <Actions item={item} />
             </div>
             <style jsx>{`
             .container {
@@ -120,15 +122,14 @@ function Header({ title, author }: {
     </div>;
 }
 
-function Actions({ booqId }: {
-    booqId: string,
-    cover?: string,
+function Actions({ item }: {
+    item: FeaturedItem,
 }) {
     const { booqs } = useCollection('reading-list');
     const { addToCollection } = useAddToCollection();
     return <div>
         <div>
-            <AddToReadingListButton booqId={booqId} />
+            <AddToReadingListButton item={item} />
         </div>
         <div>
             <LinkButton text="Read &rarr;" />
@@ -146,19 +147,18 @@ function Actions({ booqId }: {
     </div>;
 }
 
-function AddToReadingListButton({ booqId, cover }: {
-    booqId: string,
-    cover?: string,
+function AddToReadingListButton({ item }: {
+    item: FeaturedItem,
 }) {
     const { booqs } = useCollection('reading-list');
     const { addToCollection, loading } = useAddToCollection();
     const { removeFromCollection } = useRemoveFromCollection();
-    const isInReadingList = booqs.some(b => b.id === booqId);
+    const isInReadingList = booqs.some(b => b.id === item.id);
     if (isInReadingList) {
         return <LinkButton
             text="Remove -"
             onClick={() => removeFromCollection({
-                booqId,
+                booqId: item.id,
                 name: 'reading-list',
             })}
         />;
@@ -166,8 +166,11 @@ function AddToReadingListButton({ booqId, cover }: {
         return <LinkButton
             text="Add +"
             onClick={() => addToCollection({
-                booqId, cover,
                 name: 'reading-list',
+                booqId: item.id,
+                title: item.title,
+                author: item.author,
+                cover: item.cover,
             })}
             loading={loading}
         />;

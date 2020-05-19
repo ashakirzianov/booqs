@@ -14,6 +14,7 @@ const CollectionQuery = gql`query Collection($name: String!) {
 type CollectionData = {
     collection: {
         booqs: {
+            __typename: 'Booq',
             id: string,
             title?: string,
             author?: string,
@@ -21,8 +22,7 @@ type CollectionData = {
         }[],
     },
 };
-type CollectionItem = CollectionData['collection']['booqs'][number]
-    & { __typename: 'Booq' };
+type CollectionItem = CollectionData['collection']['booqs'][number];
 
 export function useCollection(name: string) {
     const { loading, data } = useQuery<CollectionData>(
@@ -48,18 +48,36 @@ export function useAddToCollection() {
     );
     return {
         loading,
-        addToCollection({ booqId, name, cover }: {
+        addToCollection({ booqId, name, cover, title, author }: {
             booqId: string,
             name: string,
+            title?: string,
+            author?: string,
             cover?: string,
         }) {
             doAdd({
                 variables: { name, booqId },
-                refetchQueries: [{
-                    query: CollectionQuery,
-                    variables: { name },
-                }],
-                awaitRefetchQueries: true,
+                optimisticResponse: { addToCollection: true },
+                update(cache, { data }) {
+                    if (data?.addToCollection) {
+                        const stored = cache.readQuery<CollectionData>({
+                            query: CollectionQuery,
+                            variables: { name },
+                        });
+                        if (stored) {
+                            stored.collection.booqs.push({
+                                __typename: 'Booq',
+                                id: booqId,
+                                title, author, cover,
+                            });
+                            cache.writeQuery({
+                                query: CollectionQuery,
+                                variables: { name },
+                                data: stored,
+                            });
+                        }
+                    }
+                }
             });
         },
     };
