@@ -1,0 +1,40 @@
+{
+    "css.lint.emptyRules": "ignore",
+    "css.lint.unknownProperties": "ignore",
+    "files.exclude": {
+        "**/.DS_Store": true,
+        "**/node_modules/**": true
+    },
+    "cSpell.words": [
+        "Booq",
+        "Cortázar",
+        "Epub",
+        "Lato",
+        "QLJSON",
+        "Rayuela",
+        "Themer",
+        "Uploader",
+        "Whitespaces",
+        "booqs",
+        "coverpage",
+        "diagnoser",
+        "epubs",
+        "esnext",
+        "fontawesome",
+        "fortawesome",
+        "inmemory",
+        "jssdk",
+        "kinesisvideomedia",
+        "lucene",
+        "pids",
+        "promisify",
+        "rarr",
+        "refetch",
+        "rgrove",
+        "srcs",
+        "tippyjs",
+        "unfetch",
+        "xfbml",
+        "xmls"
+    ]
+}
