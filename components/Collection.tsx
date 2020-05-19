@@ -2,8 +2,9 @@ import React from 'react';
 import { useCollection } from '../app/collections';
 import { BooqCover } from '../controls/BooqCover';
 import { Spinner } from '../controls/Spinner';
+import { meter, panelShadow } from '../controls/theme';
 
-export function Collection({ name }: {
+export function Collection({ name, title }: {
     name: string,
     title: string,
 }) {
@@ -38,6 +39,7 @@ function CollectionItems({ booqs }: {
             .container {
                 display: flex;
                 flex-direction: row;
+                overflow: scroll;
             }
             `}</style>
     </div>
@@ -45,13 +47,22 @@ function CollectionItems({ booqs }: {
 function CollectionItemTile({
     title, author, cover,
 }: CollectionItem) {
-    return <div title={composeTitle(title, author)}>
+    return <div
+        className='tile'
+        title={composeTitle(title, author)}
+    >
         <BooqCover
             title={title}
             author={author}
             cover={cover}
             size={40}
         />
+        <style jsx>{`
+            .tile {
+                margin: ${meter.regular};
+                box-shadow: ${panelShadow};
+            }
+            `}</style>
     </div>;
 }
 
