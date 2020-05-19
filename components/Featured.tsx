@@ -67,31 +67,47 @@ function FeaturedCard({
 }) {
     return <Panel>
         <div className="container">
-            <BooqCover
-                title={item.title}
-                author={item.author}
-                cover={item.cover}
-            />
+            <div className='cover'>
+                <BooqCover
+                    title={item.title}
+                    author={item.author}
+                    cover={item.cover}
+                />
+            </div>
             <div className="details">
-                <div>
+                <div className='header'>
                     <Header title={item.title} author={item.author} />
+                </div>
+                <div className='tags'>
                     <BooqTags tags={item.tags} />
                 </div>
-                <Actions item={item} />
+                <div className='actions'>
+                    <Actions item={item} />
+                </div>
             </div>
             <style jsx>{`
             .container {
                 display: flex;
-                flex-direction: row;
+                flex-flow: row wrap;
                 flex: 1;
                 padding: ${meter.large};
+            }
+            .cover {
+                display: flex;
+                margin: ${meter.regular} ${meter.xxLarge} ${meter.regular} 0;
             }
             .details {
                 display: flex;
                 flex-direction: column;
                 flex: 1;
                 justify-content: space-between;
-                margin-left: ${meter.xxLarge};
+                margin: ${meter.regular} 0 ${meter.regular} 0;
+            }
+            .tags {
+                margin: ${meter.large} 0 0 0;
+            }
+            .actions {
+                margin: ${meter.large} 0 0 0;
             }
             `}</style>
         </div>
@@ -125,22 +141,21 @@ function Header({ title, author }: {
 function Actions({ item }: {
     item: FeaturedItem,
 }) {
-    const { booqs } = useCollection('my-books');
-    const { addToCollection } = useAddToCollection();
-    return <div>
-        <div>
+    return <div className='container'>
+        <div className='button'>
             <AddToReadingListButton item={item} />
         </div>
-        <div>
+        <div className='button'>
             <LinkButton text="Read &rarr;" />
         </div>
         <style jsx>{`
-        div {
+        .container {
             display: flex;
+            flex-flow: row wrap;
             align-self: stretch;
             justify-content: flex-end;
         }
-        div > * {
+        .button {
             margin: 0 0 0 ${meter.xLarge};
         }
         `}</style>

@@ -19,7 +19,6 @@ export function BooqTags({ tags }: {
             div {
                 display: flex;
                 flex-flow: row wrap;
-                margin: ${meter.large} 0 0 0;
             }
             `}</style>
     </div>;
