@@ -8,10 +8,6 @@ export default function Home() {
   return <Page title="Booqs">
     <AppBar />
     <ReadingHistory />
-    <Collection
-      name='my-books'
-      title='Reading List'
-    />
     <Featured />
     <style jsx>{`
       div {
