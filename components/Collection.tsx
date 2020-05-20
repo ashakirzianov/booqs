@@ -4,7 +4,7 @@ import { BooqCover } from '../controls/BooqCover';
 import { Spinner } from '../controls/Spinner';
 import { meter, panelShadow } from '../controls/theme';
 
-export function Collection({ name, title }: {
+export function Collection({ name }: {
     name: string,
     title: string,
 }) {
