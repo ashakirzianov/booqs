@@ -111,6 +111,7 @@ async function signIn(client: ApolloClient<unknown>, token: string, provider: st
             : initialAuthData;
         storeAuthToken(auth.token);
         client.writeData<AuthData>({ data });
+        client.reFetchObservableQueries();
     }
 
     return auth;
