@@ -1,29 +1,55 @@
-import { useRouter } from "next/dist/client/router";
+import { GetStaticPaths, GetStaticProps } from "next";
+import { useRouter } from "next/router";
 import { Page } from "../../components/Page";
-import { useBooq } from "../../app";
+import { useBooq, Booq, fetchBooq } from "../../app";
 import { Spinner } from "../../controls/Spinner";
 
-export default function Book() {
-    const router = useRouter();
-    const { path } = router.query;
-    const booqId = Array.isArray(path)
-        ? path.join('/')
-        : undefined;
-    if (!booqId) {
-        return <span>Generating</span>;
-    }
-    return <BooqPage booqId={booqId} />;
+type PageData = {
+    kind: 'preloaded',
+    booq: Booq,
+} | {
+    kind: 'not-found',
+};
+type BooqPageProps = {
+    data?: PageData,
+};
+type QueryParams = {
+    path: string[],
+};
+export const getStaticPaths: GetStaticPaths<QueryParams> = async () => {
+    return {
+        paths: [],
+        fallback: true,
+    };
 }
 
-function BooqPage({ booqId }: {
-    booqId: string,
-}) {
-    const { loading, booq } = useBooq(booqId);
-    return <Page title={booq?.title ?? 'Booq'}>
-        {
-            loading
-                ? <Spinner />
-                : <span>{JSON.stringify(booq)}</span>
-        }
-    </Page>;
+export const getStaticProps: GetStaticProps<
+    BooqPageProps, QueryParams
+> = async ({ params }) => {
+    if (!params) {
+        return { props: { data: { kind: 'not-found' } } };
+    }
+    const { path } = params;
+    const booqId = path.join('/');
+    const booq = await fetchBooq(booqId);
+    if (booq) {
+        return { props: { data: { kind: 'preloaded', booq } } };
+    } else {
+        return { props: { data: { kind: 'not-found' } } };
+    }
+};
+
+export default function BooqPage({ data }: BooqPageProps) {
+    if (!data) {
+        return <Spinner />;
+    } else if (data.kind === 'preloaded') {
+        const booq = data.booq;
+        return <Page title={booq?.title ?? 'Booq'}>
+            <span>{JSON.stringify(booq)}</span>
+        </Page>;
+    } else {
+        return <Page title='Booq not found'>
+            <span>Not found</span>
+        </Page>;
+    }
 }
