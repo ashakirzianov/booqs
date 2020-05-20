@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import { Page } from "../../components/Page";
 import { useBooq, Booq, fetchBooq } from "../../app";
 import { Spinner } from "../../controls/Spinner";
+import { BooqScreen } from "../../components/Booq";
 
 type PageData = {
     kind: 'preloaded',
@@ -41,11 +42,13 @@ export const getStaticProps: GetStaticProps<
 
 export default function BooqPage({ data }: BooqPageProps) {
     if (!data) {
-        return <Spinner />;
+        return <Page title='Loading...'>
+            <Spinner />
+        </Page>;
     } else if (data.kind === 'preloaded') {
         const booq = data.booq;
         return <Page title={booq?.title ?? 'Booq'}>
-            <span>{JSON.stringify(booq)}</span>
+            <BooqScreen booq={booq} />
         </Page>;
     } else {
         return <Page title='Booq not found'>
