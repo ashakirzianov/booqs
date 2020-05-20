@@ -64,13 +64,12 @@ export function Search() {
             justify-content: flex-start;
             margin: 0;
             color: ${primary};
-            max-height: 2rem;
+            max-height: 3rem;
             overflow: visible;
         }
         .content {
             display: flex;
             position: relative;
-            top: -${meter.regular};
             flex-direction: column;
             background-color: ${background};
             border-radius: ${radius};
@@ -80,7 +79,7 @@ export function Search() {
             border: none;
             width: 100%;
             min-width: 0px;
-            margin: ${meter.regular} ${meter.regular} ${meter.regular} ${meter.large};
+            margin: ${meter.regular} ${meter.large};
             font: inherit;
             font-size: x-large;
             font-weight: ${normalWeight};
