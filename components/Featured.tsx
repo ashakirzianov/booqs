@@ -7,7 +7,7 @@ import { Panel } from '../controls/Panel';
 import { BooqTags } from '../controls/BooqTags';
 import { BooqCover } from '../controls/BooqCover';
 import { boldWeight, meter } from '../controls/theme';
-import { useAddToCollection, useCollection, useRemoveFromCollection } from '../app/collections';
+import { useAddToCollection, useCollection, useRemoveFromCollection } from '../app';
 import { booqHref } from '../app';
 
 const FeaturedQuery = gql`query Featured {
