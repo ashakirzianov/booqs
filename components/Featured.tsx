@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 import { useQuery } from '@apollo/react-hooks';
 import gql from 'graphql-tag';
 import { LinkButton } from '../controls/Buttons';
@@ -7,6 +8,7 @@ import { BooqTags } from '../controls/BooqTags';
 import { BooqCover } from '../controls/BooqCover';
 import { boldWeight, meter } from '../controls/theme';
 import { useAddToCollection, useCollection, useRemoveFromCollection } from '../app/collections';
+import { booqHref } from '../app';
 
 const FeaturedQuery = gql`query Featured {
     featured(limit: 10) {
@@ -146,7 +148,7 @@ function Actions({ item }: {
             <AddToReadingListButton item={item} />
         </div>
         <div className='button'>
-            <LinkButton text="Read &rarr;" />
+            <ReadButton item={item} />
         </div>
         <style jsx>{`
         .container {
@@ -160,6 +162,14 @@ function Actions({ item }: {
         }
         `}</style>
     </div>;
+}
+
+function ReadButton({ item }: {
+    item: FeaturedItem,
+}) {
+    return <Link href={booqHref(item.id)}>
+        <LinkButton text="Read &rarr;" />
+    </Link>;
 }
 
 function AddToReadingListButton({ item }: {
