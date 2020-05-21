@@ -1,5 +1,5 @@
-import React from 'react';
-import { Booq, BooqNode } from '../app';
+import React, { createElement, ReactNode } from 'react';
+import { Booq, BooqNode, BooqPath, pathToString } from '../app';
 
 export function BooqScreen({ booq }: {
     booq: Booq,
@@ -20,20 +20,57 @@ function Nodes({ nodes }: {
     return <>
         {
             nodes.map(
-                (node, idx) => <Node key={idx} node={node} />,
+                (node, idx) => renderNode({ node, path: [idx] }),
             )
         }
     </>;
 }
 
-function Node({ node }: {
+type RenderArgs = {
     node: BooqNode,
-}) {
-    if (node.children) {
-        return <Nodes nodes={node.children} />;
-    } else if (node.content !== undefined) {
-        return <span>{node.content}</span>;
-    } else {
-        return <span>UNSUPPORTED</span>;
+    path: BooqPath,
+};
+function renderNode(args: RenderArgs): ReactNode {
+    const name = args.node.name;
+    const props = getProps(args);
+    switch (name) {
+        case undefined:
+            return args.node.content;
+        case 'file':
+            return createElement(
+                'div', props,
+                getChildren(args),
+            );
+        case 'img': // TODO: proper src
+        case 'br':
+            return createElement(name, props);
+        case 'div': case 'span': case 'p':
+        case 'small': case 'i':
+        case 'a': // TODO: support links
+            return createElement(name, props, getChildren(args));
+        default:
+            return createElement(
+                'span',
+                {
+                    key: pathToString(args.path),
+                    style: { color: 'red' },
+                },
+                `Unsupported: ${name}`,
+            );
     }
+}
+
+function getProps({ node, path }: RenderArgs) {
+    return {
+        ...node.attrs,
+        key: pathToString(path),
+    };
+}
+
+function getChildren({ node, path }: RenderArgs) {
+    return node.children?.length
+        ? node.children.map(
+            (n, idx) => renderNode({ node: n, path: [...path, idx] })
+        )
+        : null;
 }
