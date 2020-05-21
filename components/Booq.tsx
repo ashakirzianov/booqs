@@ -1,5 +1,6 @@
 import React, { createElement, ReactNode } from 'react';
 import { Booq, BooqNode, BooqPath, pathToString } from '../app';
+import { bookFont } from '../controls/theme';
 
 export function BooqScreen({ booq }: {
     booq: Booq,
@@ -11,19 +12,16 @@ function Content({ booq }: {
     booq: Booq,
 }) {
     const nodes = booq.nodesConnection.edges.map(e => e.node);
-    return <Nodes nodes={nodes} />;
-}
-
-function Nodes({ nodes }: {
-    nodes: BooqNode[],
-}) {
-    return <>
+    return <div>
         {
             nodes.map(
                 (node, idx) => renderNode({ node, path: [idx] }),
             )
         }
-    </>;
+        <style jsx>{`
+            font-family: ${bookFont};
+            `}</style>
+    </div>;
 }
 
 type RenderArgs = {
@@ -32,37 +30,21 @@ type RenderArgs = {
 };
 function renderNode(args: RenderArgs): ReactNode {
     const name = args.node.name;
-    const props = getProps(args);
-    switch (name) {
-        case undefined:
-            return args.node.content;
-        case 'file':
-            return createElement(
-                'div', props,
-                getChildren(args),
-            );
-        case 'img': // TODO: proper src
-        case 'br':
-            return createElement(name, props);
-        case 'div': case 'span': case 'p':
-        case 'small': case 'i':
-        case 'a': // TODO: support links
-            return createElement(name, props, getChildren(args));
-        default:
-            return createElement(
-                'span',
-                {
-                    key: pathToString(args.path),
-                    style: { color: 'red' },
-                },
-                `Unsupported: ${name}`,
-            );
+    if (!name) {
+        return args.node.content ?? null;
+    } else {
+        return createElement(
+            name,
+            getProps(args),
+            getChildren(args),
+        );
     }
 }
 
 function getProps({ node, path }: RenderArgs) {
     return {
         ...node.attrs,
+        style: node.style,
         key: pathToString(path),
     };
 }
