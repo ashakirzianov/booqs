@@ -1,6 +1,6 @@
 import gql from "graphql-tag";
 import { useQuery } from "@apollo/react-hooks";
-import { query } from "./provider";
+import { doQuery } from "./provider";
 
 const BooqNodesQuery = gql`query BooqNodes($id: ID!) {
     booq(id: $id) {
@@ -41,7 +41,7 @@ export type BooqNode = {
 export type Booq = BooqNodesData['booq'];
 
 export async function fetchBooq(id: string) {
-    const result = await query<BooqNodesData>({
+    const result = await doQuery<BooqNodesData>({
         query: BooqNodesQuery,
         variables: { id },
     });

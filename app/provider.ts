@@ -1,6 +1,6 @@
 import { ReactNode, createElement } from 'react';
 import { ApolloProvider } from '@apollo/react-hooks';
-import { ApolloClient } from 'apollo-client';
+import { ApolloClient, OperationVariables, QueryOptions } from 'apollo-client';
 import { InMemoryCache } from 'apollo-cache-inmemory';
 import { ApolloLink, DocumentNode } from 'apollo-link';
 import { onError } from 'apollo-link-error';
@@ -65,4 +65,9 @@ export function AppProvider({ children }: {
     );
 }
 
-export const query = client.query.bind(client);
+export function doQuery<Data = any, Vars = OperationVariables>(options: QueryOptions<Vars>) {
+    return client.query<Data, Vars>({
+        ...options,
+        fetchPolicy: 'network-only',
+    });
+}
