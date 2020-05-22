@@ -47,7 +47,6 @@ function ClientSidePage({ booqId, path }: {
     booqId: string,
     path?: BooqPath,
 }) {
-    console.log(booqId, path);
     const { loading, booq } = useBooq(booqId, path);
     if (loading) {
         return <LoadingPage />;
