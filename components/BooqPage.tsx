@@ -1,7 +1,7 @@
 import { Page } from "./Page";
 import { useBooq, Booq, BooqPath } from "../app";
 import { Spinner } from "../controls/Spinner";
-import { BooqScreen } from "./Booq";
+import { BooqScreen } from "./BooqScreen";
 
 type PageData = {
     kind: 'preloaded',
