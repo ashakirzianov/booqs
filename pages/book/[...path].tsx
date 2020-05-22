@@ -1,8 +1,6 @@
 import { GetStaticPaths, GetStaticProps } from "next";
-import { Page } from "../../components/Page";
-import { useBooq, Booq, fetchBooq, BooqPath, pathFromString } from "../../app";
-import { Spinner } from "../../controls/Spinner";
-import { BooqScreen } from "../../components/Booq";
+import { Booq, fetchBooq, BooqPath, pathFromString } from "../../app";
+import { BooqPage } from "../../components/BooqPage";
 
 type PageData = {
     kind: 'preloaded',
@@ -53,50 +51,6 @@ export const getStaticProps: GetStaticProps<
     return { props: { data: { kind: 'not-found' } } };
 };
 
-export default function BooqPage({ data }: BooqPageProps) {
-    switch (data?.kind) {
-        case 'preloaded':
-            return <LoadedBooqPage booq={data.booq} />;
-        case 'client-side':
-            return <ClientSidePage booqId={data.booqId} path={data.path} />;
-        case 'not-found':
-            return <NotFoundPage />;
-        default:
-            return <LoadingPage />;
-    }
-}
-
-function LoadingPage() {
-    return <Page title='Loading...'>
-        <Spinner />
-    </Page>;
-}
-
-function NotFoundPage() {
-    return <Page title='Booq not found'>
-        <span>Not found</span>
-    </Page>;
-}
-
-function ClientSidePage({ booqId, path }: {
-    booqId: string,
-    path?: BooqPath,
-}) {
-    console.log(booqId, path);
-    const { loading, booq } = useBooq(booqId, path);
-    if (loading) {
-        return <LoadingPage />;
-    } else if (!booq) {
-        return <NotFoundPage />;
-    }
-
-    return <LoadedBooqPage booq={booq} />;
-}
-
-function LoadedBooqPage({ booq }: {
-    booq: Booq,
-}) {
-    return <Page title={booq?.title ?? 'Booq'}>
-        <BooqScreen booq={booq} />
-    </Page>;
+export default function ({ data }: BooqPageProps) {
+    return <BooqPage data={data} />;
 }
