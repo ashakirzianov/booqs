@@ -5,21 +5,41 @@ import { bookFont } from '../controls/theme';
 export function BooqScreen({ booq }: {
     booq: Booq,
 }) {
-    return <Content booq={booq} />;
+    return <div className='container'>
+        <Content booq={booq} />
+        <style jsx>{`
+            .container {
+                display: flex;
+                flex: 1;
+                flex-flow: column;
+                align-items: center;
+            }
+            `}</style>
+    </div>;
 }
 
+const contentWidth = '50rem';
 function Content({ booq }: {
     booq: Booq,
 }) {
     const nodes = booq.nodesConnection.edges.map(e => e.node);
-    return <div>
-        {
-            nodes.map(
-                (node, idx) => renderNode({ node, path: [idx] }),
-            )
-        }
+    return <div className='container'>
+        <div className='content'>
+            {
+                nodes.map(
+                    (node, idx) => renderNode({ node, path: [idx] }),
+                )
+            }
+        </div>
         <style jsx>{`
-            font-family: ${bookFont};
+            .container {
+                display: flex;
+                flex-flow: column;
+                align-items: center;
+                width: 100%;
+                max-width: ${contentWidth};
+                font-family: ${bookFont};
+            }
             `}</style>
     </div>;
 }
