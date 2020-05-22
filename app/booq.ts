@@ -1,12 +1,12 @@
 import gql from "graphql-tag";
 import { useQuery } from "@apollo/react-hooks";
 import { doQuery } from "./provider";
-import { BooqNode } from "./common";
+import { BooqNode, BooqPath, pathToString } from "./common";
 
-const BooqNodesQuery = gql`query BooqNodes($id: ID!) {
+const BooqNodesQuery = gql`query BooqNodes($id: ID!, $all: Boolean, $after: String, $before: String) {
     booq(id: $id) {
         title
-        nodesConnection {
+        nodesConnection(all: $all, after: $after, before: $before) {
             edges {
                 node
             }
@@ -37,10 +37,11 @@ export async function fetchBooq(id: string) {
     }
 }
 
-export function useBooq(id: string) {
+export function useBooq(id: string, path?: BooqPath) {
+    const after = path && pathToString(path);
     const { loading, data } = useQuery<BooqNodesData>(
         BooqNodesQuery,
-        { variables: { id } },
+        { variables: { id, after } },
     );
 
     return {

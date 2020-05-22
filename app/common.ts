@@ -25,3 +25,12 @@ export function booqHref(booqId: string) {
 export function pathToString(path: BooqPath) {
     return path.join('/');
 }
+
+export function pathFromString(pathString: string): BooqPath | undefined {
+    const path = pathString
+        .split('/')
+        .map(c => parseInt(c, 10));
+    return path.some(isNaN)
+        ? undefined
+        : path;
+}

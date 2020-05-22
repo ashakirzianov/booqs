@@ -1,6 +1,6 @@
 import { GetStaticPaths, GetStaticProps } from "next";
 import { Page } from "../../components/Page";
-import { useBooq, Booq, fetchBooq } from "../../app";
+import { useBooq, Booq, fetchBooq, BooqPath, pathFromString } from "../../app";
 import { Spinner } from "../../controls/Spinner";
 import { BooqScreen } from "../../components/Booq";
 
@@ -10,6 +10,7 @@ type PageData = {
 } | {
     kind: 'client-side',
     booqId: string,
+    path: BooqPath,
 } | {
     kind: 'not-found',
 };
@@ -32,23 +33,24 @@ export const getStaticProps: GetStaticProps<
     if (!params) {
         return { props: { data: { kind: 'not-found' } } };
     }
-    const { path: [source, id, ...rest] } = params;
+    const { path: [source, id, qualifier, parameter, ...rest] } = params;
     if (rest.length || !id || !source) {
         return { props: { data: { kind: 'not-found' } } };
     }
+
     const booqId = `${source}/${id}`;
-    switch (source) {
-        case 'pg':
-            return { props: { data: { kind: 'client-side', booqId } } };
-        default: {
-            const booq = await fetchBooq(booqId);
-            if (booq) {
-                return { props: { data: { kind: 'preloaded', booq } } };
-            } else {
-                return { props: { data: { kind: 'not-found' } } };
-            }
+    if (qualifier === 'path') {
+        const path = parameter ? pathFromString(parameter) : undefined;
+        if (path) {
+            return { props: { data: { kind: 'client-side', booqId, path } } }
+        }
+    } else if (qualifier === undefined) {
+        const booq = await fetchBooq(booqId);
+        if (booq) {
+            return { props: { data: { kind: 'preloaded', booq } } };
         }
     }
+    return { props: { data: { kind: 'not-found' } } };
 };
 
 export default function BooqPage({ data }: BooqPageProps) {
@@ -56,7 +58,7 @@ export default function BooqPage({ data }: BooqPageProps) {
         case 'preloaded':
             return <LoadedBooqPage booq={data.booq} />;
         case 'client-side':
-            return <ClientSidePage booqId={data.booqId} />;
+            return <ClientSidePage booqId={data.booqId} path={data.path} />;
         case 'not-found':
             return <NotFoundPage />;
         default:
@@ -76,10 +78,12 @@ function NotFoundPage() {
     </Page>;
 }
 
-function ClientSidePage({ booqId }: {
+function ClientSidePage({ booqId, path }: {
     booqId: string,
+    path?: BooqPath,
 }) {
-    const { loading, booq } = useBooq(booqId);
+    console.log(booqId, path);
+    const { loading, booq } = useBooq(booqId, path);
     if (loading) {
         return <LoadingPage />;
     } else if (!booq) {
