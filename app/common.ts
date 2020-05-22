@@ -19,7 +19,7 @@ export type BooqNode = {
 }
 
 export function booqHref(booqId: string) {
-    return `/book/${booqId}`;
+    return `/booq/${booqId}`;
 }
 
 export function pathToString(path: BooqPath) {

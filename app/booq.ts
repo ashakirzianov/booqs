@@ -25,10 +25,14 @@ type BooqNodesData = {
 };
 export type Booq = BooqNodesData['booq'];
 
-export async function fetchBooq(id: string) {
+export async function fetchBooq(id: string, path?: BooqPath) {
     const result = await doQuery<BooqNodesData>({
         query: BooqNodesQuery,
-        variables: { id, all: true },
+        variables: {
+            id,
+            all: path ? false : true,
+            path: path ? pathToString(path) : undefined,
+        },
     });
     if (result.data) {
         return result.data.booq;

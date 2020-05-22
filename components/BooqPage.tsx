@@ -6,6 +6,7 @@ import { BooqScreen } from "./Booq";
 type PageData = {
     kind: 'preloaded',
     booq: Booq,
+    path?: BooqPath,
 } | {
     kind: 'client-side',
     booqId: string,
