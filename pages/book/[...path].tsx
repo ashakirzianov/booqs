@@ -39,15 +39,15 @@ export const getStaticProps: GetStaticProps<
     }
 
     const booqId = `${source}/${id}`;
-    if (qualifier === 'path') {
-        const path = parameter ? pathFromString(parameter) : undefined;
-        if (path) {
-            return { props: { data: { kind: 'client-side', booqId, path } } }
-        }
-    } else if (qualifier === undefined) {
+    if (qualifier === undefined || (qualifier === 'path' && parameter === '0')) {
         const booq = await fetchBooq(booqId);
         if (booq) {
             return { props: { data: { kind: 'preloaded', booq } } };
+        }
+    } else if (qualifier === 'path') {
+        const path = parameter ? pathFromString(parameter) : undefined;
+        if (path) {
+            return { props: { data: { kind: 'client-side', booqId, path } } }
         }
     }
     return { props: { data: { kind: 'not-found' } } };
