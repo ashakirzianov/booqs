@@ -14,13 +14,19 @@ export function BooqContent({ nodes }: {
 }
 
 type RenderArgs = {
+    parent?: BooqNode,
     node: BooqNode,
     path: BooqPath,
 };
 function renderNode(args: RenderArgs): ReactNode {
     const { name, id, content } = args.node;
     if (!name) {
-        return content ?? null;
+        switch (args.parent?.name) {
+            case 'table': case 'tbody': case 'tr':
+                return null;
+            default:
+                return content ?? null;
+        }
     } else {
         const element = createElement(
             name,
@@ -48,7 +54,11 @@ function getProps({ node, path }: RenderArgs) {
 function getChildren({ node, path }: RenderArgs) {
     return node.children?.length
         ? node.children.map(
-            (n, idx) => renderNode({ node: n, path: [...path, idx] })
+            (n, idx) => renderNode({
+                node: n,
+                path: [...path, idx],
+                parent: node,
+            })
         )
         : null;
 }
