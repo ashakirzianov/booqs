@@ -15,6 +15,7 @@ export function BooqContent({ nodes }: {
 
 type RenderArgs = {
     parent?: BooqNode,
+    withinAnchor?: boolean,
     node: BooqNode,
     path: BooqPath,
 };
@@ -27,14 +28,23 @@ function renderNode(args: RenderArgs): ReactNode {
             default:
                 return content ?? null;
         }
+    } else if (name === 'img') {
+        // TODO: support images
+        return null;
     } else {
+        const actualName = name === 'a' && args.withinAnchor
+            ? 'span' // Do not nest anchors
+            : name;
         const element = createElement(
-            name,
+            actualName,
             getProps(args),
             getChildren(args),
         );
         if (id) {
-            const anchor = createElement('a', { id, key: id });
+            const anchor = createElement(
+                args.withinAnchor ? 'span' : 'a', // Do not nest anchors
+                { id, key: id },
+            );
             return [anchor, element];
         } else {
             return element;
@@ -52,12 +62,14 @@ function getProps({ node, path }: RenderArgs) {
 }
 
 function getChildren({ node, path }: RenderArgs) {
+    const withinAnchor = node.name === 'a';
     return node.children?.length
         ? node.children.map(
             (n, idx) => renderNode({
                 node: n,
                 path: [...path, idx],
                 parent: node,
+                withinAnchor,
             })
         )
         : null;
