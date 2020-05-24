@@ -22,6 +22,10 @@ export function booqHref(booqId: string) {
     return `/booq/${booqId}`;
 }
 
+export function feedHref() {
+    return '/';
+}
+
 export function pathToString(path: BooqPath) {
     return path.join('/');
 }

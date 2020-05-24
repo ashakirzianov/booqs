@@ -1,13 +1,14 @@
 import React from 'react';
-import { Booq } from '../app';
-import { bookFont, headerHeight, meter } from '../controls/theme';
-import { BooqContent } from './BooqContent';
+import Link from 'next/link';
+import { Booq, feedHref } from '../app';
+import { bookFont, headerHeight, meter } from 'controls/theme';
 import { IconButton } from 'controls/Buttons';
+import { Popovers } from 'controls/Popover';
+import { BooqContent } from './BooqContent';
 import { TocButton } from './Toc';
 import { BookmarkButton } from './Bookmark';
 import { Themer } from './Themer';
 import { SignIn } from './SignIn';
-import { Popovers } from 'controls/Popover';
 
 export function BooqScreen({ booq }: {
     booq: Booq,
@@ -29,7 +30,7 @@ export function BooqScreen({ booq }: {
 function Header() {
     return <nav className='container'>
         <div className='left'>
-            <div className='button'><LibButton /></div>
+            <div className='button'><FeedButton /></div>
             <div className='button'><TocButton /></div>
         </div>
         <div className='right'>
@@ -71,10 +72,12 @@ function Header() {
     </nav>;
 }
 
-function LibButton() {
-    return <IconButton
-        icon='back'
-    />;
+function FeedButton() {
+    return <Link href={feedHref()}>
+        <IconButton
+            icon='back'
+        />
+    </Link>;
 }
 
 const contentWidth = '50rem';
