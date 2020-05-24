@@ -1,5 +1,5 @@
 import React from 'react';
-import { meter } from '../controls/theme';
+import { meter, headerHeight } from '../controls/theme';
 import { Logo } from '../controls/Logo';
 import { Popovers } from '../controls/Popover';
 import { Search } from './Search';
@@ -7,7 +7,7 @@ import { SignIn } from './SignIn';
 import { Themer } from './Themer';
 import { Upload } from './Upload';
 
-const headerHeight = '4rem';
+
 export function AppBar() {
     return <div className="container">
         <div className="logo">
