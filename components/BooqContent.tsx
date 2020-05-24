@@ -1,16 +1,33 @@
 import React, { createElement, ReactNode } from 'react';
-import { BooqNode, BooqPath, pathToString } from '../app';
+import { BooqNode, BooqPath, pathToString, useSettings, Booq } from '../app';
+import { bookFont } from 'controls/theme';
 
-export function BooqContent({ nodes }: {
+export function BooqContent({ booq }: {
+    booq: Booq,
+}) {
+    const { fontScale } = useSettings();
+    const nodes = booq.nodesConnection.edges.map(e => e.node);
+    return <div className='container'>
+        <Nodes nodes={nodes} />
+        <style jsx>{`
+            .container {
+                font-family: ${bookFont};
+                font-size: ${fontScale * 100}%;
+            }
+            `}</style>
+    </div>;
+}
+
+function Nodes({ nodes }: {
     nodes: BooqNode[],
 }) {
-    return <div>
+    return <>
         {
             nodes.map(
                 (node, idx) => renderNode({ node, path: [idx] }),
             )
         }
-    </div>;
+    </>;
 }
 
 type RenderArgs = {

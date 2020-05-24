@@ -1,7 +1,6 @@
 import { useQuery, useApolloClient } from "@apollo/react-hooks";
 import gql from 'graphql-tag';
 
-type Color = keyof Palette;
 type Palette = {
     background: string,
     action: string,
@@ -16,12 +15,15 @@ type Palettes = {
 
 const SettingsQuery = gql`query SettingsQuery {
     paletteName @client
+    fontScale @client
 }`;
 type SettingsData = {
     paletteName: PaletteName,
+    fontScale: number,
 };
 export const initialSettingsData: SettingsData = {
     paletteName: 'light',
+    fontScale: 1,
 };
 
 export function usePalette() {
@@ -30,19 +32,28 @@ export function usePalette() {
 
 export function useSettings() {
     const { data } = useQuery<SettingsData>(SettingsQuery);
-    const paletteName = data?.paletteName ?? 'light';
+    const {
+        paletteName, fontScale,
+    } = data ?? { paletteName: 'light', fontScale: 1 };
     const palette = palettes[paletteName] ?? palettes.light;
     return {
         palette,
         paletteName,
+        fontScale,
     };
 }
 export function useSetSettings() {
     const client = useApolloClient();
     return {
         setPalette(paletteName: PaletteName) {
-            client.writeData<SettingsData>({
+            client.writeData<Partial<SettingsData>>({
                 data: { paletteName },
+            });
+        },
+        setFontScale(fontScale: number) {
+            fontScale = Math.max(0.1, fontScale);
+            client.writeData<Partial<SettingsData>>({
+                data: { fontScale },
             });
         },
     };

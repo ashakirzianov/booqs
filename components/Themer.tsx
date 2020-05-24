@@ -40,9 +40,11 @@ function ThemerPanel() {
 }
 
 function FontSettings() {
+    const { fontScale } = useSettings();
+    const { setFontScale } = useSetSettings();
     return <div className="container">
-        <FontScaleButton scale='down' />
-        <FontScaleButton scale='up' />
+        <FontScaleButton scale='down' onClick={() => setFontScale(fontScale - 0.1)} />
+        <FontScaleButton scale='up' onClick={() => setFontScale(fontScale + 0.1)} />
         <style jsx>{`
             .container {
                 display: flex;
@@ -55,14 +57,15 @@ function FontSettings() {
     </div>
 }
 
-function FontScaleButton({ scale }: {
+function FontScaleButton({ scale, onClick }: {
     scale: 'up' | 'down',
+    onClick: () => void,
 }) {
     const { highlight } = usePalette();
     const fontSize = scale === 'up'
         ? 'xx-large'
         : 'large';
-    return <div>
+    return <div onClick={onClick}>
         <span>Abc</span>
         <style jsx>{`
             div {

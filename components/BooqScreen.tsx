@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { Booq, feedHref } from '../app';
-import { bookFont, headerHeight, meter } from 'controls/theme';
+import { headerHeight, meter } from 'controls/theme';
 import { IconButton } from 'controls/Buttons';
 import { Popovers } from 'controls/Popover';
 import { BooqContent } from './BooqContent';
@@ -10,18 +10,28 @@ import { BookmarkButton } from './Bookmark';
 import { Themer } from './Themer';
 import { SignIn } from './SignIn';
 
+const contentWidth = '50rem';
 export function BooqScreen({ booq }: {
     booq: Booq,
 }) {
     return <div className='container'>
         <Header />
-        <Content booq={booq} />
+        <div className='booq'>
+            <BooqContent booq={booq} />
+        </div>
         <style jsx>{`
             .container {
                 display: flex;
                 flex: 1;
                 flex-flow: column;
                 align-items: center;
+            }
+            .booq {
+                display: flex;
+                flex-flow: column;
+                align-items: center;
+                width: 100%;
+                max-width: ${contentWidth};
             }
             `}</style>
     </div>;
@@ -78,24 +88,4 @@ function FeedButton() {
             icon='back'
         /></a>
     </Link>;
-}
-
-const contentWidth = '50rem';
-function Content({ booq }: {
-    booq: Booq,
-}) {
-    const nodes = booq.nodesConnection.edges.map(e => e.node);
-    return <div className='container'>
-        <BooqContent nodes={nodes} />
-        <style jsx>{`
-            .container {
-                display: flex;
-                flex-flow: column;
-                align-items: center;
-                width: 100%;
-                max-width: ${contentWidth};
-                font-family: ${bookFont};
-            }
-            `}</style>
-    </div>;
 }
