@@ -14,29 +14,37 @@ type Palettes = {
     [key in PaletteName]: Palette;
 };
 
-const PaletteQuery = gql`query PaletteQuery {
-    palette @client
+const SettingsQuery = gql`query SettingsQuery {
+    paletteName @client
 }`;
-type PaletteData = {
-    palette: PaletteName,
+type SettingsData = {
+    paletteName: PaletteName,
 };
-export const initialPaletteData: PaletteData = {
-    palette: 'light',
+export const initialSettingsData: SettingsData = {
+    paletteName: 'light',
 };
-export function usePalette(): Palette & { name: PaletteName } {
-    const { data } = useQuery<PaletteData>(PaletteQuery);
-    const name = data?.palette ?? 'light';
+
+export function usePalette() {
+    return useSettings().palette;
+}
+
+export function useSettings() {
+    const { data } = useQuery<SettingsData>(SettingsQuery);
+    const paletteName = data?.paletteName ?? 'light';
+    const palette = palettes[paletteName] ?? palettes.light;
     return {
-        ...palettes[name],
-        name,
+        palette,
+        paletteName,
     };
 }
-export function useSetPalette() {
+export function useSetSettings() {
     const client = useApolloClient();
-    return function (palette: PaletteName) {
-        client.writeData<PaletteData>({
-            data: { palette },
-        });
+    return {
+        setPalette(paletteName: PaletteName) {
+            client.writeData<SettingsData>({
+                data: { paletteName },
+            });
+        },
     };
 }
 

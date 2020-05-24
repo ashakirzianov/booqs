@@ -7,7 +7,7 @@ import { onError } from 'apollo-link-error';
 import { setContext } from 'apollo-link-context';
 import { createUploadLink } from 'apollo-upload-client';
 import fetch from 'isomorphic-unfetch';
-import { initialPaletteData } from './palette';
+import { initialSettingsData } from './settings';
 import { restoreAuthToken, initialAuthData, initAuth } from './auth';
 
 const link = ApolloLink.from([
@@ -43,7 +43,7 @@ const client = new ApolloClient({
 
 const initialData = {
     data: {
-        ...initialPaletteData,
+        ...initialSettingsData,
         ...initialAuthData,
     },
 };

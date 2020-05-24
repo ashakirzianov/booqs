@@ -1,7 +1,7 @@
 import {
     bookFont, buttonShadow, meter,
 } from "../controls/theme";
-import { usePalette, PaletteName, palettes, useSetPalette } from '../app';
+import { usePalette, PaletteName, palettes, useSetSettings, useSettings } from '../app';
 import { PopoverSingleton, Popover } from "../controls/Popover";
 import { IconButton } from "../controls/Buttons";
 
@@ -81,12 +81,12 @@ function FontScaleButton({ scale }: {
 }
 
 function PalettePicker() {
-    const { name } = usePalette();
-    const setPalette = useSetPalette();
+    const { paletteName } = useSettings();
+    const { setPalette } = useSetSettings();
     return <div>
-        <PaletteButton name='light' current={name} onSelect={setPalette} />
-        <PaletteButton name='sepia' current={name} onSelect={setPalette} />
-        <PaletteButton name='dark' current={name} onSelect={setPalette} />
+        <PaletteButton name='light' current={paletteName} onSelect={setPalette} />
+        <PaletteButton name='sepia' current={paletteName} onSelect={setPalette} />
+        <PaletteButton name='dark' current={paletteName} onSelect={setPalette} />
         <style jsx>{`
             div {
                 display: flex;

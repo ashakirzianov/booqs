@@ -74,9 +74,9 @@ function Header() {
 
 function FeedButton() {
     return <Link href={feedHref()}>
-        <IconButton
+        <a><IconButton
             icon='back'
-        />
+        /></a>
     </Link>;
 }
 
