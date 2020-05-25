@@ -11,10 +11,12 @@ export function BooqContent({ booq }: {
         start: booq.fragment.current.path,
         end: booq.fragment.next?.path,
     };
+    const path = [range.start[0]];
     return <div className='container'>
         <Nodes
             booqId={booq.id}
             nodes={nodes}
+            path={path}
             range={range}
         />
         <style jsx>{`
@@ -26,15 +28,18 @@ export function BooqContent({ booq }: {
     </div>;
 }
 
-function Nodes({ nodes, range, booqId }: {
+function Nodes({ nodes, range, booqId, path }: {
     booqId: string,
     nodes: BooqNode[],
+    path: BooqPath,
     range: BooqRange,
 }) {
+    const prefix = path.slice(0, path.length - 1);
+    const offset = path[path.length - 1] ?? 0;
     return <>
         {
             nodes.map(
-                (node, idx) => renderNode({ node, path: [idx], range, booqId }),
+                (node, idx) => renderNode({ node, path: [...prefix, offset + idx], range, booqId }),
             )
         }
     </>;
@@ -94,11 +99,12 @@ function hrefForPath(path: BooqPath, booqId: string, range: BooqRange): string {
 
 function getChildren({ node, path, range, booqId }: RenderArgs) {
     const withinAnchor = node.name === 'a';
+    const offset = node.offset ?? 0;
     return node.children?.length
         ? node.children.map(
             (n, idx) => renderNode({
                 node: n,
-                path: [...path, idx],
+                path: [...path, idx + offset],
                 parent: node,
                 withinAnchor,
                 range,
