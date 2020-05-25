@@ -2,7 +2,7 @@ import { pathToString, BooqPath, pathFromString } from "./core";
 
 export function booqHref(booqId: string, path?: BooqPath) {
     return path?.length
-        ? `/booq/${booqId}/path/${pathToString(path)}#${pathToString(path)}`
+        ? `/booq/${booqId}/path/${pathToString(path)}#${pathToId(path)}`
         : `/booq/${booqId}`;
 }
 

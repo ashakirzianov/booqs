@@ -1,5 +1,5 @@
 import React, { createElement, ReactNode } from 'react';
-import { BooqNode, BooqPath, pathToString, useSettings, BooqData, pathToId } from '../app';
+import { BooqNode, BooqPath, pathToString, useSettings, BooqData, pathToId, BooqRange, pathInRange, booqHref } from '../app';
 import { bookFont } from 'controls/theme';
 
 export function BooqContent({ booq }: {
@@ -7,11 +7,15 @@ export function BooqContent({ booq }: {
 }) {
     const { fontScale } = useSettings();
     const nodes = booq.fragment.nodes;
+    const range: BooqRange = {
+        start: booq.fragment.current.path,
+        end: booq.fragment.next?.path,
+    };
     return <div className='container'>
         <Nodes
+            booqId={booq.id}
             nodes={nodes}
-            start={booq.fragment.current.path}
-            end={booq.fragment.next?.path}
+            range={range}
         />
         <style jsx>{`
             .container {
@@ -22,25 +26,27 @@ export function BooqContent({ booq }: {
     </div>;
 }
 
-function Nodes({ nodes }: {
+function Nodes({ nodes, range, booqId }: {
+    booqId: string,
     nodes: BooqNode[],
-    start: BooqPath,
-    end?: BooqPath,
+    range: BooqRange,
 }) {
     return <>
         {
             nodes.map(
-                (node, idx) => renderNode({ node, path: [idx] }),
+                (node, idx) => renderNode({ node, path: [idx], range, booqId }),
             )
         }
     </>;
 }
 
 type RenderArgs = {
+    booqId: string,
     parent?: BooqNode,
     withinAnchor?: boolean,
     node: BooqNode,
     path: BooqPath,
+    range: BooqRange,
 };
 function renderNode(args: RenderArgs): ReactNode {
     const { name, content } = args.node;
@@ -66,19 +72,27 @@ function renderNode(args: RenderArgs): ReactNode {
     }
 }
 
-function getProps({ node, path }: RenderArgs) {
+function getProps({ node, path, booqId, range }: RenderArgs) {
     return {
         ...node.attrs,
         id: pathToId(path),
         style: node.style,
         key: pathToString(path),
         href: node.ref
-            ? `#${pathToId(node.ref)}`
+            ? hrefForPath(node.ref, booqId, range)
             : node.attrs?.href,
     };
 }
 
-function getChildren({ node, path }: RenderArgs) {
+function hrefForPath(path: BooqPath, booqId: string, range: BooqRange): string {
+    if (pathInRange(path, range)) {
+        return `#${pathToId(path)}`;
+    } else {
+        return booqHref(booqId, path);
+    }
+}
+
+function getChildren({ node, path, range, booqId }: RenderArgs) {
     const withinAnchor = node.name === 'a';
     return node.children?.length
         ? node.children.map(
@@ -87,6 +101,8 @@ function getChildren({ node, path }: RenderArgs) {
                 path: [...path, idx],
                 parent: node,
                 withinAnchor,
+                range,
+                booqId,
             })
         )
         : null;
