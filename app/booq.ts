@@ -5,21 +5,41 @@ import { BooqNode, BooqPath } from "./common";
 
 const BooqFragmentQuery = gql`query BooqFragment($id: ID!, $path: [Int!]) {
     booq(id: $id) {
+        id
         title
         fragment(path: $path) {
             nodes
+            previous {
+                title
+                path
+            }
+            current {
+                path
+            }
+            next {
+                title
+                path
+            }
         }
     }
 }`;
 type BooqFragmentData = {
     booq: {
+        id: string,
         title?: string,
         fragment: {
             nodes: BooqNode[],
+            previous?: BooqAnchor,
+            current: BooqAnchor,
+            next?: BooqAnchor,
         }
     },
 };
-export type BooqFragment = BooqFragmentData['booq'];
+export type BooqAnchor = {
+    title?: string,
+    path: BooqPath,
+};
+export type Booq = BooqFragmentData['booq'];
 
 export async function fetchBooqFragment(id: string, path?: BooqPath) {
     const result = await doQuery<BooqFragmentData>({

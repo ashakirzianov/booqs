@@ -1,11 +1,11 @@
 import { Page } from "./Page";
-import { useBooq, BooqFragment, BooqPath } from "../app";
+import { useBooq, Booq, BooqPath } from "../app";
 import { Spinner } from "../controls/Spinner";
 import { BooqScreen } from "./BooqScreen";
 
 type PageData = {
     kind: 'preloaded',
-    booq: BooqFragment,
+    booq: Booq,
     path?: BooqPath,
 } | {
     kind: 'client-side',
@@ -58,7 +58,7 @@ function ClientSidePage({ booqId, path }: {
 }
 
 function LoadedBooqPage({ booq }: {
-    booq: BooqFragment,
+    booq: Booq,
 }) {
     return <Page title={booq?.title ?? 'Booq'}>
         <BooqScreen booq={booq} />

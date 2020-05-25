@@ -1,9 +1,9 @@
 import React, { createElement, ReactNode } from 'react';
-import { BooqNode, BooqPath, pathToString, useSettings, BooqFragment } from '../app';
+import { BooqNode, BooqPath, pathToString, useSettings, Booq } from '../app';
 import { bookFont } from 'controls/theme';
 
 export function BooqContent({ booq }: {
-    booq: BooqFragment,
+    booq: Booq,
 }) {
     const { fontScale } = useSettings();
     const nodes = booq.fragment.nodes;

@@ -18,21 +18,24 @@ export type BooqNode = {
     fileName?: string,
 }
 
-export function booqHref(booqId: string) {
-    return `/booq/${booqId}`;
+export function booqHref(booqId: string, path?: BooqPath) {
+    return path?.length
+        ? `/booq/${booqId}/path/${pathToString(path)}`
+        : `/booq/${booqId}`;
 }
 
 export function feedHref() {
     return '/';
 }
 
-export function pathToString(path: BooqPath) {
-    return path.join('/');
+const separator = '-';
+export function pathToString(path: BooqPath): string {
+    return path.join(separator);
 }
 
 export function pathFromString(pathString: string): BooqPath | undefined {
     const path = pathString
-        .split('/')
+        .split(separator)
         .map(c => parseInt(c, 10));
     return path.some(isNaN)
         ? undefined
