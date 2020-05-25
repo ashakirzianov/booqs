@@ -1,5 +1,5 @@
 import React, { createElement, ReactNode } from 'react';
-import { BooqNode, BooqPath, pathToString, useSettings, Booq } from '../app';
+import { BooqNode, BooqPath, pathToString, useSettings, Booq, pathToId } from '../app';
 import { bookFont } from 'controls/theme';
 
 export function BooqContent({ booq }: {
@@ -37,7 +37,7 @@ type RenderArgs = {
     path: BooqPath,
 };
 function renderNode(args: RenderArgs): ReactNode {
-    const { name, id, content } = args.node;
+    const { name, content } = args.node;
     if (!name) {
         switch (args.parent?.name) {
             case 'table': case 'tbody': case 'tr':
@@ -52,29 +52,23 @@ function renderNode(args: RenderArgs): ReactNode {
         const actualName = name === 'a' && args.withinAnchor
             ? 'span' // Do not nest anchors
             : name;
-        const element = createElement(
+        return createElement(
             actualName,
             getProps(args),
             getChildren(args),
         );
-        if (id) {
-            const anchor = createElement(
-                args.withinAnchor ? 'span' : 'a', // Do not nest anchors
-                { id, key: id },
-            );
-            return [anchor, element];
-        } else {
-            return element;
-        }
     }
 }
 
 function getProps({ node, path }: RenderArgs) {
     return {
         ...node.attrs,
-        id: `path:${pathToString(path)}`,
+        id: pathToId(path),
         style: node.style,
         key: pathToString(path),
+        href: node.ref
+            ? `#${pathToId(node.ref)}`
+            : node.attrs?.href,
     };
 }
 

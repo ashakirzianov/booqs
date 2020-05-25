@@ -16,11 +16,12 @@ export type BooqNode = {
     content?: string,
     offset?: number,
     fileName?: string,
+    ref?: BooqPath,
 }
 
 export function booqHref(booqId: string, path?: BooqPath) {
     return path?.length
-        ? `/booq/${booqId}/path/${pathToString(path)}`
+        ? `/booq/${booqId}/path/${pathToString(path)}#${pathToString(path)}`
         : `/booq/${booqId}`;
 }
 
@@ -40,4 +41,18 @@ export function pathFromString(pathString: string): BooqPath | undefined {
     return path.some(isNaN)
         ? undefined
         : path;
+}
+
+const idPrefix = 'path:';
+export function pathToId(path: BooqPath): string {
+    return `${idPrefix}${pathToString(path)}`;
+}
+
+export function pathFromId(id: string): BooqPath | undefined {
+    if (id.startsWith(idPrefix)) {
+        const pathString = id.substr(idPrefix.length);
+        return pathFromString(pathString);
+    } else {
+        return undefined;
+    }
 }
