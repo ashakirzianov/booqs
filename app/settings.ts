@@ -23,7 +23,7 @@ type SettingsData = {
 };
 export const initialSettingsData: SettingsData = {
     paletteName: 'light',
-    fontScale: 1,
+    fontScale: 100,
 };
 
 export function usePalette() {
@@ -34,7 +34,7 @@ export function useSettings() {
     const { data } = useQuery<SettingsData>(SettingsQuery);
     const {
         paletteName, fontScale,
-    } = data ?? { paletteName: 'light', fontScale: 1 };
+    } = data ?? { paletteName: 'light', fontScale: 100 };
     const palette = palettes[paletteName] ?? palettes.light;
     return {
         palette,
@@ -51,7 +51,7 @@ export function useSetSettings() {
             });
         },
         setFontScale(fontScale: number) {
-            fontScale = Math.max(0.1, fontScale);
+            fontScale = Math.max(10, fontScale);
             client.writeData<Partial<SettingsData>>({
                 data: { fontScale },
             });

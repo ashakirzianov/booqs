@@ -12,7 +12,7 @@ export function BooqContent({ booq }: {
         <style jsx>{`
             .container {
                 font-family: ${bookFont};
-                font-size: ${fontScale * 100}%;
+                font-size: ${fontScale}%;
             }
             `}</style>
     </div>;

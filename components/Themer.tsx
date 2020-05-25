@@ -43,8 +43,8 @@ function FontSettings() {
     const { fontScale } = useSettings();
     const { setFontScale } = useSetSettings();
     return <div className="container">
-        <FontScaleButton scale='down' onClick={() => setFontScale(fontScale - 0.1)} />
-        <FontScaleButton scale='up' onClick={() => setFontScale(fontScale + 0.1)} />
+        <FontScaleButton scale='down' onClick={() => setFontScale(fontScale - 10)} />
+        <FontScaleButton scale='up' onClick={() => setFontScale(fontScale + 10)} />
         <style jsx>{`
             .container {
                 display: flex;
