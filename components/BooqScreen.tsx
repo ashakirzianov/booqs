@@ -74,6 +74,7 @@ function Header() {
                 height: ${headerHeight};
                 position: fixed;
                 top: 0; left: 0; right: 0;
+                pointer-events: none;
             }
             .left, .right {
                 display: flex;
@@ -87,6 +88,7 @@ function Header() {
             }
             .button {
                 margin: 0 ${meter.regular};
+                pointer-events: auto;
             }
             `}</style>
     </nav>;
