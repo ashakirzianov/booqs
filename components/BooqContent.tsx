@@ -1,14 +1,18 @@
 import React, { createElement, ReactNode } from 'react';
-import { BooqNode, BooqPath, pathToString, useSettings, Booq, pathToId } from '../app';
+import { BooqNode, BooqPath, pathToString, useSettings, BooqData, pathToId } from '../app';
 import { bookFont } from 'controls/theme';
 
 export function BooqContent({ booq }: {
-    booq: Booq,
+    booq: BooqData,
 }) {
     const { fontScale } = useSettings();
     const nodes = booq.fragment.nodes;
     return <div className='container'>
-        <Nodes nodes={nodes} />
+        <Nodes
+            nodes={nodes}
+            start={booq.fragment.current.path}
+            end={booq.fragment.next?.path}
+        />
         <style jsx>{`
             .container {
                 font-family: ${bookFont};
@@ -20,6 +24,8 @@ export function BooqContent({ booq }: {
 
 function Nodes({ nodes }: {
     nodes: BooqNode[],
+    start: BooqPath,
+    end?: BooqPath,
 }) {
     return <>
         {

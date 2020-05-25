@@ -1,7 +1,7 @@
 import gql from "graphql-tag";
 import { useQuery } from "@apollo/react-hooks";
 import { doQuery } from "./provider";
-import { BooqNode, BooqPath } from "./common";
+import { BooqNode, BooqPath } from "./core";
 
 const BooqFragmentQuery = gql`query BooqFragment($id: ID!, $path: [Int!]) {
     booq(id: $id) {
@@ -39,7 +39,7 @@ export type BooqAnchor = {
     title?: string,
     path: BooqPath,
 };
-export type Booq = BooqFragmentData['booq'];
+export type BooqData = BooqFragmentData['booq'];
 
 export async function fetchBooqFragment(id: string, path?: BooqPath) {
     const result = await doQuery<BooqFragmentData>({
