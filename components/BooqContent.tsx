@@ -1,12 +1,12 @@
 import React, { createElement, ReactNode } from 'react';
-import { BooqNode, BooqPath, pathToString, useSettings, Booq } from '../app';
+import { BooqNode, BooqPath, pathToString, useSettings, BooqFragment } from '../app';
 import { bookFont } from 'controls/theme';
 
 export function BooqContent({ booq }: {
-    booq: Booq,
+    booq: BooqFragment,
 }) {
     const { fontScale } = useSettings();
-    const nodes = booq.nodesConnection.edges.map(e => e.node);
+    const nodes = booq.fragment.nodes;
     return <div className='container'>
         <Nodes nodes={nodes} />
         <style jsx>{`

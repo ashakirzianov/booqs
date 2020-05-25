@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { Booq, feedHref } from '../app';
+import { BooqFragment, feedHref } from '../app';
 import { headerHeight, meter } from 'controls/theme';
 import { IconButton } from 'controls/Buttons';
 import { Popovers } from 'controls/Popover';
@@ -12,7 +12,7 @@ import { SignIn } from './SignIn';
 
 const contentWidth = '50rem';
 export function BooqScreen({ booq }: {
-    booq: Booq,
+    booq: BooqFragment,
 }) {
     return <div className='container'>
         <Header />

@@ -1,37 +1,31 @@
 import gql from "graphql-tag";
 import { useQuery } from "@apollo/react-hooks";
 import { doQuery } from "./provider";
-import { BooqNode, BooqPath, pathToString } from "./common";
+import { BooqNode, BooqPath } from "./common";
 
-const BooqNodesQuery = gql`query BooqNodes($id: ID!, $all: Boolean, $after: String, $before: String) {
+const BooqFragmentQuery = gql`query BooqFragment($id: ID!, $path: [Int!]) {
     booq(id: $id) {
         title
-        nodesConnection(all: $all, after: $after, before: $before) {
-            edges {
-                node
-            }
+        fragment(path: $path) {
+            nodes
         }
     }
 }`;
-type BooqNodesData = {
+type BooqFragmentData = {
     booq: {
         title?: string,
-        nodesConnection: {
-            edges: {
-                node: BooqNode,
-            }[],
-        },
+        fragment: {
+            nodes: BooqNode[],
+        }
     },
 };
-export type Booq = BooqNodesData['booq'];
+export type BooqFragment = BooqFragmentData['booq'];
 
-export async function fetchBooq(id: string, path?: BooqPath) {
-    const result = await doQuery<BooqNodesData>({
-        query: BooqNodesQuery,
+export async function fetchBooqFragment(id: string, path?: BooqPath) {
+    const result = await doQuery<BooqFragmentData>({
+        query: BooqFragmentQuery,
         variables: {
-            id,
-            all: path ? false : true,
-            path: path ? pathToString(path) : undefined,
+            id, path,
         },
     });
     if (result.data) {
@@ -42,10 +36,9 @@ export async function fetchBooq(id: string, path?: BooqPath) {
 }
 
 export function useBooq(id: string, path?: BooqPath) {
-    const after = path && pathToString(path);
-    const { loading, data } = useQuery<BooqNodesData>(
-        BooqNodesQuery,
-        { variables: { id, after } },
+    const { loading, data } = useQuery<BooqFragmentData>(
+        BooqFragmentQuery,
+        { variables: { id, path } },
     );
 
     return {

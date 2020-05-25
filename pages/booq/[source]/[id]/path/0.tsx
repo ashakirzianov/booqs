@@ -1,5 +1,5 @@
 import { GetStaticPaths, GetStaticProps } from "next";
-import { fetchBooq, pathFromString } from "app";
+import { fetchBooqFragment } from "app";
 import { BooqPage, BooqPageProps } from "components/BooqPage";
 
 type QueryParams = {
@@ -22,7 +22,7 @@ export const getStaticProps: GetStaticProps<
     }
     const booqId = `${source}/${id}`;
     const booqPath = [0];
-    const booq = await fetchBooq(booqId, booqPath);
+    const booq = await fetchBooqFragment(booqId, booqPath);
     if (booq) {
         return { props: { data: { kind: 'preloaded', booq, path: booqPath } } };
     } else {
