@@ -1,45 +1,53 @@
 import React, { useState } from 'react';
 import { IconButton } from 'controls/Buttons';
 import { Modal } from 'controls/Modal';
-import { useToc } from 'app/toc';
+import { useToc, TocItem } from 'app/toc';
 import { Spinner } from 'controls/Spinner';
-import { BooqPath, usePalette } from 'app';
+import { BooqPath, usePalette, pageForPosition } from 'app';
 import { BooqLink } from 'controls/Links';
+import { meter } from 'controls/theme';
 
 export function TocButton({ booqId }: {
     booqId: string,
 }) {
     const [open, setOpen] = useState(false);
+    const { loading, items } = useToc(booqId);
     return <>
         <IconButton icon='toc' onClick={() => setOpen(true)} />
         <Modal
             isOpen={open}
             close={() => setOpen(false)}
+            title='Contents'
         >
-            <TocContent booqId={booqId} />
+            {
+                loading ? <Spinner /> :
+                    <TocContent booqId={booqId} items={items} />
+            }
         </Modal>
     </>;
 }
 
-const tocWidth = '20rem';
-function TocContent({ booqId }: {
+const tocWidth = '50rem';
+function TocContent({ booqId, items }: {
     booqId: string,
+    items: TocItem[],
 }) {
-    const { loading, items } = useToc(booqId);
-    const { background, highlight } = usePalette();
+    const { background, highlight, border } = usePalette();
     return <div className='container'>
         {
-            loading ? <Spinner /> :
-                items.map(
-                    (item, idx) => <div key={idx} className='item'>
-                        <TocItem
+            items.map(
+                (item, idx) => <>
+                    <div key={idx} className='item'>
+                        <TocRow
                             booqId={booqId}
                             title={item.title}
                             path={item.path}
                             position={item.position}
                         />
                     </div>
-                )
+                    <hr key={`${idx}-hr`} />
+                </>
+            )
         }
         <style jsx>{`
             .container {
@@ -52,12 +60,17 @@ function TocContent({ booqId }: {
                 color: ${background};
                 background: ${highlight};
             }
+            hr {
+                width: 85%;
+                border: none;
+                border-top: 1px solid ${border};
+            }
             `}</style>
     </div>;
 }
 
-function TocItem({
-    booqId, title, path,
+function TocRow({
+    booqId, title, path, position,
 }: {
     booqId: string,
     title?: string,
@@ -67,7 +80,8 @@ function TocItem({
     return <>
         <BooqLink booqId={booqId} path={path}>
             <div className='content'>
-                {title ?? 'no-title'}
+                <span className='title'>{title ?? 'no-title'}</span>
+                <span className='page'>{pageForPosition(position ?? 1)}</span>
             </div>
         </BooqLink>
         <style jsx>{`
@@ -75,6 +89,8 @@ function TocItem({
             display: flex;
             flex-flow: row nowrap;
             flex: 1;
+            padding: ${meter.large};
+            justify-content: space-between;
         }
         `}</style>
     </>;

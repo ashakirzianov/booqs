@@ -5,6 +5,7 @@ import { BooqNode, BooqPath } from "./core";
 
 const TocQuery = gql`query TocQuery($booqId: ID!) {
     booq(id: $booqId) {
+        title
         tableOfContents {
             items {
                 title
@@ -16,6 +17,7 @@ const TocQuery = gql`query TocQuery($booqId: ID!) {
 }`;
 type TocData = {
     booq: {
+        title?: string,
         tableOfContents: {
             items: {
                 title?: string,
@@ -26,6 +28,7 @@ type TocData = {
     },
 };
 
+export type TocItem = TocData['booq']['tableOfContents']['items'][number];
 export function useToc(booqId: string) {
     const { loading, data } = useQuery<TocData>(
         TocQuery,
@@ -34,6 +37,7 @@ export function useToc(booqId: string) {
 
     return {
         loading,
+        title: data?.booq.title,
         items: data?.booq.tableOfContents.items ?? [],
     };
 }
