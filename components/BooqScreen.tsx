@@ -135,6 +135,7 @@ function AnchorButton({ booqId, anchor, title }: {
             }
             .content:hover {
                 color: ${highlight};
+                border-color: ${highlight};
             }
             `}</style>
     </div>;
