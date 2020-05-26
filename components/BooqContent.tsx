@@ -1,15 +1,14 @@
-import React, { createElement, ReactNode } from 'react';
+import React, { memo, createElement, ReactNode } from 'react';
 import {
-    BooqNode, BooqPath, pathToString, useSettings, BooqData,
+    BooqNode, BooqPath, pathToString, BooqData,
     pathToId, BooqRange, pathInRange,
 } from '../app';
-import { bookFont } from 'controls/theme';
 import { booqHref } from 'controls/Links';
 
-export function BooqContent({ booq }: {
+
+export const BooqContent = memo(function BooqContent({ booq }: {
     booq: BooqData,
 }) {
-    const { fontScale } = useSettings();
     const nodes = booq.fragment.nodes;
     const range: BooqRange = {
         start: booq.fragment.current.path,
@@ -23,14 +22,8 @@ export function BooqContent({ booq }: {
             path={path}
             range={range}
         />
-        <style jsx>{`
-            .container {
-                font-family: ${bookFont};
-                font-size: ${fontScale}%;
-            }
-            `}</style>
     </div>;
-}
+});
 
 function Nodes({ nodes, range, booqId, path }: {
     booqId: string,

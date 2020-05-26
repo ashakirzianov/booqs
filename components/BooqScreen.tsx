@@ -1,6 +1,6 @@
 import React from 'react';
-import { BooqData, BooqAnchor, usePalette } from '../app';
-import { headerHeight, meter, radius } from 'controls/theme';
+import { BooqData, BooqAnchor, usePalette, useSettings } from '../app';
+import { headerHeight, meter, radius, bookFont } from 'controls/theme';
 import { IconButton } from 'controls/Buttons';
 import { Popovers } from 'controls/Popover';
 import { BooqContent } from './BooqContent';
@@ -14,6 +14,7 @@ const contentWidth = '50rem';
 export function BooqScreen({ booq }: {
     booq: BooqData,
 }) {
+    const { fontScale } = useSettings();
     return <div className='container'>
         <Header />
         <div className='booq'>
@@ -42,6 +43,8 @@ export function BooqScreen({ booq }: {
                 align-items: center;
                 width: 100%;
                 max-width: ${contentWidth};
+                font-family: ${bookFont};
+                font-size: ${fontScale}%;
             }
             `}</style>
     </div>;
