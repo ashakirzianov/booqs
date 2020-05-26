@@ -1,7 +1,9 @@
 import { Page } from "./Page";
-import { useBooq, BooqData, BooqPath } from "../app";
+import { useBooq, BooqData, BooqPath, pathToId } from "../app";
 import { Spinner } from "../controls/Spinner";
 import { BooqScreen } from "./BooqScreen";
+import { useRouter } from "next/dist/client/router";
+import { useEffect } from "react";
 
 type PageData = {
     kind: 'preloaded',
@@ -54,13 +56,26 @@ function ClientSidePage({ booqId, path }: {
         return <NotFoundPage />;
     }
 
-    return <LoadedBooqPage booq={booq} />;
+    return <LoadedBooqPage booq={booq} path={path} />;
 }
 
-function LoadedBooqPage({ booq }: {
+function LoadedBooqPage({ booq, path }: {
     booq: BooqData,
+    path?: BooqPath,
 }) {
+    usePathNavigation(path);
     return <Page title={booq?.title ?? 'Booq'}>
         <BooqScreen booq={booq} />
     </Page>;
+}
+
+function usePathNavigation(path: BooqPath | undefined) {
+    const { push, asPath } = useRouter();
+    useEffect(() => {
+        if (path) {
+            const [withoutHash] = asPath.split('#');
+            const withHash = `${withoutHash}#${pathToId(path)}`;
+            push(withHash);
+        }
+    }, []);
 }
