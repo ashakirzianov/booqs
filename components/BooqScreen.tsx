@@ -1,5 +1,4 @@
 import React from 'react';
-import Link from 'next/link';
 import { BooqData, BooqAnchor, usePalette } from '../app';
 import { headerHeight, meter, radius } from 'controls/theme';
 import { IconButton } from 'controls/Buttons';

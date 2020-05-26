@@ -59,23 +59,22 @@ function ClientSidePage({ booqId, path }: {
     return <LoadedBooqPage booq={booq} path={path} />;
 }
 
-function LoadedBooqPage({ booq, path }: {
+function LoadedBooqPage({ booq }: {
     booq: BooqData,
     path?: BooqPath,
 }) {
-    usePathNavigation(path);
+    useHashNavigation();
     return <Page title={booq?.title ?? 'Booq'}>
         <BooqScreen booq={booq} />
     </Page>;
 }
 
-function usePathNavigation(path: BooqPath | undefined) {
+function useHashNavigation() {
     const { push, asPath } = useRouter();
     useEffect(() => {
-        if (path) {
-            const [withoutHash] = asPath.split('#');
-            const withHash = `${withoutHash}#${pathToId(path)}`;
-            push(withHash);
+        const [_, hash] = asPath.split('#');
+        if (hash) {
+            push(asPath);
         }
     }, []);
 }
