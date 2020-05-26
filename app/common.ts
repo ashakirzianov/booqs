@@ -1,15 +1,5 @@
 import { pathToString, BooqPath, pathFromString } from "./core";
 
-export function booqHref(booqId: string, path?: BooqPath) {
-    return path?.length
-        ? `/booq/${booqId}/path/${pathToString(path)}`
-        : `/booq/${booqId}`;
-}
-
-export function feedHref() {
-    return '/';
-}
-
 const idPrefix = 'path:';
 export function pathToId(path: BooqPath): string {
     return `${idPrefix}${pathToString(path)}`;

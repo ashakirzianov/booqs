@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { BooqData, feedHref, BooqAnchor, booqHref, usePalette } from '../app';
+import { BooqData, BooqAnchor, usePalette } from '../app';
 import { headerHeight, meter, radius } from 'controls/theme';
 import { IconButton } from 'controls/Buttons';
 import { Popovers } from 'controls/Popover';
@@ -9,6 +9,7 @@ import { TocButton } from './Toc';
 import { BookmarkButton } from './Bookmark';
 import { Themer } from './Themer';
 import { SignIn } from './SignIn';
+import { BooqLink, FeedLink } from 'controls/Links';
 
 const contentWidth = '50rem';
 export function BooqScreen({ booq }: {
@@ -95,11 +96,9 @@ function Header() {
 }
 
 function FeedButton() {
-    return <Link href={feedHref()}>
-        <a><IconButton
-            icon='back'
-        /></a>
-    </Link>;
+    return <FeedLink>
+        <IconButton icon='back' />
+    </FeedLink>;
 }
 
 function AnchorButton({ booqId, anchor, title }: {
@@ -112,11 +111,9 @@ function AnchorButton({ booqId, anchor, title }: {
         return null;
     }
     return <div className='container'>
-        <Link href={booqHref(booqId, anchor.path)}>
-            <a className='content'>
-                {anchor.title ?? title}
-            </a>
-        </Link>
+        <BooqLink booqId={booqId} path={anchor.path}>
+            <div className='content'>{anchor.title ?? title}</div>
+        </BooqLink>
         <style jsx>{`
             .container {
                 display: flex;

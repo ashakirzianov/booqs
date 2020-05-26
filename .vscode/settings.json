@@ -27,6 +27,7 @@
         "kinesisvideomedia",
         "lucene",
         "pids",
+        "prefetch",
         "promisify",
         "rarr",
         "refetch",

@@ -1,14 +1,15 @@
 import React from 'react';
-import Link from 'next/link';
 import { useQuery } from '@apollo/react-hooks';
 import gql from 'graphql-tag';
-import { LinkButton } from '../controls/Buttons';
-import { Panel } from '../controls/Panel';
-import { BooqTags } from '../controls/BooqTags';
-import { BooqCover } from '../controls/BooqCover';
-import { boldWeight, meter } from '../controls/theme';
-import { useAddToCollection, useCollection, useRemoveFromCollection } from '../app';
-import { booqHref } from '../app';
+import { LinkButton } from 'controls/Buttons';
+import { Panel } from 'controls/Panel';
+import { BooqTags } from 'controls/BooqTags';
+import { BooqCover } from 'controls/BooqCover';
+import { boldWeight, meter } from 'controls/theme';
+import { BooqLink } from 'controls/Links';
+import {
+    useAddToCollection, useCollection, useRemoveFromCollection,
+} from '../app';
 
 const FeaturedQuery = gql`query Featured {
     featured(limit: 10) {
@@ -167,9 +168,9 @@ function Actions({ item }: {
 function ReadButton({ item }: {
     item: FeaturedItem,
 }) {
-    return <Link href={booqHref(item.id, [0])}>
+    return <BooqLink booqId={item.id} path={[0]}>
         <LinkButton text="Read &rarr;" />
-    </Link>;
+    </BooqLink>;
 }
 
 function AddToReadingListButton({ item }: {

@@ -1,6 +1,10 @@
 import React, { createElement, ReactNode } from 'react';
-import { BooqNode, BooqPath, pathToString, useSettings, BooqData, pathToId, BooqRange, pathInRange, booqHref } from '../app';
+import {
+    BooqNode, BooqPath, pathToString, useSettings, BooqData,
+    pathToId, BooqRange, pathInRange,
+} from '../app';
 import { bookFont } from 'controls/theme';
+import { booqHref } from 'controls/Links';
 
 export function BooqContent({ booq }: {
     booq: BooqData,

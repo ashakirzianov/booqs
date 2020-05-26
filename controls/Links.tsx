@@ -1,0 +1,31 @@
+import React, { ReactNode } from 'react';
+import Link from 'next/link';
+import { BooqPath, pathToString } from '../app';
+
+export function BooqLink({ booqId, path, children }: {
+    booqId: string,
+    path?: BooqPath,
+    children: ReactNode,
+}) {
+    return <Link href='/booq/[...slug]' as={booqHref(booqId, path)}>
+        <a style={{ textDecoration: 'none' }}>{children}</a>
+    </Link>;
+}
+
+export function FeedLink({ children }: {
+    children: ReactNode,
+}) {
+    return <Link href='/'>
+        <a>{children}</a>
+    </Link>;
+}
+
+export function booqHref(booqId: string, path?: BooqPath) {
+    return path?.length
+        ? `/booq/${booqId}/path/${pathToString(path)}`
+        : `/booq/${booqId}`;
+}
+
+export function feedHref() {
+    return '/';
+}
