@@ -36,8 +36,8 @@ function TocContent({ booqId, items }: {
     return <div className='container'>
         {
             items.map(
-                (item, idx) => <>
-                    <div key={idx} className='item'>
+                (item, idx) => <div key={idx}>
+                    <div className='item'>
                         <TocRow
                             booqId={booqId}
                             title={item.title}
@@ -45,8 +45,8 @@ function TocContent({ booqId, items }: {
                             position={item.position}
                         />
                     </div>
-                    <hr key={`${idx}-hr`} />
-                </>
+                    <hr />
+                </div>
             )
         }
         <style jsx>{`
