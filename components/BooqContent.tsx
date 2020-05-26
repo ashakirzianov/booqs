@@ -1,4 +1,5 @@
 import React, { memo, createElement, ReactNode, useEffect } from 'react';
+import { throttle } from 'lodash';
 import {
     BooqNode, BooqPath, pathToString, BooqData,
     pathToId, BooqRange, pathInRange, pathFromId,
@@ -48,14 +49,14 @@ function Nodes({ nodes, range, booqId, path }: {
 
 function useScroll(callback?: (path: BooqPath) => void) {
     useEffect(() => {
-        function listener() {
+        const listener = throttle(function () {
             if (callback) {
                 const path = getCurrentPath();
                 if (path) {
                     callback(path);
                 }
             }
-        }
+        }, 500);
         window.addEventListener('scroll', listener);
         return () => window.removeEventListener('scroll', listener);
     }, [callback]);

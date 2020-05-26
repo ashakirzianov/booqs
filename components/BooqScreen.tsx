@@ -9,7 +9,6 @@ import { BookmarkButton } from './Bookmark';
 import { Themer } from './Themer';
 import { SignIn } from './SignIn';
 import { BooqLink, FeedLink } from 'controls/Links';
-import { useRouter } from 'next/dist/client/router';
 
 const contentWidth = '50rem';
 export function BooqScreen({ booq }: {
