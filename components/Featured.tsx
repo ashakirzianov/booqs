@@ -167,7 +167,7 @@ function Actions({ item }: {
 function ReadButton({ item }: {
     item: FeaturedItem,
 }) {
-    return <Link href={booqHref(item.id)}>
+    return <Link href={booqHref(item.id, [0])}>
         <LinkButton text="Read &rarr;" />
     </Link>;
 }
