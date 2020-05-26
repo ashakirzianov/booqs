@@ -1,14 +1,16 @@
-import React, { memo, createElement, ReactNode } from 'react';
+import React, { memo, createElement, ReactNode, useEffect } from 'react';
 import {
     BooqNode, BooqPath, pathToString, BooqData,
-    pathToId, BooqRange, pathInRange,
+    pathToId, BooqRange, pathInRange, pathFromId,
 } from '../app';
 import { booqHref } from 'controls/Links';
 
 
-export const BooqContent = memo(function BooqContent({ booq }: {
+export const BooqContent = memo(function BooqContent({ booq, onScroll }: {
     booq: BooqData,
+    onScroll?: (path: BooqPath) => void,
 }) {
+    useScroll(onScroll);
     const nodes = booq.fragment.nodes;
     const range: BooqRange = {
         start: booq.fragment.current.path,
@@ -41,6 +43,50 @@ function Nodes({ nodes, range, booqId, path }: {
         }
     </>;
 }
+
+// --- Scroll
+
+function useScroll(callback?: (path: BooqPath) => void) {
+    useEffect(() => {
+        function listener() {
+            if (callback) {
+                const path = getCurrentPath();
+                if (path) {
+                    callback(path);
+                }
+            }
+        }
+        window.addEventListener('scroll', listener);
+        return () => window.removeEventListener('scroll', listener);
+    }, [callback]);
+}
+
+function getCurrentPath() {
+    const collection = window.document.getElementsByClassName('booq-leaf');
+    for (let idx = 0; idx < collection.length; idx++) {
+        const element = collection.item(idx);
+        if (element && isPartiallyVisible(element)) {
+            const path = pathFromId(element.id);
+            return path;
+        }
+    }
+    return undefined;
+}
+
+function isPartiallyVisible(element: Element): boolean {
+    const rect = element.getBoundingClientRect();
+    if (rect) {
+        const { top, height } = rect;
+        const result = top <= 0 && top + height >= 0;
+        if (result) {
+            return result;
+        }
+    }
+
+    return false;
+}
+
+// --- Render
 
 type RenderArgs = {
     booqId: string,
@@ -77,6 +123,9 @@ function renderNode(args: RenderArgs): ReactNode {
 function getProps({ node, path, booqId, range }: RenderArgs) {
     return {
         ...node.attrs,
+        className: node.children?.length
+            ? undefined
+            : 'booq-leaf',
         id: pathToId(path),
         style: node.style,
         key: pathToString(path),
