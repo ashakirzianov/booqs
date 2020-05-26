@@ -1,5 +1,5 @@
 import React from 'react';
-import { BooqData, BooqAnchor, usePalette, useSettings } from '../app';
+import { BooqData, BooqAnchor, usePalette, useSettings, pathToId, BooqPath } from '../app';
 import { headerHeight, meter, radius, bookFont } from 'controls/theme';
 import { IconButton } from 'controls/Buttons';
 import { Popovers } from 'controls/Popover';
@@ -9,12 +9,14 @@ import { BookmarkButton } from './Bookmark';
 import { Themer } from './Themer';
 import { SignIn } from './SignIn';
 import { BooqLink, FeedLink } from 'controls/Links';
+import { useRouter } from 'next/dist/client/router';
 
 const contentWidth = '50rem';
 export function BooqScreen({ booq }: {
     booq: BooqData,
 }) {
     const { fontScale } = useSettings();
+    const onScroll = useScrollHandler();
     return <div className='container'>
         <Header booqId={booq.id} />
         <div className='booq'>
@@ -23,7 +25,10 @@ export function BooqScreen({ booq }: {
                 anchor={booq.fragment.previous}
                 title='Previous'
             />
-            <BooqContent booq={booq} />
+            <BooqContent
+                booq={booq}
+                onScroll={onScroll}
+            />
             <AnchorButton
                 booqId={booq.id}
                 anchor={booq.fragment.next}
@@ -48,6 +53,15 @@ export function BooqScreen({ booq }: {
             }
             `}</style>
     </div>;
+}
+
+function useScrollHandler() {
+    const { replace, asPath } = useRouter();
+    return (path: BooqPath) => {
+        const [withoutHash] = asPath.split('#');
+        const withHash = `${withoutHash}#${pathToId(path)}`;
+        replace(withHash, undefined, { shallow: true });
+    };
 }
 
 function Header({ booqId }: {
