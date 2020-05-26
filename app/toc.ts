@@ -1,17 +1,15 @@
 import gql from "graphql-tag";
 import { useQuery } from "@apollo/react-hooks";
-import { doQuery } from "./provider";
-import { BooqNode, BooqPath } from "./core";
+import { BooqPath } from "./core";
 
 const TocQuery = gql`query TocQuery($booqId: ID!) {
     booq(id: $booqId) {
         title
         tableOfContents {
-            items {
-                title
-                position
-                path
-            }
+            title
+            position
+            path
+            level
         }
     }
 }`;
@@ -19,16 +17,15 @@ type TocData = {
     booq: {
         title?: string,
         tableOfContents: {
-            items: {
-                title?: string,
-                position: number,
-                path: BooqPath,
-            }[],
-        },
+            title?: string,
+            position?: number,
+            level?: number,
+            path: BooqPath,
+        }[],
     },
 };
 
-export type TocItem = TocData['booq']['tableOfContents']['items'][number];
+export type TocItem = TocData['booq']['tableOfContents'][number];
 export function useToc(booqId: string) {
     const { loading, data } = useQuery<TocData>(
         TocQuery,
@@ -38,6 +35,6 @@ export function useToc(booqId: string) {
     return {
         loading,
         title: data?.booq.title,
-        items: data?.booq.tableOfContents.items ?? [],
+        items: data?.booq.tableOfContents ?? [],
     };
 }
