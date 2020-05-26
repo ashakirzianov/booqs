@@ -43,6 +43,7 @@ function TocContent({ booqId, items }: {
                             title={item.title}
                             path={item.path}
                             position={item.position}
+                            ident={item.level ?? 0}
                         />
                     </div>
                     <hr />
@@ -70,12 +71,13 @@ function TocContent({ booqId, items }: {
 }
 
 function TocRow({
-    booqId, title, path, position,
+    booqId, title, path, position, ident,
 }: {
     booqId: string,
     title?: string,
     path: BooqPath,
     position?: number,
+    ident: number,
 }) {
     return <>
         <BooqLink booqId={booqId} path={path}>
@@ -91,6 +93,9 @@ function TocRow({
             flex: 1;
             padding: ${meter.large};
             justify-content: space-between;
+        }
+        .title {
+            text-indent: ${ident}em;
         }
         `}</style>
     </>;
