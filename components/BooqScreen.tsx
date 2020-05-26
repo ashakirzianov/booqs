@@ -56,11 +56,8 @@ export function BooqScreen({ booq }: {
 }
 
 function useScrollHandler() {
-    const { replace, asPath } = useRouter();
     return (path: BooqPath) => {
-        const [withoutHash] = asPath.split('#');
-        const withHash = `${withoutHash}#${pathToId(path)}`;
-        replace(withHash, undefined, { shallow: true });
+        console.log(path.join('-'));
     };
 }
 

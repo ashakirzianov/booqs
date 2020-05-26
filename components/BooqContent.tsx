@@ -17,7 +17,7 @@ export const BooqContent = memo(function BooqContent({ booq, onScroll }: {
         end: booq.fragment.next?.path,
     };
     const path = [range.start[0]];
-    return <div className='container'>
+    return <div id='booq-root' className='container'>
         <Nodes
             booqId={booq.id}
             nodes={nodes}
@@ -62,22 +62,33 @@ function useScroll(callback?: (path: BooqPath) => void) {
 }
 
 function getCurrentPath() {
-    const collection = window.document.getElementsByClassName('booq-leaf');
-    for (let idx = 0; idx < collection.length; idx++) {
-        const element = collection.item(idx);
-        if (element && isPartiallyVisible(element)) {
-            const path = pathFromId(element.id);
-            return path;
+    const root = window.document.getElementById('booq-root');
+    const current = root && getCurrent(root);
+    return current
+        ? pathFromId(current.id)
+        : undefined;
+}
+
+function getCurrent(element: Element): Element | undefined {
+    if (!isPartiallyVisible(element)) {
+        return undefined;
+    }
+    const children = element.children;
+    for (let idx = 0; idx < children.length; idx++) {
+        const child = children.item(idx);
+        const current = child && getCurrent(child);
+        if (current?.id) {
+            return current;
         }
     }
-    return undefined;
+    return element;
 }
 
 function isPartiallyVisible(element: Element): boolean {
     const rect = element.getBoundingClientRect();
     if (rect) {
         const { top, height } = rect;
-        const result = top <= 0 && top + height >= 0;
+        const result = height > 0 && top <= 0 && top + height >= 0;
         if (result) {
             return result;
         }
@@ -123,9 +134,6 @@ function renderNode(args: RenderArgs): ReactNode {
 function getProps({ node, path, booqId, range }: RenderArgs) {
     return {
         ...node.attrs,
-        className: node.children?.length
-            ? undefined
-            : 'booq-leaf',
         id: pathToId(path),
         style: node.style,
         key: pathToString(path),
