@@ -7,9 +7,17 @@ export function BooqLink({ booqId, path, children }: {
     path?: BooqPath,
     children: ReactNode,
 }) {
-    return <Link href='/booq/[...slug]' as={booqHref(booqId, path)}>
-        <a style={{ textDecoration: 'none' }}>{children}</a>
-    </Link>;
+    return <>
+        <Link href='/booq/[...slug]' as={booqHref(booqId, path)}>
+            <a>{children}</a>
+        </Link>
+        <style jsx>{`
+            a {
+                text-decoration: none;
+                color: inherit;
+            }
+            `}</style>
+    </>;
 }
 
 export function FeedLink({ children }: {
