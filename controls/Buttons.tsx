@@ -66,30 +66,30 @@ export function ActionButton({ text, onClick }: {
     </>;
 }
 
-export function LinkButton({ text, onClick, loading }: {
+export function TextButton({ text, onClick, loading }: {
     text: string,
     onClick?: () => void,
     loading?: boolean,
 }) {
     const { action, highlight } = usePalette();
     return <>
-        <a onClick={onClick}>
+        <span className='button' onClick={onClick}>
             {text}
             {
                 loading
                     ? <Spinner />
                     : null
             }
-        </a>
+        </span>
         <style jsx>{`
-        a {
+        .button {
             color: ${action};
             text-decoration: none;
             font-size: large;
             cursor: pointer;
             transition: color 0.25s;
         }
-        a:hover {
+        .button:hover {
             color: ${highlight};
             text-decoration: underline;
         }

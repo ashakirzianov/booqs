@@ -1,7 +1,7 @@
 import React from 'react';
 import { useQuery } from '@apollo/react-hooks';
 import gql from 'graphql-tag';
-import { LinkButton } from 'controls/Buttons';
+import { TextButton } from 'controls/Buttons';
 import { Panel } from 'controls/Panel';
 import { BooqTags } from 'controls/BooqTags';
 import { BooqCover } from 'controls/BooqCover';
@@ -169,7 +169,7 @@ function ReadButton({ item }: {
     item: FeaturedItem,
 }) {
     return <BooqLink booqId={item.id} path={[0]}>
-        <LinkButton text="Read &rarr;" />
+        <TextButton text="Read &rarr;" />
     </BooqLink>;
 }
 
@@ -181,7 +181,7 @@ function AddToReadingListButton({ item }: {
     const { removeFromCollection } = useRemoveFromCollection();
     const isInReadingList = booqs.some(b => b.id === item.id);
     if (isInReadingList) {
-        return <LinkButton
+        return <TextButton
             text="Remove -"
             onClick={() => removeFromCollection({
                 booqId: item.id,
@@ -189,7 +189,7 @@ function AddToReadingListButton({ item }: {
             })}
         />;
     } else {
-        return <LinkButton
+        return <TextButton
             text="Add +"
             onClick={() => addToCollection({
                 name: 'my-books',
