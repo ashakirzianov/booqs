@@ -16,7 +16,7 @@ export function BooqScreen({ booq }: {
 }) {
     const { fontScale } = useSettings();
     return <div className='container'>
-        <Header />
+        <Header booqId={booq.id} />
         <div className='booq'>
             <AnchorButton
                 booqId={booq.id}
@@ -50,11 +50,13 @@ export function BooqScreen({ booq }: {
     </div>;
 }
 
-function Header() {
+function Header({ booqId }: {
+    booqId: string,
+}) {
     return <nav className='container'>
         <div className='left'>
             <div className='button'><FeedButton /></div>
-            <div className='button'><TocButton /></div>
+            <div className='button'><TocButton booqId={booqId} /></div>
         </div>
         <div className='right'>
             <div className='button'><BookmarkButton /></div>

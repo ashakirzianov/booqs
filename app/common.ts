@@ -13,3 +13,7 @@ export function pathFromId(id: string): BooqPath | undefined {
         return undefined;
     }
 }
+
+export function positionToPage(position: number): number {
+    return Math.ceil(position / 1500);
+}
