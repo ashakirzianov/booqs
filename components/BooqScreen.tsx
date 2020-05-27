@@ -1,7 +1,7 @@
 import React from 'react';
 import { BooqData, BooqAnchor, usePalette, useSettings, pathToId, BooqPath } from '../app';
 import { headerHeight, meter, radius, bookFont } from 'controls/theme';
-import { IconButton } from 'controls/Buttons';
+import { IconButton, BorderButton } from 'controls/Buttons';
 import { Popovers } from 'controls/Popover';
 import { BooqContent } from './BooqContent';
 import { TocButton } from './Toc';
@@ -120,34 +120,10 @@ function AnchorButton({ booqId, anchor, title }: {
     anchor?: BooqAnchor,
     title: string,
 }) {
-    const { dimmed, highlight } = usePalette();
     if (!anchor) {
         return null;
     }
-    return <div className='container'>
-        <BooqLink booqId={booqId} path={anchor.path}>
-            <div className='content'>{anchor.title ?? title}</div>
-        </BooqLink>
-        <style jsx>{`
-            .container {
-                display: flex;
-                height: ${headerHeight};
-                align-items: center;
-            }
-            .content {
-                display: flex;
-                align-items: center;
-                flex: 1;
-                color: ${dimmed};
-                border: 2px solid ${dimmed};
-                border-radius: ${radius};
-                text-decoration: none;
-                padding: ${meter.regular};
-            }
-            .content:hover {
-                color: ${highlight};
-                border-color: ${highlight};
-            }
-            `}</style>
-    </div>;
+    return <BooqLink booqId={booqId} path={anchor.path}>
+        <BorderButton text={anchor.title ?? title} />
+    </BooqLink>;
 }

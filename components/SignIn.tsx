@@ -1,9 +1,18 @@
 import React from "react";
-import { useSignInOptions, usePalette, useAuth } from '../app';
-import { meter } from "../controls/theme";
-import { Menu, MenuItem } from "../controls/Menu";
-import { IconButton } from "../controls/Buttons";
-import { PopoverSingleton, Popover } from "../controls/Popover";
+import { useSignInOptions, usePalette, useAuth } from 'app';
+import { meter } from "controls/theme";
+import { Menu, MenuItem } from "controls/Menu";
+import { IconButton, BorderButton } from "controls/Buttons";
+import { PopoverSingleton, Popover } from "controls/Popover";
+
+export function FacebookSignButton() {
+    const { signWithFacebook } = useSignInOptions();
+    return <BorderButton
+        icon='facebook'
+        text='Facebook'
+        onClick={signWithFacebook}
+    />;
+}
 
 export function SignInMenu() {
     const { provider } = useAuth();

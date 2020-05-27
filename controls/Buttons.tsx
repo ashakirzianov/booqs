@@ -96,3 +96,36 @@ export function TextButton({ text, onClick, loading }: {
         `}</style>
     </>;
 }
+
+export function BorderButton({ text, icon, onClick }: {
+    text: string,
+    icon?: IconName,
+    onClick?: () => void,
+}) {
+    const { dimmed, highlight } = usePalette();
+    return <div className='button' onClick={onClick}>
+        {
+            !icon ? null :
+                <div className='icon'><Icon name={icon} /></div>
+        }
+        {text}
+        <style jsx>{`
+            .icon {
+                margin: 0 ${meter.regular} 0 0;
+            }
+            .button {
+                display: flex;
+                color: ${dimmed};
+                border: 2px solid ${dimmed};
+                border-radius: ${radius};
+                text-decoration: none;
+                padding: ${meter.regular};
+                cursor: pointer;
+            }
+            .button:hover {
+                color: ${highlight};
+                border-color: ${highlight};
+            }
+            `}</style>
+    </div>;
+}
