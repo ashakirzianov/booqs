@@ -1,6 +1,4 @@
 import React from 'react';
-import { useQuery } from '@apollo/react-hooks';
-import gql from 'graphql-tag';
 import { TextButton } from 'controls/Buttons';
 import { Panel } from 'controls/Panel';
 import { BooqTags } from 'controls/BooqTags';
@@ -8,41 +6,8 @@ import { BooqCover } from 'controls/BooqCover';
 import { boldWeight, meter } from 'controls/theme';
 import { BooqLink } from 'controls/Links';
 import {
-    useAddToCollection, useCollection, useRemoveFromCollection,
+    useAddToCollection, useCollection, useRemoveFromCollection, useFeatured,
 } from '../app';
-
-const FeaturedQuery = gql`query Featured {
-    featured(limit: 10) {
-        id
-        title
-        author
-        cover(size: 210)
-        tags {
-            tag
-            value
-        }
-    }
-}`;
-type FeaturedData = {
-    featured: {
-        id: string,
-        title?: string,
-        author?: string,
-        cover?: string,
-        tags: {
-            tag: string,
-            value?: string,
-        }[],
-    }[],
-};
-
-function useFeatured() {
-    const { loading, data } = useQuery<FeaturedData>(FeaturedQuery);
-    return {
-        loading,
-        cards: (data?.featured ?? []),
-    };
-}
 
 export function Featured() {
     const { cards } = useFeatured();
@@ -62,7 +27,7 @@ export function Featured() {
     </div>;
 }
 
-type FeaturedItem = FeaturedData['featured'][number];
+type FeaturedItem = ReturnType<typeof useFeatured>['cards'][number];
 function FeaturedCard({
     item,
 }: {
