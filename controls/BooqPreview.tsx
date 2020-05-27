@@ -7,10 +7,11 @@ export type BooqPreviewProps = PropsType<typeof BooqPreview>;
 export function BooqPreview({
     text, title, page,
 }: {
+    path: BooqPath,
     text: string,
     title: string,
     page: number,
-    length: number,
+    total: number,
 }) {
     const { dimmed, border } = usePalette();
     return <div className='container'>

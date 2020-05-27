@@ -1,22 +1,25 @@
-import { BooqPreview, BooqPreviewProps } from "../controls/BooqPreview";
+import { BooqPreview } from "../controls/BooqPreview";
 import { meter } from "../controls/theme";
+import { useHistory, pageForPosition } from "app";
 
 export function ReadingHistory() {
-    return <Positions previews={[]} />;
-}
-
-function Positions({ previews }: {
-    previews: BooqPreviewProps[],
-}) {
-    if (!previews.length) {
+    const { history } = useHistory();
+    if (!history.length) {
         return null;
     }
     return <div className='container'>
         {
-            previews.map(
-                (p, idx) => <div key={idx} className='preview'>
-                    <BooqPreview {...p} />
-                </div>
+            history.map(
+                (entry, idx) =>
+                    <div key={idx} className='preview'>
+                        <BooqPreview
+                            path={entry.path}
+                            text={entry.preview}
+                            title={entry.title ?? ''}
+                            page={pageForPosition(entry.position)}
+                            total={pageForPosition(entry.length)}
+                        />
+                    </div>
             )
         }
         <style jsx>{`
