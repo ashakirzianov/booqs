@@ -1,5 +1,5 @@
-import React from 'react';
-import { BooqData, BooqAnchor, usePalette, useSettings, pathToId, BooqPath, useReportHistory } from '../app';
+import React, { useState } from 'react';
+import { BooqData, BooqAnchor, usePalette, useSettings, pathToId, BooqPath, useReportHistory, positionForPath, pageForPosition, nodesLength } from '../app';
 import { headerHeight, meter, radius, bookFont } from 'controls/theme';
 import { IconButton, BorderButton } from 'controls/Buttons';
 import { Popovers } from 'controls/Popover';
@@ -15,7 +15,9 @@ export function BooqScreen({ booq }: {
     booq: BooqData,
 }) {
     const { fontScale } = useSettings();
-    const onScroll = useScrollHandler(booq.id);
+    const { onScroll, currentPath } = useScrollHandler(booq);
+    const position = positionForPath(booq.fragment.nodes, currentPath);
+    const chapterLength = booq.fragment.position + nodesLength(booq.fragment.nodes);
     return <div className='container'>
         <Header booqId={booq.id} />
         <div className='booq'>
@@ -34,6 +36,11 @@ export function BooqScreen({ booq }: {
                 title='Next'
             />
         </div>
+        <Footer
+            position={position}
+            chapterLength={chapterLength}
+            booqLength={booq.length}
+        />
         <style jsx>{`
             .container {
                 display: flex;
@@ -54,14 +61,19 @@ export function BooqScreen({ booq }: {
     </div>;
 }
 
-function useScrollHandler(booqId: string) {
+function useScrollHandler({ id, fragment }: BooqData) {
+    const [currentPath, setCurrentPath] = useState(fragment.current.path);
     const { reportHistory } = useReportHistory();
-    return (path: BooqPath) => {
-        reportHistory({
-            booqId,
-            path,
-            source: 'not-implemented',
-        });
+    return {
+        currentPath,
+        onScroll(path: BooqPath) {
+            setCurrentPath(path);
+            reportHistory({
+                booqId: id,
+                path,
+                source: 'not-implemented',
+            });
+        },
     };
 }
 
@@ -110,6 +122,54 @@ function Header({ booqId }: {
             .button {
                 margin: 0 ${meter.regular};
                 pointer-events: auto;
+            }
+            `}</style>
+    </nav>;
+}
+
+function Footer({ position, booqLength, chapterLength }: {
+    position: number,
+    booqLength: number,
+    chapterLength: number,
+}) {
+    const { dimmed } = usePalette();
+    const page = pageForPosition(position);
+    const total = pageForPosition(booqLength);
+    const chapter = pageForPosition(chapterLength);
+    return <nav className='container'>
+        <div className='left'>
+            <span className='page'>{`${page} of ${total}`}</span>
+        </div>
+        <div className='right'>
+            <span className='chapter-left'>{`${chapter - page} pages left`}</span>
+        </div>
+        <style jsx>{`
+            .container {
+                display: flex;
+                flex: 1;
+                flex-flow: row nowrap;
+                align-items: center;
+                justify-content: space-between;
+                height: ${headerHeight};
+                position: fixed;
+                bottom: 0; left: 0; right: 0;
+                pointer-events: none;
+            }
+            .left, .right {
+                display: flex;
+                flex-flow: row nowrap;
+                align-items: center;
+            }
+            .left {
+                justify-content: flex-start;
+            }
+            .right {
+                justify-content: flex-end;
+            }
+            .page, .chapter-left {
+                font-size: small;
+                margin: 0 ${meter.large};
+                color: ${dimmed};
             }
             `}</style>
     </nav>;

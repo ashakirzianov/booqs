@@ -7,6 +7,7 @@ const BooqFragmentQuery = gql`query BooqFragment($id: ID!, $path: [Int!]) {
     booq(id: $id) {
         id
         title
+        length
         fragment(path: $path) {
             nodes
             previous {
@@ -20,6 +21,7 @@ const BooqFragmentQuery = gql`query BooqFragment($id: ID!, $path: [Int!]) {
                 title
                 path
             }
+            position
         }
     }
 }`;
@@ -27,11 +29,13 @@ type BooqFragmentData = {
     booq: {
         id: string,
         title?: string,
+        length: number,
         fragment: {
             nodes: BooqNode[],
             previous?: BooqAnchor,
             current: BooqAnchor,
             next?: BooqAnchor,
+            position: number,
         }
     },
 };
