@@ -28,6 +28,7 @@ type BooqHistoryData = {
 export function useHistory() {
     const { loading, data } = useQuery<BooqHistoryData>(
         BooqHistoryQuery,
+        { fetchPolicy: 'cache-and-network' },
     );
     return {
         loading,
@@ -60,9 +61,6 @@ export function useReportHistory() {
         reportHistory(event: ReportHistoryVariables['event']) {
             report({
                 variables: { event },
-                refetchQueries: [{
-                    query: BooqHistoryQuery,
-                }],
             });
         },
     };

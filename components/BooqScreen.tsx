@@ -1,5 +1,5 @@
 import React from 'react';
-import { BooqData, BooqAnchor, usePalette, useSettings, pathToId, BooqPath } from '../app';
+import { BooqData, BooqAnchor, usePalette, useSettings, pathToId, BooqPath, useReportHistory } from '../app';
 import { headerHeight, meter, radius, bookFont } from 'controls/theme';
 import { IconButton, BorderButton } from 'controls/Buttons';
 import { Popovers } from 'controls/Popover';
@@ -15,7 +15,7 @@ export function BooqScreen({ booq }: {
     booq: BooqData,
 }) {
     const { fontScale } = useSettings();
-    const onScroll = useScrollHandler();
+    const onScroll = useScrollHandler(booq.id);
     return <div className='container'>
         <Header booqId={booq.id} />
         <div className='booq'>
@@ -54,9 +54,14 @@ export function BooqScreen({ booq }: {
     </div>;
 }
 
-function useScrollHandler() {
+function useScrollHandler(booqId: string) {
+    const { reportHistory } = useReportHistory();
     return (path: BooqPath) => {
-        console.log(path.join('-'));
+        reportHistory({
+            booqId,
+            path,
+            source: 'not-implemented',
+        });
     };
 }
 
