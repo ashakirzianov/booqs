@@ -30,7 +30,7 @@ export function FeedLink({ children }: {
 
 export function booqHref(booqId: string, path?: BooqPath) {
     return path?.length
-        ? `/booq/${booqId}/path/${pathToString(path)}#${pathToId(path)}`
+        ? `/booq/${booqId}/path/${pathToString(path)}`
         : `/booq/${booqId}`;
 }
 

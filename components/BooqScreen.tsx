@@ -164,7 +164,6 @@ function Footer({ position, booqLength, chapterLength }: {
                 flex-flow: row nowrap;
                 align-items: center;
                 justify-content: space-between;
-                height: ${headerHeight};
                 position: fixed;
                 bottom: 0; left: 0; right: 0;
                 pointer-events: none;
@@ -182,7 +181,7 @@ function Footer({ position, booqLength, chapterLength }: {
             }
             .page, .chapter-left {
                 font-size: small;
-                margin: 0 ${meter.large};
+                margin: ${meter.large};
                 color: ${dimmed};
             }
             `}</style>
