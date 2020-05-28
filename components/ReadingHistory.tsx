@@ -8,53 +8,51 @@ const historyPanelHeight = '15em';
 export function ReadingHistory() {
     const { state } = useAuth();
     const { history } = useHistory();
-    return <div className='row'>
-        <div className='column'>
-            {
-                state !== 'signed' ? <SignInPanel />
-                    : !history.length ? <EmptyHistory />
-                        : <HistoryItems items={history} />
-            }
-        </div>
+    if (state !== 'signed') {
+        return <SignInPanel />;
+    } else if (!history.length) {
+        return <EmptyHistory />;
+    } else {
+        return <HistoryItems items={history} />;
+    }
+}
+
+function SignInPanel() {
+    return <div className='container'>
+        <span>Sign in to see history</span>
+        <FacebookSignButton />
         <style jsx>{`
-            .row {
+            .container {
                 display: flex;
-                flex-flow: row;
+                flex-flow: column;
                 align-items: center;
                 justify-content: center;
                 height: ${historyPanelHeight};
             }
-            .column {
-                display: flex;
-                flex-flow: column;
-                align-items: center;
-            }
-            `}</style>
-    </div>
-}
-
-function SignInPanel() {
-    return <>
-        <span>Sign in to see history</span>
-        <FacebookSignButton />
-        <style jsx>{`
             span {
                 margin-bottom: ${meter.large};
                 font-weight: bold;
             }
             `}</style>
-    </>;
+    </div>;
 }
 
 function EmptyHistory() {
-    return <>
+    return <div className='container'>
         <span>Your reading history will appear here</span>
         <style jsx>{`
+            .container {
+                display: flex;
+                flex-flow: column;
+                align-items: center;
+                justify-content: center;
+                height: ${historyPanelHeight};
+            }
             span {
                 font-weight: bold;
             }
             `}</style>
-    </>;
+    </div>;
 }
 
 type HistoryItem = ReturnType<typeof useHistory>['history'][number];

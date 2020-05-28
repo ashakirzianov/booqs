@@ -1,5 +1,7 @@
-import { usePalette } from '../app';
-import { bookFont, meter, radius, panelShadow, panelShadowHover } from "./theme";
+import { usePalette, BooqPath } from 'app';
+import {
+    bookFont, meter, radius, panelShadow, panelShadowHover
+} from "./theme";
 import { panelWidth } from "./Panel";
 import { PropsType } from "./utils";
 
@@ -15,7 +17,7 @@ export function BooqPreview({
 }) {
     const { dimmed, border } = usePalette();
     return <div className='container'>
-        <div className='title'>{title}</div>
+        <span className='title'>{title}</span>
         <div className='preview'>{text}</div>
         <div className='page'>{page}</div>
         <style jsx>{`
@@ -33,32 +35,33 @@ export function BooqPreview({
                 border: 1px solid ${border};
                 cursor: pointer;
                 transition: box-shadow 0.25s;
+                padding: ${meter.large} ${meter.xxLarge};
             }
             .container:hover {
                 box-shadow: ${panelShadowHover};
             }
             .title {
-                display: flex;
                 color: ${dimmed};
-                margin: ${meter.large} 0 0 0;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                overflow: hidden;
+                width: 100%;
             }
             .preview {
                 display: -webkit-box;
-                -webkit-line-clamp: 8;
+                -webkit-line-clamp: 6;
                 -webkit-box-orient: vertical;
                 overflow: hidden;
                 text-overflow: ellipsis;
                 white-space: break-space;
                 text-indent: ${meter.xxLarge};
                 text-align: justify;
-                margin: ${meter.large} 0 0 0;
-                padding: 0 ${meter.xxLarge};
+                margin: ${meter.large} 0;
             }
             .page {
                 display: flex;
                 color: ${dimmed};
                 align-self: center;
-                margin: ${meter.large} ${meter.xLarge};
             }
             `}</style>
     </div>
