@@ -1,5 +1,5 @@
 import React from 'react';
-import { usePalette } from '../app';
+import { usePalette } from 'app';
 import { IconName, Icon } from './Icon';
 import { HasChildren } from './utils';
 import { meter } from './theme';

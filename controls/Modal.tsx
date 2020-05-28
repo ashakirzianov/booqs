@@ -1,6 +1,6 @@
 import React, { ReactNode } from 'react';
-import { usePalette } from '../app';
-import { panelShadow, radius, meter, boldWeight } from './theme';
+import { usePalette } from 'app';
+import { panelShadow, radius, meter } from './theme';
 import { IconButton } from './Buttons';
 
 export function Modal({

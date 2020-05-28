@@ -1,5 +1,6 @@
 import { GetStaticPaths, GetStaticProps } from "next";
-import { pathFromString, fetchBooqFragment } from "app";
+import { pathFromString } from 'core';
+import { fetchBooqFragment } from "app";
 import { BooqPage, BooqPageProps } from "components/BooqPage";
 
 type QueryParams = {

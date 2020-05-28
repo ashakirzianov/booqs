@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
+import { BooqPath } from 'core';
+import { usePalette, pageForPosition, useToc, TocItem } from 'app';
 import { IconButton } from 'controls/Buttons';
 import { Modal } from 'controls/Modal';
-import { useToc, TocItem } from 'app/toc';
 import { Spinner } from 'controls/Spinner';
-import { BooqPath, usePalette, pageForPosition } from 'app';
 import { BooqLink } from 'controls/Links';
 import { meter } from 'controls/theme';
 

@@ -1,9 +1,11 @@
 import {
+    usePalette, PaletteName, palettes, useSetSettings, useSettings,
+} from 'app';
+import {
     bookFont, buttonShadow, meter,
-} from "../controls/theme";
-import { usePalette, PaletteName, palettes, useSetSettings, useSettings } from '../app';
-import { PopoverSingleton, Popover } from "../controls/Popover";
-import { IconButton } from "../controls/Buttons";
+} from "controls/theme";
+import { PopoverSingleton, Popover } from "controls/Popover";
+import { IconButton } from "controls/Buttons";
 
 export function Themer({ singleton }: {
     singleton: PopoverSingleton,

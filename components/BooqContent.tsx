@@ -1,10 +1,12 @@
 import React, { memo, createElement, ReactNode, useEffect } from 'react';
 import { throttle } from 'lodash';
 import {
-    BooqNode, BooqPath, pathToString, BooqData,
-    pathToId, BooqRange, pathInRange, pathFromId, BooqElementNode,
-} from '../app';
+    BooqPath, BooqRange, BooqNode, BooqElementNode,
+    pathToString, pathInRange,
+} from 'core';
+import { BooqData, pathToId, pathFromId } from 'app';
 import { booqHref } from 'controls/Links';
+
 
 
 export const BooqContent = memo(function BooqContent({ booq, onScroll }: {

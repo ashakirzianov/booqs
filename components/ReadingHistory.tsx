@@ -1,9 +1,9 @@
 import React from 'react';
+import { useHistory, pageForPosition, useAuth } from "app";
 import { BooqPreview } from "controls/BooqPreview";
 import { meter } from "controls/theme";
-import { useHistory, pageForPosition, useAuth } from "app";
-import { FacebookSignButton } from './SignIn';
 import { BooqLink } from 'controls/Links';
+import { FacebookSignButton } from './SignIn';
 
 const historyPanelHeight = '15em';
 export function ReadingHistory() {

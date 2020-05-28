@@ -2,7 +2,7 @@ import { ReactNode, createElement } from 'react';
 import { ApolloProvider } from '@apollo/react-hooks';
 import { ApolloClient, OperationVariables, QueryOptions } from 'apollo-client';
 import { InMemoryCache } from 'apollo-cache-inmemory';
-import { ApolloLink, DocumentNode } from 'apollo-link';
+import { ApolloLink } from 'apollo-link';
 import { onError } from 'apollo-link-error';
 import { setContext } from 'apollo-link-context';
 import { createUploadLink } from 'apollo-upload-client';

@@ -1,5 +1,5 @@
 import React from 'react';
-import { usePalette } from '../app';
+import { usePalette } from 'app';
 import { Icon, IconName } from "./Icon";
 import {
     buttonShadow, meter, radius,

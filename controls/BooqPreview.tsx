@@ -1,4 +1,5 @@
-import { usePalette, BooqPath } from 'app';
+import { BooqPath } from 'core';
+import { usePalette } from 'app';
 import {
     bookFont, meter, radius, panelShadow, panelShadowHover
 } from "./theme";

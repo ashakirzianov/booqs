@@ -1,11 +1,12 @@
 import React from 'react';
 import Head from 'next/head';
-import { HasChildren } from '../controls/utils';
+import { usePalette } from 'app';
+import { HasChildren } from 'controls/utils';
 import {
     menuFont, bookFont, normalWeight, boldWeight, extraBoldWeight,
     menuFontPrimary, logoFont,
-} from '../controls/theme';
-import { usePalette } from '../app';
+} from 'controls/theme';
+
 
 export function Page({ title, children }: HasChildren & {
     title: string,

@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import gql from 'graphql-tag';
-import { usePalette } from '../app';
-import { normalWeight, meter, radius } from '../controls/theme';
-import { BooqCover } from '../controls/BooqCover';
 import { useQuery } from '@apollo/react-hooks';
-import { Spinner } from '../controls/Spinner';
+import { usePalette } from 'app';
+import { normalWeight, meter, radius } from 'controls/theme';
+import { BooqCover } from 'controls/BooqCover';
+import { Spinner } from 'controls/Spinner';
 
 const SearchQuery = gql`query Search($query: String!) {
     search(query: $query) {

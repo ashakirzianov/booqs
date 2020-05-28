@@ -1,9 +1,10 @@
-import { Page } from "./Page";
-import { useBooq, BooqData, BooqPath, pathToId, pathFromString } from "../app";
-import { Spinner } from "../controls/Spinner";
-import { BooqScreen } from "./BooqScreen";
-import { useRouter } from "next/dist/client/router";
 import { useEffect } from "react";
+import { useRouter } from "next/router";
+import { useBooq, BooqData, pathToId } from "app";
+import { BooqPath } from 'core';
+import { Spinner } from "../controls/Spinner";
+import { Page } from "./Page";
+import { BooqScreen } from "./BooqScreen";
 
 type PageData = {
     kind: 'preloaded',

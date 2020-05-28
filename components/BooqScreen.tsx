@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
+import { positionForPath, nodesLength, samePath, BooqPath } from 'core';
 import {
-    BooqData, BooqAnchor, usePalette, useSettings, BooqPath, useReportHistory, positionForPath, pageForPosition,
-    nodesLength, samePath,
+    BooqData, BooqAnchor, usePalette, useSettings, useReportHistory, pageForPosition,
 } from 'app';
 import { headerHeight, meter, bookFont } from 'controls/theme';
 import { IconButton, BorderButton } from 'controls/Buttons';
