@@ -20,6 +20,7 @@ export function BooqScreen({ booq }: {
     const chapterLength = booq.fragment.position + nodesLength(booq.fragment.nodes);
     return <div className='container'>
         <Header booqId={booq.id} />
+        <EmptyLine />
         <div className='booq'>
             <AnchorButton
                 booqId={booq.id}
@@ -36,6 +37,7 @@ export function BooqScreen({ booq }: {
                 title='Next'
             />
         </div>
+        <EmptyLine />
         <Footer
             position={position}
             chapterLength={chapterLength}
@@ -75,6 +77,10 @@ function useScrollHandler({ id, fragment }: BooqData) {
             });
         },
     };
+}
+
+function EmptyLine() {
+    return <div style={{ height: headerHeight }} />;
 }
 
 function Header({ booqId }: {
