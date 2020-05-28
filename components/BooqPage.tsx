@@ -1,5 +1,5 @@
 import { Page } from "./Page";
-import { useBooq, BooqData, BooqPath, pathToId } from "../app";
+import { useBooq, BooqData, BooqPath, pathToId, pathFromString } from "../app";
 import { Spinner } from "../controls/Spinner";
 import { BooqScreen } from "./BooqScreen";
 import { useRouter } from "next/dist/client/router";
@@ -70,11 +70,23 @@ function LoadedBooqPage({ booq }: {
 }
 
 function useHashNavigation() {
-    const { push, asPath } = useRouter();
+    const { replace, asPath, query } = useRouter();
     useEffect(() => {
-        const [_, hash] = asPath.split('#');
-        if (hash) {
-            push(asPath);
+        let navigateTo: BooqPath | undefined = undefined
+        if (typeof query.p === 'string') {
+            navigateTo = pathFromString(query.p);
+        } else {
+            const components = asPath.split('/');
+            const qualifier = components[components.length - 2];
+            const path = components[components.length - 1];
+            if (qualifier === 'path') {
+                navigateTo = pathFromString(path);
+            }
+        }
+        if (navigateTo) {
+            const [withoutHash] = asPath.split('#');
+            const withHash = `${withoutHash}#${pathToId(navigateTo)}`;
+            replace(withHash, undefined, { shallow: true });
         }
     }, []);
 }
