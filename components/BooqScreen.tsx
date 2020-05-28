@@ -99,6 +99,7 @@ function Header({ booqId }: {
             .left, .right {
                 display: flex;
                 flex-flow: row nowrap;
+                align-items: center;
             }
             .left {
                 justify-content: flex-start;
@@ -129,6 +130,15 @@ function AnchorButton({ booqId, anchor, title }: {
         return null;
     }
     return <BooqLink booqId={booqId} path={anchor.path}>
-        <BorderButton text={anchor.title ?? title} />
+        <div className='container'>
+            <BorderButton text={anchor.title ?? title} />
+            <style jsx>{`
+            .container {
+                display: flex;
+                flex-flow: row;
+                align-items: center; 
+                height: ${headerHeight};
+            }`}</style>
+        </div>
     </BooqLink>;
 }

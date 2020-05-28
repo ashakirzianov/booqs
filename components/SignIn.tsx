@@ -82,8 +82,8 @@ function ProfilePictureButton({ picture }: {
                 flex-shrink: 0;
                 border-radius: 50%;
                 border: 1px solid ${dimmed};
-                width: 37px;
-                height: 37px;
+                width: 36px;
+                height: 36px;
                 overflow: hidden;
                 background-image: url(${picture});
                 background-size: cover;
