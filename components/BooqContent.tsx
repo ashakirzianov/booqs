@@ -73,16 +73,18 @@ function getCurrentPath() {
 function getCurrent(element: Element): Element | undefined {
     if (!isPartiallyVisible(element)) {
         return undefined;
+    } else if (element.className === 'booq-pph') {
+        return element;
     }
     const children = element.children;
     for (let idx = 0; idx < children.length; idx++) {
         const child = children.item(idx);
         const current = child && getCurrent(child);
-        if (current?.id) {
+        if (current) {
             return current;
         }
     }
-    return element;
+    return undefined;
 }
 
 function isPartiallyVisible(element: Element): boolean {
@@ -136,6 +138,8 @@ function getProps({ node, path, booqId, range }: RenderArgs) {
     return {
         ...node.attrs,
         id: pathToId(path),
+        className: node.pph
+            ? 'booq-pph' : undefined,
         style: node.style,
         key: pathToString(path),
         href: node.ref

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BooqData, BooqAnchor, usePalette, useSettings, pathToId, BooqPath, useReportHistory, positionForPath, pageForPosition, nodesLength } from '../app';
+import { BooqData, BooqAnchor, usePalette, useSettings, pathToId, BooqPath, useReportHistory, positionForPath, pageForPosition, nodesLength, samePath } from '../app';
 import { headerHeight, meter, radius, bookFont } from 'controls/theme';
 import { IconButton, BorderButton } from 'controls/Buttons';
 import { Popovers } from 'controls/Popover';
@@ -69,12 +69,14 @@ function useScrollHandler({ id, fragment }: BooqData) {
     return {
         currentPath,
         onScroll(path: BooqPath) {
-            setCurrentPath(path);
-            reportHistory({
-                booqId: id,
-                path,
-                source: 'not-implemented',
-            });
+            if (!samePath(path, currentPath)) {
+                setCurrentPath(path);
+                reportHistory({
+                    booqId: id,
+                    path,
+                    source: 'not-implemented',
+                });
+            }
         },
     };
 }
