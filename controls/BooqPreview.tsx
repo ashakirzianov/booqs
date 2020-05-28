@@ -42,6 +42,7 @@ export function BooqPreview({
             }
             .title {
                 color: ${dimmed};
+                text-align: center;
                 text-overflow: ellipsis;
                 white-space: nowrap;
                 overflow: hidden;

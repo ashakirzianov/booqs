@@ -5,6 +5,7 @@ import { BooqPath } from "./core";
 const BooqHistoryQuery = gql`query BooqHistory {
     history {
         booq {
+            id
             title
             length
         }
@@ -16,6 +17,7 @@ const BooqHistoryQuery = gql`query BooqHistory {
 type BooqHistoryData = {
     history: {
         booq: {
+            id: string,
             title?: string,
             length: number,
         },
@@ -33,6 +35,7 @@ export function useHistory() {
     return {
         loading,
         history: (data?.history ?? []).map(h => ({
+            id: h.booq.id,
             title: h.booq.title,
             path: h.path,
             preview: h.preview,

@@ -3,6 +3,7 @@ import { BooqPreview } from "controls/BooqPreview";
 import { meter } from "controls/theme";
 import { useHistory, pageForPosition, useAuth } from "app";
 import { FacebookSignButton } from './SignIn';
+import { BooqLink } from 'controls/Links';
 
 const historyPanelHeight = '15em';
 export function ReadingHistory() {
@@ -64,13 +65,15 @@ function HistoryItems({ items }: {
             items.map(
                 (entry, idx) =>
                     <div key={idx} className='preview'>
-                        <BooqPreview
-                            path={entry.path}
-                            text={entry.preview}
-                            title={entry.title ?? ''}
-                            page={pageForPosition(entry.position)}
-                            total={pageForPosition(entry.length)}
-                        />
+                        <BooqLink booqId={entry.id} path={entry.path}>
+                            <BooqPreview
+                                path={entry.path}
+                                text={entry.preview}
+                                title={entry.title ?? ''}
+                                page={pageForPosition(entry.position)}
+                                total={pageForPosition(entry.length)}
+                            />
+                        </BooqLink>
                     </div>
             )
         }
