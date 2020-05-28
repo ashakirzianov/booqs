@@ -66,6 +66,11 @@ export function pathFromString(pathString: string): BooqPath | undefined {
         : path;
 }
 
+export function samePath(first: BooqPath, second: BooqPath) {
+    return first.length === second.length
+        && first.every((p, idx) => p === second[idx]);
+}
+
 export function pathLessThan(first: BooqPath, second: BooqPath): boolean {
     const [firstHead, ...firstTail] = first;
     const [secondHead, ...secondTail] = second;
@@ -130,4 +135,14 @@ export function nodeText(node: BooqNode): string {
     } else {
         return node.content ?? '';
     }
+}
+
+export function uuid() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, ch => {
+        // tslint:disable-next-line: no-bitwise
+        const r = Math.random() * 16 | 0;
+        // tslint:disable-next-line: no-bitwise
+        const v = ch === 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+    });
 }

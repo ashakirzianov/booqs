@@ -19,7 +19,7 @@ export function BooqScreen({ booq }: {
     const position = positionForPath(booq.fragment.nodes, currentPath);
     const chapterLength = booq.fragment.position + nodesLength(booq.fragment.nodes);
     return <div className='container'>
-        <Header booqId={booq.id} />
+        <Header booqId={booq.id} path={currentPath} />
         <EmptyLine />
         <div className='booq'>
             <AnchorButton
@@ -83,8 +83,9 @@ function EmptyLine() {
     return <div style={{ height: headerHeight }} />;
 }
 
-function Header({ booqId }: {
+function Header({ booqId, path }: {
     booqId: string,
+    path: BooqPath,
 }) {
     return <nav className='container'>
         <div className='left'>
@@ -92,7 +93,9 @@ function Header({ booqId }: {
             <div className='button'><TocButton booqId={booqId} /></div>
         </div>
         <div className='right'>
-            <div className='button'><BookmarkButton /></div>
+            <div className='button'>
+                <BookmarkButton booqId={booqId} path={path} />
+            </div>
             <Popovers>
                 {
                     singleton => <>

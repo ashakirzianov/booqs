@@ -1,6 +1,6 @@
 import gql from "graphql-tag";
 import { useQuery, useMutation } from "@apollo/react-hooks";
-import { BooqPath } from "./core";
+import { BooqPath, uuid } from "./core";
 
 const BookmarksQuery = gql`query BookmarksQuery($booqId: ID!) {
     booq(id: $booqId) {
@@ -31,35 +31,61 @@ export function useBookmarks(booqId: string) {
     };
 }
 
-const AddBookmarkMutation = gql`mutation AddBookmark($bookmark: BookmarkInput) {
+const AddBookmarkMutation = gql`mutation AddBookmark($bookmark: BookmarkInput!) {
     addBookmark(bookmark: $bookmark)
 }`;
 type AddBookmarkData = { addBookmark: boolean };
 type AddBookmarkVariables = {
     bookmark: { id: string, booqId: string, path: BooqPath },
 };
-type BookmarkInput = AddBookmarkVariables['bookmark'];
-export function useBookmarkMutations() {
+const RemoveBookmarkMutation = gql`mutation RemoveBookmark($id: ID!) {
+    removeBookmark(id: $id)
+}`;
+type RemoveBookmarkData = { removeBookmark: boolean };
+type RemoveBookmarkVariables = { id: string };
+export function useBookmarkMutations(booqId: string) {
     const [add] = useMutation<AddBookmarkData, AddBookmarkVariables>(
         AddBookmarkMutation,
     );
+    const [remove] = useMutation<RemoveBookmarkData, RemoveBookmarkVariables>(
+        RemoveBookmarkMutation,
+    );
     return {
-        addBookmark(bookmark: BookmarkInput) {
+        addBookmark(path: BooqPath) {
+            const id = uuid();
             add({
-                variables: { bookmark },
+                variables: { bookmark: { path, booqId, id } },
                 optimisticResponse: { addBookmark: true },
                 update(cache, { data }) {
                     if (data?.addBookmark) {
                         const cached = cache.readQuery<BookmarksData>({
                             query: BookmarksQuery,
-                            variables: { booqId: bookmark.booqId },
+                            variables: { booqId },
                         });
                         if (cached) {
                             cached.booq.bookmarks.push({
                                 __typename: 'Bookmark',
-                                id: bookmark.id,
-                                path: bookmark.path,
+                                id, path,
                             });
+                        }
+                    }
+                },
+            });
+        },
+        removeBookmark(id: string) {
+            remove({
+                variables: { id },
+                optimisticResponse: { removeBookmark: true },
+                update(cache, { data }) {
+                    if (data?.removeBookmark) {
+                        const cached = cache.readQuery<BookmarksData>({
+                            query: BookmarksQuery,
+                            variables: { booqId },
+                        });
+                        if (cached) {
+                            cached.booq.bookmarks = cached.booq.bookmarks.filter(
+                                bm => bm.id !== id,
+                            );
                         }
                     }
                 },
