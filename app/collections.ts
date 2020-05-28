@@ -22,7 +22,7 @@ type CollectionData = {
         }[],
     },
 };
-type CollectionItem = CollectionData['collection']['booqs'][number];
+export type CollectionItem = CollectionData['collection']['booqs'][number];
 
 export function useCollection(name: string) {
     const { loading, data } = useQuery<CollectionData>(
