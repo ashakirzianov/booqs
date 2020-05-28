@@ -7,8 +7,6 @@ import {
 import { BooqData, pathToId, pathFromId } from 'app';
 import { booqHref } from 'controls/Links';
 
-
-
 export const BooqContent = memo(function BooqContent({ booq, onScroll }: {
     booq: BooqData,
     onScroll?: (path: BooqPath) => void,
@@ -19,30 +17,26 @@ export const BooqContent = memo(function BooqContent({ booq, onScroll }: {
         start: booq.fragment.current.path,
         end: booq.fragment.next?.path,
     };
-    const path = [range.start[0]];
     return <div id='booq-root' className='container'>
         <Nodes
             booqId={booq.id}
             nodes={nodes}
-            path={path}
             range={range}
         />
     </div>;
 });
 
-function Nodes({ nodes, range, booqId, path }: {
+function Nodes({ nodes, range, booqId }: {
     booqId: string,
     nodes: BooqNode[],
-    path: BooqPath,
     range: BooqRange,
 }) {
-    const prefix = path.slice(0, path.length - 1);
-    const offset = path[path.length - 1] ?? 0;
     return <>
         {
-            nodes.map(
-                (node, idx) => renderNode({ node, path: [...prefix, offset + idx], range, booqId }),
-            )
+            renderNodes(nodes, {
+                booqId, range,
+                path: [],
+            })
         }
     </>;
 }
@@ -104,19 +98,26 @@ function isPartiallyVisible(element: Element): boolean {
 
 // --- Render
 
-type RenderArgs = {
+type RenderContext = {
     booqId: string,
-    parent?: BooqElementNode,
-    withinAnchor?: boolean,
-    node: BooqNode,
     path: BooqPath,
     range: BooqRange,
+    parent?: BooqElementNode,
+    withinAnchor?: boolean,
 };
-function renderNode(args: RenderArgs): ReactNode {
-    const node = args.node;
+function renderNodes(nodes: BooqNode[], ctx: RenderContext): ReactNode {
+    const result = nodes.map(
+        (n, idx) => renderNode(n, {
+            ...ctx,
+            path: [...ctx.path, idx],
+        }),
+    );
+    return result;
+}
+function renderNode(node: BooqNode, ctx: RenderContext): ReactNode {
     switch (node.kind) {
         case 'text':
-            switch (args.parent?.name) {
+            switch (ctx.parent?.name) {
                 case 'table': case 'tbody': case 'tr':
                     return null;
                 default:
@@ -129,29 +130,27 @@ function renderNode(args: RenderArgs): ReactNode {
                 return null; //TODO: support images
             }
             return createElement(
-                node.name === 'a' && args.withinAnchor
+                node.name === 'a' && ctx.withinAnchor
                     ? 'span' // Do not nest anchors
                     : node.name,
-                getProps(args),
-                getChildren(args),
+                getProps(node, ctx),
+                getChildren(node, ctx),
             );
     }
 }
 
-function getProps({ node, path, booqId, range }: RenderArgs) {
-    return node.kind === 'element'
-        ? {
-            ...node.attrs,
-            id: pathToId(path),
-            className: node.pph
-                ? 'booq-pph' : undefined,
-            style: node.style,
-            key: pathToString(path),
-            href: node.ref
-                ? hrefForPath(node.ref, booqId, range)
-                : node.attrs?.href,
-        }
-        : {};
+function getProps(node: BooqElementNode, { path, booqId, range }: RenderContext) {
+    return {
+        ...node.attrs,
+        id: pathToId(path),
+        className: node.pph
+            ? 'booq-pph' : undefined,
+        style: node.style,
+        key: pathToString(path),
+        href: node.ref
+            ? hrefForPath(node.ref, booqId, range)
+            : node.attrs?.href,
+    };
 }
 
 function hrefForPath(path: BooqPath, booqId: string, range: BooqRange): string {
@@ -162,17 +161,11 @@ function hrefForPath(path: BooqPath, booqId: string, range: BooqRange): string {
     }
 }
 
-function getChildren({ node, path, range, booqId, withinAnchor }: RenderArgs) {
-    return node.kind === 'element' && node.children?.length
-        ? node.children.map(
-            (n, idx) => renderNode({
-                node: n,
-                path: [...path, idx],
-                parent: node,
-                withinAnchor: withinAnchor || node.name === 'a',
-                range,
-                booqId,
-            })
-        )
+function getChildren(node: BooqElementNode, ctx: RenderContext) {
+    return node.children?.length
+        ? renderNodes(node.children, {
+            ...ctx,
+            withinAnchor: ctx.withinAnchor || node.name === 'a',
+        })
         : null;
 }

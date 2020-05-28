@@ -21,7 +21,6 @@ const BooqFragmentQuery = gql`query BooqFragment($id: ID!, $path: [Int!]) {
                 title
                 path
             }
-            position
         }
     }
 }`;
@@ -35,7 +34,6 @@ type BooqFragmentData = {
             previous?: BooqAnchor,
             current: BooqAnchor,
             next?: BooqAnchor,
-            position: number,
         }
     },
 };

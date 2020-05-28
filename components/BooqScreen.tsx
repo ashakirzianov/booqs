@@ -14,13 +14,17 @@ import { Themer } from './Themer';
 import { SignIn } from './SignIn';
 
 const contentWidth = '50rem';
-export function BooqScreen({ booq }: {
+export function BooqScreen({
+    booq,
+}: {
     booq: BooqData,
 }) {
     const { fontScale } = useSettings();
     const { onScroll, currentPath } = useScrollHandler(booq);
     const position = positionForPath(booq.fragment.nodes, currentPath);
-    const chapterLength = booq.fragment.position + nodesLength(booq.fragment.nodes);
+    const nextChapter = booq.fragment.next
+        ? positionForPath(booq.fragment.nodes, booq.fragment.next.path)
+        : booq.length;
     return <div className='container'>
         <Header booqId={booq.id} path={currentPath} />
         <EmptyLine />
@@ -43,7 +47,7 @@ export function BooqScreen({ booq }: {
         <EmptyLine />
         <Footer
             position={position}
-            chapterLength={chapterLength}
+            nextChapter={nextChapter}
             booqLength={booq.length}
         />
         <style jsx>{`
@@ -141,21 +145,25 @@ function Header({ booqId, path }: {
     </nav>;
 }
 
-function Footer({ position, booqLength, chapterLength }: {
+function Footer({ position, booqLength, nextChapter }: {
     position: number,
     booqLength: number,
-    chapterLength: number,
+    nextChapter: number,
 }) {
     const { dimmed } = usePalette();
-    const page = pageForPosition(position);
+    const page = pageForPosition(position) + 1;
     const total = pageForPosition(booqLength);
-    const chapter = pageForPosition(chapterLength);
+    const chapter = pageForPosition(nextChapter);
+    const leftPages = chapter - page;
+    const leftLabel = leftPages === 0 ? 'Last page'
+        : leftPages === 1 ? `${leftPages} page left`
+            : `${leftPages} pages left`
     return <nav className='container'>
         <div className='left'>
             <span className='page'>{`${page} of ${total}`}</span>
         </div>
         <div className='right'>
-            <span className='chapter-left'>{`${chapter - page} pages left`}</span>
+            <span className='chapter-left'>{leftLabel}</span>
         </div>
         <style jsx>{`
             .container {
