@@ -2,7 +2,7 @@ import React, { memo, createElement, ReactNode, useEffect } from 'react';
 import { throttle } from 'lodash';
 import {
     BooqNode, BooqPath, pathToString, BooqData,
-    pathToId, BooqRange, pathInRange, pathFromId,
+    pathToId, BooqRange, pathInRange, pathFromId, BooqElementNode,
 } from '../app';
 import { booqHref } from 'controls/Links';
 
@@ -104,48 +104,52 @@ function isPartiallyVisible(element: Element): boolean {
 
 type RenderArgs = {
     booqId: string,
-    parent?: BooqNode,
+    parent?: BooqElementNode,
     withinAnchor?: boolean,
     node: BooqNode,
     path: BooqPath,
     range: BooqRange,
 };
 function renderNode(args: RenderArgs): ReactNode {
-    const { name, content } = args.node;
-    if (!name) {
-        switch (args.parent?.name) {
-            case 'table': case 'tbody': case 'tr':
-                return null;
-            default:
-                return content ?? null;
-        }
-    } else if (name === 'img') {
-        // TODO: support images
-        return null;
-    } else {
-        const actualName = name === 'a' && args.withinAnchor
-            ? 'span' // Do not nest anchors
-            : name;
-        return createElement(
-            actualName,
-            getProps(args),
-            getChildren(args),
-        );
+    const node = args.node;
+    switch (node.kind) {
+        case 'text':
+            switch (args.parent?.name) {
+                case 'table': case 'tbody': case 'tr':
+                    return null;
+                default:
+                    return node.content;
+            }
+        case 'stub':
+            return null;
+        case 'element':
+            if (node.name === 'img') {
+                return null; //TODO: support images
+            }
+            return createElement(
+                node.name === 'a' && args.withinAnchor
+                    ? 'span' // Do not nest anchors
+                    : node.name,
+                getProps(args),
+                getChildren(args),
+            );
     }
 }
 
 function getProps({ node, path, booqId, range }: RenderArgs) {
-    return {
-        ...node.attrs,
-        id: pathToId(path),
-        className: node.pph
-            ? 'booq-pph' : undefined,
-        style: node.style,
-        key: pathToString(path),
-        href: node.ref
-            ? hrefForPath(node.ref, booqId, range)
-            : node.attrs?.href,
-    };
+    return node.kind === 'element'
+        ? {
+            ...node.attrs,
+            id: pathToId(path),
+            className: node.pph
+                ? 'booq-pph' : undefined,
+            style: node.style,
+            key: pathToString(path),
+            href: node.ref
+                ? hrefForPath(node.ref, booqId, range)
+                : node.attrs?.href,
+        }
+        : {};
 }
 
 function hrefForPath(path: BooqPath, booqId: string, range: BooqRange): string {
@@ -156,16 +160,14 @@ function hrefForPath(path: BooqPath, booqId: string, range: BooqRange): string {
     }
 }
 
-function getChildren({ node, path, range, booqId }: RenderArgs) {
-    const withinAnchor = node.name === 'a';
-    const offset = node.offset ?? 0;
-    return node.children?.length
+function getChildren({ node, path, range, booqId, withinAnchor }: RenderArgs) {
+    return node.kind === 'element' && node.children?.length
         ? node.children.map(
             (n, idx) => renderNode({
                 node: n,
-                path: [...path, idx + offset],
+                path: [...path, idx],
                 parent: node,
-                withinAnchor,
+                withinAnchor: withinAnchor || node.name === 'a',
                 range,
                 booqId,
             })
