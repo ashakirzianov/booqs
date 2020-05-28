@@ -4,6 +4,7 @@ import { BooqPath } from "core";
 
 const TocQuery = gql`query TocQuery($booqId: ID!) {
     booq(id: $booqId) {
+        id
         title
         tableOfContents {
             title
