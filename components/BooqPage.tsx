@@ -59,33 +59,22 @@ function ClientSidePage({ booqId, path }: {
     return <LoadedBooqPage booq={booq} path={path} />;
 }
 
-function LoadedBooqPage({ booq }: {
+function LoadedBooqPage({ booq, path }: {
     booq: BooqData,
     path?: BooqPath,
 }) {
-    useHashNavigation();
+    usePathNavigation(path);
     return <Page title={booq?.title ?? 'Booq'}>
         <BooqScreen booq={booq} />
     </Page>;
 }
 
-function useHashNavigation() {
-    const { replace, asPath, query } = useRouter();
+function usePathNavigation(path?: BooqPath) {
+    const { replace, asPath } = useRouter();
     useEffect(() => {
-        let navigateTo: BooqPath | undefined = undefined
-        if (typeof query.p === 'string') {
-            navigateTo = pathFromString(query.p);
-        } else {
-            const components = asPath.split('/');
-            const qualifier = components[components.length - 2];
-            const path = components[components.length - 1];
-            if (qualifier === 'path') {
-                navigateTo = pathFromString(path);
-            }
-        }
-        if (navigateTo) {
+        if (path) {
             const [withoutHash] = asPath.split('#');
-            const withHash = `${withoutHash}#${pathToId(navigateTo)}`;
+            const withHash = `${withoutHash}#${pathToId(path)}`;
             replace(withHash, undefined, { shallow: true });
         }
     }, []);
