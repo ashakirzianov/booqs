@@ -7,19 +7,16 @@ import {
 import { BooqData, pathToId, pathFromId } from 'app';
 import { booqHref } from 'controls/Links';
 
-export const BooqContent = memo(function BooqContent({ booq, onScroll }: {
-    booq: BooqData,
+export const BooqContent = memo(function BooqContent({ booqId, nodes, range, onScroll }: {
+    booqId: string,
+    nodes: BooqNode[],
+    range: BooqRange,
     onScroll?: (path: BooqPath) => void,
 }) {
     useScroll(onScroll);
-    const nodes = booq.fragment.nodes;
-    const range: BooqRange = {
-        start: booq.fragment.current.path,
-        end: booq.fragment.next?.path,
-    };
     return <div id='booq-root' className='container'>
         <Nodes
-            booqId={booq.id}
+            booqId={booqId}
             nodes={nodes}
             range={range}
         />

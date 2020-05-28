@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { positionForPath, nodesLength, samePath, BooqPath } from 'core';
+import { positionForPath, samePath, BooqPath, BooqRange } from 'core';
 import {
     BooqData, BooqAnchor, usePalette, useSettings, useReportHistory, pageForPosition,
 } from 'app';
@@ -25,6 +25,10 @@ export function BooqScreen({
     const nextChapter = booq.fragment.next
         ? positionForPath(booq.fragment.nodes, booq.fragment.next.path)
         : booq.length;
+    const range: BooqRange = {
+        start: booq.fragment.current.path,
+        end: booq.fragment.next?.path,
+    };
     return <div className='container'>
         <Header booqId={booq.id} path={currentPath} />
         <EmptyLine />
@@ -35,7 +39,9 @@ export function BooqScreen({
                 title='Previous'
             />
             <BooqContent
-                booq={booq}
+                booqId={booq.id}
+                nodes={booq.fragment.nodes}
+                range={range}
                 onScroll={onScroll}
             />
             <AnchorButton
