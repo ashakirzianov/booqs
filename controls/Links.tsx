@@ -1,6 +1,6 @@
 import React, { ReactNode } from 'react';
 import Link from 'next/link';
-import { BooqPath, pathToString } from 'core';
+import { BooqPath, pathToString, BooqRange, rangeToString } from 'core';
 
 export function BooqLink({ booqId, path, children }: {
     booqId: string,
@@ -32,6 +32,10 @@ export function booqHref(booqId: string, path?: BooqPath) {
     return path?.length
         ? `/booq/${booqId}/path/${pathToString(path)}`
         : `/booq/${booqId}`;
+}
+
+export function quoteRef(booqId: string, range: BooqRange) {
+    return `/booq/${booqId}/quote/${rangeToString(range)}`;
 }
 
 export function feedHref() {

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { positionForPath, samePath, BooqPath, BooqRange } from 'core';
 import {
     BooqData, BooqAnchor, usePalette, useSettings, useReportHistory, pageForPosition,
@@ -6,8 +6,8 @@ import {
 import { headerHeight, meter, bookFont } from 'controls/theme';
 import { IconButton, BorderButton } from 'controls/Buttons';
 import { Popovers } from 'controls/Popover';
-import { BooqLink, FeedLink } from 'controls/Links';
-import { BooqContent } from './BooqContent';
+import { BooqLink, FeedLink, quoteRef } from 'controls/Links';
+import { BooqContent, BooqSelection } from './BooqContent';
 import { TocButton } from './Toc';
 import { BookmarkButton } from './Bookmark';
 import { Themer } from './Themer';
@@ -21,6 +21,16 @@ export function BooqScreen({
 }) {
     const { fontScale } = useSettings();
     const { onScroll, currentPath } = useScrollHandler(booq);
+    const { onSelection, selection } = useSelectionHandler();
+    useOnCopy(useCallback(e => {
+        console.log(e);
+        if (selection.current && e.clipboardData) {
+            e.preventDefault();
+            const selectionText = `${selection.current.text}\n${quoteRef(booq.id, selection.current.range)}`;
+            e.clipboardData.setData('text/plain', selectionText);
+        }
+    }, [selection, booq.id]));
+
     const position = positionForPath(booq.fragment.nodes, currentPath);
     const nextChapter = booq.fragment.next
         ? positionForPath(booq.fragment.nodes, booq.fragment.next.path)
@@ -29,6 +39,7 @@ export function BooqScreen({
         start: booq.fragment.current.path,
         end: booq.fragment.next?.path,
     };
+
     return <div className='container'>
         <Header booqId={booq.id} path={currentPath} />
         <EmptyLine />
@@ -43,6 +54,7 @@ export function BooqScreen({
                 nodes={booq.fragment.nodes}
                 range={range}
                 onScroll={onScroll}
+                onSelection={onSelection}
             />
             <AnchorButton
                 booqId={booq.id}
@@ -92,6 +104,23 @@ function useScrollHandler({ id, fragment }: BooqData) {
             }
         },
     };
+}
+
+function useSelectionHandler() {
+    const selection = useRef<BooqSelection>();
+    return {
+        selection,
+        onSelection(newSelection?: BooqSelection) {
+            selection.current = newSelection;
+        },
+    };
+}
+
+function useOnCopy(callback: (e: ClipboardEvent) => void) {
+    useEffect(() => {
+        window.document.addEventListener('copy', callback);
+        return () => window.document.removeEventListener('copy', callback);
+    }, [callback]);
 }
 
 function EmptyLine() {

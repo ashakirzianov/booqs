@@ -158,7 +158,7 @@ function isPartiallyVisible(element: Element): boolean {
 
 // Selection:
 
-type BooqSelection = {
+export type BooqSelection = {
     range: BooqRange,
     text: string,
 };
@@ -167,13 +167,11 @@ function useSelection(callback?: (selection?: BooqSelection) => void) {
         const listener = function () {
             if (callback) {
                 const selection = getSelection();
-                if (selection) {
-                    callback(selection);
-                }
+                callback(selection);
             }
         };
-        window.addEventListener('selectionchange', listener);
-        return () => window.removeEventListener('selectionchange', listener);
+        window.document.addEventListener('selectionchange', listener);
+        return () => window.document.removeEventListener('selectionchange', listener);
     }, [callback]);
 }
 
