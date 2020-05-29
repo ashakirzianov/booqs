@@ -43,7 +43,6 @@ export function BooqScreen({
         ? [{ range: quote, color: 'orange' }]
         : [];
 
-    console.log(colorization);
     return <div className='container'>
         <Header booqId={booq.id} path={currentPath} />
         <EmptyLine />

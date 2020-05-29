@@ -78,8 +78,10 @@ function renderNode(node: BooqNode, ctx: RenderContext): ReactNode {
 
 function renderTextNode(text: string, { path, colorization }: RenderContext): ReactNode {
     const spans = applyColorization({ text, path: [...path, 0] }, colorization);
+    const id = pathToId(path);
     return <span
-        id={pathToId(path)}
+        key={id}
+        id={id}
     >
         {
             spans.map(
@@ -87,6 +89,7 @@ function renderTextNode(text: string, { path, colorization }: RenderContext): Re
                     if (span.color) {
                         return <span
                             id={pathToId(span.path)}
+                            key={pathToId(span.path)}
                             style={{ background: span.color }}>
                             {span.text}
                         </span>;
