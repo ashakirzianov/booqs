@@ -4,6 +4,7 @@ import { BooqPath, uuid } from "core";
 
 const BookmarksQuery = gql`query BookmarksQuery($booqId: ID!) {
     booq(id: $booqId) {
+        id
         bookmarks {
             id
             path
