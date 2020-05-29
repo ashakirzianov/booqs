@@ -131,6 +131,7 @@ function Header({ booqId, path }: {
                 position: fixed;
                 top: 0; left: 0; right: 0;
                 pointer-events: none;
+                z-index: 10;
             }
             .left, .right {
                 display: flex;
