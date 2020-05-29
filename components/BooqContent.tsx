@@ -96,6 +96,7 @@ function getChildren(node: BooqElementNode, ctx: RenderContext) {
     return node.children?.length
         ? renderNodes(node.children, {
             ...ctx,
+            parent: node,
             withinAnchor: ctx.withinAnchor || node.name === 'a',
         })
         : null;
