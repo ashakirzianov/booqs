@@ -1,17 +1,22 @@
 import React, { memo, createElement, ReactNode, useEffect } from 'react';
 import { throttle } from 'lodash';
 import {
-    BooqPath, BooqRange, BooqNode, BooqElementNode, pathToString, pathInRange, pathLessThan,
+    BooqPath, BooqRange, BooqNode, BooqElementNode, pathToString, pathInRange, pathLessThan, samePath,
 } from 'core';
 import { pathToId, pathFromId } from 'app';
 import { booqHref } from 'controls/Links';
 
+export type Colorization = {
+    range: BooqRange,
+    color: string,
+};
 export const BooqContent = memo(function BooqContent({
-    booqId, nodes, range, onScroll, onSelection,
+    booqId, nodes, range, colorization, onScroll, onSelection,
 }: {
     booqId: string,
     nodes: BooqNode[],
     range: BooqRange,
+    colorization: Colorization[],
     onScroll?: (path: BooqPath) => void,
     onSelection?: (selection?: BooqSelection) => void,
 }) {
@@ -20,7 +25,7 @@ export const BooqContent = memo(function BooqContent({
     return <div id='booq-root' className='container'>
         {
             renderNodes(nodes, {
-                booqId, range,
+                booqId, range, colorization,
                 path: [],
             })
         }
@@ -35,6 +40,7 @@ type RenderContext = {
     range: BooqRange,
     parent?: BooqElementNode,
     withinAnchor?: boolean,
+    colorization: Colorization[],
 };
 function renderNodes(nodes: BooqNode[], ctx: RenderContext): ReactNode {
     const result = nodes.map(
@@ -52,7 +58,7 @@ function renderNode(node: BooqNode, ctx: RenderContext): ReactNode {
                 case 'table': case 'tbody': case 'tr':
                     return null;
                 default:
-                    return node.content;
+                    return renderTextNode(node.content, ctx);
             }
         case 'stub':
             return null;
@@ -68,6 +74,29 @@ function renderNode(node: BooqNode, ctx: RenderContext): ReactNode {
                 getChildren(node, ctx),
             );
     }
+}
+
+function renderTextNode(text: string, { path, colorization }: RenderContext): ReactNode {
+    const spans = applyColorization({ text, path: [...path, 0] }, colorization);
+    return <span
+        id={pathToId(path)}
+    >
+        {
+            spans.map(
+                span => {
+                    if (span.color) {
+                        return <span
+                            id={pathToId(span.path)}
+                            style={{ background: span.color }}>
+                            {span.text}
+                        </span>;
+                    } else {
+                        return span.text;
+                    }
+                }
+            )
+        }
+    </span>;
 }
 
 function getProps(node: BooqElementNode, { path, booqId, range }: RenderContext) {
@@ -100,6 +129,84 @@ function getChildren(node: BooqElementNode, ctx: RenderContext) {
             withinAnchor: ctx.withinAnchor || node.name === 'a',
         })
         : null;
+}
+
+// --- Colorization
+
+type ColorizedSpan = {
+    path: BooqPath,
+    text: string,
+    color?: string,
+};
+
+function applyColorization(span: ColorizedSpan, colorization: Colorization[]) {
+    return colorization.reduce(
+        (res, col) => {
+            const spans = applyColorizationOnSpans(res, col);
+            return spans;
+        },
+        [span],
+    );
+}
+
+function applyColorizationOnSpans(spans: ColorizedSpan[], colorization: Colorization) {
+    return spans.reduce<ColorizedSpan[]>(
+        (res, span) => {
+            const spans = applyColorizationOnSpan(span, colorization);
+            res.push(...spans);
+            return res;
+        },
+        []);
+}
+
+function applyColorizationOnSpan(span: ColorizedSpan, { range, color }: Colorization): ColorizedSpan[] {
+    const [prefix, offset] = breakPath(span.path);
+    const [startPrefix, startOffset] = breakPath(range.start);
+    if (!samePath(prefix, startPrefix)) {
+        return [span];
+    }
+    const [endPrefix, endOffset] = range.end
+        ? breakPath(range.end)
+        : [undefined, undefined];
+
+    const len = span.text.length;
+    const start = startOffset - offset;
+    const end = endPrefix !== undefined && endOffset !== undefined && samePath(endPrefix, prefix)
+        ? endOffset - offset
+        : len;
+    const pointA = 0;
+    const pointB = Math.min(Math.max(start, 0), len);
+    const pointC = Math.min(Math.max(end, 0), len);
+    const pointD = len;
+    const result: ColorizedSpan[] = [];
+    if (pointA < pointB) {
+        result.push({
+            text: span.text.substring(pointA, pointB),
+            path: span.path,
+            color: span.color,
+        });
+    }
+    if (pointB < pointC) {
+        result.push({
+            text: span.text.substring(pointB, pointC),
+            path: [...prefix, pointB + offset],
+            color,
+        })
+    }
+    if (pointC < pointD) {
+        result.push({
+            text: span.text.substring(pointC, pointD),
+            path: [...prefix, pointC + offset],
+            color: span.color,
+        })
+    }
+    return result;
+}
+
+function breakPath(path: BooqPath) {
+    const head = path.slice(0, path.length - 1);
+    const tail = path[path.length - 1];
+    return [head, tail] as const;
 }
 
 // --- Scroll
