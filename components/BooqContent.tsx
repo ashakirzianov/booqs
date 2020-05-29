@@ -1,18 +1,22 @@
 import React, { memo, createElement, ReactNode, useEffect } from 'react';
 import { throttle } from 'lodash';
 import {
-    BooqPath, BooqRange, BooqNode, BooqElementNode, pathToString, pathInRange,
+    BooqPath, BooqRange, BooqNode, BooqElementNode, pathToString, pathInRange, pathLessThan,
 } from 'core';
 import { pathToId, pathFromId } from 'app';
 import { booqHref } from 'controls/Links';
 
-export const BooqContent = memo(function BooqContent({ booqId, nodes, range, onScroll }: {
+export const BooqContent = memo(function BooqContent({
+    booqId, nodes, range, onScroll, onSelection,
+}: {
     booqId: string,
     nodes: BooqNode[],
     range: BooqRange,
     onScroll?: (path: BooqPath) => void,
+    onSelection?: (selection?: BooqSelection) => void,
 }) {
     useScroll(onScroll);
+    useSelection(onSelection);
     return <div id='booq-root' className='container'>
         {
             renderNodes(nodes, {
@@ -150,4 +154,62 @@ function isPartiallyVisible(element: Element): boolean {
     }
 
     return false;
+}
+
+// Selection:
+
+type BooqSelection = {
+    range: BooqRange,
+    text: string,
+};
+function useSelection(callback?: (selection?: BooqSelection) => void) {
+    useEffect(() => {
+        const listener = function () {
+            if (callback) {
+                const selection = getSelection();
+                if (selection) {
+                    callback(selection);
+                }
+            }
+        };
+        window.addEventListener('selectionchange', listener);
+        return () => window.removeEventListener('selectionchange', listener);
+    }, [callback]);
+}
+
+function getSelection(): BooqSelection | undefined {
+    const selection = window.getSelection();
+    if (!selection || !selection.anchorNode || !selection.focusNode) {
+        return undefined;
+    }
+
+    const anchorPath = getSelectionPath(selection.anchorNode, selection.anchorOffset);
+    const focusPath = getSelectionPath(selection.focusNode, selection.focusOffset);
+
+    if (anchorPath && focusPath) {
+        const range = pathLessThan(anchorPath, focusPath)
+            ? { start: anchorPath, end: focusPath }
+            : { start: focusPath, end: anchorPath };
+        const text = selection.toString();
+        return { range, text };
+    } else {
+        return undefined;
+    }
+}
+
+function getSelectionPath(node: Node, offset: number) {
+    if (isElement(node)) {
+        return pathFromId(node.id);
+    } else if (node.parentElement) {
+        const path = pathFromId(node.parentElement.id);
+        return path
+            ? [...path, offset]
+            : undefined;
+    } else {
+        return undefined;
+    }
+}
+
+function isElement(node: Node): node is Element {
+    return node.nodeType === Node.ELEMENT_NODE;
 }
