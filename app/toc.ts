@@ -36,6 +36,6 @@ export function useToc(booqId: string) {
     return {
         loading,
         title: data?.booq.title,
-        items: data?.booq.tableOfContents ?? [],
+        toc: data?.booq.tableOfContents ?? [],
     };
 }

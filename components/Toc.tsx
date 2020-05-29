@@ -1,17 +1,24 @@
 import React, { useState } from 'react';
-import { BooqPath } from 'core';
-import { usePalette, pageForPosition, useToc, TocItem } from 'app';
+import { BooqPath, comparePaths } from 'core';
+import {
+    usePalette, pageForPosition, useToc, TocItem, Bookmark, useBookmarks,
+} from 'app';
 import { IconButton } from 'controls/Buttons';
 import { Modal } from 'controls/Modal';
 import { Spinner } from 'controls/Spinner';
 import { BooqLink } from 'controls/Links';
 import { meter } from 'controls/theme';
+import { IconName, Icon } from 'controls/Icon';
 
 export function TocButton({ booqId }: {
     booqId: string,
 }) {
     const [open, setOpen] = useState(false);
-    const { loading, items } = useToc(booqId);
+    const { loading, toc } = useToc(booqId);
+    const { bookmarks } = useBookmarks(booqId);
+    const display = buildDisplayItems({
+        toc, bookmarks,
+    });
     return <>
         <IconButton icon='toc' onClick={() => setOpen(true)} />
         <Modal
@@ -21,7 +28,7 @@ export function TocButton({ booqId }: {
         >
             {
                 loading ? <Spinner /> :
-                    <TocContent booqId={booqId} items={items} />
+                    <TocContent booqId={booqId} items={display} />
             }
         </Modal>
     </>;
@@ -30,7 +37,7 @@ export function TocButton({ booqId }: {
 const tocWidth = '50rem';
 function TocContent({ booqId, items }: {
     booqId: string,
-    items: TocItem[],
+    items: DisplayItem[],
 }) {
     const { background, highlight, border } = usePalette();
     return <div className='container'>
@@ -40,10 +47,7 @@ function TocContent({ booqId, items }: {
                     <div className='item'>
                         <TocRow
                             booqId={booqId}
-                            title={item.title}
-                            path={item.path}
-                            position={item.position}
-                            ident={item.level ?? 0}
+                            item={item}
                         />
                     </div>
                     <hr />
@@ -71,19 +75,26 @@ function TocContent({ booqId, items }: {
 }
 
 function TocRow({
-    booqId, title, path, position, ident,
+    booqId,
+    item: { kind, title, path, page, level, icon },
 }: {
     booqId: string,
-    title?: string,
-    path: BooqPath,
-    position?: number,
-    ident: number,
+    item: DisplayItem,
 }) {
     return <>
         <BooqLink booqId={booqId} path={path}>
             <div className='content'>
                 <span className='title'>{title ?? 'no-title'}</span>
-                <span className='page'>{pageForPosition(position ?? 1)}</span>
+                {
+                    page
+                        ? <span className='page'>{page}</span>
+                        : null
+                }
+                {
+                    icon
+                        ? <Icon name={icon} />
+                        : null
+                }
             </div>
         </BooqLink>
         <style jsx>{`
@@ -95,8 +106,52 @@ function TocRow({
             justify-content: space-between;
         }
         .title {
-            text-indent: ${ident}em;
+            text-indent: ${level}em;
+            font-style: ${kind === 'bookmark' ? 'italic' : 'normal'};
         }
         `}</style>
     </>;
+}
+
+type DisplayItem = {
+    kind: 'chapter' | 'bookmark',
+    title: string,
+    page?: string,
+    level: number,
+    path: BooqPath,
+    icon?: IconName,
+};
+function buildDisplayItems({
+    toc, bookmarks,
+}: {
+    toc: TocItem[],
+    bookmarks: Bookmark[],
+}): DisplayItem[] {
+    const maxLevel = toc.reduce((max, i) => Math.max(max, i.level ?? 0), 0);
+    const fromToc = toc.map<DisplayItem>(item => ({
+        kind: 'chapter',
+        title: item.title ?? '<no title>',
+        page: item.position ? `${pageForPosition(item.position)}` : undefined,
+        level: maxLevel - (item.level ?? 0),
+        path: item.path,
+    }));
+    const fromBookmarks = bookmarks.map<DisplayItem>(bm => ({
+        kind: 'bookmark',
+        title: 'your bookmark',
+        level: 0,
+        path: bm.path,
+        icon: 'bookmark-empty',
+    }));
+    const items = [...fromToc, ...fromBookmarks]
+        .sort((a, b) => comparePaths(a.path, b.path));
+    let lastLevel = 0;
+    for (const item of items) {
+        if (item.kind !== 'chapter') {
+            item.level = lastLevel + 1;
+        } else {
+            lastLevel = item.level;
+        }
+    }
+
+    return items;
 }

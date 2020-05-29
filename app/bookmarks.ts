@@ -20,6 +20,7 @@ type BookmarksData = {
         }[],
     },
 };
+export type Bookmark = BookmarksData['booq']['bookmarks'][number];
 
 export function useBookmarks(booqId: string) {
     const { loading, data } = useQuery<BookmarksData>(
