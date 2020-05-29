@@ -7,7 +7,7 @@ import { headerHeight, meter, bookFont } from 'controls/theme';
 import { IconButton, BorderButton } from 'controls/Buttons';
 import { Popovers } from 'controls/Popover';
 import { BooqLink, FeedLink, quoteRef } from 'controls/Links';
-import { BooqContent, BooqSelection } from './BooqContent';
+import { BooqContent, BooqSelection, Colorization } from './BooqContent';
 import { TocButton } from './Toc';
 import { BookmarkButton } from './Bookmark';
 import { Themer } from './Themer';
@@ -15,9 +15,10 @@ import { SignIn } from './SignIn';
 
 const contentWidth = '50rem';
 export function BooqScreen({
-    booq,
+    booq, quote,
 }: {
     booq: BooqData,
+    quote?: BooqRange,
 }) {
     const { fontScale } = useSettings();
     const { onScroll, currentPath } = useScrollHandler(booq);
@@ -38,7 +39,11 @@ export function BooqScreen({
         start: booq.fragment.current.path,
         end: booq.fragment.next?.path,
     };
+    const colorization: Colorization[] = quote
+        ? [{ range: quote, color: 'orange' }]
+        : [];
 
+    console.log(colorization);
     return <div className='container'>
         <Header booqId={booq.id} path={currentPath} />
         <EmptyLine />
@@ -54,6 +59,7 @@ export function BooqScreen({
                 range={range}
                 onScroll={onScroll}
                 onSelection={onSelection}
+                colorization={colorization}
             />
             <AnchorButton
                 booqId={booq.id}

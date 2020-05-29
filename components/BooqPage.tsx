@@ -67,14 +67,14 @@ function ClientSidePage({ booqId, path, quote }: {
     return <LoadedBooqPage booq={booq} path={path} quote={quote} />;
 }
 
-function LoadedBooqPage({ booq, path }: {
+function LoadedBooqPage({ booq, path, quote }: {
     booq: BooqData,
     path?: BooqPath,
     quote?: BooqRange,
 }) {
     usePathNavigation(path);
     return <Page title={booq?.title ?? 'Booq'}>
-        <BooqScreen booq={booq} />
+        <BooqScreen booq={booq} quote={quote} />
     </Page>;
 }
 
