@@ -23,10 +23,9 @@ export function BooqScreen({
     const { onScroll, currentPath } = useScrollHandler(booq);
     const { onSelection, selection } = useSelectionHandler();
     useOnCopy(useCallback(e => {
-        console.log(e);
         if (selection.current && e.clipboardData) {
             e.preventDefault();
-            const selectionText = `${selection.current.text}\n${quoteRef(booq.id, selection.current.range)}`;
+            const selectionText = quoteText(selection.current.text, booq.id, selection.current.range);
             e.clipboardData.setData('text/plain', selectionText);
         }
     }, [selection, booq.id]));
@@ -86,6 +85,11 @@ export function BooqScreen({
             }
             `}</style>
     </div>;
+}
+
+function quoteText(text: string, booqId: string, range: BooqRange) {
+    const link = `${process.env.NEXT_PUBLIC_URL}${quoteRef(booqId, range)}`;
+    return link;
 }
 
 function useScrollHandler({ id, fragment }: BooqData) {

@@ -1,5 +1,5 @@
 import { GetStaticPaths, GetStaticProps } from "next";
-import { pathFromString } from 'core';
+import { pathFromString, rangeFromString } from 'core';
 import { fetchBooqFragment } from "app";
 import { BooqPage, BooqPageProps } from "components/BooqPage";
 
@@ -26,27 +26,48 @@ export const getStaticProps: GetStaticProps<
             if (param === '0') {
                 const booq = await fetchBooqFragment(booqId, [0]);
                 if (booq) {
-                    return { props: { data: { kind: 'preloaded', booq } } };
-                } else {
-                    return { props: { data: { kind: 'not-found' } } };
+                    return {
+                        props: { data: { kind: 'preloaded', booq } },
+                    };
+                }
+            } else {
+                const path = pathFromString(param);
+                if (path) {
+                    return {
+                        props: { data: { kind: 'client-side', booqId, path } },
+                    };
                 }
             }
-            const path = pathFromString(param);
-            return path
-                ? { props: { data: { kind: 'client-side', booqId, path } } }
-                : { props: { data: { kind: 'not-found' } } };
+            break;
+        }
+        case 'quote': {
+            const quote = rangeFromString(param);
+            if (quote) {
+                const booq = await fetchBooqFragment(booqId, quote.start);
+                if (booq) {
+                    const path = quote.start.slice(0, quote.start.length - 1);
+                    return {
+                        props: {
+                            data: {
+                                kind: 'preloaded', path, booq, quote,
+                            },
+                        },
+                    };
+                }
+            }
+            break;
         }
         case undefined: {
             const booq = await fetchBooqFragment(booqId);
             if (booq) {
-                return { props: { data: { kind: 'preloaded', booq } } };
-            } else {
-                return { props: { data: { kind: 'not-found' } } };
+                return {
+                    props: { data: { kind: 'preloaded', booq } },
+                };
             }
+            break;
         }
-        default:
-            return { props: { data: { kind: 'not-found' } } };
     }
+    return { props: { data: { kind: 'not-found' } } };
 };
 
 export default BooqPage;

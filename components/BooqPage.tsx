@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/router";
 import { useBooq, BooqData, pathToId } from "app";
-import { BooqPath } from 'core';
+import { BooqPath, BooqRange } from 'core';
 import { Spinner } from "../controls/Spinner";
 import { Page } from "./Page";
 import { BooqScreen } from "./BooqScreen";
@@ -10,10 +10,12 @@ type PageData = {
     kind: 'preloaded',
     booq: BooqData,
     path?: BooqPath,
+    quote?: BooqRange,
 } | {
     kind: 'client-side',
     booqId: string,
     path: BooqPath,
+    quote?: BooqRange,
 } | {
     kind: 'not-found',
 };
@@ -24,9 +26,13 @@ export type BooqPageProps = {
 export function BooqPage({ data }: BooqPageProps) {
     switch (data?.kind) {
         case 'preloaded':
-            return <LoadedBooqPage booq={data.booq} />;
+            return <LoadedBooqPage
+                booq={data.booq} path={data.path} quote={data.quote}
+            />;
         case 'client-side':
-            return <ClientSidePage booqId={data.booqId} path={data.path} />;
+            return <ClientSidePage
+                booqId={data.booqId} path={data.path} quote={data.quote}
+            />;
         case 'not-found':
             return <NotFoundPage />;
         default:
@@ -46,9 +52,10 @@ function NotFoundPage() {
     </Page>;
 }
 
-function ClientSidePage({ booqId, path }: {
+function ClientSidePage({ booqId, path, quote }: {
     booqId: string,
     path?: BooqPath,
+    quote?: BooqRange,
 }) {
     const { loading, booq } = useBooq(booqId, path);
     if (loading) {
@@ -57,12 +64,13 @@ function ClientSidePage({ booqId, path }: {
         return <NotFoundPage />;
     }
 
-    return <LoadedBooqPage booq={booq} path={path} />;
+    return <LoadedBooqPage booq={booq} path={path} quote={quote} />;
 }
 
 function LoadedBooqPage({ booq, path }: {
     booq: BooqData,
     path?: BooqPath,
+    quote?: BooqRange,
 }) {
     usePathNavigation(path);
     return <Page title={booq?.title ?? 'Booq'}>
