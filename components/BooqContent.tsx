@@ -1,10 +1,9 @@
 import React, { memo, createElement, ReactNode, useEffect } from 'react';
 import { throttle } from 'lodash';
 import {
-    BooqPath, BooqRange, BooqNode, BooqElementNode,
-    pathToString, pathInRange,
+    BooqPath, BooqRange, BooqNode, BooqElementNode, pathToString, pathInRange,
 } from 'core';
-import { BooqData, pathToId, pathFromId } from 'app';
+import { pathToId, pathFromId } from 'app';
 import { booqHref } from 'controls/Links';
 
 export const BooqContent = memo(function BooqContent({ booqId, nodes, range, onScroll }: {
@@ -15,83 +14,14 @@ export const BooqContent = memo(function BooqContent({ booqId, nodes, range, onS
 }) {
     useScroll(onScroll);
     return <div id='booq-root' className='container'>
-        <Nodes
-            booqId={booqId}
-            nodes={nodes}
-            range={range}
-        />
-    </div>;
-});
-
-function Nodes({ nodes, range, booqId }: {
-    booqId: string,
-    nodes: BooqNode[],
-    range: BooqRange,
-}) {
-    return <>
         {
             renderNodes(nodes, {
                 booqId, range,
                 path: [],
             })
         }
-    </>;
-}
-
-// --- Scroll
-
-function useScroll(callback?: (path: BooqPath) => void) {
-    useEffect(() => {
-        const listener = throttle(function () {
-            if (callback) {
-                const path = getCurrentPath();
-                if (path) {
-                    callback(path);
-                }
-            }
-        }, 500);
-        window.addEventListener('scroll', listener);
-        return () => window.removeEventListener('scroll', listener);
-    }, [callback]);
-}
-
-function getCurrentPath() {
-    const root = window.document.getElementById('booq-root');
-    const current = root && getCurrent(root);
-    return current
-        ? pathFromId(current.id)
-        : undefined;
-}
-
-function getCurrent(element: Element): Element | undefined {
-    if (!isPartiallyVisible(element)) {
-        return undefined;
-    } else if (element.className === 'booq-pph') {
-        return element;
-    }
-    const children = element.children;
-    for (let idx = 0; idx < children.length; idx++) {
-        const child = children.item(idx);
-        const current = child && getCurrent(child);
-        if (current) {
-            return current;
-        }
-    }
-    return undefined;
-}
-
-function isPartiallyVisible(element: Element): boolean {
-    const rect = element.getBoundingClientRect();
-    if (rect) {
-        const { top, height } = rect;
-        const result = height > 0 && top <= 0 && top + height >= 0;
-        if (result) {
-            return result;
-        }
-    }
-
-    return false;
-}
+    </div>;
+});
 
 // --- Render
 
@@ -165,4 +95,59 @@ function getChildren(node: BooqElementNode, ctx: RenderContext) {
             withinAnchor: ctx.withinAnchor || node.name === 'a',
         })
         : null;
+}
+
+// --- Scroll
+
+function useScroll(callback?: (path: BooqPath) => void) {
+    useEffect(() => {
+        const listener = throttle(function () {
+            if (callback) {
+                const path = getCurrentPath();
+                if (path) {
+                    callback(path);
+                }
+            }
+        }, 500);
+        window.addEventListener('scroll', listener);
+        return () => window.removeEventListener('scroll', listener);
+    }, [callback]);
+}
+
+function getCurrentPath() {
+    const root = window.document.getElementById('booq-root');
+    const current = root && getCurrent(root);
+    return current
+        ? pathFromId(current.id)
+        : undefined;
+}
+
+function getCurrent(element: Element): Element | undefined {
+    if (!isPartiallyVisible(element)) {
+        return undefined;
+    } else if (element.className === 'booq-pph') {
+        return element;
+    }
+    const children = element.children;
+    for (let idx = 0; idx < children.length; idx++) {
+        const child = children.item(idx);
+        const current = child && getCurrent(child);
+        if (current) {
+            return current;
+        }
+    }
+    return undefined;
+}
+
+function isPartiallyVisible(element: Element): boolean {
+    const rect = element.getBoundingClientRect();
+    if (rect) {
+        const { top, height } = rect;
+        const result = height > 0 && top <= 0 && top + height >= 0;
+        if (result) {
+            return result;
+        }
+    }
+
+    return false;
 }
