@@ -2,6 +2,9 @@
     "css.lint.emptyRules": "ignore",
     "css.lint.unknownProperties": "ignore",
     "files.exclude": {
+        ".*": true,
+        "next-env.d.ts": true,
+        "package-lock.json": true,
         "**/.DS_Store": true,
         "**/node_modules/**": true
     },
