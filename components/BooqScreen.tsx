@@ -205,8 +205,8 @@ function Footer({ position, booqLength, nextChapter }: {
     const total = pageForPosition(booqLength);
     const chapter = pageForPosition(nextChapter);
     const leftPages = chapter - page;
-    const leftLabel = leftPages === 0 ? 'Last page'
-        : leftPages === 1 ? `${leftPages} page left`
+    const leftLabel = leftPages <= 0 ? 'Last page'
+        : leftPages === 1 ? '1 page left'
             : `${leftPages} pages left`
     return <nav className='container'>
         <div className='left'>
