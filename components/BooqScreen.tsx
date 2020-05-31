@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { positionForPath, samePath, BooqPath, BooqRange } from 'core';
 import {
     BooqData, BooqAnchor, usePalette, useSettings, useReportHistory, pageForPosition,
@@ -35,13 +35,16 @@ export function BooqScreen({
     const nextChapter = booq.fragment.next
         ? positionForPath(booq.fragment.nodes, booq.fragment.next.path)
         : booq.length;
-    const range: BooqRange = {
+    const range: BooqRange = useMemo(() => ({
         start: booq.fragment.current.path,
         end: booq.fragment.next?.path,
-    };
-    const colorization: Colorization[] = quote
-        ? [{ range: quote, color: 'orange' }]
-        : [];
+    }), [booq]);
+    const colorization: Colorization[] = useMemo(
+        () => quote
+            ? [{ range: quote, color: 'orange' }]
+            : [],
+        [quote],
+    );
 
     return <div className='container'>
         <Header booqId={booq.id} path={currentPath} />
@@ -100,28 +103,30 @@ function quoteText(text: string, booqId: string, range: BooqRange) {
 function useScrollHandler({ id, fragment }: BooqData) {
     const [currentPath, setCurrentPath] = useState(fragment.current.path);
     const { reportHistory } = useReportHistory();
+    const onScroll = useCallback(function (path: BooqPath) {
+        if (!samePath(path, currentPath)) {
+            setCurrentPath(path);
+            reportHistory({
+                booqId: id,
+                path,
+                source: 'not-implemented',
+            });
+        }
+    }, [id]);
     return {
         currentPath,
-        onScroll(path: BooqPath) {
-            if (!samePath(path, currentPath)) {
-                setCurrentPath(path);
-                reportHistory({
-                    booqId: id,
-                    path,
-                    source: 'not-implemented',
-                });
-            }
-        },
+        onScroll,
     };
 }
 
 function useSelectionHandler() {
     const selection = useRef<BooqSelection>();
+    const onSelection = useCallback(function (newSelection?: BooqSelection) {
+        selection.current = newSelection;
+    }, [selection]);
     return {
         selection,
-        onSelection(newSelection?: BooqSelection) {
-            selection.current = newSelection;
-        },
+        onSelection,
     };
 }
 
