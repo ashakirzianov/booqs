@@ -165,18 +165,20 @@ function applyColorizationOnSpans(spans: ColorizedSpan[], colorization: Coloriza
 function applyColorizationOnSpan(span: ColorizedSpan, { range, color }: Colorization): ColorizedSpan[] {
     const [prefix, offset] = breakPath(span.path);
     const [startPrefix, startOffset] = breakPath(range.start);
-    if (!samePath(prefix, startPrefix)) {
-        return [span];
-    }
     const [endPrefix, endOffset] = range.end
         ? breakPath(range.end)
         : [undefined, undefined];
 
     const len = span.text.length;
-    const start = startOffset - offset;
-    const end = endPrefix !== undefined && endOffset !== undefined && samePath(endPrefix, prefix)
-        ? endOffset - offset
-        : len;
+    const start = samePath(startPrefix, prefix) ? startOffset - offset
+        : pathLessThan(startPrefix, prefix) ? 0
+            : len;
+    const end = endPrefix !== undefined && endOffset !== undefined
+        ? (
+            samePath(prefix, endPrefix) ? endOffset - offset
+                : pathLessThan(prefix, endPrefix) ? len : 0
+        )
+        : 0;
     const pointA = 0;
     const pointB = Math.min(Math.max(start, 0), len);
     const pointC = Math.min(Math.max(end, 0), len);

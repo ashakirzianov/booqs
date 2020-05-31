@@ -45,7 +45,7 @@ export const getStaticProps: GetStaticProps<
             if (quote) {
                 const booq = await fetchBooqFragment(booqId, quote.start);
                 if (booq) {
-                    const path = quote.start.slice(0, quote.start.length - 1);
+                    const path = quote.start; // .slice(0, quote.start.length - 1);
                     return {
                         props: {
                             data: {
