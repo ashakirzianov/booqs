@@ -1,6 +1,7 @@
 {
     "css.lint.emptyRules": "ignore",
     "css.lint.unknownProperties": "ignore",
+    "css.validate": false,
     "files.exclude": {
         ".next": true,
         ".vercel": true,

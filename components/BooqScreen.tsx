@@ -141,10 +141,12 @@ function EmptyLine() {
     return <div style={{ height: headerHeight }} />;
 }
 
+const maxWidth = '1000px';
 function Header({ booqId, path }: {
     booqId: string,
     path: BooqPath,
 }) {
+    const { background } = usePalette();
     return <nav className='container'>
         <div className='left'>
             <div className='button'><FeedButton /></div>
@@ -191,6 +193,12 @@ function Header({ booqId, path }: {
                 margin: 0 ${meter.regular};
                 pointer-events: auto;
             }
+            @media (max-width: ${maxWidth}) {
+                .container {
+                    background: ${background};
+                    box-shadow: 2px 0px 2px rgba(0, 0, 0, 0.3);
+                }
+            }
             `}</style>
     </nav>;
 }
@@ -200,7 +208,7 @@ function Footer({ position, booqLength, nextChapter }: {
     booqLength: number,
     nextChapter: number,
 }) {
-    const { dimmed } = usePalette();
+    const { dimmed, background } = usePalette();
     const page = pageForPosition(position) + 1;
     const total = pageForPosition(booqLength);
     const chapter = pageForPosition(nextChapter);
@@ -224,6 +232,7 @@ function Footer({ position, booqLength, nextChapter }: {
                 justify-content: space-between;
                 position: fixed;
                 bottom: 0; left: 0; right: 0;
+                height: ${headerHeight};
                 pointer-events: none;
             }
             .left, .right {
@@ -241,6 +250,12 @@ function Footer({ position, booqLength, nextChapter }: {
                 font-size: small;
                 margin: ${meter.large};
                 color: ${dimmed};
+            }
+            @media (max-width: ${maxWidth}) {
+                .container {
+                    background: ${background};
+                    box-shadow: -2px 0px 2px rgba(0, 0, 0, 0.3);
+                }
             }
             `}</style>
     </nav>;
