@@ -6,7 +6,7 @@ import {
 import { headerHeight, meter, bookFont } from 'controls/theme';
 import { IconButton, BorderButton } from 'controls/Buttons';
 import { Popovers } from 'controls/Popover';
-import { BooqLink, FeedLink, quoteRef } from 'controls/Links';
+import { BooqLink, FeedLink } from 'controls/Links';
 import { BooqContent, BooqSelection, Colorization } from './BooqContent';
 import { BooqContextMenu } from './BooqContextMenu';
 import { TocButton } from './Toc';
@@ -24,13 +24,6 @@ export function BooqScreen({
     const { fontScale } = useSettings();
     const { onScroll, currentPath } = useScrollHandler(booq);
     const { onSelection, selection } = useSelectionHandler();
-    useOnCopy(useCallback(e => {
-        if (selection && e.clipboardData) {
-            e.preventDefault();
-            const selectionText = quoteText(selection.text, booq.id, selection.range);
-            e.clipboardData.setData('text/plain', selectionText);
-        }
-    }, [selection, booq.id]));
 
     const position = positionForPath(booq.fragment.nodes, currentPath);
     const nextChapter = booq.fragment.next
@@ -65,6 +58,7 @@ export function BooqScreen({
                 colorization={colorization}
             />
             <BooqContextMenu
+                booqId={booq.id}
                 selection={selection}
             />
             <AnchorButton
@@ -97,11 +91,6 @@ export function BooqScreen({
             }
             `}</style>
     </div>;
-}
-
-function quoteText(text: string, booqId: string, range: BooqRange) {
-    const link = `${process.env.NEXT_PUBLIC_URL}${quoteRef(booqId, range)}`;
-    return link;
 }
 
 function useScrollHandler({ id, fragment }: BooqData) {

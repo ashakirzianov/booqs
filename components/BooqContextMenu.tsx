@@ -3,13 +3,25 @@ import React, { useState, useEffect } from 'react';
 import Tippy from '@tippyjs/react';
 import { BooqSelection } from './BooqContent';
 import { Menu, MenuItem } from 'controls/Menu';
+import { eventSubscription } from 'controls/utils';
+import { quoteRef } from 'controls/Links';
+import { BooqRange } from 'core';
 
 export function BooqContextMenu({
+    booqId,
     selection,
 }: {
+    booqId: string,
     selection: BooqSelection | undefined,
 }) {
     const rect = useSelectionRect(selection);
+    useEffect(() => eventSubscription('copy', e => {
+        if (selection && e.clipboardData) {
+            e.preventDefault();
+            const selectionText = generateQuote(selection.text, booqId, selection.range);
+            e.clipboardData.setData('text/plain', selectionText);
+        }
+    }), [selection, booqId]);
     if (!rect || !selection) {
         return null;
     }
@@ -30,6 +42,15 @@ export function BooqContextMenu({
             }} />
         </Tippy>
     </div>;
+}
+
+function generateQuote(text: string, booqId: string, range: BooqRange) {
+    const link = generateLink(booqId, range);
+    return `"${text}" ${link}`;
+}
+
+function generateLink(booqId: string, range: BooqRange) {
+    return `${process.env.NEXT_PUBLIC_URL}${quoteRef(booqId, range)}`;
 }
 
 function useSelectionRect(selection: BooqSelection | undefined) {
