@@ -67,6 +67,9 @@ function getSelectionRect() {
             height: rect.height, width: rect.width,
         } : undefined;
 }
+function removeSelection() {
+    window.getSelection()?.empty();
+}
 
 function useCopyQuote(booqId: string, selection?: BooqSelection) {
     useDocumentEvent('copy', useCallback(e => {
@@ -108,6 +111,7 @@ function CopyQuoteItem({ booqId, selection }: {
         callback={() => {
             const quote = generateQuote(booqId, selection.text, selection.range);
             clipboard.writeText(quote);
+            removeSelection();
         }}
     />;
 }
@@ -121,6 +125,7 @@ function CopyTextItem({ selection }: {
         callback={() => {
             const text = selection.text;
             clipboard.writeText(text);
+            removeSelection();
         }}
     />;
 }
@@ -135,6 +140,7 @@ function CopyLinkItem({ booqId, selection }: {
         callback={() => {
             const link = generateLink(booqId, selection.range);
             clipboard.writeText(link);
+            removeSelection();
         }}
     />;
 }

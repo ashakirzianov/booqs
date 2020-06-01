@@ -4,11 +4,12 @@ import { IconName, Icon } from './Icon';
 import { meter, menuFont } from './theme';
 import { Spinner } from './Spinner';
 
-export function Menu({ width, children }: {
-    width?: string,
+export function Menu({ width, callback, children }: {
     children: ReactNode,
+    width?: string,
+    callback?: () => void,
 }) {
-    return <div>
+    return <div onClick={callback}>
         {children}
         <style jsx>{`
             div {
