@@ -1,11 +1,12 @@
 // eslint-disable-next-line
 import React, { useState, useEffect, useCallback } from 'react';
 import Tippy from '@tippyjs/react';
+import * as clipboard from 'clipboard-polyfill';
+import { BooqRange } from 'core';
 import { BooqSelection } from './BooqContent';
 import { Menu, MenuItem } from 'controls/Menu';
 import { useDocumentEvent } from 'controls/utils';
 import { quoteRef } from 'controls/Links';
-import { BooqRange } from 'core';
 
 export function BooqContextMenu({
     booqId,
@@ -27,7 +28,9 @@ export function BooqContextMenu({
             arrow={false}
             placement='bottom'
             animation='shift-away'
-            content={<ContextMenuContent selection={selection} />}
+            content={<ContextMenuContent
+                booqId={booqId} selection={selection}
+            />}
         >
             <div style={{
                 position: 'fixed',
@@ -69,13 +72,13 @@ function useCopyQuote(booqId: string, selection?: BooqSelection) {
     useDocumentEvent('copy', useCallback(e => {
         if (selection && e.clipboardData) {
             e.preventDefault();
-            const selectionText = generateQuote(selection.text, booqId, selection.range);
+            const selectionText = generateQuote(booqId, selection.text, selection.range);
             e.clipboardData.setData('text/plain', selectionText);
         }
     }, [selection, booqId]));
 }
 
-function generateQuote(text: string, booqId: string, range: BooqRange) {
+function generateQuote(booqId: string, text: string, range: BooqRange) {
     const link = generateLink(booqId, range);
     return `"${text}" ${link}`;
 }
@@ -84,22 +87,28 @@ function generateLink(booqId: string, range: BooqRange) {
     return `${process.env.NEXT_PUBLIC_URL}${quoteRef(booqId, range)}`;
 }
 
-function ContextMenuContent({ selection }: {
+function ContextMenuContent({ booqId, selection }: {
+    booqId: string,
     selection: BooqSelection,
 }) {
     return <Menu width='10rem'>
-        <CopyQuoteItem selection={selection} />
+        <CopyQuoteItem booqId={booqId} selection={selection} />
         <CopyTextItem selection={selection} />
-        <CopyLinkItem selection={selection} />
+        <CopyLinkItem booqId={booqId} selection={selection} />
     </Menu>;
 }
 
-function CopyQuoteItem({ selection }: {
+function CopyQuoteItem({ booqId, selection }: {
+    booqId: string,
     selection: BooqSelection,
 }) {
     return <MenuItem
         text='Copy quote'
         icon='quote'
+        callback={() => {
+            const quote = generateQuote(booqId, selection.text, selection.range);
+            clipboard.writeText(quote);
+        }}
     />;
 }
 
@@ -109,14 +118,23 @@ function CopyTextItem({ selection }: {
     return <MenuItem
         text='Copy text'
         icon='copy'
+        callback={() => {
+            const text = selection.text;
+            clipboard.writeText(text);
+        }}
     />;
 }
 
-function CopyLinkItem({ selection }: {
+function CopyLinkItem({ booqId, selection }: {
+    booqId: string,
     selection: BooqSelection,
 }) {
     return <MenuItem
         text='Copy link'
         icon='link'
+        callback={() => {
+            const link = generateLink(booqId, selection.range);
+            clipboard.writeText(link);
+        }}
     />;
 }
