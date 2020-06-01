@@ -274,12 +274,6 @@ function isPartiallyVisible(element: Element): boolean {
 export type BooqSelection = {
     range: BooqRange,
     text: string,
-    rect: {
-        top: number,
-        left: number,
-        height: number,
-        width: number,
-    },
 };
 function useSelection(callback?: (selection?: BooqSelection) => void) {
     useEffect(() => {
@@ -296,8 +290,7 @@ function useSelection(callback?: (selection?: BooqSelection) => void) {
 
 function getSelection(): BooqSelection | undefined {
     const selection = window.getSelection();
-    const selectionRange = selection?.getRangeAt(0);
-    if (!selection || !selection.anchorNode || !selection.focusNode || !selectionRange) {
+    if (!selection || !selection.anchorNode || !selection.focusNode) {
         return undefined;
     }
 
@@ -310,13 +303,8 @@ function getSelection(): BooqSelection | undefined {
                 : undefined;
         if (range) {
             const text = selection.toString();
-            const rect = selectionRange.getBoundingClientRect();
             return {
                 range, text,
-                rect: {
-                    top: rect.top, left: rect.left,
-                    height: rect.height, width: rect.width,
-                },
             };
         }
 

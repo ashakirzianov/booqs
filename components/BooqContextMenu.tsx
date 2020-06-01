@@ -1,5 +1,5 @@
 // eslint-disable-next-line
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Tippy from '@tippyjs/react';
 import { BooqSelection } from './BooqContent';
 import { Menu, MenuItem } from 'controls/Menu';
@@ -9,10 +9,11 @@ export function BooqContextMenu({
 }: {
     selection: BooqSelection | undefined,
 }) {
-    if (!selection) {
+    const rect = useSelectionRect(selection);
+    if (!rect || !selection) {
         return null;
     }
-    const { top, left, width, height } = selection.rect;
+    const { top, left, width, height } = rect;
     return <Tippy
         visible={true}
         interactive={true}
@@ -27,6 +28,37 @@ export function BooqContextMenu({
             top, left, width, height,
         }} />
     </Tippy>;
+}
+
+function useSelectionRect(selection: BooqSelection | undefined) {
+    const [rect, setRect] = useState<SelectionRect>(undefined);
+    useEffect(() => {
+        if (selection) {
+            setRect(getSelectionRect());
+        }
+    }, [selection]);
+    useEffect(() => {
+        function listener() {
+            if (selection) {
+                setRect(getSelectionRect());
+            }
+        }
+        window.document.addEventListener('scroll', listener);
+        return () => window.document.removeEventListener('scroll', listener);
+    }, [setRect, selection]);
+    return rect;
+}
+
+type SelectionRect = ReturnType<typeof getSelectionRect>;
+function getSelectionRect() {
+    const rect = window.getSelection()
+        ?.getRangeAt(0)
+        ?.getBoundingClientRect();
+    return rect
+        ? {
+            top: rect.top, left: rect.left,
+            height: rect.height, width: rect.width,
+        } : undefined;
 }
 
 function ContextMenuContent({ selection }: {
