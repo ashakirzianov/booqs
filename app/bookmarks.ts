@@ -69,6 +69,11 @@ export function useBookmarkMutations(booqId: string) {
                                 __typename: 'Bookmark',
                                 id, path,
                             });
+                            cache.writeQuery({
+                                query: BookmarksQuery,
+                                variables: { booqId },
+                                data: cached,
+                            });
                         }
                     }
                 },
@@ -92,7 +97,7 @@ export function useBookmarkMutations(booqId: string) {
                                 query: BookmarksQuery,
                                 variables: { booqId },
                                 data: cached,
-                            })
+                            });
                         }
                     }
                 },
