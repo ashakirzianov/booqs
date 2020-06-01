@@ -80,3 +80,18 @@ export function useHighlightMutations(booqId: string) {
         },
     };
 }
+
+const groupColorMapping: {
+    [group in string]: string | undefined;
+} = {
+    first: 'yellow',
+    second: 'blue',
+    third: 'pink',
+    forth: 'violet',
+};
+export function groups() {
+    return Object.keys(groupColorMapping);
+}
+export function colorForGroup(group: string) {
+    return groupColorMapping[group] ?? 'yellow';
+}

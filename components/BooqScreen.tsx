@@ -13,6 +13,7 @@ import { TocButton } from './Toc';
 import { BookmarkButton } from './Bookmark';
 import { Themer } from './Themer';
 import { SignIn } from './SignIn';
+import { useHighlights, colorForGroup } from 'app/highlights';
 
 const contentWidth = '50rem';
 export function BooqScreen({
@@ -33,12 +34,7 @@ export function BooqScreen({
         start: booq.fragment.current.path,
         end: booq.fragment.next?.path,
     }), [booq]);
-    const colorization: Colorization[] = useMemo(
-        () => quote
-            ? [{ range: quote, color: 'orange' }]
-            : [],
-        [quote],
-    );
+    const colorization = useColorization(booq.id, quote);
 
     return <div className='container'>
         <Header booqId={booq.id} path={currentPath} />
@@ -91,6 +87,22 @@ export function BooqScreen({
             }
             `}</style>
     </div>;
+}
+
+function useColorization(booqId: string, quote?: BooqRange) {
+    const { highlights } = useHighlights(booqId);
+    return useMemo(
+        () => {
+            const colorization = highlights.map<Colorization>(h => ({
+                range: { start: h.start, end: h.end },
+                color: colorForGroup(h.group),
+            }));
+            return quote
+                ? [...colorization, { range: quote, color: 'orange' }]
+                : colorization;
+        },
+        [quote, highlights],
+    );
 }
 
 function useScrollHandler({ id, fragment }: BooqData) {
