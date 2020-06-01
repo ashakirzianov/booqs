@@ -14,20 +14,22 @@ export function BooqContextMenu({
         return null;
     }
     const { top, left, width, height } = rect;
-    return <Tippy
-        visible={true}
-        interactive={true}
-        arrow={false}
-        placement='bottom'
-        animation='shift-away'
-        content={<ContextMenuContent selection={selection} />}
-    >
-        <div style={{
-            position: 'fixed',
-            pointerEvents: 'none',
-            top, left, width, height,
-        }} />
-    </Tippy>;
+    return <div>
+        <Tippy
+            visible={true}
+            interactive={true}
+            arrow={false}
+            placement='bottom'
+            animation='shift-away'
+            content={<ContextMenuContent selection={selection} />}
+        >
+            <div style={{
+                position: 'fixed',
+                pointerEvents: 'none',
+                top, left, width, height,
+            }} />
+        </Tippy>
+    </div>;
 }
 
 function useSelectionRect(selection: BooqSelection | undefined) {
