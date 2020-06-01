@@ -2,8 +2,9 @@ import gql from "graphql-tag";
 import { useQuery, useMutation } from "@apollo/react-hooks";
 import { BooqPath, uuid } from "core";
 
-const HighlightsQuery = gql`query HighlightsQuery($bookId: ID!) {
-    booq(id: $bookId) {
+const HighlightsQuery = gql`query HighlightsQuery($booqId: ID!) {
+    booq(id: $booqId) {
+        id
         highlights {
             id
             start
@@ -14,6 +15,7 @@ const HighlightsQuery = gql`query HighlightsQuery($bookId: ID!) {
 }`;
 type HighlightsData = {
     booq: {
+        id: string,
         highlights: {
             __typename: 'BooqHighlight',
             id: string,
@@ -34,7 +36,7 @@ export function useHighlights(booqId: string) {
     };
 }
 
-const AddHighlightMutation = gql`mutation AddHighlight($highlight: HighlightInput) {
+const AddHighlightMutation = gql`mutation AddHighlight($highlight: HighlightInput!) {
     addHighlight(highlight: $highlight)
 }`;
 type AddHighlightData = { addHighlight: boolean };
@@ -73,6 +75,11 @@ export function useHighlightMutations(booqId: string) {
                                 __typename: 'BooqHighlight',
                                 id,
                             });
+                            cache.writeQuery({
+                                query: HighlightsQuery,
+                                variables: { booqId },
+                                data: cached,
+                            });
                         }
                     }
                 },
@@ -81,17 +88,16 @@ export function useHighlightMutations(booqId: string) {
     };
 }
 
+const defaultColor = 'rgba(255, 215, 0, 0.6)';
 const groupColorMapping: {
     [group in string]: string | undefined;
 } = {
-    first: 'yellow',
-    second: 'blue',
-    third: 'pink',
-    forth: 'violet',
+    first: defaultColor,
+    second: 'rgba(135, 206, 235, 0.6)',
+    third: 'rgba(240, 128, 128, 0.6)',
+    forth: 'rgba(75, 0, 130, 0.6)',
 };
-export function groups() {
-    return Object.keys(groupColorMapping);
-}
 export function colorForGroup(group: string) {
-    return groupColorMapping[group] ?? 'yellow';
+    return groupColorMapping[group] ?? defaultColor;
 }
+export const quoteColor = 'rgba(255, 165, 0, 0.6)'

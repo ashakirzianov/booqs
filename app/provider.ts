@@ -24,7 +24,7 @@ const link = ApolloLink.from([
         if (graphQLErrors)
             graphQLErrors.forEach(({ message, locations, path }) =>
                 console.log(
-                    `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`,
+                    `[GraphQL error]: Message: ${message}, Location: ${locations?.join(' ')}, Path: ${path?.join(' ')}`,
                 ),
             );
         if (networkError) console.log(`[Network error]: ${networkError}`);

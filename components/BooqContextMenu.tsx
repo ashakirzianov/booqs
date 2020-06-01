@@ -8,6 +8,8 @@ import { Menu, MenuItem } from 'controls/Menu';
 import { useDocumentEvent } from 'controls/utils';
 import { quoteRef } from 'controls/Links';
 import { useRouter } from 'next/router';
+import { useHighlightMutations } from 'app/highlights';
+import { useAuth } from 'app';
 
 export function BooqContextMenu({
     booqId,
@@ -97,11 +99,33 @@ function ContextMenuContent({ booqId, selection }: {
     booqId: string,
     selection: BooqSelection,
 }) {
+    const { state } = useAuth();
     return <Menu width='10rem'>
+        {
+            state === 'signed'
+                ? <ManageHighlightsItem booqId={booqId} selection={selection} />
+                : null
+        }
         <CopyQuoteItem booqId={booqId} selection={selection} />
-        <CopyTextItem selection={selection} />
+        <CopyTextItem booqId={booqId} selection={selection} />
         <CopyLinkItem booqId={booqId} selection={selection} />
     </Menu>;
+}
+
+function ManageHighlightsItem({ booqId, selection }: {
+    booqId: string,
+    selection: BooqSelection,
+}) {
+    const { addHighlight } = useHighlightMutations(booqId);
+    return <MenuItem
+        text='Highlight'
+        icon='highlight'
+        callback={() => addHighlight({
+            group: 'first',
+            start: selection.range.start,
+            end: selection.range.end ?? selection.range.start,
+        })}
+    />;
 }
 
 function CopyQuoteItem({ booqId, selection }: {
@@ -122,6 +146,7 @@ function CopyQuoteItem({ booqId, selection }: {
 }
 
 function CopyTextItem({ selection }: {
+    booqId: string,
     selection: BooqSelection,
 }) {
     return <MenuItem

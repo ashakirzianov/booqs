@@ -88,6 +88,11 @@ export function useBookmarkMutations(booqId: string) {
                             cached.booq.bookmarks = cached.booq.bookmarks.filter(
                                 bm => bm.id !== id,
                             );
+                            cache.writeQuery({
+                                query: BookmarksQuery,
+                                variables: { booqId },
+                                data: cached,
+                            })
                         }
                     }
                 },

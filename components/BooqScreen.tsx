@@ -13,7 +13,7 @@ import { TocButton } from './Toc';
 import { BookmarkButton } from './Bookmark';
 import { Themer } from './Themer';
 import { SignIn } from './SignIn';
-import { useHighlights, colorForGroup } from 'app/highlights';
+import { useHighlights, colorForGroup, quoteColor } from 'app/highlights';
 
 const contentWidth = '50rem';
 export function BooqScreen({
@@ -98,7 +98,7 @@ function useColorization(booqId: string, quote?: BooqRange) {
                 color: colorForGroup(h.group),
             }));
             return quote
-                ? [...colorization, { range: quote, color: 'orange' }]
+                ? [...colorization, { range: quote, color: quoteColor }]
                 : colorization;
         },
         [quote, highlights],

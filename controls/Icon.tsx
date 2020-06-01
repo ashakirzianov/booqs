@@ -4,7 +4,7 @@ import { FontAwesomeIcon, FontAwesomeIconProps } from '@fortawesome/react-fontaw
 import {
     faPlus, faFontCase, faSignIn, faSignOut, faQuestion, faSearch,
     faFileAlt, faUser, faTimes, faListUl, faBookmark, faAngleLeft,
-    faQuoteRight, faClone, faLink,
+    faQuoteRight, faClone, faLink, faHighlighter,
 } from '@fortawesome/pro-light-svg-icons';
 import {
     faFacebookF,
@@ -20,7 +20,7 @@ export type IconName =
     | 'toc' | 'bookmark-empty' | 'bookmark-solid'
     | 'search' | 'pages'
     | 'facebook'
-    | 'quote' | 'copy' | 'link'
+    | 'quote' | 'copy' | 'link' | 'highlight'
     ;
 
 export function Icon({ name, size }: {
@@ -68,6 +68,8 @@ function iconForName(name: IconName) {
             return faClone;
         case 'link':
             return faLink;
+        case 'highlight':
+            return faHighlighter;
         default:
             assertNever(name);
             return faQuestion;
