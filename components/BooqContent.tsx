@@ -1,10 +1,11 @@
-import React, { memo, createElement, ReactNode, useEffect } from 'react';
+import React, { memo, createElement, ReactNode, useEffect, useCallback } from 'react';
 import { throttle } from 'lodash';
 import {
     BooqPath, BooqRange, BooqNode, BooqElementNode, pathToString, pathInRange, pathLessThan, samePath,
 } from 'core';
 import { pathToId, pathFromId } from 'app';
 import { booqHref } from 'controls/Links';
+import { useDocumentEvent } from 'controls/utils';
 
 export type Colorization = {
     range: BooqRange,
@@ -217,18 +218,14 @@ function breakPath(path: BooqPath) {
 // --- Scroll
 
 function useScroll(callback?: (path: BooqPath) => void) {
-    useEffect(() => {
-        const listener = throttle(function () {
-            if (callback) {
-                const path = getCurrentPath();
-                if (path) {
-                    callback(path);
-                }
+    useDocumentEvent('scroll', useCallback(throttle(function () {
+        if (callback) {
+            const path = getCurrentPath();
+            if (path) {
+                callback(path);
             }
-        }, 500);
-        window.addEventListener('scroll', listener);
-        return () => window.removeEventListener('scroll', listener);
-    }, [callback]);
+        }
+    }, 500), [callback]));
 }
 
 function getCurrentPath() {
@@ -276,16 +273,12 @@ export type BooqSelection = {
     text: string,
 };
 function useSelection(callback?: (selection?: BooqSelection) => void) {
-    useEffect(() => {
-        const listener = function () {
-            if (callback) {
-                const selection = getSelection();
-                callback(selection);
-            }
-        };
-        window.document.addEventListener('selectionchange', listener);
-        return () => window.document.removeEventListener('selectionchange', listener);
-    }, [callback]);
+    useDocumentEvent('selectionchange', useCallback(() => {
+        if (callback) {
+            const selection = getSelection();
+            callback(selection);
+        }
+    }, [callback]));
 }
 
 function getSelection(): BooqSelection | undefined {

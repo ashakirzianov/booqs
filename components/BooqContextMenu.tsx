@@ -1,9 +1,9 @@
 // eslint-disable-next-line
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Tippy from '@tippyjs/react';
 import { BooqSelection } from './BooqContent';
 import { Menu, MenuItem } from 'controls/Menu';
-import { eventSubscription } from 'controls/utils';
+import { useDocumentEvent } from 'controls/utils';
 import { quoteRef } from 'controls/Links';
 import { BooqRange } from 'core';
 
@@ -15,13 +15,7 @@ export function BooqContextMenu({
     selection: BooqSelection | undefined,
 }) {
     const rect = useSelectionRect(selection);
-    useEffect(() => eventSubscription('copy', e => {
-        if (selection && e.clipboardData) {
-            e.preventDefault();
-            const selectionText = generateQuote(selection.text, booqId, selection.range);
-            e.clipboardData.setData('text/plain', selectionText);
-        }
-    }), [selection, booqId]);
+    useCopyQuote(booqId, selection);
     if (!rect || !selection) {
         return null;
     }
@@ -44,15 +38,6 @@ export function BooqContextMenu({
     </div>;
 }
 
-function generateQuote(text: string, booqId: string, range: BooqRange) {
-    const link = generateLink(booqId, range);
-    return `"${text}" ${link}`;
-}
-
-function generateLink(booqId: string, range: BooqRange) {
-    return `${process.env.NEXT_PUBLIC_URL}${quoteRef(booqId, range)}`;
-}
-
 function useSelectionRect(selection: BooqSelection | undefined) {
     const [rect, setRect] = useState<SelectionRect>(undefined);
     useEffect(() => {
@@ -60,15 +45,11 @@ function useSelectionRect(selection: BooqSelection | undefined) {
             setRect(getSelectionRect());
         }
     }, [selection]);
-    useEffect(() => {
-        function listener() {
-            if (selection) {
-                setRect(getSelectionRect());
-            }
+    useDocumentEvent('scroll', useCallback(() => {
+        if (selection) {
+            setRect(getSelectionRect());
         }
-        window.document.addEventListener('scroll', listener);
-        return () => window.document.removeEventListener('scroll', listener);
-    }, [setRect, selection]);
+    }, [setRect, selection]));
     return rect;
 }
 
@@ -82,6 +63,25 @@ function getSelectionRect() {
             top: rect.top, left: rect.left,
             height: rect.height, width: rect.width,
         } : undefined;
+}
+
+function useCopyQuote(booqId: string, selection?: BooqSelection) {
+    useDocumentEvent('copy', useCallback(e => {
+        if (selection && e.clipboardData) {
+            e.preventDefault();
+            const selectionText = generateQuote(selection.text, booqId, selection.range);
+            e.clipboardData.setData('text/plain', selectionText);
+        }
+    }, [selection, booqId]));
+}
+
+function generateQuote(text: string, booqId: string, range: BooqRange) {
+    const link = generateLink(booqId, range);
+    return `"${text}" ${link}`;
+}
+
+function generateLink(booqId: string, range: BooqRange) {
+    return `${process.env.NEXT_PUBLIC_URL}${quoteRef(booqId, range)}`;
 }
 
 function ContextMenuContent({ selection }: {

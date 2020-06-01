@@ -123,13 +123,6 @@ function useSelectionHandler() {
     };
 }
 
-function useOnCopy(callback: (e: ClipboardEvent) => void) {
-    useEffect(() => {
-        window.document.addEventListener('copy', callback);
-        return () => window.document.removeEventListener('copy', callback);
-    }, [callback]);
-}
-
 function EmptyLine() {
     return <div style={{ height: headerHeight }} />;
 }

@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactNode, useEffect } from "react";
 
 type FunctionComponent<P extends {}> = (props: P) => ReactNode;
 
@@ -7,7 +7,9 @@ export type PropsType<T extends FunctionComponent<any>> =
 
 export type HasChildren = { children: ReactNode };
 
-export function eventSubscription<K extends keyof DocumentEventMap>(name: K, listener: (e: DocumentEventMap[K]) => void) {
-    window.document.addEventListener(name, listener);
-    return () => window.document.removeEventListener(name, listener);
+export function useDocumentEvent<K extends keyof DocumentEventMap>(name: K, listener: (e: DocumentEventMap[K]) => void) {
+    useEffect(() => {
+        window.document.addEventListener(name, listener);
+        return () => window.document.removeEventListener(name, listener);
+    }, [listener]);
 }
