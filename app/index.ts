@@ -4,6 +4,7 @@ export * from './booq';
 export * from './collections';
 export * from './common';
 export * from './featured';
+export * from './highlights';
 export * from './history';
 export * from './provider';
 export * from './settings';

@@ -25,6 +25,7 @@ type HighlightsData = {
         }[],
     },
 };
+export type Highlight = HighlightsData['booq']['highlights'][number];
 export function useHighlights(booqId: string) {
     const { loading, data } = useQuery<HighlightsData>(
         HighlightsQuery,
@@ -49,9 +50,24 @@ type AddHighlightVars = {
         end: BooqPath,
     },
 };
+const RemoveHighlightMutation = gql`mutation RemoveHighlight($id: ID!) {
+    removeHighlight(id: $id)
+}`;
+type RemoveHighlightData = { removeHighlight: boolean };
+type RemoveHighlightVars = { id: string };
+
+const UpdateHighlightMutation = gql`mutation UpdateHighlight($id: ID!, $group: String) {
+    updateHighlight(id: $id, group: $group)
+}`;
+type UpdateHighlightData = { updateHighlight: boolean };
+type UpdateHighlightVars = { id: string, group?: string };
+
 export function useHighlightMutations(booqId: string) {
     const [add] = useMutation<AddHighlightData, AddHighlightVars>(
         AddHighlightMutation,
+    );
+    const [remove] = useMutation<RemoveHighlightData, RemoveHighlightVars>(
+        RemoveHighlightMutation,
     );
     return {
         addHighlight(input: {
@@ -84,6 +100,30 @@ export function useHighlightMutations(booqId: string) {
                     }
                 },
             });
+        },
+        removeHighlight(id: string) {
+            remove({
+                variables: { id },
+                optimisticResponse: { removeHighlight: true },
+                update(cache, { data }) {
+                    if (data?.removeHighlight) {
+                        const cached = cache.readQuery<HighlightsData>({
+                            query: HighlightsQuery,
+                            variables: { booqId },
+                        });
+                        if (cached) {
+                            cached.booq.highlights = cached.booq.highlights.filter(
+                                h => h.id !== id,
+                            );
+                            cache.writeQuery<HighlightsData>({
+                                query: HighlightsQuery,
+                                variables: { booqId },
+                                data: cached,
+                            });
+                        }
+                    }
+                }
+            })
         },
     };
 }

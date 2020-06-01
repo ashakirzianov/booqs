@@ -1,15 +1,15 @@
-// eslint-disable-next-line
 import React, { useState, useEffect, useCallback } from 'react';
+import { useRouter } from 'next/router';
 import Tippy from '@tippyjs/react';
 import * as clipboard from 'clipboard-polyfill';
-import { BooqRange } from 'core';
-import { BooqSelection } from './BooqContent';
+import { BooqRange, isOverlapping } from 'core';
+import {
+    useAuth, useHighlightMutations, useHighlights, Highlight,
+} from 'app';
 import { Menu, MenuItem } from 'controls/Menu';
 import { useDocumentEvent } from 'controls/utils';
 import { quoteRef } from 'controls/Links';
-import { useRouter } from 'next/router';
-import { useHighlightMutations } from 'app/highlights';
-import { useAuth } from 'app';
+import { BooqSelection } from './BooqContent';
 
 export function BooqContextMenu({
     booqId,
@@ -99,20 +99,42 @@ function ContextMenuContent({ booqId, selection }: {
     booqId: string,
     selection: BooqSelection,
 }) {
-    const { state } = useAuth();
-    return <Menu width='10rem'>
-        {
-            state === 'signed'
-                ? <ManageHighlightsItem booqId={booqId} selection={selection} />
-                : null
-        }
+    return <Menu width='12rem'>
+        <HighlightsItems booqId={booqId} selection={selection} />
         <CopyQuoteItem booqId={booqId} selection={selection} />
         <CopyTextItem booqId={booqId} selection={selection} />
         <CopyLinkItem booqId={booqId} selection={selection} />
     </Menu>;
 }
 
-function ManageHighlightsItem({ booqId, selection }: {
+function HighlightsItems({ booqId, selection }: {
+    booqId: string,
+    selection: BooqSelection,
+}) {
+    const { state } = useAuth();
+    const { highlights } = useHighlights(booqId);
+    const selected = highlights.filter(h => isOverlapping(selection.range, {
+        start: h.start,
+        end: h.end,
+    }));
+    if (state !== 'signed') {
+        return null;
+    } else if (selected.length) {
+        return <>
+            {
+                selected.map(
+                    (h, idx) => <ManageHighlightItem
+                        key={idx} booqId={booqId} highlight={h}
+                    />
+                )
+            }
+        </>;
+    } else {
+        return <AddHighlightItem booqId={booqId} selection={selection} />;
+    }
+}
+
+function AddHighlightItem({ booqId, selection }: {
     booqId: string,
     selection: BooqSelection,
 }) {
@@ -125,6 +147,18 @@ function ManageHighlightsItem({ booqId, selection }: {
             start: selection.range.start,
             end: selection.range.end ?? selection.range.start,
         })}
+    />;
+}
+
+function ManageHighlightItem({ booqId, highlight }: {
+    booqId: string,
+    highlight: Highlight,
+}) {
+    const { removeHighlight } = useHighlightMutations(booqId);
+    return <MenuItem
+        text='Remove highlight'
+        icon='highlight'
+        callback={() => removeHighlight(highlight.id)}
     />;
 }
 
