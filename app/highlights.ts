@@ -69,6 +69,9 @@ export function useHighlightMutations(booqId: string) {
     const [remove] = useMutation<RemoveHighlightData, RemoveHighlightVars>(
         RemoveHighlightMutation,
     );
+    const [update] = useMutation<UpdateHighlightData, UpdateHighlightVars>(
+        UpdateHighlightMutation,
+    );
     return {
         addHighlight(input: {
             start: BooqPath,
@@ -125,6 +128,33 @@ export function useHighlightMutations(booqId: string) {
                 }
             })
         },
+        updateHighlight(id: string, group: string) {
+            update({
+                variables: { id, group },
+                optimisticResponse: { updateHighlight: true },
+                update(cache, { data }) {
+                    if (data?.updateHighlight) {
+                        const cached = cache.readQuery<HighlightsData>({
+                            query: HighlightsQuery,
+                            variables: { booqId },
+                        });
+                        if (cached) {
+                            const target = cached.booq.highlights.find(
+                                h => h.id === id,
+                            );
+                            if (target) {
+                                target.group = group;
+                                cache.writeQuery<HighlightsData>({
+                                    query: HighlightsQuery,
+                                    variables: { booqId },
+                                    data: cached,
+                                });
+                            }
+                        }
+                    }
+                },
+            });
+        },
     };
 }
 
@@ -140,4 +170,5 @@ const groupColorMapping: {
 export function colorForGroup(group: string) {
     return groupColorMapping[group] ?? defaultColor;
 }
-export const quoteColor = 'rgba(255, 165, 0, 0.6)'
+export const quoteColor = 'rgba(255, 165, 0, 0.6)';
+export const groups = Object.keys(groupColorMapping);
