@@ -7,6 +7,7 @@ import { BooqSelection } from './BooqContent';
 import { Menu, MenuItem } from 'controls/Menu';
 import { useDocumentEvent } from 'controls/utils';
 import { quoteRef } from 'controls/Links';
+import { useRouter } from 'next/router';
 
 export function BooqContextMenu({
     booqId,
@@ -72,13 +73,15 @@ function removeSelection() {
 }
 
 function useCopyQuote(booqId: string, selection?: BooqSelection) {
+    const { prefetch } = useRouter();
     useDocumentEvent('copy', useCallback(e => {
         if (selection && e.clipboardData) {
             e.preventDefault();
             const selectionText = generateQuote(booqId, selection.text, selection.range);
             e.clipboardData.setData('text/plain', selectionText);
+            prefetch(quoteRef(booqId, selection.range));
         }
-    }, [selection, booqId]));
+    }, [selection, booqId, prefetch]));
 }
 
 function generateQuote(booqId: string, text: string, range: BooqRange) {
@@ -105,6 +108,7 @@ function CopyQuoteItem({ booqId, selection }: {
     booqId: string,
     selection: BooqSelection,
 }) {
+    const { prefetch } = useRouter();
     return <MenuItem
         text='Copy quote'
         icon='quote'
@@ -112,6 +116,7 @@ function CopyQuoteItem({ booqId, selection }: {
             const quote = generateQuote(booqId, selection.text, selection.range);
             clipboard.writeText(quote);
             removeSelection();
+            prefetch(quoteRef(booqId, selection.range));
         }}
     />;
 }
@@ -134,6 +139,7 @@ function CopyLinkItem({ booqId, selection }: {
     booqId: string,
     selection: BooqSelection,
 }) {
+    const { prefetch } = useRouter();
     return <MenuItem
         text='Copy link'
         icon='link'
@@ -141,6 +147,7 @@ function CopyLinkItem({ booqId, selection }: {
             const link = generateLink(booqId, selection.range);
             clipboard.writeText(link);
             removeSelection();
+            prefetch(quoteRef(booqId, selection.range));
         }}
     />;
 }
