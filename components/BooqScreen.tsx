@@ -8,6 +8,7 @@ import { IconButton, BorderButton } from 'controls/Buttons';
 import { Popovers } from 'controls/Popover';
 import { BooqLink, FeedLink, quoteRef } from 'controls/Links';
 import { BooqContent, BooqSelection, Colorization } from './BooqContent';
+import { BooqContextMenu } from './BooqContextMenu';
 import { TocButton } from './Toc';
 import { BookmarkButton } from './Bookmark';
 import { Themer } from './Themer';
@@ -24,9 +25,9 @@ export function BooqScreen({
     const { onScroll, currentPath } = useScrollHandler(booq);
     const { onSelection, selection } = useSelectionHandler();
     useOnCopy(useCallback(e => {
-        if (selection.current && e.clipboardData) {
+        if (selection && e.clipboardData) {
             e.preventDefault();
-            const selectionText = quoteText(selection.current.text, booq.id, selection.current.range);
+            const selectionText = quoteText(selection.text, booq.id, selection.range);
             e.clipboardData.setData('text/plain', selectionText);
         }
     }, [selection, booq.id]));
@@ -62,6 +63,9 @@ export function BooqScreen({
                 onScroll={onScroll}
                 onSelection={onSelection}
                 colorization={colorization}
+            />
+            <BooqContextMenu
+                selection={selection}
             />
             <AnchorButton
                 booqId={booq.id}
@@ -120,10 +124,10 @@ function useScrollHandler({ id, fragment }: BooqData) {
 }
 
 function useSelectionHandler() {
-    const selection = useRef<BooqSelection>();
+    const [selection, setSelection] = useState<BooqSelection | undefined>(undefined);
     const onSelection = useCallback(function (newSelection?: BooqSelection) {
-        selection.current = newSelection;
-    }, [selection]);
+        setSelection(newSelection);
+    }, [setSelection]);
     return {
         selection,
         onSelection,

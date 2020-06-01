@@ -274,6 +274,12 @@ function isPartiallyVisible(element: Element): boolean {
 export type BooqSelection = {
     range: BooqRange,
     text: string,
+    rect: {
+        top: number,
+        left: number,
+        height: number,
+        width: number,
+    },
 };
 function useSelection(callback?: (selection?: BooqSelection) => void) {
     useEffect(() => {
@@ -290,7 +296,8 @@ function useSelection(callback?: (selection?: BooqSelection) => void) {
 
 function getSelection(): BooqSelection | undefined {
     const selection = window.getSelection();
-    if (!selection || !selection.anchorNode || !selection.focusNode) {
+    const selectionRange = selection?.getRangeAt(0);
+    if (!selection || !selection.anchorNode || !selection.focusNode || !selectionRange) {
         return undefined;
     }
 
@@ -298,14 +305,23 @@ function getSelection(): BooqSelection | undefined {
     const focusPath = getSelectionPath(selection.focusNode, selection.focusOffset);
 
     if (anchorPath && focusPath) {
-        const range = pathLessThan(anchorPath, focusPath)
-            ? { start: anchorPath, end: focusPath }
-            : { start: focusPath, end: anchorPath };
-        const text = selection.toString();
-        return { range, text };
-    } else {
-        return undefined;
+        const range = pathLessThan(anchorPath, focusPath) ? { start: anchorPath, end: focusPath }
+            : pathLessThan(focusPath, anchorPath) ? { start: focusPath, end: anchorPath }
+                : undefined;
+        if (range) {
+            const text = selection.toString();
+            const rect = selectionRange.getBoundingClientRect();
+            return {
+                range, text,
+                rect: {
+                    top: rect.top, left: rect.left,
+                    height: rect.height, width: rect.width,
+                },
+            };
+        }
+
     }
+    return undefined;
 }
 
 function getSelectionPath(node: Node, offset: number) {

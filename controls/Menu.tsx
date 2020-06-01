@@ -1,11 +1,13 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { usePalette } from 'app';
 import { IconName, Icon } from './Icon';
-import { HasChildren } from './utils';
-import { meter } from './theme';
+import { meter, menuFont } from './theme';
 import { Spinner } from './Spinner';
 
-export function Menu({ children }: HasChildren) {
+export function Menu({ width, children }: {
+    width?: string,
+    children: ReactNode,
+}) {
     return <div>
         {children}
         <style jsx>{`
@@ -14,6 +16,7 @@ export function Menu({ children }: HasChildren) {
                 flex-direction: column;
                 align-items: stretch;
                 flex: 1;
+                width: ${width ?? 'auto'};
             }
             `}</style>
     </div>;
@@ -46,7 +49,9 @@ export function MenuItem({ icon, text, callback, spinner }: {
                 align-items: center;
                 padding: ${meter.large};
                 cursor: pointer;
-                font-size: large;
+                font-size: small;
+                font-family: ${menuFont};
+                user-select: none;
             }
             .container:hover {
                 color: ${background};
