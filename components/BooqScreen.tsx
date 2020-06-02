@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useRef, useEffect, useCallback, useMemo, ReactNode } from 'react';
 import { positionForPath, samePath, BooqPath, BooqRange } from 'core';
 import {
     BooqData, BooqAnchor, usePalette, useSettings, useReportHistory, pageForPosition,
@@ -14,6 +14,7 @@ import { BookmarkButton } from './Bookmark';
 import { Themer } from './Themer';
 import { SignIn } from './SignIn';
 import { useHighlights, colorForGroup, quoteColor } from 'app/highlights';
+import { Spinner } from 'controls/Spinner';
 
 const contentWidth = '50rem';
 export function BooqScreen({
@@ -89,6 +90,26 @@ export function BooqScreen({
     </div>;
 }
 
+export function LoadingBooqScreen() {
+    return <div className='container'>
+        <LoadingHeader />
+        <span className='label'>Loading...</span>
+        <Spinner />
+        <style jsx>{`
+            .container {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 100vw;
+                height: 100vh;
+            }
+            .label {
+                margin: ${meter.large};
+            }
+            `}</style>
+    </div>;
+}
+
 function useColorization(booqId: string, quote?: BooqRange) {
     const { highlights } = useHighlights(booqId);
     return useMemo(
@@ -141,18 +162,26 @@ function EmptyLine() {
 
 const maxWidth = '1000px';
 function Header({ booqId, path }: {
-    booqId: string,
-    path: BooqPath,
+    booqId?: string,
+    path?: BooqPath,
 }) {
     const { background } = usePalette();
     return <nav className='container'>
         <div className='left'>
             <div className='button'><FeedButton /></div>
-            <div className='button'><TocButton booqId={booqId} /></div>
+            {
+                booqId
+                    ? <div className='button'><TocButton booqId={booqId} /></div>
+                    : null
+            }
         </div>
         <div className='right'>
             <div className='button'>
-                <BookmarkButton booqId={booqId} path={path} />
+                {
+                    booqId && path
+                        ? <BookmarkButton booqId={booqId} path={path} />
+                        : null
+                }
             </div>
             <Popovers>
                 {
@@ -199,6 +228,10 @@ function Header({ booqId, path }: {
             }
             `}</style>
     </nav>;
+}
+
+function LoadingHeader() {
+    return <Header />;
 }
 
 function Footer({ position, booqLength, nextChapter }: {

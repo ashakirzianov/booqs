@@ -4,7 +4,7 @@ import { useBooq, BooqData, pathToId } from "app";
 import { BooqPath, BooqRange } from 'core';
 import { Spinner } from "../controls/Spinner";
 import { Page } from "./Page";
-import { BooqScreen } from "./BooqScreen";
+import { BooqScreen, LoadingBooqScreen } from "./BooqScreen";
 
 type PageData = {
     kind: 'preloaded',
@@ -42,7 +42,7 @@ export function BooqPage({ data }: BooqPageProps) {
 
 function LoadingPage() {
     return <Page title='Loading...'>
-        <Spinner />
+        <LoadingBooqScreen />
     </Page>;
 }
 
@@ -59,7 +59,7 @@ function ClientSidePage({ booqId, path, quote }: {
 }) {
     const { loading, booq } = useBooq(booqId, path);
     if (loading) {
-        return <LoadingPage />;
+        return <LoadingBooqScreen />;
     } else if (!booq) {
         return <NotFoundPage />;
     }
