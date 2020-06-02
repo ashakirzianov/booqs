@@ -36,14 +36,22 @@ export function BooqScreen({
         end: booq.fragment.next?.path,
     }), [booq]);
     const colorization = useColorization(booq.id, quote);
-    const { locked, lock, unlock } = useSelectionLocks();
+    const {
+        contextMenuLocked, controlsVisible,
+        onMouseDown, onMouseLeave, onMouseUp,
+    } = useMouseHandlers();
 
     return <div className='container'
-        onMouseDown={lock}
-        onMouseUp={unlock}
-        onMouseLeave={unlock}
+        onMouseDown={onMouseDown}
+        onMouseUp={onMouseUp}
+        onMouseLeave={onMouseLeave}
+        onTouchStart={onMouseDown}
+        onTouchEnd={onMouseUp}
+        onTouchCancel={onMouseLeave}
     >
-        <Header booqId={booq.id} path={currentPath} />
+        <Header
+            booqId={booq.id} path={currentPath} visible={controlsVisible}
+        />
         <EmptyLine />
         <div className='booq'>
             <AnchorButton
@@ -60,7 +68,7 @@ export function BooqScreen({
                 colorization={colorization}
             />
             <BooqContextMenu
-                locked={locked}
+                locked={contextMenuLocked}
                 booqId={booq.id}
                 selection={selection}
             />
@@ -72,6 +80,7 @@ export function BooqScreen({
         </div>
         <EmptyLine />
         <Footer
+            visible={controlsVisible}
             position={position}
             nextChapter={nextChapter}
             booqLength={booq.length}
@@ -118,13 +127,34 @@ export function LoadingBooqScreen() {
     </div>;
 }
 
-function useSelectionLocks() {
+function useMouseHandlers() {
     const [locked, setLocked] = useState(false);
+    const [visible, setVisible] = useState(false);
     return {
-        locked,
-        lock: () => setLocked(true),
-        unlock: () => setLocked(false),
+        contextMenuLocked: locked,
+        controlsVisible: visible,
+        onMouseDown() {
+            setLocked(true);
+        },
+        onMouseUp() {
+            setLocked(false);
+            if (!isAnythingSelected()) {
+                setVisible(!visible);
+            }
+        },
+        onMouseLeave() {
+            setLocked(false);
+        },
     };
+}
+
+function isAnythingSelected() {
+    const selection = window.getSelection();
+    if (!selection) {
+        return false;
+    }
+    return selection.anchorNode !== selection.focusNode
+        || selection.anchorOffset !== selection.focusOffset;
 }
 
 function useColorization(booqId: string, quote?: BooqRange) {
@@ -178,11 +208,15 @@ function EmptyLine() {
 }
 
 const maxWidth = '1000px';
-function Header({ booqId, path }: {
+function Header({ booqId, path, visible }: {
     booqId?: string,
     path?: BooqPath,
+    visible: boolean,
 }) {
     const { background } = usePalette();
+    if (!visible) {
+        return null;
+    }
     return <nav className='container'>
         <div className='left'>
             <div className='button'><FeedButton /></div>
@@ -248,15 +282,19 @@ function Header({ booqId, path }: {
 }
 
 function LoadingHeader() {
-    return <Header />;
+    return <Header visible={true} />;
 }
 
-function Footer({ position, booqLength, nextChapter }: {
+function Footer({ position, booqLength, nextChapter, visible }: {
+    visible: boolean,
     position: number,
     booqLength: number,
     nextChapter: number,
 }) {
     const { dimmed, background } = usePalette();
+    if (!visible) {
+        return null;
+    }
     const page = pageForPosition(position) + 1;
     const total = pageForPosition(booqLength);
     const chapter = pageForPosition(nextChapter);
