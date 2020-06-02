@@ -102,6 +102,7 @@ export function LoadingBooqScreen() {
                 justify-content: center;
                 width: 100vw;
                 height: 100vh;
+                font-size: large;
             }
             .label {
                 margin: ${meter.large};
