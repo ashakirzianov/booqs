@@ -1,13 +1,13 @@
 import { ReactNode, createElement } from 'react';
 import { ApolloProvider } from '@apollo/react-hooks';
-import { ApolloClient } from 'apollo-client';
+import { ApolloClient, OperationVariables, QueryOptions } from 'apollo-client';
 import { InMemoryCache } from 'apollo-cache-inmemory';
 import { ApolloLink } from 'apollo-link';
 import { onError } from 'apollo-link-error';
 import { setContext } from 'apollo-link-context';
 import { createUploadLink } from 'apollo-upload-client';
 import fetch from 'isomorphic-unfetch';
-import { initialPaletteData } from './palette';
+import { initialSettingsData } from './settings';
 import { restoreAuthToken, initialAuthData, initAuth } from './auth';
 
 const link = ApolloLink.from([
@@ -24,7 +24,7 @@ const link = ApolloLink.from([
         if (graphQLErrors)
             graphQLErrors.forEach(({ message, locations, path }) =>
                 console.log(
-                    `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`,
+                    `[GraphQL error]: Message: ${message}, Location: ${locations?.join(' ')}, Path: ${path?.join(' ')}`,
                 ),
             );
         if (networkError) console.log(`[Network error]: ${networkError}`);
@@ -43,7 +43,7 @@ const client = new ApolloClient({
 
 const initialData = {
     data: {
-        ...initialPaletteData,
+        ...initialSettingsData,
         ...initialAuthData,
     },
 };
@@ -63,4 +63,11 @@ export function AppProvider({ children }: {
             children,
         },
     );
+}
+
+export function doQuery<Data = any, Vars = OperationVariables>(options: QueryOptions<Vars>) {
+    return client.query<Data, Vars>({
+        ...options,
+        fetchPolicy: 'network-only',
+    });
 }

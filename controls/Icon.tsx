@@ -3,17 +3,24 @@ import React from 'react';
 import { FontAwesomeIcon, FontAwesomeIconProps } from '@fortawesome/react-fontawesome';
 import {
     faPlus, faFontCase, faSignIn, faSignOut, faQuestion, faSearch,
-    faFileAlt, faUser, faTimes,
+    faFileAlt, faUser, faTimes, faListUl, faBookmark, faAngleLeft,
+    faQuoteRight, faClone, faLink, faHighlighter, faTrashAlt,
 } from '@fortawesome/pro-light-svg-icons';
 import {
     faFacebookF,
 } from '@fortawesome/free-brands-svg-icons';
+import {
+    faBookmark as faSolidBookmark,
+} from '@fortawesome/free-solid-svg-icons';
 
 export type IconName =
+    | 'back'
     | 'user' | 'sign-in' | 'sign-out'
-    | 'upload' | 'appearance' | 'close'
+    | 'upload' | 'appearance' | 'close' | 'remove'
+    | 'toc' | 'bookmark-empty' | 'bookmark-solid'
     | 'search' | 'pages'
     | 'facebook'
+    | 'quote' | 'copy' | 'link' | 'highlight'
     ;
 
 export function Icon({ name, size }: {
@@ -29,6 +36,8 @@ export function Icon({ name, size }: {
 
 function iconForName(name: IconName) {
     switch (name) {
+        case 'back':
+            return faAngleLeft;
         case 'user':
             return faUser;
         case 'sign-in':
@@ -37,6 +46,14 @@ function iconForName(name: IconName) {
             return faSignOut;
         case 'close':
             return faTimes;
+        case 'remove':
+            return faTrashAlt;
+        case 'toc':
+            return faListUl;
+        case 'bookmark-empty':
+            return faBookmark;
+        case 'bookmark-solid':
+            return faSolidBookmark;
         case 'appearance':
             return faFontCase;
         case 'upload':
@@ -47,6 +64,14 @@ function iconForName(name: IconName) {
             return faFileAlt;
         case 'facebook':
             return faFacebookF;
+        case 'quote':
+            return faQuoteRight;
+        case 'copy':
+            return faClone;
+        case 'link':
+            return faLink;
+        case 'highlight':
+            return faHighlighter;
         default:
             assertNever(name);
             return faQuestion;

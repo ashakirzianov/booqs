@@ -11,6 +11,8 @@ export const extraBoldWeight = 700;
 
 export const radius = '4px';
 
+export const headerHeight = '3rem';
+
 export const meter = {
     small: meterSize(0.5),
     regular: meterSize(1),

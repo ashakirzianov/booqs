@@ -1,13 +1,13 @@
 import { useRef, useState } from "react";
-import { ActionButton, IconButton } from "../controls/Buttons";
-import { meter } from "../controls/theme";
-import { useAuth, useUpload } from "../app";
+import { useAuth, useUpload } from "app";
+import { ActionButton, IconButton } from "controls/Buttons";
+import { meter } from "controls/theme";
 import {
     SelectFileDialogRef, SelectFileDialog,
-} from "../controls/SelectFileDialog";
-import { Spinner } from "../controls/Spinner";
-import { PopoverSingleton, Popover } from "../controls/Popover";
-import { Modal } from "../controls/Modal";
+} from "controls/SelectFileDialog";
+import { Spinner } from "controls/Spinner";
+import { PopoverSingleton, Popover } from "controls/Popover";
+import { Modal } from "controls/Modal";
 
 export function Upload({ singleton }: {
     singleton: PopoverSingleton,

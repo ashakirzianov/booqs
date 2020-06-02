@@ -1,7 +1,7 @@
 import React, { ReactNode } from 'react';
 import { roundArrow } from 'tippy.js';
 import Tippy, { useSingleton } from '@tippyjs/react';
-import { usePalette } from '../app';
+import { usePalette } from 'app';
 import { panelShadow, radius } from './theme';
 
 export type PopoverSingleton = ReturnType<typeof useSingleton>[1];

@@ -1,5 +1,5 @@
 import React from 'react';
-import { usePalette } from '../app';
+import { usePalette } from 'app';
 import { Icon, IconName } from "./Icon";
 import {
     buttonShadow, meter, radius,
@@ -66,33 +66,66 @@ export function ActionButton({ text, onClick }: {
     </>;
 }
 
-export function LinkButton({ text, onClick, loading }: {
+export function TextButton({ text, onClick, loading }: {
     text: string,
     onClick?: () => void,
     loading?: boolean,
 }) {
     const { action, highlight } = usePalette();
     return <>
-        <a onClick={onClick}>
+        <span className='button' onClick={onClick}>
             {text}
             {
                 loading
                     ? <Spinner />
                     : null
             }
-        </a>
+        </span>
         <style jsx>{`
-        a {
+        .button {
             color: ${action};
             text-decoration: none;
             font-size: large;
             cursor: pointer;
             transition: color 0.25s;
         }
-        a:hover {
+        .button:hover {
             color: ${highlight};
             text-decoration: underline;
         }
         `}</style>
     </>;
+}
+
+export function BorderButton({ text, icon, onClick }: {
+    text: string,
+    icon?: IconName,
+    onClick?: () => void,
+}) {
+    const { dimmed, highlight } = usePalette();
+    return <div className='button' onClick={onClick}>
+        {
+            !icon ? null :
+                <div className='icon'><Icon name={icon} /></div>
+        }
+        {text}
+        <style jsx>{`
+            .icon {
+                margin: 0 ${meter.regular} 0 0;
+            }
+            .button {
+                display: flex;
+                color: ${dimmed};
+                border: 2px solid ${dimmed};
+                border-radius: ${radius};
+                text-decoration: none;
+                padding: ${meter.regular};
+                cursor: pointer;
+            }
+            .button:hover {
+                color: ${highlight};
+                border-color: ${highlight};
+            }
+            `}</style>
+    </div>;
 }

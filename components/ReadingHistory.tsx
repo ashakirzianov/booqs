@@ -1,22 +1,80 @@
-import { BooqPreview, BooqPreviewProps } from "../controls/BooqPreview";
-import { meter } from "../controls/theme";
+import React from 'react';
+import { useHistory, pageForPosition, useAuth } from "app";
+import { BooqPreview } from "controls/BooqPreview";
+import { meter } from "controls/theme";
+import { BooqLink } from 'controls/Links';
+import { FacebookSignButton } from './SignIn';
 
+const historyPanelHeight = '15em';
 export function ReadingHistory() {
-    return <Positions previews={[]} />;
+    const { state } = useAuth();
+    const { history } = useHistory();
+    if (state !== 'signed') {
+        return <SignInPanel />;
+    } else if (!history.length) {
+        return <EmptyHistory />;
+    } else {
+        return <HistoryItems items={history} />;
+    }
 }
 
-function Positions({ previews }: {
-    previews: BooqPreviewProps[],
+function SignInPanel() {
+    return <div className='container'>
+        <span>Sign in to see history</span>
+        <FacebookSignButton />
+        <style jsx>{`
+            .container {
+                display: flex;
+                flex-flow: column;
+                align-items: center;
+                justify-content: center;
+                height: ${historyPanelHeight};
+            }
+            span {
+                margin-bottom: ${meter.large};
+                font-weight: bold;
+            }
+            `}</style>
+    </div>;
+}
+
+function EmptyHistory() {
+    return <div className='container'>
+        <span>Your reading history will appear here</span>
+        <style jsx>{`
+            .container {
+                display: flex;
+                flex-flow: column;
+                align-items: center;
+                justify-content: center;
+                height: ${historyPanelHeight};
+            }
+            span {
+                font-weight: bold;
+            }
+            `}</style>
+    </div>;
+}
+
+type HistoryItem = ReturnType<typeof useHistory>['history'][number];
+function HistoryItems({ items }: {
+    items: HistoryItem[],
 }) {
-    if (!previews.length) {
-        return null;
-    }
     return <div className='container'>
         {
-            previews.map(
-                (p, idx) => <div key={idx} className='preview'>
-                    <BooqPreview {...p} />
-                </div>
+            items.map(
+                (entry, idx) =>
+                    <div key={idx} className='preview'>
+                        <BooqLink booqId={entry.id} path={entry.path}>
+                            <BooqPreview
+                                path={entry.path}
+                                text={entry.preview}
+                                title={entry.title ?? ''}
+                                page={pageForPosition(entry.position)}
+                                total={pageForPosition(entry.length)}
+                            />
+                        </BooqLink>
+                    </div>
             )
         }
         <style jsx>{`

@@ -1,12 +1,15 @@
-import React from 'react';
-import { usePalette } from '../app';
+import React, { ReactNode } from 'react';
+import { usePalette } from 'app';
 import { IconName, Icon } from './Icon';
-import { HasChildren } from './utils';
-import { meter } from './theme';
+import { meter, menuFont } from './theme';
 import { Spinner } from './Spinner';
 
-export function Menu({ children }: HasChildren) {
-    return <div>
+export function Menu({ width, callback, children }: {
+    children: ReactNode,
+    width?: string,
+    callback?: () => void,
+}) {
+    return <div onClick={callback}>
         {children}
         <style jsx>{`
             div {
@@ -14,6 +17,7 @@ export function Menu({ children }: HasChildren) {
                 flex-direction: column;
                 align-items: stretch;
                 flex: 1;
+                width: ${width ?? 'auto'};
             }
             `}</style>
     </div>;
@@ -46,7 +50,9 @@ export function MenuItem({ icon, text, callback, spinner }: {
                 align-items: center;
                 padding: ${meter.large};
                 cursor: pointer;
-                font-size: large;
+                font-size: small;
+                font-family: ${menuFont};
+                user-select: none;
             }
             .container:hover {
                 color: ${background};

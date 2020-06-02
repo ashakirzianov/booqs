@@ -1,9 +1,11 @@
 import {
+    usePalette, PaletteName, palettes, useSetSettings, useSettings,
+} from 'app';
+import {
     bookFont, buttonShadow, meter,
-} from "../controls/theme";
-import { usePalette, PaletteName, palettes, useSetPalette } from '../app';
-import { PopoverSingleton, Popover } from "../controls/Popover";
-import { IconButton } from "../controls/Buttons";
+} from "controls/theme";
+import { PopoverSingleton, Popover } from "controls/Popover";
+import { IconButton } from "controls/Buttons";
 
 export function Themer({ singleton }: {
     singleton: PopoverSingleton,
@@ -40,9 +42,11 @@ function ThemerPanel() {
 }
 
 function FontSettings() {
+    const { fontScale } = useSettings();
+    const { setFontScale } = useSetSettings();
     return <div className="container">
-        <FontScaleButton scale='down' />
-        <FontScaleButton scale='up' />
+        <FontScaleButton scale='down' onClick={() => setFontScale(fontScale - 10)} />
+        <FontScaleButton scale='up' onClick={() => setFontScale(fontScale + 10)} />
         <style jsx>{`
             .container {
                 display: flex;
@@ -55,14 +59,15 @@ function FontSettings() {
     </div>
 }
 
-function FontScaleButton({ scale }: {
+function FontScaleButton({ scale, onClick }: {
     scale: 'up' | 'down',
+    onClick: () => void,
 }) {
     const { highlight } = usePalette();
     const fontSize = scale === 'up'
         ? 'xx-large'
         : 'large';
-    return <div>
+    return <div onClick={onClick}>
         <span>Abc</span>
         <style jsx>{`
             div {
@@ -81,12 +86,12 @@ function FontScaleButton({ scale }: {
 }
 
 function PalettePicker() {
-    const { name } = usePalette();
-    const setPalette = useSetPalette();
+    const { paletteName } = useSettings();
+    const { setPalette } = useSetSettings();
     return <div>
-        <PaletteButton name='light' current={name} onSelect={setPalette} />
-        <PaletteButton name='sepia' current={name} onSelect={setPalette} />
-        <PaletteButton name='dark' current={name} onSelect={setPalette} />
+        <PaletteButton name='light' current={paletteName} onSelect={setPalette} />
+        <PaletteButton name='sepia' current={paletteName} onSelect={setPalette} />
+        <PaletteButton name='dark' current={paletteName} onSelect={setPalette} />
         <style jsx>{`
             div {
                 display: flex;

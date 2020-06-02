@@ -1,6 +1,6 @@
 import React from 'react';
+import { usePalette } from 'app';
 import { meter } from './theme';
-import { usePalette } from '../app';
 
 export type BooqTag = {
     tag: string,
