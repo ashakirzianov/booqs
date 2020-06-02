@@ -14,15 +14,15 @@ import { Icon } from 'controls/Icon';
 import { meter, radius } from 'controls/theme';
 
 export function BooqContextMenu({
-    booqId,
-    selection,
+    booqId, selection, locked,
 }: {
     booqId: string,
     selection: BooqSelection | undefined,
+    locked: boolean,
 }) {
     const rect = useSelectionRect(selection);
     useCopyQuote(booqId, selection);
-    if (!rect || !selection) {
+    if (!rect || !selection || locked) {
         return null;
     }
     const { top, left, width, height } = rect;

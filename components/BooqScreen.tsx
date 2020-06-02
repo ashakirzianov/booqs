@@ -36,8 +36,13 @@ export function BooqScreen({
         end: booq.fragment.next?.path,
     }), [booq]);
     const colorization = useColorization(booq.id, quote);
+    const { locked, lock, unlock } = useSelectionLocks();
 
-    return <div className='container'>
+    return <div className='container'
+        onMouseDown={lock}
+        onMouseUp={unlock}
+        onMouseLeave={unlock}
+    >
         <Header booqId={booq.id} path={currentPath} />
         <EmptyLine />
         <div className='booq'>
@@ -55,6 +60,7 @@ export function BooqScreen({
                 colorization={colorization}
             />
             <BooqContextMenu
+                locked={locked}
                 booqId={booq.id}
                 selection={selection}
             />
@@ -110,6 +116,15 @@ export function LoadingBooqScreen() {
             }
             `}</style>
     </div>;
+}
+
+function useSelectionLocks() {
+    const [locked, setLocked] = useState(false);
+    return {
+        locked,
+        lock: () => setLocked(true),
+        unlock: () => setLocked(false),
+    };
 }
 
 function useColorization(booqId: string, quote?: BooqRange) {
