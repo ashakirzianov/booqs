@@ -183,6 +183,9 @@ function ManageHighlightItem({ booqId, highlight }: {
                 font-size: small;
                 user-select: none;
             }
+            .remove {
+                font-size: large;
+            }
             .remove:hover {
                 color: ${highlightColor};
             }
@@ -190,7 +193,7 @@ function ManageHighlightItem({ booqId, highlight }: {
     </div>;
 }
 
-const circleSize = '1rem';
+const circleSize = '1.25rem';
 function CircleButton({ color, callback }: {
     color: string,
     callback: () => void,
