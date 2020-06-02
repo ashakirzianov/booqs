@@ -1,5 +1,5 @@
 import { GetStaticPaths, GetStaticProps } from "next";
-import { pathFromString, rangeFromString } from 'core';
+import { pathFromString, rangeFromString, BooqPath, BooqRange } from 'core';
 import { fetchBooqFragment } from "app";
 import { BooqPage, BooqPageProps } from "components/BooqPage";
 
@@ -13,6 +13,39 @@ export const getStaticPaths: GetStaticPaths<QueryParams> = async () => {
     };
 }
 
+async function buildProps({ booqId, path, quote, preload }: {
+    booqId: string,
+    path?: BooqPath,
+    quote?: BooqRange,
+    preload: boolean,
+}) {
+    path = quote?.start ?? path;
+    if (preload) {
+        const booq = await fetchBooqFragment(booqId, path);
+        if (booq) {
+            return {
+                props: {
+                    data: {
+                        kind: 'preloaded' as const,
+                        booq, path, quote,
+                    }
+                },
+            };
+        } else {
+            return { props: { data: { kind: 'not-found' as const } } };
+        }
+    } else {
+        return {
+            props: {
+                data: {
+                    kind: 'client-side' as const,
+                    booqId, quote, path,
+                },
+            },
+        };
+    }
+}
+
 export const getStaticProps: GetStaticProps<
     BooqPageProps, QueryParams
 > = async ({ params }) => {
@@ -21,51 +54,23 @@ export const getStaticProps: GetStaticProps<
         return { props: { data: { kind: 'not-found' } } };
     }
     const booqId = `${source}/${id}`;
+    const preload = source !== 'uu';
     switch (qualifier) {
-        case 'path': {
-            if (param === '0') {
-                const booq = await fetchBooqFragment(booqId, [0]);
-                if (booq) {
-                    return {
-                        props: { data: { kind: 'preloaded', booq } },
-                    };
-                }
-            } else {
-                const path = pathFromString(param);
-                if (path) {
-                    return {
-                        props: { data: { kind: 'client-side', booqId, path } },
-                    };
-                }
-            }
-            break;
-        }
+        case 'path':
+            return buildProps({
+                booqId,
+                path: pathFromString(param),
+                preload,
+            });
         case 'quote': {
-            const quote = rangeFromString(param);
-            if (quote) {
-                const booq = await fetchBooqFragment(booqId, quote.start);
-                if (booq) {
-                    const path = quote.start; // .slice(0, quote.start.length - 1);
-                    return {
-                        props: {
-                            data: {
-                                kind: 'preloaded', path, booq, quote,
-                            },
-                        },
-                    };
-                }
-            }
-            break;
+            return buildProps({
+                booqId,
+                quote: rangeFromString(param),
+                preload,
+            });
         }
-        case undefined: {
-            const booq = await fetchBooqFragment(booqId);
-            if (booq) {
-                return {
-                    props: { data: { kind: 'preloaded', booq } },
-                };
-            }
-            break;
-        }
+        case undefined:
+            return buildProps({ booqId, preload });
     }
     return { props: { data: { kind: 'not-found' } } };
 };

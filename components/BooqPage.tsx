@@ -14,7 +14,7 @@ type PageData = {
 } | {
     kind: 'client-side',
     booqId: string,
-    path: BooqPath,
+    path?: BooqPath,
     quote?: BooqRange,
 } | {
     kind: 'not-found',
