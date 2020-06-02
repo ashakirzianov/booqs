@@ -11,7 +11,7 @@ import { useDocumentEvent } from 'controls/utils';
 import { quoteRef } from 'controls/Links';
 import { BooqSelection } from './BooqContent';
 import { Icon } from 'controls/Icon';
-import { meter, radius } from 'controls/theme';
+import { meter, radius, panelShadow } from 'controls/theme';
 
 export function BooqContextMenu({
     booqId, selection, locked,
@@ -20,6 +20,7 @@ export function BooqContextMenu({
     selection: BooqSelection | undefined,
     locked: boolean,
 }) {
+    const { primary, background, border } = usePalette();
     const rect = useSelectionRect(selection);
     useCopyQuote(booqId, selection);
     if (!rect || !selection || locked) {
@@ -43,6 +44,20 @@ export function BooqContextMenu({
                 top, left, width, height,
             }} />
         </Tippy>
+        <style jsx global>{`
+        .tippy-box {
+            color: ${primary};
+            background-color: ${background};
+            box-shadow: ${panelShadow};
+            border: 1px solid ${border};
+            border-radius: ${radius};
+        }
+        .tippy-content {
+            padding: 0;
+            overflow: hidden;
+            border-radius: ${radius};
+        }
+            `}</style>
     </div>;
 }
 
