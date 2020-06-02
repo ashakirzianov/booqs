@@ -36,21 +36,20 @@ export function BooqScreen({
         end: booq.fragment.next?.path,
     }), [booq]);
     const colorization = useColorization(booq.id, quote);
-    const {
-        contextMenuLocked, controlsVisible,
-        onMouseDown, onMouseLeave, onMouseUp,
-    } = useMouseHandlers();
+    const { locked, lock, unlock } = useMenuLock();
+    const { visible, toggle } = useControlsVisibility();
 
     return <div className='container'
-        onMouseDown={onMouseDown}
-        onMouseUp={onMouseUp}
-        onMouseLeave={onMouseLeave}
-        onTouchStart={onMouseDown}
-        onTouchEnd={onMouseUp}
-        onTouchCancel={onMouseLeave}
+        onMouseDown={lock}
+        onTouchStart={lock}
+        onMouseUp={unlock}
+        onTouchEnd={unlock}
+        onMouseLeave={unlock}
+        onTouchCancel={unlock}
+        onClick={toggle}
     >
         <Header
-            booqId={booq.id} path={currentPath} visible={controlsVisible}
+            booqId={booq.id} path={currentPath} visible={visible}
         />
         <EmptyLine />
         <div className='booq'>
@@ -68,7 +67,7 @@ export function BooqScreen({
                 colorization={colorization}
             />
             <BooqContextMenu
-                locked={contextMenuLocked}
+                locked={locked}
                 booqId={booq.id}
                 selection={selection}
             />
@@ -80,7 +79,7 @@ export function BooqScreen({
         </div>
         <EmptyLine />
         <Footer
-            visible={controlsVisible}
+            visible={visible}
             position={position}
             nextChapter={nextChapter}
             booqLength={booq.length}
@@ -127,23 +126,24 @@ export function LoadingBooqScreen() {
     </div>;
 }
 
-function useMouseHandlers() {
+function useMenuLock() {
     const [locked, setLocked] = useState(false);
     const [visible, setVisible] = useState(false);
     return {
-        contextMenuLocked: locked,
-        controlsVisible: visible,
-        onMouseDown() {
-            setLocked(true);
-        },
-        onMouseUp() {
-            setLocked(false);
+        locked,
+        lock: () => setLocked(true),
+        unlock: () => setLocked(false),
+    };
+}
+
+function useControlsVisibility() {
+    const [visible, setVisible] = useState(false);
+    return {
+        visible,
+        toggle() {
             if (!isAnythingSelected()) {
                 setVisible(!visible);
             }
-        },
-        onMouseLeave() {
-            setLocked(false);
         },
     };
 }
