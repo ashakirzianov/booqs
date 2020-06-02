@@ -64,9 +64,6 @@ function renderNode(node: BooqNode, ctx: RenderContext): ReactNode {
         case 'stub':
             return null;
         case 'element':
-            if (node.name === 'img') {
-                return null; //TODO: support images
-            }
             return createElement(
                 node.name === 'a' && ctx.withinAnchor
                     ? 'span' // Do not nest anchors
@@ -114,7 +111,22 @@ function getProps(node: BooqElementNode, { path, booqId, range }: RenderContext)
         href: node.ref
             ? hrefForPath(node.ref, booqId, range)
             : node.attrs?.href,
+        src: node.attrs?.src
+            ? (
+                isExternalSrc(node.attrs.src)
+                    ? node.attrs.src
+                    : imageFullSrc(booqId, node.attrs.src)
+            )
+            : undefined,
     };
+}
+
+function isExternalSrc(src: string) {
+    return src.startsWith('http://') || src.startsWith('https://') || src.startsWith('www.');
+}
+
+function imageFullSrc(booqId: string, src: string) {
+    return `https://booqs-images.s3.amazonaws.com/${booqId}/${src}`;
 }
 
 function hrefForPath(path: BooqPath, booqId: string, range: BooqRange): string {
