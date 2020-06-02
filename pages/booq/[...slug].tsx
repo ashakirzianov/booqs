@@ -15,13 +15,13 @@ export const getStaticPaths: GetStaticPaths<QueryParams> = async () => {
 
 async function buildProps({ booqId, path, quote, preload }: {
     booqId: string,
-    path?: BooqPath,
-    quote?: BooqRange,
+    path: BooqPath | null,
+    quote: BooqRange | null,
     preload: boolean,
 }) {
     path = quote?.start ?? path;
     if (preload) {
-        const booq = await fetchBooqFragment(booqId, path);
+        const booq = await fetchBooqFragment(booqId, path ?? undefined);
         if (booq) {
             return {
                 props: {
@@ -59,18 +59,20 @@ export const getStaticProps: GetStaticProps<
         case 'path':
             return buildProps({
                 booqId,
-                path: pathFromString(param),
+                path: pathFromString(param) ?? null,
+                quote: null,
                 preload,
             });
         case 'quote': {
             return buildProps({
                 booqId,
-                quote: rangeFromString(param),
+                quote: rangeFromString(param) ?? null,
+                path: null,
                 preload,
             });
         }
         case undefined:
-            return buildProps({ booqId, preload });
+            return buildProps({ booqId, preload, path: null, quote: null });
     }
     return { props: { data: { kind: 'not-found' } } };
 };
