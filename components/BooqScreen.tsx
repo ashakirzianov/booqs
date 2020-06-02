@@ -3,7 +3,7 @@ import { positionForPath, samePath, BooqPath, BooqRange } from 'core';
 import {
     BooqData, BooqAnchor, usePalette, useSettings, useReportHistory, pageForPosition,
 } from 'app';
-import { headerHeight, meter, bookFont } from 'controls/theme';
+import { headerHeight, meter, bookFont, menuFont } from 'controls/theme';
 import { IconButton, BorderButton } from 'controls/Buttons';
 import { Popovers } from 'controls/Popover';
 import { BooqLink, FeedLink } from 'controls/Links';
@@ -103,6 +103,7 @@ export function LoadingBooqScreen() {
                 width: 100vw;
                 height: 100vh;
                 font-size: large;
+                font-family: ${menuFont};
             }
             .label {
                 margin: ${meter.large};
