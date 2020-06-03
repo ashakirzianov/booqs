@@ -1,5 +1,7 @@
-import React, { memo, createElement, ReactNode, useCallback, useState, useRef } from 'react';
-import { throttle, debounce } from 'lodash';
+import React, {
+    createElement, ReactNode, useCallback, useRef, useMemo,
+} from 'react';
+import { throttle } from 'lodash';
 import {
     BooqPath, BooqRange, BooqNode, BooqElementNode, pathToString, pathInRange, pathLessThan, samePath,
 } from 'core';
@@ -11,7 +13,7 @@ export type Colorization = {
     range: BooqRange,
     color: string,
 };
-export const BooqContent = memo(function BooqContent({
+export const BooqContent = (function BooqContent({
     booqId, nodes, range, colorization,
     onScroll, onSelection, onClick,
 }: {
@@ -26,14 +28,16 @@ export const BooqContent = memo(function BooqContent({
     useOnScroll(onScroll);
     useOnSelection(onSelection);
     useOnClick(onClick);
-    return <div id='booq-root' className='container'>
-        {
-            renderNodes(nodes, {
-                booqId, range, colorization,
-                path: [],
-            })
-        }
-    </div>;
+    return useMemo(function () {
+        return <div id='booq-root' className='container'>
+            {
+                renderNodes(nodes, {
+                    booqId, range, colorization,
+                    path: [],
+                })
+            }
+        </div>;
+    }, [nodes, booqId, range, colorization]);
 });
 
 function useOnClick(callback?: () => void) {

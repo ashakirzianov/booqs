@@ -4,7 +4,7 @@ import {
     BooqData, BooqAnchor, useSettings, useReportHistory,
     useHighlights, colorForGroup, quoteColor,
 } from 'app';
-import { headerHeight, meter, bookFont, menuFont, extraBoldWeight, boldWeight } from 'controls/theme';
+import { headerHeight, meter, bookFont } from 'controls/theme';
 import { BorderButton } from 'controls/Buttons';
 import { BooqLink } from 'controls/Links';
 import { Spinner } from 'controls/Spinner';
@@ -151,7 +151,7 @@ function useColorization(booqId: string, quote?: BooqRange) {
 function useScrollHandler({ id, fragment }: BooqData) {
     const [currentPath, setCurrentPath] = useState(fragment.current.path);
     const { reportHistory } = useReportHistory();
-    const onScroll = useCallback(function (path: BooqPath) {
+    const onScroll = function (path: BooqPath) {
         if (!samePath(path, currentPath)) {
             setCurrentPath(path);
             reportHistory({
@@ -160,7 +160,7 @@ function useScrollHandler({ id, fragment }: BooqData) {
                 source: 'not-implemented',
             });
         }
-    }, [id]);
+    };
     return {
         currentPath,
         onScroll,
@@ -169,9 +169,9 @@ function useScrollHandler({ id, fragment }: BooqData) {
 
 function useSelectionHandler() {
     const [selection, setSelection] = useState<BooqSelection | undefined>(undefined);
-    const onSelection = useCallback(function (newSelection?: BooqSelection) {
+    const onSelection = function (newSelection?: BooqSelection) {
         setSelection(newSelection);
-    }, [setSelection]);
+    };
     return {
         selection,
         onSelection,
