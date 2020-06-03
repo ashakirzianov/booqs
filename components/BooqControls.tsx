@@ -83,6 +83,9 @@ export function Header({ booqId, path, visible }: {
                     background: ${background};
                     box-shadow: 2px 0px 2px rgba(0, 0, 0, 0.3);
                 }
+                .feed, .toc, .bookmark, .themer, .sign {
+                    margin: 0 ${meter.small};
+                }
             }
             `}</style>
     </nav>;
