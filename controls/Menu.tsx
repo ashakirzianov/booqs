@@ -1,7 +1,7 @@
 import React, { ReactNode } from 'react';
 import { usePalette } from 'app';
 import { IconName, Icon } from './Icon';
-import { meter, menuFont } from './theme';
+import { meter, menuFont, boldWeight } from './theme';
 import { Spinner } from './Spinner';
 
 export function Menu({ width, callback, children }: {
@@ -52,6 +52,7 @@ export function MenuItem({ icon, text, callback, spinner }: {
                 cursor: pointer;
                 font-size: small;
                 font-family: ${menuFont};
+                font-weight: ${boldWeight};
                 user-select: none;
             }
             .container:hover {

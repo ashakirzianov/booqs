@@ -4,7 +4,7 @@ import {
     BooqData, BooqAnchor, useSettings, useReportHistory,
     useHighlights, colorForGroup, quoteColor,
 } from 'app';
-import { headerHeight, meter, bookFont, menuFont } from 'controls/theme';
+import { headerHeight, meter, bookFont, menuFont, extraBoldWeight, boldWeight } from 'controls/theme';
 import { BorderButton } from 'controls/Buttons';
 import { BooqLink } from 'controls/Links';
 import { Spinner } from 'controls/Spinner';
@@ -94,7 +94,6 @@ export function BooqScreen({
 export function LoadingBooqScreen() {
     return <div className='container'>
         <LoadingHeader />
-        <span className='label'>Loading...</span>
         <Spinner />
         <style jsx>{`
             .container {
@@ -103,8 +102,7 @@ export function LoadingBooqScreen() {
                 justify-content: center;
                 width: 100vw;
                 height: 100vh;
-                font-size: large;
-                font-family: ${menuFont};
+                font-size: xx-large;
             }
             .label {
                 margin: ${meter.large};
