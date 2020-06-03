@@ -74,7 +74,7 @@ export function Header({ booqId, path, visible }: {
                 grid-column: 6 / span 1;
             }
             .feed, .toc, .bookmark, .themer, .sign {
-                margin: 0 ${meter.regular};
+                margin: 0 ${meter.large};
                 pointer-events: auto;
             }
             @media (max-width: ${transparentMaxWidth}) {
