@@ -354,16 +354,14 @@ function getSelection(): BooqSelection | undefined {
 }
 
 function getSelectionPath(node: Node, offset: number) {
-    if (isElement(node)) {
-        return pathFromId(node.id);
-    } else if (node.parentElement) {
+    if (node.parentElement) {
         const path = pathFromId(node.parentElement.id);
-        return path
-            ? [...path, offset]
-            : undefined;
-    } else {
-        return undefined;
+        if (path) {
+            path[path.length - 1] += offset;
+            return path;
+        }
     }
+    return undefined;
 }
 
 function isElement(node: Node): node is Element {
