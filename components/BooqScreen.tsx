@@ -118,7 +118,9 @@ function useControlsVisibility() {
     return {
         visible,
         toggle: useCallback(() => {
-            setVisible(!visible);
+            if (!isAnythingSelected()) {
+                setVisible(!visible);
+            }
         }, [visible, setVisible]),
     };
 }
