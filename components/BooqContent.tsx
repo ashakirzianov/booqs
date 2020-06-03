@@ -1,5 +1,5 @@
 import React, { memo, createElement, ReactNode, useEffect, useCallback } from 'react';
-import { throttle } from 'lodash';
+import { throttle, debounce } from 'lodash';
 import {
     BooqPath, BooqRange, BooqNode, BooqElementNode, pathToString, pathInRange, pathLessThan, samePath,
 } from 'core';
@@ -12,7 +12,8 @@ export type Colorization = {
     color: string,
 };
 export const BooqContent = memo(function BooqContent({
-    booqId, nodes, range, colorization, onScroll, onSelection,
+    booqId, nodes, range, colorization,
+    onScroll, onSelection, onClick,
 }: {
     booqId: string,
     nodes: BooqNode[],
@@ -20,9 +21,11 @@ export const BooqContent = memo(function BooqContent({
     colorization: Colorization[],
     onScroll?: (path: BooqPath) => void,
     onSelection?: (selection?: BooqSelection) => void,
+    onClick?: () => void,
 }) {
-    useScroll(onScroll);
-    useSelection(onSelection);
+    useOnScroll(onScroll);
+    useOnSelection(onSelection);
+    useOnClick(onClick);
     return <div id='booq-root' className='container'>
         {
             renderNodes(nodes, {
@@ -32,6 +35,28 @@ export const BooqContent = memo(function BooqContent({
         }
     </div>;
 });
+
+function useOnClick(callback?: () => void) {
+    const actual = useCallback(debounce((event: Event) => {
+        if (callback && isEventOnContent(event)) {
+            callback();
+        }
+    }, 200), [callback]);
+    useDocumentEvent('click', actual);
+    useDocumentEvent('touchend', actual);
+}
+
+function isEventOnContent(event: Event): boolean {
+    const id: string | undefined = (event.target as any).id;
+    if (id === undefined) {
+        return false;
+    }
+    const path = pathFromId(id);
+    if (path) {
+        return true;
+    }
+    return id === 'booq-root';
+}
 
 // --- Render
 
@@ -229,7 +254,7 @@ function breakPath(path: BooqPath) {
 
 // --- Scroll
 
-function useScroll(callback?: (path: BooqPath) => void) {
+function useOnScroll(callback?: (path: BooqPath) => void) {
     useDocumentEvent('scroll', useCallback(throttle(function () {
         if (callback) {
             const path = getCurrentPath();
@@ -284,7 +309,7 @@ export type BooqSelection = {
     range: BooqRange,
     text: string,
 };
-function useSelection(callback?: (selection?: BooqSelection) => void) {
+function useOnSelection(callback?: (selection?: BooqSelection) => void) {
     useDocumentEvent('selectionchange', useCallback(() => {
         if (callback) {
             const selection = getSelection();

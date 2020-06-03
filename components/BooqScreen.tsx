@@ -35,15 +35,7 @@ export function BooqScreen({
     const { locked, lock, unlock } = useMenuLock();
     const { visible, toggle } = useControlsVisibility();
 
-    return <div className='container'
-        onMouseDown={lock}
-        onTouchStart={lock}
-        onMouseUp={unlock}
-        onTouchEnd={unlock}
-        onMouseLeave={unlock}
-        onTouchCancel={unlock}
-        onClick={toggle}
-    >
+    return <div className='container'>
         <Header
             booqId={booq.id} path={currentPath} visible={visible}
         />
@@ -58,9 +50,10 @@ export function BooqScreen({
                 booqId={booq.id}
                 nodes={booq.fragment.nodes}
                 range={range}
+                colorization={colorization}
                 onScroll={onScroll}
                 onSelection={onSelection}
-                colorization={colorization}
+                onClick={toggle}
             />
             <BooqContextMenu
                 locked={locked}
@@ -136,11 +129,9 @@ function useControlsVisibility() {
     const [visible, setVisible] = useState(false);
     return {
         visible,
-        toggle() {
-            if (!isAnythingSelected()) {
-                setVisible(!visible);
-            }
-        },
+        toggle: useCallback(() => {
+            setVisible(!visible);
+        }, [visible, setVisible]),
     };
 }
 
