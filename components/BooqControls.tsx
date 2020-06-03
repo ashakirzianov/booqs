@@ -21,16 +21,15 @@ export function Header({ booqId, path, visible }: {
     visible: boolean,
 }) {
     const { background } = usePalette();
-    if (!visible) {
-        return null;
-    }
     return <nav className='container'>
         <div className='feed'><FeedButton /></div>
-        {
-            booqId
-                ? <div className='toc'><TocButton booqId={booqId} /></div>
-                : null
-        }
+        <div className='toc'>
+            {
+                booqId
+                    ? <TocButton booqId={booqId} />
+                    : null
+            }
+        </div>
         <div className='bookmark'>
             {
                 booqId && path
@@ -56,6 +55,8 @@ export function Header({ booqId, path, visible }: {
                 top: 0; left: 0; right: 0;
                 pointer-events: none;
                 z-index: 10;
+                transition: 250ms height;
+                overflow: hidden;
             }
             .feed {
                 grid-column: 1 / span 1;
@@ -80,6 +81,7 @@ export function Header({ booqId, path, visible }: {
             }
             @media (max-width: ${transparentMaxWidth}) {
                 .container {
+                    height: ${visible ? headerHeight : '0px'};
                     background: ${background};
                     box-shadow: 2px 0px 2px rgba(0, 0, 0, 0.3);
                 }
@@ -102,9 +104,6 @@ export function Footer({ position, booqLength, nextChapter, visible }: {
     nextChapter: number,
 }) {
     const { dimmed, background } = usePalette();
-    if (!visible) {
-        return null;
-    }
     const page = pageForPosition(position) + 1;
     const total = pageForPosition(booqLength);
     const chapter = pageForPosition(nextChapter);
@@ -126,10 +125,12 @@ export function Footer({ position, booqLength, nextChapter, visible }: {
                 flex-flow: row nowrap;
                 align-items: center;
                 justify-content: space-between;
+                height: ${headerHeight};
                 position: fixed;
                 bottom: 0; left: 0; right: 0;
-                height: ${headerHeight};
                 pointer-events: none;
+                transition: 250ms height;
+                overflow: hidden;
             }
             .left, .right {
                 display: flex;
@@ -149,6 +150,7 @@ export function Footer({ position, booqLength, nextChapter, visible }: {
             }
             @media (max-width: ${transparentMaxWidth}) {
                 .container {
+                    height: ${visible ? headerHeight : '0px'};
                     background: ${background};
                     box-shadow: -2px 0px 2px rgba(0, 0, 0, 0.3);
                 }
