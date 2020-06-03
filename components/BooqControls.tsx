@@ -22,70 +22,67 @@ export function Header({ booqId, path, visible }: {
 }) {
     const { background } = usePalette();
     return <nav className='container'>
-        <div className='feed'><FeedButton /></div>
-        <div className='toc'>
-            {
-                booqId
-                    ? <TocButton booqId={booqId} />
-                    : null
-            }
+        <div className='left'>
+            <div className='button'><FeedButton /></div>
+            <div className='button'>
+                {
+                    booqId
+                        ? <TocButton booqId={booqId} />
+                        : null
+                }
+            </div>
         </div>
-        <div className='bookmark'>
-            {
-                booqId && path
-                    ? <BookmarkButton booqId={booqId} path={path} />
-                    : null
-            }
+        <div className='right'>
+            <div className='button'>
+                {
+                    booqId && path
+                        ? <BookmarkButton booqId={booqId} path={path} />
+                        : null
+                }
+            </div>
+            <Popovers>
+                {
+                    singleton => <>
+                        <div className='button'><Themer singleton={singleton} /></div>
+                        <div className='button'><SignIn singleton={singleton} /></div>
+                    </>
+                }
+            </Popovers>
         </div>
-        <Popovers>
-            {
-                singleton => <>
-                    <div className='themer'><Themer singleton={singleton} /></div>
-                    <div className='sign'><SignIn singleton={singleton} /></div>
-                </>
-            }
-        </Popovers>
         <style jsx>{`
             .container {
-                display: grid;
-                grid-template-columns: auto auto 1fr auto auto auto;
-                grid-template-rows: 100%;
+                display: flex;
+                flex-flow: row;
+                justify-content: space-between;
+                align-items: center;
                 height: ${headerHeight};
                 position: fixed;
                 top: 0; left: 0; right: 0;
                 pointer-events: none;
                 z-index: 10;
-                transition: 250ms height;
-                overflow: hidden;
+                transition: 250ms top;
             }
-            .feed {
-                grid-column: 1 / span 1;
+            .left {
+                display: flex;
+                flex-flow: row;
+                justify-content: flex-start;
             }
-            .toc {
-                grid-column: 2 / span 1;
+            .right {
+                display: flex;
+                flex-flow: row;
+                justify-content: flex-end;
             }
-            .bookmark {
-                grid-column: 4 / span 1;
-            }
-            .themer {
-                grid-column: 5 / span 1;
-            }
-            .sign {
-                grid-column: 6 / span 1;
-            }
-            .feed, .toc, .bookmark, .themer, .sign {
-                align-self: center;
-                justify-self: center;
+            .button {
                 margin: 0 ${meter.regular};
                 pointer-events: auto;
             }
             @media (max-width: ${transparentMaxWidth}) {
                 .container {
-                    height: ${visible ? headerHeight : '0px'};
+                    top: ${visible ? 0 : '-' + headerHeight};
                     background: ${background};
                     box-shadow: 2px 0px 2px rgba(0, 0, 0, 0.3);
                 }
-                .feed, .toc, .bookmark, .themer, .sign {
+                .button {
                     margin: 0 ${meter.small};
                 }
             }
@@ -129,8 +126,7 @@ export function Footer({ position, booqLength, nextChapter, visible }: {
                 position: fixed;
                 bottom: 0; left: 0; right: 0;
                 pointer-events: none;
-                transition: 250ms height;
-                overflow: hidden;
+                transition: 250ms bottom;
             }
             .left, .right {
                 display: flex;
@@ -150,9 +146,9 @@ export function Footer({ position, booqLength, nextChapter, visible }: {
             }
             @media (max-width: ${transparentMaxWidth}) {
                 .container {
-                    height: ${visible ? headerHeight : '0px'};
                     background: ${background};
                     box-shadow: -2px 0px 2px rgba(0, 0, 0, 0.3);
+                    bottom: ${visible ? 0 : '-' + headerHeight};
                 }
             }
             `}</style>
