@@ -311,13 +311,14 @@ export type BooqSelection = {
 };
 function useOnSelection(callback?: (selection?: BooqSelection) => void) {
     const [locked, setLocked] = useState(false);
-    const [unhandled, setUnhandled] = useState<BooqSelection | undefined>(undefined);
+    const [unhandled, setUnhandled] = useState(false);
     const lock = () => setLocked(true);
     const unlock = () => {
         setLocked(false);
-        if (callback) {
-            callback(unhandled);
-            setUnhandled(undefined);
+        if (callback && unhandled) {
+            const selection = getSelection();
+            callback(selection);
+            setUnhandled(false);
         }
     };
     useDocumentEvent('mousedown', lock);
@@ -330,7 +331,7 @@ function useOnSelection(callback?: (selection?: BooqSelection) => void) {
             if (!locked) {
                 callback(selection);
             } else {
-                setUnhandled(selection);
+                setUnhandled(true);
             }
         }
     }, [locked, setUnhandled, callback]));
