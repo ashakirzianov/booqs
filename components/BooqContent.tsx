@@ -1,4 +1,4 @@
-import React, { memo, createElement, ReactNode, useEffect, useCallback, useState } from 'react';
+import React, { memo, createElement, ReactNode, useCallback, useState } from 'react';
 import { throttle, debounce } from 'lodash';
 import {
     BooqPath, BooqRange, BooqNode, BooqElementNode, pathToString, pathInRange, pathLessThan, samePath,
@@ -37,11 +37,11 @@ export const BooqContent = memo(function BooqContent({
 });
 
 function useOnClick(callback?: () => void) {
-    const actual = useCallback(debounce((event: Event) => {
+    const actual = useCallback((event: Event) => {
         if (callback && isEventOnContent(event)) {
             callback();
         }
-    }, 200), [callback]);
+    }, [callback]);
     useDocumentEvent('click', actual);
     useDocumentEvent('touchend', actual);
 }
