@@ -363,7 +363,3 @@ function getSelectionPath(node: Node, offset: number) {
     }
     return undefined;
 }
-
-function isElement(node: Node): node is Element {
-    return node.nodeType === Node.ELEMENT_NODE;
-}

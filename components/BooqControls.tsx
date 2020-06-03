@@ -22,38 +22,34 @@ export function Header({ booqId, path, visible }: {
 }) {
     const { background } = usePalette();
     return <nav className='container'>
-        <div className='left'>
-            <div className='button'><FeedButton /></div>
-            <div className='button'>
-                {
-                    booqId
-                        ? <TocButton booqId={booqId} />
-                        : null
-                }
-            </div>
+        <div className='feed'><FeedButton /></div>
+        <div className='toc'>
+            {
+                booqId
+                    ? <TocButton booqId={booqId} />
+                    : null
+            }
         </div>
-        <div className='right'>
-            <div className='button'>
-                {
-                    booqId && path
-                        ? <BookmarkButton booqId={booqId} path={path} />
-                        : null
-                }
-            </div>
-            <Popovers>
-                {
-                    singleton => <>
-                        <div className='button'><Themer singleton={singleton} /></div>
-                        <div className='button'><SignIn singleton={singleton} /></div>
-                    </>
-                }
-            </Popovers>
+        <div className='bookmark'>
+            {
+                booqId && path
+                    ? <BookmarkButton booqId={booqId} path={path} />
+                    : null
+            }
         </div>
+        <Popovers>
+            {
+                singleton => <>
+                    <div className='themer'><Themer singleton={singleton} /></div>
+                    <div className='sign'><SignIn singleton={singleton} /></div>
+                </>
+            }
+        </Popovers>
         <style jsx>{`
             .container {
-                display: flex;
-                flex-flow: row;
-                justify-content: space-between;
+                display: grid;
+                grid-template-columns: auto auto 1fr auto auto auto;
+                justify-items: center;
                 align-items: center;
                 height: ${headerHeight};
                 position: fixed;
@@ -62,28 +58,34 @@ export function Header({ booqId, path, visible }: {
                 z-index: 10;
                 transition: 250ms top;
             }
-            .left {
-                display: flex;
-                flex-flow: row;
-                justify-content: flex-start;
+            .feed {
+                grid-column: 1 / span 1;
             }
-            .right {
-                display: flex;
-                flex-flow: row;
-                justify-content: flex-end;
+            .toc {
+                grid-column: 2 / span 1;
             }
-            .button {
+            .bookmark {
+                grid-column: 4 / span 1;
+            }
+            .themer {
+                grid-column: 5 / span 1;
+            }
+            .sign {
+                grid-column: 6 / span 1;
+            }
+            .feed, .toc, .bookmark, .themer, .sign {
                 margin: 0 ${meter.regular};
                 pointer-events: auto;
             }
             @media (max-width: ${transparentMaxWidth}) {
                 .container {
+                    grid-template-columns: auto auto 0 auto auto auto;
                     top: ${visible ? 0 : '-' + headerHeight};
                     background: ${background};
                     box-shadow: 2px 0px 2px rgba(0, 0, 0, 0.3);
                 }
-                .button {
-                    margin: 0 ${meter.small};
+                .feed, .toc, .bookmark, .themer, .sign {
+                    margin: 0;
                 }
             }
             `}</style>
