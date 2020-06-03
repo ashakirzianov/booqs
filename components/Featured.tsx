@@ -56,13 +56,14 @@ function FeaturedCard({
             <style jsx>{`
             .container {
                 display: flex;
-                flex-flow: row wrap;
+                flex-flow: column;
                 flex: 1;
                 padding: ${meter.large};
+                align-items: center;
             }
             .cover {
                 display: flex;
-                margin: ${meter.regular} ${meter.xxLarge} ${meter.regular} 0;
+                margin: ${meter.regular};
             }
             .details {
                 display: flex;
@@ -76,6 +77,14 @@ function FeaturedCard({
             }
             .actions {
                 margin: ${meter.large} 0 0 0;
+            }
+            @media (min-width: 600px) {
+                .container {
+                    flex-flow: row wrap;
+                }
+                .cover {
+                    margin: ${meter.regular} ${meter.xxLarge} ${meter.regular} 0;
+                }
             }
             `}</style>
         </div>

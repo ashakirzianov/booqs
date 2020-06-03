@@ -25,32 +25,32 @@ export function AppBar() {
                 flex-direction: row;
                 align-items: center;
                 height: ${headerHeight};
-                padding: 0 ${meter.large};
+                padding: ${meter.xLarge} ${meter.regular};
             }
             .logo {
-                display: flex;
+                display: none;
                 flex-direction: column;
                 flex: 0 0;
                 margin: 0 ${meter.xLarge} 0 0;
             }
-            @media (max-width: 40rem) {
+            @media (min-width: 40rem) {
                 .logo {
-                    display: none;
+                    display: flex;
                 }
                 .container {
-                    padding: ${meter.xLarge} ${meter.regular};
+                    padding: 0 ${meter.large};
                 }
             }
             .search {
                 display: flex;
                 flex-direction: column;
-                flex: 1 1;
+                flex: 1;
             }
             .buttons {
                 display: flex;
                 flex-direction: column;
-                flex: 1 0;
-                max-width: 10rem;
+                flex: 1;
+                max-width: 12rem;
             }
             `}</style>
     </div>;
@@ -68,8 +68,9 @@ function AppButtons() {
         <style jsx>{`
             .buttons-row {
                 display: flex;
+                flex: 1;
                 flex-direction: row;
-                justify-content: space-around;
+                justify-content: space-between;
                 align-items: center;
             }
             `}</style>

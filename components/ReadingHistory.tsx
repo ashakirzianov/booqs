@@ -83,7 +83,7 @@ function HistoryItems({ items }: {
                 flex: 1 1;
                 flex-direction: row;
                 box-sizing: border-box;
-                padding: ${meter.xLarge} 25vw;
+                padding: ${meter.xLarge} ${meter.regular};
                 overflow: scroll;
                 scroll-snap-type: x mandatory;
             }

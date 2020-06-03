@@ -46,7 +46,7 @@ export function Search() {
         input {
             display: flex;
             border: none;
-            width: 7rem;
+            max-width: 7rem;
             margin: ${meter.regular} ${meter.large};
             font: inherit;
             font-size: x-large;
@@ -55,7 +55,7 @@ export function Search() {
             background-color: rgba(0,0,0,0);
         }
         input:focus {
-            width: 100%;
+            max-width: auto;
             border: none;
             outline: none;
         }

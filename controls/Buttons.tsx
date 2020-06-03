@@ -13,12 +13,15 @@ export function IconButton({ icon, onClick }: {
 }) {
     const { dimmed, highlight } = usePalette();
     return <button
+        className='button'
         onClick={onClick}
     >
         <Icon name={icon} />
         <style jsx>{`
-            button {
+            .button {
                 display: flex;
+                margin: 0;
+                padding: 0;
                 height: ${buttonSize};
                 color: ${dimmed};
                 border: none;
@@ -27,10 +30,10 @@ export function IconButton({ icon, onClick }: {
                 transition: color 0.25s;
                 background-color: rgba(0, 0, 0, 0);
             }
-            button:hover {
+            .button:hover {
                 color: ${highlight};
             }
-            button:focus {
+            .button:focus {
                 outline: 0;
             }
         `}</style>
