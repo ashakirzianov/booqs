@@ -1,4 +1,4 @@
-import React, { memo, createElement, ReactNode, useEffect, useCallback } from 'react';
+import React, { memo, createElement, ReactNode, useEffect, useCallback, useState } from 'react';
 import { throttle, debounce } from 'lodash';
 import {
     BooqPath, BooqRange, BooqNode, BooqElementNode, pathToString, pathInRange, pathLessThan, samePath,
@@ -310,12 +310,33 @@ export type BooqSelection = {
     text: string,
 };
 function useOnSelection(callback?: (selection?: BooqSelection) => void) {
+    const [locked, setLocked] = useState(false);
+    const [unhandled, setUnhandled] = useState<BooqSelection | undefined>(undefined);
+    const lock = () => setLocked(true);
+    const unlock = () => {
+        setLocked(false);
+        if (callback) {
+            callback(unhandled);
+            setUnhandled(undefined);
+        }
+    };
+    useDocumentEvent('mousedown', lock);
+    useDocumentEvent('touchstart', lock);
+    useDocumentEvent('mouseup', unlock);
+    useDocumentEvent('touchend', unlock);
+    useDocumentEvent('mouseleave', unlock);
+    useDocumentEvent('touchcancel', unlock);
+
     useDocumentEvent('selectionchange', useCallback(() => {
         if (callback) {
             const selection = getSelection();
-            callback(selection);
+            if (!locked) {
+                callback(selection);
+            } else {
+                setUnhandled(selection);
+            }
         }
-    }, [callback]));
+    }, [locked, setUnhandled, callback]));
 }
 
 function getSelection(): BooqSelection | undefined {

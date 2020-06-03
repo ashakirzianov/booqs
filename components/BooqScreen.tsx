@@ -32,7 +32,6 @@ export function BooqScreen({
         end: booq.fragment.next?.path,
     }), [booq]);
     const colorization = useColorization(booq.id, quote);
-    const { locked, lock, unlock } = useMenuLock();
     const { visible, toggle } = useControlsVisibility();
 
     return <div className='container'>
@@ -56,7 +55,6 @@ export function BooqScreen({
                 onClick={toggle}
             />
             <BooqContextMenu
-                locked={locked}
                 booqId={booq.id}
                 selection={selection}
             />
@@ -113,16 +111,6 @@ export function LoadingBooqScreen() {
             }
             `}</style>
     </div>;
-}
-
-function useMenuLock() {
-    const [locked, setLocked] = useState(false);
-    const [visible, setVisible] = useState(false);
-    return {
-        locked,
-        lock: () => setLocked(true),
-        unlock: () => setLocked(false),
-    };
 }
 
 function useControlsVisibility() {

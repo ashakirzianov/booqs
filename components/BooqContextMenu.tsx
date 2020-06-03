@@ -18,7 +18,7 @@ export function BooqContextMenu({
 }: {
     booqId: string,
     selection: BooqSelection | undefined,
-    locked: boolean,
+    locked?: boolean,
 }) {
     const { primary, background, border } = usePalette();
     const rect = useSelectionRect(selection);
