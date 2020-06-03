@@ -1,39 +1,8 @@
-import React, { useState } from 'react';
-import gql from 'graphql-tag';
-import { useQuery } from '@apollo/react-hooks';
-import { usePalette } from 'app';
+import React from 'react';
+import { usePalette, useSearch, SearchResult } from 'app';
 import { normalWeight, meter, radius } from 'controls/theme';
 import { BooqCover } from 'controls/BooqCover';
 import { Spinner } from 'controls/Spinner';
-
-const SearchQuery = gql`query Search($query: String!) {
-    search(query: $query) {
-        title
-        author
-        cover(size: 60)
-    }
-}`;
-type SearchData = {
-    search: {
-        title?: string,
-        author?: string,
-        cover?: string,
-    }[],
-};
-function useSearch() {
-    const [query, setQuery] = useState('');
-    const { loading, data } = useQuery<SearchData>(
-        SearchQuery,
-        { variables: { query } },
-    );
-
-    return {
-        query,
-        doQuery: setQuery,
-        results: data?.search ?? [],
-        loading,
-    };
-}
 
 export function Search() {
     const { primary, dimmed, background } = usePalette();
@@ -119,7 +88,6 @@ export function Search() {
     </div>;
 }
 
-type SearchResult = SearchData['search'][number];
 function SearchResults({ loading, query, results }: {
     results: SearchResult[],
     query: string,
@@ -129,7 +97,7 @@ function SearchResults({ loading, query, results }: {
         {
             results.map(
                 (result, idx) => <div key={idx} className='result'>
-                    <SearchResult
+                    <SingleResult
                         result={result}
                         query={query}
                     />
@@ -154,7 +122,7 @@ function SearchResults({ loading, query, results }: {
     </div>;
 }
 
-function SearchResult({ result, query }: {
+function SingleResult({ result, query }: {
     result: SearchResult,
     query: string,
 }) {
