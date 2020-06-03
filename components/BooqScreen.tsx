@@ -10,8 +10,9 @@ import { BooqLink } from 'controls/Links';
 import { Spinner } from 'controls/Spinner';
 import { BooqContent, BooqSelection, Colorization } from './BooqContent';
 import { BooqContextMenu } from './BooqContextMenu';
-import { LoadingHeader, Footer, EmptyLine, Header, contentWidth } from './BooqControls';
+import { LoadingHeader, Footer, EmptyLine, Header } from './BooqControls';
 
+const contentWidth = '50rem';
 export function BooqScreen({
     booq, quote,
 }: {

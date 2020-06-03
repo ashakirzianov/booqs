@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { BooqPath } from 'core';
 import { usePalette, pageForPosition } from 'app';
 import { headerHeight, meter } from 'controls/theme';
@@ -10,34 +10,11 @@ import { BookmarkButton } from './Bookmark';
 import { Themer } from './Themer';
 import { SignIn } from './SignIn';
 
-export const contentWidth = '50rem';
-
-export function useControlsVisibility() {
-    const [visible, setVisible] = useState(false);
-    return {
-        visible,
-        toggle() {
-            if (!isAnythingSelected()) {
-                setVisible(!visible);
-            }
-        },
-    };
-}
-
-function isAnythingSelected() {
-    const selection = window.getSelection();
-    if (!selection) {
-        return false;
-    }
-    return selection.anchorNode !== selection.focusNode
-        || selection.anchorOffset !== selection.focusOffset;
-}
-
 export function EmptyLine() {
     return <div style={{ height: headerHeight }} />;
 }
 
-const maxWidth = '1000px';
+const transparentMaxWidth = '1000px';
 export function Header({ booqId, path, visible }: {
     booqId?: string,
     path?: BooqPath,
@@ -48,60 +25,60 @@ export function Header({ booqId, path, visible }: {
         return null;
     }
     return <nav className='container'>
-        <div className='left'>
-            <div className='button'><FeedButton /></div>
+        <div className='feed'><FeedButton /></div>
+        {
+            booqId
+                ? <div className='toc'><TocButton booqId={booqId} /></div>
+                : null
+        }
+        <div className='bookmark'>
             {
-                booqId
-                    ? <div className='button'><TocButton booqId={booqId} /></div>
+                booqId && path
+                    ? <BookmarkButton booqId={booqId} path={path} />
                     : null
             }
         </div>
-        <div className='right'>
-            <div className='button'>
-                {
-                    booqId && path
-                        ? <BookmarkButton booqId={booqId} path={path} />
-                        : null
-                }
-            </div>
-            <Popovers>
-                {
-                    singleton => <>
-                        <div className='button'><Themer singleton={singleton} /></div>
-                        <div className='button'><SignIn singleton={singleton} /></div>
-                    </>
-                }
-            </Popovers>
-        </div>
+        <Popovers>
+            {
+                singleton => <>
+                    <div className='themer'><Themer singleton={singleton} /></div>
+                    <div className='sign'><SignIn singleton={singleton} /></div>
+                </>
+            }
+        </Popovers>
         <style jsx>{`
             .container {
-                display: flex;
-                flex: 1;
-                flex-flow: row nowrap;
-                align-items: center;
-                justify-content: space-between;
+                display: grid;
+                grid-template-columns: auto auto 1fr auto auto auto;
+                grid-template-rows: 100%;
                 height: ${headerHeight};
                 position: fixed;
                 top: 0; left: 0; right: 0;
                 pointer-events: none;
                 z-index: 10;
             }
-            .left, .right {
-                display: flex;
-                flex-flow: row nowrap;
-                align-items: center;
+            .feed {
+                grid-column: 1 / span 1;
             }
-            .left {
-                justify-content: flex-start;
+            .toc {
+                grid-column: 2 / span 1;
             }
-            .right {
-                justify-content: flex-end;
+            .bookmark {
+                grid-column: 4 / span 1;
             }
-            .button {
+            .themer {
+                grid-column: 5 / span 1;
+            }
+            .sign {
+                grid-column: 6 / span 1;
+            }
+            .feed, .toc, .bookmark, .themer, .sign {
+                align-self: center;
+                justify-self: center;
                 margin: 0 ${meter.regular};
                 pointer-events: auto;
             }
-            @media (max-width: ${maxWidth}) {
+            @media (max-width: ${transparentMaxWidth}) {
                 .container {
                     background: ${background};
                     box-shadow: 2px 0px 2px rgba(0, 0, 0, 0.3);
@@ -167,7 +144,7 @@ export function Footer({ position, booqLength, nextChapter, visible }: {
                 margin: ${meter.large};
                 color: ${dimmed};
             }
-            @media (max-width: ${maxWidth}) {
+            @media (max-width: ${transparentMaxWidth}) {
                 .container {
                     background: ${background};
                     box-shadow: -2px 0px 2px rgba(0, 0, 0, 0.3);
