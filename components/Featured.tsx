@@ -9,8 +9,9 @@ import { BooqCover } from 'controls/BooqCover';
 import { boldWeight, meter } from 'controls/theme';
 import { BooqLink } from 'controls/Links';
 
-export function Featured() {
-    const { cards } = useFeatured();
+export function Featured({ cards }: {
+    cards: FeaturedItem[],
+}) {
     return <div>
         {
             cards.map(
