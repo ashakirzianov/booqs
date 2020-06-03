@@ -1,14 +1,19 @@
 import { GetStaticPaths, GetStaticProps } from "next";
 import { pathFromString, rangeFromString, BooqPath, BooqRange } from 'core';
-import { fetchBooqFragment } from "app";
+import { fetchBooqFragment, fetchFeatured } from "app";
 import { BooqPage, BooqPageProps } from "components/BooqPage";
+import { booqHref } from "controls/Links";
 
 type QueryParams = {
     slug: string[],
 };
 export const getStaticPaths: GetStaticPaths<QueryParams> = async () => {
+    const featured = await fetchFeatured();
+    const paths = featured.map(
+        f => booqHref(f.id, [0]),
+    );
     return {
-        paths: [],
+        paths,
         fallback: true,
     };
 }
