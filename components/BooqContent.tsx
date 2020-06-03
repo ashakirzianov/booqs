@@ -1,4 +1,4 @@
-import React, { memo, createElement, ReactNode, useCallback, useState } from 'react';
+import React, { memo, createElement, ReactNode, useCallback, useState, useRef } from 'react';
 import { throttle, debounce } from 'lodash';
 import {
     BooqPath, BooqRange, BooqNode, BooqElementNode, pathToString, pathInRange, pathLessThan, samePath,
@@ -102,27 +102,14 @@ function renderNode(node: BooqNode, ctx: RenderContext): ReactNode {
 function renderTextNode(text: string, { path, colorization }: RenderContext): ReactNode {
     const spans = applyColorization({ text, path: [...path, 0] }, colorization);
     const id = pathToId(path);
-    return <span
-        key={id}
-        id={id}
-    >
-        {
-            spans.map(
-                span => {
-                    if (span.color) {
-                        return <span
-                            id={pathToId(span.path)}
-                            key={pathToId(span.path)}
-                            style={{ background: span.color }}>
-                            {span.text}
-                        </span>;
-                    } else {
-                        return span.text;
-                    }
-                }
-            )
-        }
-    </span>;
+    return spans.map(
+        span => <span
+            id={pathToId(span.path)}
+            key={pathToId(span.path)}
+            style={{ background: span.color }}>
+            {span.text}
+        </span>
+    );
 }
 
 function getProps(node: BooqElementNode, { path, booqId, range }: RenderContext) {
@@ -310,31 +297,36 @@ export type BooqSelection = {
     text: string,
 };
 function useOnSelection(callback?: (selection?: BooqSelection) => void) {
-    const [locked, setLocked] = useState(false);
-    const [unhandled, setUnhandled] = useState(false);
-    const lock = () => setLocked(true);
+    const locked = useRef(false);
+    const unhandled = useRef(false);
+    const lock = () => locked.current = true;
     const unlock = () => {
-        setLocked(false);
-        if (callback && unhandled) {
+        locked.current = false;
+        if (callback && unhandled.current) {
             const selection = getSelection();
             callback(selection);
-            setUnhandled(false);
+            unhandled.current = false;
         }
     };
-    useDocumentEvent('mousedown', lock);
     useDocumentEvent('mouseup', unlock);
-    useDocumentEvent('mouseleave', unlock);
+    useDocumentEvent('mousemove', event => {
+        if (event.buttons) {
+            lock();
+        } else {
+            unlock();
+        }
+    });
 
-    useDocumentEvent('selectionchange', useCallback(() => {
+    useDocumentEvent('selectionchange', useCallback(event => {
         if (callback) {
             const selection = getSelection();
-            if (!locked) {
+            if (!locked.current) {
                 callback(selection);
             } else {
-                setUnhandled(true);
+                unhandled.current = true;
             }
         }
-    }, [locked, setUnhandled, callback]));
+    }, [callback]));
 }
 
 function getSelection(): BooqSelection | undefined {
