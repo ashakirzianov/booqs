@@ -321,11 +321,8 @@ function useOnSelection(callback?: (selection?: BooqSelection) => void) {
         }
     };
     useDocumentEvent('mousedown', lock);
-    useDocumentEvent('touchstart', lock);
     useDocumentEvent('mouseup', unlock);
-    useDocumentEvent('touchend', unlock);
     useDocumentEvent('mouseleave', unlock);
-    useDocumentEvent('touchcancel', unlock);
 
     useDocumentEvent('selectionchange', useCallback(() => {
         if (callback) {
