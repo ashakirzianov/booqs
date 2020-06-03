@@ -3,7 +3,7 @@ import gql from 'graphql-tag';
 import { useQuery } from '@apollo/react-hooks';
 
 const SearchQuery = gql`query Search($query: String!) {
-    search(query: $query) {
+    search(query: $query, limit: 10) {
         title
         author
         cover(size: 60)
