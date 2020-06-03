@@ -3,10 +3,10 @@ import { faSpinnerThird } from '@fortawesome/pro-duotone-svg-icons';
 import { usePalette } from 'app';
 
 export function Spinner() {
-    const { dimmed } = usePalette();
+    const { highlight } = usePalette();
     return <FontAwesomeIcon
         icon={faSpinnerThird}
-        color={dimmed}
+        color={highlight}
         spin
     />;
 }
