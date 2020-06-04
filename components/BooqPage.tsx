@@ -86,9 +86,11 @@ function usePathNavigation(path?: BooqPath) {
     const { replace, asPath } = useRouter();
     useEffect(() => {
         if (path) {
-            const [withoutHash] = asPath.split('#');
-            const withHash = `${withoutHash}#${pathToId(path)}`;
-            replace(withHash, undefined, { shallow: true });
+            setTimeout(() => {
+                const [withoutHash] = asPath.split('#');
+                const withHash = `${withoutHash}#${pathToId(path)}`;
+                replace(withHash, undefined, { shallow: true });
+            });
         }
     }, []);
 }
