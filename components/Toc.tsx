@@ -13,7 +13,8 @@ import { IconName, Icon } from 'controls/Icon';
 export function TocButton({ booqId }: {
     booqId: string,
 }) {
-    const [open, setOpen] = useState(false);
+    const [isOpen, setOpen] = useState(false);
+    const close = () => setOpen(false);
     const { loading, toc } = useToc(booqId);
     const { bookmarks } = useBookmarks(booqId);
     const display = buildDisplayItems({
@@ -22,28 +23,33 @@ export function TocButton({ booqId }: {
     return <>
         <IconButton icon='toc' onClick={() => setOpen(true)} />
         <Modal
-            isOpen={open}
-            close={() => setOpen(false)}
+            isOpen={isOpen}
+            close={close}
             title='Contents'
         >
             {
-                loading ? <Spinner /> :
-                    <TocContent booqId={booqId} items={display} />
+                loading
+                    ? <Spinner />
+                    : <TocContent
+                        booqId={booqId} items={display}
+                        closeModal={close}
+                    />
             }
         </Modal>
     </>;
 }
 
 const tocWidth = '50rem';
-function TocContent({ booqId, items }: {
+function TocContent({ booqId, items, closeModal }: {
     booqId: string,
     items: DisplayItem[],
+    closeModal: () => void,
 }) {
     const { background, highlight, border } = usePalette();
     return <div className='container'>
         {
             items.map(
-                (item, idx) => <div key={idx}>
+                (item, idx) => <div key={idx} onClick={closeModal}>
                     <div className='item'>
                         <TocRow
                             booqId={booqId}
