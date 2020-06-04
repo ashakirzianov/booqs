@@ -39,5 +39,6 @@ export async function fetchFeatured() {
     const result = await doQuery<FeaturedData>({
         query: FeaturedQuery,
     });
-    return result.data?.featured ?? [];
+    return (result.data?.featured ?? [])
+        .filter(f => f !== null && f !== undefined);
 }
