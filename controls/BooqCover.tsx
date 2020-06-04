@@ -100,27 +100,27 @@ function colorForString(s: string) {
     // TODO: more & better colors
     const coverColors: Array<{ back: string, text: string }> = [
         {
-            back: 'linear-gradient(0deg, #FDBB2D 0%, #22C1C3 100%)',
+            back: 'linear-gradient(0deg, rgba(255,165,0,0.5) 0%, rgba(255,165,0,1) 100%)',
             text: 'white',
         },
         {
-            back: 'linear-gradient(0deg, rgba(131,58,180,1) 0%, rgba(253,29,29,1) 50%, rgba(252,176,69,1) 100%)',
+            back: 'linear-gradient(0deg, rgba(102, 51, 153,0.5) 0%, rgba(102, 51, 153,1) 50%)',
             text: 'white',
         },
         {
-            back: 'linear-gradient(0deg, #e3ffe7 0%, #d9e7ff 100%)',
-            text: 'steelblue',
-        },
-        {
-            back: 'linear-gradient(0deg, #FC466B 0%, #3F5EFB 100%)',
+            back: 'linear-gradient(0deg, rgba(0,100,0,0.5) 0%, rgba(0,100,0,1) 100%)',
             text: 'white',
         },
         {
-            back: 'linear-gradient(0deg, #fcff9e 0%, #c67700 100%)',
+            back: 'linear-gradient(0deg, rgba(65,105,225,0.5) 0%, rgba(65,105,225,1) 100%)',
             text: 'white',
         },
         {
-            back: 'linear-gradient(0deg, #00d2ff 0%, #3a47d5 100%)',
+            back: 'linear-gradient(0deg, rgba(210,105,30,0.5) 0%, rgba(210,105,30,1) 100%)',
+            text: 'white',
+        },
+        {
+            back: 'black',
             text: 'white',
         },
     ];

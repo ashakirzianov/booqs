@@ -9,8 +9,9 @@ import { BooqCover } from 'controls/BooqCover';
 import { boldWeight, meter } from 'controls/theme';
 import { BooqLink } from 'controls/Links';
 
-export function Featured() {
-    const { cards } = useFeatured();
+export function Featured({ cards }: {
+    cards: FeaturedItem[],
+}) {
     return <div>
         {
             cards.map(
@@ -56,13 +57,14 @@ function FeaturedCard({
             <style jsx>{`
             .container {
                 display: flex;
-                flex-flow: row wrap;
+                flex-flow: column;
                 flex: 1;
                 padding: ${meter.large};
+                align-items: center;
             }
             .cover {
                 display: flex;
-                margin: ${meter.regular} ${meter.xxLarge} ${meter.regular} 0;
+                margin: ${meter.regular};
             }
             .details {
                 display: flex;
@@ -76,6 +78,15 @@ function FeaturedCard({
             }
             .actions {
                 margin: ${meter.large} 0 0 0;
+            }
+            @media (min-width: 600px) {
+                .container {
+                    flex-flow: row wrap;
+                    align-items: stretch;
+                }
+                .cover {
+                    margin: ${meter.regular} ${meter.xxLarge} ${meter.regular} 0;
+                }
             }
             `}</style>
         </div>
@@ -134,7 +145,7 @@ function ReadButton({ item }: {
     item: FeaturedItem,
 }) {
     return <BooqLink booqId={item.id} path={[0]}>
-        <TextButton text="Read &rarr;" />
+        <TextButton text="Read" />
     </BooqLink>;
 }
 
@@ -147,7 +158,7 @@ function AddToReadingListButton({ item }: {
     const isInReadingList = booqs.some(b => b.id === item.id);
     if (isInReadingList) {
         return <TextButton
-            text="Remove -"
+            text="Remove"
             onClick={() => removeFromCollection({
                 booqId: item.id,
                 name: 'my-books',
@@ -155,7 +166,7 @@ function AddToReadingListButton({ item }: {
         />;
     } else {
         return <TextButton
-            text="Add +"
+            text="Add"
             onClick={() => addToCollection({
                 name: 'my-books',
                 booqId: item.id,

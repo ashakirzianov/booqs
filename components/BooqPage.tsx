@@ -9,13 +9,13 @@ import { BooqScreen, LoadingBooqScreen } from "./BooqScreen";
 type PageData = {
     kind: 'preloaded',
     booq: BooqData,
-    path?: BooqPath,
-    quote?: BooqRange,
+    path: BooqPath | null,
+    quote: BooqRange | null,
 } | {
     kind: 'client-side',
     booqId: string,
-    path: BooqPath,
-    quote?: BooqRange,
+    path: BooqPath | null,
+    quote: BooqRange | null,
 } | {
     kind: 'not-found',
 };
@@ -27,11 +27,15 @@ export function BooqPage({ data }: BooqPageProps) {
     switch (data?.kind) {
         case 'preloaded':
             return <LoadedBooqPage
-                booq={data.booq} path={data.path} quote={data.quote}
+                booq={data.booq}
+                path={data.path ?? undefined}
+                quote={data.quote ?? undefined}
             />;
         case 'client-side':
             return <ClientSidePage
-                booqId={data.booqId} path={data.path} quote={data.quote}
+                booqId={data.booqId}
+                path={data.path ?? undefined}
+                quote={data.quote ?? undefined}
             />;
         case 'not-found':
             return <NotFoundPage />;
@@ -82,9 +86,11 @@ function usePathNavigation(path?: BooqPath) {
     const { replace, asPath } = useRouter();
     useEffect(() => {
         if (path) {
-            const [withoutHash] = asPath.split('#');
-            const withHash = `${withoutHash}#${pathToId(path)}`;
-            replace(withHash, undefined, { shallow: true });
+            setTimeout(() => {
+                const [withoutHash] = asPath.split('#');
+                const withHash = `${withoutHash}#${pathToId(path)}`;
+                replace(withHash, undefined, { shallow: true });
+            });
         }
     }, []);
 }

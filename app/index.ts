@@ -7,6 +7,7 @@ export * from './featured';
 export * from './highlights';
 export * from './history';
 export * from './provider';
+export * from './search';
 export * from './settings';
 export * from './toc';
 export * from './upload';

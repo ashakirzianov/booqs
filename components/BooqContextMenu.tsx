@@ -11,18 +11,19 @@ import { useDocumentEvent } from 'controls/utils';
 import { quoteRef } from 'controls/Links';
 import { BooqSelection } from './BooqContent';
 import { Icon } from 'controls/Icon';
-import { meter, radius } from 'controls/theme';
+import { meter, radius, panelShadow } from 'controls/theme';
 
 export function BooqContextMenu({
-    booqId,
-    selection,
+    booqId, selection, locked,
 }: {
     booqId: string,
     selection: BooqSelection | undefined,
+    locked?: boolean,
 }) {
+    const { primary, background, border } = usePalette();
     const rect = useSelectionRect(selection);
     useCopyQuote(booqId, selection);
-    if (!rect || !selection) {
+    if (!rect || !selection || locked) {
         return null;
     }
     const { top, left, width, height } = rect;
@@ -43,6 +44,20 @@ export function BooqContextMenu({
                 top, left, width, height,
             }} />
         </Tippy>
+        <style jsx global>{`
+        .tippy-box {
+            color: ${primary};
+            background-color: ${background};
+            box-shadow: ${panelShadow};
+            border: 1px solid ${border};
+            border-radius: ${radius};
+        }
+        .tippy-content {
+            padding: 0;
+            overflow: hidden;
+            border-radius: ${radius};
+        }
+            `}</style>
     </div>;
 }
 
@@ -94,7 +109,13 @@ function generateQuote(booqId: string, text: string, range: BooqRange) {
 }
 
 function generateLink(booqId: string, range: BooqRange) {
-    return `${process.env.NEXT_PUBLIC_URL}${quoteRef(booqId, range)}`;
+    return `${baseUrl()}${quoteRef(booqId, range)}`;
+}
+
+function baseUrl() {
+    const current = window.location;
+    return `${current.protocol}//${current.host}`;
+    // return process.env.NEXT_PUBLIC_URL;
 }
 
 function ContextMenuContent({ booqId, selection }: {

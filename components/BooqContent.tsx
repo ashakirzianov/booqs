@@ -1,4 +1,6 @@
-import React, { memo, createElement, ReactNode, useEffect, useCallback } from 'react';
+import React, {
+    createElement, ReactNode, useCallback, useRef, useMemo,
+} from 'react';
 import { throttle } from 'lodash';
 import {
     BooqPath, BooqRange, BooqNode, BooqElementNode, pathToString, pathInRange, pathLessThan, samePath,
@@ -11,8 +13,9 @@ export type Colorization = {
     range: BooqRange,
     color: string,
 };
-export const BooqContent = memo(function BooqContent({
-    booqId, nodes, range, colorization, onScroll, onSelection,
+export const BooqContent = (function BooqContent({
+    booqId, nodes, range, colorization,
+    onScroll, onSelection, onClick,
 }: {
     booqId: string,
     nodes: BooqNode[],
@@ -20,18 +23,43 @@ export const BooqContent = memo(function BooqContent({
     colorization: Colorization[],
     onScroll?: (path: BooqPath) => void,
     onSelection?: (selection?: BooqSelection) => void,
+    onClick?: () => void,
 }) {
-    useScroll(onScroll);
-    useSelection(onSelection);
-    return <div id='booq-root' className='container'>
-        {
-            renderNodes(nodes, {
-                booqId, range, colorization,
-                path: [],
-            })
-        }
-    </div>;
+    useOnScroll(onScroll);
+    useOnSelection(onSelection);
+    useOnClick(onClick);
+    return useMemo(function () {
+        return <div id='booq-root' className='container'>
+            {
+                renderNodes(nodes, {
+                    booqId, range, colorization,
+                    path: [],
+                })
+            }
+        </div>;
+    }, [nodes, booqId, range, colorization]);
 });
+
+function useOnClick(callback?: () => void) {
+    const actual = useCallback((event: Event) => {
+        if (callback && isEventOnContent(event)) {
+            callback();
+        }
+    }, [callback]);
+    useDocumentEvent('click', actual);
+}
+
+function isEventOnContent(event: Event): boolean {
+    const id: string | undefined = (event.target as any).id;
+    if (id === undefined) {
+        return false;
+    }
+    const path = pathFromId(id);
+    if (path) {
+        return true;
+    }
+    return id === 'booq-root';
+}
 
 // --- Render
 
@@ -77,27 +105,14 @@ function renderNode(node: BooqNode, ctx: RenderContext): ReactNode {
 function renderTextNode(text: string, { path, colorization }: RenderContext): ReactNode {
     const spans = applyColorization({ text, path: [...path, 0] }, colorization);
     const id = pathToId(path);
-    return <span
-        key={id}
-        id={id}
-    >
-        {
-            spans.map(
-                span => {
-                    if (span.color) {
-                        return <span
-                            id={pathToId(span.path)}
-                            key={pathToId(span.path)}
-                            style={{ background: span.color }}>
-                            {span.text}
-                        </span>;
-                    } else {
-                        return span.text;
-                    }
-                }
-            )
-        }
-    </span>;
+    return spans.map(
+        span => <span
+            id={pathToId(span.path)}
+            key={pathToId(span.path)}
+            style={{ background: span.color }}>
+            {span.text}
+        </span>
+    );
 }
 
 function getProps(node: BooqElementNode, { path, booqId, range }: RenderContext) {
@@ -229,7 +244,7 @@ function breakPath(path: BooqPath) {
 
 // --- Scroll
 
-function useScroll(callback?: (path: BooqPath) => void) {
+function useOnScroll(callback?: (path: BooqPath) => void) {
     useDocumentEvent('scroll', useCallback(throttle(function () {
         if (callback) {
             const path = getCurrentPath();
@@ -284,11 +299,35 @@ export type BooqSelection = {
     range: BooqRange,
     text: string,
 };
-function useSelection(callback?: (selection?: BooqSelection) => void) {
-    useDocumentEvent('selectionchange', useCallback(() => {
-        if (callback) {
+function useOnSelection(callback?: (selection?: BooqSelection) => void) {
+    const locked = useRef(false);
+    const unhandled = useRef(false);
+    const lock = () => locked.current = true;
+    const unlock = () => {
+        locked.current = false;
+        if (callback && unhandled.current) {
             const selection = getSelection();
             callback(selection);
+            unhandled.current = false;
+        }
+    };
+    useDocumentEvent('mouseup', unlock);
+    useDocumentEvent('mousemove', event => {
+        if (event.buttons) {
+            lock();
+        } else {
+            unlock();
+        }
+    });
+
+    useDocumentEvent('selectionchange', useCallback(event => {
+        if (callback) {
+            const selection = getSelection();
+            if (!locked.current) {
+                callback(selection);
+            } else {
+                unhandled.current = true;
+            }
         }
     }, [callback]));
 }
@@ -318,18 +357,12 @@ function getSelection(): BooqSelection | undefined {
 }
 
 function getSelectionPath(node: Node, offset: number) {
-    if (isElement(node)) {
-        return pathFromId(node.id);
-    } else if (node.parentElement) {
+    if (node.parentElement) {
         const path = pathFromId(node.parentElement.id);
-        return path
-            ? [...path, offset]
-            : undefined;
-    } else {
-        return undefined;
+        if (path) {
+            path[path.length - 1] += offset;
+            return path;
+        }
     }
-}
-
-function isElement(node: Node): node is Element {
-    return node.nodeType === Node.ELEMENT_NODE;
+    return undefined;
 }
