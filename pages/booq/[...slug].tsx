@@ -9,11 +9,14 @@ type QueryParams = {
 };
 export const getStaticPaths: GetStaticPaths<QueryParams> = async () => {
     const featured = await fetchFeatured();
-    const paths = featured.map(
+    const paths0 = featured.map(
         f => booqHref(f.id, [0]),
     );
+    const pathsRoot = featured.map(
+        f => booqHref(f.id),
+    );
     return {
-        paths,
+        paths: [...paths0, ...pathsRoot],
         fallback: true,
     };
 }
