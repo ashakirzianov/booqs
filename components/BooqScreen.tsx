@@ -10,7 +10,7 @@ import { BooqLink } from 'controls/Links';
 import { Spinner } from 'controls/Spinner';
 import { BooqContent, BooqSelection, Colorization } from './BooqContent';
 import { BooqContextMenu } from './BooqContextMenu';
-import { LoadingHeader, Footer, EmptyLine, Header } from './BooqControls';
+import { LoadingHeader, Footer, Header, transparentMaxWidth } from './BooqControls';
 
 const contentWidth = '50rem';
 export function BooqScreen({
@@ -38,7 +38,6 @@ export function BooqScreen({
         <Header
             booqId={booq.id} path={currentPath} visible={visible}
         />
-        <EmptyLine />
         <div className='booq'>
             <AnchorButton
                 booqId={booq.id}
@@ -64,7 +63,6 @@ export function BooqScreen({
                 title='Next'
             />
         </div>
-        <EmptyLine />
         <Footer
             visible={visible}
             position={position}
@@ -86,7 +84,13 @@ export function BooqScreen({
                 max-width: ${contentWidth};
                 font-family: ${bookFont};
                 font-size: ${fontScale}%;
-                padding: ${meter.large};
+                padding: ${meter.xxLarge} ${meter.large};
+                transition: 250ms padding;
+            }
+            @media (min-width: ${transparentMaxWidth}) {
+                .booq {
+                    padding: 0;
+                }
             }
             `}</style>
     </div>;
@@ -196,6 +200,7 @@ function AnchorButton({ booqId, anchor, title }: {
                 flex-flow: row;
                 align-items: center; 
                 height: ${headerHeight};
+                margin: ${meter.regular};
             }`}</style>
         </div>
     </BooqLink>;

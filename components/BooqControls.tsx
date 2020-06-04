@@ -10,11 +10,7 @@ import { BookmarkButton } from './Bookmark';
 import { Themer } from './Themer';
 import { SignIn } from './SignIn';
 
-export function EmptyLine() {
-    return <div style={{ height: headerHeight }} />;
-}
-
-const transparentMaxWidth = '1000px';
+export const transparentMaxWidth = '1000px';
 export function Header({ booqId, path, visible }: {
     booqId?: string,
     path?: BooqPath,

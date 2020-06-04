@@ -118,6 +118,7 @@ export function BorderButton({ text, icon, onClick }: {
             }
             .button {
                 display: flex;
+                text-align: center;
                 color: ${dimmed};
                 border: 2px solid ${dimmed};
                 border-radius: ${radius};
