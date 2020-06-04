@@ -86,6 +86,7 @@ export function BooqScreen({
                 max-width: ${contentWidth};
                 font-family: ${bookFont};
                 font-size: ${fontScale}%;
+                padding: ${meter.large};
             }
             `}</style>
     </div>;
