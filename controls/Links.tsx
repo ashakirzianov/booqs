@@ -1,6 +1,7 @@
 import React, { ReactNode } from 'react';
 import Link from 'next/link';
 import { BooqPath, pathToString, BooqRange, rangeToString } from 'core';
+import { pathToId } from 'app';
 
 export function BooqLink({ booqId, path, children }: {
     booqId: string,
@@ -30,7 +31,7 @@ export function FeedLink({ children }: {
 
 export function booqHref(booqId: string, path?: BooqPath) {
     return path?.length
-        ? `/booq/${booqId}/path/${pathToString(path)}`
+        ? `/booq/${booqId}/path/${pathToString(path)}#${pathToId(path)}`
         : `/booq/${booqId}`;
 }
 
