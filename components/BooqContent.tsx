@@ -47,7 +47,6 @@ function useOnClick(callback?: () => void) {
         }
     }, [callback]);
     useDocumentEvent('click', actual);
-    useDocumentEvent('touchend', actual);
 }
 
 function isEventOnContent(event: Event): boolean {
