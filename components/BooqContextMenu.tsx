@@ -109,7 +109,13 @@ function generateQuote(booqId: string, text: string, range: BooqRange) {
 }
 
 function generateLink(booqId: string, range: BooqRange) {
-    return `${process.env.NEXT_PUBLIC_URL}${quoteRef(booqId, range)}`;
+    return `${baseUrl()}${quoteRef(booqId, range)}`;
+}
+
+function baseUrl() {
+    const current = window.location;
+    return `${current.protocol}//${current.host}`;
+    // return process.env.NEXT_PUBLIC_URL;
 }
 
 function ContextMenuContent({ booqId, selection }: {
