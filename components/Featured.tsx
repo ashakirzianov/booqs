@@ -144,7 +144,7 @@ function ReadButton({ item }: {
     item: FeaturedItem,
 }) {
     return <BooqLink booqId={item.id} path={[0]}>
-        <TextButton text="Read &rarr;" />
+        <TextButton text="Read" />
     </BooqLink>;
 }
 
@@ -157,7 +157,7 @@ function AddToReadingListButton({ item }: {
     const isInReadingList = booqs.some(b => b.id === item.id);
     if (isInReadingList) {
         return <TextButton
-            text="Remove -"
+            text="Remove"
             onClick={() => removeFromCollection({
                 booqId: item.id,
                 name: 'my-books',
@@ -165,7 +165,7 @@ function AddToReadingListButton({ item }: {
         />;
     } else {
         return <TextButton
-            text="Add +"
+            text="Add"
             onClick={() => addToCollection({
                 name: 'my-books',
                 booqId: item.id,
