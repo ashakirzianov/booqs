@@ -6,7 +6,6 @@ import { ApolloLink } from 'apollo-link';
 import { onError } from 'apollo-link-error';
 import { setContext } from 'apollo-link-context';
 import { createUploadLink } from 'apollo-upload-client';
-import fetch from 'isomorphic-unfetch';
 import { initialSettingsData } from './settings';
 import { restoreAuthToken, initialAuthData, initAuth } from './auth';
 
