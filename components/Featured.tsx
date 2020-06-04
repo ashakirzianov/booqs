@@ -82,6 +82,7 @@ function FeaturedCard({
             @media (min-width: 600px) {
                 .container {
                     flex-flow: row wrap;
+                    align-items: stretch;
                 }
                 .cover {
                     margin: ${meter.regular} ${meter.xxLarge} ${meter.regular} 0;
