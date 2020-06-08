@@ -7,7 +7,7 @@ import {
 } from "controls/SelectFileDialog";
 import { Spinner } from "controls/Spinner";
 import { PopoverSingleton, Popover } from "controls/Popover";
-import { Modal, useModal } from "controls/Modal";
+import { useModal } from "controls/Modal";
 
 export function Upload({ singleton }: {
     singleton: PopoverSingleton,
@@ -19,26 +19,24 @@ export function Upload({ singleton }: {
     const {
         content, buttons,
     } = useUploadState({ file });
-    const { openModal, modalContent } = useModal({
-        render: ({ closeModal }) => ({
-            content: <div className='content'>
-                {content}
-                <style jsx>{`
-        .content {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 15rem;
-            padding: 0 0 ${meter.regular} 0;
-        }
-        `}</style>
-            </div>,
-            buttons: [...buttons, {
-                text: 'Dismiss',
-                onClick: closeModal,
-            }],
-        }),
-    });
+    const { openModal, modalContent } = useModal(({ closeModal }) => ({
+        body: <div className='content'>
+            {content}
+            <style jsx>{`
+                .content {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    width: 15rem;
+                    padding: 0 0 ${meter.regular} 0;
+                }
+                `}</style>
+        </div>,
+        buttons: [...buttons, {
+            text: 'Dismiss',
+            onClick: closeModal,
+        }],
+    }));
 
     return <>
         <Popover

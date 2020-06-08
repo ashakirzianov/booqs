@@ -4,7 +4,7 @@ import {
     usePalette, pageForPosition, useToc, TocItem, Bookmark, useBookmarks,
 } from 'app';
 import { IconButton } from 'controls/Buttons';
-import { Modal, useModal } from 'controls/Modal';
+import { useModal } from 'controls/Modal';
 import { Spinner } from 'controls/Spinner';
 import { BooqLink } from 'controls/Links';
 import { meter } from 'controls/theme';
@@ -20,16 +20,14 @@ export function TocButton({ booqId }: {
     const display = buildDisplayItems({
         toc, bookmarks,
     });
-    const { openModal, modalContent } = useModal({
-        render: ({ closeModal }) => ({
-            content: loading
-                ? <Spinner />
-                : <TocContent
-                    booqId={booqId} items={display}
-                    closeModal={closeModal}
-                />,
-        }),
-    })
+    const { openModal, modalContent } = useModal(({ closeModal }) => ({
+        body: loading
+            ? <Spinner />
+            : <TocContent
+                booqId={booqId} items={display}
+                closeModal={closeModal}
+            />,
+    }));
     return <>
         <IconButton icon='toc' onClick={openModal} />
         {modalContent}

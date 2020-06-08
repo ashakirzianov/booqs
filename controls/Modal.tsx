@@ -2,21 +2,23 @@ import React, { ReactNode, useState } from 'react';
 import { usePalette } from 'app';
 import { panelShadow, radius, meter } from './theme';
 
-export function useModal({ render }: {
-    render: (props: { closeModal: () => void }) => {
-        content: ReactNode,
-        buttons?: ButtonProps[],
-    },
-}) {
+export type ModalDefinition = {
+    body: ReactNode,
+    buttons?: ButtonProps[],
+};
+export type ModalRenderProps = {
+    closeModal: () => void,
+};
+export function useModal(render: (props: ModalRenderProps) => ModalDefinition) {
     const [isOpen, setIsOpen] = useState(false);
     const openModal = () => setIsOpen(true);
     const closeModal = () => setIsOpen(false);
     if (isOpen) {
-        const { content, buttons } = render({ closeModal });
+        const { body, buttons } = render({ closeModal });
         return {
             openModal, closeModal,
             modalContent: <ModalContent
-                content={content}
+                content={body}
                 buttons={buttons}
                 close={closeModal}
             />,
