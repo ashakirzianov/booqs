@@ -1,15 +1,16 @@
 import React, { ReactNode } from 'react';
 import { usePalette } from 'app';
-import { panelShadow, radius } from './theme';
+import { panelShadow, radius, meter } from './theme';
 
 export function Modal({
-    isOpen, close, children,
+    isOpen, close, children, buttons,
 }: {
     isOpen: boolean,
     close: () => void,
     children: ReactNode,
+    buttons?: ButtonProps[],
 }) {
-    const { background, dimmed } = usePalette();
+    const { background } = usePalette();
     if (!isOpen) {
         return null;
     }
@@ -20,6 +21,13 @@ export function Modal({
         >
             <div className='content'>
                 {children}
+            </div>
+            <div className='buttons'>
+                {
+                    (buttons ?? []).map(
+                        (props, idx) => <ModalButton key={idx} {...props} />
+                    )
+                }
             </div>
         </div>
         <style jsx>{`
@@ -47,4 +55,38 @@ export function Modal({
             }
             `}</style>
     </div>;
+}
+
+type ButtonProps = {
+    text: string,
+    onClick: () => void,
+};
+function ModalButton({ text, onClick }: ButtonProps) {
+    const { border, action, highlight } = usePalette();
+    return <div className='container' onClick={onClick}>
+        <hr />
+        <span className='text'>{text}</span>
+        <style jsx>{`
+            .container {
+                display: flex;
+                flex: 1;
+                flex-flow: column;
+                align-items: center;
+                cursor: pointer;
+                color: ${action};
+            }
+            .container:hover {
+                color: ${highlight};
+            }
+            .text {
+                margin: ${meter.large};
+            }
+            hr {
+                width: 100%;
+                border: none;
+                border-top: 1px solid ${border};
+                margin: 0;
+            }
+            `}</style>
+    </div>
 }

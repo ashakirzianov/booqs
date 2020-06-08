@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { useAuth, useUpload } from "app";
-import { ActionButton, IconButton } from "controls/Buttons";
+import { IconButton } from "controls/Buttons";
 import { meter } from "controls/theme";
 import {
     SelectFileDialogRef, SelectFileDialog,
@@ -16,6 +16,7 @@ export function Upload({ singleton }: {
     const isSigned = auth.state === 'signed';
     const dialogRef = useRef<SelectFileDialogRef>();
     const [file, setFile] = useState<File | undefined>(undefined);
+    const [open, setOpen] = useState(false);
 
     return <>
         <Popover
@@ -39,49 +40,80 @@ export function Upload({ singleton }: {
         <SelectFileDialog
             accept='application/epub+zip'
             refCallback={r => dialogRef.current = r}
-            onFileChanged={setFile}
+            onFileChanged={file => {
+                setFile(file);
+                setOpen(true);
+            }}
         />
-        <Modal
-            isOpen={!!file}
-            close={() => setFile(undefined)}
-        >
-            <div className='modal'>
-                <UploadModalContent file={file!} />
-            </div>
-            <style jsx>{`
-                .modal {
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                    width: 30rem;
-                    padding: 0 0 ${meter.regular} 0;
-                }
-                `}</style>
-        </Modal>
+        <UploadModal
+            file={file}
+            isOpen={open}
+            close={() => setOpen(false)}
+        />
     </>;
 }
 
-function UploadModalContent({ file }: {
-    file: File,
+function UploadModal({ file, isOpen, close }: {
+    file?: File,
+    isOpen: boolean,
+    close: () => void,
+}) {
+    const { content, buttons } = useUploadState({ file, close });
+    return <Modal
+        isOpen={isOpen}
+        close={close}
+        buttons={buttons}
+    >
+        <div className='content'>
+            {content}
+        </div>
+        <style jsx>{`
+            .content {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                width: 15rem;
+                padding: 0 0 ${meter.regular} 0;
+            }
+            `}</style>
+    </Modal>;
+}
+
+function useUploadState({ close, file }: {
+    close: () => void,
+    file: File | undefined,
 }) {
     const {
         uploaded, uploading, upload,
     } = useUpload();
+    const dismissProps = {
+        text: 'Dismiss',
+        onClick: close,
+    };
     if (uploaded) {
-        return <Label text={`Successfully uploaded: ${uploaded.title}.`} />;
+        return {
+            content: <Label text={`Successfully uploaded: ${uploaded.title}.`} />,
+            buttons: [dismissProps],
+        };
     } else if (uploading) {
-        return <>
-            <Label text={`Uploading ${file.name}...`} />
-            <Spinner />
-        </>;
+        return {
+            content: <>
+                <Label text={`Uploading ${file?.name}...`} />
+                <Spinner />
+            </>,
+            buttons: [dismissProps],
+        };
     } else {
-        return <>
-            <Label text={`Upload ${file.name}`} />
-            <ActionButton
-                text='Upload'
-                onClick={() => upload(file)}
-            />
-        </>;
+        return {
+            content: <Label text={`Upload ${file?.name}`} />,
+            buttons: [
+                {
+                    text: 'Upload',
+                    onClick: () => upload(file),
+                },
+                dismissProps,
+            ],
+        };
     }
 }
 
