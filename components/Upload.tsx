@@ -7,7 +7,7 @@ import {
 } from "controls/SelectFileDialog";
 import { Spinner } from "controls/Spinner";
 import { PopoverSingleton, Popover } from "controls/Popover";
-import { Modal } from "controls/Modal";
+import { Modal, useModal } from "controls/Modal";
 
 export function Upload({ singleton }: {
     singleton: PopoverSingleton,
@@ -16,7 +16,29 @@ export function Upload({ singleton }: {
     const isSigned = auth.state === 'signed';
     const dialogRef = useRef<SelectFileDialogRef>();
     const [file, setFile] = useState<File | undefined>(undefined);
-    const [open, setOpen] = useState(false);
+    const {
+        content, buttons,
+    } = useUploadState({ file });
+    const { openModal, modalContent } = useModal({
+        render: ({ closeModal }) => ({
+            content: <div className='content'>
+                {content}
+                <style jsx>{`
+        .content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 15rem;
+            padding: 0 0 ${meter.regular} 0;
+        }
+        `}</style>
+            </div>,
+            buttons: [...buttons, {
+                text: 'Dismiss',
+                onClick: closeModal,
+            }],
+        }),
+    });
 
     return <>
         <Popover
@@ -42,58 +64,23 @@ export function Upload({ singleton }: {
             refCallback={r => dialogRef.current = r}
             onFileChanged={file => {
                 setFile(file);
-                setOpen(true);
+                openModal();
             }}
         />
-        <UploadModal
-            file={file}
-            isOpen={open}
-            close={() => setOpen(false)}
-        />
+        {modalContent}
     </>;
 }
 
-function UploadModal({ file, isOpen, close }: {
-    file?: File,
-    isOpen: boolean,
-    close: () => void,
-}) {
-    const { content, buttons } = useUploadState({ file, close });
-    return <Modal
-        isOpen={isOpen}
-        close={close}
-        buttons={buttons}
-    >
-        <div className='content'>
-            {content}
-        </div>
-        <style jsx>{`
-            .content {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                width: 15rem;
-                padding: 0 0 ${meter.regular} 0;
-            }
-            `}</style>
-    </Modal>;
-}
-
-function useUploadState({ close, file }: {
-    close: () => void,
+function useUploadState({ file }: {
     file: File | undefined,
 }) {
     const {
         uploaded, uploading, upload,
     } = useUpload();
-    const dismissProps = {
-        text: 'Dismiss',
-        onClick: close,
-    };
     if (uploaded) {
         return {
             content: <Label text={`Successfully uploaded: ${uploaded.title}.`} />,
-            buttons: [dismissProps],
+            buttons: [],
         };
     } else if (uploading) {
         return {
@@ -101,18 +88,15 @@ function useUploadState({ close, file }: {
                 <Label text={`Uploading ${file?.name}...`} />
                 <Spinner />
             </>,
-            buttons: [dismissProps],
+            buttons: [],
         };
     } else {
         return {
             content: <Label text={`Upload ${file?.name}`} />,
-            buttons: [
-                {
-                    text: 'Upload',
-                    onClick: () => upload(file),
-                },
-                dismissProps,
-            ],
+            buttons: [{
+                text: 'Upload',
+                onClick: () => upload(file),
+            }],
         };
     }
 }

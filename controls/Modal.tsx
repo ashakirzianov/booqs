@@ -1,26 +1,48 @@
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useState } from 'react';
 import { usePalette } from 'app';
 import { panelShadow, radius, meter } from './theme';
 
-export function Modal({
-    isOpen, close, children, buttons,
+export function useModal({ render }: {
+    render: (props: { closeModal: () => void }) => {
+        content: ReactNode,
+        buttons?: ButtonProps[],
+    },
+}) {
+    const [isOpen, setIsOpen] = useState(false);
+    const openModal = () => setIsOpen(true);
+    const closeModal = () => setIsOpen(false);
+    if (isOpen) {
+        const { content, buttons } = render({ closeModal });
+        return {
+            openModal, closeModal,
+            modalContent: <ModalContent
+                content={content}
+                buttons={buttons}
+                close={closeModal}
+            />,
+        };
+    } else {
+        return {
+            openModal, closeModal, modalContent: null,
+        };
+    }
+}
+
+function ModalContent({
+    content, buttons, close,
 }: {
-    isOpen: boolean,
     close: () => void,
-    children: ReactNode,
+    content: ReactNode,
     buttons?: ButtonProps[],
 }) {
     const { background } = usePalette();
-    if (!isOpen) {
-        return null;
-    }
     return <div className='screen' onClick={close}>
         <div
             className='container'
             onClick={e => e.stopPropagation()}
         >
             <div className='content'>
-                {children}
+                {content}
             </div>
             <div className='buttons'>
                 {
