@@ -1,6 +1,7 @@
 import React, { ReactNode, useState } from 'react';
 import { usePalette } from 'app';
 import { panelShadow, radius, meter } from './theme';
+import Link from 'next/link';
 
 export type ModalDefinition = {
     body: ReactNode,
@@ -83,13 +84,20 @@ function ModalContent({
 
 type ButtonProps = {
     text: string,
-    onClick: () => void,
+    onClick?: () => void,
+    href?: string,
 };
-function ModalButton({ text, onClick }: ButtonProps) {
+function ModalButton({ text, onClick, href }: ButtonProps) {
     const { border, action, highlight } = usePalette();
     return <div className='container' onClick={onClick}>
         <hr />
-        <span className='text'>{text}</span>
+        {
+            href
+                ? <Link href={href}>
+                    <span className='text'>{text}</span>
+                </Link>
+                : <span className='text'>{text}</span>
+        }
         <style jsx>{`
             .container {
                 display: flex;
@@ -104,6 +112,7 @@ function ModalButton({ text, onClick }: ButtonProps) {
             }
             .text {
                 margin: ${meter.large};
+                text-decoration: none;
             }
             hr {
                 width: 100%;

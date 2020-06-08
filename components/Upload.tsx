@@ -5,6 +5,8 @@ import { useSelectFileDialog } from "controls/SelectFileDialog";
 import { Spinner } from "controls/Spinner";
 import { PopoverSingleton, Popover } from "controls/Popover";
 import { useModal } from "controls/Modal";
+import { BooqCover } from "controls/BooqCover";
+import { booqHref } from "controls/Links";
 
 export function Upload({ singleton }: {
     singleton: PopoverSingleton,
@@ -12,7 +14,7 @@ export function Upload({ singleton }: {
     const auth = useAuth();
     const isSigned = auth.state === 'signed';
     const {
-        body, buttons,
+        body, buttons, clearFile,
     } = useModalDefinition();
     const { openModal, modalContent } = useModal(({ closeModal }) => ({
         body: <div className='content'>
@@ -23,13 +25,17 @@ export function Upload({ singleton }: {
                     flex-direction: column;
                     align-items: center;
                     width: 15rem;
-                    padding: 0 0 ${meter.regular} 0;
+                    max-width: 100vw;
+                    padding: ${meter.large};
                 }
                 `}</style>
         </div>,
         buttons: [...buttons, {
             text: 'Dismiss',
-            onClick: closeModal,
+            onClick() {
+                closeModal();
+                clearFile();
+            }
         }],
     }));
 
@@ -58,13 +64,14 @@ export function Upload({ singleton }: {
 
 function useModalDefinition() {
     const {
-        file, openDialog, dialogContent,
+        file, openDialog, dialogContent, clearFile,
     } = useSelectFileDialog({ accept: 'application/epub+zip' });
     const {
         uploaded, uploading, upload,
     } = useUpload();
     if (!file) {
         return {
+            clearFile,
             body: <>
                 <Label text='Select file to upload' />
                 {dialogContent}
@@ -76,11 +83,22 @@ function useModalDefinition() {
         };
     } else if (uploaded) {
         return {
-            body: <Label text={`Successfully uploaded: ${uploaded.title}.`} />,
-            buttons: [],
+            clearFile,
+            body: <>
+                <Label text={`${uploaded.title}`} />
+                <BooqCover
+                    title={uploaded.title}
+                    cover={uploaded.cover}
+                />
+            </>,
+            buttons: [{
+                text: 'Read now',
+                href: booqHref(uploaded.id, [0]),
+            }],
         };
     } else if (uploading) {
         return {
+            clearFile,
             body: <>
                 <Label text={`Uploading ${file.name}...`} />
                 <Spinner />
@@ -89,6 +107,7 @@ function useModalDefinition() {
         };
     } else {
         return {
+            clearFile,
             body: <Label text={`${file.name}`} />,
             buttons: [{
                 text: 'Upload',

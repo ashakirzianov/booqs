@@ -4,16 +4,18 @@ import { currentSource } from './common';
 
 export type FileData = any;
 
-const UploadEpubMutation = gql`mutation UploadEpub($file: Upload!) {
-    uploadEpub(file: $file) {
+const UploadEpubMutation = gql`mutation UploadEpub($file: Upload!, $source: String!) {
+    uploadEpub(file: $file, source: $source) {
         id
         title
+        cover
     }
 }`;
 type UploadEpubData = {
     uploadEpub: {
         id: string,
         title?: string,
+        cover?: string,
     },
 };
 type UploadEpubVariables = {
