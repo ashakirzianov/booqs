@@ -1,10 +1,7 @@
-import { useRef, useState } from "react";
 import { useAuth, useUpload } from "app";
 import { IconButton } from "controls/Buttons";
 import { meter } from "controls/theme";
-import {
-    SelectFileDialogRef, SelectFileDialog,
-} from "controls/SelectFileDialog";
+import { useSelectFileDialog } from "controls/SelectFileDialog";
 import { Spinner } from "controls/Spinner";
 import { PopoverSingleton, Popover } from "controls/Popover";
 import { useModal } from "controls/Modal";
@@ -60,8 +57,9 @@ export function Upload({ singleton }: {
 }
 
 function useModalDefinition() {
-    const dialogRef = useRef<SelectFileDialogRef>();
-    const [file, setFile] = useState<File | undefined>(undefined);
+    const {
+        file, openDialog, dialogContent,
+    } = useSelectFileDialog({ accept: 'application/epub+zip' });
     const {
         uploaded, uploading, upload,
     } = useUpload();
@@ -69,17 +67,11 @@ function useModalDefinition() {
         return {
             body: <>
                 <Label text='Select file to upload' />
-                <SelectFileDialog
-                    accept='application/epub+zip'
-                    refCallback={r => dialogRef.current = r}
-                    onFileChanged={file => {
-                        setFile(file);
-                    }}
-                />
+                {dialogContent}
             </>,
             buttons: [{
                 text: 'Select .epub',
-                onClick: () => dialogRef.current?.show(),
+                onClick: openDialog,
             }],
         };
     } else if (uploaded) {
