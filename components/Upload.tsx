@@ -14,14 +14,12 @@ export function Upload({ singleton }: {
 }) {
     const auth = useAuth();
     const isSigned = auth.state === 'signed';
-    const dialogRef = useRef<SelectFileDialogRef>();
-    const [file, setFile] = useState<File | undefined>(undefined);
     const {
-        content, buttons,
-    } = useUploadState({ file });
+        body, buttons,
+    } = useModalDefinition();
     const { openModal, modalContent } = useModal(({ closeModal }) => ({
         body: <div className='content'>
-            {content}
+            {body}
             <style jsx>{`
                 .content {
                     display: flex;
@@ -46,7 +44,7 @@ export function Upload({ singleton }: {
                     icon='upload'
                     onClick={
                         isSigned
-                            ? () => dialogRef.current?.show()
+                            ? openModal
                             : undefined
                     }
                 />
@@ -57,40 +55,49 @@ export function Upload({ singleton }: {
                     : 'Sign in to upload'
             } />}
         />
-        <SelectFileDialog
-            accept='application/epub+zip'
-            refCallback={r => dialogRef.current = r}
-            onFileChanged={file => {
-                setFile(file);
-                openModal();
-            }}
-        />
         {modalContent}
     </>;
 }
 
-function useUploadState({ file }: {
-    file: File | undefined,
-}) {
+function useModalDefinition() {
+    const dialogRef = useRef<SelectFileDialogRef>();
+    const [file, setFile] = useState<File | undefined>(undefined);
     const {
         uploaded, uploading, upload,
     } = useUpload();
-    if (uploaded) {
+    if (!file) {
         return {
-            content: <Label text={`Successfully uploaded: ${uploaded.title}.`} />,
+            body: <>
+                <Label text='Select file to upload' />
+                <SelectFileDialog
+                    accept='application/epub+zip'
+                    refCallback={r => dialogRef.current = r}
+                    onFileChanged={file => {
+                        setFile(file);
+                    }}
+                />
+            </>,
+            buttons: [{
+                text: 'Select .epub',
+                onClick: () => dialogRef.current?.show(),
+            }],
+        };
+    } else if (uploaded) {
+        return {
+            body: <Label text={`Successfully uploaded: ${uploaded.title}.`} />,
             buttons: [],
         };
     } else if (uploading) {
         return {
-            content: <>
-                <Label text={`Uploading ${file?.name}...`} />
+            body: <>
+                <Label text={`Uploading ${file.name}...`} />
                 <Spinner />
             </>,
             buttons: [],
         };
     } else {
         return {
-            content: <Label text={`Upload ${file?.name}`} />,
+            body: <Label text={`${file.name}`} />,
             buttons: [{
                 text: 'Upload',
                 onClick: () => upload(file),
