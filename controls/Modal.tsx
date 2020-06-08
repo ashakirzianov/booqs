@@ -1,12 +1,10 @@
 import React, { ReactNode } from 'react';
 import { usePalette } from 'app';
-import { panelShadow, radius, meter } from './theme';
-import { IconButton } from './Buttons';
+import { panelShadow, radius } from './theme';
 
 export function Modal({
-    title, isOpen, close, children,
+    isOpen, close, children,
 }: {
-    title?: string,
     isOpen: boolean,
     close: () => void,
     children: ReactNode,
@@ -20,17 +18,6 @@ export function Modal({
             className='container'
             onClick={e => e.stopPropagation()}
         >
-            {
-                title !== undefined
-                    ? <div className='title'>
-                        {title}
-                        <IconButton
-                            icon='close'
-                            onClick={close}
-                        />
-                    </div>
-                    : null
-            }
             <div className='content'>
                 {children}
             </div>
@@ -57,15 +44,6 @@ export function Modal({
                 box-shadow: ${panelShadow};
                 border-radius: ${radius};
                 pointer-events: auto;
-            }
-            .title {
-                display: flex;
-                flex-flow: row;
-                justify-content: space-between;
-                align-items: flex-start;
-                padding: ${meter.large};
-                font-size: x-large;
-                color: ${dimmed};
             }
             `}</style>
     </div>;

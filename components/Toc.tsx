@@ -25,7 +25,6 @@ export function TocButton({ booqId }: {
         <Modal
             isOpen={isOpen}
             close={close}
-            title='Contents'
         >
             {
                 loading
@@ -45,8 +44,15 @@ function TocContent({ booqId, items, closeModal }: {
     items: DisplayItem[],
     closeModal: () => void,
 }) {
-    const { background, highlight, border } = usePalette();
+    const { background, highlight, border, dimmed } = usePalette();
     return <div className='container'>
+        <div className='title'>
+            Contents
+                        <IconButton
+                icon='close'
+                onClick={closeModal}
+            />
+        </div>
         {
             items.map(
                 (item, idx) => <div key={idx} onClick={closeModal}>
@@ -66,6 +72,15 @@ function TocContent({ booqId, items, closeModal }: {
                 flex-flow: column nowrap;
                 width: 100vw;
                 max-width: ${tocWidth};
+            }
+            .title {
+                display: flex;
+                flex-flow: row;
+                justify-content: space-between;
+                align-items: flex-start;
+                padding: ${meter.large};
+                font-size: x-large;
+                color: ${dimmed};
             }
             .item:hover {
                 color: ${background};
