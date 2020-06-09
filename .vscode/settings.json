@@ -3,8 +3,6 @@
     "css.lint.unknownProperties": "ignore",
     "css.validate": false,
     "files.exclude": {
-        ".next": true,
-        ".vercel": true,
         "**/.DS_Store": true,
         "**/node_modules/**": true
     },

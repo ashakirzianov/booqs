@@ -2,26 +2,17 @@ import { ApolloClient } from "apollo-client";
 import { useApolloClient, useQuery } from '@apollo/react-hooks';
 import gql from 'graphql-tag';
 import { facebookSdk } from "./facebookSdk";
+import { syncStorage } from "plat";
 
-const storage = process.browser
-    ? sessionStorage
-    : undefined;
-export function restoreAuthToken() {
-    return storage?.getItem('auth');
+type AuthDataWithToken = AuthData & { token: string };
+export function restoreAuthData() {
+    return syncStorage().restore<AuthDataWithToken>('auth');
 }
-function storeAuthToken(token: string) {
-    storage?.setItem('auth', token);
+function storeAuthData(authData: AuthDataWithToken) {
+    syncStorage().store('auth', authData);
 }
-
-function clearAuthToken() {
-    storage?.removeItem('auth');
-}
-
-export async function initAuth(client: ApolloClient<unknown>) {
-    const fbStatus = await facebookSdk()?.status();
-    if (fbStatus?.status === 'connected') {
-        signIn(client, fbStatus.authResponse.accessToken, 'facebook');
-    }
+function clearAuthData() {
+    syncStorage().clear('auth');
 }
 
 type AuthData = {
@@ -34,11 +25,18 @@ const AuthStateQuery = gql`query AuthState {
     profilePicture @client
     provider @client
 }`;
-export const initialAuthData: AuthData = {
-    name: null,
-    profilePicture: null,
-    provider: null,
-};
+const restored = restoreAuthData();
+export const initialAuthData: AuthData = restored
+    ? {
+        name: restored.name,
+        provider: restored.provider,
+        profilePicture: restored.profilePicture ?? null,
+    }
+    : {
+        name: null,
+        profilePicture: null,
+        provider: null,
+    };
 export type Auth = ReturnType<typeof useAuth>;
 export function useAuth() {
     const { data } = useQuery<AuthData>(AuthStateQuery);
@@ -79,7 +77,7 @@ export function useSignInOptions() {
             });
             await facebookSdk()?.logout();
             client.resetStore();
-            clearAuthToken();
+            clearAuthData();
         }
     };
 }
@@ -109,7 +107,12 @@ async function signIn(client: ApolloClient<unknown>, token: string, provider: st
                 profilePicture: auth.profilePicture,
             }
             : initialAuthData;
-        storeAuthToken(auth.token);
+        storeAuthData({
+            provider,
+            token: auth.token,
+            name: auth.name,
+            profilePicture: data.profilePicture,
+        });
         client.writeData<AuthData>({ data });
         client.reFetchObservableQueries(true);
     }

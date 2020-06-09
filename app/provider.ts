@@ -7,11 +7,11 @@ import { onError } from 'apollo-link-error';
 import { setContext } from 'apollo-link-context';
 import { createUploadLink } from 'apollo-upload-client';
 import { initialSettingsData } from './settings';
-import { restoreAuthToken, initialAuthData, initAuth } from './auth';
+import { restoreAuthData, initialAuthData } from './auth';
 
 const link = ApolloLink.from([
     setContext((_, { headers }) => {
-        const token = restoreAuthToken();
+        const token = restoreAuthData()?.token;
         return {
             headers: {
                 ...headers,
@@ -50,7 +50,6 @@ client.writeData(initialData);
 client.onResetStore(async () => {
     client.writeData(initialData);
 });
-initAuth(client);
 
 export function AppProvider({ children }: {
     children: ReactNode,
