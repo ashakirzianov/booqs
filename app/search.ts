@@ -4,6 +4,7 @@ import { useQuery } from '@apollo/react-hooks';
 
 const SearchQuery = gql`query Search($query: String!) {
     search(query: $query, limit: 10) {
+        id
         title
         author
         cover(size: 60)
@@ -11,6 +12,7 @@ const SearchQuery = gql`query Search($query: String!) {
 }`;
 type SearchData = {
     search: {
+        id: string,
         title?: string,
         author?: string,
         cover?: string,
