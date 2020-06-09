@@ -1,8 +1,7 @@
 import React, { ReactNode } from 'react';
 import { roundArrow } from 'tippy.js';
 import Tippy, { useSingleton } from '@tippyjs/react';
-import { usePalette } from 'app';
-import { panelShadow, radius } from './theme';
+import { panelShadow, radius, vars } from './theme';
 
 export type PopoverSingleton = ReturnType<typeof useSingleton>[1];
 
@@ -32,7 +31,6 @@ export function Popover({ singleton, anchor, content }: {
 export function Popovers({ children }: {
     children: (singleton: PopoverSingleton) => ReactNode,
 }) {
-    const { primary, border, background } = usePalette();
     const [source, target] = useSingleton();
     return <>
         <Tippy
@@ -47,10 +45,10 @@ export function Popovers({ children }: {
         {children(target)}
         <style jsx global>{`
         .tippy-box {
-            color: ${primary};
-            background-color: ${background};
+            color: var(${vars.primary});
+            background-color: var(${vars.background});
             box-shadow: ${panelShadow};
-            border: 1px solid ${border};
+            border: 1px solid var(${vars.border});
             border-radius: ${radius};
         }
         .tippy-content {
@@ -59,10 +57,10 @@ export function Popovers({ children }: {
             border-radius: ${radius};
         }
         .tippy-svg-arrow > svg:first-child {
-            fill: ${border};
+            fill: var(${vars.border});
         }
         .tippy-svg-arrow > svg:last-child {
-            fill: ${background};
+            fill: var(${vars.background});
         }
             `}</style>
     </>;

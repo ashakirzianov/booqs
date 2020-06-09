@@ -1,7 +1,6 @@
 import React, { ReactNode } from 'react';
-import { usePalette } from 'app';
 import { IconName, Icon } from './Icon';
-import { meter, menuFont, boldWeight } from './theme';
+import { meter, menuFont, boldWeight, vars } from './theme';
 import { Spinner } from './Spinner';
 
 export function Menu({ width, callback, children }: {
@@ -29,7 +28,6 @@ export function MenuItem({ icon, text, callback, spinner }: {
     callback?: () => void,
     spinner?: boolean,
 }) {
-    const { highlight, background } = usePalette();
     return <div className='container' onClick={callback}>
         {
             icon
@@ -56,8 +54,8 @@ export function MenuItem({ icon, text, callback, spinner }: {
                 user-select: none;
             }
             .container:hover {
-                color: ${background};
-                background-color: ${highlight};
+                color: var(${vars.background});
+                background-color: var(${vars.highlight});
             }
             .icon {
                 display: flex;

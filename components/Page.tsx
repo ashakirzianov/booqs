@@ -1,17 +1,17 @@
 import React from 'react';
 import Head from 'next/head';
-import { usePalette } from 'app';
+import { useSettings, palettes } from 'app';
 import { HasChildren } from 'controls/utils';
 import {
-    menuFont, normalWeight, fontHref,
+    menuFont, normalWeight, fontHref, vars,
 } from 'controls/theme';
 
 
 export function Page({ title, children }: HasChildren & {
     title: string,
 }) {
-    const { background, primary } = usePalette();
-    return <div className="page">
+    const { paletteName } = useSettings();
+    return <div className={`page ${paletteName}`}>
         <Head>
             <title>{title}</title>
             <meta name="viewport" content="initial-scale=1.0, width=device-width" />
@@ -26,6 +26,34 @@ export function Page({ title, children }: HasChildren & {
                 display: flex;
                 flex: 1;
                 flex-direction: column;
+                font-family: ${menuFont};
+                font-weight: ${normalWeight};
+                color: var(${vars.primary});
+                background: var(${vars.background});
+            }
+            .page.light {
+                ${vars.action}: ${palettes.light.action};
+                ${vars.background}: ${palettes.light.background};
+                ${vars.border}: ${palettes.light.border};
+                ${vars.dimmed}: ${palettes.light.dimmed};
+                ${vars.highlight}: ${palettes.light.highlight};
+                ${vars.primary}: ${palettes.light.primary};
+            }
+            .page.sepia {
+                ${vars.action}: ${palettes.sepia.action};
+                ${vars.background}: ${palettes.sepia.background};
+                ${vars.border}: ${palettes.sepia.border};
+                ${vars.dimmed}: ${palettes.sepia.dimmed};
+                ${vars.highlight}: ${palettes.sepia.highlight};
+                ${vars.primary}: ${palettes.sepia.primary};
+            }
+            .page.dark {
+                ${vars.action}: ${palettes.dark.action};
+                ${vars.background}: ${palettes.dark.background};
+                ${vars.border}: ${palettes.dark.border};
+                ${vars.dimmed}: ${palettes.dark.dimmed};
+                ${vars.highlight}: ${palettes.dark.highlight};
+                ${vars.primary}: ${palettes.dark.primary};
             }
         `}</style>
         <style jsx global>{`
@@ -36,10 +64,6 @@ export function Page({ title, children }: HasChildren & {
                 margin: 0;
                 padding: 0;
                 overflow-x: hidden;
-                font-family: ${menuFont};
-                font-weight: ${normalWeight};
-                color: ${primary};
-                background: ${background};
             }
         `}</style>
     </div>;

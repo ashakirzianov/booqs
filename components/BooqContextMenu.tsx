@@ -4,14 +4,14 @@ import Tippy from '@tippyjs/react';
 import * as clipboard from 'clipboard-polyfill';
 import { BooqRange, isOverlapping } from 'core';
 import {
-    useAuth, useHighlightMutations, useHighlights, Highlight, usePalette, colorForGroup, groups,
+    useAuth, useHighlightMutations, useHighlights, Highlight, colorForGroup, groups,
 } from 'app';
 import { Menu, MenuItem } from 'controls/Menu';
 import { useDocumentEvent } from 'controls/utils';
 import { quoteRef } from 'controls/Links';
 import { BooqSelection } from './BooqContent';
 import { Icon } from 'controls/Icon';
-import { meter, radius, panelShadow } from 'controls/theme';
+import { meter, radius, panelShadow, vars } from 'controls/theme';
 
 export function BooqContextMenu({
     booqId, selection, locked,
@@ -20,7 +20,6 @@ export function BooqContextMenu({
     selection: BooqSelection | undefined,
     locked?: boolean,
 }) {
-    const { primary, background, border } = usePalette();
     const rect = useSelectionRect(selection);
     useCopyQuote(booqId, selection);
     if (!rect || !selection || locked) {
@@ -46,10 +45,10 @@ export function BooqContextMenu({
         </Tippy>
         <style jsx global>{`
         .tippy-box {
-            color: ${primary};
-            background-color: ${background};
+            color: var(${vars.primary});
+            background-color: var(${vars.background});
             box-shadow: ${panelShadow};
-            border: 1px solid ${border};
+            border: 1px solid var(${vars.border});
             border-radius: ${radius};
         }
         .tippy-content {
@@ -178,7 +177,6 @@ function ManageHighlightItem({ booqId, highlight }: {
     highlight: Highlight,
 }) {
     const { removeHighlight, updateHighlight } = useHighlightMutations(booqId);
-    const { highlight: highlightColor } = usePalette();
     return <div className='container'>
         {
             groups.map(
@@ -208,7 +206,7 @@ function ManageHighlightItem({ booqId, highlight }: {
                 font-size: large;
             }
             .remove:hover {
-                color: ${highlightColor};
+                color: var(${vars.highlight});
             }
             `}</style>
     </div>;

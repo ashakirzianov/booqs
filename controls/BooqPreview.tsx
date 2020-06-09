@@ -1,7 +1,6 @@
 import { BooqPath } from 'core';
-import { usePalette } from 'app';
 import {
-    bookFont, meter, radius, panelShadow, panelShadowHover
+    bookFont, meter, radius, panelShadow, panelShadowHover, vars
 } from "./theme";
 import { panelWidth } from "./Panel";
 import { PropsType } from "./utils";
@@ -16,7 +15,6 @@ export function BooqPreview({
     page: number,
     total: number,
 }) {
-    const { dimmed, border } = usePalette();
     return <div className='container'>
         <span className='title'>{title}</span>
         <div className='preview'>{text}</div>
@@ -33,7 +31,7 @@ export function BooqPreview({
                 font-family: ${bookFont};
                 font-size: large;
                 border-radius: ${radius};
-                border: 1px solid ${border};
+                border: 1px solid var(${vars.border});
                 cursor: pointer;
                 transition: box-shadow 0.25s;
                 padding: ${meter.large} ${meter.xxLarge};
@@ -42,7 +40,7 @@ export function BooqPreview({
                 box-shadow: ${panelShadowHover};
             }
             .title {
-                color: ${dimmed};
+                color: var(${vars.dimmed});
                 text-align: center;
                 text-overflow: ellipsis;
                 white-space: nowrap;
@@ -62,7 +60,7 @@ export function BooqPreview({
             }
             .page {
                 display: flex;
-                color: ${dimmed};
+                color: var(${vars.dimmed});
                 align-self: center;
             }
             `}</style>

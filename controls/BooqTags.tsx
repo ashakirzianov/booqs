@@ -1,6 +1,5 @@
 import React from 'react';
-import { usePalette } from 'app';
-import { meter } from './theme';
+import { meter, vars } from './theme';
 
 export type BooqTag = {
     tag: string,
@@ -27,7 +26,6 @@ export function BooqTags({ tags }: {
 function BooqTagPill({ tag }: {
     tag: BooqTag,
 }) {
-    const { primary } = usePalette();
     switch (tag.tag.toLowerCase()) {
         case 'language':
             return tag.value
@@ -49,7 +47,7 @@ function BooqTagPill({ tag }: {
             />;
         case 'pages':
             return <Pill
-                color={primary}
+                color={`var(${vars.primary})`}
                 label={`${tag.value} pages`}
             />;
         default:

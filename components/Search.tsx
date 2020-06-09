@@ -1,11 +1,10 @@
 import React from 'react';
-import { usePalette, useSearch, SearchResult } from 'app';
-import { normalWeight, meter, radius } from 'controls/theme';
+import { useSearch, SearchResult } from 'app';
+import { normalWeight, meter, radius, vars } from 'controls/theme';
 import { BooqCover } from 'controls/BooqCover';
 import { Spinner } from 'controls/Spinner';
 
 export function Search() {
-    const { primary, dimmed, background } = usePalette();
     const { query, doQuery, results, loading } = useSearch();
     return <div className='container'>
         <div className='content'>
@@ -32,7 +31,7 @@ export function Search() {
             align-items: flex-start;
             justify-content: flex-start;
             margin: 0;
-            color: ${primary};
+            color: var(${vars.primary});
             max-height: 3rem;
             overflow: visible;
         }
@@ -40,7 +39,7 @@ export function Search() {
             display: flex;
             position: relative;
             flex-direction: column;
-            background-color: ${background};
+            background-color: var(${vars.background});
             border-radius: ${radius};
         }
         input {
@@ -51,7 +50,7 @@ export function Search() {
             font: inherit;
             font-size: x-large;
             font-weight: ${normalWeight};
-            color: ${primary};
+            color: var(${vars.primary});
             background-color: rgba(0,0,0,0);
         }
         input:focus {
@@ -60,7 +59,7 @@ export function Search() {
             outline: none;
         }
         input::placeholder {
-            color: ${dimmed};
+            color: var(${vars.dimmed});
         }
         .results {
             display: none;
@@ -126,7 +125,6 @@ function SingleResult({ result, query }: {
     result: SearchResult,
     query: string,
 }) {
-    const { highlight, background } = usePalette();
     return <div className='container'>
         <BooqCover
             cover={result.cover}
@@ -154,8 +152,8 @@ function SingleResult({ result, query }: {
                 cursor: pointer;
             }
             .container:hover {
-                background-color: ${highlight};
-                color: ${background};
+                background-color: var(${vars.highlight});
+                color: var(${vars.background});
             }
             .details {
                 display: flex;

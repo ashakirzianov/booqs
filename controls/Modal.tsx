@@ -1,6 +1,5 @@
 import React, { ReactNode, useState } from 'react';
-import { usePalette } from 'app';
-import { panelShadow, radius, meter } from './theme';
+import { panelShadow, radius, meter, vars } from './theme';
 import Link from 'next/link';
 
 export type ModalDefinition = {
@@ -34,7 +33,6 @@ function ModalContent({
     content: ReactNode,
     buttons?: ButtonProps[],
 }) {
-    const { background } = usePalette();
     const openClass = isOpen ? 'open' : 'closed';
     return <div className={`screen ${openClass}`} onClick={close}>
         <div
@@ -75,7 +73,7 @@ function ModalContent({
                 overflow-y: scroll;
                 overflow-x: hidden;
                 z-index: 10;
-                background: ${background};
+                background: var(${vars.background});
                 box-shadow: ${panelShadow};
                 border-radius: ${radius};
                 pointer-events: auto;
@@ -95,7 +93,6 @@ type ButtonProps = {
     href?: string,
 };
 function ModalButton({ text, onClick, href }: ButtonProps) {
-    const { border, action, highlight } = usePalette();
     return <div className='container' onClick={onClick}>
         <hr />
         {
@@ -112,10 +109,10 @@ function ModalButton({ text, onClick, href }: ButtonProps) {
                 flex-flow: column;
                 align-items: center;
                 cursor: pointer;
-                color: ${action};
+                color: var(${vars.action});
             }
             .container:hover {
-                color: ${highlight};
+                color: var(${vars.highlight});
             }
             .text {
                 margin: ${meter.large};
@@ -124,7 +121,7 @@ function ModalButton({ text, onClick, href }: ButtonProps) {
             hr {
                 width: 100%;
                 border: none;
-                border-top: 1px solid ${border};
+                border-top: 1px solid var(${vars.border});
                 margin: 0;
             }
             `}</style>
