@@ -33,3 +33,12 @@ export const meter = {
 function meterSize(x: number) {
     return `${x * 0.5}rem`;
 }
+
+export const vars = {
+    background: '--theme-background',
+    action: '--theme-action',
+    primary: '--theme-primary',
+    dimmed: '--theme-dimmed',
+    border: '--theme-border',
+    highlight: '--theme-highlight',
+};

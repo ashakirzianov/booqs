@@ -1,8 +1,8 @@
 import {
-    usePalette, PaletteName, palettes, useSetSettings, useSettings,
+    PaletteName, palettes, useSetSettings, useSettings,
 } from 'app';
 import {
-    bookFont, buttonShadow, meter,
+    bookFont, buttonShadow, meter, vars,
 } from "controls/theme";
 import { PopoverSingleton, Popover } from "controls/Popover";
 import { IconButton } from "controls/Buttons";
@@ -18,7 +18,6 @@ export function Themer({ singleton }: {
 }
 
 function ThemerPanel() {
-    const { border } = usePalette();
     return <div className="container">
         <FontSettings />
         <hr />
@@ -35,7 +34,7 @@ function ThemerPanel() {
                 margin: ${meter.xLarge} 0;
                 align-self: center;
                 border: none;
-                border-top: 1px solid ${border};
+                border-top: 1px solid var(${vars.border});
             }
         `}</style>
     </div>;
@@ -63,7 +62,6 @@ function FontScaleButton({ scale, onClick }: {
     scale: 'up' | 'down',
     onClick: () => void,
 }) {
-    const { highlight } = usePalette();
     const fontSize = scale === 'up'
         ? 'xx-large'
         : 'large';
@@ -79,7 +77,7 @@ function FontScaleButton({ scale, onClick }: {
                 transition: color 0.25s;
             }
             span:hover {
-                color: ${highlight};
+                color: var(${vars.highlight});
             }
             `}</style>
     </div>

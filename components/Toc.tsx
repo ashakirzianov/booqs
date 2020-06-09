@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { BooqPath, comparePaths } from 'core';
 import {
-    usePalette, pageForPosition, useToc, TocItem, Bookmark, useBookmarks,
+    pageForPosition, useToc, TocItem, Bookmark, useBookmarks,
 } from 'app';
 import { IconButton } from 'controls/Buttons';
 import { useModal } from 'controls/Modal';
 import { Spinner } from 'controls/Spinner';
 import { BooqLink } from 'controls/Links';
-import { meter } from 'controls/theme';
+import { meter, vars } from 'controls/theme';
 import { IconName, Icon } from 'controls/Icon';
 
 export function TocButton({ booqId }: {
@@ -40,7 +40,6 @@ function TocContent({ booqId, items, closeModal }: {
     items: DisplayItem[],
     closeModal: () => void,
 }) {
-    const { background, highlight, border, dimmed } = usePalette();
     return <div className='container'>
         <div className='title'>
             Contents
@@ -76,16 +75,16 @@ function TocContent({ booqId, items, closeModal }: {
                 align-items: flex-start;
                 padding: ${meter.large};
                 font-size: x-large;
-                color: ${dimmed};
+                color: var(${vars.dimmed});
             }
             .item:hover {
-                color: ${background};
-                background: ${highlight};
+                color: var(${vars.background});
+                background: var(${vars.highlight});
             }
             hr {
                 width: 85%;
                 border: none;
-                border-top: 1px solid ${border};
+                border-top: 1px solid var(${vars.border});
             }
             `}</style>
     </div>;

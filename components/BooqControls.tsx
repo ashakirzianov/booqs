@@ -1,7 +1,7 @@
 import React from 'react';
 import { BooqPath } from 'core';
-import { usePalette, pageForPosition } from 'app';
-import { headerHeight, meter } from 'controls/theme';
+import { pageForPosition } from 'app';
+import { headerHeight, meter, vars } from 'controls/theme';
 import { IconButton } from 'controls/Buttons';
 import { Popovers } from 'controls/Popover';
 import { FeedLink } from 'controls/Links';
@@ -16,7 +16,6 @@ export function Header({ booqId, path, visible }: {
     path?: BooqPath,
     visible: boolean,
 }) {
-    const { background } = usePalette();
     return <nav className='container'>
         <div className='feed'><FeedButton /></div>
         <div className='toc'>
@@ -77,7 +76,7 @@ export function Header({ booqId, path, visible }: {
                 .container {
                     grid-template-columns: auto auto 0 auto auto auto;
                     top: ${visible ? 0 : '-' + headerHeight};
-                    background: ${background};
+                    background: var(${vars.background});
                     box-shadow: 2px 0px 2px rgba(0, 0, 0, 0.3);
                 }
                 .feed, .toc, .bookmark, .themer, .sign {
@@ -98,7 +97,6 @@ export function Footer({ position, booqLength, nextChapter, visible }: {
     booqLength: number,
     nextChapter: number,
 }) {
-    const { dimmed, background } = usePalette();
     const page = pageForPosition(position) + 1;
     const total = pageForPosition(booqLength);
     const chapter = pageForPosition(nextChapter);
@@ -140,11 +138,11 @@ export function Footer({ position, booqLength, nextChapter, visible }: {
             .page, .chapter-left {
                 font-size: small;
                 margin: ${meter.large};
-                color: ${dimmed};
+                color: var(${vars.dimmed});
             }
             @media (max-width: ${transparentMaxWidth}) {
                 .container {
-                    background: ${background};
+                    background: var(${vars.background});
                     box-shadow: -2px 0px 2px rgba(0, 0, 0, 0.3);
                     bottom: ${visible ? 0 : '-' + headerHeight};
                 }

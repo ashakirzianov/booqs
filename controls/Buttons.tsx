@@ -1,8 +1,7 @@
 import React from 'react';
-import { usePalette } from 'app';
 import { Icon, IconName } from "./Icon";
 import {
-    buttonShadow, meter, radius,
+    buttonShadow, meter, radius, vars,
 } from "./theme";
 import { Spinner } from './Spinner';
 
@@ -11,7 +10,6 @@ export function IconButton({ icon, onClick }: {
     icon: IconName,
     onClick?: () => void,
 }) {
-    const { dimmed, highlight } = usePalette();
     return <button
         className='button'
         onClick={onClick}
@@ -23,7 +21,7 @@ export function IconButton({ icon, onClick }: {
                 margin: 0;
                 padding: 0;
                 height: ${buttonSize};
-                color: ${dimmed};
+                color: var(${vars.dimmed});
                 border: none;
                 font-size: x-large;
                 cursor: pointer;
@@ -31,7 +29,7 @@ export function IconButton({ icon, onClick }: {
                 background-color: rgba(0, 0, 0, 0);
             }
             .button:hover {
-                color: ${highlight};
+                color: var(${vars.highlight});
             }
             .button:focus {
                 outline: 0;
@@ -44,7 +42,6 @@ export function ActionButton({ text, onClick }: {
     text: string,
     onClick?: () => void,
 }) {
-    const { action, background, highlight } = usePalette();
     return <>
         <button onClick={onClick}>
             <span>{text}</span>
@@ -53,8 +50,8 @@ export function ActionButton({ text, onClick }: {
             button {
                 border: none;
                 border-radius: ${radius};
-                background-color: ${action};
-                color: ${background};
+                background-color: var(${vars.action});
+                color: var(${vars.background});
                 box-shadow: ${buttonShadow};
                 font-size: large;
                 padding: ${meter.regular};
@@ -63,7 +60,7 @@ export function ActionButton({ text, onClick }: {
                 transition: background-color 0.25s;
             }
             button:hover {
-                background-color: ${highlight};
+                background-color: var(${vars.highlight});
             }
             `}</style>
     </>;
@@ -74,7 +71,6 @@ export function TextButton({ text, onClick, loading }: {
     onClick?: () => void,
     loading?: boolean,
 }) {
-    const { action, highlight } = usePalette();
     return <>
         <span className='button' onClick={onClick}>
             {text}
@@ -86,14 +82,14 @@ export function TextButton({ text, onClick, loading }: {
         </span>
         <style jsx>{`
         .button {
-            color: ${action};
+            color: var(${vars.action});
             text-decoration: none;
             font-size: large;
             cursor: pointer;
             transition: color 0.25s;
         }
         .button:hover {
-            color: ${highlight};
+            color: var(${vars.highlight});
             text-decoration: underline;
         }
         `}</style>
@@ -105,7 +101,6 @@ export function BorderButton({ text, icon, onClick }: {
     icon?: IconName,
     onClick?: () => void,
 }) {
-    const { dimmed, highlight } = usePalette();
     return <div className='button' onClick={onClick}>
         {
             !icon ? null :
@@ -119,16 +114,16 @@ export function BorderButton({ text, icon, onClick }: {
             .button {
                 display: flex;
                 text-align: center;
-                color: ${dimmed};
-                border: 2px solid ${dimmed};
+                color: var(${vars.dimmed});
+                border: 2px solid var(${vars.dimmed});
                 border-radius: ${radius};
                 text-decoration: none;
                 padding: ${meter.regular};
                 cursor: pointer;
             }
             .button:hover {
-                color: ${highlight};
-                border-color: ${highlight};
+                color: var(${vars.highlight});
+                border-color: var(${vars.highlight});
             }
             `}</style>
     </div>;

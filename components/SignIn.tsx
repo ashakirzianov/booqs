@@ -1,6 +1,6 @@
 import React from "react";
-import { useSignInOptions, usePalette, useAuth } from 'app';
-import { meter } from "controls/theme";
+import { useSignInOptions, useAuth } from 'app';
+import { meter, vars } from "controls/theme";
 import { Menu, MenuItem } from "controls/Menu";
 import { IconButton, BorderButton } from "controls/Buttons";
 import { PopoverSingleton, Popover } from "controls/Popover";
@@ -73,7 +73,6 @@ function SignInPanel() {
 function ProfilePictureButton({ picture }: {
     picture: string,
 }) {
-    const { dimmed, highlight } = usePalette();
     return <div className='container'>
         <style jsx>{`
             .container {
@@ -81,7 +80,7 @@ function ProfilePictureButton({ picture }: {
                 display: flex;
                 flex-shrink: 0;
                 border-radius: 50%;
-                border: 1px solid ${dimmed};
+                border: 1px solid var(${vars.dimmed});
                 width: 36px;
                 height: 36px;
                 overflow: hidden;
@@ -91,7 +90,7 @@ function ProfilePictureButton({ picture }: {
                 cursor: pointer;
             }
             .container:hover {
-                border: 1px solid ${highlight};
+                border: 1px solid var(${vars.highlight});
             }
             `}</style>
     </div>;

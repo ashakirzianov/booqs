@@ -1,6 +1,5 @@
 import React, { ReactNode, useState } from 'react';
-import { usePalette } from 'app';
-import { panelShadow, radius, meter } from './theme';
+import { panelShadow, radius, meter, vars } from './theme';
 import Link from 'next/link';
 
 export type ModalDefinition = {
@@ -14,34 +13,30 @@ export function useModal(render: (props: ModalRenderProps) => ModalDefinition) {
     const [isOpen, setIsOpen] = useState(false);
     const openModal = () => setIsOpen(true);
     const closeModal = () => setIsOpen(false);
-    if (isOpen) {
-        const { body, buttons } = render({ closeModal });
-        return {
-            openModal, closeModal,
-            modalContent: <ModalContent
-                content={body}
-                buttons={buttons}
-                close={closeModal}
-            />,
-        };
-    } else {
-        return {
-            openModal, closeModal, modalContent: null,
-        };
-    }
+    const { body, buttons } = render({ closeModal });
+    return {
+        openModal, closeModal,
+        modalContent: <ModalContent
+            isOpen={isOpen}
+            content={body}
+            buttons={buttons}
+            close={closeModal}
+        />,
+    };
 }
 
 function ModalContent({
-    content, buttons, close,
+    isOpen, content, buttons, close,
 }: {
+    isOpen: boolean,
     close: () => void,
     content: ReactNode,
     buttons?: ButtonProps[],
 }) {
-    const { background } = usePalette();
-    return <div className='screen' onClick={close}>
+    const openClass = isOpen ? 'open' : 'closed';
+    return <div className={`screen ${openClass}`} onClick={close}>
         <div
-            className='container'
+            className={`container ${openClass}`}
             onClick={e => e.stopPropagation()}
         >
             <div className='content'>
@@ -65,6 +60,11 @@ function ModalContent({
                 align-items: center;
                 background: rgba(0, 0, 0, 0.25);
                 z-index: 10;
+                transition:  250ms visibility, 250ms background-color;
+            }
+            .screen.closed {
+                visibility: hidden;
+                background-color: rgba(0, 0, 0, 0.0);
             }
             .container {
                 position: relative;
@@ -73,10 +73,15 @@ function ModalContent({
                 overflow-y: scroll;
                 overflow-x: hidden;
                 z-index: 10;
-                background: ${background};
+                background: var(${vars.background});
                 box-shadow: ${panelShadow};
                 border-radius: ${radius};
                 pointer-events: auto;
+                transition: 250ms transform, 250ms opacity;
+            }
+            .container.closed {
+                transform: translateY(-25%);
+                opacity: 0;
             }
             `}</style>
     </div>;
@@ -88,7 +93,6 @@ type ButtonProps = {
     href?: string,
 };
 function ModalButton({ text, onClick, href }: ButtonProps) {
-    const { border, action, highlight } = usePalette();
     return <div className='container' onClick={onClick}>
         <hr />
         {
@@ -105,10 +109,10 @@ function ModalButton({ text, onClick, href }: ButtonProps) {
                 flex-flow: column;
                 align-items: center;
                 cursor: pointer;
-                color: ${action};
+                color: var(${vars.action});
             }
             .container:hover {
-                color: ${highlight};
+                color: var(${vars.highlight});
             }
             .text {
                 margin: ${meter.large};
@@ -117,7 +121,7 @@ function ModalButton({ text, onClick, href }: ButtonProps) {
             hr {
                 width: 100%;
                 border: none;
-                border-top: 1px solid ${border};
+                border-top: 1px solid var(${vars.border});
                 margin: 0;
             }
             `}</style>
