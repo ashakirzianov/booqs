@@ -1,29 +1,23 @@
-import React from 'react';
+import { useState, useRef } from 'react';
 
-export type SelectFileDialogRef = {
-    show(): void,
-};
-export function SelectFileDialog({
-    refCallback, accept, onFileChanged,
-}: {
+export function useSelectFileDialog({ accept }: {
     accept?: string,
-    refCallback: (ref: SelectFileDialogRef) => void,
-    onFileChanged: (file: File) => void,
 }) {
-    return <input
-        accept={accept}
-        style={{ display: 'none' }}
-        ref={r => refCallback({
-            show() {
-                r?.click();
-            }
-        })}
-        type='file'
-        onChange={e => {
-            const file = e.target.files && e.target.files[0];
-            if (file) {
-                onFileChanged(file);
-            }
-        }}
-    />;
+    const [file, setFile] = useState<File | undefined>(undefined);
+    const ref = useRef<HTMLInputElement>();
+    return {
+        openDialog: () => ref.current?.click(),
+        dialogContent: <input
+            accept={accept}
+            style={{ display: 'none' }}
+            ref={r => ref.current = r ?? undefined}
+            type='file'
+            onChange={e => {
+                const file = e.target.files && e.target.files[0];
+                setFile(file ?? undefined);
+            }}
+        />,
+        file,
+        clearFile: () => setFile(undefined),
+    };
 }

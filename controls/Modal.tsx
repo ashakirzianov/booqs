@@ -1,38 +1,58 @@
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useState } from 'react';
 import { usePalette } from 'app';
 import { panelShadow, radius, meter } from './theme';
-import { IconButton } from './Buttons';
+import Link from 'next/link';
 
-export function Modal({
-    title, isOpen, close, children,
-}: {
-    title?: string,
-    isOpen: boolean,
-    close: () => void,
-    children: ReactNode,
-}) {
-    const { background, dimmed } = usePalette();
-    if (!isOpen) {
-        return null;
+export type ModalDefinition = {
+    body: ReactNode,
+    buttons?: ButtonProps[],
+};
+export type ModalRenderProps = {
+    closeModal: () => void,
+};
+export function useModal(render: (props: ModalRenderProps) => ModalDefinition) {
+    const [isOpen, setIsOpen] = useState(false);
+    const openModal = () => setIsOpen(true);
+    const closeModal = () => setIsOpen(false);
+    if (isOpen) {
+        const { body, buttons } = render({ closeModal });
+        return {
+            openModal, closeModal,
+            modalContent: <ModalContent
+                content={body}
+                buttons={buttons}
+                close={closeModal}
+            />,
+        };
+    } else {
+        return {
+            openModal, closeModal, modalContent: null,
+        };
     }
+}
+
+function ModalContent({
+    content, buttons, close,
+}: {
+    close: () => void,
+    content: ReactNode,
+    buttons?: ButtonProps[],
+}) {
+    const { background } = usePalette();
     return <div className='screen' onClick={close}>
         <div
             className='container'
             onClick={e => e.stopPropagation()}
         >
-            {
-                title !== undefined
-                    ? <div className='title'>
-                        {title}
-                        <IconButton
-                            icon='close'
-                            onClick={close}
-                        />
-                    </div>
-                    : null
-            }
             <div className='content'>
-                {children}
+                {content}
+            </div>
+            <div className='buttons'>
+                {
+                    (buttons ?? []).map(
+                        (props, idx) => <ModalButton key={idx} {...props} />
+                    )
+                }
             </div>
         </div>
         <style jsx>{`
@@ -58,15 +78,48 @@ export function Modal({
                 border-radius: ${radius};
                 pointer-events: auto;
             }
-            .title {
-                display: flex;
-                flex-flow: row;
-                justify-content: space-between;
-                align-items: flex-start;
-                padding: ${meter.large};
-                font-size: x-large;
-                color: ${dimmed};
-            }
             `}</style>
     </div>;
+}
+
+type ButtonProps = {
+    text: string,
+    onClick?: () => void,
+    href?: string,
+};
+function ModalButton({ text, onClick, href }: ButtonProps) {
+    const { border, action, highlight } = usePalette();
+    return <div className='container' onClick={onClick}>
+        <hr />
+        {
+            href
+                ? <Link href={href}>
+                    <span className='text'>{text}</span>
+                </Link>
+                : <span className='text'>{text}</span>
+        }
+        <style jsx>{`
+            .container {
+                display: flex;
+                flex: 1;
+                flex-flow: column;
+                align-items: center;
+                cursor: pointer;
+                color: ${action};
+            }
+            .container:hover {
+                color: ${highlight};
+            }
+            .text {
+                margin: ${meter.large};
+                text-decoration: none;
+            }
+            hr {
+                width: 100%;
+                border: none;
+                border-top: 1px solid ${border};
+                margin: 0;
+            }
+            `}</style>
+    </div>
 }

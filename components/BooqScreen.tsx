@@ -162,7 +162,6 @@ function useScrollHandler({ id, fragment }: BooqData) {
             reportHistory({
                 booqId: id,
                 path,
-                source: 'not-implemented',
             });
         }
     };

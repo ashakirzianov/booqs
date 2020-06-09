@@ -1,21 +1,43 @@
-import { useRef, useState } from "react";
 import { useAuth, useUpload } from "app";
-import { ActionButton, IconButton } from "controls/Buttons";
+import { IconButton } from "controls/Buttons";
 import { meter } from "controls/theme";
-import {
-    SelectFileDialogRef, SelectFileDialog,
-} from "controls/SelectFileDialog";
+import { useSelectFileDialog } from "controls/SelectFileDialog";
 import { Spinner } from "controls/Spinner";
 import { PopoverSingleton, Popover } from "controls/Popover";
-import { Modal } from "controls/Modal";
+import { useModal } from "controls/Modal";
+import { BooqCover } from "controls/BooqCover";
+import { booqHref } from "controls/Links";
 
 export function Upload({ singleton }: {
     singleton: PopoverSingleton,
 }) {
     const auth = useAuth();
     const isSigned = auth.state === 'signed';
-    const dialogRef = useRef<SelectFileDialogRef>();
-    const [file, setFile] = useState<File | undefined>(undefined);
+    const {
+        body, buttons, clearFile,
+    } = useModalDefinition();
+    const { openModal, modalContent } = useModal(({ closeModal }) => ({
+        body: <div className='content'>
+            {body}
+            <style jsx>{`
+                .content {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    width: 15rem;
+                    max-width: 100vw;
+                    padding: ${meter.large};
+                }
+                `}</style>
+        </div>,
+        buttons: [...buttons, {
+            text: 'Dismiss',
+            onClick() {
+                closeModal();
+                clearFile();
+            }
+        }],
+    }));
 
     return <>
         <Popover
@@ -25,7 +47,7 @@ export function Upload({ singleton }: {
                     icon='upload'
                     onClick={
                         isSigned
-                            ? () => dialogRef.current?.show()
+                            ? openModal
                             : undefined
                     }
                 />
@@ -36,52 +58,62 @@ export function Upload({ singleton }: {
                     : 'Sign in to upload'
             } />}
         />
-        <SelectFileDialog
-            accept='application/epub+zip'
-            refCallback={r => dialogRef.current = r}
-            onFileChanged={setFile}
-        />
-        <Modal
-            isOpen={!!file}
-            close={() => setFile(undefined)}
-        >
-            <div className='modal'>
-                <UploadModalContent file={file!} />
-            </div>
-            <style jsx>{`
-                .modal {
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                    width: 30rem;
-                    padding: 0 0 ${meter.regular} 0;
-                }
-                `}</style>
-        </Modal>
+        {modalContent}
     </>;
 }
 
-function UploadModalContent({ file }: {
-    file: File,
-}) {
+function useModalDefinition() {
+    const {
+        file, openDialog, dialogContent, clearFile,
+    } = useSelectFileDialog({ accept: 'application/epub+zip' });
     const {
         uploaded, uploading, upload,
     } = useUpload();
-    if (uploaded) {
-        return <Label text={`Successfully uploaded: ${uploaded.title}.`} />;
+    if (!file) {
+        return {
+            clearFile,
+            body: <>
+                <Label text='Select file to upload' />
+                {dialogContent}
+            </>,
+            buttons: [{
+                text: 'Select .epub',
+                onClick: openDialog,
+            }],
+        };
+    } else if (uploaded) {
+        return {
+            clearFile,
+            body: <>
+                <Label text={`${uploaded.title}`} />
+                <BooqCover
+                    title={uploaded.title}
+                    cover={uploaded.cover}
+                />
+            </>,
+            buttons: [{
+                text: 'Read now',
+                href: booqHref(uploaded.id, [0]),
+            }],
+        };
     } else if (uploading) {
-        return <>
-            <Label text={`Uploading ${file.name}...`} />
-            <Spinner />
-        </>;
+        return {
+            clearFile,
+            body: <>
+                <Label text={`Uploading ${file.name}...`} />
+                <Spinner />
+            </>,
+            buttons: [],
+        };
     } else {
-        return <>
-            <Label text={`Upload ${file.name}`} />
-            <ActionButton
-                text='Upload'
-                onClick={() => upload(file)}
-            />
-        </>;
+        return {
+            clearFile,
+            body: <Label text={`${file.name}`} />,
+            buttons: [{
+                text: 'Upload',
+                onClick: () => upload(file),
+            }],
+        };
     }
 }
 

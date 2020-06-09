@@ -17,3 +17,7 @@ export function pathFromId(id: string): BooqPath | undefined {
 export function pageForPosition(position: number): number {
     return Math.ceil(position / 2500);
 }
+
+export function currentSource(): string {
+    return 'default/0';
+}

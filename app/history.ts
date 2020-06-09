@@ -1,6 +1,7 @@
 import { useQuery, useMutation } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 import { BooqPath } from "core";
+import { currentSource } from "./common";
 
 const BooqHistoryQuery = gql`query BooqHistory {
     history {
@@ -56,14 +57,20 @@ type ReportHistoryVariables = {
         path: BooqPath,
     },
 };
+type HistoryEvent = Omit<ReportHistoryVariables['event'], 'source'>;
 export function useReportHistory() {
     const [report] = useMutation<ReportHistoryData, ReportHistoryVariables>(
         ReportHistoryMutation,
     );
     return {
-        reportHistory(event: ReportHistoryVariables['event']) {
+        reportHistory(event: HistoryEvent) {
             report({
-                variables: { event },
+                variables: {
+                    event: {
+                        ...event,
+                        source: currentSource(),
+                    },
+                },
             });
         },
     };

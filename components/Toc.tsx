@@ -4,7 +4,7 @@ import {
     usePalette, pageForPosition, useToc, TocItem, Bookmark, useBookmarks,
 } from 'app';
 import { IconButton } from 'controls/Buttons';
-import { Modal } from 'controls/Modal';
+import { useModal } from 'controls/Modal';
 import { Spinner } from 'controls/Spinner';
 import { BooqLink } from 'controls/Links';
 import { meter } from 'controls/theme';
@@ -20,22 +20,17 @@ export function TocButton({ booqId }: {
     const display = buildDisplayItems({
         toc, bookmarks,
     });
+    const { openModal, modalContent } = useModal(({ closeModal }) => ({
+        body: loading
+            ? <Spinner />
+            : <TocContent
+                booqId={booqId} items={display}
+                closeModal={closeModal}
+            />,
+    }));
     return <>
-        <IconButton icon='toc' onClick={() => setOpen(true)} />
-        <Modal
-            isOpen={isOpen}
-            close={close}
-            title='Contents'
-        >
-            {
-                loading
-                    ? <Spinner />
-                    : <TocContent
-                        booqId={booqId} items={display}
-                        closeModal={close}
-                    />
-            }
-        </Modal>
+        <IconButton icon='toc' onClick={openModal} />
+        {modalContent}
     </>;
 }
 
@@ -45,8 +40,15 @@ function TocContent({ booqId, items, closeModal }: {
     items: DisplayItem[],
     closeModal: () => void,
 }) {
-    const { background, highlight, border } = usePalette();
+    const { background, highlight, border, dimmed } = usePalette();
     return <div className='container'>
+        <div className='title'>
+            Contents
+                        <IconButton
+                icon='close'
+                onClick={closeModal}
+            />
+        </div>
         {
             items.map(
                 (item, idx) => <div key={idx} onClick={closeModal}>
@@ -66,6 +68,15 @@ function TocContent({ booqId, items, closeModal }: {
                 flex-flow: column nowrap;
                 width: 100vw;
                 max-width: ${tocWidth};
+            }
+            .title {
+                display: flex;
+                flex-flow: row;
+                justify-content: space-between;
+                align-items: flex-start;
+                padding: ${meter.large};
+                font-size: x-large;
+                color: ${dimmed};
             }
             .item:hover {
                 color: ${background};
