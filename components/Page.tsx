@@ -10,7 +10,7 @@ import {
 export function Page({ title, children }: HasChildren & {
     title: string,
 }) {
-    const { paletteName } = useSettings();
+    const { paletteName, palette: { background, primary } } = useSettings();
     return <div className={`page ${paletteName}`}>
         <Head>
             <title>{title}</title>
@@ -28,8 +28,6 @@ export function Page({ title, children }: HasChildren & {
                 flex-direction: column;
                 font-family: ${menuFont};
                 font-weight: ${normalWeight};
-                color: var(${vars.primary});
-                background: var(${vars.background});
             }
             .page.light {
                 ${vars.action}: ${palettes.light.action};
@@ -64,6 +62,8 @@ export function Page({ title, children }: HasChildren & {
                 margin: 0;
                 padding: 0;
                 overflow-x: hidden;
+                color: ${primary};
+                background: ${background};
             }
         `}</style>
     </div>;

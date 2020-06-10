@@ -1,5 +1,6 @@
 import { useQuery, useApolloClient } from "@apollo/react-hooks";
 import gql from 'graphql-tag';
+import { syncStorageCell } from "plat";
 
 type Palette = {
     background: string,
@@ -21,10 +22,12 @@ type SettingsData = {
     paletteName: PaletteName,
     fontScale: number,
 };
-export const initialSettingsData: SettingsData = {
+const storage = syncStorageCell<SettingsData>('settings');
+export const initialSettingsData: SettingsData = storage.restore() ?? {
     paletteName: 'light',
     fontScale: 100,
 };
+storage.store(initialSettingsData);
 
 export function usePalette() {
     return useSettings().palette;
@@ -34,7 +37,7 @@ export function useSettings() {
     const { data } = useQuery<SettingsData>(SettingsQuery);
     const {
         paletteName, fontScale,
-    } = data ?? { paletteName: 'light', fontScale: 100 };
+    } = data ?? initialSettingsData;
     const palette = palettes[paletteName] ?? palettes.light;
     return {
         palette,
@@ -49,12 +52,14 @@ export function useSetSettings() {
             client.writeData<Partial<SettingsData>>({
                 data: { paletteName },
             });
+            storage.update({ paletteName });
         },
         setFontScale(fontScale: number) {
             fontScale = Math.max(10, fontScale);
             client.writeData<Partial<SettingsData>>({
                 data: { fontScale },
             });
+            storage.update({ fontScale });
         },
     };
 }

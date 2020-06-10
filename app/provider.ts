@@ -4,21 +4,11 @@ import { ApolloClient, OperationVariables, QueryOptions } from 'apollo-client';
 import { InMemoryCache } from 'apollo-cache-inmemory';
 import { ApolloLink } from 'apollo-link';
 import { onError } from 'apollo-link-error';
-import { setContext } from 'apollo-link-context';
 import { createUploadLink } from 'apollo-upload-client';
 import { initialSettingsData } from './settings';
-import { restoreAuthToken, initialAuthData, initAuth } from './auth';
+import { initialAuthData } from './auth';
 
 const link = ApolloLink.from([
-    setContext((_, { headers }) => {
-        const token = restoreAuthToken();
-        return {
-            headers: {
-                ...headers,
-                authorization: token ? `Bearer ${token}` : "",
-            },
-        };
-    }),
     onError(({ graphQLErrors, networkError }) => {
         if (graphQLErrors)
             graphQLErrors.forEach(({ message, locations, path }) =>
@@ -30,7 +20,11 @@ const link = ApolloLink.from([
     }),
     createUploadLink({
         uri: process.env.NEXT_PUBLIC_BACKEND,
+        credentials: 'include',
         fetch,
+        fetchOptions: {
+            credentials: 'include',
+        },
     }),
 ]);
 
@@ -50,7 +44,6 @@ client.writeData(initialData);
 client.onResetStore(async () => {
     client.writeData(initialData);
 });
-initAuth(client);
 
 export function AppProvider({ children }: {
     children: ReactNode,
