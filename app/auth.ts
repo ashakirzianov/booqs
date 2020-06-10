@@ -4,11 +4,10 @@ import gql from 'graphql-tag';
 import { facebookSdk } from "./facebookSdk";
 import { syncStorage } from "plat";
 
-type AuthDataWithToken = AuthData & { token: string };
 export function restoreAuthData() {
-    return syncStorage().restore<AuthDataWithToken>('auth');
+    return syncStorage().restore<AuthData>('auth');
 }
-function storeAuthData(authData: AuthDataWithToken) {
+function storeAuthData(authData: AuthData) {
     syncStorage().store('auth', authData);
 }
 function clearAuthData() {
@@ -25,18 +24,11 @@ const AuthStateQuery = gql`query AuthState {
     profilePicture @client
     provider @client
 }`;
-const restored = restoreAuthData();
-export const initialAuthData: AuthData = restored
-    ? {
-        name: restored.name,
-        provider: restored.provider,
-        profilePicture: restored.profilePicture ?? null,
-    }
-    : {
-        name: null,
-        profilePicture: null,
-        provider: null,
-    };
+export const initialAuthData: AuthData = restoreAuthData() ?? {
+    name: null,
+    profilePicture: null,
+    provider: null,
+};
 export type Auth = ReturnType<typeof useAuth>;
 export function useAuth() {
     const { data } = useQuery<AuthData>(AuthStateQuery);
@@ -70,16 +62,27 @@ export function useSignInOptions() {
             }
         },
         async signOut() {
-            client.writeData<AuthData>({
-                data: {
-                    provider: null, name: null, profilePicture: null,
-                },
-            });
-            await facebookSdk()?.logout();
-            client.resetStore();
-            clearAuthData();
-        }
+            signOut(client);
+        },
     };
+}
+
+async function signOut(client: ApolloClient<unknown>) {
+    const result = await client.query<{ logout: boolean }>({
+        query: gql`query Logout {
+            logout
+        }`,
+    });
+    if (result?.data?.logout) {
+        client.writeData<AuthData>({
+            data: {
+                provider: null, name: null, profilePicture: null,
+            },
+        });
+        await facebookSdk()?.logout();
+        client.resetStore();
+        clearAuthData();
+    }
 }
 
 async function signIn(client: ApolloClient<unknown>, token: string, provider: string) {
@@ -109,7 +112,6 @@ async function signIn(client: ApolloClient<unknown>, token: string, provider: st
             : initialAuthData;
         storeAuthData({
             provider,
-            token: auth.token,
             name: auth.name,
             profilePicture: data.profilePicture,
         });
