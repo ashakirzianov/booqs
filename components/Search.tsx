@@ -82,9 +82,11 @@ export function Search() {
             height: 100%;
             pointer-events: none;
             border-radius: ${radius};
+            transition: 250ms box-shadow;
         }
         input:focus ~ .shadow {
             box-shadow: 0px 0px 7px rgba(0,0,0,0.1);
+            border: 1px solid var(${vars.border});
         }
         `}</style>
     </div>;
@@ -95,6 +97,9 @@ function SearchResults({ loading, query, results }: {
     query: string,
     loading: boolean,
 }) {
+    if (!results.length) {
+        return null;
+    }
     return <div className='container'>
         {
             results.map(
@@ -115,7 +120,7 @@ function SearchResults({ loading, query, results }: {
             .container {
                 display: flex;
                 flex-direction: column;
-                max-height: 100vh;
+                max-height: 19rem;
                 overflow: scroll;
             }
             .spinner {

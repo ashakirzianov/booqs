@@ -38,7 +38,7 @@ export function AppBar() {
                     display: flex;
                 }
                 .container {
-                    padding: 0 ${meter.large};
+                    padding: ${meter.xLarge} ${meter.large};
                 }
             }
             .search {
