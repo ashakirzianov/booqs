@@ -2,17 +2,17 @@ import React, { useState, useCallback, useMemo } from 'react';
 import { positionForPath, samePath, BooqPath, BooqRange } from 'core';
 import {
     BooqData, BooqAnchor, useSettings, useReportHistory,
-    useHighlights, colorForGroup, quoteColor,
+    useHighlights, colorForGroup, quoteColor, pageForPosition,
 } from 'app';
-import { headerHeight, meter, bookFont } from 'controls/theme';
-import { BorderButton } from 'controls/Buttons';
-import { BooqLink } from 'controls/Links';
+import { headerHeight, meter, bookFont, vars } from 'controls/theme';
+import { BorderButton, IconButton } from 'controls/Buttons';
+import { BooqLink, FeedLink } from 'controls/Links';
 import { Spinner } from 'controls/Spinner';
 import { BooqContent, BooqSelection, Colorization } from './BooqContent';
 import { BooqContextMenu } from './BooqContextMenu';
-import { LoadingHeader, Footer, Header, transparentMaxWidth } from './BooqControls';
+import { LoadingHeader } from './BooqControls';
+import { BooqLayout } from './BooqLayout';
 
-const contentWidth = '50rem';
 export function BooqScreen({
     booq, quote,
 }: {
@@ -20,13 +20,10 @@ export function BooqScreen({
     quote?: BooqRange,
 }) {
     const { fontScale } = useSettings();
-    const { onScroll, currentPath } = useScrollHandler(booq);
+    const {
+        onScroll, currentPath, currentPage, totalPages, leftPages,
+    } = useScrollHandler(booq);
     const { onSelection, selection } = useSelectionHandler();
-
-    const position = positionForPath(booq.fragment.nodes, currentPath);
-    const nextChapter = booq.fragment.next
-        ? positionForPath(booq.fragment.nodes, booq.fragment.next.path)
-        : booq.length;
     const range: BooqRange = useMemo(() => ({
         start: booq.fragment.current.path,
         end: booq.fragment.next?.path,
@@ -34,16 +31,17 @@ export function BooqScreen({
     const colorization = useColorization(booq.id, quote);
     const { visible, toggle } = useControlsVisibility();
 
-    return <div className='container'>
-        <Header
-            booqId={booq.id} path={currentPath} visible={visible}
-        />
-        <div className='booq'>
-            <AnchorButton
-                booqId={booq.id}
-                anchor={booq.fragment.previous}
-                title='Previous'
-            />
+    const pagesLabel = `${currentPage} of ${totalPages}`;
+    const leftLabel = leftPages <= 1 ? 'Last page'
+        : `${leftPages} pages left`;
+
+    return <BooqLayout
+        isVisible={visible}
+        isNavigationOpen={false}
+        BooqContent={<div style={{
+            fontFamily: bookFont,
+            fontSize: `${fontScale}%`,
+        }}>
             <BooqContent
                 booqId={booq.id}
                 nodes={booq.fragment.nodes}
@@ -53,47 +51,31 @@ export function BooqScreen({
                 onSelection={onSelection}
                 onClick={toggle}
             />
-            <BooqContextMenu
-                booqId={booq.id}
-                selection={selection}
-            />
-            <AnchorButton
-                booqId={booq.id}
-                anchor={booq.fragment.next}
-                title='Next'
-            />
-        </div>
-        <Footer
-            visible={visible}
-            position={position}
-            nextChapter={nextChapter}
-            booqLength={booq.length}
-        />
-        <style jsx>{`
-            .container {
-                display: flex;
-                flex: 1;
-                flex-flow: column;
-                align-items: center;
-            }
-            .booq {
-                display: flex;
-                flex-flow: column;
-                align-items: center;
-                width: 100%;
-                max-width: ${contentWidth};
-                font-family: ${bookFont};
-                font-size: ${fontScale}%;
-                padding: ${meter.xxLarge} ${meter.large};
-                transition: 250ms padding;
-            }
-            @media (min-width: ${transparentMaxWidth}) {
-                .booq {
-                    padding: 0;
-                }
-            }
-            `}</style>
-    </div>;
+        </div>}
+        PrevButton={<AnchorButton
+            booqId={booq.id}
+            anchor={booq.fragment.previous}
+            title='Previous'
+        />}
+        NextButton={<AnchorButton
+            booqId={booq.id}
+            anchor={booq.fragment.next}
+            title='Next'
+        />}
+        ContextMenu={<BooqContextMenu
+            booqId={booq.id}
+            selection={selection}
+        />}
+        MainButton={<FeedLink>
+            <IconButton icon='back' />
+        </FeedLink>}
+        NavigationButton={<IconButton icon='toc' />}
+        ThemerButton={<IconButton icon='appearance' />}
+        AccountButton={<IconButton icon='sign-in' />}
+        CurrentPage={<PageLabel text={pagesLabel} />}
+        PagesLeft={<PageLabel text={leftLabel} />}
+        NavigationContent={null}
+    />;
 }
 
 export function LoadingBooqScreen() {
@@ -153,9 +135,19 @@ function useColorization(booqId: string, quote?: BooqRange) {
     );
 }
 
-function useScrollHandler({ id, fragment }: BooqData) {
+function useScrollHandler({ id, fragment, length }: BooqData) {
     const [currentPath, setCurrentPath] = useState(fragment.current.path);
     const { reportHistory } = useReportHistory();
+
+    const position = positionForPath(fragment.nodes, currentPath);
+    const nextChapter = fragment.next
+        ? positionForPath(fragment.nodes, fragment.next.path)
+        : length;
+    const currentPage = pageForPosition(position) + 1;
+    const totalPages = pageForPosition(length);
+    const chapter = pageForPosition(nextChapter);
+    const leftPages = chapter - currentPage + 1;
+
     const onScroll = function (path: BooqPath) {
         if (!samePath(path, currentPath)) {
             setCurrentPath(path);
@@ -167,6 +159,7 @@ function useScrollHandler({ id, fragment }: BooqData) {
     };
     return {
         currentPath,
+        currentPage, totalPages, leftPages,
         onScroll,
     };
 }
@@ -203,4 +196,19 @@ function AnchorButton({ booqId, anchor, title }: {
             }`}</style>
         </div>
     </BooqLink>;
+}
+
+function PageLabel({ text }: {
+    text: string,
+}) {
+    return <span className='label'>
+        {text}
+        <style jsx>{`
+            .label {
+                font-size: small;
+                margin: ${meter.large};
+                color: var(${vars.dimmed});
+            }
+            `}</style>
+    </span>;
 }
