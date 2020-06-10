@@ -2,17 +2,9 @@ import { ApolloClient } from "apollo-client";
 import { useApolloClient, useQuery } from '@apollo/react-hooks';
 import gql from 'graphql-tag';
 import { facebookSdk } from "./facebookSdk";
-import { syncStorage } from "plat";
+import { syncStorageCell } from "plat";
 
-export function restoreAuthData() {
-    return syncStorage().restore<AuthData>('auth');
-}
-function storeAuthData(authData: AuthData) {
-    syncStorage().store('auth', authData);
-}
-function clearAuthData() {
-    syncStorage().clear('auth');
-}
+const storage = syncStorageCell<AuthData>('auth');
 
 type AuthData = {
     name: string | null,
@@ -24,7 +16,7 @@ const AuthStateQuery = gql`query AuthState {
     profilePicture @client
     provider @client
 }`;
-export const initialAuthData: AuthData = restoreAuthData() ?? {
+export const initialAuthData: AuthData = storage.restore() ?? {
     name: null,
     profilePicture: null,
     provider: null,
@@ -81,7 +73,7 @@ async function signOut(client: ApolloClient<unknown>) {
         });
         await facebookSdk()?.logout();
         client.resetStore();
-        clearAuthData();
+        storage.clear();
     }
 }
 
@@ -110,7 +102,7 @@ async function signIn(client: ApolloClient<unknown>, token: string, provider: st
                 profilePicture: auth.profilePicture,
             }
             : initialAuthData;
-        storeAuthData({
+        storage.store({
             provider,
             name: auth.name,
             profilePicture: data.profilePicture,
