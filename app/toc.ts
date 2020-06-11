@@ -18,9 +18,9 @@ type TocData = {
     booq: {
         title?: string,
         tableOfContents: {
-            title?: string,
-            position?: number,
-            level?: number,
+            title: string,
+            position: number,
+            level: number,
             path: BooqPath,
         }[],
     },
