@@ -4,53 +4,39 @@ import {
     pageForPosition, useToc, TocItem, Bookmark, useBookmarks,
 } from 'app';
 import { IconButton } from 'controls/Buttons';
-import { useModal } from 'controls/Modal';
-import { Spinner } from 'controls/Spinner';
 import { BooqLink } from 'controls/Links';
 import { meter, vars } from 'controls/theme';
 import { IconName, Icon } from 'controls/Icon';
 
-export function TocButton({ booqId }: {
-    booqId: string,
-}) {
-    const [isOpen, setOpen] = useState(false);
-    const close = () => setOpen(false);
-    const { loading, toc } = useToc(booqId);
-    const { bookmarks } = useBookmarks(booqId);
-    const display = buildDisplayItems({
-        toc, bookmarks,
-    });
-    const { openModal, modalContent } = useModal(({ closeModal }) => ({
-        body: loading
-            ? <Spinner />
-            : <TocContent
-                booqId={booqId} items={display}
-                closeModal={closeModal}
-            />,
-    }));
-    return <>
-        <IconButton icon='toc' onClick={openModal} />
-        {modalContent}
-    </>;
+export function useNavigationPanel(booqId: string) {
+    const [navigationOpen, setOpen] = useState(false);
+    const NavigationButton = <IconButton
+        icon='toc'
+        onClick={() => setOpen(!navigationOpen)}
+        isSelected={navigationOpen}
+    />;
+    const NavigationContent = <Navigation
+        booqId={booqId}
+        closeSelf={() => setOpen(false)}
+    />;
+    return {
+        navigationOpen, NavigationButton, NavigationContent,
+    };
 }
 
-const tocWidth = '50rem';
-function TocContent({ booqId, items, closeModal }: {
+function Navigation({ booqId, closeSelf }: {
     booqId: string,
-    items: DisplayItem[],
-    closeModal: () => void,
+    closeSelf: () => void,
 }) {
+    const { toc } = useToc(booqId);
+    const { bookmarks } = useBookmarks(booqId);
+    const items = buildDisplayItems({
+        toc, bookmarks,
+    });
     return <div className='container'>
-        <div className='title'>
-            Contents
-                        <IconButton
-                icon='close'
-                onClick={closeModal}
-            />
-        </div>
         {
             items.map(
-                (item, idx) => <div key={idx} onClick={closeModal}>
+                (item, idx) => <div key={idx} onClick={closeSelf}>
                     <div className='item'>
                         <TocRow
                             booqId={booqId}
@@ -64,22 +50,11 @@ function TocContent({ booqId, items, closeModal }: {
         <style jsx>{`
             .container {
                 display: flex;
+                flex: 1 1;
                 flex-flow: column nowrap;
-                width: 100vw;
-                max-width: ${tocWidth};
-            }
-            .title {
-                display: flex;
-                flex-flow: row;
-                justify-content: space-between;
-                align-items: flex-start;
-                padding: ${meter.large};
-                font-size: x-large;
-                color: var(${vars.dimmed});
             }
             .item:hover {
-                color: var(${vars.background});
-                background: var(${vars.highlight});
+                color: var(${vars.highlight});
             }
             hr {
                 width: 85%;

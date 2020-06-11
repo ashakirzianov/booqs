@@ -8,7 +8,7 @@ import { headerHeight, meter, bookFont, vars } from 'controls/theme';
 import { BorderButton, IconButton } from 'controls/Buttons';
 import { BooqLink, FeedLink } from 'controls/Links';
 import { Spinner } from 'controls/Spinner';
-import { TocButton } from 'components/Toc';
+import { useNavigationPanel } from 'components/Toc';
 import { Themer } from 'components/Themer';
 import { SignIn } from 'components/SignIn';
 import { BooqContent, BooqSelection, Colorization } from './BooqContent';
@@ -39,10 +39,13 @@ export function Reader({
         : `${leftPages} pages left`;
 
     const { singleton, singletonNode } = usePopoverSingleton();
+    const {
+        navigationOpen, NavigationButton, NavigationContent,
+    } = useNavigationPanel(booq.id);
 
     return <ReaderLayout
         isVisible={visible}
-        isNavigationOpen={false}
+        isNavigationOpen={navigationOpen}
         BooqContent={<div style={{
             fontFamily: bookFont,
             fontSize: `${fontScale}%`,
@@ -75,12 +78,12 @@ export function Reader({
         MainButton={<FeedLink>
             <IconButton icon='back' />
         </FeedLink>}
-        NavigationButton={<TocButton booqId={booq.id} />}
+        NavigationButton={NavigationButton}
         ThemerButton={<Themer singleton={singleton} />}
         AccountButton={<SignIn singleton={singleton} />}
         CurrentPage={<PageLabel text={pagesLabel} />}
         PagesLeft={<PageLabel text={leftLabel} />}
-        NavigationContent={null}
+        NavigationContent={NavigationContent}
     />;
 }
 

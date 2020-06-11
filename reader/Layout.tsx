@@ -52,10 +52,11 @@ export function ReaderLayout({
 }
 
 function BooqControls({
-    isVisible,
+    isVisible, isNavigationOpen,
     MainButton, NavigationButton,
     ThemerButton, AccountButton,
     CurrentPage, PagesLeft,
+    NavigationContent,
 }: ControlsProps) {
     return <div className='container'>
         <div className='main'>{MainButton}</div>
@@ -64,6 +65,7 @@ function BooqControls({
         <div className='account'>{AccountButton}</div>
         <div className='page'>{CurrentPage}</div>
         <div className='left'>{PagesLeft}</div>
+        <div className='navc' onScroll={e => { e.preventDefault(); e.stopPropagation(); }}>{NavigationContent}</div>
         <div className='content' />
         <div className='back-top' />
         <div className='back-bottom' />
@@ -72,20 +74,30 @@ function BooqControls({
                 position: fixed;
                 top: 0; bottom: 0; left: 0; right: 0;
                 pointer-events: none;
-                display: grid;
                 justify-items: center;
                 align-items: center;
-                grid-template-columns: auto auto 1fr ${contentWidth} 1fr auto auto;
+                display: grid;
+                grid-template-columns: minmax(0, auto) minmax(0, auto) 1fr ${contentWidth} 1fr minmax(0, auto) minmax(0, auto);
                 grid-template-rows: ${headerHeight} 1fr ${headerHeight};
                 grid-template-areas: 
-                    "main nav  . content . themer account"
-                    ".    .    . content . .      .      "
-                    "page page . content . left   left   ";
+                    "main nav  .    content . themer account"
+                    "navc navc navc content . .      .      "
+                    "page page .    content . left   left   ";
             }
             .content {
                 grid-area: content;
                 align-self: stretch;
                 justify-self: stretch;
+            }
+            .navc {
+                display: flex;
+                flex: 1 1;
+                grid-area: navc;
+                pointer-events: auto;
+                overflow: scroll;
+                align-self: stretch;
+                justify-self: stretch;
+                transition: 250ms transform;
             }
             .main, .nav, .themer, .account, .page, .left {
                 transition: 250ms transform;
@@ -121,9 +133,12 @@ function BooqControls({
                     grid-template-columns: auto auto 1fr auto auto;
                     grid-template-rows: ${headerHeight} 1fr ${headerHeight};
                     grid-template-areas: 
-                        "main nav  content themer account"
-                        ".    .    content .      ."
-                        "page page content left   left";
+                        "main nav  .    themer account"
+                        "navc navc navc navc   navc"
+                        "page page .    left   left";
+                }
+                .navc {
+                    background: var(${vars.background});
                 }
                 .back-top, .back-bottom {
                     display: block;
@@ -143,6 +158,9 @@ function BooqControls({
             }
             `}</style>
         <style jsx>{`
+            .navc {
+                transform: ${isNavigationOpen ? 'initial' : 'translateX(-100%)'};
+            }
             @media (max-width: ${smallScreenWidth}) {
                 .main, .nav, .themer, .account, .back-top {
                     transform: ${isVisible ? undefined : `translateY(-${headerHeight})`};
