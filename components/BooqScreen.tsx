@@ -206,7 +206,6 @@ function PageLabel({ text }: {
         <style jsx>{`
             .label {
                 font-size: small;
-                margin: ${meter.large};
                 color: var(${vars.dimmed});
             }
             `}</style>
