@@ -1,1 +1,1 @@
-export * from './BooqPage';
+export * from './ReaderPage';

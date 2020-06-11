@@ -13,7 +13,7 @@ import { BooqSelection } from './BooqContent';
 import { Icon } from 'controls/Icon';
 import { meter, radius, panelShadow, vars } from 'controls/theme';
 
-export function BooqContextMenu({
+export function ContextMenu({
     booqId, selection, locked,
 }: {
     booqId: string,

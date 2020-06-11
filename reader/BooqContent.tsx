@@ -13,7 +13,7 @@ export type Colorization = {
     range: BooqRange,
     color: string,
 };
-export const BooqContent = (function BooqContent({
+export function BooqContent({
     booqId, nodes, range, colorization,
     onScroll, onSelection, onClick,
 }: {
@@ -38,7 +38,7 @@ export const BooqContent = (function BooqContent({
             }
         </div>;
     }, [nodes, booqId, range, colorization]);
-});
+}
 
 function useOnClick(callback?: () => void) {
     const actual = useCallback((event: Event) => {

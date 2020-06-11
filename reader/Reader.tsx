@@ -12,11 +12,11 @@ import { TocButton } from 'components/Toc';
 import { Themer } from 'components/Themer';
 import { SignIn } from 'components/SignIn';
 import { BooqContent, BooqSelection, Colorization } from './BooqContent';
-import { BooqContextMenu } from './BooqContextMenu';
-import { BooqLayout } from './BooqLayout';
+import { ContextMenu } from './ContextMenu';
+import { ReaderLayout } from './Layout';
 import { usePopoverSingleton } from 'controls/Popover';
 
-export function BooqScreen({
+export function Reader({
     booq, quote,
 }: {
     booq: BooqData,
@@ -40,7 +40,7 @@ export function BooqScreen({
 
     const { singleton, singletonNode } = usePopoverSingleton();
 
-    return <BooqLayout
+    return <ReaderLayout
         isVisible={visible}
         isNavigationOpen={false}
         BooqContent={<div style={{
@@ -68,7 +68,7 @@ export function BooqScreen({
             anchor={booq.fragment.next}
             title='Next'
         />}
-        ContextMenu={<BooqContextMenu
+        ContextMenu={<ContextMenu
             booqId={booq.id}
             selection={selection}
         />}
@@ -85,7 +85,7 @@ export function BooqScreen({
 }
 
 export function LoadingBooqScreen() {
-    return <BooqLayout
+    return <ReaderLayout
         isVisible={true}
         isNavigationOpen={false}
         BooqContent={<div style={{

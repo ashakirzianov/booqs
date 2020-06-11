@@ -21,7 +21,7 @@ type LayoutProps = ControlsProps & {
 
 const contentWidth = '40rem';
 export const smallScreenWidth = '60rem';
-export function BooqLayout({
+export function ReaderLayout({
     BooqContent, PrevButton, NextButton, ContextMenu,
     ...controls
 }: LayoutProps) {
