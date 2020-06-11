@@ -9,7 +9,7 @@ import { BooqCover } from "controls/BooqCover";
 import { booqHref } from "controls/Links";
 
 export function Upload({ singleton }: {
-    singleton: PopoverSingleton,
+    singleton?: PopoverSingleton,
 }) {
     const auth = useAuth();
     const isSigned = auth.state === 'signed';

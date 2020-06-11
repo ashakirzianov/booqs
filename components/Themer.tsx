@@ -8,7 +8,7 @@ import { PopoverSingleton, Popover } from "controls/Popover";
 import { IconButton } from "controls/Buttons";
 
 export function Themer({ singleton }: {
-    singleton: PopoverSingleton,
+    singleton?: PopoverSingleton,
 }) {
     return <Popover
         singleton={singleton}

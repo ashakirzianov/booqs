@@ -12,6 +12,9 @@ import { BooqContent, BooqSelection, Colorization } from './BooqContent';
 import { BooqContextMenu } from './BooqContextMenu';
 import { LoadingHeader } from './BooqControls';
 import { BooqLayout } from './BooqLayout';
+import { TocButton } from './Toc';
+import { Themer } from './Themer';
+import { SignIn } from './SignIn';
 
 export function BooqScreen({
     booq, quote,
@@ -69,9 +72,9 @@ export function BooqScreen({
         MainButton={<FeedLink>
             <IconButton icon='back' />
         </FeedLink>}
-        NavigationButton={<IconButton icon='toc' />}
-        ThemerButton={<IconButton icon='appearance' />}
-        AccountButton={<IconButton icon='sign-in' />}
+        NavigationButton={<TocButton booqId={booq.id} />}
+        ThemerButton={<Themer />}
+        AccountButton={<SignIn />}
         CurrentPage={<PageLabel text={pagesLabel} />}
         PagesLeft={<PageLabel text={leftLabel} />}
         NavigationContent={null}
