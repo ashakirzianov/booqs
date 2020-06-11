@@ -2,8 +2,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/router";
 import { useBooq, BooqData, pathToId } from "app";
 import { BooqPath, BooqRange } from 'core';
-import { Spinner } from "../controls/Spinner";
-import { Page } from "./Page";
+import { Page } from "components/Page";
 import { BooqScreen, LoadingBooqScreen } from "./BooqScreen";
 
 type PageData = {
