@@ -168,6 +168,8 @@ function AddHighlightItem({ booqId, selection }: {
             group: 'first',
             start: selection.range.start,
             end: selection.range.end ?? selection.range.start,
+            // TODO: implement
+            text: '<not-implemented>',
         })}
     />;
 }
