@@ -2,9 +2,8 @@ import { useEffect } from "react";
 import { useRouter } from "next/router";
 import { useBooq, BooqData, pathToId } from "app";
 import { BooqPath, BooqRange } from 'core';
-import { Spinner } from "../controls/Spinner";
-import { Page } from "./Page";
-import { BooqScreen, LoadingBooqScreen } from "./BooqScreen";
+import { Page } from "components/Page";
+import { Reader, LoadingBooqScreen } from "./Reader";
 
 type PageData = {
     kind: 'preloaded',
@@ -78,7 +77,7 @@ function LoadedBooqPage({ booq, path, quote }: {
 }) {
     usePathNavigation(path);
     return <Page title={booq?.title ?? 'Booq'}>
-        <BooqScreen booq={booq} quote={quote} />
+        <Reader booq={booq} quote={quote} />
     </Page>;
 }
 

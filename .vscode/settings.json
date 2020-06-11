@@ -27,6 +27,8 @@
         "jssdk",
         "kinesisvideomedia",
         "lucene",
+        "minmax",
+        "navc",
         "pids",
         "prefetch",
         "promisify",

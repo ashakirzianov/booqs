@@ -28,7 +28,7 @@ export function SignInMenu() {
 }
 
 export function SignIn({ singleton }: {
-    singleton: PopoverSingleton,
+    singleton?: PopoverSingleton,
 }) {
     return <Popover
         singleton={singleton}

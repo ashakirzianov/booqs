@@ -6,9 +6,10 @@ import {
 import { Spinner } from './Spinner';
 
 const buttonSize = 50;
-export function IconButton({ icon, onClick }: {
+export function IconButton({ icon, onClick, isSelected }: {
     icon: IconName,
     onClick?: () => void,
+    isSelected?: boolean,
 }) {
     return <button
         className='button'
@@ -35,6 +36,11 @@ export function IconButton({ icon, onClick }: {
                 outline: 0;
             }
         `}</style>
+        <style jsx>{`
+            .button {
+                color: ${isSelected ? `var(${vars.highlight})` : `var(${vars.dimmed})`}
+            }
+            `}</style>
     </button>;
 }
 
