@@ -132,7 +132,7 @@ function BooqControls({
                     align-self: stretch;
                     justify-self: stretch;
                     background: var(${vars.background});
-                    box-shadow: 0px 0px 1px 0px rgba(0, 0, 0, 0.1);
+                    box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.1);
                 }
                 .back-top {
                     grid-area: 1 / 1 / 1 / 6;

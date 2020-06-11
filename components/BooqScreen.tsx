@@ -86,23 +86,32 @@ export function BooqScreen({
 }
 
 export function LoadingBooqScreen() {
-    return <div className='container'>
-        <LoadingHeader />
-        <Spinner />
-        <style jsx>{`
-            .container {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                width: 100vw;
-                height: 100vh;
-                font-size: xx-large;
-            }
-            .label {
-                margin: ${meter.large};
-            }
-            `}</style>
-    </div>;
+    return <BooqLayout
+        isVisible={true}
+        isNavigationOpen={false}
+        BooqContent={<div style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            width: '100vw',
+            height: '100vh',
+            fontSize: 'xx-large',
+        }}>
+            <Spinner />
+        </div>}
+        PrevButton={null}
+        NextButton={null}
+        ContextMenu={null}
+        MainButton={<FeedLink>
+            <IconButton icon='back' />
+        </FeedLink>}
+        NavigationButton={null}
+        ThemerButton={<Themer />}
+        AccountButton={<SignIn />}
+        CurrentPage={null}
+        PagesLeft={null}
+        NavigationContent={null}
+    />;
 }
 
 function useControlsVisibility() {
