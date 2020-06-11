@@ -15,6 +15,7 @@ import { BooqLayout } from './BooqLayout';
 import { TocButton } from './Toc';
 import { Themer } from './Themer';
 import { SignIn } from './SignIn';
+import { usePopoverSingleton } from 'controls/Popover';
 
 export function BooqScreen({
     booq, quote,
@@ -38,6 +39,8 @@ export function BooqScreen({
     const leftLabel = leftPages <= 1 ? 'Last page'
         : `${leftPages} pages left`;
 
+    const { singleton, singletonNode } = usePopoverSingleton();
+
     return <BooqLayout
         isVisible={visible}
         isNavigationOpen={false}
@@ -45,6 +48,7 @@ export function BooqScreen({
             fontFamily: bookFont,
             fontSize: `${fontScale}%`,
         }}>
+            {singletonNode}
             <BooqContent
                 booqId={booq.id}
                 nodes={booq.fragment.nodes}
@@ -73,8 +77,8 @@ export function BooqScreen({
             <IconButton icon='back' />
         </FeedLink>}
         NavigationButton={<TocButton booqId={booq.id} />}
-        ThemerButton={<Themer />}
-        AccountButton={<SignIn />}
+        ThemerButton={<Themer singleton={singleton} />}
+        AccountButton={<SignIn singleton={singleton} />}
         CurrentPage={<PageLabel text={pagesLabel} />}
         PagesLeft={<PageLabel text={leftLabel} />}
         NavigationContent={null}

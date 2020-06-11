@@ -14,12 +14,6 @@ export function Popover({ singleton, anchor, content }: {
     return <div>
         <Tippy
             singleton={singleton}
-            popperOptions={{ strategy: 'fixed' }}
-            arrow={roundArrow + roundArrow}
-            placement='bottom'
-            interactive={true}
-            hideOnClick={true}
-            animation='shift-away'
             content={<div className='anchor'>
                 {content}
             </div>}
@@ -32,8 +26,27 @@ export function Popover({ singleton, anchor, content }: {
                 flex: 1;
             }
         `}</style>
-        <style jsx global>{popoverStyles}</style>
     </div>;
+}
+
+export function usePopoverSingleton() {
+    const [source, target] = useSingleton();
+    const singletonNode = <>
+        <Tippy
+            singleton={source}
+            popperOptions={{ strategy: 'fixed' }}
+            arrow={roundArrow + roundArrow}
+            placement='bottom'
+            interactive={true}
+            hideOnClick={true}
+            animation='shift-away'
+        />
+        <style jsx global>{popoverStyles}</style>
+    </>;
+    return {
+        singletonNode,
+        singleton: target,
+    };
 }
 
 export function Popovers({ children }: {
