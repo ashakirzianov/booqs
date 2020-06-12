@@ -5,10 +5,10 @@ import {
 } from 'app';
 import { IconButton } from 'controls/Buttons';
 import { BooqLink } from 'controls/Links';
-import { meter, vars } from 'controls/theme';
+import { meter, vars, boldWeight, bookFont } from 'controls/theme';
 
 export function useNavigationPanel(booqId: string) {
-    const [navigationOpen, setOpen] = useState(false);
+    const [navigationOpen, setOpen] = useState(true);
     const NavigationButton = <IconButton
         icon='toc'
         onClick={() => setOpen(!navigationOpen)}
@@ -29,47 +29,269 @@ function Navigation({ booqId, closeSelf }: {
 }) {
     const { toc, title } = useToc(booqId);
     const { highlights } = useHighlights(booqId);
-    const [filter, setFilter] = useState('all');
+    const [filter, setFilter] = useState('paths');
     const nodes = buildNodes({
         filter,
         title, toc, highlights,
     });
     return <div className='container'>
-        <FilterComp
-            items={[
-                { text: 'All', value: 'all' },
-                { text: 'Paths', value: 'paths' },
-            ]}
-            selected={filter}
-            select={setFilter}
-        />
+        <div className='header'>
+            <div className='label'>CONTENTS</div>
+            <div className='filter'>
+                <FilterComp
+                    items={[
+                        { text: 'All', value: 'all' },
+                        { text: 'Highlights', value: 'paths' },
+                    ]}
+                    selected={filter}
+                    select={setFilter}
+                />
+            </div>
+        </div>
+        <div className='items'>
+            {
+                nodes.map(
+                    (node, idx) => <div key={idx} onClick={closeSelf}>
+                        <div className='item'>
+                            <NavigationNodeComp
+                                booqId={booqId}
+                                node={node}
+                            />
+                        </div>
+                    </div>
+                )
+            }
+        </div>
+        <style jsx>{`
+            .container {
+                display: flex;
+                flex: 1 1;
+                flex-flow: column nowrap;
+                color: var(${vars.dimmed});
+                padding: ${meter.large};
+                border-bottom: 0.5px solid var(${vars.border});
+            }
+            .header {
+                display: flex;
+                flex-flow: column;
+                font-size: small;
+                font-weight: ${boldWeight};
+            }
+            .label {
+                align-self: center;
+                letter-spacing: 0.1em;
+            }
+            .items {
+                max-height: 100%;
+                overflow: scroll;
+            }
+            .item {
+                padding: ${meter.regular} 0;
+            }
+            hr {
+                width: 85%;
+                border: none;
+                border-top: 0.5px solid var(${vars.border});
+            }
+            `}</style>
+    </div>;
+}
+
+function NavigationNodeComp({ booqId, node }: {
+    booqId: string,
+    node: NavigationNode,
+}) {
+    switch (node.kind) {
+        case 'toc':
+            return <TocNodeComp
+                booqId={booqId}
+                node={node}
+            />;
+        case 'highlight':
+            return <HighlightComp
+                booqId={booqId}
+                highlight={node.highlight}
+            />;
+        case 'path-highlights':
+            return <PathHighlightsNodeComp
+                booqId={booqId}
+                node={node}
+            />;
+        default:
+            return null;
+    }
+}
+
+function TocNodeComp({
+    booqId, node: { item: { path, title, position } },
+}: {
+    booqId: string,
+    node: TocNode,
+}) {
+    return <>
+        <BooqLink booqId={booqId} path={path}>
+            <div className='content'>
+                <span className='title'>{title ?? 'no-title'}</span>
+                <span className='page'>{pageForPosition(position)}</span>
+            </div>
+        </BooqLink>
+        <style jsx>{`
+        .content {
+            display: flex;
+            flex-flow: row nowrap;
+            flex: 1;
+            justify-content: space-between;
+            font-size: small;
+            font-weight: ${boldWeight};
+        }
+        .content:hover {
+            color: var(${vars.highlight});
+        }
+        `}</style>
+    </>;
+}
+
+function PathHighlightsNodeComp({
+    booqId,
+    node: { items, highlights },
+}: {
+    booqId: string,
+    node: PathHighlightsNode,
+}) {
+    return <div>
+        <Path booqId={booqId} items={items} />
         {
-            nodes.map(
-                (node, idx) => <div key={idx} onClick={closeSelf}>
-                    <div className='item'>
-                        <NavigationNodeComp
+            highlights.map(
+                (hl, idx) =>
+                    <div key={idx} className='highlight'>
+                        <HighlightComp
                             booqId={booqId}
-                            node={node}
+                            highlight={hl}
                         />
                     </div>
-                    <hr />
+            )
+        }
+        <style jsx>{`
+            .highlight {
+                margin: ${meter.regular} 0;
+            }
+            `}</style>
+    </div>;
+}
+
+function Path({ items, booqId }: {
+    booqId: string,
+    items: Array<TocItem | undefined>,
+}) {
+    return <div className='container'>
+        {
+            items.map((item, idx) => !item ? null
+                : <>
+                    {idx === 0 ? null : <div className='separator'>/</div>}
+                    <div className='element'>
+                        <BooqLink booqId={booqId} path={item.path}>
+
+                            {item.title}
+                        </BooqLink>
+                    </div>
+                </>
+            )
+        }
+        <style jsx>{`
+            .container {
+                display: flex;
+                flex-flow: row wrap;
+            }
+            .element {
+                margin: 0 ${meter.regular} 0 0;
+                font-size: small;
+                font-weight: ${boldWeight};
+            }
+            .element:hover {
+                text-decoration: underline;
+            }
+            .separator {
+                margin: 0 ${meter.regular} 0 0;
+            }
+            `}</style>
+    </div>;
+}
+
+// TODO: move
+function HighlightComp({ booqId, highlight }: {
+    booqId: string,
+    highlight: Highlight,
+}) {
+    return <BooqLink booqId={booqId} path={highlight.start}>
+        <div className='container'>
+            {highlight.text}
+            <style jsx>{`
+            .container {
+                border-left: 3px solid ${colorForGroup(highlight.group)};
+                padding-left: ${meter.regular};
+                color: var(${vars.primary});
+            }
+            .container:hover {
+            }
+            `}</style>
+        </div>
+    </BooqLink>;
+}
+
+type FilterItem = {
+    text: string,
+    value: string,
+}
+function FilterComp({
+    items, selected, select,
+}: {
+    items: FilterItem[],
+    selected: string,
+    select: (value: string) => void,
+}) {
+    return <div className='container'>
+        {
+            items.map(
+                (item, idx) => <div
+                    key={idx}
+                    className={`item ${item.value === selected ? 'selected' : ''}`}
+                    onClick={() => select(item.value)}
+                >
+                    {item.text}
                 </div>
             )
         }
         <style jsx>{`
             .container {
                 display: flex;
-                flex: 1 1;
-                flex-flow: column nowrap;
+                flex-flow: row wrap;
+                margin: ${meter.regular} 0;
             }
-            hr {
-                width: 85%;
-                border: none;
-                border-top: 1px solid var(${vars.border});
+            .item {
+                cursor: pointer;
+                padding: ${meter.small} ${meter.regular};
+            }
+            .item.selected {
+                border-bottom: 2px solid var(${vars.highlight});
             }
             `}</style>
-    </div>;
+    </div>
 }
+
+type TocNode = {
+    kind: 'toc',
+    item: TocItem,
+}
+type HighlightNode = {
+    kind: 'highlight',
+    highlight: Highlight,
+};
+type PathHighlightsNode = {
+    kind: 'path-highlights',
+    items: Array<TocItem | undefined>,
+    highlights: Highlight[],
+}
+type NavigationNode = TocNode | HighlightNode | PathHighlightsNode;
 
 function buildNodes({ toc, filter, highlights, title }: {
     title?: string,
@@ -115,161 +337,4 @@ function buildNodes({ toc, filter, highlights, title }: {
         prev = next;
     }
     return nodes;
-}
-
-type TocNode = {
-    kind: 'toc',
-    item: TocItem,
-}
-type HighlightNode = {
-    kind: 'highlight',
-    highlight: Highlight,
-};
-type PathHighlightsNode = {
-    kind: 'path-highlights',
-    items: Array<TocItem | undefined>,
-    highlights: Highlight[],
-}
-type NavigationNode = TocNode | HighlightNode | PathHighlightsNode;
-
-function NavigationNodeComp({ booqId, node }: {
-    booqId: string,
-    node: NavigationNode,
-}) {
-    switch (node.kind) {
-        case 'toc':
-            return <TocNodeComp
-                booqId={booqId}
-                node={node}
-            />;
-        case 'highlight':
-            return <HighlightComp
-                booqId={booqId}
-                highlight={node.highlight}
-            />;
-        case 'path-highlights':
-            return <PathHighlightsNodeComp
-                booqId={booqId}
-                node={node}
-            />;
-        default:
-            return null;
-    }
-}
-
-function TocNodeComp({
-    booqId, node: { item: { path, title, position } },
-}: {
-    booqId: string,
-    node: TocNode,
-}) {
-    return <>
-        <BooqLink booqId={booqId} path={path}>
-            <div className='content'>
-                <span className='title'>{title ?? 'no-title'}</span>
-                <span className='page'>{pageForPosition(position)}</span>
-            </div>
-        </BooqLink>
-        <style jsx>{`
-        .content {
-            display: flex;
-            flex-flow: row nowrap;
-            flex: 1;
-            padding: ${meter.large};
-            justify-content: space-between;
-        }
-        `}</style>
-    </>;
-}
-
-function PathHighlightsNodeComp({
-    booqId,
-    node: { items, highlights },
-}: {
-    booqId: string,
-    node: PathHighlightsNode,
-}) {
-    return <div>
-        <Path booqId={booqId} items={items} />
-        {
-            highlights.map(
-                (hl, idx) =>
-                    <HighlightComp
-                        key={idx}
-                        booqId={booqId}
-                        highlight={hl}
-                    />
-            )
-        }
-    </div>;
-}
-
-function Path({ items, booqId }: {
-    booqId: string,
-    items: Array<TocItem | undefined>,
-}) {
-    return <div>
-        {
-            items.map((item, idx) => !item ? null
-                : <BooqLink booqId={booqId} path={item.path}>
-                    {idx === 0 ? null : ' / '}
-                    {item.title}
-                </BooqLink>)
-        }
-    </div>;
-}
-
-// TODO: move
-function HighlightComp({ booqId, highlight }: {
-    booqId: string,
-    highlight: Highlight,
-}) {
-    return <div className='container'>
-        <BooqLink booqId={booqId} path={highlight.start}>
-            {highlight.text}
-        </BooqLink>
-        <style jsx>{`
-            .container {
-                background: ${colorForGroup(highlight.group)};
-            }
-            `}</style>
-    </div>;
-}
-
-type FilterItem = {
-    text: string,
-    value: string,
-}
-function FilterComp({
-    items, selected, select,
-}: {
-    items: FilterItem[],
-    selected: string,
-    select: (value: string) => void,
-}) {
-    return <div className='container'>
-        {
-            items.map(
-                (item, idx) => <div
-                    key={idx}
-                    className={`item ${item.value === selected ? 'selected' : ''}`}
-                    onClick={() => select(item.value)}
-                >
-                    {item.text}
-                </div>
-            )
-        }
-        <style jsx>{`
-            .container {
-                display: flex;
-                flex-flow: row wrap;
-            }
-            .item {
-                cursor: pointer;
-            }
-            .item.selected {
-                border-bottom: 1px solid gold;
-            }
-            `}</style>
-    </div>
 }
