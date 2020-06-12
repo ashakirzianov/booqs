@@ -174,6 +174,7 @@ function PathHighlightsNodeComp({
                 (hl, idx) =>
                     <HighlightComp
                         key={idx}
+                        booqId={booqId}
                         highlight={hl}
                     />
             )
@@ -197,10 +198,13 @@ function Path({ items, booqId }: {
 }
 
 // TODO: move
-function HighlightComp({ highlight }: {
+function HighlightComp({ booqId, highlight }: {
+    booqId: string,
     highlight: Highlight,
 }) {
     return <div>
-        {highlight.text}
+        <BooqLink booqId={booqId} path={highlight.start}>
+            {highlight.text}
+        </BooqLink>
     </div>;
 }
