@@ -69,17 +69,20 @@ function buildNodes({ toc, filter, highlights, title }: {
     highlights: Highlight[],
 }): NavigationNode[] {
     const nodes: NavigationNode[] = [];
-    let prev: TocItem | undefined = undefined;
-    let currTitles: string[] = [];
+    let prev: TocItem = {
+        title: title ?? 'Untitled',
+        position: 0,
+        level: 0,
+        path: [0],
+    };
+    let prevPath: Array<TocItem | undefined> = [];
     for (const next of toc) {
-        currTitles = currTitles.slice(0, prev?.level).map(
-            title => title ?? '_'
-        );
-        currTitles.push(prev?.title ?? title ?? 'Untitled');
+        prevPath = prevPath.slice(0, prev.level);
+        prevPath[prev.level] = prev;
         if (filter === 'all') {
             nodes.push({
                 kind: 'toc',
-                ...next,
+                item: next,
             });
         } else if (filter === 'path') {
             const inside = highlights.filter(
@@ -91,9 +94,7 @@ function buildNodes({ toc, filter, highlights, title }: {
             if (inside.length !== 0) {
                 nodes.push({
                     kind: 'path-highlights',
-                    titles: currTitles,
-                    position: next.position,
-                    path: next.path,
+                    items: prevPath,
                     highlights: inside,
                 });
             }
@@ -105,16 +106,11 @@ function buildNodes({ toc, filter, highlights, title }: {
 
 type TocNode = {
     kind: 'toc',
-    title?: string,
-    path: BooqPath,
-    level?: number,
-    position: number,
+    item: TocItem,
 }
 type PathHighlightsNode = {
     kind: 'path-highlights',
-    titles: string[],
-    path: BooqPath,
-    position: number,
+    items: Array<TocItem | undefined>,
     highlights: Highlight[],
 }
 type NavigationNode = TocNode | PathHighlightsNode;
@@ -140,7 +136,7 @@ function NavigationNodeComp({ booqId, node }: {
 }
 
 function TocNodeComp({
-    booqId, node: { path, title, position },
+    booqId, node: { item: { path, title, position } },
 }: {
     booqId: string,
     node: TocNode,
@@ -165,13 +161,14 @@ function TocNodeComp({
 }
 
 function PathHighlightsNodeComp({
-    node: { titles, highlights },
+    booqId,
+    node: { items, highlights },
 }: {
     booqId: string,
     node: PathHighlightsNode,
 }) {
     return <div>
-        <Path titles={titles} />
+        <Path booqId={booqId} items={items} />
         {
             highlights.map(
                 (hl, idx) =>
@@ -184,11 +181,18 @@ function PathHighlightsNodeComp({
     </div>;
 }
 
-function Path({ titles }: {
-    titles: string[],
+function Path({ items, booqId }: {
+    booqId: string,
+    items: Array<TocItem | undefined>,
 }) {
     return <div>
-        {titles.join(' / ')}
+        {
+            items.map((item, idx) => !item ? null
+                : <BooqLink booqId={booqId} path={item.path}>
+                    {idx === 0 ? null : ' / '}
+                    {item.title}
+                </BooqLink>)
+        }
     </div>;
 }
 
