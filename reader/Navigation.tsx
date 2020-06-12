@@ -29,11 +29,20 @@ function Navigation({ booqId, closeSelf }: {
 }) {
     const { toc, title } = useToc(booqId);
     const { highlights } = useHighlights(booqId);
+    const [filter, setFilter] = useState('all');
     const nodes = buildNodes({
-        filter: 'all',
+        filter,
         title, toc, highlights,
     });
     return <div className='container'>
+        <FilterComp
+            items={[
+                { text: 'All', value: 'all' },
+                { text: 'Paths', value: 'paths' },
+            ]}
+            selected={filter}
+            select={setFilter}
+        />
         {
             nodes.map(
                 (node, idx) => <div key={idx} onClick={closeSelf}>
@@ -64,7 +73,7 @@ function Navigation({ booqId, closeSelf }: {
 
 function buildNodes({ toc, filter, highlights, title }: {
     title?: string,
-    filter: 'all' | 'path',
+    filter: string,
     toc: TocItem[],
     highlights: Highlight[],
 }): NavigationNode[] {
@@ -94,7 +103,7 @@ function buildNodes({ toc, filter, highlights, title }: {
                 kind: 'highlight' as const,
                 highlight: h,
             })));
-        } else if (filter === 'path') {
+        } else if (filter === 'paths') {
             if (inside.length !== 0) {
                 nodes.push({
                     kind: 'path-highlights',
@@ -225,4 +234,42 @@ function HighlightComp({ booqId, highlight }: {
             }
             `}</style>
     </div>;
+}
+
+type FilterItem = {
+    text: string,
+    value: string,
+}
+function FilterComp({
+    items, selected, select,
+}: {
+    items: FilterItem[],
+    selected: string,
+    select: (value: string) => void,
+}) {
+    return <div className='container'>
+        {
+            items.map(
+                (item, idx) => <div
+                    key={idx}
+                    className={`item ${item.value === selected ? 'selected' : ''}`}
+                    onClick={() => select(item.value)}
+                >
+                    {item.text}
+                </div>
+            )
+        }
+        <style jsx>{`
+            .container {
+                display: flex;
+                flex-flow: row wrap;
+            }
+            .item {
+                cursor: pointer;
+            }
+            .item.selected {
+                border-bottom: 1px solid gold;
+            }
+            `}</style>
+    </div>
 }
