@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { BooqPath, pathInRange } from 'core';
 import {
-    useToc, TocItem, pageForPosition, useHighlights, Highlight,
+    useToc, TocItem, pageForPosition, useHighlights, Highlight, colorForGroup,
 } from 'app';
 import { IconButton } from 'controls/Buttons';
 import { BooqLink } from 'controls/Links';
@@ -30,7 +30,7 @@ function Navigation({ booqId, closeSelf }: {
     const { toc, title } = useToc(booqId);
     const { highlights } = useHighlights(booqId);
     const nodes = buildNodes({
-        filter: 'path',
+        filter: 'all',
         title, toc, highlights,
     });
     return <div className='container'>
@@ -79,18 +79,22 @@ function buildNodes({ toc, filter, highlights, title }: {
     for (const next of toc) {
         prevPath = prevPath.slice(0, prev.level);
         prevPath[prev.level] = prev;
+        const inside = highlights.filter(
+            hl => pathInRange(hl.start, {
+                start: prev?.path ?? [0],
+                end: next.path,
+            }),
+        );
         if (filter === 'all') {
             nodes.push({
                 kind: 'toc',
                 item: next,
             });
+            nodes.push(...inside.map(h => ({
+                kind: 'highlight' as const,
+                highlight: h,
+            })));
         } else if (filter === 'path') {
-            const inside = highlights.filter(
-                hl => pathInRange(hl.start, {
-                    start: prev?.path ?? [0],
-                    end: next.path,
-                }),
-            );
             if (inside.length !== 0) {
                 nodes.push({
                     kind: 'path-highlights',
@@ -108,12 +112,16 @@ type TocNode = {
     kind: 'toc',
     item: TocItem,
 }
+type HighlightNode = {
+    kind: 'highlight',
+    highlight: Highlight,
+};
 type PathHighlightsNode = {
     kind: 'path-highlights',
     items: Array<TocItem | undefined>,
     highlights: Highlight[],
 }
-type NavigationNode = TocNode | PathHighlightsNode;
+type NavigationNode = TocNode | HighlightNode | PathHighlightsNode;
 
 function NavigationNodeComp({ booqId, node }: {
     booqId: string,
@@ -124,6 +132,11 @@ function NavigationNodeComp({ booqId, node }: {
             return <TocNodeComp
                 booqId={booqId}
                 node={node}
+            />;
+        case 'highlight':
+            return <HighlightComp
+                booqId={booqId}
+                highlight={node.highlight}
             />;
         case 'path-highlights':
             return <PathHighlightsNodeComp
@@ -202,9 +215,14 @@ function HighlightComp({ booqId, highlight }: {
     booqId: string,
     highlight: Highlight,
 }) {
-    return <div>
+    return <div className='container'>
         <BooqLink booqId={booqId} path={highlight.start}>
             {highlight.text}
         </BooqLink>
+        <style jsx>{`
+            .container {
+                background: ${colorForGroup(highlight.group)};
+            }
+            `}</style>
     </div>;
 }
