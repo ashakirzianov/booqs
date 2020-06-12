@@ -35,7 +35,7 @@ function Navigation({ booqId, closeSelf }: {
             { text: 'All', value: 'all' },
             { text: 'Highlights', value: 'highlights' },
         ],
-        initial: 'highlights',
+        initial: 'all',
     });
     const nodes = buildNodes({
         filter,
