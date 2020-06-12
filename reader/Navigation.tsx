@@ -217,7 +217,6 @@ function Path({ items, booqId }: {
     </div>;
 }
 
-// TODO: move
 function HighlightComp({ booqId, highlight }: {
     booqId: string,
     highlight: Highlight,
