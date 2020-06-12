@@ -27,11 +27,11 @@ function Navigation({ booqId, closeSelf }: {
     booqId: string,
     closeSelf: () => void,
 }) {
-    const { toc } = useToc(booqId);
+    const { toc, title } = useToc(booqId);
     const { highlights } = useHighlights(booqId);
     const nodes = buildNodes({
         filter: 'path',
-        toc, highlights,
+        title, toc, highlights,
     });
     return <div className='container'>
         {
@@ -62,42 +62,43 @@ function Navigation({ booqId, closeSelf }: {
     </div>;
 }
 
-function buildNodes({ toc, filter, highlights }: {
+function buildNodes({ toc, filter, highlights, title }: {
+    title?: string,
     filter: 'all' | 'path',
     toc: TocItem[],
     highlights: Highlight[],
 }): NavigationNode[] {
     const nodes: NavigationNode[] = [];
-    let prev: BooqPath = [0];
+    let prev: TocItem | undefined = undefined;
     let currTitles: string[] = [];
-    for (const curr of toc) {
-        currTitles = currTitles.slice(0, curr.level).map(
+    for (const next of toc) {
+        currTitles = currTitles.slice(0, prev?.level).map(
             title => title ?? '_'
         );
-        currTitles.push(curr.title);
+        currTitles.push(prev?.title ?? title ?? 'Untitled');
         if (filter === 'all') {
             nodes.push({
                 kind: 'toc',
-                ...curr,
+                ...next,
             });
         } else if (filter === 'path') {
             const inside = highlights.filter(
                 hl => pathInRange(hl.start, {
-                    start: prev,
-                    end: curr.path,
+                    start: prev?.path ?? [0],
+                    end: next.path,
                 }),
             );
             if (inside.length !== 0) {
                 nodes.push({
                     kind: 'path-highlights',
                     titles: currTitles,
-                    position: curr.position,
-                    path: curr.path,
+                    position: next.position,
+                    path: next.path,
                     highlights: inside,
                 });
             }
         }
-        prev = curr.path;
+        prev = next;
     }
     return nodes;
 }
@@ -196,6 +197,6 @@ function HighlightComp({ highlight }: {
     highlight: Highlight,
 }) {
     return <div>
-        {highlight.group}: {highlight.text}
+        {highlight.text}
     </div>;
 }
