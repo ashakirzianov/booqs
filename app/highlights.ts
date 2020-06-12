@@ -83,7 +83,14 @@ export function useHighlightMutations(booqId: string) {
         }) {
             const id = uuid();
             add({
-                variables: { highlight: { ...input, booqId, id } },
+                variables: {
+                    highlight: {
+                        booqId, id,
+                        start: input.start,
+                        end: input.end,
+                        group: input.group,
+                    }
+                },
                 optimisticResponse: { addHighlight: true },
                 update(cache, { data }) {
                     if (data?.addHighlight) {

@@ -29,9 +29,8 @@ function Navigation({ booqId, closeSelf }: {
 }) {
     const { toc } = useToc(booqId);
     const { highlights } = useHighlights(booqId);
-    console.log(highlights);
     const nodes = buildNodes({
-        filter: 'all',
+        filter: 'path',
         toc, highlights,
     });
     return <div className='container'>
