@@ -48,19 +48,25 @@ function renderNode(node: BooqNode, ctx: RenderContext): ReactNode {
 
 function renderTextNode(text: string, { path, colorization }: RenderContext): ReactNode {
     const spans = applyColorization({ text, path: [...path, 0] }, colorization);
-    const id = pathToId(path);
-    return spans.map(
-        span => createElement(
-            'span',
-            {
-                key: id,
-                id,
-                style: {
-                    background: span.color,
+    return createElement(
+        'span',
+        {
+            key: pathToId(path),
+            id: pathToId(path),
+        },
+        spans.map(
+            span => createElement(
+                'span',
+                {
+                    key: pathToId(span.path),
+                    id: pathToId(span.path),
+                    style: {
+                        background: span.color,
+                    },
                 },
-            },
-            span.text,
-        )
+                span.text,
+            )
+        ),
     );
 }
 

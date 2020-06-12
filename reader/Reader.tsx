@@ -8,13 +8,13 @@ import { headerHeight, meter, bookFont, vars } from 'controls/theme';
 import { BorderButton, IconButton } from 'controls/Buttons';
 import { BooqLink, FeedLink } from 'controls/Links';
 import { Spinner } from 'controls/Spinner';
-import { useNavigationPanel } from 'components/Toc';
+import { usePopoverSingleton } from 'controls/Popover';
 import { Themer } from 'components/Themer';
 import { SignIn } from 'components/SignIn';
 import { BooqContent, BooqSelection, Colorization } from './BooqContent';
 import { ContextMenu } from './ContextMenu';
+import { useNavigationPanel } from './Navigation';
 import { ReaderLayout } from './Layout';
-import { usePopoverSingleton } from 'controls/Popover';
 
 export function Reader({
     booq, quote,
@@ -29,7 +29,7 @@ export function Reader({
     const { onSelection, selection } = useSelectionHandler();
     const range: BooqRange = useMemo(() => ({
         start: booq.fragment.current.path,
-        end: booq.fragment.next?.path,
+        end: booq.fragment.next?.path ?? [booq.fragment.nodes.length],
     }), [booq]);
     const colorization = useColorization(booq.id, quote);
     const { visible, toggle } = useControlsVisibility();

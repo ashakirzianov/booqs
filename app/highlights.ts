@@ -10,6 +10,7 @@ const HighlightsQuery = gql`query HighlightsQuery($booqId: ID!) {
             start
             end
             group
+            text
         }
     }
 }`;
@@ -22,6 +23,7 @@ type HighlightsData = {
             start: BooqPath,
             end: BooqPath,
             group: string,
+            text: string,
         }[],
     },
 };
@@ -77,10 +79,18 @@ export function useHighlightMutations(booqId: string) {
             start: BooqPath,
             end: BooqPath,
             group: string,
+            text: string,
         }) {
             const id = uuid();
             add({
-                variables: { highlight: { ...input, booqId, id } },
+                variables: {
+                    highlight: {
+                        booqId, id,
+                        start: input.start,
+                        end: input.end,
+                        group: input.group,
+                    }
+                },
                 optimisticResponse: { addHighlight: true },
                 update(cache, { data }) {
                     if (data?.addHighlight) {
