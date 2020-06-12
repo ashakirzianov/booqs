@@ -29,7 +29,7 @@ export function Reader({
     const { onSelection, selection } = useSelectionHandler();
     const range: BooqRange = useMemo(() => ({
         start: booq.fragment.current.path,
-        end: booq.fragment.next?.path,
+        end: booq.fragment.next?.path ?? [booq.fragment.nodes.length],
     }), [booq]);
     const colorization = useColorization(booq.id, quote);
     const { visible, toggle } = useControlsVisibility();
