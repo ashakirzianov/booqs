@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { BooqPath, pathInRange } from 'core';
+import { pathInRange } from 'core';
 import {
     useToc, TocItem, pageForPosition, useHighlights, Highlight, colorForGroup,
 } from 'app';
 import { IconButton } from 'controls/Buttons';
 import { BooqLink } from 'controls/Links';
-import { meter, vars, boldWeight, bookFont } from 'controls/theme';
+import { meter, vars, boldWeight } from 'controls/theme';
+import { useFilterPanel } from 'controls/FilterPanel';
 
 export function useNavigationPanel(booqId: string) {
     const [navigationOpen, setOpen] = useState(true);
@@ -29,7 +30,13 @@ function Navigation({ booqId, closeSelf }: {
 }) {
     const { toc, title } = useToc(booqId);
     const { highlights } = useHighlights(booqId);
-    const [filter, setFilter] = useState('paths');
+    const { filter, FilterNode } = useFilterPanel({
+        items: [
+            { text: 'All', value: 'all' },
+            { text: 'Highlights', value: 'highlights' },
+        ],
+        initial: 'highlights',
+    });
     const nodes = buildNodes({
         filter,
         title, toc, highlights,
@@ -38,14 +45,7 @@ function Navigation({ booqId, closeSelf }: {
         <div className='header'>
             <div className='label'>CONTENTS</div>
             <div className='filter'>
-                <FilterComp
-                    items={[
-                        { text: 'All', value: 'all' },
-                        { text: 'Highlights', value: 'paths' },
-                    ]}
-                    selected={filter}
-                    select={setFilter}
-                />
+                {FilterNode}
             </div>
         </div>
         <div className='items'>
@@ -112,7 +112,7 @@ function NavigationNodeComp({ booqId, node }: {
                 booqId={booqId}
                 highlight={node.highlight}
             />;
-        case 'path-highlights':
+        case 'highlights':
             return <PathHighlightsNodeComp
                 booqId={booqId}
                 node={node}
@@ -237,46 +237,6 @@ function HighlightComp({ booqId, highlight }: {
     </BooqLink>;
 }
 
-type FilterItem = {
-    text: string,
-    value: string,
-}
-function FilterComp({
-    items, selected, select,
-}: {
-    items: FilterItem[],
-    selected: string,
-    select: (value: string) => void,
-}) {
-    return <div className='container'>
-        {
-            items.map(
-                (item, idx) => <div
-                    key={idx}
-                    className={`item ${item.value === selected ? 'selected' : ''}`}
-                    onClick={() => select(item.value)}
-                >
-                    {item.text}
-                </div>
-            )
-        }
-        <style jsx>{`
-            .container {
-                display: flex;
-                flex-flow: row wrap;
-                margin: ${meter.regular} 0;
-            }
-            .item {
-                cursor: pointer;
-                padding: ${meter.small} ${meter.regular};
-            }
-            .item.selected {
-                border-bottom: 2px solid var(${vars.highlight});
-            }
-            `}</style>
-    </div>
-}
-
 type TocNode = {
     kind: 'toc',
     item: TocItem,
@@ -286,7 +246,7 @@ type HighlightNode = {
     highlight: Highlight,
 };
 type PathHighlightsNode = {
-    kind: 'path-highlights',
+    kind: 'highlights',
     items: Array<TocItem | undefined>,
     highlights: Highlight[],
 }
@@ -324,10 +284,10 @@ function buildNodes({ toc, filter, highlights, title }: {
                 kind: 'highlight' as const,
                 highlight: h,
             })));
-        } else if (filter === 'paths') {
+        } else if (filter === 'highlights') {
             if (inside.length !== 0) {
                 nodes.push({
-                    kind: 'path-highlights',
+                    kind: 'highlights',
                     items: prevPath,
                     highlights: inside,
                 });
