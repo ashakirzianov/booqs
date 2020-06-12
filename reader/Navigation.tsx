@@ -9,7 +9,7 @@ import { meter, vars, boldWeight } from 'controls/theme';
 import { useFilterPanel } from 'controls/FilterPanel';
 
 export function useNavigationPanel(booqId: string) {
-    const [navigationOpen, setOpen] = useState(true);
+    const [navigationOpen, setOpen] = useState(false);
     const NavigationButton = <IconButton
         icon='toc'
         onClick={() => setOpen(!navigationOpen)}
