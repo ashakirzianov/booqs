@@ -49,6 +49,9 @@ export function FilterPanel({
                 cursor: pointer;
                 padding: ${meter.small} ${meter.regular};
             }
+            .item:hover {
+                border-bottom: 2px solid var(${vars.highlight});
+            }
             .item.selected {
                 border-bottom: 2px solid var(${vars.highlight});
             }

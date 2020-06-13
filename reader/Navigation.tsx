@@ -5,7 +5,7 @@ import {
 } from 'app';
 import { IconButton } from 'controls/Buttons';
 import { BooqLink } from 'controls/Links';
-import { meter, vars, boldWeight } from 'controls/theme';
+import { meter, vars, boldWeight, bookFont } from 'controls/theme';
 import { useFilterPanel } from 'controls/FilterPanel';
 
 export function useNavigationPanel(booqId: string) {
@@ -34,6 +34,7 @@ function Navigation({ booqId, closeSelf }: {
         items: [
             { text: 'All', value: 'all' },
             { text: 'Highlights', value: 'highlights' },
+            { text: 'Chapters', value: 'contents' },
         ],
         initial: 'all',
     });
@@ -68,13 +69,12 @@ function Navigation({ booqId, closeSelf }: {
                 flex: 1 1;
                 flex-flow: column nowrap;
                 color: var(${vars.dimmed});
-                padding: ${meter.large};
-                border-bottom: 0.5px solid var(${vars.border});
+                padding: ${meter.large} ${meter.large} 0 ${meter.large};
+                font-size: 0.9rem;
             }
             .header {
                 display: flex;
                 flex-flow: column;
-                font-size: small;
                 font-weight: ${boldWeight};
             }
             .label {
@@ -141,7 +141,6 @@ function TocNodeComp({
             flex-flow: row nowrap;
             flex: 1;
             justify-content: space-between;
-            font-size: small;
             font-weight: ${boldWeight};
         }
         .content:hover {
@@ -204,7 +203,6 @@ function Path({ items, booqId }: {
             }
             .element {
                 margin: 0 ${meter.regular} 0 0;
-                font-size: small;
                 font-weight: ${boldWeight};
             }
             .element:hover {
@@ -284,6 +282,11 @@ function buildNodes({ toc, filter, highlights, title }: {
                 kind: 'highlight' as const,
                 highlight: h,
             })));
+        } else if (filter === 'contents') {
+            nodes.push({
+                kind: 'toc',
+                item: next,
+            });
         } else if (filter === 'highlights') {
             if (inside.length !== 0) {
                 nodes.push({

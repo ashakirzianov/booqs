@@ -26,13 +26,13 @@ export function ReaderLayout({
     ...controls
 }: LayoutProps) {
     return <div className='container'>
-        <BooqControls {...controls} />
         <div className='booq'>
             {PrevButton}
             {BooqContent}
             {NextButton}
             {ContextMenu}
         </div>
+        <BooqControls {...controls} />
         <style jsx>{`
             .container {
                 display: flex;
@@ -46,6 +46,7 @@ export function ReaderLayout({
                 align-items: center;
                 width: 100%;
                 max-width: ${contentWidth};
+                padding: ${meter.large};
             }
             `}</style>
     </div>;
@@ -65,7 +66,7 @@ function BooqControls({
         <div className='account'>{AccountButton}</div>
         <div className='page'>{CurrentPage}</div>
         <div className='left'>{PagesLeft}</div>
-        <div className='navc' onScroll={e => { e.preventDefault(); e.stopPropagation(); }}>{NavigationContent}</div>
+        <div className='navc'>{NavigationContent}</div>
         <div className='content' />
         <div className='back-top' />
         <div className='back-bottom' />
@@ -73,6 +74,8 @@ function BooqControls({
             .container {
                 position: fixed;
                 top: 0; bottom: 0; left: 0; right: 0;
+                height: 100vh;
+                width: 100vw;
                 pointer-events: none;
                 justify-items: center;
                 align-items: center;
@@ -92,12 +95,13 @@ function BooqControls({
             .navc {
                 display: flex;
                 flex: 1 1;
-                grid-area: navc;
+                grid-area: 2 / 1 / 4 / 4;
                 pointer-events: auto;
                 overflow: scroll;
                 align-self: stretch;
                 justify-self: stretch;
                 transition: 250ms transform;
+                background: var(${vars.background});
             }
             .main, .nav, .themer, .account, .page, .left {
                 transition: 250ms transform;
@@ -138,12 +142,11 @@ function BooqControls({
                         "page page .    left   left";
                 }
                 .navc {
-                    background: var(${vars.background});
+                    grid-area: 2 / 1 / 4 / 6;
                 }
                 .back-top, .back-bottom {
                     display: block;
                     z-index: -1;
-                    grid-area: 1 / 1 / 1 / 6;
                     align-self: stretch;
                     justify-self: stretch;
                     background: var(${vars.background});

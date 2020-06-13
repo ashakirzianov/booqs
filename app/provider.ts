@@ -22,9 +22,6 @@ const link = ApolloLink.from([
         uri: process.env.NEXT_PUBLIC_BACKEND,
         credentials: 'include',
         fetch,
-        fetchOptions: {
-            credentials: 'include',
-        },
     }),
 ]);
 

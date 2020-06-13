@@ -25,7 +25,7 @@ export function useOnSelection(callback?: (selection?: BooqSelection) => void) {
         }
     });
 
-    useDocumentEvent('selectionchange', useCallback(event => {
+    const selectionHandler = useCallback(event => {
         if (callback) {
             const selection = getSelection();
             if (!locked.current) {
@@ -34,7 +34,11 @@ export function useOnSelection(callback?: (selection?: BooqSelection) => void) {
                 unhandled.current = true;
             }
         }
-    }, [callback]));
+    }, [callback]);
+
+    // Note: handle click as workaround for dead context menu
+    useDocumentEvent('click', selectionHandler);
+    useDocumentEvent('selectionchange', selectionHandler);
 }
 
 function getSelection(): BooqSelection | undefined {
