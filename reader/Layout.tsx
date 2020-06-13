@@ -26,13 +26,13 @@ export function ReaderLayout({
     ...controls
 }: LayoutProps) {
     return <div className='container'>
-        <BooqControls {...controls} />
         <div className='booq'>
             {PrevButton}
             {BooqContent}
             {NextButton}
             {ContextMenu}
         </div>
+        <BooqControls {...controls} />
         <style jsx>{`
             .container {
                 display: flex;
