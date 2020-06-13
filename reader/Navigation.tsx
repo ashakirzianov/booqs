@@ -68,8 +68,7 @@ function Navigation({ booqId, closeSelf }: {
                 flex: 1 1;
                 flex-flow: column nowrap;
                 color: var(${vars.dimmed});
-                padding: ${meter.large};
-                border-bottom: 0.5px solid var(${vars.border});
+                padding: ${meter.large} ${meter.large} 0 ${meter.large};
             }
             .header {
                 display: flex;
