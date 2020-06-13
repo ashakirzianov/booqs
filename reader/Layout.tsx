@@ -66,7 +66,7 @@ function BooqControls({
         <div className='account'>{AccountButton}</div>
         <div className='page'>{CurrentPage}</div>
         <div className='left'>{PagesLeft}</div>
-        <div className='navc' onScroll={e => { e.preventDefault(); e.stopPropagation(); }}>{NavigationContent}</div>
+        <div className='navc'>{NavigationContent}</div>
         <div className='content' />
         <div className='back-top' />
         <div className='back-bottom' />
@@ -95,12 +95,13 @@ function BooqControls({
             .navc {
                 display: flex;
                 flex: 1 1;
-                grid-area: navc;
+                grid-area: 2 / 1 / 4 / 4;
                 pointer-events: auto;
                 overflow: scroll;
                 align-self: stretch;
                 justify-self: stretch;
                 transition: 250ms transform;
+                background: var(${vars.background});
             }
             .main, .nav, .themer, .account, .page, .left {
                 transition: 250ms transform;
@@ -141,12 +142,11 @@ function BooqControls({
                         "page page .    left   left";
                 }
                 .navc {
-                    background: var(${vars.background});
+                    grid-area: 2 / 1 / 4 / 6;
                 }
                 .back-top, .back-bottom {
                     display: block;
                     z-index: -1;
-                    grid-area: 1 / 1 / 1 / 6;
                     align-self: stretch;
                     justify-self: stretch;
                     background: var(${vars.background});
