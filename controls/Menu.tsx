@@ -28,7 +28,11 @@ export function MenuItem({ icon, text, callback, spinner }: {
     callback?: () => void,
     spinner?: boolean,
 }) {
-    return <div className='container' onClick={callback}>
+    return <div
+        className='container'
+        // Note: Patch: safari change selection before onClick
+        onMouseDown={callback}
+    >
         {
             icon
                 ? <div className="icon"><Icon name={icon} /></div>
