@@ -34,6 +34,7 @@ function Navigation({ booqId, closeSelf }: {
         items: [
             { text: 'All', value: 'all' },
             { text: 'Highlights', value: 'highlights' },
+            { text: 'Chapters', value: 'contents' },
         ],
         initial: 'all',
     });
@@ -283,6 +284,11 @@ function buildNodes({ toc, filter, highlights, title }: {
                 kind: 'highlight' as const,
                 highlight: h,
             })));
+        } else if (filter === 'contents') {
+            nodes.push({
+                kind: 'toc',
+                item: next,
+            });
         } else if (filter === 'highlights') {
             if (inside.length !== 0) {
                 nodes.push({
