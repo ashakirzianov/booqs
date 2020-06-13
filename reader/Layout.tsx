@@ -46,6 +46,7 @@ export function ReaderLayout({
                 align-items: center;
                 width: 100%;
                 max-width: ${contentWidth};
+                padding: ${meter.large};
             }
             `}</style>
     </div>;
