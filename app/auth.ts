@@ -1,10 +1,10 @@
 import { ApolloClient } from "apollo-client";
 import { useApolloClient, useQuery } from '@apollo/react-hooks';
 import gql from 'graphql-tag';
-import { facebookSdk } from "./facebookSdk";
 import { syncStorageCell } from "plat";
+import { facebookSdk } from "./facebookSdk";
 
-const storage = syncStorageCell<AuthData>('auth');
+const storage = syncStorageCell<AuthData>('auth-data');
 
 type AuthData = {
     name: string | null,
