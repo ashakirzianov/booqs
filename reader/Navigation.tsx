@@ -69,7 +69,6 @@ function Navigation({ booqId, closeSelf }: {
                 flex: 1 1;
                 flex-flow: column nowrap;
                 color: var(${vars.dimmed});
-                padding: ${meter.large} ${meter.large} 0 ${meter.large};
                 font-size: 0.9rem;
             }
             .header {
@@ -145,6 +144,9 @@ function TocNodeComp({
         }
         .content:hover {
             color: var(${vars.highlight});
+        }
+        .page {
+            margin-left: ${meter.regular};
         }
         `}</style>
     </>;
