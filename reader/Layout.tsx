@@ -126,9 +126,13 @@ function BooqControls({
             }
             .page {
                 grid-area: page;
+                justify-self: flex-start;
+                padding: ${meter.large};
             }
             .left {
                 grid-area: left;
+                justify-self: flex-end;
+                padding: ${meter.large};
             }
             .back-top, .back-bottom {
                 display: none;
