@@ -227,6 +227,7 @@ function HighlightComp({ booqId, highlight }: {
                 border-left: 3px solid ${colorForGroup(highlight.group)};
                 padding-left: ${meter.regular};
                 color: var(${vars.primary});
+                text-align: justify;
             }
             .container:hover {
             }

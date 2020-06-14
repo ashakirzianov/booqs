@@ -2,7 +2,7 @@ import React, { ReactNode } from 'react';
 import { meter, headerHeight, vars } from 'controls/theme';
 
 type ControlsProps = {
-    isVisible: boolean,
+    isControlsVisible: boolean,
     isNavigationOpen: boolean,
     MainButton: ReactNode,
     NavigationButton: ReactNode,
@@ -53,12 +53,13 @@ export function ReaderLayout({
 }
 
 function BooqControls({
-    isVisible, isNavigationOpen,
+    isControlsVisible, isNavigationOpen,
     MainButton, NavigationButton,
     ThemerButton, AccountButton,
     CurrentPage, PagesLeft,
     NavigationContent,
 }: ControlsProps) {
+    const showControls = isControlsVisible || isNavigationOpen;
     return <div className='container'>
         <div className='main'>{MainButton}</div>
         <div className='nav'>{NavigationButton}</div>
@@ -166,10 +167,10 @@ function BooqControls({
             }
             @media (max-width: ${smallScreenWidth}) {
                 .main, .nav, .themer, .account, .back-top {
-                    transform: ${isVisible ? undefined : `translateY(-${headerHeight})`};
+                    transform: ${showControls ? undefined : `translateY(-${headerHeight})`};
                 }
                 .page, .left, .back-bottom {
-                    transform: ${isVisible ? undefined : `translateY(${headerHeight})`};
+                    transform: ${showControls ? undefined : `translateY(${headerHeight})`};
                 }
             }
             `}</style>
