@@ -44,7 +44,7 @@ export function Reader({
     } = useNavigationPanel(booq.id);
 
     return <ReaderLayout
-        isVisible={visible}
+        isControlsVisible={visible}
         isNavigationOpen={navigationOpen}
         BooqContent={<div style={{
             fontFamily: bookFont,
@@ -89,7 +89,7 @@ export function Reader({
 
 export function LoadingBooqScreen() {
     return <ReaderLayout
-        isVisible={true}
+        isControlsVisible={true}
         isNavigationOpen={false}
         BooqContent={<div style={{
             display: 'flex',
