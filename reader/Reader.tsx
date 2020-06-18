@@ -12,7 +12,7 @@ import { usePopoverSingleton } from 'controls/Popover';
 import { Themer } from 'components/Themer';
 import { SignIn } from 'components/SignIn';
 import { BooqContent, Colorization } from './BooqContent';
-import { ContextMenu } from './ContextMenu';
+import { useContextMenu } from './ContextMenu';
 import { useNavigationPanel } from './Navigation';
 import { ReaderLayout } from './Layout';
 
@@ -41,9 +41,12 @@ export function Reader({
     const {
         navigationOpen, NavigationButton, NavigationContent,
     } = useNavigationPanel(booq.id);
+    const {
+        ContextMenuNode, isVisible: contextMenuVisible,
+    } = useContextMenu(booq.id);
 
     return <ReaderLayout
-        isControlsVisible={visible}
+        isControlsVisible={!contextMenuVisible && visible}
         isNavigationOpen={navigationOpen}
         BooqContent={<div style={{
             fontFamily: bookFont,
@@ -69,9 +72,7 @@ export function Reader({
             anchor={booq.fragment.next}
             title='Next'
         />}
-        ContextMenu={<ContextMenu
-            booqId={booq.id}
-        />}
+        ContextMenu={ContextMenuNode}
         MainButton={<FeedLink>
             <IconButton icon='back' />
         </FeedLink>}

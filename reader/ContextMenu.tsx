@@ -5,10 +5,24 @@ import { Overlay } from 'controls/Popover';
 import { BooqSelection, getBooqSelection } from './BooqContent';
 import { ContextMenuContent } from './ContextMenuContent';
 
-export function ContextMenu({ booqId }: {
+export function useContextMenu(booqId: string) {
+    const selectionState = useSelectionState();
+    const ContextMenuNode = <ContextMenu
+        booqId={booqId}
+        selectionState={selectionState}
+    />;
+
+    return {
+        isVisible: !!selectionState,
+        ContextMenuNode,
+    };
+}
+
+function ContextMenu({ booqId, selectionState }: {
     booqId: string,
+    selectionState: SelectionState | undefined,
 }) {
-    const { rect, selection } = useSelectionState() ?? {};
+    const { rect, selection } = selectionState ?? {};
     if (rect && selection) {
         return <ContextMenuLayout
             rect={rect}
