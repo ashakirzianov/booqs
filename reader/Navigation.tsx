@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { pathInRange } from 'core';
 import {
     useToc, TocItem, pageForPosition, useHighlights, Highlight, colorForGroup,
@@ -24,7 +24,7 @@ export function useNavigationPanel(booqId: string) {
     };
 }
 
-function Navigation({ booqId, closeSelf }: {
+function Navigation({ booqId }: {
     booqId: string,
     closeSelf: () => void,
 }) {
@@ -38,32 +38,33 @@ function Navigation({ booqId, closeSelf }: {
         ],
         initial: 'all',
     });
-    const nodes = buildNodes({
+    const nodes = useMemo(() => buildNodes({
         filter,
         title, toc, highlights,
-    });
-    return <div className='container'>
-        <div className='header'>
-            <div className='label'>CONTENTS</div>
-            <div className='filter'>
-                {FilterNode}
+    }), [filter, title, toc, highlights]);
+    return useMemo(() => {
+        return <div className='container'>
+            <div className='header'>
+                <div className='label'>CONTENTS</div>
+                <div className='filter'>
+                    {FilterNode}
+                </div>
             </div>
-        </div>
-        <div className='items'>
-            {
-                nodes.map(
-                    (node, idx) => <div key={idx} onClick={closeSelf}>
-                        <div className='item'>
-                            <NavigationNodeComp
-                                booqId={booqId}
-                                node={node}
-                            />
+            <div className='items'>
+                {
+                    nodes.map(
+                        (node, idx) => <div key={idx}>
+                            <div className='item'>
+                                <NavigationNodeComp
+                                    booqId={booqId}
+                                    node={node}
+                                />
+                            </div>
                         </div>
-                    </div>
-                )
-            }
-        </div>
-        <style jsx>{`
+                    )
+                }
+            </div>
+            <style jsx>{`
             .container {
                 display: flex;
                 flex: 1 1;
@@ -93,7 +94,10 @@ function Navigation({ booqId, closeSelf }: {
                 border-top: 0.5px solid var(${vars.border});
             }
             `}</style>
-    </div>;
+        </div>;
+    }, [
+        filter, nodes,
+    ]);
 }
 
 function NavigationNodeComp({ booqId, node }: {
