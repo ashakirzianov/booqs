@@ -67,11 +67,11 @@ function BooqControls({
         <div className='account'>{AccountButton}</div>
         <div className='page'>{CurrentPage}</div>
         <div className='left'>{PagesLeft}</div>
-        <div className='navc'>{NavigationContent}</div>
         <div className='content' />
         <div className='back-top' />
         <div className='back-bottom' />
         <div className='ctx'>{ContextMenu}</div>
+        <div className='navc'>{NavigationContent}</div>
         <style jsx>{`
             .container {
                 position: fixed;
