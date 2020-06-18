@@ -1,6 +1,6 @@
 import React, { useCallback, ReactNode, useRef, useState } from 'react';
 import { useDocumentEvent } from 'controls/utils';
-import { vars, radius } from 'controls/theme';
+import { vars, radius, meter } from 'controls/theme';
 import { Overlay } from 'controls/Popover';
 import { BooqSelection, getBooqSelection } from './BooqContent';
 import { ContextMenuContent } from './ContextMenuContent';
@@ -105,6 +105,7 @@ function ContextMenuLayout({ content, rect }: {
                 background: var(${vars.background});
                 border-radius: ${radius};
                 border: 1px solid var(${vars.border});
+                padding-bottom: ${meter.xLarge};
             }
             `}</style>
     </div>;
