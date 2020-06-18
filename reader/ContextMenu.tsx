@@ -113,6 +113,7 @@ function ContextMenuLayout({ content, rect }: {
                 flex-flow: column;
                 justify-content: flex-end;
                 align-items: stretch;
+                user-select: none;
             }
             .content {
                 pointer-events: auto;
