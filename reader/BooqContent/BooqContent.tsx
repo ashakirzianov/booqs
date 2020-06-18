@@ -2,9 +2,9 @@ import React, { useCallback, useMemo } from 'react';
 import { BooqPath, BooqRange, BooqNode } from 'core';
 import { pathFromId } from 'app';
 import { useDocumentEvent } from 'controls/utils';
-import { renderNodes } from './BooqContent.render';
-import { useOnSelection } from './BooqContent.selection';
-import { useOnScroll } from './BooqContent.scroll';
+import { renderNodes } from './render';
+import { useOnSelection } from './selection';
+import { useOnScroll } from './scroll';
 
 export type BooqSelection = {
     range: BooqRange,
