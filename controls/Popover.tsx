@@ -31,7 +31,7 @@ export function Popover({ singleton, anchor, content }: {
 
 export function usePopoverSingleton() {
     const [source, target] = useSingleton();
-    const singletonNode = <>
+    const SingletonNode = <>
         <Tippy
             singleton={source}
             popperOptions={{ strategy: 'fixed' }}
@@ -44,28 +44,9 @@ export function usePopoverSingleton() {
         <style jsx global>{popoverStyles}</style>
     </>;
     return {
-        singletonNode,
+        SingletonNode,
         singleton: target,
     };
-}
-
-export function Popovers({ children }: {
-    children: (singleton: PopoverSingleton) => ReactNode,
-}) {
-    const [source, target] = useSingleton();
-    return <>
-        <Tippy
-            singleton={source}
-            popperOptions={{ strategy: 'fixed' }}
-            arrow={roundArrow + roundArrow}
-            placement='bottom'
-            interactive={true}
-            hideOnClick={true}
-            animation='shift-away'
-        />
-        {children(target)}
-        <style jsx global>{popoverStyles}</style>
-    </>;
 }
 
 const popoverStyles = css.global`

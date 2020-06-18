@@ -1,7 +1,7 @@
 import React from 'react';
-import { meter, headerHeight } from '../controls/theme';
-import { Logo } from '../controls/Logo';
-import { Popovers } from '../controls/Popover';
+import { meter, headerHeight } from 'controls/theme';
+import { Logo } from 'controls/Logo';
+import { usePopoverSingleton } from 'controls/Popover';
 import { Search } from './Search';
 import { SignIn } from './SignIn';
 import { Themer } from './Themer';
@@ -57,14 +57,12 @@ export function AppBar() {
 }
 
 function AppButtons() {
+    const { singleton, SingletonNode } = usePopoverSingleton();
     return <div className='buttons-row'>
-        <Popovers>
-            {singleton => <>
-                <Upload singleton={singleton} />
-                <Themer singleton={singleton} />
-                <SignIn singleton={singleton} />
-            </>}
-        </Popovers>
+        {SingletonNode}
+        <Upload singleton={singleton} />
+        <Themer singleton={singleton} />
+        <SignIn singleton={singleton} />
         <style jsx>{`
             .buttons-row {
                 display: flex;
