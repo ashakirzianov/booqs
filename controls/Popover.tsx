@@ -11,7 +11,7 @@ export function Overlay({ anchor, content }: {
     anchor: ReactElement,
     content: ReactNode,
 }) {
-    return <div>
+    return <>
         <Tippy
             popperOptions={{ strategy: 'fixed' }}
             arrow={false}
@@ -23,7 +23,7 @@ export function Overlay({ anchor, content }: {
             children={anchor}
         />
         <style jsx global>{popoverStyles}</style>
-    </div>;
+    </>;
 }
 
 // TODO: rethink div wrapping

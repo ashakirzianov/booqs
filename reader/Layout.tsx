@@ -1,7 +1,5 @@
-import React, { ReactNode, useCallback, useEffect, useState, ReactElement } from 'react';
+import React, { ReactNode } from 'react';
 import { meter, headerHeight, vars } from 'controls/theme';
-import { useDocumentEvent } from 'controls/utils';
-import { Overlay } from 'controls/Popover';
 
 type ControlsProps = {
     isControlsVisible: boolean,
@@ -98,7 +96,9 @@ function BooqControls({
             }
             .ctx {
                 grid-area: content;
-                pointer-events: auto;
+                pointer-events: none;
+                align-self: stretch;
+                justify-self: stretch;
             }
             .navc {
                 display: flex;

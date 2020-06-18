@@ -9,7 +9,7 @@ import { MenuItem } from 'controls/Menu';
 import { useDocumentEvent } from 'controls/utils';
 import { quoteRef } from 'controls/Links';
 import { Icon } from 'controls/Icon';
-import { meter, vars } from 'controls/theme';
+import { meter, vars, radius } from 'controls/theme';
 import { Overlay } from 'controls/Popover';
 import { BooqSelection } from './BooqContent';
 
@@ -32,25 +32,57 @@ export function ContextMenu({ booqId, selection }: {
 function ContextMenuLayout({ content }: {
     content: ReactNode,
 }) {
-    const rect = useSelectionRect();
-    return <ContextMenuPopover
-        content={content}
-        rect={rect}
-    />;
+    const isSmall = useIsSmallScreen();
+    if (!isSmall) {
+        return <ContextMenuPopover
+            content={content}
+        />;
+    }
+    return <div className='container'>
+        <div className='content'>{content}</div>
+        <style jsx>{`
+            .container {
+                display: flex;
+                flex: 1;
+                height: 100%;
+                align-self: stretch;
+                pointer-events: none;
+                flex-flow: column;
+                justify-content: flex-end;
+                align-items: stretch;
+            }
+            .content {
+                pointer-events: auto;
+                background: var(${vars.background});
+                border-radius: ${radius};
+                border: 1px solid var(${vars.border});
+            }
+            `}</style>
+    </div>;
+}
+
+function useIsSmallScreen() {
+    const result = window.innerWidth < 800;
+    console.log(result, window.innerWidth);
+    return result;
 }
 
 function ContextMenuPopover({
-    content, rect,
+    content,
 }: {
     content: ReactNode,
-    rect: SelectionRect | undefined,
 }) {
-    if (!rect) {
+    const { top, left, width, height } = useSelectionRect() ?? {};
+    if (top === undefined) {
         return null;
     }
-    const { top, left, width, height } = rect;
     return <Overlay
-        content={content}
+        content={<div style={{
+            width: '12rem',
+            pointerEvents: 'auto',
+        }}>
+            {content}
+        </div>}
         anchor={<div style={{
             position: 'fixed',
             pointerEvents: 'none',
@@ -96,21 +128,12 @@ export function ContextMenuContent({ booqId, selection }: {
     selection: BooqSelection,
 }) {
     useCopyQuote(booqId, selection);
-    return <div className='container'>
+    return <>
         <HighlightsItems booqId={booqId} selection={selection} />
         <CopyQuoteItem booqId={booqId} selection={selection} />
         <CopyTextItem booqId={booqId} selection={selection} />
         <CopyLinkItem booqId={booqId} selection={selection} />
-        <style jsx>{`
-            .container {
-                display: flex;
-                flex-flow: column;
-                flex: 1;
-                width: 12rem;
-                background: var(${vars.background});
-            }
-            `}</style>
-    </div>;
+    </>;
 }
 
 function removeSelection() {
