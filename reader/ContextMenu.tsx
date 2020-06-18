@@ -145,7 +145,9 @@ function ContextMenuLayout({ content, rect }: {
 }
 
 function useIsSmallScreen() {
-    return window.innerWidth < 800;
+    return process.browser
+        ? window.innerWidth < 800
+        : false;
 }
 
 function ContextMenuPopover({

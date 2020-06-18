@@ -59,7 +59,6 @@ function generateLink(booqId: string, range: BooqRange) {
 function baseUrl() {
     const current = window.location;
     return `${current.protocol}//${current.host}`;
-    // return process.env.NEXT_PUBLIC_URL;
 }
 
 function HighlightsItems({ booqId, selection }: {
