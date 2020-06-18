@@ -11,8 +11,8 @@ import { Spinner } from 'controls/Spinner';
 import { usePopoverSingleton } from 'controls/Popover';
 import { Themer } from 'components/Themer';
 import { SignIn } from 'components/SignIn';
-import { BooqContent, BooqSelection, Colorization } from './BooqContent';
-import { ContextMenuContent, ContextMenu } from './ContextMenu';
+import { BooqContent, Colorization } from './BooqContent';
+import { ContextMenu } from './ContextMenu';
 import { useNavigationPanel } from './Navigation';
 import { ReaderLayout } from './Layout';
 
@@ -26,7 +26,6 @@ export function Reader({
     const {
         onScroll, currentPath, currentPage, totalPages, leftPages,
     } = useScrollHandler(booq);
-    const { onSelection, selection } = useSelectionHandler();
     const range: BooqRange = useMemo(() => ({
         start: booq.fragment.current.path,
         end: booq.fragment.next?.path ?? [booq.fragment.nodes.length],
@@ -57,7 +56,6 @@ export function Reader({
                 range={range}
                 colorization={colorization}
                 onScroll={onScroll}
-                onSelection={onSelection}
                 onClick={toggle}
             />
         </div>}
@@ -73,7 +71,6 @@ export function Reader({
         />}
         ContextMenu={<ContextMenu
             booqId={booq.id}
-            selection={selection}
         />}
         MainButton={<FeedLink>
             <IconButton icon='back' />
@@ -179,17 +176,6 @@ function useScrollHandler({ id, fragment, length }: BooqData) {
         currentPath,
         currentPage, totalPages, leftPages,
         onScroll,
-    };
-}
-
-function useSelectionHandler() {
-    const [selection, setSelection] = useState<BooqSelection | undefined>(undefined);
-    const onSelection = function (newSelection?: BooqSelection) {
-        setSelection(newSelection);
-    };
-    return {
-        selection,
-        onSelection,
     };
 }
 

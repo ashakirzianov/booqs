@@ -1,21 +1,22 @@
-import React, { useCallback, ReactNode, useState, useEffect } from 'react';
+import React, { useCallback, ReactNode, useRef, useState } from 'react';
 import { useDocumentEvent } from 'controls/utils';
 import { vars, radius } from 'controls/theme';
 import { Overlay } from 'controls/Popover';
-import { BooqSelection } from './BooqContent';
+import { BooqSelection, getBooqSelection } from './BooqContent';
 import { ContextMenuContent } from './ContextMenuContent';
 
-export function ContextMenu({ booqId, selection }: {
+export function ContextMenu({ booqId }: {
     booqId: string,
-    selection: BooqSelection | undefined,
 }) {
-    if (selection) {
+    const { rect, selection } = useSelectionState() ?? {};
+    if (rect && selection) {
         return <ContextMenuLayout
+            rect={rect}
             content={<ContextMenuContent
                 booqId={booqId}
                 target={{
                     kind: 'selection',
-                    selection,
+                    selection: selection,
                 }}
             />}
         />;
@@ -24,13 +25,66 @@ export function ContextMenu({ booqId, selection }: {
     }
 }
 
-function ContextMenuLayout({ content }: {
+type SelectionState = {
+    selection: BooqSelection,
+    rect: SelectionRect,
+};
+function useSelectionState() {
+    const [selectionState, setSelectionState] = useState<SelectionState | undefined>(undefined);
+    const locked = useRef(false);
+    const unhandled = useRef(false);
+    const lock = () => locked.current = true;
+    const unlock = () => {
+        locked.current = false;
+        if (unhandled.current) {
+            setSelectionState(getSelection());
+            unhandled.current = false;
+        }
+    };
+    useDocumentEvent('mouseup', unlock);
+    useDocumentEvent('mousemove', event => {
+        if (event.buttons) {
+            lock();
+        } else {
+            unlock();
+        }
+    });
+
+    const selectionHandler = useCallback(event => {
+        if (!locked.current) {
+            setSelectionState(getSelection());
+        } else {
+            unhandled.current = true;
+        }
+    }, []);
+
+    // Note: handle click as workaround for dead context menu
+    useDocumentEvent('click', selectionHandler);
+    useDocumentEvent('selectionchange', selectionHandler);
+
+    return selectionState;
+}
+
+function getSelection() {
+    const rect = getSelectionRect();
+    if (rect) {
+        const selection = getBooqSelection();
+        if (selection) {
+            return { rect, selection };
+        }
+    }
+    return undefined;
+}
+
+function ContextMenuLayout({ content, rect }: {
     content: ReactNode,
+    rect: SelectionRect,
 }) {
     const isSmall = useIsSmallScreen();
     if (!isSmall) {
         return <ContextMenuPopover
             content={content}
+            rect={rect}
         />;
     }
     return <div className='container'>
@@ -63,14 +117,11 @@ function useIsSmallScreen() {
 }
 
 function ContextMenuPopover({
-    content,
+    content, rect: { top, left, width, height },
 }: {
     content: ReactNode,
+    rect: SelectionRect,
 }) {
-    const { top, left, width, height } = useSelectionRect() ?? {};
-    if (top === undefined) {
-        return null;
-    }
     return <Overlay
         content={<div style={{
             width: '12rem',
@@ -84,17 +135,6 @@ function ContextMenuPopover({
             top, left, width, height,
         }} />}
     />;
-}
-
-function useSelectionRect(): SelectionRect | undefined {
-    const [rect, setRect] = useState<SelectionRect | undefined>(undefined);
-    useEffect(() => {
-        setRect(getSelectionRect());
-    });
-    useDocumentEvent('scroll', useCallback(() => {
-        setRect(getSelectionRect());
-    }, [setRect]));
-    return rect;
 }
 
 type SelectionRect = {

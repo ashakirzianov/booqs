@@ -3,7 +3,6 @@ import { BooqPath, BooqRange, BooqNode } from 'core';
 import { pathFromId } from 'app';
 import { useDocumentEvent } from 'controls/utils';
 import { renderNodes } from './render';
-import { useOnSelection } from './selection';
 import { useOnScroll } from './scroll';
 
 export type BooqSelection = {
@@ -16,18 +15,16 @@ export type Colorization = {
 };
 export function BooqContent({
     booqId, nodes, range, colorization,
-    onScroll, onSelection, onClick,
+    onScroll, onClick,
 }: {
     booqId: string,
     nodes: BooqNode[],
     range: BooqRange,
     colorization: Colorization[],
     onScroll?: (path: BooqPath) => void,
-    onSelection?: (selection?: BooqSelection) => void,
     onClick?: () => void,
 }) {
     useOnScroll(onScroll);
-    useOnSelection(onSelection);
     useOnClick(onClick);
     return useMemo(function () {
         return <div id='booq-root' className='container'>
