@@ -15,7 +15,7 @@ import { BooqSelection } from './BooqContent';
 export type ContextMenuTarget = {
     kind: 'selection',
     selection: BooqSelection,
-}
+};
 export function ContextMenuContent({
     booqId, target: { selection },
 }: {

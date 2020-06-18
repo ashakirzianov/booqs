@@ -23,20 +23,19 @@ function ContextMenu({ booqId, selectionState }: {
     selectionState: SelectionState | undefined,
 }) {
     const { rect, selection } = selectionState ?? {};
-    if (rect && selection) {
-        return <ContextMenuLayout
-            rect={rect}
-            content={<ContextMenuContent
+    return <ContextMenuLayout
+        rect={rect}
+        content={selection
+            ? <ContextMenuContent
                 booqId={booqId}
                 target={{
                     kind: 'selection',
                     selection: selection,
                 }}
-            />}
-        />;
-    } else {
-        return null;
-    }
+            />
+            : null
+        }
+    />;
 }
 
 type SelectionState = {
@@ -84,8 +83,6 @@ function useSelectionState() {
                     ...selectionState,
                     rect,
                 });
-            } else {
-                console.log('unexpected');
             }
         }
     }, [selectionState]));
@@ -106,17 +103,20 @@ function getSelection() {
 
 function ContextMenuLayout({ content, rect }: {
     content: ReactNode,
-    rect: SelectionRect,
+    rect?: SelectionRect,
 }) {
     const isSmall = useIsSmallScreen();
     if (!isSmall) {
-        return <ContextMenuPopover
-            content={content}
-            rect={rect}
-        />;
+        return rect
+            ? <ContextMenuPopover
+                content={content}
+                rect={rect}
+            />
+            : null;
     }
+    const visibility = rect ? '' : 'hidden'; \
     return <div className='container'>
-        <div className='content'>{content}</div>
+        <div className={`content ${visibility}`}>{content}</div>
         <style jsx>{`
             .container {
                 display: flex;
@@ -135,6 +135,10 @@ function ContextMenuLayout({ content, rect }: {
                 border-radius: ${radius};
                 border: 1px solid var(${vars.border});
                 padding-bottom: ${meter.xLarge};
+                transition: 250ms transform;
+            }
+            .content.hidden {
+                transform: translateY(100%);
             }
             `}</style>
     </div>;
