@@ -114,7 +114,7 @@ function ContextMenuLayout({ content, rect }: {
             />
             : null;
     }
-    const visibility = rect ? '' : 'hidden'; \
+    const visibility = rect ? '' : 'hidden';
     return <div className='container'>
         <div className={`content ${visibility}`}>{content}</div>
         <style jsx>{`
