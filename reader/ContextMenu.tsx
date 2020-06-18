@@ -33,22 +33,22 @@ function useSelectionState() {
     const [selectionState, setSelectionState] = useState<SelectionState | undefined>(undefined);
     const locked = useRef(false);
     const unhandled = useRef(false);
-    const lock = () => locked.current = true;
-    const unlock = () => {
+    const lock = useCallback(() => locked.current = true, [locked]);
+    const unlock = useCallback(() => {
         locked.current = false;
         if (unhandled.current) {
             setSelectionState(getSelection());
             unhandled.current = false;
         }
-    };
+    }, [locked, unhandled]);
     useDocumentEvent('mouseup', unlock);
-    useDocumentEvent('mousemove', event => {
+    useDocumentEvent('mousemove', useCallback(event => {
         if (event.buttons) {
             lock();
         } else {
             unlock();
         }
-    });
+    }, [lock, unlock]));
 
     const selectionHandler = useCallback(event => {
         if (!locked.current) {
@@ -61,6 +61,20 @@ function useSelectionState() {
     // Note: handle click as workaround for dead context menu
     useDocumentEvent('click', selectionHandler);
     useDocumentEvent('selectionchange', selectionHandler);
+
+    useDocumentEvent('scroll', useCallback(event => {
+        if (selectionState) {
+            const rect = getSelectionRect();
+            if (rect) {
+                setSelectionState({
+                    ...selectionState,
+                    rect,
+                });
+            } else {
+                console.log('unexpected');
+            }
+        }
+    }, [selectionState]));
 
     return selectionState;
 }
@@ -112,9 +126,7 @@ function ContextMenuLayout({ content, rect }: {
 }
 
 function useIsSmallScreen() {
-    const result = window.innerWidth < 800;
-    console.log(result, window.innerWidth);
-    return result;
+    return window.innerWidth < 800;
 }
 
 function ContextMenuPopover({
