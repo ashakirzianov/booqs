@@ -27,8 +27,8 @@ export function useOnSelection(callback?: (selection?: BooqSelection) => void) {
 
     const selectionHandler = useCallback(event => {
         if (callback) {
-            const selection = getSelection();
             if (!locked.current) {
+                const selection = getSelection();
                 callback(selection);
             } else {
                 unhandled.current = true;

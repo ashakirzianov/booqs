@@ -1,6 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useCallback } from 'react';
 import { useRouter } from 'next/router';
-import Tippy from '@tippyjs/react';
 import * as clipboard from 'clipboard-polyfill';
 import { BooqRange, isOverlapping } from 'core';
 import {
@@ -11,81 +10,30 @@ import { useDocumentEvent } from 'controls/utils';
 import { quoteRef } from 'controls/Links';
 import { BooqSelection } from './BooqContent';
 import { Icon } from 'controls/Icon';
-import { meter, radius, panelShadow, vars } from 'controls/theme';
+import { meter, vars } from 'controls/theme';
 
-export function ContextMenu({
-    booqId, selection, locked,
-}: {
+export function ContextMenuContent({ booqId, selection }: {
     booqId: string,
-    selection: BooqSelection | undefined,
-    locked?: boolean,
+    selection: BooqSelection,
 }) {
-    const rect = useSelectionRect(selection);
     useCopyQuote(booqId, selection);
-    if (!rect || !selection || locked) {
-        return null;
-    }
-    const { top, left, width, height } = rect;
-    return <div>
-        <Tippy
-            visible={true}
-            interactive={true}
-            arrow={false}
-            placement='bottom'
-            animation='shift-away'
-            content={<ContextMenuContent
-                booqId={booqId} selection={selection}
-            />}
-        >
-            <div style={{
-                position: 'fixed',
-                pointerEvents: 'none',
-                top, left, width, height,
-            }} />
-        </Tippy>
-        <style jsx global>{`
-        .tippy-box {
-            color: var(${vars.primary});
-            background-color: var(${vars.background});
-            box-shadow: ${panelShadow};
-            border: 1px solid var(${vars.border});
-            border-radius: ${radius};
-        }
-        .tippy-content {
-            padding: 0;
-            overflow: hidden;
-            border-radius: ${radius};
-        }
+    return <div className='container'>
+        <HighlightsItems booqId={booqId} selection={selection} />
+        <CopyQuoteItem booqId={booqId} selection={selection} />
+        <CopyTextItem booqId={booqId} selection={selection} />
+        <CopyLinkItem booqId={booqId} selection={selection} />
+        <style jsx>{`
+            .container {
+                display: flex;
+                flex-flow: column;
+                flex: 1;
+                width: 12rem;
+                background: var(${vars.background});
+            }
             `}</style>
     </div>;
 }
 
-function useSelectionRect(selection: BooqSelection | undefined) {
-    const [rect, setRect] = useState<SelectionRect>(undefined);
-    useEffect(() => {
-        if (selection) {
-            setRect(getSelectionRect());
-        }
-    }, [selection]);
-    useDocumentEvent('scroll', useCallback(() => {
-        if (selection) {
-            setRect(getSelectionRect());
-        }
-    }, [setRect, selection]));
-    return rect;
-}
-
-type SelectionRect = ReturnType<typeof getSelectionRect>;
-function getSelectionRect() {
-    const rect = window.getSelection()
-        ?.getRangeAt(0)
-        ?.getBoundingClientRect();
-    return rect
-        ? {
-            top: rect.top, left: rect.left,
-            height: rect.height, width: rect.width,
-        } : undefined;
-}
 function removeSelection() {
     window.getSelection()?.empty();
 }
@@ -115,18 +63,6 @@ function baseUrl() {
     const current = window.location;
     return `${current.protocol}//${current.host}`;
     // return process.env.NEXT_PUBLIC_URL;
-}
-
-function ContextMenuContent({ booqId, selection }: {
-    booqId: string,
-    selection: BooqSelection,
-}) {
-    return <Menu width='12rem'>
-        <HighlightsItems booqId={booqId} selection={selection} />
-        <CopyQuoteItem booqId={booqId} selection={selection} />
-        <CopyTextItem booqId={booqId} selection={selection} />
-        <CopyLinkItem booqId={booqId} selection={selection} />
-    </Menu>;
 }
 
 function HighlightsItems({ booqId, selection }: {

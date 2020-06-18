@@ -1,5 +1,7 @@
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useCallback, useEffect, useState, ReactElement } from 'react';
 import { meter, headerHeight, vars } from 'controls/theme';
+import { useDocumentEvent } from 'controls/utils';
+import { Overlay } from 'controls/Popover';
 
 type ControlsProps = {
     isControlsVisible: boolean,
@@ -30,7 +32,9 @@ export function ReaderLayout({
             {PrevButton}
             {BooqContent}
             {NextButton}
-            {ContextMenu}
+            <ContextMenuLayout
+                content={ContextMenu}
+            />
         </div>
         <BooqControls {...controls} />
         <style jsx>{`
@@ -180,4 +184,66 @@ function BooqControls({
             }
             `}</style>
     </div>;
+}
+
+function ContextMenuLayout({ content }: {
+    content: ReactNode,
+}) {
+    const rect = useSelectionRect();
+    return <ContextMenuPopover
+        content={content}
+        rect={rect}
+    />;
+}
+
+function ContextMenuPopover({
+    content, rect,
+}: {
+    content: ReactNode,
+    rect: SelectionRect | undefined,
+}) {
+    if (!rect) {
+        return null;
+    }
+    const { top, left, width, height } = rect;
+    return <Overlay
+        content={content}
+        anchor={<div style={{
+            position: 'fixed',
+            pointerEvents: 'none',
+            top, left, width, height,
+        }} />}
+    />;
+}
+
+function useSelectionRect(): SelectionRect | undefined {
+    const [rect, setRect] = useState<SelectionRect | undefined>(undefined);
+    useEffect(() => {
+        setRect(getSelectionRect());
+    });
+    useDocumentEvent('scroll', useCallback(() => {
+        setRect(getSelectionRect());
+    }, [setRect]));
+    return rect;
+}
+
+type SelectionRect = {
+    top: number,
+    left: number,
+    height: number,
+    width: number,
+};
+function getSelectionRect() {
+    const selection = window.getSelection();
+    if (selection && selection.rangeCount > 0) {
+        const rect = selection.getRangeAt(0)
+            ?.getBoundingClientRect();
+        return rect
+            ? {
+                top: rect.top, left: rect.left,
+                height: rect.height, width: rect.width,
+            } : undefined;
+    } else {
+        return undefined;
+    }
 }

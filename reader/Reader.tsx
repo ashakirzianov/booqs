@@ -12,7 +12,7 @@ import { usePopoverSingleton } from 'controls/Popover';
 import { Themer } from 'components/Themer';
 import { SignIn } from 'components/SignIn';
 import { BooqContent, BooqSelection, Colorization } from './BooqContent';
-import { ContextMenu } from './ContextMenu';
+import { ContextMenuContent } from './ContextMenu';
 import { useNavigationPanel } from './Navigation';
 import { ReaderLayout } from './Layout';
 
@@ -38,7 +38,7 @@ export function Reader({
     const leftLabel = leftPages <= 1 ? 'Last page'
         : `${leftPages} pages left`;
 
-    const { singleton, singletonNode } = usePopoverSingleton();
+    const { singleton, SingletonNode } = usePopoverSingleton();
     const {
         navigationOpen, NavigationButton, NavigationContent,
     } = useNavigationPanel(booq.id);
@@ -50,7 +50,7 @@ export function Reader({
             fontFamily: bookFont,
             fontSize: `${fontScale}%`,
         }}>
-            {singletonNode}
+            {SingletonNode}
             <BooqContent
                 booqId={booq.id}
                 nodes={booq.fragment.nodes}
@@ -71,10 +71,14 @@ export function Reader({
             anchor={booq.fragment.next}
             title='Next'
         />}
-        ContextMenu={<ContextMenu
-            booqId={booq.id}
-            selection={selection}
-        />}
+        ContextMenu={
+            selection
+                ? <ContextMenuContent
+                    booqId={booq.id}
+                    selection={selection}
+                />
+                : null
+        }
         MainButton={<FeedLink>
             <IconButton icon='back' />
         </FeedLink>}
