@@ -1,16 +1,95 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, ReactNode, useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import * as clipboard from 'clipboard-polyfill';
 import { BooqRange, isOverlapping } from 'core';
 import {
     useAuth, useHighlightMutations, useHighlights, Highlight, colorForGroup, groups,
 } from 'app';
-import { Menu, MenuItem } from 'controls/Menu';
+import { MenuItem } from 'controls/Menu';
 import { useDocumentEvent } from 'controls/utils';
 import { quoteRef } from 'controls/Links';
-import { BooqSelection } from './BooqContent';
 import { Icon } from 'controls/Icon';
 import { meter, vars } from 'controls/theme';
+import { Overlay } from 'controls/Popover';
+import { BooqSelection } from './BooqContent';
+
+export function ContextMenu({ booqId, selection }: {
+    booqId: string,
+    selection: BooqSelection | undefined,
+}) {
+    if (selection) {
+        return <ContextMenuLayout
+            content={<ContextMenuContent
+                booqId={booqId}
+                selection={selection}
+            />}
+        />;
+    } else {
+        return null;
+    }
+}
+
+function ContextMenuLayout({ content }: {
+    content: ReactNode,
+}) {
+    const rect = useSelectionRect();
+    return <ContextMenuPopover
+        content={content}
+        rect={rect}
+    />;
+}
+
+function ContextMenuPopover({
+    content, rect,
+}: {
+    content: ReactNode,
+    rect: SelectionRect | undefined,
+}) {
+    if (!rect) {
+        return null;
+    }
+    const { top, left, width, height } = rect;
+    return <Overlay
+        content={content}
+        anchor={<div style={{
+            position: 'fixed',
+            pointerEvents: 'none',
+            top, left, width, height,
+        }} />}
+    />;
+}
+
+function useSelectionRect(): SelectionRect | undefined {
+    const [rect, setRect] = useState<SelectionRect | undefined>(undefined);
+    useEffect(() => {
+        setRect(getSelectionRect());
+    });
+    useDocumentEvent('scroll', useCallback(() => {
+        setRect(getSelectionRect());
+    }, [setRect]));
+    return rect;
+}
+
+type SelectionRect = {
+    top: number,
+    left: number,
+    height: number,
+    width: number,
+};
+function getSelectionRect() {
+    const selection = window.getSelection();
+    if (selection && selection.rangeCount > 0) {
+        const rect = selection.getRangeAt(0)
+            ?.getBoundingClientRect();
+        return rect
+            ? {
+                top: rect.top, left: rect.left,
+                height: rect.height, width: rect.width,
+            } : undefined;
+    } else {
+        return undefined;
+    }
+}
 
 export function ContextMenuContent({ booqId, selection }: {
     booqId: string,

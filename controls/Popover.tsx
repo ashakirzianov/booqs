@@ -13,6 +13,7 @@ export function Overlay({ anchor, content }: {
 }) {
     return <div>
         <Tippy
+            popperOptions={{ strategy: 'fixed' }}
             arrow={false}
             interactive={true}
             placement='bottom'

@@ -13,18 +13,18 @@ type ControlsProps = {
     CurrentPage: ReactNode,
     PagesLeft: ReactNode,
     NavigationContent: ReactNode,
+    ContextMenu: ReactNode,
 };
 type LayoutProps = ControlsProps & {
     BooqContent: ReactNode,
     PrevButton: ReactNode,
     NextButton: ReactNode,
-    ContextMenu: ReactNode,
 };
 
 const contentWidth = '40rem';
 export const smallScreenWidth = '60rem';
 export function ReaderLayout({
-    BooqContent, PrevButton, NextButton, ContextMenu,
+    BooqContent, PrevButton, NextButton,
     ...controls
 }: LayoutProps) {
     return <div className='container'>
@@ -32,9 +32,6 @@ export function ReaderLayout({
             {PrevButton}
             {BooqContent}
             {NextButton}
-            <ContextMenuLayout
-                content={ContextMenu}
-            />
         </div>
         <BooqControls {...controls} />
         <style jsx>{`
@@ -62,6 +59,7 @@ function BooqControls({
     ThemerButton, AccountButton,
     CurrentPage, PagesLeft,
     NavigationContent,
+    ContextMenu,
 }: ControlsProps) {
     const showControls = isControlsVisible || isNavigationOpen;
     return <div className='container'>
@@ -75,6 +73,7 @@ function BooqControls({
         <div className='content' />
         <div className='back-top' />
         <div className='back-bottom' />
+        <div className='ctx'>{ContextMenu}</div>
         <style jsx>{`
             .container {
                 position: fixed;
@@ -96,6 +95,10 @@ function BooqControls({
                 grid-area: content;
                 align-self: stretch;
                 justify-self: stretch;
+            }
+            .ctx {
+                grid-area: content;
+                pointer-events: auto;
             }
             .navc {
                 display: flex;
@@ -151,6 +154,9 @@ function BooqControls({
                         "navc navc navc navc   navc"
                         "page page .    left   left";
                 }
+                .ctx {
+                    grid-area: 2 / 1 / 4 / 6;
+                }
                 .navc {
                     grid-area: 2 / 1 / 4 / 6;
                 }
@@ -184,66 +190,4 @@ function BooqControls({
             }
             `}</style>
     </div>;
-}
-
-function ContextMenuLayout({ content }: {
-    content: ReactNode,
-}) {
-    const rect = useSelectionRect();
-    return <ContextMenuPopover
-        content={content}
-        rect={rect}
-    />;
-}
-
-function ContextMenuPopover({
-    content, rect,
-}: {
-    content: ReactNode,
-    rect: SelectionRect | undefined,
-}) {
-    if (!rect) {
-        return null;
-    }
-    const { top, left, width, height } = rect;
-    return <Overlay
-        content={content}
-        anchor={<div style={{
-            position: 'fixed',
-            pointerEvents: 'none',
-            top, left, width, height,
-        }} />}
-    />;
-}
-
-function useSelectionRect(): SelectionRect | undefined {
-    const [rect, setRect] = useState<SelectionRect | undefined>(undefined);
-    useEffect(() => {
-        setRect(getSelectionRect());
-    });
-    useDocumentEvent('scroll', useCallback(() => {
-        setRect(getSelectionRect());
-    }, [setRect]));
-    return rect;
-}
-
-type SelectionRect = {
-    top: number,
-    left: number,
-    height: number,
-    width: number,
-};
-function getSelectionRect() {
-    const selection = window.getSelection();
-    if (selection && selection.rangeCount > 0) {
-        const rect = selection.getRangeAt(0)
-            ?.getBoundingClientRect();
-        return rect
-            ? {
-                top: rect.top, left: rect.left,
-                height: rect.height, width: rect.width,
-            } : undefined;
-    } else {
-        return undefined;
-    }
 }

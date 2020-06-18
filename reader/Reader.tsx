@@ -12,7 +12,7 @@ import { usePopoverSingleton } from 'controls/Popover';
 import { Themer } from 'components/Themer';
 import { SignIn } from 'components/SignIn';
 import { BooqContent, BooqSelection, Colorization } from './BooqContent';
-import { ContextMenuContent } from './ContextMenu';
+import { ContextMenuContent, ContextMenu } from './ContextMenu';
 import { useNavigationPanel } from './Navigation';
 import { ReaderLayout } from './Layout';
 
@@ -71,14 +71,10 @@ export function Reader({
             anchor={booq.fragment.next}
             title='Next'
         />}
-        ContextMenu={
-            selection
-                ? <ContextMenuContent
-                    booqId={booq.id}
-                    selection={selection}
-                />
-                : null
-        }
+        ContextMenu={<ContextMenu
+            booqId={booq.id}
+            selection={selection}
+        />}
         MainButton={<FeedLink>
             <IconButton icon='back' />
         </FeedLink>}
