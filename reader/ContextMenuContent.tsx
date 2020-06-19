@@ -12,15 +12,44 @@ import { Icon } from 'controls/Icon';
 import { meter, vars } from 'controls/theme';
 import { BooqSelection } from './BooqContent';
 
-export type ContextMenuTarget = {
+type EmptyTarget = {
+    kind: 'empty',
+};
+type SelectionTarget = {
     kind: 'selection',
     selection: BooqSelection,
 };
+type QuoteTarget = {
+    kind: 'quote',
+    quote: BooqSelection,
+};
+export type ContextMenuTarget =
+    | EmptyTarget | SelectionTarget | QuoteTarget;
 export function ContextMenuContent({
-    booqId, target: { selection },
+    booqId, target,
 }: {
     booqId: string,
     target: ContextMenuTarget,
+}) {
+    switch (target.kind) {
+        case 'selection':
+            return <SelectionTargetMenu
+                booqId={booqId}
+                target={target}
+            />;
+        case 'quote':
+            return <QuoteTargetMenu
+                booqId={booqId}
+                target={target}
+            />;
+        default:
+            return null;
+    }
+}
+
+function SelectionTargetMenu({ booqId, target: { selection } }: {
+    booqId: string,
+    target: SelectionTarget,
 }) {
     useCopyQuote(booqId, selection);
     return <>
@@ -31,34 +60,14 @@ export function ContextMenuContent({
     </>;
 }
 
-function removeSelection() {
-    window.getSelection()?.empty();
-}
-
-function useCopyQuote(booqId: string, selection?: BooqSelection) {
-    const { prefetch } = useRouter();
-    useDocumentEvent('copy', useCallback(e => {
-        if (selection && e.clipboardData) {
-            e.preventDefault();
-            const selectionText = generateQuote(booqId, selection.text, selection.range);
-            e.clipboardData.setData('text/plain', selectionText);
-            prefetch(quoteRef(booqId, selection.range));
-        }
-    }, [selection, booqId, prefetch]));
-}
-
-function generateQuote(booqId: string, text: string, range: BooqRange) {
-    const link = generateLink(booqId, range);
-    return `"${text}" ${link}`;
-}
-
-function generateLink(booqId: string, range: BooqRange) {
-    return `${baseUrl()}${quoteRef(booqId, range)}`;
-}
-
-function baseUrl() {
-    const current = window.location;
-    return `${current.protocol}//${current.host}`;
+function QuoteTargetMenu({ booqId, target: { quote } }: {
+    booqId: string,
+    target: QuoteTarget,
+}) {
+    return <>
+        <HighlightsItems booqId={booqId} selection={quote} />
+        <CopyTextItem booqId={booqId} selection={quote} />
+    </>;
 }
 
 function HighlightsItems({ booqId, selection }: {
@@ -213,4 +222,34 @@ function CopyLinkItem({ booqId, selection }: {
             prefetch(quoteRef(booqId, selection.range));
         }}
     />;
+}
+
+function useCopyQuote(booqId: string, selection?: BooqSelection) {
+    const { prefetch } = useRouter();
+    useDocumentEvent('copy', useCallback(e => {
+        if (selection && e.clipboardData) {
+            e.preventDefault();
+            const selectionText = generateQuote(booqId, selection.text, selection.range);
+            e.clipboardData.setData('text/plain', selectionText);
+            prefetch(quoteRef(booqId, selection.range));
+        }
+    }, [selection, booqId, prefetch]));
+}
+
+function removeSelection() {
+    window.getSelection()?.empty();
+}
+
+function generateQuote(booqId: string, text: string, range: BooqRange) {
+    const link = generateLink(booqId, range);
+    return `"${text}" ${link}`;
+}
+
+function generateLink(booqId: string, range: BooqRange) {
+    return `${baseUrl()}${quoteRef(booqId, range)}`;
+}
+
+function baseUrl() {
+    const current = window.location;
+    return `${current.protocol}//${current.host}`;
 }
