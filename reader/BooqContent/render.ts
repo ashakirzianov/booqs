@@ -63,14 +63,15 @@ function renderTextNode(text: string, {
             id: pathToId(path),
         },
         spans.map(span => {
-            const augmentedId = span.id;
-            const augmentationProps = augmentedId ? {
+            const augmentationId = span.id;
+            const augmentationProps = augmentationId ? {
+                'data-augmentation-id': augmentationId,
                 style: {
                     background: span.color,
                     cursor: 'pointer',
                 },
                 onClick: onAugmentationClick
-                    ? () => onAugmentationClick(augmentedId)
+                    ? () => onAugmentationClick(augmentationId)
                     : undefined,
             } : {};
             return createElement(
