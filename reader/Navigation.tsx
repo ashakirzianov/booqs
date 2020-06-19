@@ -44,25 +44,27 @@ function Navigation({ booqId }: {
     }), [filter, title, toc, highlights]);
     return useMemo(() => {
         return <div className='container'>
-            <div className='header'>
-                <div className='label'>CONTENTS</div>
-                <div className='filter'>
-                    {FilterNode}
+            <div className='safe-area'>
+                <div className='header'>
+                    <div className='label'>CONTENTS</div>
+                    <div className='filter'>
+                        {FilterNode}
+                    </div>
                 </div>
-            </div>
-            <div className='items'>
-                {
-                    nodes.map(
-                        (node, idx) => <div key={idx}>
-                            <div className='item'>
-                                <NavigationNodeComp
-                                    booqId={booqId}
-                                    node={node}
-                                />
+                <div className='items'>
+                    {
+                        nodes.map(
+                            (node, idx) => <div key={idx}>
+                                <div className='item'>
+                                    <NavigationNodeComp
+                                        booqId={booqId}
+                                        node={node}
+                                    />
+                                </div>
                             </div>
-                        </div>
-                    )
-                }
+                        )
+                    }
+                </div>
             </div>
             <style jsx>{`
             .container {
@@ -71,6 +73,9 @@ function Navigation({ booqId }: {
                 flex-flow: column nowrap;
                 color: var(${vars.dimmed});
                 font-size: 0.9rem;
+            }
+            .safe-area {
+                padding: 0 env(safe-area-inset-right) 0 env(safe-area-inset-left);
             }
             .header {
                 display: flex;

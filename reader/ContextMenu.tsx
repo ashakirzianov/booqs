@@ -134,7 +134,7 @@ function ContextMenuLayout({ content, rect }: {
                 background: var(${vars.background});
                 border-radius: ${radius};
                 border: 1px solid var(${vars.border});
-                padding-bottom: ${meter.xLarge};
+                padding-bottom: env(safe-area-inset-bottom);
                 transition: 250ms transform;
             }
             .content.hidden {
@@ -146,7 +146,7 @@ function ContextMenuLayout({ content, rect }: {
 
 function useIsSmallScreen() {
     return process.browser
-        ? window.innerWidth < 800
+        ? window.innerWidth < 1000
         : false;
 }
 
