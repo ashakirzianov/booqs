@@ -51,6 +51,7 @@ export function ReaderLayout({
     </div>;
 }
 
+const buttonSize = '64px';
 function BooqControls({
     isControlsVisible, isNavigationOpen,
     MainButton, NavigationButton,
@@ -82,12 +83,12 @@ function BooqControls({
                 justify-items: center;
                 align-items: center;
                 display: grid;
-                grid-template-columns: minmax(0, auto) minmax(0, auto) 1fr ${contentWidth} 1fr minmax(0, auto) minmax(0, auto);
+                grid-template-columns: ${buttonSize} ${buttonSize} 1fr ${contentWidth} 1fr ${buttonSize} ${buttonSize};
                 grid-template-rows: ${headerHeight} 1fr ${headerHeight};
                 grid-template-areas: 
-                    "main nav  .    content . themer account"
-                    "navc navc navc content . .      .      "
-                    "page page .    content . left   left   ";
+                    "main nav  .    content .    themer account"
+                    "navc navc navc content .    .      .      "
+                    "page page page content left left   left   ";
             }
             .content {
                 grid-area: content;
@@ -150,15 +151,16 @@ function BooqControls({
                     grid-template-columns: auto auto 1fr auto auto;
                     grid-template-rows: ${headerHeight} 1fr ${headerHeight};
                     grid-template-areas: 
-                        "main nav  .    themer account"
-                        "navc navc navc navc   navc"
-                        "page page .    left   left";
+                        "main    nav     .       themer  account"
+                        "content content content content content"
+                        "page    page    .       left    left";
                 }
                 .ctx {
                     grid-area: 2 / 1 / 4 / 6;
                 }
                 .navc {
                     grid-area: 2 / 1 / 4 / 6;
+                    padding: ${meter.regular} ${meter.large} 0 ${meter.large};
                 }
                 .back-top, .back-bottom {
                     display: block;
