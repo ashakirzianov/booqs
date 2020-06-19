@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react';
+import React, { ReactNode, ReactElement } from 'react';
 import { roundArrow } from 'tippy.js';
 import Tippy, { useSingleton } from '@tippyjs/react';
 import css from 'styled-jsx/css'
@@ -6,6 +6,27 @@ import { panelShadow, radius, vars } from './theme';
 
 export type PopoverSingleton = ReturnType<typeof useSingleton>[1];
 
+// TODO: combine 'Popover' & 'Overlay' ?
+export function Overlay({ anchor, content }: {
+    anchor: ReactElement,
+    content: ReactNode,
+}) {
+    return <>
+        <Tippy
+            popperOptions={{ strategy: 'fixed' }}
+            arrow={false}
+            interactive={true}
+            placement='bottom'
+            visible={true}
+            animation='shift-away'
+            content={<>{content}</>}
+            children={anchor}
+        />
+        <style jsx global>{popoverStyles}</style>
+    </>;
+}
+
+// TODO: rethink div wrapping
 export function Popover({ singleton, anchor, content }: {
     singleton?: PopoverSingleton,
     anchor: ReactNode,
@@ -14,13 +35,13 @@ export function Popover({ singleton, anchor, content }: {
     return <div>
         <Tippy
             singleton={singleton}
-            content={<div className='anchor'>
+            content={<div className='content'>
                 {content}
             </div>}
             children={<div>{anchor}</div>}
         />
         <style jsx>{`
-            .anchor {
+            .content {
                 display: flex;
                 min-width: 15rem;
                 flex: 1;
@@ -31,7 +52,7 @@ export function Popover({ singleton, anchor, content }: {
 
 export function usePopoverSingleton() {
     const [source, target] = useSingleton();
-    const singletonNode = <>
+    const SingletonNode = <>
         <Tippy
             singleton={source}
             popperOptions={{ strategy: 'fixed' }}
@@ -44,28 +65,9 @@ export function usePopoverSingleton() {
         <style jsx global>{popoverStyles}</style>
     </>;
     return {
-        singletonNode,
+        SingletonNode,
         singleton: target,
     };
-}
-
-export function Popovers({ children }: {
-    children: (singleton: PopoverSingleton) => ReactNode,
-}) {
-    const [source, target] = useSingleton();
-    return <>
-        <Tippy
-            singleton={source}
-            popperOptions={{ strategy: 'fixed' }}
-            arrow={roundArrow + roundArrow}
-            placement='bottom'
-            interactive={true}
-            hideOnClick={true}
-            animation='shift-away'
-        />
-        {children(target)}
-        <style jsx global>{popoverStyles}</style>
-    </>;
 }
 
 const popoverStyles = css.global`

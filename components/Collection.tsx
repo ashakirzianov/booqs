@@ -39,7 +39,7 @@ function CollectionItems({ booqs }: {
             .container {
                 display: flex;
                 flex-direction: row;
-                overflow: scroll;
+                overflow: auto;
             }
             `}</style>
     </div>

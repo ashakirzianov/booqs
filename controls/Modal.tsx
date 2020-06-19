@@ -70,7 +70,7 @@ function ModalContent({
                 position: relative;
                 max-width: 50rem;
                 max-height: 100%;
-                overflow-y: scroll;
+                overflow-y: auto;
                 overflow-x: hidden;
                 z-index: 10;
                 background: var(${vars.background});

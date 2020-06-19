@@ -13,3 +13,12 @@ export function useDocumentEvent<K extends keyof DocumentEventMap>(name: K, list
         return () => window.document.removeEventListener(name, listener);
     }, [listener]);
 }
+
+export function isSmallScreen(): boolean {
+    if (process.browser) {
+        const mql = window.matchMedia(`(max-width: 60rem)`);
+        return mql.matches;
+    } else {
+        return false;
+    }
+}

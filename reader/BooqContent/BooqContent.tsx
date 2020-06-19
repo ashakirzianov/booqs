@@ -2,9 +2,8 @@ import React, { useCallback, useMemo } from 'react';
 import { BooqPath, BooqRange, BooqNode } from 'core';
 import { pathFromId } from 'app';
 import { useDocumentEvent } from 'controls/utils';
-import { renderNodes } from './BooqContent.render';
-import { useOnSelection } from './BooqContent.selection';
-import { useOnScroll } from './BooqContent.scroll';
+import { renderNodes } from './render';
+import { useOnScroll } from './scroll';
 
 export type BooqSelection = {
     range: BooqRange,
@@ -16,18 +15,16 @@ export type Colorization = {
 };
 export function BooqContent({
     booqId, nodes, range, colorization,
-    onScroll, onSelection, onClick,
+    onScroll, onClick,
 }: {
     booqId: string,
     nodes: BooqNode[],
     range: BooqRange,
     colorization: Colorization[],
     onScroll?: (path: BooqPath) => void,
-    onSelection?: (selection?: BooqSelection) => void,
     onClick?: () => void,
 }) {
     useOnScroll(onScroll);
-    useOnSelection(onSelection);
     useOnClick(onClick);
     return useMemo(function () {
         return <div id='booq-root' className='container'>

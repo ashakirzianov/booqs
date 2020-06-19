@@ -4,15 +4,15 @@ import {
     BooqData, BooqAnchor, useSettings, useReportHistory,
     useHighlights, colorForGroup, quoteColor, pageForPosition,
 } from 'app';
-import { headerHeight, meter, bookFont, vars } from 'controls/theme';
+import { headerHeight, meter, bookFont, vars, boldWeight } from 'controls/theme';
 import { BorderButton, IconButton } from 'controls/Buttons';
 import { BooqLink, FeedLink } from 'controls/Links';
 import { Spinner } from 'controls/Spinner';
 import { usePopoverSingleton } from 'controls/Popover';
 import { Themer } from 'components/Themer';
 import { SignIn } from 'components/SignIn';
-import { BooqContent, BooqSelection, Colorization } from './BooqContent';
-import { ContextMenu } from './ContextMenu';
+import { BooqContent, Colorization } from './BooqContent';
+import { useContextMenu } from './ContextMenu';
 import { useNavigationPanel } from './Navigation';
 import { ReaderLayout } from './Layout';
 
@@ -26,7 +26,6 @@ export function Reader({
     const {
         onScroll, currentPath, currentPage, totalPages, leftPages,
     } = useScrollHandler(booq);
-    const { onSelection, selection } = useSelectionHandler();
     const range: BooqRange = useMemo(() => ({
         start: booq.fragment.current.path,
         end: booq.fragment.next?.path ?? [booq.fragment.nodes.length],
@@ -38,26 +37,28 @@ export function Reader({
     const leftLabel = leftPages <= 1 ? 'Last page'
         : `${leftPages} pages left`;
 
-    const { singleton, singletonNode } = usePopoverSingleton();
+    const { singleton, SingletonNode } = usePopoverSingleton();
     const {
         navigationOpen, NavigationButton, NavigationContent,
     } = useNavigationPanel(booq.id);
+    const {
+        ContextMenuNode, isVisible: contextMenuVisible,
+    } = useContextMenu(booq.id);
 
     return <ReaderLayout
-        isControlsVisible={visible}
+        isControlsVisible={!contextMenuVisible && visible}
         isNavigationOpen={navigationOpen}
         BooqContent={<div style={{
             fontFamily: bookFont,
             fontSize: `${fontScale}%`,
         }}>
-            {singletonNode}
+            {SingletonNode}
             <BooqContent
                 booqId={booq.id}
                 nodes={booq.fragment.nodes}
                 range={range}
                 colorization={colorization}
                 onScroll={onScroll}
-                onSelection={onSelection}
                 onClick={toggle}
             />
         </div>}
@@ -71,10 +72,7 @@ export function Reader({
             anchor={booq.fragment.next}
             title='Next'
         />}
-        ContextMenu={<ContextMenu
-            booqId={booq.id}
-            selection={selection}
-        />}
+        ContextMenu={ContextMenuNode}
         MainButton={<FeedLink>
             <IconButton icon='back' />
         </FeedLink>}
@@ -182,17 +180,6 @@ function useScrollHandler({ id, fragment, length }: BooqData) {
     };
 }
 
-function useSelectionHandler() {
-    const [selection, setSelection] = useState<BooqSelection | undefined>(undefined);
-    const onSelection = function (newSelection?: BooqSelection) {
-        setSelection(newSelection);
-    };
-    return {
-        selection,
-        onSelection,
-    };
-}
-
 function AnchorButton({ booqId, anchor, title }: {
     booqId: string,
     anchor?: BooqAnchor,
@@ -224,6 +211,7 @@ function PageLabel({ text }: {
         <style jsx>{`
             .label {
                 font-size: small;
+                font-weight: ${boldWeight};
                 color: var(${vars.dimmed});
             }
             `}</style>

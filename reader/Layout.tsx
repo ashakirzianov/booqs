@@ -11,18 +11,18 @@ type ControlsProps = {
     CurrentPage: ReactNode,
     PagesLeft: ReactNode,
     NavigationContent: ReactNode,
+    ContextMenu: ReactNode,
 };
 type LayoutProps = ControlsProps & {
     BooqContent: ReactNode,
     PrevButton: ReactNode,
     NextButton: ReactNode,
-    ContextMenu: ReactNode,
 };
 
 const contentWidth = '40rem';
 export const smallScreenWidth = '60rem';
 export function ReaderLayout({
-    BooqContent, PrevButton, NextButton, ContextMenu,
+    BooqContent, PrevButton, NextButton,
     ...controls
 }: LayoutProps) {
     return <div className='container'>
@@ -30,7 +30,6 @@ export function ReaderLayout({
             {PrevButton}
             {BooqContent}
             {NextButton}
-            {ContextMenu}
         </div>
         <BooqControls {...controls} />
         <style jsx>{`
@@ -52,12 +51,14 @@ export function ReaderLayout({
     </div>;
 }
 
+const buttonSize = '64px';
 function BooqControls({
     isControlsVisible, isNavigationOpen,
     MainButton, NavigationButton,
     ThemerButton, AccountButton,
     CurrentPage, PagesLeft,
     NavigationContent,
+    ContextMenu,
 }: ControlsProps) {
     const showControls = isControlsVisible || isNavigationOpen;
     return <div className='container'>
@@ -67,10 +68,11 @@ function BooqControls({
         <div className='account'>{AccountButton}</div>
         <div className='page'>{CurrentPage}</div>
         <div className='left'>{PagesLeft}</div>
-        <div className='navc'>{NavigationContent}</div>
         <div className='content' />
         <div className='back-top' />
         <div className='back-bottom' />
+        <div className='ctx'>{ContextMenu}</div>
+        <div className='navc'>{NavigationContent}</div>
         <style jsx>{`
             .container {
                 position: fixed;
@@ -81,15 +83,21 @@ function BooqControls({
                 justify-items: center;
                 align-items: center;
                 display: grid;
-                grid-template-columns: minmax(0, auto) minmax(0, auto) 1fr ${contentWidth} 1fr minmax(0, auto) minmax(0, auto);
+                grid-template-columns: ${buttonSize} ${buttonSize} 1fr ${contentWidth} 1fr ${buttonSize} ${buttonSize};
                 grid-template-rows: ${headerHeight} 1fr ${headerHeight};
                 grid-template-areas: 
-                    "main nav  .    content . themer account"
-                    "navc navc navc content . .      .      "
-                    "page page .    content . left   left   ";
+                    "main nav  .    content .    themer account"
+                    "navc navc navc content .    .      .      "
+                    "page page page content left left   left   ";
             }
             .content {
                 grid-area: content;
+                align-self: stretch;
+                justify-self: stretch;
+            }
+            .ctx {
+                grid-area: content;
+                pointer-events: none;
                 align-self: stretch;
                 justify-self: stretch;
             }
@@ -97,8 +105,9 @@ function BooqControls({
                 display: flex;
                 flex: 1 1;
                 grid-area: 2 / 1 / 4 / 4;
+                padding: ${meter.regular} 0 0 ${meter.large};
                 pointer-events: auto;
-                overflow: scroll;
+                overflow: hidden;
                 align-self: stretch;
                 justify-self: stretch;
                 transition: 250ms transform;
@@ -125,9 +134,13 @@ function BooqControls({
             }
             .page {
                 grid-area: page;
+                justify-self: flex-start;
+                padding: ${meter.large};
             }
             .left {
                 grid-area: left;
+                justify-self: flex-end;
+                padding: ${meter.large};
             }
             .back-top, .back-bottom {
                 display: none;
@@ -138,12 +151,16 @@ function BooqControls({
                     grid-template-columns: auto auto 1fr auto auto;
                     grid-template-rows: ${headerHeight} 1fr ${headerHeight};
                     grid-template-areas: 
-                        "main nav  .    themer account"
-                        "navc navc navc navc   navc"
-                        "page page .    left   left";
+                        "main    nav     .       themer  account"
+                        "content content content content content"
+                        "page    page    .       left    left";
+                }
+                .ctx {
+                    grid-area: 2 / 1 / 4 / 6;
                 }
                 .navc {
                     grid-area: 2 / 1 / 4 / 6;
+                    padding: ${meter.regular} ${meter.large} 0 ${meter.large};
                 }
                 .back-top, .back-bottom {
                     display: block;

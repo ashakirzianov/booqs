@@ -3,9 +3,8 @@ import { IconName, Icon } from './Icon';
 import { meter, menuFont, boldWeight, vars } from './theme';
 import { Spinner } from './Spinner';
 
-export function Menu({ width, callback, children }: {
+export function Menu({ callback, children }: {
     children: ReactNode,
-    width?: string,
     callback?: () => void,
 }) {
     return <div onClick={callback}>
@@ -16,7 +15,6 @@ export function Menu({ width, callback, children }: {
                 flex-direction: column;
                 align-items: stretch;
                 flex: 1;
-                width: ${width ?? 'auto'};
             }
             `}</style>
     </div>;

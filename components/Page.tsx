@@ -14,7 +14,7 @@ export function Page({ title, children }: HasChildren & {
     return <div className={`page ${paletteName}`}>
         <Head>
             <title>{title}</title>
-            <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+            <meta name="viewport" content="initial-scale=1.0, width=device-width, viewport-fit=cover" />
             <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
             <link rel="manifest" href="/manifest.json" />
             <link href={fontHref} rel="stylesheet" />
