@@ -1,15 +1,15 @@
 import React, { useCallback, ReactNode, useRef, useState } from 'react';
 import { useDocumentEvent, isSmallScreen } from 'controls/utils';
-import { vars, radius, meter } from 'controls/theme';
+import { vars, radius } from 'controls/theme';
 import { Overlay } from 'controls/Popover';
-import { BooqSelection, getBooqSelection } from './BooqContent';
-import { ContextMenuContent } from './ContextMenuContent';
+import { getBooqSelection } from './BooqContent';
+import { ContextMenuContent, ContextMenuTarget } from './ContextMenuContent';
 
 export function useContextMenu(booqId: string) {
-    const selectionState = useSelectionState();
+    const selectionState = useMenuState();
     const ContextMenuNode = <ContextMenu
         booqId={booqId}
-        selectionState={selectionState}
+        menuState={selectionState}
     />;
 
     return {
@@ -18,39 +18,36 @@ export function useContextMenu(booqId: string) {
     };
 }
 
-function ContextMenu({ booqId, selectionState }: {
+function ContextMenu({
+    booqId, menuState: { rect, target },
+}: {
     booqId: string,
-    selectionState: SelectionState | undefined,
+    menuState: MenuState,
 }) {
-    const { rect, selection } = selectionState ?? {};
     return <ContextMenuLayout
         rect={rect}
-        content={selection
-            ? <ContextMenuContent
-                booqId={booqId}
-                target={{
-                    kind: 'selection',
-                    selection: selection,
-                }}
-            />
-            : null
-        }
+        content={<ContextMenuContent
+            booqId={booqId}
+            target={target}
+        />}
     />;
 }
 
-type SelectionState = {
-    selection: BooqSelection,
-    rect: SelectionRect,
+type MenuState = {
+    target: ContextMenuTarget,
+    rect?: SelectionRect,
 };
-function useSelectionState() {
-    const [selectionState, setSelectionState] = useState<SelectionState | undefined>(undefined);
+function useMenuState() {
+    const [state, setState] = useState<MenuState>({
+        target: { kind: 'empty' },
+    });
     const locked = useRef(false);
     const unhandled = useRef(false);
     const lock = useCallback(() => locked.current = true, [locked]);
     const unlock = useCallback(() => {
         locked.current = false;
         if (unhandled.current) {
-            setSelectionState(getSelection());
+            setState(getSelectionState());
             unhandled.current = false;
         }
     }, [locked, unhandled]);
@@ -65,7 +62,7 @@ function useSelectionState() {
 
     const selectionHandler = useCallback(event => {
         if (!locked.current) {
-            setSelectionState(getSelection());
+            setState(getSelectionState());
         } else {
             unhandled.current = true;
         }
@@ -75,24 +72,32 @@ function useSelectionState() {
     useDocumentEvent('click', selectionHandler);
     useDocumentEvent('selectionchange', selectionHandler);
 
-    useDocumentEvent('scroll', useCallback(event => {
-        if (selectionState) {
-            setSelectionState(undefined);
-        }
-    }, [selectionState]));
+    useDocumentEvent('scroll', useCallback(() => {
+        setState({
+            target: { kind: 'empty' },
+        });
+    }, []));
 
-    return selectionState;
+    return state;
 }
 
-function getSelection() {
+function getSelectionState(): MenuState {
     const rect = getSelectionRect();
     if (rect) {
         const selection = getBooqSelection();
         if (selection) {
-            return { rect, selection };
+            return {
+                rect,
+                target: {
+                    kind: 'selection',
+                    selection,
+                },
+            };
         }
     }
-    return undefined;
+    return {
+        target: { kind: 'empty' },
+    };
 }
 
 function ContextMenuLayout({ content, rect }: {
