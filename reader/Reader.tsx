@@ -11,7 +11,7 @@ import { Spinner } from 'controls/Spinner';
 import { usePopoverSingleton } from 'controls/Popover';
 import { Themer } from 'components/Themer';
 import { SignIn } from 'components/SignIn';
-import { BooqContent, Colorization } from './BooqContent';
+import { BooqContent, Augmentation } from './BooqContent';
 import { useContextMenu } from './ContextMenu';
 import { useNavigationPanel } from './Navigation';
 import { ReaderLayout } from './Layout';
@@ -30,7 +30,7 @@ export function Reader({
         start: booq.fragment.current.path,
         end: booq.fragment.next?.path ?? [booq.fragment.nodes.length],
     }), [booq]);
-    const colorization = useColorization(booq.id, quote);
+    const augmentation = useAugmentation(booq.id, quote);
     const { visible, toggle } = useControlsVisibility();
 
     const pagesLabel = `${currentPage} of ${totalPages}`;
@@ -57,7 +57,7 @@ export function Reader({
                 booqId={booq.id}
                 nodes={booq.fragment.nodes}
                 range={range}
-                colorization={colorization}
+                augmentation={augmentation}
                 onScroll={onScroll}
                 onClick={toggle}
             />
@@ -135,17 +135,17 @@ function isAnythingSelected() {
         || selection.anchorOffset !== selection.focusOffset;
 }
 
-function useColorization(booqId: string, quote?: BooqRange) {
+function useAugmentation(booqId: string, quote?: BooqRange) {
     const { highlights } = useHighlights(booqId);
     return useMemo(
         () => {
-            const colorization = highlights.map<Colorization>(h => ({
+            const augmentation = highlights.map<Augmentation>(h => ({
                 range: { start: h.start, end: h.end },
                 color: colorForGroup(h.group),
             }));
             return quote
-                ? [...colorization, { range: quote, color: quoteColor }]
-                : colorization;
+                ? [...augmentation, { range: quote, color: quoteColor }]
+                : augmentation;
         },
         [quote, highlights],
     );
