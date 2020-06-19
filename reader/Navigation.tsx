@@ -7,6 +7,7 @@ import { IconButton } from 'controls/Buttons';
 import { BooqLink } from 'controls/Links';
 import { meter, vars, boldWeight, bookFont } from 'controls/theme';
 import { useFilterPanel } from 'controls/FilterPanel';
+import { isSmallScreen } from 'controls/utils';
 
 export function useNavigationPanel(booqId: string) {
     const [navigationOpen, setOpen] = useState(false);
@@ -17,14 +18,18 @@ export function useNavigationPanel(booqId: string) {
     />;
     const NavigationContent = <Navigation
         booqId={booqId}
-        closeSelf={() => setOpen(false)}
+        closeSelf={() => {
+            if (isSmallScreen()) {
+                setOpen(false);
+            }
+        }}
     />;
     return {
         navigationOpen, NavigationButton, NavigationContent,
     };
 }
 
-function Navigation({ booqId }: {
+function Navigation({ booqId, closeSelf }: {
     booqId: string,
     closeSelf: () => void,
 }) {
@@ -55,7 +60,7 @@ function Navigation({ booqId }: {
                     {
                         nodes.map(
                             (node, idx) => <div key={idx}>
-                                <div className='item'>
+                                <div className='item' onClick={closeSelf}>
                                     <NavigationNodeComp
                                         booqId={booqId}
                                         node={node}

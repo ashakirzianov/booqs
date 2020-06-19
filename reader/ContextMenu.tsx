@@ -1,5 +1,5 @@
 import React, { useCallback, ReactNode, useRef, useState } from 'react';
-import { useDocumentEvent } from 'controls/utils';
+import { useDocumentEvent, isSmallScreen } from 'controls/utils';
 import { vars, radius, meter } from 'controls/theme';
 import { Overlay } from 'controls/Popover';
 import { BooqSelection, getBooqSelection } from './BooqContent';
@@ -105,7 +105,7 @@ function ContextMenuLayout({ content, rect }: {
     content: ReactNode,
     rect?: SelectionRect,
 }) {
-    const isSmall = useIsSmallScreen();
+    const isSmall = isSmallScreen();
     if (!isSmall) {
         return rect
             ? <ContextMenuPopover
@@ -142,12 +142,6 @@ function ContextMenuLayout({ content, rect }: {
             }
             `}</style>
     </div>;
-}
-
-function useIsSmallScreen() {
-    return process.browser
-        ? window.innerWidth < 1000
-        : false;
 }
 
 function ContextMenuPopover({
