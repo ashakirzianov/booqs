@@ -11,16 +11,18 @@ export type BooqSelection = {
 };
 export type Augmentation = {
     range: BooqRange,
-    color: string,
+    id: string,
+    color?: string,
 };
 export function BooqContent({
-    booqId, nodes, range, augmentation,
-    onScroll, onClick,
+    booqId, nodes, range, augmentations,
+    onAugmentationClick, onScroll, onClick,
 }: {
     booqId: string,
     nodes: BooqNode[],
     range: BooqRange,
-    augmentation: Augmentation[],
+    augmentations: Augmentation[],
+    onAugmentationClick?: (id: string) => void,
     onScroll?: (path: BooqPath) => void,
     onClick?: () => void,
 }) {
@@ -30,12 +32,12 @@ export function BooqContent({
         return <div id='booq-root' className='container'>
             {
                 renderNodes(nodes, {
-                    booqId, range, augmentations: augmentation,
                     path: [],
+                    booqId, range, augmentations, onAugmentationClick,
                 })
             }
         </div>;
-    }, [nodes, booqId, range, augmentation]);
+    }, [nodes, booqId, range, augmentations]);
 }
 
 function useOnClick(callback?: () => void) {

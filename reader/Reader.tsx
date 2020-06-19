@@ -57,7 +57,7 @@ export function Reader({
                 booqId={booq.id}
                 nodes={booq.fragment.nodes}
                 range={range}
-                augmentation={augmentation}
+                augmentations={augmentation}
                 onScroll={onScroll}
                 onClick={toggle}
             />
@@ -137,18 +137,23 @@ function isAnythingSelected() {
 
 function useAugmentation(booqId: string, quote?: BooqRange) {
     const { highlights } = useHighlights(booqId);
-    return useMemo(
-        () => {
-            const augmentation = highlights.map<Augmentation>(h => ({
-                range: { start: h.start, end: h.end },
-                color: colorForGroup(h.group),
-            }));
-            return quote
-                ? [...augmentation, { range: quote, color: quoteColor }]
-                : augmentation;
-        },
-        [quote, highlights],
-    );
+    return useMemo(() => {
+        const augmentations = highlights.map<Augmentation>(h => ({
+            id: `highlight/${h.id}`,
+            range: { start: h.start, end: h.end },
+            color: colorForGroup(h.group),
+        }));
+        if (quote) {
+            const quoteAugmentation: Augmentation = {
+                range: quote,
+                color: quoteColor,
+                id: 'quote/0',
+            };
+            return [...augmentations, quoteAugmentation];
+        } else {
+            return augmentations;
+        }
+    }, [quote, highlights]);
 }
 
 function useScrollHandler({ id, fragment, length }: BooqData) {
