@@ -77,13 +77,7 @@ function useSelectionState() {
 
     useDocumentEvent('scroll', useCallback(event => {
         if (selectionState) {
-            const rect = getSelectionRect();
-            if (rect) {
-                setSelectionState({
-                    ...selectionState,
-                    rect,
-                });
-            }
+            setSelectionState(undefined);
         }
     }, [selectionState]));
 
