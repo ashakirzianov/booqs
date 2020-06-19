@@ -183,6 +183,18 @@ function useAugmentations(booqId: string, quote?: BooqRange) {
                             },
                         }
                         : undefined;
+                case 'highlight': {
+                    const highlight = highlights.find(hl => hl.id === id);
+                    return highlight
+                        ? {
+                            rect,
+                            target: {
+                                kind: 'highlight',
+                                highlight,
+                            }
+                        }
+                        : undefined;
+                }
                 default:
                     return undefined;
             }

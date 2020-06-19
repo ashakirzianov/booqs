@@ -1,9 +1,9 @@
 import React, { useCallback } from 'react';
 import { useRouter } from 'next/router';
 import * as clipboard from 'clipboard-polyfill';
-import { BooqRange, isOverlapping } from 'core';
+import { BooqRange } from 'core';
 import {
-    useAuth, useHighlightMutations, useHighlights, Highlight, colorForGroup, groups,
+    useHighlightMutations, Highlight, colorForGroup, groups,
 } from 'app';
 import { MenuItem } from 'controls/Menu';
 import { useDocumentEvent } from 'controls/utils';
@@ -23,8 +23,12 @@ type QuoteTarget = {
     kind: 'quote',
     quote: BooqSelection,
 };
+type HighlightTarget = {
+    kind: 'highlight',
+    highlight: Highlight,
+};
 export type ContextMenuTarget =
-    | EmptyTarget | SelectionTarget | QuoteTarget;
+    | EmptyTarget | SelectionTarget | QuoteTarget | HighlightTarget;
 export function ContextMenuContent({
     booqId, target,
 }: {
@@ -42,6 +46,11 @@ export function ContextMenuContent({
                 booqId={booqId}
                 target={target}
             />;
+        case 'highlight':
+            return <HighlightTargetMenu
+                booqId={booqId}
+                target={target}
+            />;
         default:
             return null;
     }
@@ -53,7 +62,7 @@ function SelectionTargetMenu({ booqId, target: { selection } }: {
 }) {
     useCopyQuote(booqId, selection);
     return <>
-        <HighlightsItems booqId={booqId} selection={selection} />
+        <AddHighlightItem booqId={booqId} selection={selection} />
         <CopyQuoteItem booqId={booqId} selection={selection} />
         <CopyTextItem booqId={booqId} selection={selection} />
         <CopyLinkItem booqId={booqId} selection={selection} />
@@ -65,36 +74,24 @@ function QuoteTargetMenu({ booqId, target: { quote } }: {
     target: QuoteTarget,
 }) {
     return <>
-        <HighlightsItems booqId={booqId} selection={quote} />
+        <AddHighlightItem booqId={booqId} selection={quote} />
         <CopyTextItem booqId={booqId} selection={quote} />
     </>;
 }
 
-function HighlightsItems({ booqId, selection }: {
+function HighlightTargetMenu({ booqId, target: { highlight } }: {
     booqId: string,
-    selection: BooqSelection,
+    target: HighlightTarget,
 }) {
-    const { state } = useAuth();
-    const { highlights } = useHighlights(booqId);
-    const selected = highlights.filter(h => isOverlapping(selection.range, {
-        start: h.start,
-        end: h.end,
-    }));
-    if (state !== 'signed') {
-        return null;
-    } else if (selected.length) {
-        return <>
-            {
-                selected.map(
-                    (h, idx) => <ManageHighlightItem
-                        key={idx} booqId={booqId} highlight={h}
-                    />
-                )
-            }
-        </>;
-    } else {
-        return <AddHighlightItem booqId={booqId} selection={selection} />;
-    }
+    const selection = {
+        range: { start: highlight.start, end: highlight.end },
+        text: highlight.text,
+    };
+    return <>
+        <SelectHighlightGroupItem booqId={booqId} highlight={highlight} />
+        <CopyQuoteItem booqId={booqId} selection={selection} />
+        <CopyLinkItem booqId={booqId} selection={selection} />
+    </>;
 }
 
 function AddHighlightItem({ booqId, selection }: {
@@ -114,7 +111,7 @@ function AddHighlightItem({ booqId, selection }: {
     />;
 }
 
-function ManageHighlightItem({ booqId, highlight }: {
+function SelectHighlightGroupItem({ booqId, highlight }: {
     booqId: string,
     highlight: Highlight,
 }) {
