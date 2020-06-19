@@ -84,7 +84,7 @@ function HistoryItems({ items }: {
                 flex-direction: row;
                 box-sizing: border-box;
                 padding: ${meter.xLarge} ${meter.regular};
-                overflow: scroll;
+                overflow: auto;
                 scroll-snap-type: x mandatory;
             }
             .preview {

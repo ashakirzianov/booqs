@@ -48,8 +48,9 @@ function Navigation({ booqId, closeSelf }: {
         title, toc, highlights,
     }), [filter, title, toc, highlights]);
     return useMemo(() => {
-        return <div className='container'>
-            <div className='safe-area'>
+        return <div className='safe-area'>
+            <div className='container'>
+
                 <div className='header'>
                     <div className='label'>CONTENTS</div>
                     <div className='filter'>
@@ -72,15 +73,17 @@ function Navigation({ booqId, closeSelf }: {
                 </div>
             </div>
             <style jsx>{`
+            .safe-area {
+                display: flex;
+                padding: 0 env(safe-area-inset-right) 0 env(safe-area-inset-left);
+            }
             .container {
                 display: flex;
                 flex: 1 1;
-                flex-flow: column nowrap;
+                flex-flow: column;
                 color: var(${vars.dimmed});
                 font-size: 0.9rem;
-            }
-            .safe-area {
-                padding: 0 env(safe-area-inset-right) 0 env(safe-area-inset-left);
+                max-height: 100%;
             }
             .header {
                 display: flex;
@@ -92,8 +95,10 @@ function Navigation({ booqId, closeSelf }: {
                 letter-spacing: 0.1em;
             }
             .items {
-                max-height: 100%;
-                overflow: scroll;
+                display: flex;
+                flex-flow: column;
+                flex: 1 1;
+                overflow: auto;
             }
             .item {
                 padding: ${meter.regular} 0;

@@ -121,7 +121,7 @@ function SearchResults({ loading, query, results }: {
                 display: flex;
                 flex-direction: column;
                 max-height: 19rem;
-                overflow: scroll;
+                overflow: auto;
             }
             .spinner {
                 align-self: center;

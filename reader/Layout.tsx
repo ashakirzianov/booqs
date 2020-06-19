@@ -107,7 +107,7 @@ function BooqControls({
                 grid-area: 2 / 1 / 4 / 4;
                 padding: ${meter.regular} 0 0 ${meter.large};
                 pointer-events: auto;
-                overflow: scroll;
+                overflow: hidden;
                 align-self: stretch;
                 justify-self: stretch;
                 transition: 250ms transform;
