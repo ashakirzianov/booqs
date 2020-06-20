@@ -42,6 +42,15 @@ export function getAugmentationRect(augmentationId: string): AnchorRect | undefi
     return curr;
 }
 
+export function getAugmentationText(augmentationId: string): string {
+    const elements = window.document.querySelectorAll(`span[data-augmentation-id='${augmentationId}']`);
+    let text = '';
+    for (const [_, element] of elements.entries()) {
+        text += element.textContent;
+    }
+    return text;
+}
+
 export function getBooqSelection(): BooqSelection | undefined {
     const selection = window.getSelection();
     if (!selection || !selection.anchorNode || !selection.focusNode) {

@@ -11,7 +11,7 @@ import { Spinner } from 'controls/Spinner';
 import { usePopoverSingleton } from 'controls/Popover';
 import { Themer } from 'components/Themer';
 import { SignIn } from 'components/SignIn';
-import { BooqContent, Augmentation, getAugmentationRect } from './BooqContent';
+import { BooqContent, Augmentation, getAugmentationRect, getAugmentationText } from './BooqContent';
 import { useContextMenu, ContextMenuState } from './ContextMenu';
 import { useNavigationPanel } from './Navigation';
 import { ReaderLayout } from './Layout';
@@ -178,7 +178,7 @@ function useAugmentations(booqId: string, quote?: BooqRange) {
                                 kind: 'quote',
                                 selection: {
                                     range: quote,
-                                    text: '<not-implemented>',
+                                    text: getAugmentationText('quote/0'),
                                 },
                             },
                         }
