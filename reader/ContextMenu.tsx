@@ -1,6 +1,6 @@
 import React, { useCallback, ReactNode, useRef, useState } from 'react';
 import { useDocumentEvent, isSmallScreen } from 'controls/utils';
-import { vars, radius } from 'controls/theme';
+import { vars, radius, meter } from 'controls/theme';
 import { Overlay } from 'controls/Popover';
 import { getBooqSelection, AnchorRect, getSelectionRect, getAugmentationRect } from './BooqContent';
 import { ContextMenuContent, ContextMenuTarget } from './ContextMenuContent';
@@ -208,17 +208,19 @@ function ContextMenuPanel({ content, rect }: {
                 justify-content: flex-end;
                 align-items: stretch;
                 user-select: none;
+                padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
             }
             .content {
                 pointer-events: auto;
                 background: var(${vars.background});
                 border-radius: ${radius};
                 border: 1px solid var(${vars.border});
-                padding-bottom: env(safe-area-inset-bottom);
+                margin: ${meter.regular};
                 transition: 250ms transform;
             }
             .content.hidden {
                 transform: translateY(100%);
+                opacity: 0;
             }
             `}</style>
     </div>;
