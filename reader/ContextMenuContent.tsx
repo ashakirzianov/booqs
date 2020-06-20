@@ -60,7 +60,6 @@ function SelectionTargetMenu({
     return <>
         <AddHighlightItem {...rest} selection={selection} />
         <CopyQuoteItem {...rest} selection={selection} />
-        <CopyTextItem {...rest} selection={selection} />
         <CopyLinkItem {...rest} selection={selection} />
     </>;
 }
@@ -94,6 +93,7 @@ function HighlightTargetMenu({
     };
     return <>
         <SelectHighlightGroupItem  {...rest} highlight={highlight} />
+        <RemoveHighlightItem  {...rest} highlight={highlight} />
         <CopyQuoteItem {...rest} selection={selection} />
         <CopyLinkItem {...rest} selection={selection} />
     </>;
@@ -125,6 +125,24 @@ function AddHighlightItem({
     />;
 }
 
+function RemoveHighlightItem({
+    highlight, booqId, setTarget,
+}: {
+    highlight: Highlight,
+    booqId: string,
+    setTarget: (target: ContextMenuTarget) => void,
+}) {
+    const { removeHighlight } = useHighlightMutations(booqId);
+    return <MenuItem
+        text='Remove'
+        icon='remove'
+        callback={() => {
+            removeHighlight(highlight.id);
+            setTarget({ kind: 'empty' });
+        }}
+    />;
+}
+
 function SelectHighlightGroupItem({
     highlight, booqId, setTarget,
 }: {
@@ -143,12 +161,6 @@ function SelectHighlightGroupItem({
                 />,
             )
         }
-        <div key='remove' className='remove' onClick={() => {
-            removeHighlight(highlight.id);
-            setTarget({ kind: 'empty' });
-        }}>
-            <Icon name='remove' />
-        </div>
         <style jsx>{`
             .container {
                 display: flex;
@@ -160,12 +172,6 @@ function SelectHighlightGroupItem({
                 cursor: pointer;
                 font-size: small;
                 user-select: none;
-            }
-            .remove {
-                font-size: large;
-            }
-            .remove:hover {
-                color: var(${vars.highlight});
             }
             `}</style>
     </div>;
