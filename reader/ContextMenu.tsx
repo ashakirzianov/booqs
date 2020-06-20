@@ -34,28 +34,32 @@ function useMenuState() {
     const [menuState, setMenuState] = useState<ContextMenuState>({
         target: { kind: 'empty' },
     });
+    const handleSelectionChange = useCallback(() => setMenuState(prev => {
+        if (prev.target.kind === 'empty' || prev.target.kind === 'selection') {
+            return getSelectionState();
+        } else {
+            return prev;
+        }
+    }), []);
     const locked = useRef(false);
     const unhandled = useRef(false);
     const lock = useCallback(() => locked.current = true, [locked]);
     const unlock = useCallback(() => {
         locked.current = false;
         if (unhandled.current) {
-            setMenuState(getSelectionState());
-            unhandled.current = false;
+            handleSelectionChange();
         }
-    }, [locked, unhandled]);
+    }, [locked, unhandled, handleSelectionChange]);
+    useDocumentEvent('mousedown', lock);
+    useDocumentEvent('touchstart', lock);
     useDocumentEvent('mouseup', unlock);
-    useDocumentEvent('mousemove', useCallback(event => {
-        if (event.buttons) {
-            lock();
-        } else {
-            unlock();
-        }
-    }, [lock, unlock]));
+    useDocumentEvent('touchend', unlock);
+    useDocumentEvent('mouseleave', unlock);
+    useDocumentEvent('touchcancel', unlock);
 
     const selectionHandler = useCallback(event => {
         if (!locked.current) {
-            setMenuState(getSelectionState());
+            handleSelectionChange();
         } else {
             unhandled.current = true;
         }

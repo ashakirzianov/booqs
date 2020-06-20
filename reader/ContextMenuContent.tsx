@@ -126,7 +126,7 @@ function AddHighlightItem({
 }
 
 function SelectHighlightGroupItem({
-    highlight, booqId,
+    highlight, booqId, setTarget,
 }: {
     highlight: Highlight,
     booqId: string,
@@ -143,7 +143,10 @@ function SelectHighlightGroupItem({
                 />,
             )
         }
-        <div key='remove' className='remove' onClick={() => removeHighlight(highlight.id)}>
+        <div key='remove' className='remove' onClick={() => {
+            removeHighlight(highlight.id);
+            setTarget({ kind: 'empty' });
+        }}>
             <Icon name='remove' />
         </div>
         <style jsx>{`
