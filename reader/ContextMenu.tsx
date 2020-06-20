@@ -110,7 +110,39 @@ function ContextMenuLayout({ content, rect }: {
                 rect={rect}
             />
             : null;
+    } else {
+        return <ContextMenuPanel
+            rect={rect}
+            content={content}
+        />;
     }
+}
+
+function ContextMenuPopover({
+    content, rect: { top, left, width, height },
+}: {
+    content: ReactNode,
+    rect: AnchorRect,
+}) {
+    return <Overlay
+        content={<div style={{
+            width: '12rem',
+            pointerEvents: 'auto',
+        }}>
+            {content}
+        </div>}
+        anchor={<div style={{
+            position: 'fixed',
+            pointerEvents: 'none',
+            top, left, width, height,
+        }} />}
+    />;
+}
+
+function ContextMenuPanel({ content, rect }: {
+    content: ReactNode,
+    rect?: AnchorRect,
+}) {
     const visibility = rect ? '' : 'hidden';
     return <div className='container'>
         <div className={`content ${visibility}`}>{content}</div>
@@ -139,25 +171,4 @@ function ContextMenuLayout({ content, rect }: {
             }
             `}</style>
     </div>;
-}
-
-function ContextMenuPopover({
-    content, rect: { top, left, width, height },
-}: {
-    content: ReactNode,
-    rect: AnchorRect,
-}) {
-    return <Overlay
-        content={<div style={{
-            width: '12rem',
-            pointerEvents: 'auto',
-        }}>
-            {content}
-        </div>}
-        anchor={<div style={{
-            position: 'fixed',
-            pointerEvents: 'none',
-            top, left, width, height,
-        }} />}
-    />;
 }
