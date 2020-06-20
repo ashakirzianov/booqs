@@ -2,7 +2,7 @@ import React, { useCallback, ReactNode, useRef, useState } from 'react';
 import { useDocumentEvent, isSmallScreen } from 'controls/utils';
 import { vars, radius } from 'controls/theme';
 import { Overlay } from 'controls/Popover';
-import { getBooqSelection, AnchorRect, getSelectionRect } from './BooqContent';
+import { getBooqSelection, AnchorRect, getSelectionRect, getAugmentationRect } from './BooqContent';
 import { ContextMenuContent, ContextMenuTarget } from './ContextMenuContent';
 
 export function useContextMenu(booqId: string) {
@@ -68,15 +68,67 @@ function useMenuState() {
     useDocumentEvent('selectionchange', selectionHandler);
 
     useDocumentEvent('scroll', useCallback(() => {
-        setMenuState({
-            target: { kind: 'empty' },
+        setMenuState(prev => {
+            if (prev.target.kind === 'selection') {
+                const rect = getSelectionRect();
+                if (rect) {
+                    return {
+                        ...prev,
+                        rect,
+                    };
+                } else {
+                    return { target: { kind: 'empty' } };
+                }
+            } else if (prev.target.kind === 'highlight') {
+                const rect = getAugmentationRect(`highlight/${prev.target.highlight.id}`);
+                if (rect) {
+                    return {
+                        ...prev,
+                        rect,
+                    };
+                } else {
+                    return { target: { kind: 'empty' } };
+                }
+            } else if (prev.target.kind === 'quote') {
+                const rect = getAugmentationRect('quote/0');
+                if (rect) {
+                    return {
+                        ...prev,
+                        rect,
+                    };
+                } else {
+                    return { target: { kind: 'empty' } };
+                }
+            } else {
+                return prev;
+            }
         });
     }, []));
+
+    useDocumentEvent('click', event => {
+        console.log('here');
+        if (!isWithinCtxMenu(event.target)) {
+            setMenuState({
+                target: { kind: 'empty' },
+            });
+        }
+    });
 
     return {
         menuState,
         setMenuState,
     };
+}
+
+function isWithinCtxMenu(target: any): boolean {
+    console.log(target?.id, target?.parent);
+    if (!target) {
+        return false;
+    } else if (target.id === 'ctxmenu') {
+        return true;
+    } else {
+        return isWithinCtxMenu(target.parent);
+    }
 }
 
 function getSelectionState(): ContextMenuState {
@@ -125,7 +177,7 @@ function ContextMenuPopover({
     rect: AnchorRect,
 }) {
     return <Overlay
-        content={<div style={{
+        content={<div id='ctxmenu' style={{
             width: '12rem',
             pointerEvents: 'auto',
         }}>
@@ -144,7 +196,7 @@ function ContextMenuPanel({ content, rect }: {
     rect?: AnchorRect,
 }) {
     const visibility = rect ? '' : 'hidden';
-    return <div className='container'>
+    return <div id='ctxmenu' className='container'>
         <div className={`content ${visibility}`}>{content}</div>
         <style jsx>{`
             .container {
