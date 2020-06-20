@@ -176,7 +176,7 @@ function useAugmentations(booqId: string, quote?: BooqRange) {
                             rect,
                             target: {
                                 kind: 'quote',
-                                quote: {
+                                selection: {
                                     range: quote,
                                     text: '<not-implemented>',
                                 },
