@@ -46,9 +46,7 @@ function useMenuState() {
     const lock = useCallback(() => locked.current = true, [locked]);
     const unlock = useCallback(() => {
         locked.current = false;
-        if (unhandled.current) {
-            handleSelectionChange();
-        }
+        handleSelectionChange();
     }, [locked, unhandled, handleSelectionChange]);
     useDocumentEvent('mousedown', lock);
     useDocumentEvent('touchstart', lock);
@@ -106,11 +104,13 @@ function useMenuState() {
     }, []));
 
     useDocumentEvent('click', event => {
-        console.log('here');
         if (!isWithinCtxMenu(event.target)) {
-            setMenuState({
-                target: { kind: 'empty' },
-            });
+            const selection = getBooqSelection();
+            if (!selection) {
+                setMenuState({
+                    target: { kind: 'empty' },
+                });
+            }
         }
     });
 
@@ -121,7 +121,6 @@ function useMenuState() {
 }
 
 function isWithinCtxMenu(target: any): boolean {
-    console.log(target?.id, target?.parent);
     if (!target) {
         return false;
     } else if (target.id === 'ctxmenu') {
