@@ -7,9 +7,16 @@ import { ContextMenuContent, ContextMenuTarget } from './ContextMenuContent';
 
 export function useContextMenu(booqId: string) {
     const { menuState, setMenuState } = useMenuState();
-    const ContextMenuNode = <ContextMenu
-        booqId={booqId}
-        menuState={menuState}
+    const ContextMenuNode = <ContextMenuLayout
+        rect={menuState.rect}
+        content={<ContextMenuContent
+            booqId={booqId}
+            target={menuState.target}
+            setTarget={target => setMenuState({
+                ...menuState,
+                target,
+            })}
+        />}
     />;
 
     return {
@@ -17,21 +24,6 @@ export function useContextMenu(booqId: string) {
         ContextMenuNode,
         setMenuState,
     };
-}
-
-function ContextMenu({
-    booqId, menuState: { rect, target },
-}: {
-    booqId: string,
-    menuState: ContextMenuState,
-}) {
-    return <ContextMenuLayout
-        rect={rect}
-        content={<ContextMenuContent
-            booqId={booqId}
-            target={target}
-        />}
-    />;
 }
 
 export type ContextMenuState = {

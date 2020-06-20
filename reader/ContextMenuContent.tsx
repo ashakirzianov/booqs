@@ -21,7 +21,7 @@ type SelectionTarget = {
 };
 type QuoteTarget = {
     kind: 'quote',
-    quote: BooqSelection,
+    selection: BooqSelection,
 };
 type HighlightTarget = {
     kind: 'highlight',
@@ -29,91 +29,108 @@ type HighlightTarget = {
 };
 export type ContextMenuTarget =
     | EmptyTarget | SelectionTarget | QuoteTarget | HighlightTarget;
+
 export function ContextMenuContent({
-    booqId, target,
+    target, ...rest
 }: {
-    booqId: string,
     target: ContextMenuTarget,
+    booqId: string,
+    setTarget: (target: ContextMenuTarget) => void,
 }) {
     switch (target.kind) {
         case 'selection':
-            return <SelectionTargetMenu
-                booqId={booqId}
-                target={target}
-            />;
+            return <SelectionTargetMenu target={target} {...rest} />;
         case 'quote':
-            return <QuoteTargetMenu
-                booqId={booqId}
-                target={target}
-            />;
+            return <QuoteTargetMenu target={target} {...rest} />;
         case 'highlight':
-            return <HighlightTargetMenu
-                booqId={booqId}
-                target={target}
-            />;
+            return <HighlightTargetMenu target={target} {...rest} />;
         default:
             return null;
     }
 }
 
-function SelectionTargetMenu({ booqId, target: { selection } }: {
-    booqId: string,
+function SelectionTargetMenu({
+    target: { selection }, ...rest
+}: {
     target: SelectionTarget,
+    booqId: string,
+    setTarget: (target: ContextMenuTarget) => void,
 }) {
-    useCopyQuote(booqId, selection);
+    useCopyQuote(rest.booqId, selection);
     return <>
-        <AddHighlightItem booqId={booqId} selection={selection} />
-        <CopyQuoteItem booqId={booqId} selection={selection} />
-        <CopyTextItem booqId={booqId} selection={selection} />
-        <CopyLinkItem booqId={booqId} selection={selection} />
+        <AddHighlightItem {...rest} selection={selection} />
+        <CopyQuoteItem {...rest} selection={selection} />
+        <CopyTextItem {...rest} selection={selection} />
+        <CopyLinkItem {...rest} selection={selection} />
     </>;
 }
 
-function QuoteTargetMenu({ booqId, target: { quote } }: {
-    booqId: string,
+function QuoteTargetMenu({
+    target: { selection }, ...rest
+}: {
     target: QuoteTarget,
+    booqId: string,
+    setTarget: (target: ContextMenuTarget) => void,
 }) {
     return <>
-        <AddHighlightItem booqId={booqId} selection={quote} />
-        <CopyTextItem booqId={booqId} selection={quote} />
+        <AddHighlightItem {...rest} selection={selection} />
+        <CopyTextItem {...rest} selection={selection} />
     </>;
 }
 
-function HighlightTargetMenu({ booqId, target: { highlight } }: {
-    booqId: string,
+function HighlightTargetMenu({
+    target: { highlight }, ...rest
+}: {
     target: HighlightTarget,
+    booqId: string,
+    setTarget: (target: ContextMenuTarget) => void,
 }) {
     const selection = {
-        range: { start: highlight.start, end: highlight.end },
+        range: {
+            start: highlight.start,
+            end: highlight.end,
+        },
         text: highlight.text,
     };
     return <>
-        <SelectHighlightGroupItem booqId={booqId} highlight={highlight} />
-        <CopyQuoteItem booqId={booqId} selection={selection} />
-        <CopyLinkItem booqId={booqId} selection={selection} />
+        <SelectHighlightGroupItem  {...rest} highlight={highlight} />
+        <CopyQuoteItem {...rest} selection={selection} />
+        <CopyLinkItem {...rest} selection={selection} />
     </>;
 }
 
-function AddHighlightItem({ booqId, selection }: {
-    booqId: string,
+function AddHighlightItem({
+    selection, booqId, setTarget,
+}: {
     selection: BooqSelection,
+    booqId: string,
+    setTarget: (target: ContextMenuTarget) => void,
 }) {
     const { addHighlight } = useHighlightMutations(booqId);
     return <MenuItem
         text='Highlight'
         icon='highlight'
-        callback={() => addHighlight({
-            group: 'first',
-            start: selection.range.start,
-            end: selection.range.end ?? selection.range.start,
-            text: selection.text,
-        })}
+        callback={() => {
+            const highlight = addHighlight({
+                group: 'first',
+                start: selection.range.start,
+                end: selection.range.end ?? selection.range.start,
+                text: selection.text,
+            });
+            setTarget({
+                kind: 'highlight',
+                highlight,
+            });
+        }}
     />;
 }
 
-function SelectHighlightGroupItem({ booqId, highlight }: {
-    booqId: string,
+function SelectHighlightGroupItem({
+    highlight, booqId,
+}: {
     highlight: Highlight,
+    booqId: string,
+    setTarget: (target: ContextMenuTarget) => void,
 }) {
     const { removeHighlight, updateHighlight } = useHighlightMutations(booqId);
     return <div className='container'>
@@ -172,9 +189,12 @@ function CircleButton({ color, callback }: {
     </div>;
 }
 
-function CopyQuoteItem({ booqId, selection }: {
-    booqId: string,
+function CopyQuoteItem({
+    selection, booqId, setTarget,
+}: {
     selection: BooqSelection,
+    booqId: string,
+    setTarget: (target: ContextMenuTarget) => void,
 }) {
     const { prefetch } = useRouter();
     return <MenuItem
@@ -185,13 +205,17 @@ function CopyQuoteItem({ booqId, selection }: {
             clipboard.writeText(quote);
             removeSelection();
             prefetch(quoteRef(booqId, selection.range));
+            setTarget({ kind: 'empty' });
         }}
     />;
 }
 
-function CopyTextItem({ selection }: {
-    booqId: string,
+function CopyTextItem({
+    selection, setTarget,
+}: {
     selection: BooqSelection,
+    booqId: string,
+    setTarget: (target: ContextMenuTarget) => void,
 }) {
     return <MenuItem
         text='Copy text'
@@ -200,13 +224,17 @@ function CopyTextItem({ selection }: {
             const text = selection.text;
             clipboard.writeText(text);
             removeSelection();
+            setTarget({ kind: 'empty' });
         }}
     />;
 }
 
-function CopyLinkItem({ booqId, selection }: {
-    booqId: string,
+function CopyLinkItem({
+    selection, booqId, setTarget,
+}: {
     selection: BooqSelection,
+    booqId: string,
+    setTarget: (target: ContextMenuTarget) => void,
 }) {
     const { prefetch } = useRouter();
     return <MenuItem
@@ -217,6 +245,7 @@ function CopyLinkItem({ booqId, selection }: {
             clipboard.writeText(link);
             removeSelection();
             prefetch(quoteRef(booqId, selection.range));
+            setTarget({ kind: 'empty' });
         }}
     />;
 }
@@ -239,7 +268,7 @@ function removeSelection() {
 
 function generateQuote(booqId: string, text: string, range: BooqRange) {
     const link = generateLink(booqId, range);
-    return `"${text}" ${link}`;
+    return `"${text}"\n${link}`;
 }
 
 function generateLink(booqId: string, range: BooqRange) {
