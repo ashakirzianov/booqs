@@ -98,6 +98,9 @@ function Navigation({ booqId, closeSelf }: {
                 display: flex;
                 flex-flow: column;
                 flex: 1 1;
+                overflow: hidden;
+            }
+            .items {
                 overflow: auto;
             }
             .item {

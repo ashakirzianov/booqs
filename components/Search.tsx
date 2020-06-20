@@ -121,6 +121,9 @@ function SearchResults({ loading, query, results }: {
                 display: flex;
                 flex-direction: column;
                 max-height: 19rem;
+                overflow: hidden;
+            }
+            .container:hover {
                 overflow: auto;
             }
             .spinner {
