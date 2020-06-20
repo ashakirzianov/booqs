@@ -150,14 +150,25 @@ function SelectHighlightGroupItem({
     booqId: string,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
-    const { removeHighlight, updateHighlight } = useHighlightMutations(booqId);
+    const { updateHighlight } = useHighlightMutations(booqId);
     return <div className='container'>
         {
             groups.map(
-                (group, idx) => <CircleButton
+                (group, idx) => <GroupSelectionButton
                     key={idx}
+                    selected={group === highlight.group}
                     color={colorForGroup(group)}
-                    callback={() => updateHighlight(highlight.id, group)}
+                    callback={() => {
+                        updateHighlight(highlight.id, group);
+                        // Note: hackie way of updating selection
+                        setTarget({
+                            kind: 'highlight',
+                            highlight: {
+                                ...highlight,
+                                group,
+                            },
+                        })
+                    }}
                 />,
             )
         }
@@ -166,9 +177,8 @@ function SelectHighlightGroupItem({
                 display: flex;
                 flex: 1;
                 flex-direction: row;
-                align-items: center;
+                align-items: stretch;
                 justify-content: space-between;
-                padding: ${meter.large};
                 cursor: pointer;
                 font-size: small;
                 user-select: none;
@@ -177,22 +187,26 @@ function SelectHighlightGroupItem({
     </div>;
 }
 
-const circleSize = '1.25rem';
-function CircleButton({ color, callback }: {
+function GroupSelectionButton({ color, selected, callback }: {
+    selected: boolean,
     color: string,
     callback: () => void,
 }) {
     return <div onClick={callback} className='button'>
         <style jsx>{`
             .button {
+                display: flex;
+                flex: 1;
+                align-self: stretch;
                 background: ${color};
-                border-radius: 50%;
-                width: ${circleSize};
-                height: ${circleSize};
+                color: rgba(0, 0, 0, 0);
                 cursor: pointer;
+                border-bottom: 0.5rem solid ${selected ? `${color}` : `rgba(0,0,0,0)`};
+                height: 2rem;
+                transition: 250ms border;
             }
             .button:hover {
-                border: 2px solid ${color};
+                border-bottom: 0.5rem solid ${color};
             }
             `}</style>
     </div>;
