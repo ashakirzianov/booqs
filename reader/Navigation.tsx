@@ -300,14 +300,14 @@ function buildNodes({ toc, filter, highlights, title }: {
             }),
         );
         if (filter === 'all') {
-            nodes.push({
-                kind: 'toc',
-                item: next,
-            });
             nodes.push(...inside.map(h => ({
                 kind: 'highlight' as const,
                 highlight: h,
             })));
+            nodes.push({
+                kind: 'toc',
+                item: next,
+            });
         } else if (filter === 'contents') {
             nodes.push({
                 kind: 'toc',
