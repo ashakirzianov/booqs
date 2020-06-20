@@ -1,8 +1,10 @@
 import React, { useCallback, ReactNode, useRef, useState } from 'react';
-import { useDocumentEvent, isSmallScreen } from 'controls/utils';
+import { useDocumentEvent } from 'controls/utils';
 import { vars, radius, meter } from 'controls/theme';
 import { Overlay } from 'controls/Popover';
-import { getBooqSelection, AnchorRect, getSelectionRect, getAugmentationRect } from './BooqContent';
+import {
+    getBooqSelection, AnchorRect, getSelectionRect, getAugmentationRect,
+} from './BooqContent';
 import { ContextMenuContent, ContextMenuTarget } from './ContextMenuContent';
 
 export function useContextMenu(booqId: string) {
@@ -153,20 +155,12 @@ function ContextMenuLayout({ content, rect }: {
     content: ReactNode,
     rect?: AnchorRect,
 }) {
-    const isSmall = isSmallScreen();
-    if (!isSmall) {
-        return rect
-            ? <ContextMenuPopover
-                content={content}
-                rect={rect}
-            />
-            : null;
-    } else {
-        return <ContextMenuPanel
-            rect={rect}
+    return rect
+        ? <ContextMenuPopover
             content={content}
-        />;
-    }
+            rect={rect}
+        />
+        : null;
 }
 
 function ContextMenuPopover({
