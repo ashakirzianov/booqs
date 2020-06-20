@@ -114,6 +114,7 @@ export function useHighlightMutations(booqId: string) {
             });
             return {
                 ...highlight,
+                text: input.text,
                 __typename: 'BooqHighlight',
             };
         },
@@ -179,6 +180,7 @@ const groupColorMapping: {
     second: 'rgba(135, 206, 235, 0.6)',
     third: 'rgba(240, 128, 128, 0.6)',
     forth: 'rgba(75, 0, 130, 0.6)',
+    fifth: 'rgba(34, 139, 34, 0.6)',
 };
 export function colorForGroup(group: string) {
     return groupColorMapping[group] ?? defaultColor;
