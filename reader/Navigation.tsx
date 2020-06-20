@@ -75,6 +75,7 @@ function Navigation({ booqId, closeSelf }: {
             <style jsx>{`
             .safe-area {
                 display: flex;
+                flex: 1;
                 padding: 0 env(safe-area-inset-right) 0 env(safe-area-inset-left);
             }
             .container {
