@@ -80,17 +80,16 @@ export function useHighlightMutations(booqId: string) {
             end: BooqPath,
             group: string,
             text: string,
-        }) {
-            const id = uuid();
+        }): Highlight {
+            const highlight = {
+                booqId,
+                id: uuid(),
+                start: input.start,
+                end: input.end,
+                group: input.group,
+            };
             add({
-                variables: {
-                    highlight: {
-                        booqId, id,
-                        start: input.start,
-                        end: input.end,
-                        group: input.group,
-                    }
-                },
+                variables: { highlight },
                 optimisticResponse: { addHighlight: true },
                 update(cache, { data }) {
                     if (data?.addHighlight) {
@@ -102,7 +101,7 @@ export function useHighlightMutations(booqId: string) {
                             cached.booq.highlights.push({
                                 ...input,
                                 __typename: 'BooqHighlight',
-                                id,
+                                id: highlight.id,
                             });
                             cache.writeQuery({
                                 query: HighlightsQuery,
@@ -113,6 +112,11 @@ export function useHighlightMutations(booqId: string) {
                     }
                 },
             });
+            return {
+                ...highlight,
+                text: input.text,
+                __typename: 'BooqHighlight',
+            };
         },
         removeHighlight(id: string) {
             remove({
@@ -176,6 +180,7 @@ const groupColorMapping: {
     second: 'rgba(135, 206, 235, 0.6)',
     third: 'rgba(240, 128, 128, 0.6)',
     forth: 'rgba(75, 0, 130, 0.6)',
+    fifth: 'rgba(34, 139, 34, 0.6)',
 };
 export function colorForGroup(group: string) {
     return groupColorMapping[group] ?? defaultColor;

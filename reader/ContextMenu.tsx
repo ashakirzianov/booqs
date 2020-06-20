@@ -2,108 +2,156 @@ import React, { useCallback, ReactNode, useRef, useState } from 'react';
 import { useDocumentEvent, isSmallScreen } from 'controls/utils';
 import { vars, radius, meter } from 'controls/theme';
 import { Overlay } from 'controls/Popover';
-import { BooqSelection, getBooqSelection } from './BooqContent';
-import { ContextMenuContent } from './ContextMenuContent';
+import { getBooqSelection, AnchorRect, getSelectionRect, getAugmentationRect } from './BooqContent';
+import { ContextMenuContent, ContextMenuTarget } from './ContextMenuContent';
 
 export function useContextMenu(booqId: string) {
-    const selectionState = useSelectionState();
-    const ContextMenuNode = <ContextMenu
-        booqId={booqId}
-        selectionState={selectionState}
+    const { menuState, setMenuState } = useMenuState();
+    const ContextMenuNode = <ContextMenuLayout
+        rect={menuState.rect}
+        content={<ContextMenuContent
+            booqId={booqId}
+            target={menuState.target}
+            setTarget={target => setMenuState({
+                ...menuState,
+                target,
+            })}
+        />}
     />;
 
     return {
-        isVisible: !!selectionState,
+        isVisible: menuState.target.kind !== 'empty',
         ContextMenuNode,
+        setMenuState,
     };
 }
 
-function ContextMenu({ booqId, selectionState }: {
-    booqId: string,
-    selectionState: SelectionState | undefined,
-}) {
-    const { rect, selection } = selectionState ?? {};
-    return <ContextMenuLayout
-        rect={rect}
-        content={selection
-            ? <ContextMenuContent
-                booqId={booqId}
-                target={{
-                    kind: 'selection',
-                    selection: selection,
-                }}
-            />
-            : null
-        }
-    />;
-}
-
-type SelectionState = {
-    selection: BooqSelection,
-    rect: SelectionRect,
+export type ContextMenuState = {
+    target: ContextMenuTarget,
+    rect?: AnchorRect,
 };
-function useSelectionState() {
-    const [selectionState, setSelectionState] = useState<SelectionState | undefined>(undefined);
+function useMenuState() {
+    const [menuState, setMenuState] = useState<ContextMenuState>({
+        target: { kind: 'empty' },
+    });
+    const handleSelectionChange = useCallback(() => setMenuState(prev => {
+        if (prev.target.kind === 'empty' || prev.target.kind === 'selection') {
+            return getSelectionState();
+        } else {
+            return prev;
+        }
+    }), []);
     const locked = useRef(false);
     const unhandled = useRef(false);
     const lock = useCallback(() => locked.current = true, [locked]);
     const unlock = useCallback(() => {
         locked.current = false;
-        if (unhandled.current) {
-            setSelectionState(getSelection());
-            unhandled.current = false;
-        }
-    }, [locked, unhandled]);
+        handleSelectionChange();
+    }, [locked, unhandled, handleSelectionChange]);
+    useDocumentEvent('mousedown', lock);
+    useDocumentEvent('touchstart', lock);
     useDocumentEvent('mouseup', unlock);
-    useDocumentEvent('mousemove', useCallback(event => {
-        if (event.buttons) {
-            lock();
-        } else {
-            unlock();
-        }
-    }, [lock, unlock]));
+    useDocumentEvent('touchend', unlock);
+    useDocumentEvent('mouseleave', unlock);
+    useDocumentEvent('touchcancel', unlock);
 
     const selectionHandler = useCallback(event => {
         if (!locked.current) {
-            setSelectionState(getSelection());
+            handleSelectionChange();
         } else {
             unhandled.current = true;
         }
     }, []);
 
-    // Note: handle click as workaround for dead context menu
-    useDocumentEvent('click', selectionHandler);
     useDocumentEvent('selectionchange', selectionHandler);
 
-    useDocumentEvent('scroll', useCallback(event => {
-        if (selectionState) {
-            const rect = getSelectionRect();
-            if (rect) {
-                setSelectionState({
-                    ...selectionState,
-                    rect,
+    useDocumentEvent('scroll', useCallback(() => {
+        setMenuState(prev => {
+            if (prev.target.kind === 'selection') {
+                const rect = getSelectionRect();
+                if (rect) {
+                    return {
+                        ...prev,
+                        rect,
+                    };
+                } else {
+                    return { target: { kind: 'empty' } };
+                }
+            } else if (prev.target.kind === 'highlight') {
+                const rect = getAugmentationRect(`highlight/${prev.target.highlight.id}`);
+                if (rect) {
+                    return {
+                        ...prev,
+                        rect,
+                    };
+                } else {
+                    return { target: { kind: 'empty' } };
+                }
+            } else if (prev.target.kind === 'quote') {
+                const rect = getAugmentationRect('quote/0');
+                if (rect) {
+                    return {
+                        ...prev,
+                        rect,
+                    };
+                } else {
+                    return { target: { kind: 'empty' } };
+                }
+            } else {
+                return prev;
+            }
+        });
+    }, []));
+
+    useDocumentEvent('click', event => {
+        if (!isWithinCtxMenu(event.target)) {
+            const selection = getBooqSelection();
+            if (!selection) {
+                setMenuState({
+                    target: { kind: 'empty' },
                 });
             }
         }
-    }, [selectionState]));
+    });
 
-    return selectionState;
+    return {
+        menuState,
+        setMenuState,
+    };
 }
 
-function getSelection() {
+function isWithinCtxMenu(target: any): boolean {
+    if (!target) {
+        return false;
+    } else if (target.id === 'ctxmenu') {
+        return true;
+    } else {
+        return isWithinCtxMenu(target.parent);
+    }
+}
+
+function getSelectionState(): ContextMenuState {
     const rect = getSelectionRect();
     if (rect) {
         const selection = getBooqSelection();
         if (selection) {
-            return { rect, selection };
+            return {
+                rect,
+                target: {
+                    kind: 'selection',
+                    selection,
+                },
+            };
         }
     }
-    return undefined;
+    return {
+        target: { kind: 'empty' },
+    };
 }
 
 function ContextMenuLayout({ content, rect }: {
     content: ReactNode,
-    rect?: SelectionRect,
+    rect?: AnchorRect,
 }) {
     const isSmall = isSmallScreen();
     if (!isSmall) {
@@ -113,45 +161,22 @@ function ContextMenuLayout({ content, rect }: {
                 rect={rect}
             />
             : null;
+    } else {
+        return <ContextMenuPanel
+            rect={rect}
+            content={content}
+        />;
     }
-    const visibility = rect ? '' : 'hidden';
-    return <div className='container'>
-        <div className={`content ${visibility}`}>{content}</div>
-        <style jsx>{`
-            .container {
-                display: flex;
-                flex: 1;
-                height: 100%;
-                align-self: stretch;
-                pointer-events: none;
-                flex-flow: column;
-                justify-content: flex-end;
-                align-items: stretch;
-                user-select: none;
-            }
-            .content {
-                pointer-events: auto;
-                background: var(${vars.background});
-                border-radius: ${radius};
-                border: 1px solid var(${vars.border});
-                padding-bottom: env(safe-area-inset-bottom);
-                transition: 250ms transform;
-            }
-            .content.hidden {
-                transform: translateY(100%);
-            }
-            `}</style>
-    </div>;
 }
 
 function ContextMenuPopover({
     content, rect: { top, left, width, height },
 }: {
     content: ReactNode,
-    rect: SelectionRect,
+    rect: AnchorRect,
 }) {
     return <Overlay
-        content={<div style={{
+        content={<div id='ctxmenu' style={{
             width: '12rem',
             pointerEvents: 'auto',
         }}>
@@ -165,23 +190,38 @@ function ContextMenuPopover({
     />;
 }
 
-type SelectionRect = {
-    top: number,
-    left: number,
-    height: number,
-    width: number,
-};
-function getSelectionRect() {
-    const selection = window.getSelection();
-    if (selection && selection.rangeCount > 0) {
-        const rect = selection.getRangeAt(0)
-            ?.getBoundingClientRect();
-        return rect
-            ? {
-                top: rect.top, left: rect.left,
-                height: rect.height, width: rect.width,
-            } : undefined;
-    } else {
-        return undefined;
-    }
+function ContextMenuPanel({ content, rect }: {
+    content: ReactNode,
+    rect?: AnchorRect,
+}) {
+    const visibility = rect ? '' : 'hidden';
+    return <div id='ctxmenu' className='container'>
+        <div className={`content ${visibility}`}>{content}</div>
+        <style jsx>{`
+            .container {
+                display: flex;
+                flex: 1;
+                height: 100%;
+                align-self: stretch;
+                pointer-events: none;
+                flex-flow: column;
+                justify-content: flex-end;
+                align-items: stretch;
+                user-select: none;
+                padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+            }
+            .content {
+                pointer-events: auto;
+                background: var(${vars.background});
+                border-radius: ${radius};
+                border: 1px solid var(${vars.border});
+                margin: ${meter.regular};
+                transition: 250ms transform;
+            }
+            .content.hidden {
+                transform: translateY(100%);
+                opacity: 0;
+            }
+            `}</style>
+    </div>;
 }

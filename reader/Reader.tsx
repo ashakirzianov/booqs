@@ -11,8 +11,8 @@ import { Spinner } from 'controls/Spinner';
 import { usePopoverSingleton } from 'controls/Popover';
 import { Themer } from 'components/Themer';
 import { SignIn } from 'components/SignIn';
-import { BooqContent, Colorization } from './BooqContent';
-import { useContextMenu } from './ContextMenu';
+import { BooqContent, Augmentation, getAugmentationRect, getAugmentationText } from './BooqContent';
+import { useContextMenu, ContextMenuState } from './ContextMenu';
 import { useNavigationPanel } from './Navigation';
 import { ReaderLayout } from './Layout';
 
@@ -30,7 +30,7 @@ export function Reader({
         start: booq.fragment.current.path,
         end: booq.fragment.next?.path ?? [booq.fragment.nodes.length],
     }), [booq]);
-    const colorization = useColorization(booq.id, quote);
+    const { augmentations, menuStateForAugmentation } = useAugmentations(booq.id, quote);
     const { visible, toggle } = useControlsVisibility();
 
     const pagesLabel = `${currentPage} of ${totalPages}`;
@@ -43,6 +43,7 @@ export function Reader({
     } = useNavigationPanel(booq.id);
     const {
         ContextMenuNode, isVisible: contextMenuVisible,
+        setMenuState,
     } = useContextMenu(booq.id);
 
     return <ReaderLayout
@@ -57,9 +58,15 @@ export function Reader({
                 booqId={booq.id}
                 nodes={booq.fragment.nodes}
                 range={range}
-                colorization={colorization}
+                augmentations={augmentations}
                 onScroll={onScroll}
                 onClick={toggle}
+                onAugmentationClick={id => {
+                    const next = menuStateForAugmentation(id);
+                    if (next) {
+                        setMenuState(next);
+                    }
+                }}
             />
         </div>}
         PrevButton={<AnchorButton
@@ -135,20 +142,64 @@ function isAnythingSelected() {
         || selection.anchorOffset !== selection.focusOffset;
 }
 
-function useColorization(booqId: string, quote?: BooqRange) {
+function useAugmentations(booqId: string, quote?: BooqRange) {
     const { highlights } = useHighlights(booqId);
-    return useMemo(
-        () => {
-            const colorization = highlights.map<Colorization>(h => ({
-                range: { start: h.start, end: h.end },
-                color: colorForGroup(h.group),
-            }));
-            return quote
-                ? [...colorization, { range: quote, color: quoteColor }]
-                : colorization;
+    const augmentations = useMemo(() => {
+        const augmentations = highlights.map<Augmentation>(h => ({
+            id: `highlight/${h.id}`,
+            range: { start: h.start, end: h.end },
+            color: colorForGroup(h.group),
+        }));
+        if (quote) {
+            const quoteAugmentation: Augmentation = {
+                range: quote,
+                color: quoteColor,
+                id: 'quote/0',
+            };
+            return [quoteAugmentation, ...augmentations];
+        } else {
+            return augmentations;
+        }
+    }, [quote, highlights]);
+    return {
+        augmentations,
+        menuStateForAugmentation(augmentationId: string): ContextMenuState | undefined {
+            const rect = getAugmentationRect(augmentationId);
+            if (!rect) {
+                return undefined;
+            }
+            const [kind, id] = augmentationId.split('/');
+            switch (kind) {
+                case 'quote':
+                    return quote
+                        ? {
+                            rect,
+                            target: {
+                                kind: 'quote',
+                                selection: {
+                                    range: quote,
+                                    text: getAugmentationText('quote/0'),
+                                },
+                            },
+                        }
+                        : undefined;
+                case 'highlight': {
+                    const highlight = highlights.find(hl => hl.id === id);
+                    return highlight
+                        ? {
+                            rect,
+                            target: {
+                                kind: 'highlight',
+                                highlight,
+                            }
+                        }
+                        : undefined;
+                }
+                default:
+                    return undefined;
+            }
         },
-        [quote, highlights],
-    );
+    };
 }
 
 function useScrollHandler({ id, fragment, length }: BooqData) {

@@ -5,7 +5,7 @@ import {
 } from "core";
 import { pathToId } from "app";
 import { booqHref } from "controls/Links";
-import type { Colorization } from "./BooqContent";
+import type { Augmentation } from "./BooqContent";
 
 type RenderContext = {
     booqId: string,
@@ -13,7 +13,8 @@ type RenderContext = {
     range: BooqRange,
     parent?: BooqElementNode,
     withinAnchor?: boolean,
-    colorization: Colorization[],
+    augmentations: Augmentation[],
+    onAugmentationClick?: (id: string) => void,
 };
 export function renderNodes(nodes: BooqNode[], ctx: RenderContext): ReactNode {
     const result = nodes.map(
@@ -46,27 +47,43 @@ function renderNode(node: BooqNode, ctx: RenderContext): ReactNode {
     }
 }
 
-function renderTextNode(text: string, { path, colorization }: RenderContext): ReactNode {
-    const spans = applyColorization({ text, path: [...path, 0] }, colorization);
+function renderTextNode(text: string, {
+    path, augmentations, onAugmentationClick,
+}: RenderContext): ReactNode {
+    const spans = applyAugmentations({
+        text, path: [...path, 0],
+        id: undefined,
+    },
+        augmentations,
+    );
     return createElement(
         'span',
         {
             key: pathToId(path),
             id: pathToId(path),
         },
-        spans.map(
-            span => createElement(
+        spans.map(span => {
+            const augmentationId = span.id;
+            const augmentationProps = augmentationId ? {
+                'data-augmentation-id': augmentationId,
+                style: {
+                    background: span.color,
+                    cursor: 'pointer',
+                },
+                onClick: onAugmentationClick
+                    ? () => onAugmentationClick(augmentationId)
+                    : undefined,
+            } : {};
+            return createElement(
                 'span',
                 {
                     key: pathToId(span.path),
                     id: pathToId(span.path),
-                    style: {
-                        background: span.color,
-                    },
+                    ...augmentationProps,
                 },
                 span.text,
-            )
-        ),
+            );
+        }),
     );
 }
 
@@ -117,35 +134,36 @@ function getChildren(node: BooqElementNode, ctx: RenderContext) {
         : null;
 }
 
-// --- Colorization
+// --- Augmentation
 
-type ColorizedSpan = {
+type AugmentedSpan = {
     path: BooqPath,
     text: string,
     color?: string,
+    id: string | undefined,
 };
 
-function applyColorization(span: ColorizedSpan, colorization: Colorization[]) {
-    return colorization.reduce(
+function applyAugmentations(span: AugmentedSpan, augmentations: Augmentation[]) {
+    return augmentations.reduce(
         (res, col) => {
-            const spans = applyColorizationOnSpans(res, col);
+            const spans = applyAugmentationOnSpans(res, col);
             return spans;
         },
         [span],
     );
 }
 
-function applyColorizationOnSpans(spans: ColorizedSpan[], colorization: Colorization) {
-    return spans.reduce<ColorizedSpan[]>(
+function applyAugmentationOnSpans(spans: AugmentedSpan[], augmentation: Augmentation) {
+    return spans.reduce<AugmentedSpan[]>(
         (res, span) => {
-            const spans = applyColorizationOnSpan(span, colorization);
+            const spans = applyAugmentationOnSpan(span, augmentation);
             res.push(...spans);
             return res;
         },
         []);
 }
 
-function applyColorizationOnSpan(span: ColorizedSpan, { range, color }: Colorization): ColorizedSpan[] {
+function applyAugmentationOnSpan(span: AugmentedSpan, { range, color, id }: Augmentation): AugmentedSpan[] {
     const [prefix, offset] = breakPath(span.path);
     const [startPrefix, startOffset] = breakPath(range.start);
     const [endPrefix, endOffset] = range.end
@@ -166,19 +184,20 @@ function applyColorizationOnSpan(span: ColorizedSpan, { range, color }: Coloriza
     const pointB = Math.min(Math.max(start, 0), len);
     const pointC = Math.min(Math.max(end, 0), len);
     const pointD = len;
-    const result: ColorizedSpan[] = [];
+    const result: AugmentedSpan[] = [];
     if (pointA < pointB) {
         result.push({
             text: span.text.substring(pointA, pointB),
             path: span.path,
             color: span.color,
+            id: span.id,
         });
     }
     if (pointB < pointC) {
         result.push({
             text: span.text.substring(pointB, pointC),
             path: [...prefix, pointB + offset],
-            color,
+            color, id,
         })
     }
     if (pointC < pointD) {
@@ -186,6 +205,7 @@ function applyColorizationOnSpan(span: ColorizedSpan, { range, color }: Coloriza
             text: span.text.substring(pointC, pointD),
             path: [...prefix, pointC + offset],
             color: span.color,
+            id: span.id,
         })
     }
     return result;

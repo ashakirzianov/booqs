@@ -86,6 +86,10 @@ function HistoryItems({ items }: {
                 padding: ${meter.xLarge} ${meter.regular};
                 overflow: auto;
                 scroll-snap-type: x mandatory;
+                scrollbar-width: none;
+            }
+            .container::-webkit-scrollbar {
+                display: none;
             }
             .preview {
                 display: flex;
