@@ -26,11 +26,11 @@ export function ReaderLayout({
     ...controls
 }: LayoutProps) {
     return <div className='container'>
+        {PrevButton}
         <div className='booq'>
-            {PrevButton}
             {BooqContent}
-            {NextButton}
         </div>
+        {NextButton}
         <BooqControls {...controls} />
         <style jsx>{`
             .container {
@@ -42,7 +42,7 @@ export function ReaderLayout({
             .booq {
                 display: flex;
                 flex-flow: column;
-                align-items: center;
+                align-items: stretch;
                 width: 100%;
                 max-width: ${contentWidth};
                 padding: ${meter.large};
