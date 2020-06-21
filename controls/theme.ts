@@ -21,6 +21,15 @@ function fontDef(name: string, ...weights: number[]) {
 export const radius = '4px';
 
 export const headerHeight = '3rem';
+export const smallScreenWidth = '60rem';
+export function isSmallScreen(): boolean {
+    if (process.browser) {
+        const mql = window.matchMedia(`(max-width: ${smallScreenWidth})`);
+        return mql.matches;
+    } else {
+        return false;
+    }
+}
 
 export const meter = {
     small: meterSize(0.5),

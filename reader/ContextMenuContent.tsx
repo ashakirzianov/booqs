@@ -8,8 +8,6 @@ import {
 import { MenuItem } from 'controls/Menu';
 import { useDocumentEvent } from 'controls/utils';
 import { quoteRef } from 'controls/Links';
-import { Icon } from 'controls/Icon';
-import { meter, vars } from 'controls/theme';
 import { BooqSelection } from './BooqContent';
 
 type EmptyTarget = {
@@ -222,7 +220,7 @@ function GroupSelectionButton({ color, selected, callback }: {
                 color: rgba(0, 0, 0, 0);
                 cursor: pointer;
                 border-bottom: 0.5rem solid ${selected ? `${color}` : `rgba(0,0,0,0)`};
-                height: 2rem;
+                height: 2.5rem;
                 transition: 250ms border;
             }
             .button:hover {

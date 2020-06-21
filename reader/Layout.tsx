@@ -1,5 +1,7 @@
 import React, { ReactNode } from 'react';
-import { meter, headerHeight, vars } from 'controls/theme';
+import {
+    meter, headerHeight, vars, smallScreenWidth,
+} from 'controls/theme';
 
 type ControlsProps = {
     isControlsVisible: boolean,
@@ -20,7 +22,6 @@ type LayoutProps = ControlsProps & {
 };
 
 const contentWidth = '40rem';
-export const smallScreenWidth = '60rem';
 export function ReaderLayout({
     BooqContent, PrevButton, NextButton,
     ...controls
