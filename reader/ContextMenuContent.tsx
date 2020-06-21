@@ -107,23 +107,42 @@ function AddHighlightItem({
     setTarget: (target: ContextMenuTarget) => void,
 }) {
     const { addHighlight } = useHighlightMutations(booqId);
-    return <MenuItem
-        text='Highlight'
-        icon='highlight'
-        callback={() => {
-            const highlight = addHighlight({
-                group: 'first',
-                start: selection.range.start,
-                end: selection.range.end ?? selection.range.start,
-                text: selection.text,
-            });
-            setTarget({
-                kind: 'highlight',
-                highlight,
-            });
-            removeSelection();
-        }}
-    />;
+    return <div className='container'>
+        {
+            groups.map(
+                (group, idx) => <GroupSelectionButton
+                    key={idx}
+                    selected={false}
+                    color={colorForGroup(group)}
+                    callback={() => {
+                        const highlight = addHighlight({
+                            group,
+                            start: selection.range.start,
+                            end: selection.range.end ?? selection.range.start,
+                            text: selection.text,
+                        });
+                        setTarget({
+                            kind: 'highlight',
+                            highlight,
+                        });
+                        removeSelection();
+                    }}
+                />,
+            )
+        }
+        <style jsx>{`
+            .container {
+                display: flex;
+                flex: 1;
+                flex-direction: row;
+                align-items: stretch;
+                justify-content: space-between;
+                cursor: pointer;
+                font-size: small;
+                user-select: none;
+            }
+            `}</style>
+    </div>;
 }
 
 function RemoveHighlightItem({
