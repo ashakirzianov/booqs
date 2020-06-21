@@ -5,9 +5,8 @@ import {
 } from 'app';
 import { IconButton } from 'controls/Buttons';
 import { BooqLink } from 'controls/Links';
-import { meter, vars, boldWeight, bookFont } from 'controls/theme';
+import { meter, vars, boldWeight, isSmallScreen } from 'controls/theme';
 import { useFilterPanel } from 'controls/FilterPanel';
-import { isSmallScreen } from 'controls/utils';
 
 export function useNavigationPanel(booqId: string) {
     const [navigationOpen, setOpen] = useState(false);

@@ -1,4 +1,5 @@
 import { ReactNode, useEffect } from "react";
+import { smallScreenWidth } from "./theme";
 
 type FunctionComponent<P extends {}> = (props: P) => ReactNode;
 
@@ -12,13 +13,4 @@ export function useDocumentEvent<K extends keyof DocumentEventMap>(name: K, list
         window.document.addEventListener(name, listener);
         return () => window.document.removeEventListener(name, listener);
     }, [listener]);
-}
-
-export function isSmallScreen(): boolean {
-    if (process.browser) {
-        const mql = window.matchMedia(`(max-width: 60rem)`);
-        return mql.matches;
-    } else {
-        return false;
-    }
 }

@@ -1,5 +1,7 @@
 import React, { ReactNode } from 'react';
-import { meter, headerHeight, vars } from 'controls/theme';
+import {
+    meter, headerHeight, vars, smallScreenWidth,
+} from 'controls/theme';
 
 type ControlsProps = {
     isControlsVisible: boolean,
@@ -20,17 +22,16 @@ type LayoutProps = ControlsProps & {
 };
 
 const contentWidth = '40rem';
-export const smallScreenWidth = '60rem';
 export function ReaderLayout({
     BooqContent, PrevButton, NextButton,
     ...controls
 }: LayoutProps) {
     return <div className='container'>
+        {PrevButton}
         <div className='booq'>
-            {PrevButton}
             {BooqContent}
-            {NextButton}
         </div>
+        {NextButton}
         <BooqControls {...controls} />
         <style jsx>{`
             .container {
@@ -42,7 +43,7 @@ export function ReaderLayout({
             .booq {
                 display: flex;
                 flex-flow: column;
-                align-items: center;
+                align-items: stretch;
                 width: 100%;
                 max-width: ${contentWidth};
                 padding: ${meter.large};

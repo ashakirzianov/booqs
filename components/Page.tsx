@@ -14,7 +14,7 @@ export function Page({ title, children }: HasChildren & {
     return <div className={`page ${paletteName}`}>
         <Head>
             <title>{title}</title>
-            <meta name="viewport" content="initial-scale=1.0, width=device-width, viewport-fit=cover" />
+            <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=3.0,minimum-scale=1.0,viewport-fit=cover" />
             <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
             <link rel="manifest" href="/manifest.json" />
             <link href={fontHref} rel="stylesheet" />
@@ -28,6 +28,7 @@ export function Page({ title, children }: HasChildren & {
                 flex-direction: column;
                 font-family: ${menuFont};
                 font-weight: ${normalWeight};
+                overflow: hidden;
             }
             .page.light {
                 ${vars.action}: ${palettes.light.action};
@@ -61,7 +62,6 @@ export function Page({ title, children }: HasChildren & {
             body {
                 margin: 0;
                 padding: 0;
-                overflow-x: hidden;
                 color: ${primary};
                 background: ${background};
             }
