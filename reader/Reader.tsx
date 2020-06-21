@@ -100,6 +100,7 @@ export function LoadingBooqScreen() {
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
+            alignSelf: 'center',
             width: '100vw',
             height: '100vh',
             fontSize: 'xx-large',
