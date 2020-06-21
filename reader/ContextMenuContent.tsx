@@ -121,6 +121,7 @@ function AddHighlightItem({
                 kind: 'highlight',
                 highlight,
             });
+            removeSelection();
         }}
     />;
 }
