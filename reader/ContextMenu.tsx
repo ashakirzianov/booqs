@@ -6,6 +6,7 @@ import {
     getBooqSelection, AnchorRect, getSelectionRect, getAugmentationRect,
 } from './BooqContent';
 import { ContextMenuContent, ContextMenuTarget } from './ContextMenuContent';
+import { throttle } from 'lodash';
 
 export function useContextMenu(booqId: string) {
     const { menuState, setMenuState } = useMenuState();
@@ -67,7 +68,7 @@ function useMenuState() {
 
     useDocumentEvent('selectionchange', selectionHandler);
 
-    useDocumentEvent('scroll', useCallback(() => {
+    useDocumentEvent('scroll', useCallback(throttle(() => {
         setMenuState(prev => {
             if (prev.target.kind === 'selection') {
                 const rect = getSelectionRect();
@@ -103,7 +104,7 @@ function useMenuState() {
                 return prev;
             }
         });
-    }, []));
+    }, 200), []));
 
     useDocumentEvent('click', event => {
         if (!isWithinCtxMenu(event.target)) {

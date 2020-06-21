@@ -22,7 +22,7 @@ export function Overlay({ anchor, content }: {
             content={<>{content}</>}
             children={anchor}
         />
-        <style jsx global>{popoverStyles}</style>
+        <style jsx global>{overlayStyles}</style>
     </>;
 }
 
@@ -74,13 +74,34 @@ const popoverStyles = css.global`
 .tippy-box {
     color: var(${vars.primary});
     background-color: var(${vars.background});
-    box-shadow: ${panelShadow};
+    box-shadow: 0px 0px 5px rgba(0,0,0,0.1);
     border: 1px solid var(${vars.border});
     border-radius: ${radius};
 }
 .tippy-content {
     padding: 0;
     overflow: hidden;
+    border-radius: ${radius};
+}
+.tippy-svg-arrow > svg:first-child {
+    fill: var(${vars.border});
+}
+.tippy-svg-arrow > svg:last-child {
+    fill: var(${vars.background});
+}
+`;
+
+const overlayStyles = css.global`
+.tippy-box {
+    color: var(${vars.primary});
+    background-color: var(${vars.background});
+    box-shadow: unset;
+    border: unset;
+}
+.tippy-content {
+    padding: 0;
+    overflow: hidden;
+    box-shadow: 0px 0px 20px rgba(0,0,0,0.2);
     border-radius: ${radius};
 }
 .tippy-svg-arrow > svg:first-child {
