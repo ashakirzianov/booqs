@@ -21,7 +21,7 @@ type LayoutProps = ControlsProps & {
     NextButton: ReactNode,
 };
 
-const contentWidth = '40rem';
+const contentWidth = '45rem';
 export function ReaderLayout({
     BooqContent, PrevButton, NextButton,
     ...controls
