@@ -54,6 +54,7 @@ export function MenuItem({ icon, text, callback, spinner }: {
                 font-family: ${menuFont};
                 font-weight: ${boldWeight};
                 user-select: none;
+                transition: 250ms color, 250ms background-color;
             }
             .container:hover {
                 color: var(${vars.background});
