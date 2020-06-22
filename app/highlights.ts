@@ -11,6 +11,7 @@ const HighlightsQuery = gql`query HighlightsQuery($booqId: ID!) {
             end
             group
             text
+            position
         }
     }
 }`;
@@ -24,6 +25,7 @@ type HighlightsData = {
             end: BooqPath,
             group: string,
             text: string,
+            position: number | null,
         }[],
     },
 };
@@ -102,6 +104,7 @@ export function useHighlightMutations(booqId: string) {
                                 ...input,
                                 __typename: 'BooqHighlight',
                                 id: highlight.id,
+                                position: null
                             });
                             cache.writeQuery({
                                 query: HighlightsQuery,
@@ -116,6 +119,7 @@ export function useHighlightMutations(booqId: string) {
                 ...highlight,
                 text: input.text,
                 __typename: 'BooqHighlight',
+                position: null,
             };
         },
         removeHighlight(id: string) {

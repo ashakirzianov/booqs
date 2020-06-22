@@ -137,7 +137,7 @@ function NavigationNodeComp({ booqId, node }: {
                 node={node}
             />;
         case 'highlight':
-            return <HighlightComp
+            return <HighlightNodeComp
                 booqId={booqId}
                 highlight={node.highlight}
             />;
@@ -195,7 +195,7 @@ function PathHighlightsNodeComp({
             highlights.map(
                 (hl, idx) =>
                     <div key={idx} className='highlight'>
-                        <HighlightComp
+                        <HighlightNodeComp
                             booqId={booqId}
                             highlight={hl}
                         />
@@ -247,7 +247,7 @@ function Path({ items, booqId }: {
     </div>;
 }
 
-function HighlightComp({ booqId, highlight }: {
+function HighlightNodeComp({ booqId, highlight }: {
     booqId: string,
     highlight: Highlight,
 }) {
@@ -276,6 +276,11 @@ function HighlightComp({ booqId, highlight }: {
                     />
                 </div>}
             />
+            <div className='page'>
+                {
+                    highlight.position ? pageForPosition(highlight.position) : null
+                }
+            </div>
         </div>
         <style jsx>{`
             .container {
@@ -297,8 +302,13 @@ function HighlightComp({ booqId, highlight }: {
             .side {
                 display: flex;
                 flex-flow: column;
+                justify-content: space-between;
                 align-items: stretch;
                 margin-left: ${meter.large};
+            }
+            .page {
+                margin-top: ${meter.regular};
+                font-weight: ${boldWeight};
             }
             .container:hover .more {
                 color: var(${vars.dimmed});
