@@ -1,6 +1,6 @@
 import gql from "graphql-tag";
 import { useQuery, useMutation } from "@apollo/react-hooks";
-import { BooqPath, uuid } from "core";
+import { BooqPath, uniqueId } from "core";
 
 const BookmarksQuery = gql`query BookmarksQuery($booqId: ID!) {
     booq(id: $booqId) {
@@ -54,7 +54,7 @@ export function useBookmarkMutations(booqId: string) {
     );
     return {
         addBookmark(path: BooqPath) {
-            const id = uuid();
+            const id = uniqueId();
             add({
                 variables: { bookmark: { path, booqId, id } },
                 optimisticResponse: { addBookmark: true },
