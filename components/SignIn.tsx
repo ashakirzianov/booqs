@@ -40,9 +40,9 @@ export function SignIn({ singleton }: {
 function SingInButton() {
     const state = useAuth();
     if (state.state === 'signed') {
-        return state.profilePicture
+        return state.pictureUrl
             ? <ProfilePictureButton
-                picture={state.profilePicture}
+                picture={state.pictureUrl}
             />
             : <IconButton
                 icon='user'

@@ -4,32 +4,32 @@ import gql from 'graphql-tag';
 import { syncStorageCell } from "plat";
 import { facebookSdk } from "./facebookSdk";
 
-const storage = syncStorageCell<AuthData>('auth-data');
+const storage = syncStorageCell<AuthData>('user');
 
 type AuthData = {
     name: string | null,
-    profilePicture: string | null,
+    pictureUrl: string | null,
     provider: string | null,
 };
 const AuthStateQuery = gql`query AuthState {
     name @client
-    profilePicture @client
+    pictureUrl @client
     provider @client
 }`;
 export const initialAuthData: AuthData = storage.restore() ?? {
     name: null,
-    profilePicture: null,
+    pictureUrl: null,
     provider: null,
 };
 export type Auth = ReturnType<typeof useAuth>;
 export function useAuth() {
     const { data } = useQuery<AuthData>(AuthStateQuery);
 
-    const { name, profilePicture, provider } = (data ?? initialAuthData);
+    const { name, pictureUrl, provider } = (data ?? initialAuthData);
     if (name) {
         return {
             state: 'signed',
-            name, profilePicture, provider,
+            name, pictureUrl, provider,
         } as const;
     } else {
         return { state: 'not-signed', provider } as const;
@@ -43,7 +43,7 @@ export function useSignInOptions() {
         async signWithFacebook() {
             client.writeData<AuthData>({
                 data: {
-                    provider: 'facebook', name: null, profilePicture: null,
+                    provider: 'facebook', name: null, pictureUrl: null,
                 },
             });
             const status = await facebookSdk()?.login();
@@ -68,7 +68,7 @@ async function signOut(client: ApolloClient<unknown>) {
     if (result?.data?.logout) {
         client.writeData<AuthData>({
             data: {
-                provider: null, name: null, profilePicture: null,
+                provider: null, name: null, pictureUrl: null,
             },
         });
         await facebookSdk()?.logout();
@@ -81,15 +81,19 @@ async function signIn(client: ApolloClient<unknown>, token: string, provider: st
     const { data: { auth } } = await client.query<{
         auth: {
             token: string,
-            name: string,
-            profilePicture: string | null,
+            user: {
+                name: string,
+                pictureUrl: string | null,
+            },
         },
     }>({
         query: gql`query Auth($token: String!, $provider: String!) {
             auth(token: $token, provider: $provider) {
                 token
-                name
-                profilePicture
+                user {
+                    name
+                    pictureUrl
+                }
             }
         }`,
         variables: { token, provider },
@@ -98,14 +102,14 @@ async function signIn(client: ApolloClient<unknown>, token: string, provider: st
         const data: AuthData = auth
             ? {
                 provider,
-                name: auth.name,
-                profilePicture: auth.profilePicture,
+                name: auth.user.name,
+                pictureUrl: auth.user.pictureUrl,
             }
             : initialAuthData;
         storage.store({
             provider,
-            name: auth.name,
-            profilePicture: data.profilePicture,
+            name: data.name,
+            pictureUrl: data.pictureUrl,
         });
         client.writeData<AuthData>({ data });
         client.reFetchObservableQueries(true);
