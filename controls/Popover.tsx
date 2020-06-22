@@ -2,22 +2,28 @@ import React, { ReactNode, ReactElement } from 'react';
 import { roundArrow } from 'tippy.js';
 import Tippy, { useSingleton } from '@tippyjs/react';
 import css from 'styled-jsx/css'
-import { panelShadow, radius, vars } from './theme';
+import { radius, vars } from './theme';
 
 export type PopoverSingleton = ReturnType<typeof useSingleton>[1];
 
 // TODO: combine 'Popover' & 'Overlay' ?
-export function Overlay({ anchor, content }: {
+export function Overlay({
+    anchor, content, placement, visible, hideOnClick,
+}: {
     anchor: ReactElement,
     content: ReactNode,
+    placement: 'bottom' | 'right-start',
+    visible?: boolean,
+    hideOnClick?: boolean,
 }) {
     return <>
         <Tippy
             popperOptions={{ strategy: 'fixed' }}
             arrow={false}
             interactive={true}
-            placement='bottom'
-            visible={true}
+            placement={placement ?? 'bottom'}
+            visible={visible}
+            hideOnClick={hideOnClick}
             animation='shift-away'
             content={<>{content}</>}
             children={anchor}

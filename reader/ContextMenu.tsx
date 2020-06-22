@@ -171,6 +171,8 @@ function ContextMenuPopover({
     rect: AnchorRect,
 }) {
     return <Overlay
+        placement='bottom'
+        visible={true}
         content={<div id='ctxmenu' style={{
             width: '12rem',
             pointerEvents: 'auto',
