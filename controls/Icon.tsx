@@ -5,6 +5,7 @@ import {
     faPlus, faFontCase, faSignIn, faSignOut, faQuestion, faSearch,
     faFileAlt, faUser, faTimes, faListUl, faBookmark, faAngleLeft,
     faQuoteRight, faClone, faLink, faHighlighter, faTrashAlt,
+    faEllipsisV,
 } from '@fortawesome/pro-light-svg-icons';
 import {
     faFacebookF,
@@ -14,7 +15,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 
 export type IconName =
-    | 'back'
+    | 'back' | 'more'
     | 'user' | 'sign-in' | 'sign-out'
     | 'upload' | 'appearance' | 'close' | 'remove'
     | 'toc' | 'bookmark-empty' | 'bookmark-solid'
@@ -38,6 +39,8 @@ function iconForName(name: IconName) {
     switch (name) {
         case 'back':
             return faAngleLeft;
+        case 'more':
+            return faEllipsisV;
         case 'user':
             return faUser;
         case 'sign-in':
