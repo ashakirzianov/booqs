@@ -46,7 +46,11 @@ export function ReaderLayout({
                 align-items: stretch;
                 width: 100%;
                 max-width: ${contentWidth};
-                padding: ${meter.large};
+            }
+            @media (max-width: ${smallScreenWidth}) {
+                .booq {
+                    padding-right: ${meter.large};
+                }
             }
             `}</style>
     </div>;
@@ -106,7 +110,7 @@ function BooqControls({
                 display: flex;
                 flex: 1 1;
                 grid-area: 2 / 1 / 4 / 4;
-                padding: ${meter.regular} 0 0 ${meter.large};
+                padding: ${meter.regular} 0 0 0;
                 pointer-events: auto;
                 overflow: hidden;
                 align-self: stretch;

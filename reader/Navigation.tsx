@@ -5,7 +5,7 @@ import {
 } from 'app';
 import { IconButton } from 'controls/Buttons';
 import { BooqLink } from 'controls/Links';
-import { meter, vars, boldWeight, isSmallScreen } from 'controls/theme';
+import { meter, vars, boldWeight, isSmallScreen, smallScreenWidth } from 'controls/theme';
 import { useFilterPanel } from 'controls/FilterPanel';
 import { Overlay } from 'controls/Popover';
 import { Icon } from 'controls/Icon';
@@ -101,9 +101,6 @@ function Navigation({ booqId, closeSelf }: {
                 display: flex;
                 flex-flow: column;
                 flex: 1 1;
-                overflow: hidden;
-            }
-            .items {
                 overflow: auto;
             }
             .item {
@@ -113,6 +110,14 @@ function Navigation({ booqId, closeSelf }: {
                 width: 85%;
                 border: none;
                 border-top: 0.5px solid var(${vars.border});
+            }
+            @media (min-width: ${smallScreenWidth}) {
+                .items {
+                    padding: 0 ${meter.large};
+                }
+                .header {
+                    padding: 0 ${meter.large};
+                }
             }
             `}</style>
         </div>;
