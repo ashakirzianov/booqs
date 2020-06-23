@@ -49,7 +49,10 @@ export function ReaderLayout({
             }
             @media (max-width: ${smallScreenWidth}) {
                 .booq {
-                    padding-right: ${meter.large};
+                    padding: 0 ${meter.large};
+                }
+                .container {
+                    padding: ${meter.xxLarge} 0;
                 }
             }
             `}</style>

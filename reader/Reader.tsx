@@ -4,14 +4,16 @@ import {
     BooqData, BooqAnchor, useSettings, useReportHistory,
     useHighlights, colorForGroup, quoteColor, pageForPosition,
 } from 'app';
-import { headerHeight, meter, bookFont, vars, boldWeight } from 'controls/theme';
+import { headerHeight, bookFont, vars, boldWeight } from 'controls/theme';
 import { BorderButton, IconButton } from 'controls/Buttons';
 import { BooqLink, FeedLink } from 'controls/Links';
 import { Spinner } from 'controls/Spinner';
 import { usePopoverSingleton } from 'controls/Popover';
 import { Themer } from 'components/Themer';
 import { SignIn } from 'components/SignIn';
-import { BooqContent, Augmentation, getAugmentationRect, getAugmentationText } from './BooqContent';
+import {
+    BooqContent, Augmentation, getAugmentationRect, getAugmentationText,
+} from './BooqContent';
 import { useContextMenu, ContextMenuState } from './ContextMenu';
 import { useNavigationPanel } from './Navigation';
 import { ReaderLayout } from './Layout';
@@ -249,7 +251,6 @@ function AnchorButton({ booqId, anchor, title }: {
                 flex-flow: row;
                 align-items: center; 
                 height: ${headerHeight};
-                margin: ${meter.regular};
             }`}</style>
         </div>
     </BooqLink>;
