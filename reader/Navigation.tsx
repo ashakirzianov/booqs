@@ -276,11 +276,6 @@ function HighlightNodeComp({ booqId, highlight }: {
                     />
                 </div>}
             />
-            <div className='page'>
-                {
-                    highlight.position ? pageForPosition(highlight.position) : null
-                }
-            </div>
         </div>
         <style jsx>{`
             .container {
