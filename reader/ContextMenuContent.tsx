@@ -3,12 +3,14 @@ import { useRouter } from 'next/router';
 import * as clipboard from 'clipboard-polyfill';
 import { BooqRange } from 'core';
 import {
-    useHighlightMutations, Highlight, colorForGroup, groups, useAuth,
+    useHighlightMutations, Highlight, colorForGroup, groups,
 } from 'app';
 import { MenuItem } from 'controls/Menu';
 import { useDocumentEvent } from 'controls/utils';
 import { quoteRef } from 'controls/Links';
 import { BooqSelection } from './BooqContent';
+import { meter, vars, menuFont, boldWeight } from 'controls/theme';
+import { ProfileBadge } from 'controls/ProfilePicture';
 
 type EmptyTarget = {
     kind: 'empty',
@@ -33,6 +35,7 @@ export function ContextMenuContent({
 }: {
     target: ContextMenuTarget,
     booqId: string,
+    selfId: string | undefined,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
     switch (target.kind) {
@@ -52,6 +55,7 @@ function SelectionTargetMenu({
 }: {
     target: SelectionTarget,
     booqId: string,
+    selfId: string | undefined,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
     useCopyQuote(rest.booqId, selection);
@@ -67,6 +71,7 @@ function QuoteTargetMenu({
 }: {
     target: QuoteTarget,
     booqId: string,
+    selfId: string | undefined,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
     return <>
@@ -76,12 +81,14 @@ function QuoteTargetMenu({
 }
 
 function HighlightTargetMenu({
-    target: { highlight }, ...rest
+    target: { highlight }, selfId, ...rest
 }: {
     target: HighlightTarget,
     booqId: string,
+    selfId: string | undefined,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
+    const isOwnHighlight = selfId === highlight.author.id;
     const selection = {
         range: {
             start: highlight.start,
@@ -90,23 +97,77 @@ function HighlightTargetMenu({
         text: highlight.text,
     };
     return <>
-        <SelectHighlightGroupItem  {...rest} highlight={highlight} />
-        <RemoveHighlightItem  {...rest} highlight={highlight} />
+        {isOwnHighlight ? null :
+            <AuthorItem
+                name={highlight.author.name}
+                pictureUrl={highlight.author.pictureUrl ?? undefined}
+            />
+        }
+        {!isOwnHighlight ? null :
+            <SelectHighlightGroupItem  {...rest} highlight={highlight} />
+        }
+        {!isOwnHighlight ? null :
+            <RemoveHighlightItem  {...rest} highlight={highlight} />
+        }
         <CopyQuoteItem {...rest} selection={selection} />
         <CopyLinkItem {...rest} selection={selection} />
     </>;
 }
 
+function AuthorItem({ name, pictureUrl }: {
+    name: string,
+    pictureUrl?: string,
+}) {
+    return <div className='container'>
+        {
+            pictureUrl
+                ? <div className="picture">
+                    <ProfileBadge
+                        border={false}
+                        size={24}
+                        name={name}
+                        picture={pictureUrl}
+                    />
+                </div>
+                : null
+        }
+        <span className='name'>{name}</span>
+        <style jsx>{`
+            .container {
+                display: flex;
+                flex: 1;
+                flex-direction: row;
+                align-items: center;
+                padding: ${meter.large};
+                font-size: smaller;
+                font-family: ${menuFont};
+                font-weight: ${boldWeight};
+                user-select: none;
+            }
+            .picture {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                margin-right: ${meter.large};
+            }
+            .name {
+                display: flex;
+                flex: 1;
+            }
+            `}</style>
+    </div>;
+}
+
 function AddHighlightItem({
-    selection, booqId, setTarget,
+    selection, booqId, selfId, setTarget,
 }: {
     selection: BooqSelection,
     booqId: string,
+    selfId: string | undefined,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
-    const { id } = useAuth();
     const { addHighlight } = useHighlightMutations(booqId);
-    if (!id) {
+    if (!selfId) {
         return null;
     }
     return <div className='container'>
@@ -122,7 +183,7 @@ function AddHighlightItem({
                             start: selection.range.start,
                             end: selection.range.end ?? selection.range.start,
                             text: selection.text,
-                            authorId: id,
+                            authorId: selfId,
                         });
                         setTarget({
                             kind: 'highlight',

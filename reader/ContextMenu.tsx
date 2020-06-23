@@ -7,13 +7,16 @@ import {
 } from './BooqContent';
 import { ContextMenuContent, ContextMenuTarget } from './ContextMenuContent';
 import { throttle } from 'lodash';
+import { useAuth } from 'app';
 
 export function useContextMenu(booqId: string) {
     const { menuState, setMenuState } = useMenuState();
+    const { id } = useAuth();
     const ContextMenuNode = <ContextMenuLayout
         rect={menuState.rect}
         content={<ContextMenuContent
             booqId={booqId}
+            selfId={id ?? undefined}
             target={menuState.target}
             setTarget={target => setMenuState({
                 ...menuState,

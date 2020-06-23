@@ -111,13 +111,14 @@ export function useHighlightMutations(booqId: string) {
                             variables: { booqId },
                         });
                         if (cached) {
-                            cached.booq.highlights.push({
+                            cached.booq.highlights.unshift({
                                 ...input,
                                 __typename: 'BooqHighlight',
                                 id: highlight.id,
                                 position: null,
                                 author: {
                                     id: input.authorId,
+                                    name: '',
                                     pictureUrl: null,
                                 },
                             });
@@ -137,6 +138,7 @@ export function useHighlightMutations(booqId: string) {
                 position: null,
                 author: {
                     id: input.authorId,
+                    name: '',
                     pictureUrl: null,
                 },
             };
