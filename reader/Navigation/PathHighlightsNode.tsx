@@ -5,10 +5,11 @@ import { PathHighlightsNode } from './model';
 import { HighlightNodeComp } from './HighlightNode';
 
 export function PathHighlightsNodeComp({
-    booqId,
+    booqId, selfId,
     node: { items, highlights },
 }: {
     booqId: string,
+    selfId: string | undefined,
     node: PathHighlightsNode,
 }) {
     return <div>
@@ -19,6 +20,7 @@ export function PathHighlightsNodeComp({
                     <div key={idx} className='highlight'>
                         <HighlightNodeComp
                             booqId={booqId}
+                            selfId={selfId}
                             highlight={hl}
                         />
                     </div>

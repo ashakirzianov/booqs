@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { useToc, useHighlights } from 'app';
+import { useToc, useHighlights, useAuth } from 'app';
 import { IconButton } from 'controls/Buttons';
 import { meter, vars, boldWeight, isSmallScreen, smallScreenWidth } from 'controls/theme';
 import { useFilterPanel } from 'controls/FilterPanel';
@@ -32,6 +32,7 @@ function Navigation({ booqId, closeSelf }: {
     booqId: string,
     closeSelf: () => void,
 }) {
+    const { id } = useAuth();
     const { toc, title } = useToc(booqId);
     const { highlights } = useHighlights(booqId);
     const { filter, FilterNode } = useFilterPanel({
@@ -63,6 +64,7 @@ function Navigation({ booqId, closeSelf }: {
                                 <div className='item' onClick={closeSelf}>
                                     <NavigationNodeComp
                                         booqId={booqId}
+                                        selfId={id ?? 'why'}
                                         node={node}
                                     />
                                 </div>
@@ -123,8 +125,9 @@ function Navigation({ booqId, closeSelf }: {
     ]);
 }
 
-function NavigationNodeComp({ booqId, node }: {
+function NavigationNodeComp({ booqId, selfId, node }: {
     booqId: string,
+    selfId: string | undefined,
     node: NavigationNode,
 }) {
     switch (node.kind) {
@@ -136,11 +139,13 @@ function NavigationNodeComp({ booqId, node }: {
         case 'highlight':
             return <HighlightNodeComp
                 booqId={booqId}
+                selfId={selfId}
                 highlight={node.highlight}
             />;
         case 'highlights':
             return <PathHighlightsNodeComp
                 booqId={booqId}
+                selfId={selfId}
                 node={node}
             />;
         default:

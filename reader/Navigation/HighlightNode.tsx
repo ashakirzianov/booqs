@@ -6,8 +6,9 @@ import { Icon } from "controls/Icon";
 import { ContextMenuContent } from "reader/ContextMenuContent";
 import { ProfileBadge } from "controls/ProfilePicture";
 
-export function HighlightNodeComp({ booqId, highlight }: {
+export function HighlightNodeComp({ booqId, highlight, selfId }: {
     booqId: string,
+    selfId: string | undefined,
     highlight: Highlight,
 }) {
     const smallScreen = isSmallScreen();
@@ -61,6 +62,7 @@ export function HighlightNodeComp({ booqId, highlight }: {
                 text-align: justify;
             }
             .badge {
+                display: ${selfId === highlight.author.id ? 'none' : 'flex'};
                 margin-top: ${meter.regular};
             }
             .side {
