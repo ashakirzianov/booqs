@@ -16,7 +16,7 @@ export function FacebookSignButton() {
 }
 
 export function SignInMenu() {
-    const { provider } = useAuth();
+    const { provider } = useAuth() ?? {};
     const { signWithFacebook } = useSignInOptions();
     return <Menu>
         <MenuItem
@@ -44,7 +44,7 @@ function SingInButton() {
         cursor: 'pointer'
     }}>
         {
-            state.signed
+            state?.signed
                 ? <ProfileBadge
                     name={state.name}
                     picture={state.pictureUrl ?? undefined}
@@ -60,7 +60,7 @@ function SingInButton() {
 
 function SignInPanel() {
     const state = useAuth();
-    if (state.signed) {
+    if (state?.signed) {
         return <Signed
             name={state.name}
         />;
@@ -72,7 +72,7 @@ function SignInPanel() {
 function Signed({ name }: {
     name: string,
 }) {
-    const { provider } = useAuth();
+    const { provider } = useAuth() ?? {};
     const { signOut } = useSignInOptions();
     return <div>
         <span>{name}</span>

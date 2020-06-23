@@ -11,7 +11,7 @@ import { booqHref } from "controls/Links";
 export function Upload({ singleton }: {
     singleton?: PopoverSingleton,
 }) {
-    const { signed } = useAuth();
+    const { signed } = useAuth() ?? {};
     const {
         body, buttons, clearFile,
     } = useModalDefinition();

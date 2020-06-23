@@ -11,7 +11,7 @@ import { useAuth } from 'app';
 
 export function useContextMenu(booqId: string) {
     const { menuState, setMenuState } = useMenuState();
-    const { id } = useAuth();
+    const { id } = useAuth() ?? {};
     const ContextMenuNode = <ContextMenuLayout
         rect={menuState.rect}
         content={<ContextMenuContent

@@ -32,7 +32,7 @@ function Navigation({ booqId, closeSelf }: {
     booqId: string,
     closeSelf: () => void,
 }) {
-    const { id } = useAuth();
+    const { id } = useAuth() ?? {};
     const { toc, title } = useToc(booqId);
     const { highlights } = useHighlights(booqId);
     const { filter, FilterNode } = useFilterPanel({

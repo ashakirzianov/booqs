@@ -29,13 +29,13 @@ export function useAuth() {
     const { data } = useQuery<AuthData>(AuthStateQuery);
 
     const { id, name, pictureUrl, provider } = (data ?? initialAuthData);
-    if (name) {
+    if (id && name && provider) {
         return {
             signed: true,
             id, name, pictureUrl, provider,
         } as const;
     } else {
-        return { signed: false } as const;
+        return undefined;
     }
 }
 
