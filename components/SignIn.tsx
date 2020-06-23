@@ -4,6 +4,7 @@ import { meter, vars } from "controls/theme";
 import { Menu, MenuItem } from "controls/Menu";
 import { IconButton, BorderButton } from "controls/Buttons";
 import { PopoverSingleton, Popover } from "controls/Popover";
+import { ProfileBadge } from "controls/ProfilePicture";
 
 export function FacebookSignButton() {
     const { signWithFacebook } = useSignInOptions();
@@ -40,13 +41,11 @@ export function SignIn({ singleton }: {
 function SingInButton() {
     const state = useAuth();
     if (state.state === 'signed') {
-        return state.pictureUrl
-            ? <ProfilePictureButton
-                picture={state.pictureUrl}
-            />
-            : <IconButton
-                icon='user'
-            />
+        return <ProfileBadge
+            name={state.name}
+            picture={state.pictureUrl ?? undefined}
+            size={36}
+        />;
     } else {
         return <IconButton
             icon='sign-in'
@@ -66,34 +65,6 @@ function SignInPanel() {
         default:
             return null;
     }
-}
-
-
-
-function ProfilePictureButton({ picture }: {
-    picture: string,
-}) {
-    return <div className='container'>
-        <style jsx>{`
-            .container {
-                font-size: x-large;
-                display: flex;
-                flex-shrink: 0;
-                border-radius: 50%;
-                border: 1px solid var(${vars.dimmed});
-                width: 36px;
-                height: 36px;
-                overflow: hidden;
-                background-image: url(${picture});
-                background-size: cover;
-                background-repeat: no-repeat;
-                cursor: pointer;
-            }
-            .container:hover {
-                border: 1px solid var(${vars.highlight});
-            }
-            `}</style>
-    </div>;
 }
 
 function Signed({ name }: {
