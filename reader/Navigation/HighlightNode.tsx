@@ -4,6 +4,7 @@ import { BooqLink } from "controls/Links";
 import { Overlay } from "controls/Popover";
 import { Icon } from "controls/Icon";
 import { ContextMenuContent } from "reader/ContextMenuContent";
+import { ProfileBadge } from "controls/ProfilePicture";
 
 export function HighlightNodeComp({ booqId, highlight }: {
     booqId: string,
@@ -11,7 +12,7 @@ export function HighlightNodeComp({ booqId, highlight }: {
 }) {
     const smallScreen = isSmallScreen();
     return <div className='container'>
-        <div className='text'>
+        <div className='content'>
             <BooqLink booqId={booqId} path={highlight.start}>
                 {highlight.text}
             </BooqLink>
@@ -34,6 +35,14 @@ export function HighlightNodeComp({ booqId, highlight }: {
                     />
                 </div>}
             />
+            <div className='badge'>
+                <ProfileBadge
+                    size={16}
+                    name={highlight.author.name}
+                    picture={highlight.author.pictureUrl ?? undefined}
+                    border={false}
+                />
+            </div>
         </div>
         <style jsx>{`
             .container {
@@ -46,11 +55,13 @@ export function HighlightNodeComp({ booqId, highlight }: {
             }
             .container:hover {
             }
-            .text {
-                display: flex;
-                flex: 1;
+            .content {
+                width: 100%;
                 color: var(${vars.primary});
                 text-align: justify;
+            }
+            .badge {
+                margin-top: ${meter.regular};
             }
             .side {
                 display: flex;

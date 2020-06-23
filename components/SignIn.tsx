@@ -40,17 +40,22 @@ export function SignIn({ singleton }: {
 
 function SingInButton() {
     const state = useAuth();
-    if (state.signed) {
-        return <ProfileBadge
-            name={state.name}
-            picture={state.pictureUrl ?? undefined}
-            size={36}
-        />;
-    } else {
-        return <IconButton
-            icon='sign-in'
-        />;
-    }
+    return <div style={{
+        cursor: 'pointer'
+    }}>
+        {
+            state.signed
+                ? <ProfileBadge
+                    name={state.name}
+                    picture={state.pictureUrl ?? undefined}
+                    size={36}
+                    border={true}
+                />
+                : <IconButton
+                    icon='sign-in'
+                />
+        }
+    </div>;
 }
 
 function SignInPanel() {

@@ -14,6 +14,7 @@ const HighlightsQuery = gql`query HighlightsQuery($booqId: ID!) {
             position
             author {
                 id
+                name
                 pictureUrl
             }
         }
@@ -32,6 +33,7 @@ type HighlightsData = {
             position: number | null,
             author: {
                 id: string,
+                name: string,
                 pictureUrl: string | null,
             },
         }[],
