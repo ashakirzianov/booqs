@@ -12,6 +12,10 @@ const HighlightsQuery = gql`query HighlightsQuery($booqId: ID!) {
             group
             text
             position
+            author {
+                id
+                pictureUrl
+            }
         }
     }
 }`;
@@ -26,6 +30,10 @@ type HighlightsData = {
             group: string,
             text: string,
             position: number | null,
+            author: {
+                id: string,
+                pictureUrl: string | null,
+            },
         }[],
     },
 };
@@ -82,6 +90,7 @@ export function useHighlightMutations(booqId: string) {
             end: BooqPath,
             group: string,
             text: string,
+            authorId: string,
         }): Highlight {
             const highlight = {
                 booqId,
@@ -104,7 +113,11 @@ export function useHighlightMutations(booqId: string) {
                                 ...input,
                                 __typename: 'BooqHighlight',
                                 id: highlight.id,
-                                position: null
+                                position: null,
+                                author: {
+                                    id: input.authorId,
+                                    pictureUrl: null,
+                                },
                             });
                             cache.writeQuery({
                                 query: HighlightsQuery,
@@ -120,6 +133,10 @@ export function useHighlightMutations(booqId: string) {
                 text: input.text,
                 __typename: 'BooqHighlight',
                 position: null,
+                author: {
+                    id: input.authorId,
+                    pictureUrl: null,
+                },
             };
         },
         removeHighlight(id: string) {

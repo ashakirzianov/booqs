@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import * as clipboard from 'clipboard-polyfill';
 import { BooqRange } from 'core';
 import {
-    useHighlightMutations, Highlight, colorForGroup, groups,
+    useHighlightMutations, Highlight, colorForGroup, groups, useAuth,
 } from 'app';
 import { MenuItem } from 'controls/Menu';
 import { useDocumentEvent } from 'controls/utils';
@@ -104,7 +104,11 @@ function AddHighlightItem({
     booqId: string,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
+    const { id } = useAuth();
     const { addHighlight } = useHighlightMutations(booqId);
+    if (!id) {
+        return null;
+    }
     return <div className='container'>
         {
             groups.map(
@@ -118,6 +122,7 @@ function AddHighlightItem({
                             start: selection.range.start,
                             end: selection.range.end ?? selection.range.start,
                             text: selection.text,
+                            authorId: id,
                         });
                         setTarget({
                             kind: 'highlight',

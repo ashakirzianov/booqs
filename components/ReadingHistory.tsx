@@ -7,9 +7,9 @@ import { FacebookSignButton } from './SignIn';
 
 const historyPanelHeight = '15em';
 export function ReadingHistory() {
-    const { state } = useAuth();
+    const { signed } = useAuth();
     const { history } = useHistory();
-    if (state !== 'signed') {
+    if (!signed) {
         return <SignInPanel />;
     } else if (!history.length) {
         return <EmptyHistory />;

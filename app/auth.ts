@@ -4,19 +4,22 @@ import gql from 'graphql-tag';
 import { syncStorageCell } from "plat";
 import { facebookSdk } from "./facebookSdk";
 
-const storage = syncStorageCell<AuthData>('user');
+const storage = syncStorageCell<AuthData>('user-data');
 
 type AuthData = {
+    id: string | null,
     name: string | null,
     pictureUrl: string | null,
     provider: string | null,
 };
 const AuthStateQuery = gql`query AuthState {
+    id @client
     name @client
     pictureUrl @client
     provider @client
 }`;
 export const initialAuthData: AuthData = storage.restore() ?? {
+    id: null,
     name: null,
     pictureUrl: null,
     provider: null,
@@ -25,14 +28,14 @@ export type Auth = ReturnType<typeof useAuth>;
 export function useAuth() {
     const { data } = useQuery<AuthData>(AuthStateQuery);
 
-    const { name, pictureUrl, provider } = (data ?? initialAuthData);
+    const { id, name, pictureUrl, provider } = (data ?? initialAuthData);
     if (name) {
         return {
-            state: 'signed',
-            name, pictureUrl, provider,
+            signed: true,
+            id, name, pictureUrl, provider,
         } as const;
     } else {
-        return { state: 'not-signed', provider } as const;
+        return { signed: false } as const;
     }
 }
 
@@ -43,7 +46,8 @@ export function useSignInOptions() {
         async signWithFacebook() {
             client.writeData<AuthData>({
                 data: {
-                    provider: 'facebook', name: null, pictureUrl: null,
+                    provider: 'facebook',
+                    id: null, name: null, pictureUrl: null,
                 },
             });
             const status = await facebookSdk()?.login();
@@ -68,7 +72,7 @@ async function signOut(client: ApolloClient<unknown>) {
     if (result?.data?.logout) {
         client.writeData<AuthData>({
             data: {
-                provider: null, name: null, pictureUrl: null,
+                provider: null, id: null, name: null, pictureUrl: null,
             },
         });
         await facebookSdk()?.logout();
@@ -82,6 +86,7 @@ async function signIn(client: ApolloClient<unknown>, token: string, provider: st
         auth: {
             token: string,
             user: {
+                id: string,
                 name: string,
                 pictureUrl: string | null,
             },
@@ -91,6 +96,7 @@ async function signIn(client: ApolloClient<unknown>, token: string, provider: st
             auth(token: $token, provider: $provider) {
                 token
                 user {
+                    id
                     name
                     pictureUrl
                 }
@@ -102,12 +108,14 @@ async function signIn(client: ApolloClient<unknown>, token: string, provider: st
         const data: AuthData = auth
             ? {
                 provider,
+                id: auth.user.id,
                 name: auth.user.name,
                 pictureUrl: auth.user.pictureUrl,
             }
             : initialAuthData;
         storage.store({
             provider,
+            id: data.id,
             name: data.name,
             pictureUrl: data.pictureUrl,
         });

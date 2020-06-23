@@ -40,7 +40,7 @@ export function SignIn({ singleton }: {
 
 function SingInButton() {
     const state = useAuth();
-    if (state.state === 'signed') {
+    if (state.signed) {
         return <ProfileBadge
             name={state.name}
             picture={state.pictureUrl ?? undefined}
@@ -55,15 +55,12 @@ function SingInButton() {
 
 function SignInPanel() {
     const state = useAuth();
-    switch (state.state) {
-        case 'signed':
-            return <Signed
-                name={state.name}
-            />;
-        case 'not-signed':
-            return <NotSigned />;
-        default:
-            return null;
+    if (state.signed) {
+        return <Signed
+            name={state.name}
+        />;
+    } else {
+        return <NotSigned />;
     }
 }
 
