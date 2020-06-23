@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { useToc, useHighlights, useAuth } from 'app';
+import { useToc, useHighlights, useAuth, UserData } from 'app';
 import { IconButton } from 'controls/Buttons';
 import { meter, vars, boldWeight, isSmallScreen, smallScreenWidth } from 'controls/theme';
 import { useFilterPanel } from 'controls/FilterPanel';
@@ -32,7 +32,7 @@ function Navigation({ booqId, closeSelf }: {
     booqId: string,
     closeSelf: () => void,
 }) {
-    const { id } = useAuth() ?? {};
+    const self = useAuth();
     const { toc, title } = useToc(booqId);
     const { highlights } = useHighlights(booqId);
     const { filter, FilterNode } = useFilterPanel({
@@ -64,7 +64,7 @@ function Navigation({ booqId, closeSelf }: {
                                 <div className='item' onClick={closeSelf}>
                                     <NavigationNodeComp
                                         booqId={booqId}
-                                        selfId={id ?? 'why'}
+                                        self={self}
                                         node={node}
                                     />
                                 </div>
@@ -125,9 +125,9 @@ function Navigation({ booqId, closeSelf }: {
     ]);
 }
 
-function NavigationNodeComp({ booqId, selfId, node }: {
+function NavigationNodeComp({ booqId, self, node }: {
     booqId: string,
-    selfId: string | undefined,
+    self: UserData | undefined,
     node: NavigationNode,
 }) {
     switch (node.kind) {
@@ -139,13 +139,13 @@ function NavigationNodeComp({ booqId, selfId, node }: {
         case 'highlight':
             return <HighlightNodeComp
                 booqId={booqId}
-                selfId={selfId}
+                self={self}
                 highlight={node.highlight}
             />;
         case 'highlights':
             return <PathHighlightsNodeComp
                 booqId={booqId}
-                selfId={selfId}
+                self={self}
                 node={node}
             />;
         default:

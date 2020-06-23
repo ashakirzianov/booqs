@@ -3,13 +3,13 @@ import { useRouter } from 'next/router';
 import * as clipboard from 'clipboard-polyfill';
 import { BooqRange } from 'core';
 import {
-    useHighlightMutations, Highlight, colorForGroup, groups,
+    useHighlightMutations, Highlight, colorForGroup, groups, UserData,
 } from 'app';
 import { MenuItem } from 'controls/Menu';
 import { useDocumentEvent } from 'controls/utils';
 import { quoteRef } from 'controls/Links';
 import { BooqSelection } from './BooqContent';
-import { meter, vars, menuFont, boldWeight } from 'controls/theme';
+import { meter, menuFont, boldWeight } from 'controls/theme';
 import { ProfileBadge } from 'controls/ProfilePicture';
 
 type EmptyTarget = {
@@ -35,7 +35,7 @@ export function ContextMenuContent({
 }: {
     target: ContextMenuTarget,
     booqId: string,
-    selfId: string | undefined,
+    self: UserData | undefined,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
     switch (target.kind) {
@@ -55,7 +55,7 @@ function SelectionTargetMenu({
 }: {
     target: SelectionTarget,
     booqId: string,
-    selfId: string | undefined,
+    self: UserData | undefined,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
     useCopyQuote(rest.booqId, selection);
@@ -71,7 +71,7 @@ function QuoteTargetMenu({
 }: {
     target: QuoteTarget,
     booqId: string,
-    selfId: string | undefined,
+    self: UserData | undefined,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
     return <>
@@ -81,14 +81,14 @@ function QuoteTargetMenu({
 }
 
 function HighlightTargetMenu({
-    target: { highlight }, selfId, ...rest
+    target: { highlight }, self, ...rest
 }: {
     target: HighlightTarget,
     booqId: string,
-    selfId: string | undefined,
+    self: UserData | undefined,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
-    const isOwnHighlight = selfId === highlight.author.id;
+    const isOwnHighlight = self?.id === highlight.author.id;
     const selection = {
         range: {
             start: highlight.start,
@@ -159,15 +159,15 @@ function AuthorItem({ name, pictureUrl }: {
 }
 
 function AddHighlightItem({
-    selection, booqId, selfId, setTarget,
+    selection, booqId, self, setTarget,
 }: {
     selection: BooqSelection,
     booqId: string,
-    selfId: string | undefined,
+    self: UserData | undefined,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
     const { addHighlight } = useHighlightMutations(booqId);
-    if (!selfId) {
+    if (!self?.id) {
         return null;
     }
     return <div className='container'>
@@ -183,7 +183,7 @@ function AddHighlightItem({
                             start: selection.range.start,
                             end: selection.range.end ?? selection.range.start,
                             text: selection.text,
-                            authorId: selfId,
+                            author: self,
                         });
                         setTarget({
                             kind: 'highlight',

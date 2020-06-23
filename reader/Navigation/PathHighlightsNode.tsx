@@ -1,15 +1,15 @@
-import { TocItem } from 'app';
+import { TocItem, UserData } from 'app';
 import { BooqLink } from 'controls/Links';
 import { meter, boldWeight } from 'controls/theme';
 import { PathHighlightsNode } from './model';
 import { HighlightNodeComp } from './HighlightNode';
 
 export function PathHighlightsNodeComp({
-    booqId, selfId,
+    booqId, self,
     node: { items, highlights },
 }: {
     booqId: string,
-    selfId: string | undefined,
+    self: UserData | undefined,
     node: PathHighlightsNode,
 }) {
     return <div>
@@ -20,7 +20,7 @@ export function PathHighlightsNodeComp({
                     <div key={idx} className='highlight'>
                         <HighlightNodeComp
                             booqId={booqId}
-                            selfId={selfId}
+                            self={self}
                             highlight={hl}
                         />
                     </div>

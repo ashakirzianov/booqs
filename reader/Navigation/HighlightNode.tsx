@@ -1,4 +1,4 @@
-import { Highlight, colorForGroup } from "app";
+import { Highlight, colorForGroup, UserData } from "app";
 import { isSmallScreen, meter, vars, boldWeight } from "controls/theme";
 import { BooqLink } from "controls/Links";
 import { Overlay } from "controls/Popover";
@@ -6,9 +6,9 @@ import { Icon } from "controls/Icon";
 import { ContextMenuContent } from "reader/ContextMenuContent";
 import { ProfileBadge } from "controls/ProfilePicture";
 
-export function HighlightNodeComp({ booqId, highlight, selfId }: {
+export function HighlightNodeComp({ booqId, highlight, self }: {
     booqId: string,
-    selfId: string | undefined,
+    self: UserData | undefined,
     highlight: Highlight,
 }) {
     const smallScreen = isSmallScreen();
@@ -28,6 +28,7 @@ export function HighlightNodeComp({ booqId, highlight, selfId }: {
                 content={<div className='menu'>
                     <ContextMenuContent
                         booqId={booqId}
+                        self={self}
                         setTarget={() => undefined}
                         target={{
                             kind: 'highlight',
@@ -62,7 +63,7 @@ export function HighlightNodeComp({ booqId, highlight, selfId }: {
                 text-align: justify;
             }
             .badge {
-                display: ${selfId === highlight.author.id ? 'none' : 'flex'};
+                display: ${self?.id === highlight.author.id ? 'none' : 'flex'};
                 margin-top: ${meter.regular};
             }
             .side {

@@ -1,6 +1,7 @@
 import gql from "graphql-tag";
 import { useQuery, useMutation } from "@apollo/react-hooks";
 import { BooqPath, uniqueId } from "core";
+import { UserData } from "./auth";
 
 const HighlightsQuery = gql`query HighlightsQuery($booqId: ID!) {
     booq(id: $booqId) {
@@ -92,7 +93,7 @@ export function useHighlightMutations(booqId: string) {
             end: BooqPath,
             group: string,
             text: string,
-            authorId: string,
+            author: UserData,
         }): Highlight {
             const highlight = {
                 booqId,
@@ -101,6 +102,17 @@ export function useHighlightMutations(booqId: string) {
                 end: input.end,
                 group: input.group,
             };
+            const created = {
+                ...input,
+                __typename: 'BooqHighlight',
+                id: highlight.id,
+                position: null,
+                author: {
+                    id: input.author.id,
+                    name: input.author.name,
+                    pictureUrl: input.author.pictureUrl,
+                },
+            } as const;
             add({
                 variables: { highlight },
                 optimisticResponse: { addHighlight: true },
@@ -111,17 +123,7 @@ export function useHighlightMutations(booqId: string) {
                             variables: { booqId },
                         });
                         if (cached) {
-                            cached.booq.highlights.unshift({
-                                ...input,
-                                __typename: 'BooqHighlight',
-                                id: highlight.id,
-                                position: null,
-                                author: {
-                                    id: input.authorId,
-                                    name: '',
-                                    pictureUrl: null,
-                                },
-                            });
+                            cached.booq.highlights.unshift(created);
                             cache.writeQuery({
                                 query: HighlightsQuery,
                                 variables: { booqId },
@@ -131,17 +133,7 @@ export function useHighlightMutations(booqId: string) {
                     }
                 },
             });
-            return {
-                ...highlight,
-                text: input.text,
-                __typename: 'BooqHighlight',
-                position: null,
-                author: {
-                    id: input.authorId,
-                    name: '',
-                    pictureUrl: null,
-                },
-            };
+            return created;
         },
         removeHighlight(id: string) {
             remove({
