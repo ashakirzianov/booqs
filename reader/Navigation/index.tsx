@@ -45,30 +45,31 @@ function Navigation({ booqId, closeSelf }: {
     return useMemo(() => {
         return <div className='safe-area'>
             <div className='container'>
-
-                <div className='header'>
-                    <div className='label'>CONTENTS</div>
-                    <div className='filter'>
-                        <NavigationFilter
-                            self={self}
-                            authors={exceptSelf}
-                        />
+                <div className='scrollable'>
+                    <div className='header'>
+                        <div className='label'>CONTENTS</div>
+                        <div className='filter'>
+                            <NavigationFilter
+                                self={self}
+                                authors={exceptSelf}
+                            />
+                        </div>
                     </div>
-                </div>
-                <div className='items'>
-                    {
-                        nodes.map(
-                            (node, idx) => <div key={idx}>
-                                <div className='item' onClick={closeSelf}>
-                                    <NavigationNodeComp
-                                        booqId={booqId}
-                                        self={self}
-                                        node={node}
-                                    />
+                    <div className='items'>
+                        {
+                            nodes.map(
+                                (node, idx) => <div key={idx}>
+                                    <div className='item' onClick={closeSelf}>
+                                        <NavigationNodeComp
+                                            booqId={booqId}
+                                            self={self}
+                                            node={node}
+                                        />
+                                    </div>
                                 </div>
-                            </div>
-                        )
-                    }
+                            )
+                        }
+                    </div>
                 </div>
             </div>
             <style jsx>{`
@@ -85,20 +86,26 @@ function Navigation({ booqId, closeSelf }: {
                 font-size: 0.9rem;
                 max-height: 100%;
             }
+            .scrollable {
+                display: flex;
+                flex-flow: column;
+                flex: 1;
+                overflow: auto;
+                margin-top: ${meter.large};
+            }
             .header {
                 display: flex;
                 flex-flow: column;
-                font-weight: ${boldWeight};
             }
             .label {
                 align-self: center;
                 letter-spacing: 0.1em;
+                font-weight: ${boldWeight};
             }
             .items {
                 display: flex;
                 flex-flow: column;
                 flex: 1 1;
-                overflow: auto;
             }
             .item {
                 padding: ${meter.regular} 0;

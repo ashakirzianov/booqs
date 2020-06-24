@@ -1,7 +1,7 @@
 import { ReactNode } from 'react';
 import { UserData } from "app";
 import { ProfileBadge } from 'controls/ProfilePicture';
-import { meter } from 'controls/theme';
+import { meter, boldWeight } from 'controls/theme';
 
 export function NavigationFilter({ authors }: {
     self: UserData | undefined,
@@ -58,6 +58,9 @@ function FilterButton({ text, Badge }: {
             }
             .badge {
                 margin-right: ${meter.regular};
+            }
+            .text {
+                font-weight: ${boldWeight};
             }
             `}</style>
     </div>;
