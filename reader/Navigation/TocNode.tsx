@@ -1,7 +1,6 @@
-import { pageForPosition } from "app";
+import { pageForPosition, TocNode } from "app";
 import { BooqLink } from "controls/Links";
 import { boldWeight, vars, meter } from "controls/theme";
-import { TocNode } from "./model";
 
 
 export function TocNodeComp({

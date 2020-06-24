@@ -1,5 +1,8 @@
-import { TocItem, Highlight } from "app";
+import { groupBy } from "lodash";
 import { pathInRange } from "core";
+import {
+    TocItem, Highlight, useToc, useHighlights, UserData,
+} from "app";
 
 export type TocNode = {
     kind: 'toc',
@@ -16,7 +19,21 @@ export type PathHighlightsNode = {
 }
 export type NavigationNode = TocNode | HighlightNode | PathHighlightsNode;
 
-export function buildNodes({ toc, filter, highlights, title }: {
+export function useNavigationNodes(booqId: string) {
+    const { toc, title } = useToc(booqId);
+    const { highlights } = useHighlights(booqId);
+    const authors = highlightsAuthors(highlights);
+    const nodes = buildNodes({
+        filter: 'highlights',
+        title, toc, highlights,
+    });
+    return {
+        nodes,
+        authors,
+    };
+}
+
+function buildNodes({ toc, filter, highlights, title }: {
     title?: string,
     filter: string,
     toc: TocItem[],
@@ -65,4 +82,15 @@ export function buildNodes({ toc, filter, highlights, title }: {
         prev = next;
     }
     return nodes;
+}
+
+function highlightsAuthors(highlights: Highlight[]): UserData[] {
+    const grouped = groupBy(highlights, h => h.author.id);
+    return Object.entries(grouped).map(
+        ([_, [{ author }]]) => ({
+            id: author.id,
+            name: author.name,
+            pictureUrl: author.pictureUrl ?? undefined,
+        })
+    );
 }

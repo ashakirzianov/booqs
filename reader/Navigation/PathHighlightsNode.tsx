@@ -1,7 +1,6 @@
-import { TocItem, UserData } from 'app';
+import { TocItem, UserData, PathHighlightsNode } from 'app';
 import { BooqLink } from 'controls/Links';
 import { meter, boldWeight } from 'controls/theme';
-import { PathHighlightsNode } from './model';
 import { HighlightNodeComp } from './HighlightNode';
 
 export function PathHighlightsNodeComp({

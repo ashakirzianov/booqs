@@ -1,13 +1,15 @@
 import React, { useState, useMemo } from 'react';
-import { useToc, useHighlights, useAuth, UserData, Highlight } from 'app';
+import {
+    useAuth, UserData, useNavigationNodes, NavigationNode,
+} from 'app';
+import {
+    meter, vars, boldWeight, isSmallScreen, smallScreenWidth,
+} from 'controls/theme';
 import { IconButton } from 'controls/Buttons';
-import { meter, vars, boldWeight, isSmallScreen, smallScreenWidth } from 'controls/theme';
-import { buildNodes, NavigationNode } from './model';
 import { TocNodeComp } from './TocNode';
 import { HighlightNodeComp } from './HighlightNode';
 import { PathHighlightsNodeComp } from './PathHighlightsNode';
 import { NavigationFilter } from './Filter';
-import { groupBy } from 'lodash';
 
 export function useNavigationPanel(booqId: string) {
     const [navigationOpen, setOpen] = useState(false);
@@ -34,14 +36,8 @@ function Navigation({ booqId, closeSelf }: {
     closeSelf: () => void,
 }) {
     const self = useAuth();
-    const { toc, title } = useToc(booqId);
-    const { highlights } = useHighlights(booqId);
-    const allAuthors = highlightsAuthors(highlights);
-    const exceptSelf = allAuthors.filter(a => a.id !== self?.id);
-    const nodes = useMemo(() => buildNodes({
-        filter: 'highlights',
-        title, toc, highlights,
-    }), [title, toc, highlights]);
+    const { nodes, authors } = useNavigationNodes(booqId);
+    const exceptSelf = authors.filter(a => a.id !== self?.id);
     return useMemo(() => {
         return <div className='safe-area'>
             <div className='container'>
@@ -159,12 +155,4 @@ function NavigationNodeComp({ booqId, self, node }: {
         default:
             return null;
     }
-}
-
-function highlightsAuthors(highlights: Highlight[]): UserData[] {
-    const grouped = groupBy(highlights, h => h.author.id);
-    const authors = Object.entries(grouped).map(
-        ([_, [first]]) => first.author
-    );
-    return authors;
 }
