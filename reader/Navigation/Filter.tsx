@@ -19,7 +19,7 @@ export function NavigationFilter({ authors }: {
                     <FilterButton
                         text={first}
                         Badge={<ProfileBadge
-                            size={16}
+                            size={1}
                             border={false}
                             name={author.name}
                             picture={author.pictureUrl ?? undefined}

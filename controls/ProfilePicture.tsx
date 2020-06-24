@@ -37,8 +37,8 @@ function ProfilePicture({ picture, size, border }: {
                 flex-shrink: 0;
                 border-radius: 50%;
                 border: ${border ? `1.5px solid var(${vars.dimmed})` : 'none'};
-                width: ${size}px;
-                height: ${size}px;
+                width: ${size}rem;
+                height: ${size}rem;
                 overflow: hidden;
                 background-image: url(${picture});
                 background-size: cover;
@@ -69,12 +69,12 @@ function ProfilePicturePlaceholder({ letter, size, border }: {
                 flex-shrink: 0;
                 border-radius: 50%;
                 border: ${border ? `1.5px solid var(${vars.dimmed})` : 'none'};
-                width: ${size}px;
-                height: ${size}px;
+                width: ${size}rem;
+                height: ${size}rem;
                 overflow: hidden;
                 background: var(${vars.background});
                 color: var(${vars.dimmed});
-                font-size: ${size / 2}px;
+                font-size: ${size / 2}rem;
                 font-weight: ${boldWeight};
                 transition: 250ms color, 250ms border;
             }

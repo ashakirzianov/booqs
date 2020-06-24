@@ -48,7 +48,7 @@ function SingInButton() {
                 ? <ProfileBadge
                     name={state.name}
                     picture={state.pictureUrl ?? undefined}
-                    size={36}
+                    size={2}
                     border={true}
                 />
                 : <IconButton

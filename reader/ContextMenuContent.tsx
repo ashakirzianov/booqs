@@ -124,7 +124,7 @@ function AuthorItem({ name, pictureUrl }: {
                 ? <div className="picture">
                     <ProfileBadge
                         border={false}
-                        size={24}
+                        size={1.5}
                         name={name}
                         picture={pictureUrl}
                     />
