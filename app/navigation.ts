@@ -1,8 +1,11 @@
+import { atom, useRecoilValue, useRecoilState } from "recoil";
 import { groupBy } from "lodash";
 import { pathInRange } from "core";
 import {
     TocItem, Highlight, useToc, useHighlights, UserData,
 } from "app";
+import { syncStorageCell } from "plat";
+import { useAuth } from "./auth";
 
 export type TocNode = {
     kind: 'toc',
@@ -20,18 +23,73 @@ export type PathHighlightsNode = {
 export type NavigationNode = TocNode | HighlightNode | PathHighlightsNode;
 
 export function useNavigationNodes(booqId: string) {
+    const { showChapters, showHighlights, showAuthors } = useRecoilValue(navigationState);
+    const self = useAuth();
     const { toc, title } = useToc(booqId);
     const { highlights } = useHighlights(booqId);
     const authors = highlightsAuthors(highlights);
+
+    const filteredHighlights = highlights.filter(
+        h => h.id === self?.id
+            || showAuthors.some(authorId => h.id === authorId)
+    );
+
+    const filter = showChapters
+        ? (showHighlights ? 'all' : 'chapters')
+        : (showHighlights ? 'highlights' : 'none');
     const nodes = buildNodes({
-        filter: 'highlights',
-        title, toc, highlights,
+        filter, title, toc,
+        highlights: filteredHighlights,
     });
+
     return {
         nodes,
         authors,
     };
 }
+
+export function useNavigationState() {
+    const [{ showChapters, showHighlights, showAuthors }, setter] = useRecoilState(navigationState);
+    return {
+        showChapters, showHighlights, showAuthors,
+        toggleChapters() {
+            setter(prev => ({
+                ...prev, showChapters: !prev.showChapters,
+            }));
+        },
+        toggleHighlights() {
+            setter(prev => ({
+                ...prev, showHighlights: !prev.showHighlights,
+            }));
+        },
+        toggleAuthor(authorId: string) {
+            setter(prev => ({
+                ...prev,
+                showAuthors: prev.showAuthors.some(id => id === authorId)
+                    ? prev.showAuthors.filter(id => id !== authorId)
+                    : [authorId, ...prev.showAuthors],
+            }));
+        },
+    }
+}
+
+type NavigationState = {
+    showChapters: boolean,
+    showHighlights: boolean,
+    showAuthors: string[],
+};
+const key = 'navigation';
+const storage = syncStorageCell<NavigationState>(key);
+const defaultState: NavigationState = {
+    showChapters: true,
+    showHighlights: true,
+    showAuthors: [],
+};
+storage.store(defaultState);
+const navigationState = atom({
+    key,
+    default: defaultState,
+});
 
 function buildNodes({ toc, filter, highlights, title }: {
     title?: string,
