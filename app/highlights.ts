@@ -110,7 +110,7 @@ export function useHighlightMutations(booqId: string) {
                 author: {
                     id: input.author.id,
                     name: input.author.name,
-                    pictureUrl: input.author.pictureUrl,
+                    pictureUrl: input.author.pictureUrl ?? null,
                 },
             } as const;
             add({

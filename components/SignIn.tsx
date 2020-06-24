@@ -1,6 +1,6 @@
 import React from "react";
 import { useSignInOptions, useAuth } from 'app';
-import { meter, vars } from "controls/theme";
+import { meter } from "controls/theme";
 import { Menu, MenuItem } from "controls/Menu";
 import { IconButton, BorderButton } from "controls/Buttons";
 import { PopoverSingleton, Popover } from "controls/Popover";
@@ -16,14 +16,13 @@ export function FacebookSignButton() {
 }
 
 export function SignInMenu() {
-    const { provider } = useAuth() ?? {};
     const { signWithFacebook } = useSignInOptions();
     return <Menu>
         <MenuItem
             icon="facebook"
             text="Facebook"
             callback={signWithFacebook}
-            spinner={provider === 'facebook'}
+            spinner={false}
         />
     </Menu>;
 }
@@ -72,7 +71,6 @@ function SignInPanel() {
 function Signed({ name }: {
     name: string,
 }) {
-    const { provider } = useAuth() ?? {};
     const { signOut } = useSignInOptions();
     return <div>
         <span>{name}</span>
@@ -81,7 +79,7 @@ function Signed({ name }: {
                 icon='sign-out'
                 text='Sing Out'
                 callback={signOut}
-                spinner={!provider}
+                spinner={false}
             />
         </Menu>
         <style jsx>{`

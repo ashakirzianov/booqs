@@ -30,7 +30,8 @@
     "graphql-tag": "^2.10.3",
     "next": "^9.4.4",
     "react": "16.13.1",
-    "react-dom": "16.13.1"
+    "react-dom": "16.13.1",
+    "recoil": "0.0.10"
   },
   "devDependencies": {
     "@types/apollo-upload-client": "^8.1.3",

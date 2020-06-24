@@ -1,5 +1,4 @@
-import { useQuery, useApolloClient } from "@apollo/react-hooks";
-import gql from 'graphql-tag';
+import { atom, useRecoilValue, useSetRecoilState } from 'recoil';
 import { syncStorageCell } from "plat";
 
 type Palette = {
@@ -13,31 +12,28 @@ type Palette = {
 type Palettes = {
     [key in PaletteName]: Palette;
 };
-
-const SettingsQuery = gql`query SettingsQuery {
-    paletteName @client
-    fontScale @client
-}`;
 type SettingsData = {
     paletteName: PaletteName,
     fontScale: number,
 };
-const storage = syncStorageCell<SettingsData>('settings');
-export const initialSettingsData: SettingsData = storage.restore() ?? {
+const key = 'settings';
+const storage = syncStorageCell<SettingsData>(key);
+const initialSettingsData: SettingsData = storage.restore() ?? {
     paletteName: 'light',
     fontScale: 100,
 };
 storage.store(initialSettingsData);
+const settingsState = atom({
+    key,
+    default: initialSettingsData,
+});
 
 export function usePalette() {
     return useSettings().palette;
 }
 
 export function useSettings() {
-    const { data } = useQuery<SettingsData>(SettingsQuery);
-    const {
-        paletteName, fontScale,
-    } = data ?? initialSettingsData;
+    const { paletteName, fontScale } = useRecoilValue(settingsState);
     const palette = palettes[paletteName] ?? palettes.light;
     return {
         palette,
@@ -46,20 +42,28 @@ export function useSettings() {
     };
 }
 export function useSetSettings() {
-    const client = useApolloClient();
+    const setter = useSetRecoilState(settingsState);
     return {
         setPalette(paletteName: PaletteName) {
-            client.writeData<Partial<SettingsData>>({
-                data: { paletteName },
+            setter(curr => {
+                const next = {
+                    ...curr,
+                    paletteName,
+                };
+                storage.store(next);
+                return next;
             });
-            storage.update({ paletteName });
         },
         setFontScale(fontScale: number) {
-            fontScale = Math.max(10, fontScale);
-            client.writeData<Partial<SettingsData>>({
-                data: { fontScale },
+            setter(curr => {
+                fontScale = Math.max(10, fontScale);
+                const next = {
+                    ...curr,
+                    fontScale,
+                };
+                storage.store(next);
+                return next;
             });
-            storage.update({ fontScale });
         },
     };
 }
