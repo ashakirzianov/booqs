@@ -27,8 +27,7 @@ export const initialAuthData: AuthData = storage.restore() ?? {
 export type UserData = {
     id: string,
     name: string,
-    provider: string,
-    pictureUrl: string | null,
+    pictureUrl: string | null, // TODO: string | undefined
 };
 export function useAuth() {
     const { data } = useQuery<AuthData>(AuthStateQuery);

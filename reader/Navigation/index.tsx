@@ -1,12 +1,13 @@
 import React, { useState, useMemo } from 'react';
-import { useToc, useHighlights, useAuth, UserData } from 'app';
+import { useToc, useHighlights, useAuth, UserData, Highlight } from 'app';
 import { IconButton } from 'controls/Buttons';
 import { meter, vars, boldWeight, isSmallScreen, smallScreenWidth } from 'controls/theme';
-import { useFilterPanel } from 'controls/FilterPanel';
 import { buildNodes, NavigationNode } from './model';
 import { TocNodeComp } from './TocNode';
 import { HighlightNodeComp } from './HighlightNode';
 import { PathHighlightsNodeComp } from './PathHighlightsNode';
+import { NavigationFilter } from './Filter';
+import { groupBy } from 'lodash';
 
 export function useNavigationPanel(booqId: string) {
     const [navigationOpen, setOpen] = useState(false);
@@ -35,18 +36,12 @@ function Navigation({ booqId, closeSelf }: {
     const self = useAuth();
     const { toc, title } = useToc(booqId);
     const { highlights } = useHighlights(booqId);
-    const { filter, FilterNode } = useFilterPanel({
-        items: [
-            { text: 'All', value: 'all' },
-            { text: 'Highlights', value: 'highlights' },
-            { text: 'Chapters', value: 'contents' },
-        ],
-        initial: 'all',
-    });
+    const allAuthors = highlightsAuthors(highlights);
+    const exceptSelf = allAuthors.filter(a => a.id !== self?.id);
     const nodes = useMemo(() => buildNodes({
-        filter,
+        filter: 'highlights',
         title, toc, highlights,
-    }), [filter, title, toc, highlights]);
+    }), [title, toc, highlights]);
     return useMemo(() => {
         return <div className='safe-area'>
             <div className='container'>
@@ -54,7 +49,10 @@ function Navigation({ booqId, closeSelf }: {
                 <div className='header'>
                     <div className='label'>CONTENTS</div>
                     <div className='filter'>
-                        {FilterNode}
+                        <NavigationFilter
+                            self={self}
+                            authors={exceptSelf}
+                        />
                     </div>
                 </div>
                 <div className='items'>
@@ -121,7 +119,7 @@ function Navigation({ booqId, closeSelf }: {
             `}</style>
         </div>;
     }, [
-        filter, nodes,
+        nodes,
     ]);
 }
 
@@ -151,4 +149,12 @@ function NavigationNodeComp({ booqId, self, node }: {
         default:
             return null;
     }
+}
+
+function highlightsAuthors(highlights: Highlight[]): UserData[] {
+    const grouped = groupBy(highlights, h => h.author.id);
+    const authors = Object.entries(grouped).map(
+        ([_, [first]]) => first.author
+    );
+    return authors;
 }
