@@ -37,11 +37,11 @@ export function HighlightNodeComp({ booqId, highlight, self }: {
                     />
                 </div>}
             />
-            <div className='badge'>
+            <div className='badge' title={highlight.author.name}>
                 <ProfileBadge
                     size={1}
                     name={highlight.author.name}
-                    picture={highlight.author.pictureUrl ?? undefined}
+                    picture={undefined}
                     border={false}
                 />
             </div>
