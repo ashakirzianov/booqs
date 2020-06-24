@@ -42,10 +42,9 @@ function Path({ items, booqId }: {
         {
             items.map((item, idx) => !item ? null
                 : <>
-                    {idx === 0 ? null : <div className='separator'>/</div>}
-                    <div className='element'>
+                    {idx === 0 ? null : <div key='separator' className='separator'>/</div>}
+                    <div key={idx} className='element'>
                         <BooqLink booqId={booqId} path={item.path}>
-
                             {item.title}
                         </BooqLink>
                     </div>
