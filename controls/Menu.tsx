@@ -28,8 +28,9 @@ export function MenuItem({ icon, text, callback, spinner }: {
 }) {
     return <div
         className='container'
-        // Note: Patch: safari change selection before onClick
-        onMouseDown={callback}
+        // Note: prevent loosing selection on safari
+        onMouseDown={e => e.preventDefault()}
+        onClick={callback}
     >
         {
             icon

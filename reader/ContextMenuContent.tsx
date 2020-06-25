@@ -276,7 +276,10 @@ function GroupSelectionButton({ color, selected, callback }: {
     color: string,
     callback: () => void,
 }) {
-    return <div onClick={callback} className='button'>
+    return <div
+        // Note: prevent loosing selection on safari
+        onMouseDown={e => e.preventDefault()}
+        onClick={callback} className='button'>
         <style jsx>{`
             .button {
                 display: flex;
