@@ -70,22 +70,30 @@ export function useNavigationState() {
     return {
         showChapters, showHighlights, showAuthors,
         toggleChapters() {
-            setter(prev => ({
-                ...prev, showChapters: !prev.showChapters,
-            }));
+            setter(prev => {
+                const next = { ...prev, showChapters: !prev.showChapters };
+                storage.store(next);
+                return next;
+            });
         },
         toggleHighlights() {
-            setter(prev => ({
-                ...prev, showHighlights: !prev.showHighlights,
-            }));
+            setter(prev => {
+                const next = { ...prev, showHighlights: !prev.showHighlights };
+                storage.store(next);
+                return next;
+            });
         },
         toggleAuthor(authorId: string) {
-            setter(prev => ({
-                ...prev,
-                showAuthors: prev.showAuthors.some(id => id === authorId)
-                    ? prev.showAuthors.filter(id => id !== authorId)
-                    : [authorId, ...prev.showAuthors],
-            }));
+            setter(prev => {
+                const next = {
+                    ...prev,
+                    showAuthors: prev.showAuthors.some(id => id === authorId)
+                        ? prev.showAuthors.filter(id => id !== authorId)
+                        : [authorId, ...prev.showAuthors],
+                };
+                storage.store(next);
+                return next;
+            });
         },
     }
 }
@@ -97,7 +105,7 @@ type NavigationState = {
 };
 const key = 'navigation';
 const storage = syncStorageCell<NavigationState>(key);
-const defaultState: NavigationState = {
+const defaultState: NavigationState = storage.restore() ?? {
     showChapters: true,
     showHighlights: true,
     showAuthors: [],
