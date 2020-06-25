@@ -50,6 +50,21 @@ export function useNavigationNodes(booqId: string) {
     };
 }
 
+export function useFilteredHighlights(booqId: string) {
+    const { showHighlights, showAuthors } = useRecoilValue(navigationState);
+    const self = useAuth();
+    const { highlights } = useHighlights(booqId);
+
+    const allAuthors = showHighlights && self?.id
+        ? [self.id, ...showAuthors]
+        : showAuthors;
+    const filteredHighlights = highlights.filter(
+        h => allAuthors.some(authorId => h.author.id === authorId)
+    );
+
+    return filteredHighlights;
+}
+
 export function useNavigationState() {
     const [{ showChapters, showHighlights, showAuthors }, setter] = useRecoilState(navigationState);
     return {

@@ -2,7 +2,7 @@ import React, { useState, useCallback, useMemo } from 'react';
 import { positionForPath, samePath, BooqPath, BooqRange } from 'core';
 import {
     BooqData, BooqAnchor, useSettings, useReportHistory,
-    useHighlights, colorForGroup, quoteColor, pageForPosition,
+    useFilteredHighlights, colorForGroup, quoteColor, pageForPosition,
 } from 'app';
 import { headerHeight, bookFont, vars, boldWeight } from 'controls/theme';
 import { BorderButton, IconButton } from 'controls/Buttons';
@@ -146,7 +146,7 @@ function isAnythingSelected() {
 }
 
 function useAugmentations(booqId: string, quote?: BooqRange) {
-    const { highlights } = useHighlights(booqId);
+    const highlights = useFilteredHighlights(booqId);
     const augmentations = useMemo(() => {
         const augmentations = highlights.map<Augmentation>(h => ({
             id: `highlight/${h.id}`,
