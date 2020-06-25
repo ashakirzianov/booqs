@@ -86,11 +86,8 @@ function Navigation({ booqId, closeSelf }: {
                 display: flex;
                 flex-flow: column;
                 flex: 1;
-                overflow: hidden;
-                margin-top: ${meter.large};
-            }
-            .scrollable:hover {
                 overflow: auto;
+                margin-top: ${meter.large};
             }
             .header {
                 display: flex;
