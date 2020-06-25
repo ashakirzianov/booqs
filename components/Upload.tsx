@@ -11,8 +11,7 @@ import { booqHref } from "controls/Links";
 export function Upload({ singleton }: {
     singleton?: PopoverSingleton,
 }) {
-    const auth = useAuth();
-    const isSigned = auth.state === 'signed';
+    const { signed } = useAuth() ?? {};
     const {
         body, buttons, clearFile,
     } = useModalDefinition();
@@ -46,14 +45,14 @@ export function Upload({ singleton }: {
                 <IconButton
                     icon='upload'
                     onClick={
-                        isSigned
+                        signed
                             ? openModal
                             : undefined
                     }
                 />
             </>}
             content={<Label text={
-                isSigned
+                signed
                     ? 'Click to select epub'
                     : 'Sign in to upload'
             } />}

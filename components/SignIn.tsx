@@ -1,9 +1,10 @@
 import React from "react";
 import { useSignInOptions, useAuth } from 'app';
-import { meter, vars } from "controls/theme";
+import { meter } from "controls/theme";
 import { Menu, MenuItem } from "controls/Menu";
 import { IconButton, BorderButton } from "controls/Buttons";
 import { PopoverSingleton, Popover } from "controls/Popover";
+import { ProfileBadge } from "controls/ProfilePicture";
 
 export function FacebookSignButton() {
     const { signWithFacebook } = useSignInOptions();
@@ -15,14 +16,13 @@ export function FacebookSignButton() {
 }
 
 export function SignInMenu() {
-    const { provider } = useAuth();
     const { signWithFacebook } = useSignInOptions();
     return <Menu>
         <MenuItem
             icon="facebook"
             text="Facebook"
             callback={signWithFacebook}
-            spinner={provider === 'facebook'}
+            spinner={false}
         />
     </Menu>;
 }
@@ -39,67 +39,38 @@ export function SignIn({ singleton }: {
 
 function SingInButton() {
     const state = useAuth();
-    if (state.state === 'signed') {
-        return state.profilePicture
-            ? <ProfilePictureButton
-                picture={state.profilePicture}
-            />
-            : <IconButton
-                icon='user'
-            />
-    } else {
-        return <IconButton
-            icon='sign-in'
-        />;
-    }
+    return <div style={{
+        cursor: 'pointer'
+    }}>
+        {
+            state?.signed
+                ? <ProfileBadge
+                    name={state.name}
+                    picture={state.pictureUrl ?? undefined}
+                    size={2}
+                    border={true}
+                />
+                : <IconButton
+                    icon='sign-in'
+                />
+        }
+    </div>;
 }
 
 function SignInPanel() {
     const state = useAuth();
-    switch (state.state) {
-        case 'signed':
-            return <Signed
-                name={state.name}
-            />;
-        case 'not-signed':
-            return <NotSigned />;
-        default:
-            return null;
+    if (state?.signed) {
+        return <Signed
+            name={state.name}
+        />;
+    } else {
+        return <NotSigned />;
     }
-}
-
-
-
-function ProfilePictureButton({ picture }: {
-    picture: string,
-}) {
-    return <div className='container'>
-        <style jsx>{`
-            .container {
-                font-size: x-large;
-                display: flex;
-                flex-shrink: 0;
-                border-radius: 50%;
-                border: 1px solid var(${vars.dimmed});
-                width: 36px;
-                height: 36px;
-                overflow: hidden;
-                background-image: url(${picture});
-                background-size: cover;
-                background-repeat: no-repeat;
-                cursor: pointer;
-            }
-            .container:hover {
-                border: 1px solid var(${vars.highlight});
-            }
-            `}</style>
-    </div>;
 }
 
 function Signed({ name }: {
     name: string,
 }) {
-    const { provider } = useAuth();
     const { signOut } = useSignInOptions();
     return <div>
         <span>{name}</span>
@@ -108,7 +79,7 @@ function Signed({ name }: {
                 icon='sign-out'
                 text='Sing Out'
                 callback={signOut}
-                spinner={!provider}
+                spinner={false}
             />
         </Menu>
         <style jsx>{`

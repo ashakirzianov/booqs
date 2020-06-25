@@ -5,8 +5,7 @@ import { InMemoryCache } from 'apollo-cache-inmemory';
 import { ApolloLink } from 'apollo-link';
 import { onError } from 'apollo-link-error';
 import { createUploadLink } from 'apollo-upload-client';
-import { initialSettingsData } from './settings';
-import { initialAuthData } from './auth';
+import { RecoilRoot } from 'recoil';
 
 const link = ApolloLink.from([
     onError(({ graphQLErrors, networkError }) => {
@@ -31,17 +30,6 @@ const client = new ApolloClient({
     resolvers: {},
 });
 
-const initialData = {
-    data: {
-        ...initialSettingsData,
-        ...initialAuthData,
-    },
-};
-client.writeData(initialData);
-client.onResetStore(async () => {
-    client.writeData(initialData);
-});
-
 export function AppProvider({ children }: {
     children: ReactNode,
 }) {
@@ -49,7 +37,11 @@ export function AppProvider({ children }: {
         ApolloProvider,
         {
             client,
-            children,
+            children: createElement(
+                RecoilRoot,
+                {},
+                children,
+            ),
         },
     );
 }

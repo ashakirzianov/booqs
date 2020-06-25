@@ -7,13 +7,16 @@ import {
 } from './BooqContent';
 import { ContextMenuContent, ContextMenuTarget } from './ContextMenuContent';
 import { throttle } from 'lodash';
+import { useAuth } from 'app';
 
 export function useContextMenu(booqId: string) {
     const { menuState, setMenuState } = useMenuState();
+    const self = useAuth();
     const ContextMenuNode = <ContextMenuLayout
         rect={menuState.rect}
         content={<ContextMenuContent
             booqId={booqId}
+            self={self}
             target={menuState.target}
             setTarget={target => setMenuState({
                 ...menuState,
@@ -171,6 +174,8 @@ function ContextMenuPopover({
     rect: AnchorRect,
 }) {
     return <Overlay
+        placement='bottom'
+        visible={true}
         content={<div id='ctxmenu' style={{
             width: '12rem',
             pointerEvents: 'auto',

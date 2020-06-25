@@ -1,7 +1,7 @@
 import React from 'react';
 import { Icon, IconName } from "./Icon";
 import {
-    buttonShadow, meter, radius, vars,
+    buttonShadow, meter, radius, vars, boldWeight,
 } from "./theme";
 import { Spinner } from './Spinner';
 
@@ -123,9 +123,11 @@ export function BorderButton({ text, icon, onClick }: {
                 color: var(${vars.dimmed});
                 border: 2px solid var(${vars.dimmed});
                 border-radius: ${radius};
+                font-weight: ${boldWeight};
                 text-decoration: none;
-                padding: ${meter.regular};
+                padding: ${meter.small} ${meter.regular};
                 cursor: pointer;
+                transition: 250ms border-color, 250ms color;
             }
             .button:hover {
                 color: var(${vars.highlight});

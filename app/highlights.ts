@@ -1,6 +1,7 @@
 import gql from "graphql-tag";
 import { useQuery, useMutation } from "@apollo/react-hooks";
-import { BooqPath, uuid } from "core";
+import { BooqPath, uniqueId } from "core";
+import { UserData } from "./auth";
 
 const HighlightsQuery = gql`query HighlightsQuery($booqId: ID!) {
     booq(id: $booqId) {
@@ -11,6 +12,12 @@ const HighlightsQuery = gql`query HighlightsQuery($booqId: ID!) {
             end
             group
             text
+            position
+            author {
+                id
+                name
+                pictureUrl
+            }
         }
     }
 }`;
@@ -24,6 +31,12 @@ type HighlightsData = {
             end: BooqPath,
             group: string,
             text: string,
+            position: number | null,
+            author: {
+                id: string,
+                name: string,
+                pictureUrl: string | null,
+            },
         }[],
     },
 };
@@ -80,14 +93,26 @@ export function useHighlightMutations(booqId: string) {
             end: BooqPath,
             group: string,
             text: string,
+            author: UserData,
         }): Highlight {
             const highlight = {
                 booqId,
-                id: uuid(),
+                id: uniqueId(),
                 start: input.start,
                 end: input.end,
                 group: input.group,
             };
+            const created = {
+                ...input,
+                __typename: 'BooqHighlight',
+                id: highlight.id,
+                position: null,
+                author: {
+                    id: input.author.id,
+                    name: input.author.name,
+                    pictureUrl: input.author.pictureUrl ?? null,
+                },
+            } as const;
             add({
                 variables: { highlight },
                 optimisticResponse: { addHighlight: true },
@@ -98,11 +123,7 @@ export function useHighlightMutations(booqId: string) {
                             variables: { booqId },
                         });
                         if (cached) {
-                            cached.booq.highlights.push({
-                                ...input,
-                                __typename: 'BooqHighlight',
-                                id: highlight.id,
-                            });
+                            cached.booq.highlights.unshift(created);
                             cache.writeQuery({
                                 query: HighlightsQuery,
                                 variables: { booqId },
@@ -112,11 +133,7 @@ export function useHighlightMutations(booqId: string) {
                     }
                 },
             });
-            return {
-                ...highlight,
-                text: input.text,
-                __typename: 'BooqHighlight',
-            };
+            return created;
         },
         removeHighlight(id: string) {
             remove({

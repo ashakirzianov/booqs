@@ -2,16 +2,18 @@ import React, { useState, useCallback, useMemo } from 'react';
 import { positionForPath, samePath, BooqPath, BooqRange } from 'core';
 import {
     BooqData, BooqAnchor, useSettings, useReportHistory,
-    useHighlights, colorForGroup, quoteColor, pageForPosition,
+    useFilteredHighlights, colorForGroup, quoteColor, pageForPosition,
 } from 'app';
-import { headerHeight, meter, bookFont, vars, boldWeight } from 'controls/theme';
+import { headerHeight, bookFont, vars, boldWeight } from 'controls/theme';
 import { BorderButton, IconButton } from 'controls/Buttons';
 import { BooqLink, FeedLink } from 'controls/Links';
 import { Spinner } from 'controls/Spinner';
 import { usePopoverSingleton } from 'controls/Popover';
 import { Themer } from 'components/Themer';
 import { SignIn } from 'components/SignIn';
-import { BooqContent, Augmentation, getAugmentationRect, getAugmentationText } from './BooqContent';
+import {
+    BooqContent, Augmentation, getAugmentationRect, getAugmentationText,
+} from './BooqContent';
 import { useContextMenu, ContextMenuState } from './ContextMenu';
 import { useNavigationPanel } from './Navigation';
 import { ReaderLayout } from './Layout';
@@ -144,7 +146,7 @@ function isAnythingSelected() {
 }
 
 function useAugmentations(booqId: string, quote?: BooqRange) {
-    const { highlights } = useHighlights(booqId);
+    const highlights = useFilteredHighlights(booqId);
     const augmentations = useMemo(() => {
         const augmentations = highlights.map<Augmentation>(h => ({
             id: `highlight/${h.id}`,
@@ -249,7 +251,6 @@ function AnchorButton({ booqId, anchor, title }: {
                 flex-flow: row;
                 align-items: center; 
                 height: ${headerHeight};
-                margin: ${meter.regular};
             }`}</style>
         </div>
     </BooqLink>;

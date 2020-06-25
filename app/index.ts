@@ -6,6 +6,7 @@ export * from './common';
 export * from './featured';
 export * from './highlights';
 export * from './history';
+export * from './navigation';
 export * from './provider';
 export * from './search';
 export * from './settings';

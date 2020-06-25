@@ -1,113 +1,113 @@
 import { ApolloClient } from "apollo-client";
-import { useApolloClient, useQuery } from '@apollo/react-hooks';
+import { useApolloClient } from '@apollo/react-hooks';
 import gql from 'graphql-tag';
 import { syncStorageCell } from "plat";
 import { facebookSdk } from "./facebookSdk";
+import { atom, useRecoilValue, useSetRecoilState, SetterOrUpdater } from "recoil";
 
-const storage = syncStorageCell<AuthData>('auth-data');
+export type UserData = {
+    id: string,
+    name: string,
+    pictureUrl?: string,
+};
+export type CurrentUser = UserData | undefined;
 
-type AuthData = {
-    name: string | null,
-    profilePicture: string | null,
-    provider: string | null,
-};
-const AuthStateQuery = gql`query AuthState {
-    name @client
-    profilePicture @client
-    provider @client
-}`;
-export const initialAuthData: AuthData = storage.restore() ?? {
-    name: null,
-    profilePicture: null,
-    provider: null,
-};
-export type Auth = ReturnType<typeof useAuth>;
+const key = 'current-user';
+const storage = syncStorageCell<CurrentUser>(key);
+const initialAuthData: CurrentUser = storage.restore() ?? undefined;
+storage.store(initialAuthData);
+const authState = atom({
+    key,
+    default: initialAuthData,
+});
+
 export function useAuth() {
-    const { data } = useQuery<AuthData>(AuthStateQuery);
+    const {
+        id, name, pictureUrl,
+    } = useRecoilValue(authState) ?? {};
 
-    const { name, profilePicture, provider } = (data ?? initialAuthData);
-    if (name) {
+    if (id && name) {
         return {
-            state: 'signed',
-            name, profilePicture, provider,
+            signed: true,
+            id, name, pictureUrl,
         } as const;
     } else {
-        return { state: 'not-signed', provider } as const;
+        return undefined;
     }
 }
 
 export function useSignInOptions() {
     const client = useApolloClient();
+    const setter = useSetRecoilState(authState);
 
     return {
         async signWithFacebook() {
-            client.writeData<AuthData>({
-                data: {
-                    provider: 'facebook', name: null, profilePicture: null,
-                },
-            });
             const status = await facebookSdk()?.login();
             if (status?.status === 'connected') {
-                return signIn(client, status.authResponse.accessToken, 'facebook');
+                return signIn(client, setter, status.authResponse.accessToken, 'facebook');
             } else {
                 return undefined;
             }
         },
         async signOut() {
-            signOut(client);
+            signOut(client, setter);
         },
     };
 }
 
-async function signOut(client: ApolloClient<unknown>) {
+async function signOut(client: ApolloClient<unknown>, setter: SetterOrUpdater<CurrentUser>) {
     const result = await client.query<{ logout: boolean }>({
         query: gql`query Logout {
             logout
         }`,
     });
     if (result?.data?.logout) {
-        client.writeData<AuthData>({
-            data: {
-                provider: null, name: null, profilePicture: null,
-            },
-        });
+        setter(undefined);
         await facebookSdk()?.logout();
         client.resetStore();
         storage.clear();
     }
 }
 
-async function signIn(client: ApolloClient<unknown>, token: string, provider: string) {
-    const { data: { auth } } = await client.query<{
-        auth: {
-            token: string,
+const AuthQuery = gql`query Auth($token: String!, $provider: String!) {
+    auth(token: $token, provider: $provider) {
+        token
+        user {
+            id
+            name
+            pictureUrl
+        }
+    }
+}`;
+type AuthData = {
+    auth: {
+        token: string,
+        user: {
+            id: string,
             name: string,
-            profilePicture: string | null,
+            pictureUrl: string | null,
         },
-    }>({
-        query: gql`query Auth($token: String!, $provider: String!) {
-            auth(token: $token, provider: $provider) {
-                token
-                name
-                profilePicture
-            }
-        }`,
+    },
+};
+type AuthVariables = {
+    token: string,
+    provider: string,
+};
+async function signIn(client: ApolloClient<unknown>, setter: SetterOrUpdater<CurrentUser>, token: string, provider: string) {
+    const { data: { auth } } = await client.query<AuthData, AuthVariables>({
+        query: AuthQuery,
         variables: { token, provider },
     });
     if (auth) {
-        const data: AuthData = auth
+        const data: CurrentUser = auth
             ? {
-                provider,
-                name: auth.name,
-                profilePicture: auth.profilePicture,
+                id: auth.user.id,
+                name: auth.user.name,
+                pictureUrl: auth.user.pictureUrl ?? undefined,
             }
             : initialAuthData;
-        storage.store({
-            provider,
-            name: auth.name,
-            profilePicture: data.profilePicture,
-        });
-        client.writeData<AuthData>({ data });
+        storage.store(data);
+        setter(data);
         client.reFetchObservableQueries(true);
     }
 
