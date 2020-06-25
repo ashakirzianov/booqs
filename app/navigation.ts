@@ -29,13 +29,15 @@ export function useNavigationNodes(booqId: string) {
     const { highlights } = useHighlights(booqId);
     const authors = highlightsAuthors(highlights);
 
+    const allAuthors = showHighlights && self?.id
+        ? [self.id, ...showAuthors]
+        : showAuthors;
     const filteredHighlights = highlights.filter(
-        h => h.id === self?.id
-            || showAuthors.some(authorId => h.id === authorId)
+        h => allAuthors.some(authorId => h.author.id === authorId)
     );
 
     const filter = showChapters
-        ? (showHighlights ? 'all' : 'chapters')
+        ? (showHighlights ? 'all' : 'contents')
         : (showHighlights ? 'highlights' : 'none');
     const nodes = buildNodes({
         filter, title, toc,
