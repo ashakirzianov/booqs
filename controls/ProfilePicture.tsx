@@ -15,9 +15,8 @@ export function ProfileBadge({
             border={border}
         />;
     } else {
-        const letter = name.substr(0, 1);
         return <ProfilePicturePlaceholder
-            letter={letter}
+            initials={getInitials(name)}
             size={size}
             border={border}
         />;
@@ -52,13 +51,13 @@ function ProfilePicture({ picture, size, border }: {
     </div>;
 }
 
-function ProfilePicturePlaceholder({ letter, size, border }: {
-    letter: string,
+function ProfilePicturePlaceholder({ initials, size, border }: {
+    initials: string,
     size: number,
     border: boolean,
 }) {
     return <div className='container'>
-        {letter}
+        {initials}
         <style jsx>{`
             .container {
                 font-size: x-large;
@@ -84,4 +83,13 @@ function ProfilePicturePlaceholder({ letter, size, border }: {
             }
             `}</style>
     </div>;
+}
+
+function getInitials(name: string) {
+    const names = name.split(' ');
+    const first = names[0];
+    const last = names.length > 1
+        ? names[names.length - 1]
+        : '';
+    return (first?.charAt(0) ?? '') + (last?.charAt(0) ?? '');
 }
