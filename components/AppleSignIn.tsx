@@ -8,3 +8,13 @@ export function AppleSdkHeader({ state }: {
         <meta name="appleid-signin-use-popup" content="true" />
     </>;
 }
+
+export function AppleSignInButton() {
+    return <>
+        <div id="appleid-signin" />
+        <script
+            type="text/javascript"
+            src="https://appleid.cdn-apple.com/appleauth/static/jsapi/appleid/1/en_US/appleid.auth.js"
+        />
+    </>;
+}
