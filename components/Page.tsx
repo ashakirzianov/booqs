@@ -5,6 +5,7 @@ import { HasChildren } from 'controls/utils';
 import {
     menuFont, normalWeight, fontHref, vars,
 } from 'controls/theme';
+import { AppleSignInHead } from './AppleSignIn';
 
 
 export function Page({ title, children }: HasChildren & {
@@ -20,6 +21,7 @@ export function Page({ title, children }: HasChildren & {
             <link href={fontHref} rel="stylesheet" />
             <script async defer src="https://connect.facebook.net/en_US/sdk.js"></script>
         </Head>
+        <AppleSignInHead />
         {children}
         <style jsx>{`
             .page {
