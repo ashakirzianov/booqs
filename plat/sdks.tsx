@@ -33,6 +33,8 @@ export function sdks() {
                             } else {
                                 res(undefined);
                             }
+                        }, {
+                            scope: 'email',
                         })
                     } else {
                         rej('Can not load facebook sdk');
