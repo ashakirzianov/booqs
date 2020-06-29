@@ -8,7 +8,7 @@ import {
     faEllipsisV,
 } from '@fortawesome/pro-light-svg-icons';
 import {
-    faFacebookF,
+    faFacebookF, faApple,
 } from '@fortawesome/free-brands-svg-icons';
 import {
     faBookmark as faSolidBookmark,
@@ -20,7 +20,7 @@ export type IconName =
     | 'upload' | 'appearance' | 'close' | 'remove'
     | 'toc' | 'bookmark-empty' | 'bookmark-solid'
     | 'search' | 'pages'
-    | 'facebook'
+    | 'facebook' | 'apple'
     | 'quote' | 'copy' | 'link' | 'highlight'
     ;
 
@@ -67,6 +67,8 @@ function iconForName(name: IconName) {
             return faFileAlt;
         case 'facebook':
             return faFacebookF;
+        case 'apple':
+            return faApple;
         case 'quote':
             return faQuoteRight;
         case 'copy':
