@@ -21,16 +21,9 @@ export function sdks() {
     return {
         apple: {
             async signIn() {
-                const { user, authorization } = await appleSdk()?.auth.signIn() ?? {};
-                if (user && authorization) {
-                    return {
-                        name: `${user.name.firstName} ${user.name.lastName}`,
-                        email: user.email,
-                        token: authorization.id_token,
-                    };
-                } else {
-                    return undefined;
-                }
+                const result = await appleSdk()?.auth.signIn();
+                console.log('apple sign', result);
+                return result?.authorization.id_token;
             }
         }
     };

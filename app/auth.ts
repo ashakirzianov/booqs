@@ -52,9 +52,9 @@ export function useSignInOptions() {
             }
         },
         async signWithApple() {
-            const user = await sdks().apple.signIn();
-            if (user) {
-                return signIn(client, setter, user.token, 'apple');
+            const token = await sdks().apple.signIn();
+            if (token) {
+                return signIn(client, setter, token, 'apple');
             }
         },
         async signOut() {
