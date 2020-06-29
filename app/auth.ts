@@ -10,10 +10,13 @@ export type UserData = {
     name: string,
     pictureUrl?: string,
 };
-export type CurrentUser = UserData | undefined;
+export type CurrentUser = {
+    user: UserData,
+    provider: string,
+} | undefined;
 
 const key = 'current-user';
-const storage = syncStorageCell<CurrentUser>(key);
+const storage = syncStorageCell<CurrentUser>(key, '0.1.0');
 const initialAuthData: CurrentUser = storage.restore() ?? undefined;
 storage.store(initialAuthData);
 const authState = atom({
@@ -22,14 +25,13 @@ const authState = atom({
 });
 
 export function useAuth() {
-    const {
-        id, name, pictureUrl,
-    } = useRecoilValue(authState) ?? {};
+    const current = useRecoilValue(authState);
 
-    if (id && name) {
+    if (current) {
         return {
             signed: true,
-            id, name, pictureUrl,
+            provider: current.provider,
+            ...current.user,
         } as const;
     } else {
         return undefined;
@@ -107,9 +109,12 @@ async function signIn(client: ApolloClient<unknown>, setter: SetterOrUpdater<Cur
     if (auth) {
         const data: CurrentUser = auth
             ? {
-                id: auth.user.id,
-                name: auth.user.name,
-                pictureUrl: auth.user.pictureUrl ?? undefined,
+                user: {
+                    id: auth.user.id,
+                    name: auth.user.name,
+                    pictureUrl: auth.user.pictureUrl ?? undefined,
+                },
+                provider,
             }
             : initialAuthData;
         storage.store(data);
