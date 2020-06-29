@@ -1,9 +1,10 @@
 import { ApolloClient } from "apollo-client";
 import { useApolloClient } from '@apollo/react-hooks';
 import gql from 'graphql-tag';
+import {
+    atom, useRecoilValue, useSetRecoilState, SetterOrUpdater,
+} from "recoil";
 import { syncStorageCell, sdks } from "plat";
-import { facebookSdk } from "./facebookSdk";
-import { atom, useRecoilValue, useSetRecoilState, SetterOrUpdater } from "recoil";
 
 export type UserData = {
     id: string,
@@ -44,9 +45,9 @@ export function useSignInOptions() {
 
     return {
         async signWithFacebook() {
-            const status = await facebookSdk()?.login();
-            if (status?.status === 'connected') {
-                return signIn(client, setter, status.authResponse.accessToken, 'facebook');
+            const token = await sdks().facebook.signIn();
+            if (token) {
+                return signIn(client, setter, token, 'facebook');
             } else {
                 return undefined;
             }
@@ -70,8 +71,14 @@ async function signOut(client: ApolloClient<unknown>, setter: SetterOrUpdater<Cu
         }`,
     });
     if (result?.data?.logout) {
-        setter(undefined);
-        await facebookSdk()?.logout();
+        setter(prev => {
+            switch (prev?.provider) {
+                case 'facebook':
+                    sdks().facebook.signOut();
+                    break;
+            }
+            return undefined;
+        });
         client.resetStore();
         storage.clear();
     }
