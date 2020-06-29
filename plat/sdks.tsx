@@ -1,24 +1,9 @@
 /*global globalThis*/
 import Head from "next/head";
 import { useEffect } from "react";
-import { BorderButton } from "controls/Buttons";
 
-export function AppleSignInButton() {
-    return <BorderButton
-        icon='apple'
-        text='Apple'
-        onClick={() => {
-            appleSdk()?.auth.signIn().then(result => {
-                console.log('Apple sign in result');
-                console.log(result);
-            });
-        }}
-    />;
-}
-
-export function AppleSignInHead() {
+export function SdksHead() {
     useEffect(() => {
-        console.log(appleSdk());
         appleSdk()?.auth.init({
             clientId: process.env.NEXT_PUBLIC_APPLE_APP_ID,
             scope: 'name email',
@@ -30,6 +15,25 @@ export function AppleSignInHead() {
     return <Head>
         <script type="text/javascript" src="https://appleid.cdn-apple.com/appleauth/static/jsapi/appleid/1/en_US/appleid.auth.js" />
     </Head>;
+}
+
+export function sdks() {
+    return {
+        apple: {
+            async signIn() {
+                const { user, authorization } = await appleSdk()?.auth.signIn() ?? {};
+                if (user && authorization) {
+                    return {
+                        name: `${user.name.firstName} ${user.name.lastName}`,
+                        email: user.email,
+                        token: authorization.id_token,
+                    };
+                } else {
+                    return undefined;
+                }
+            }
+        }
+    };
 }
 
 function appleSdk() {

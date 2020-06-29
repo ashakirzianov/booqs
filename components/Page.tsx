@@ -1,11 +1,11 @@
 import React from 'react';
 import Head from 'next/head';
+import { SdksHead } from 'plat';
 import { useSettings, palettes } from 'app';
 import { HasChildren } from 'controls/utils';
 import {
     menuFont, normalWeight, fontHref, vars,
 } from 'controls/theme';
-import { AppleSignInHead } from './AppleSignIn';
 
 
 export function Page({ title, children }: HasChildren & {
@@ -21,7 +21,7 @@ export function Page({ title, children }: HasChildren & {
             <link href={fontHref} rel="stylesheet" />
             <script async defer src="https://connect.facebook.net/en_US/sdk.js"></script>
         </Head>
-        <AppleSignInHead />
+        <SdksHead />
         {children}
         <style jsx>{`
             .page {

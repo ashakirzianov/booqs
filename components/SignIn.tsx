@@ -15,9 +15,24 @@ export function FacebookSignButton() {
     />;
 }
 
+export function AppleSignInButton() {
+    const { signWithApple } = useSignInOptions();
+    return <BorderButton
+        icon='apple'
+        text='Apple'
+        onClick={signWithApple}
+    />;
+}
+
 export function SignInMenu() {
-    const { signWithFacebook } = useSignInOptions();
+    const { signWithFacebook, signWithApple } = useSignInOptions();
     return <Menu>
+        <MenuItem
+            icon="apple"
+            text="Apple"
+            callback={signWithApple}
+            spinner={false}
+        />
         <MenuItem
             icon="facebook"
             text="Facebook"

@@ -1,7 +1,7 @@
 import { ApolloClient } from "apollo-client";
 import { useApolloClient } from '@apollo/react-hooks';
 import gql from 'graphql-tag';
-import { syncStorageCell } from "plat";
+import { syncStorageCell, sdks } from "plat";
 import { facebookSdk } from "./facebookSdk";
 import { atom, useRecoilValue, useSetRecoilState, SetterOrUpdater } from "recoil";
 
@@ -47,6 +47,12 @@ export function useSignInOptions() {
                 return signIn(client, setter, status.authResponse.accessToken, 'facebook');
             } else {
                 return undefined;
+            }
+        },
+        async signWithApple() {
+            const user = await sdks().apple.signIn();
+            if (user) {
+                return signIn(client, setter, user.token, 'apple');
             }
         },
         async signOut() {

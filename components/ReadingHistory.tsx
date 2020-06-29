@@ -3,8 +3,7 @@ import { useHistory, pageForPosition, useAuth } from "app";
 import { BooqPreview } from "controls/BooqPreview";
 import { meter } from "controls/theme";
 import { BooqLink } from 'controls/Links';
-import { FacebookSignButton } from './SignIn';
-import { AppleSignInButton } from './AppleSignIn';
+import { FacebookSignButton, AppleSignInButton } from './SignIn';
 
 const historyPanelHeight = '15em';
 export function ReadingHistory() {
@@ -21,9 +20,13 @@ export function ReadingHistory() {
 
 function SignInPanel() {
     return <div className='container'>
-        <span>Sign in to see history</span>
-        <FacebookSignButton />
-        <AppleSignInButton />
+        <span className='label'>Sign in to see history</span>
+        <div className='button'>
+            <AppleSignInButton />
+        </div>
+        <div className='button'>
+            <FacebookSignButton />
+        </div>
         <style jsx>{`
             .container {
                 display: flex;
@@ -32,7 +35,10 @@ function SignInPanel() {
                 justify-content: center;
                 height: ${historyPanelHeight};
             }
-            span {
+            .button {
+                margin: ${meter.regular};
+            }
+            .label {
                 margin-bottom: ${meter.large};
                 font-weight: bold;
             }
