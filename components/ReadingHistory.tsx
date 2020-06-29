@@ -4,6 +4,7 @@ import { BooqPreview } from "controls/BooqPreview";
 import { meter } from "controls/theme";
 import { BooqLink } from 'controls/Links';
 import { FacebookSignButton } from './SignIn';
+import { AppleSignInButton } from './AppleSignIn';
 
 const historyPanelHeight = '15em';
 export function ReadingHistory() {
@@ -22,6 +23,7 @@ function SignInPanel() {
     return <div className='container'>
         <span>Sign in to see history</span>
         <FacebookSignButton />
+        <AppleSignInButton />
         <style jsx>{`
             .container {
                 display: flex;

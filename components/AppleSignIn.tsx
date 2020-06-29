@@ -18,7 +18,7 @@ export function AppleSignInButton() {
     useCustomDocumentEvent<any>('AppleIDSignInOnFailure', data => {
         console.log(data);
     });
-    return <>
+    return <div className='container'>
         <div
             id="appleid-signin" data-color="black" data-border="true" data-type="sign in"
         />
@@ -26,5 +26,13 @@ export function AppleSignInButton() {
             type="text/javascript"
             src="https://appleid.cdn-apple.com/appleauth/static/jsapi/appleid/1/en_US/appleid.auth.js"
         />
-    </>;
+        <style jsx>{`
+            #appleid-signin {
+                width: 10rem;
+                height: 3rem;
+            }
+            .container {
+            }
+            `}</style>
+    </div>;
 }
