@@ -94,5 +94,6 @@ function redirectUri() {
         ? window.location
         : undefined ?? {};
     const url = `${protocol}//${host}${pathname}`;
+    console.log(url);
     return url;
 }
