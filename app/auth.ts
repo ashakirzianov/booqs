@@ -45,17 +45,28 @@ export function useSignInOptions() {
 
     return {
         async signWithFacebook() {
-            const token = await sdks().facebook.signIn();
+            const { token } = await sdks().facebook.signIn() ?? {};
             if (token) {
-                return signIn(client, setter, token, 'facebook');
+                return signIn({
+                    apolloClient: client,
+                    recoilSetter: setter,
+                    token,
+                    provider: 'facebook',
+                });
             } else {
                 return undefined;
             }
         },
         async signWithApple() {
-            const token = await sdks().apple.signIn();
+            const { token, name } = await sdks().apple.signIn() ?? {};
             if (token) {
-                return signIn(client, setter, token, 'apple');
+                return signIn({
+                    provider: 'apple',
+                    apolloClient: client,
+                    recoilSetter: setter,
+                    token,
+                    name,
+                });
             }
         },
         async signOut() {
@@ -107,11 +118,20 @@ type AuthData = {
 type AuthVariables = {
     token: string,
     provider: string,
+    name?: string,
 };
-async function signIn(client: ApolloClient<unknown>, setter: SetterOrUpdater<CurrentUser>, token: string, provider: string) {
-    const { data: { auth } } = await client.query<AuthData, AuthVariables>({
+async function signIn({
+    apolloClient, recoilSetter, token, name, provider,
+}: {
+    apolloClient: ApolloClient<unknown>,
+    recoilSetter: SetterOrUpdater<CurrentUser>,
+    token: string,
+    name?: string,
+    provider: string,
+}) {
+    const { data: { auth } } = await apolloClient.query<AuthData, AuthVariables>({
         query: AuthQuery,
-        variables: { token, provider },
+        variables: { token, provider, name },
     });
     if (auth) {
         const data: CurrentUser = auth
@@ -125,8 +145,8 @@ async function signIn(client: ApolloClient<unknown>, setter: SetterOrUpdater<Cur
             }
             : initialAuthData;
         storage.store(data);
-        setter(data);
-        client.reFetchObservableQueries(true);
+        recoilSetter(data);
+        apolloClient.reFetchObservableQueries(true);
     }
 
     return auth;

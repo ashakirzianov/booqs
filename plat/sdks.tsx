@@ -19,17 +19,28 @@ export function sdks() {
             async signIn() {
                 const result = await appleSdk()?.auth.signIn();
                 console.log('apple sign', result);
-                return result?.authorization.id_token;
+                if (result) {
+                    return {
+                        token: result.authorization.id_token,
+                        name: result.user
+                            ? `${result.user.name.firstName} ${result.user.name.lastName}`
+                            : undefined,
+                    };
+                } else {
+                    return undefined;
+                }
             },
         },
         facebook: {
             async signIn() {
-                return new Promise<string | undefined>((res, rej) => {
+                return new Promise<{ token: string } | undefined>((res, rej) => {
                     const sdk = facebookSdk();
                     if (sdk) {
                         sdk.login(response => {
                             if (response.authResponse.accessToken) {
-                                res(response.authResponse.accessToken);
+                                res({
+                                    token: response.authResponse.accessToken,
+                                });
                             } else {
                                 res(undefined);
                             }
@@ -58,7 +69,6 @@ export function sdks() {
 }
 
 function initAppleSdk() {
-    console.log('redirect', redirectUri());
     appleSdk()?.auth.init({
         clientId: process.env.NEXT_PUBLIC_APPLE_APP_ID,
         scope: 'name email',
