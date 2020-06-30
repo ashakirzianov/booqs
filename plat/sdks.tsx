@@ -58,6 +58,7 @@ export function sdks() {
 }
 
 function initAppleSdk() {
+    console.log('redirect', redirectUri());
     appleSdk()?.auth.init({
         clientId: process.env.NEXT_PUBLIC_APPLE_APP_ID,
         scope: 'name email',
@@ -94,6 +95,5 @@ function redirectUri() {
         ? window.location
         : undefined ?? {};
     const url = `${protocol}//${host}${pathname}`;
-    console.log(url);
     return url;
 }
