@@ -89,14 +89,13 @@ export function TextButton({ text, onClick, loading }: {
         <style jsx>{`
         .button {
             color: var(${vars.action});
-            text-decoration: none;
+            text-decoration: underline;
             font-size: large;
             cursor: pointer;
             transition: color 0.25s;
         }
         .button:hover {
             color: var(${vars.highlight});
-            text-decoration: underline;
         }
         `}</style>
     </>;
