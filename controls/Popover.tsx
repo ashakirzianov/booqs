@@ -25,7 +25,7 @@ export function Overlay({
             visible={visible}
             hideOnClick={hideOnClick}
             animation='shift-away'
-            content={<>{content}</>}
+            content={<div>{content}</div>}
             children={anchor}
             className='overlay-theme'
         />
