@@ -37,7 +37,7 @@ export function sdks() {
                     const sdk = facebookSdk();
                     if (sdk) {
                         sdk.login(response => {
-                            if (response.authResponse.accessToken) {
+                            if (response?.authResponse?.accessToken) {
                                 res({
                                     token: response.authResponse.accessToken,
                                 });
