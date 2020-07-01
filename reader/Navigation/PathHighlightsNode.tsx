@@ -1,3 +1,4 @@
+import { Fragment } from 'react';
 import { TocItem, UserData, PathHighlightsNode } from 'app';
 import { BooqLink } from 'controls/Links';
 import { meter, boldWeight } from 'controls/theme';
@@ -15,8 +16,8 @@ export function PathHighlightsNodeComp({
         <Path booqId={booqId} items={items} />
         {
             highlights.map(
-                (hl, idx) =>
-                    <div key={idx} className='highlight'>
+                (hl) =>
+                    <div key={hl.id} className='highlight'>
                         <HighlightNodeComp
                             booqId={booqId}
                             self={self}
@@ -40,14 +41,14 @@ function Path({ items, booqId }: {
     return <div className='container'>
         {
             items.map((item, idx) => !item ? null
-                : <>
-                    {idx === 0 ? null : <div key='separator' className='separator'>/</div>}
-                    <div key={idx} className='element'>
+                : <Fragment key={idx}>
+                    {idx === 0 ? null : <div className='separator'>/</div>}
+                    <div className='element'>
                         <BooqLink booqId={booqId} path={item.path}>
                             {item.title}
                         </BooqLink>
                     </div>
-                </>
+                </Fragment>
             )
         }
         <style jsx>{`
