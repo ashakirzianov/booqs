@@ -1,6 +1,7 @@
 import React, { ReactNode, useState } from 'react';
-import { panelShadow, radius, meter, vars } from './theme';
 import Link from 'next/link';
+import { panelShadow, radius, meter, vars } from './theme';
+import { Icon, IconName } from './Icon';
 
 export type ModalDefinition = {
     body: ReactNode,
@@ -16,7 +17,7 @@ export function useModal(render: (props: ModalRenderProps) => ModalDefinition) {
     const { body, buttons } = render({ closeModal });
     return {
         openModal, closeModal,
-        modalContent: <ModalContent
+        ModalContent: <ModalContent
             isOpen={isOpen}
             content={body}
             buttons={buttons}
@@ -89,18 +90,38 @@ function ModalContent({
 
 type ButtonProps = {
     text: string,
+    icon?: IconName,
     onClick?: () => void,
     href?: string,
 };
-function ModalButton({ text, onClick, href }: ButtonProps) {
+function ModalButton({ text, icon, onClick, href }: ButtonProps) {
+    const Content = <div className='content'>
+        {
+            icon
+                ? <div><Icon name={icon} /></div>
+                : null
+        }
+        <span className='text'>{text}</span>
+        <style jsx>{`
+            .content {
+                display: flex;
+                flex-flow: row;
+                align-items: center;
+            }
+            .text {
+                margin: ${meter.large};
+                text-decoration: none;
+            }
+            `}</style>
+    </div>;
     return <div className='container' onClick={onClick}>
         <hr />
         {
             href
                 ? <Link href={href}>
-                    <span className='text'>{text}</span>
+                    {Content}
                 </Link>
-                : <span className='text'>{text}</span>
+                : Content
         }
         <style jsx>{`
             .container {
@@ -113,10 +134,6 @@ function ModalButton({ text, onClick, href }: ButtonProps) {
             }
             .container:hover {
                 color: var(${vars.highlight});
-            }
-            .text {
-                margin: ${meter.large};
-                text-decoration: none;
             }
             hr {
                 width: 100%;

@@ -15,7 +15,7 @@ export function Upload({ singleton }: {
     const {
         body, buttons, clearFile,
     } = useModalDefinition();
-    const { openModal, modalContent } = useModal(({ closeModal }) => ({
+    const { openModal, ModalContent: modalContent } = useModal(({ closeModal }) => ({
         body: <div className='content'>
             {body}
             <style jsx>{`
