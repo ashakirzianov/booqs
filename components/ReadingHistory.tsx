@@ -1,9 +1,9 @@
 import React from 'react';
 import { useHistory, pageForPosition, useAuth } from "app";
 import { BooqPreview } from "controls/BooqPreview";
-import { meter } from "controls/theme";
+import { meter, vars } from "controls/theme";
 import { BooqLink } from 'controls/Links';
-import { FacebookSignButton, AppleSignInButton } from './SignIn';
+import { useSignInModal } from './SignIn';
 
 const historyPanelHeight = '15em';
 export function ReadingHistory() {
@@ -19,14 +19,12 @@ export function ReadingHistory() {
 }
 
 function SignInPanel() {
+    const { openModal, ModalContent } = useSignInModal();
     return <div className='container'>
-        <span className='label'>Sign in to see history</span>
-        <div className='button'>
-            <AppleSignInButton />
-        </div>
-        <div className='button'>
-            <FacebookSignButton />
-        </div>
+        <span className='label'>
+            <span className='sign-in-link' onClick={openModal}>Sign in</span> to see history
+            </span>
+        {ModalContent}
         <style jsx>{`
             .container {
                 display: flex;
@@ -35,12 +33,17 @@ function SignInPanel() {
                 justify-content: center;
                 height: ${historyPanelHeight};
             }
-            .button {
-                margin: ${meter.regular};
-            }
             .label {
                 margin-bottom: ${meter.large};
                 font-weight: bold;
+            }
+            .sign-in-link {
+                cursor: pointer;
+                text-decoration: 2px underline;
+                color: var(${vars.action});
+            }
+            .sign-in-link:hover {
+                color: var(${vars.highlight});
             }
             `}</style>
     </div>;

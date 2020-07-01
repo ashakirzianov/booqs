@@ -2,7 +2,7 @@ import React from "react";
 import { useSignInOptions, useAuth } from 'app';
 import { meter } from "controls/theme";
 import { Menu, MenuItem } from "controls/Menu";
-import { IconButton, BorderButton } from "controls/Buttons";
+import { IconButton } from "controls/Buttons";
 import { PopoverSingleton, Popover } from "controls/Popover";
 import { ProfileBadge } from "controls/ProfilePicture";
 import { useModal } from "controls/Modal";
@@ -50,24 +50,6 @@ export function useSignInModal() {
         openModal,
         ModalContent,
     };
-}
-
-export function FacebookSignButton() {
-    const { signWithFacebook } = useSignInOptions();
-    return <BorderButton
-        icon='facebook'
-        text='Facebook'
-        onClick={signWithFacebook}
-    />;
-}
-
-export function AppleSignInButton() {
-    const { signWithApple } = useSignInOptions();
-    return <BorderButton
-        icon='apple'
-        text='Apple'
-        onClick={signWithApple}
-    />;
 }
 
 export function SignIn({ singleton }: {
