@@ -83,24 +83,26 @@ export function SignIn({ singleton }: {
 function SingInButton() {
     const state = useAuth();
     const { openModal, ModalContent } = useSignInModal();
-    return <div style={{
-        cursor: 'pointer'
-    }}>
-        {
-            state?.signed
-                ? <ProfileBadge
-                    name={state.name}
-                    picture={state.pictureUrl ?? undefined}
-                    size={2}
-                    border={true}
-                />
-                : <IconButton
-                    icon='sign-in'
-                    onClick={openModal}
-                />
-        }
+    return <>
+        <div style={{
+            cursor: 'pointer'
+        }}>
+            {
+                state?.signed
+                    ? <ProfileBadge
+                        name={state.name}
+                        picture={state.pictureUrl ?? undefined}
+                        size={2}
+                        border={true}
+                    />
+                    : <IconButton
+                        icon='sign-in'
+                        onClick={openModal}
+                    />
+            }
+        </div>
         {ModalContent}
-    </div>;
+    </>;
 }
 
 function SignInPanel() {

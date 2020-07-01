@@ -7,6 +7,7 @@ import { PopoverSingleton, Popover } from "controls/Popover";
 import { useModal } from "controls/Modal";
 import { BooqCover } from "controls/BooqCover";
 import { booqHref } from "controls/Links";
+import { useSignInModal } from "./SignIn";
 
 export function Upload({ singleton }: {
     singleton?: PopoverSingleton,
@@ -15,7 +16,7 @@ export function Upload({ singleton }: {
     const {
         body, buttons, clearFile,
     } = useModalDefinition();
-    const { openModal, ModalContent: modalContent } = useModal(({ closeModal }) => ({
+    const { openModal, ModalContent } = useModal(({ closeModal }) => ({
         body: <div className='content'>
             {body}
             <style jsx>{`
@@ -37,6 +38,10 @@ export function Upload({ singleton }: {
             }
         }],
     }));
+    const {
+        openModal: openSignIn,
+        ModalContent: SignInModalContent,
+    } = useSignInModal();
 
     return <>
         <Popover
@@ -47,7 +52,7 @@ export function Upload({ singleton }: {
                     onClick={
                         signed
                             ? openModal
-                            : undefined
+                            : openSignIn
                     }
                 />
             </>}
@@ -57,7 +62,8 @@ export function Upload({ singleton }: {
                     : 'Sign in to upload'
             } />}
         />
-        {modalContent}
+        {ModalContent}
+        {SignInModalContent}
     </>;
 }
 
