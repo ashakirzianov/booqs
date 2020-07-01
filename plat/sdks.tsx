@@ -104,6 +104,6 @@ function redirectUri() {
     const { protocol, host, pathname } = process.browser
         ? window.location
         : undefined ?? {};
-    const url = `${protocol}//${host}${pathname}`;
+    const url = `${protocol}//${host}/`;
     return url;
 }
