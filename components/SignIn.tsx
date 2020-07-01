@@ -99,7 +99,7 @@ function SignInPanel() {
 }
 
 function Signed({ name }: {
-    name: string,
+    name?: string,
 }) {
     const { signOut } = useSignInOptions();
     return <div>

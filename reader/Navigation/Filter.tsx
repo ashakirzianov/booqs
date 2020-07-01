@@ -28,10 +28,10 @@ export function NavigationFilter({ authors }: {
         </div>
         {
             authors.map(author => {
-                const [first] = author.name.split(' ');
+                const [first] = author.name?.split(' ');
                 return <div className='item' key={author.id}>
                     <FilterButton
-                        text={first}
+                        text={first ?? 'Incognito'}
                         selected={showAuthors.some(id => id === author.id)}
                         toggle={() => toggleAuthor(author.id)}
                         Badge={<ProfileBadge

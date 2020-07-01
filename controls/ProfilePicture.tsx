@@ -4,7 +4,7 @@ export function ProfileBadge({
     picture, name, size, border,
 }: {
     picture?: string,
-    name: string,
+    name?: string,
     size: number,
     border: boolean,
 }) {
@@ -15,8 +15,11 @@ export function ProfileBadge({
             border={border}
         />;
     } else {
+        const initials = name
+            ? getInitials(name)
+            : 'X';
         return <ProfilePicturePlaceholder
-            initials={getInitials(name)}
+            initials={initials}
             size={size}
             border={border}
         />;

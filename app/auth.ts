@@ -8,7 +8,7 @@ import { syncStorageCell, sdks } from "plat";
 
 export type UserData = {
     id: string,
-    name: string,
+    name?: string,
     pictureUrl?: string,
 };
 export type CurrentUser = {
@@ -110,7 +110,7 @@ type AuthData = {
         token: string,
         user: {
             id: string,
-            name: string,
+            name: string | null,
             pictureUrl: string | null,
         },
     },
@@ -138,7 +138,7 @@ async function signIn({
             ? {
                 user: {
                     id: auth.user.id,
-                    name: auth.user.name,
+                    name: auth.user.name ?? undefined,
                     pictureUrl: auth.user.pictureUrl ?? undefined,
                 },
                 provider,
