@@ -122,9 +122,6 @@ function Actions({ item }: {
 }) {
     return <div className='container'>
         <div className='button'>
-            <AddToReadingListButton item={item} />
-        </div>
-        <div className='button'>
             <ReadButton item={item} />
         </div>
         <style jsx>{`

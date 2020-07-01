@@ -1,5 +1,6 @@
 import React from 'react';
 import Head from 'next/head';
+import { SdksHead } from 'plat';
 import { useSettings, palettes } from 'app';
 import { HasChildren } from 'controls/utils';
 import {
@@ -20,6 +21,7 @@ export function Page({ title, children }: HasChildren & {
             <link href={fontHref} rel="stylesheet" />
             <script async defer src="https://connect.facebook.net/en_US/sdk.js"></script>
         </Head>
+        <SdksHead />
         {children}
         <style jsx>{`
             .page {

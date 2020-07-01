@@ -2,29 +2,54 @@ import React from "react";
 import { useSignInOptions, useAuth } from 'app';
 import { meter } from "controls/theme";
 import { Menu, MenuItem } from "controls/Menu";
-import { IconButton, BorderButton } from "controls/Buttons";
+import { IconButton } from "controls/Buttons";
 import { PopoverSingleton, Popover } from "controls/Popover";
 import { ProfileBadge } from "controls/ProfilePicture";
+import { useModal } from "controls/Modal";
 
-export function FacebookSignButton() {
-    const { signWithFacebook } = useSignInOptions();
-    return <BorderButton
-        icon='facebook'
-        text='Facebook'
-        onClick={signWithFacebook}
-    />;
-}
-
-export function SignInMenu() {
-    const { signWithFacebook } = useSignInOptions();
-    return <Menu>
-        <MenuItem
-            icon="facebook"
-            text="Facebook"
-            callback={signWithFacebook}
-            spinner={false}
-        />
-    </Menu>;
+export function useSignInModal() {
+    const { signWithApple, signWithFacebook } = useSignInOptions();
+    const { openModal, ModalContent } = useModal(({ closeModal }) => ({
+        body: <div className='content'>
+            Choose provider
+            <style jsx>{`
+                .content {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    width: 15rem;
+                    max-width: 100vw;
+                    padding: ${meter.large};
+                }
+                `}</style>
+        </div>,
+        buttons: [
+            {
+                text: 'Apple',
+                icon: 'apple',
+                onClick() {
+                    signWithApple();
+                    closeModal();
+                },
+            },
+            {
+                text: 'Facebook',
+                icon: 'facebook',
+                onClick() {
+                    signWithFacebook();
+                    closeModal();
+                },
+            },
+            {
+                text: 'Dismiss',
+                onClick: closeModal,
+            },
+        ],
+    }));
+    return {
+        openModal,
+        ModalContent,
+    };
 }
 
 export function SignIn({ singleton }: {
@@ -39,22 +64,27 @@ export function SignIn({ singleton }: {
 
 function SingInButton() {
     const state = useAuth();
-    return <div style={{
-        cursor: 'pointer'
-    }}>
-        {
-            state?.signed
-                ? <ProfileBadge
-                    name={state.name}
-                    picture={state.pictureUrl ?? undefined}
-                    size={2}
-                    border={true}
-                />
-                : <IconButton
-                    icon='sign-in'
-                />
-        }
-    </div>;
+    const { openModal, ModalContent } = useSignInModal();
+    return <>
+        <div style={{
+            cursor: 'pointer'
+        }}>
+            {
+                state?.signed
+                    ? <ProfileBadge
+                        name={state.name}
+                        picture={state.pictureUrl ?? undefined}
+                        size={2}
+                        border={true}
+                    />
+                    : <IconButton
+                        icon='sign-in'
+                        onClick={openModal}
+                    />
+            }
+        </div>
+        {ModalContent}
+    </>;
 }
 
 function SignInPanel() {
@@ -69,7 +99,7 @@ function SignInPanel() {
 }
 
 function Signed({ name }: {
-    name: string,
+    name?: string,
 }) {
     const { signOut } = useSignInOptions();
     return <div>
@@ -103,7 +133,6 @@ function Signed({ name }: {
 function NotSigned() {
     return <div>
         <span>Sign In</span>
-        <SignInMenu />
         <style jsx>{`
         div {
             display: flex;

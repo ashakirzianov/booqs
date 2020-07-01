@@ -33,3 +33,7 @@ yarn-error.log*
 /dist
 
 .vercel
+
+# local certificate
+localhost.crt
+localhost.key

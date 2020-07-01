@@ -34,7 +34,7 @@ type HighlightsData = {
             position: number | null,
             author: {
                 id: string,
-                name: string,
+                name?: string,
                 pictureUrl: string | null,
             },
         }[],

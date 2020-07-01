@@ -115,7 +115,7 @@ function HighlightTargetMenu({
 }
 
 function AuthorItem({ name, pictureUrl }: {
-    name: string,
+    name?: string,
     pictureUrl?: string,
 }) {
     return <div className='container'>
@@ -131,7 +131,7 @@ function AuthorItem({ name, pictureUrl }: {
                 </div>
                 : null
         }
-        <span className='name'>{name}</span>
+        <span className='name'>{name ?? 'Incognito'}</span>
         <style jsx>{`
             .container {
                 display: flex;
