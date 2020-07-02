@@ -33,6 +33,7 @@ type HighlightsData = {
             text: string,
             position: number | null,
             author: {
+                __typename: 'User',
                 id: string,
                 name?: string,
                 pictureUrl: string | null,
@@ -102,12 +103,13 @@ export function useHighlightMutations(booqId: string) {
                 end: input.end,
                 group: input.group,
             };
-            const created = {
+            const created: Highlight = {
                 ...input,
                 __typename: 'BooqHighlight',
                 id: highlight.id,
                 position: null,
                 author: {
+                    __typename: 'User',
                     id: input.author.id,
                     name: input.author.name,
                     pictureUrl: input.author.pictureUrl ?? null,
