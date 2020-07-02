@@ -6,6 +6,7 @@ import {
 } from "app";
 import { syncStorageCell } from "plat";
 import { useAuth } from "./auth";
+import { useMemo } from "react";
 
 export type TocNode = {
     kind: 'toc',
@@ -55,14 +56,16 @@ export function useFilteredHighlights(booqId: string) {
     const self = useAuth();
     const { highlights } = useHighlights(booqId);
 
-    const allAuthors = showHighlights && self?.id
-        ? [self.id, ...showAuthors]
-        : showAuthors;
-    const filteredHighlights = highlights.filter(
-        h => allAuthors.some(authorId => h.author.id === authorId)
-    );
+    return useMemo(() => {
+        const allAuthors = showHighlights && self?.id
+            ? [self.id, ...showAuthors]
+            : showAuthors;
+        const filteredHighlights = highlights.filter(
+            h => allAuthors.some(authorId => h.author.id === authorId)
+        );
 
-    return filteredHighlights;
+        return filteredHighlights;
+    }, [highlights, self?.id, showAuthors]);
 }
 
 export function useNavigationState() {
