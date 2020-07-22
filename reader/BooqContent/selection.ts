@@ -76,7 +76,13 @@ export function getBooqSelection(): BooqSelection | undefined {
 }
 
 function getSelectionPath(node: Node, offset: number) {
-    if (node.parentElement) {
+    // Note: hackie
+    if ((node as any).id) {
+        const path = pathFromId((node as any).id);
+        if (path) {
+            return [...path, offset, 0];
+        }
+    } else if (node.parentElement) {
         const path = pathFromId(node.parentElement.id);
         if (path) {
             path[path.length - 1] += offset;
