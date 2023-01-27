@@ -1,9 +1,7 @@
 import { ReactNode, createElement } from 'react';
 import { ApolloProvider } from '@apollo/react-hooks';
-import { ApolloClient, OperationVariables, QueryOptions } from 'apollo-client';
-import { InMemoryCache } from 'apollo-cache-inmemory';
-import { ApolloLink } from 'apollo-link';
-import { onError } from 'apollo-link-error';
+import { ApolloClient, OperationVariables, QueryOptions, InMemoryCache, ApolloLink } from '@apollo/client';
+import { onError } from "@apollo/client/link/error";
 import { createUploadLink } from 'apollo-upload-client';
 import { RecoilRoot } from 'recoil';
 
@@ -39,7 +37,7 @@ export function AppProvider({ children }: {
             client,
             children: createElement(
                 RecoilRoot,
-                {},
+                null,
                 children,
             ),
         },

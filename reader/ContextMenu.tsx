@@ -61,7 +61,7 @@ function useMenuState() {
     useDocumentEvent('mouseleave', unlock);
     useDocumentEvent('touchcancel', unlock);
 
-    const selectionHandler = useCallback(event => {
+    const selectionHandler = useCallback(() => {
         if (!locked.current) {
             handleSelectionChange();
         } else {
