@@ -1,4 +1,4 @@
-import { ApolloClient } from "apollo-client";
+import { ApolloClient } from '@apollo/client';
 import { useApolloClient } from '@apollo/react-hooks';
 import gql from 'graphql-tag';
 import {
@@ -123,7 +123,7 @@ type AuthVariables = {
 async function signIn({
     apolloClient, recoilSetter, token, name, provider,
 }: {
-    apolloClient: ApolloClient<unknown>,
+    apolloClient: ApolloClient<object>,
     recoilSetter: SetterOrUpdater<CurrentUser>,
     token: string,
     name?: string,

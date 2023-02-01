@@ -2,11 +2,11 @@ import React from 'react';
 
 import { FontAwesomeIcon, FontAwesomeIconProps } from '@fortawesome/react-fontawesome';
 import {
-    faPlus, faFontCase, faSignIn, faSignOut, faQuestion, faSearch,
+    faPlus, faFont as faFontCase, faSignInAlt as faSignIn, faSignOutAlt as faSignOut, faQuestion, faSearch,
     faFileAlt, faUser, faTimes, faListUl, faBookmark, faAngleLeft,
     faQuoteRight, faClone, faLink, faHighlighter, faTrashAlt,
     faEllipsisV,
-} from '@fortawesome/pro-light-svg-icons';
+} from '@fortawesome/free-solid-svg-icons';
 import {
     faFacebookF, faApple,
 } from '@fortawesome/free-brands-svg-icons';
