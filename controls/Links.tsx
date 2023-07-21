@@ -8,24 +8,19 @@ export function BooqLink({ booqId, path, children }: {
     path?: BooqPath,
     children: ReactNode,
 }) {
-    return <>
-        <Link href='/booq/[...slug]' as={booqHref(booqId, path)}>
-            <a>{children}</a>
-        </Link>
-        <style jsx>{`
-            a {
-                text-decoration: none;
-                color: inherit;
-            }
-            `}</style>
-    </>;
+    return <Link href='/booq/[...slug]' as={booqHref(booqId, path)} style={{
+        textDecoration: 'none',
+        color: 'inherit',
+    }}>
+        {children}
+    </Link>;
 }
 
 export function FeedLink({ children }: {
     children: ReactNode,
 }) {
     return <Link href='/'>
-        <a>{children}</a>
+        {children}
     </Link>;
 }
 
