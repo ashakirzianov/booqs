@@ -1,5 +1,5 @@
 import React from 'react'
-import { menuFontPrimary, normalWeight } from './theme'
+import { normalWeight } from './theme'
 
 export function Logo() {
     return <div>
@@ -7,7 +7,7 @@ export function Logo() {
         <style jsx>{`
             div {
                 color: rgba(253,163,2,1);
-                font-family: ${menuFontPrimary};
+                font-family: var(--font-main);
                 font-size: x-large;
                 font-weight: ${normalWeight};
                 background: -webkit-linear-gradient(180deg, rgba(253,163,2,1) 50%, rgb(200, 145, 2) 100%);

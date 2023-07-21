@@ -12,6 +12,23 @@ config.autoAddCss = false
 import { AppProps } from 'next/app'
 import { AppProvider } from '@/app'
 
+import { Lato, Lora } from 'next/font/google'
+import { boldWeight, extraBoldWeight, normalWeight } from '@/controls/theme'
+
+const lato = Lato({
+    subsets: ['latin'],
+    display: 'swap',
+    weight: ['300', '400', '700'],
+    variable: '--font-main',
+})
+
+const lora = Lora({
+    subsets: ['latin-ext', 'cyrillic-ext'],
+    display: 'swap',
+    weight: ['400', '700'],
+    variable: '--font-book',
+})
+
 export default function App({ Component, pageProps }: AppProps) {
     return <AppProvider>
         <Component {...pageProps} />

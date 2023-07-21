@@ -1,6 +1,6 @@
 import { BooqPath } from '@/core'
 import {
-    bookFont, meter, radius, panelShadow, panelShadowHover, vars
+    meter, radius, panelShadow, panelShadowHover, vars
 } from './theme'
 import { panelWidth } from './Panel'
 import { PropsType } from './utils'
@@ -28,7 +28,7 @@ export function BooqPreview({
                 flex-direction: column;
                 align-items: center;
                 box-shadow: ${panelShadow};
-                font-family: ${bookFont};
+                font-family: var(--font-book);
                 font-size: large;
                 border-radius: ${radius};
                 border: 1px solid var(${vars.border});

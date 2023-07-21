@@ -4,7 +4,7 @@ import {
     BooqData, BooqAnchor, useSettings, useReportHistory,
     useFilteredHighlights, colorForGroup, quoteColor, pageForPosition,
 } from '@/app'
-import { headerHeight, bookFont, vars, boldWeight } from '@/controls/theme'
+import { headerHeight, vars, boldWeight } from '@/controls/theme'
 import { BorderButton, IconButton } from '@/controls/Buttons'
 import { BooqLink, FeedLink } from '@/controls/Links'
 import { Spinner } from '@/controls/Spinner'
@@ -52,7 +52,7 @@ export function Reader({
         isControlsVisible={!contextMenuVisible && visible}
         isNavigationOpen={navigationOpen}
         BooqContent={<div style={{
-            fontFamily: bookFont,
+            fontFamily: 'var(--font-book)',
             fontSize: `${fontScale}%`,
         }}>
             {SingletonNode}

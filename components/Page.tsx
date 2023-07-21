@@ -4,7 +4,7 @@ import { SdksHead } from '@/plat'
 import { useSettings, palettes } from '@/app'
 import { HasChildren } from '@/controls/utils'
 import {
-    menuFont, normalWeight, fontHref, vars,
+    normalWeight, vars,
 } from '@/controls/theme'
 
 
@@ -18,7 +18,6 @@ export function Page({ title, children }: HasChildren & {
             <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=3.0,minimum-scale=1.0,viewport-fit=cover" />
             <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
             <link rel="manifest" href="/manifest.json" />
-            <link href={fontHref} rel="stylesheet" />
             <script async defer src="https://connect.facebook.net/en_US/sdk.js"></script>
         </Head>
         <SdksHead />
@@ -28,7 +27,7 @@ export function Page({ title, children }: HasChildren & {
                 display: flex;
                 flex: 1;
                 flex-direction: column;
-                font-family: ${menuFont};
+                font-family: var(--font-main);
                 font-weight: ${normalWeight};
                 overflow: hidden;
             }

@@ -1,6 +1,6 @@
 import React, { ReactNode } from 'react'
 import { IconName, Icon } from './Icon'
-import { meter, menuFont, boldWeight, vars, smallScreenWidth } from './theme'
+import { meter, boldWeight, vars, smallScreenWidth } from './theme'
 import { Spinner } from './Spinner'
 
 export function Menu({ callback, children }: {
@@ -52,7 +52,7 @@ export function MenuItem({ icon, text, callback, spinner }: {
                 padding: ${meter.large};
                 cursor: pointer;
                 font-size: smaller;
-                font-family: ${menuFont};
+                font-family: var(--font-main);
                 font-weight: ${boldWeight};
                 user-select: none;
                 transition: 250ms color, 250ms background-color;

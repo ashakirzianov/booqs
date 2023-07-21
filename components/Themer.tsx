@@ -2,7 +2,7 @@ import {
     PaletteName, palettes, useSetSettings, useSettings,
 } from '@/app'
 import {
-    bookFont, buttonShadow, meter, vars,
+    buttonShadow, meter, vars,
 } from '@/controls/theme'
 import { PopoverSingleton, Popover } from '@/controls/Popover'
 import { IconButton } from '@/controls/Buttons'
@@ -73,7 +73,7 @@ function FontScaleButton({ scale, onClick }: {
             }
             span {
                 font-size: ${fontSize};
-                font-family: ${bookFont};
+                font-family: var(--font-book);
                 transition: color 0.25s;
             }
             span:hover {
@@ -117,7 +117,7 @@ function PaletteButton({ name, current, onSelect }: {
                 justify-content: center;
                 align-items: center;
                 font-size: x-large;
-                font-family: ${bookFont};
+                font-family: var(--font-book);
                 padding: 0;
                 width: ${size};
                 height: ${size};
