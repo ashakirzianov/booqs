@@ -3,7 +3,7 @@ import { groupBy } from 'lodash'
 import { pathInRange } from '@/core'
 import {
     TocItem, Highlight, useToc, useHighlights, UserData,
-} from '@/app'
+} from '@/application'
 import { syncStorageCell } from '@/plat'
 import { useAuth } from './auth'
 import { useMemo } from 'react'

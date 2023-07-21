@@ -1,5 +1,5 @@
 import React from 'react'
-import { useSignInOptions, useAuth } from '@/app'
+import { useSignInOptions, useAuth } from '@/application'
 import { meter } from '@/controls/theme'
 import { Menu, MenuItem } from '@/controls/Menu'
 import { IconButton } from '@/controls/Buttons'

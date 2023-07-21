@@ -3,7 +3,7 @@ import {
     BooqPath, BooqRange, BooqElementNode, BooqNode, pathToString,
     pathInRange, samePath, pathLessThan,
 } from '@/core'
-import { pathToId } from '@/app'
+import { pathToId } from '@/application'
 import { booqHref } from '@/controls/Links'
 import type { Augmentation } from './BooqContent'
 

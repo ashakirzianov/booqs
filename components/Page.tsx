@@ -1,7 +1,7 @@
 import React from 'react'
 import Head from 'next/head'
 import { SdksHead } from '@/plat'
-import { useSettings, palettes } from '@/app'
+import { useSettings, palettes } from '@/application'
 import { HasChildren } from '@/controls/utils'
 import {
     normalWeight, vars,

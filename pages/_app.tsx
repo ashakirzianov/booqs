@@ -10,7 +10,7 @@ import '@fortawesome/fontawesome-svg-core/styles.css'
 config.autoAddCss = false
 
 import { AppProps } from 'next/app'
-import { AppProvider } from '@/app'
+import { AppProvider } from '@/application'
 
 import { Lato, Lora } from 'next/font/google'
 

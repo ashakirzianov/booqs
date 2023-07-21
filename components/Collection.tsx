@@ -1,5 +1,5 @@
 import React from 'react'
-import { useCollection } from '@/app'
+import { useCollection } from '@/application'
 import { BooqCover } from '../controls/BooqCover'
 import { Spinner } from '../controls/Spinner'
 import { meter, panelShadow } from '../controls/theme'

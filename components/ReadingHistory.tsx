@@ -1,5 +1,5 @@
 import React from 'react'
-import { useHistory, pageForPosition, useAuth } from '@/app'
+import { useHistory, pageForPosition, useAuth } from '@/application'
 import { BooqPreview } from '@/controls/BooqPreview'
 import { meter, vars } from '@/controls/theme'
 import { BooqLink } from '@/controls/Links'

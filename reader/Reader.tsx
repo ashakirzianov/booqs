@@ -3,7 +3,7 @@ import { positionForPath, samePath, BooqPath, BooqRange } from '@/core'
 import {
     BooqData, BooqAnchor, useSettings, useReportHistory,
     useFilteredHighlights, colorForGroup, quoteColor, pageForPosition,
-} from '@/app'
+} from '@/application'
 import { headerHeight, vars, boldWeight } from '@/controls/theme'
 import { BorderButton, IconButton } from '@/controls/Buttons'
 import { BooqLink, FeedLink } from '@/controls/Links'

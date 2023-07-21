@@ -1,6 +1,6 @@
 import { GetStaticPaths, GetStaticProps } from 'next'
 import { pathFromString, rangeFromString, BooqPath, BooqRange } from '@/core'
-import { fetchBooqFragment, fetchFeatured } from '@/app'
+import { fetchBooqFragment, fetchFeatured } from '@/application'
 import { BooqPage, BooqPageProps } from '@/reader'
 import { booqHref } from '@/controls/Links'
 

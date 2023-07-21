@@ -1,4 +1,4 @@
-import { Highlight, colorForGroup, UserData } from '@/app'
+import { Highlight, colorForGroup, UserData } from '@/application'
 import { isSmallScreen, meter, vars, boldWeight } from '@/controls/theme'
 import { BooqLink } from '@/controls/Links'
 import { Overlay } from '@/controls/Popover'

@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react'
 import {
     useAuth, UserData, useNavigationNodes, NavigationNode,
-} from '@/app'
+} from '@/application'
 import {
     meter, vars, boldWeight, isSmallScreen, smallScreenWidth,
 } from '@/controls/theme'

@@ -1,6 +1,6 @@
 import {
     PaletteName, palettes, useSetSettings, useSettings,
-} from '@/app'
+} from '@/application'
 import {
     buttonShadow, meter, vars,
 } from '@/controls/theme'

@@ -1,4 +1,4 @@
-import { useAuth, useUpload } from '@/app'
+import { useAuth, useUpload } from '@/application'
 import { IconButton } from '@/controls/Buttons'
 import { meter } from '@/controls/theme'
 import { useSelectFileDialog } from '@/controls/SelectFileDialog'

@@ -1,7 +1,7 @@
 import React from 'react'
 import {
     useAddToCollection, useCollection, useRemoveFromCollection, useFeatured,
-} from '@/app'
+} from '@/application'
 import { TextButton } from '@/controls/Buttons'
 import { Panel } from '@/controls/Panel'
 import { BooqTags } from '@/controls/BooqTags'

@@ -1,5 +1,5 @@
 import { GetStaticProps } from 'next'
-import { FeaturedItem, fetchFeatured } from '@/app'
+import { FeaturedItem, fetchFeatured } from '@/application'
 import { Page } from '@/components/Page'
 import { AppBar } from '@/components/AppBar'
 import { Featured } from '@/components/Featured'

@@ -1,5 +1,5 @@
 import { Fragment } from 'react'
-import { TocItem, UserData, PathHighlightsNode } from '@/app'
+import { TocItem, UserData, PathHighlightsNode } from '@/application'
 import { BooqLink } from '@/controls/Links'
 import { meter, boldWeight } from '@/controls/theme'
 import { HighlightNodeComp } from './HighlightNode'

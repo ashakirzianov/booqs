@@ -4,7 +4,7 @@ import * as clipboard from 'clipboard-polyfill'
 import { BooqRange } from '@/core'
 import {
     useHighlightMutations, Highlight, colorForGroup, groups, UserData,
-} from '@/app'
+} from '@/application'
 import { MenuItem } from '@/controls/Menu'
 import { useDocumentEvent } from '@/controls/utils'
 import { quoteRef } from '@/controls/Links'

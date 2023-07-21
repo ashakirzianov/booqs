@@ -1,5 +1,5 @@
 import { ReactNode } from 'react'
-import { UserData, useNavigationState } from '@/app'
+import { UserData, useNavigationState } from '@/application'
 import { ProfileBadge } from '@/controls/ProfilePicture'
 import { meter, boldWeight, vars, radius } from '@/controls/theme'
 

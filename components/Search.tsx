@@ -1,5 +1,5 @@
 import React from 'react'
-import { useSearch, SearchResult } from '@/app'
+import { useSearch, SearchResult } from '@/application'
 import { normalWeight, meter, radius, vars } from '@/controls/theme'
 import { BooqCover } from '@/controls/BooqCover'
 import { Spinner } from '@/controls/Spinner'

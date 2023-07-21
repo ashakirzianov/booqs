@@ -7,7 +7,7 @@ import {
 } from './BooqContent'
 import { ContextMenuContent, ContextMenuTarget } from './ContextMenuContent'
 import { throttle } from 'lodash'
-import { useAuth } from '@/app'
+import { useAuth } from '@/application'
 
 export function useContextMenu(booqId: string) {
     const { menuState, setMenuState } = useMenuState()

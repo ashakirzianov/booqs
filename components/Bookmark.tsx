@@ -1,6 +1,6 @@
 import React from 'react'
 import { BooqPath, samePath } from '@/core'
-import { useBookmarks, useBookmarkMutations, useAuth } from '@/app'
+import { useBookmarks, useBookmarkMutations, useAuth } from '@/application'
 import { IconButton } from '@/controls/Buttons'
 
 export function BookmarkButton({ booqId, path }: {
