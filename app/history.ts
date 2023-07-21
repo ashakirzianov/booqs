@@ -1,6 +1,6 @@
 import { useQuery, useMutation } from '@apollo/react-hooks'
 import gql from 'graphql-tag'
-import { BooqPath } from 'core'
+import { BooqPath } from '@/core'
 import { currentSource } from './common'
 
 const BooqHistoryQuery = gql`query BooqHistory {

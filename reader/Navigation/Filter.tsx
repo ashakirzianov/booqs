@@ -1,7 +1,7 @@
 import { ReactNode } from 'react'
-import { UserData, useNavigationState } from 'app'
-import { ProfileBadge } from 'controls/ProfilePicture'
-import { meter, boldWeight, vars, radius } from 'controls/theme'
+import { UserData, useNavigationState } from '@/app'
+import { ProfileBadge } from '@/controls/ProfilePicture'
+import { meter, boldWeight, vars, radius } from '@/controls/theme'
 
 export function NavigationFilter({ authors }: {
     self: UserData | undefined,

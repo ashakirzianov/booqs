@@ -1,11 +1,11 @@
 import React from 'react'
 import Head from 'next/head'
-import { SdksHead } from 'plat'
-import { useSettings, palettes } from 'app'
-import { HasChildren } from 'controls/utils'
+import { SdksHead } from '@/plat'
+import { useSettings, palettes } from '@/app'
+import { HasChildren } from '@/controls/utils'
 import {
     menuFont, normalWeight, fontHref, vars,
-} from 'controls/theme'
+} from '@/controls/theme'
 
 
 export function Page({ title, children }: HasChildren & {

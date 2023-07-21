@@ -1,11 +1,11 @@
 import React, { useState, useMemo } from 'react'
 import {
     useAuth, UserData, useNavigationNodes, NavigationNode,
-} from 'app'
+} from '@/app'
 import {
     meter, vars, boldWeight, isSmallScreen, smallScreenWidth,
-} from 'controls/theme'
-import { IconButton } from 'controls/Buttons'
+} from '@/controls/theme'
+import { IconButton } from '@/controls/Buttons'
 import { TocNodeComp } from './TocNode'
 import { HighlightNodeComp } from './HighlightNode'
 import { PathHighlightsNodeComp } from './PathHighlightsNode'

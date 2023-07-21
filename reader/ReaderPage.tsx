@@ -1,8 +1,8 @@
 import { useEffect } from 'react'
 import { useRouter } from 'next/router'
-import { useBooq, BooqData, pathToId } from 'app'
-import { BooqPath, BooqRange } from 'core'
-import { Page } from 'components/Page'
+import { useBooq, BooqData, pathToId } from '@/app'
+import { BooqPath, BooqRange } from '@/core'
+import { Page } from '@/components/Page'
 import { Reader, LoadingBooqScreen } from './Reader'
 
 type PageData = {

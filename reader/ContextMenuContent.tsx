@@ -1,16 +1,16 @@
 import React, { useCallback } from 'react'
 import { useRouter } from 'next/router'
 import * as clipboard from 'clipboard-polyfill'
-import { BooqRange } from 'core'
+import { BooqRange } from '@/core'
 import {
     useHighlightMutations, Highlight, colorForGroup, groups, UserData,
-} from 'app'
-import { MenuItem } from 'controls/Menu'
-import { useDocumentEvent } from 'controls/utils'
-import { quoteRef } from 'controls/Links'
+} from '@/app'
+import { MenuItem } from '@/controls/Menu'
+import { useDocumentEvent } from '@/controls/utils'
+import { quoteRef } from '@/controls/Links'
 import { BooqSelection } from './BooqContent'
-import { meter, menuFont, boldWeight } from 'controls/theme'
-import { ProfileBadge } from 'controls/ProfilePicture'
+import { meter, menuFont, boldWeight } from '@/controls/theme'
+import { ProfileBadge } from '@/controls/ProfilePicture'
 
 type EmptyTarget = {
     kind: 'empty',

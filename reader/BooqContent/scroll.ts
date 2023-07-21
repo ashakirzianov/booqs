@@ -1,8 +1,8 @@
 import { useCallback } from 'react'
 import { throttle } from 'lodash'
-import { BooqPath } from 'core'
-import { pathFromId } from 'app'
-import { useDocumentEvent } from 'controls/utils'
+import { BooqPath } from '@/core'
+import { pathFromId } from '@/app'
+import { useDocumentEvent } from '@/controls/utils'
 
 export function useOnScroll(callback?: (path: BooqPath) => void) {
     useDocumentEvent('scroll', useCallback(throttle(function () {

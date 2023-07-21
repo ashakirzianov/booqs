@@ -1,11 +1,11 @@
 import React from 'react'
-import { useSignInOptions, useAuth } from 'app'
-import { meter } from 'controls/theme'
-import { Menu, MenuItem } from 'controls/Menu'
-import { IconButton } from 'controls/Buttons'
-import { PopoverSingleton, Popover } from 'controls/Popover'
-import { ProfileBadge } from 'controls/ProfilePicture'
-import { useModal } from 'controls/Modal'
+import { useSignInOptions, useAuth } from '@/app'
+import { meter } from '@/controls/theme'
+import { Menu, MenuItem } from '@/controls/Menu'
+import { IconButton } from '@/controls/Buttons'
+import { PopoverSingleton, Popover } from '@/controls/Popover'
+import { ProfileBadge } from '@/controls/ProfilePicture'
+import { useModal } from '@/controls/Modal'
 
 export function useSignInModal() {
     const { signWithApple, signWithFacebook } = useSignInOptions()

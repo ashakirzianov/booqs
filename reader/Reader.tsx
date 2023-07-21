@@ -1,16 +1,16 @@
 import React, { useState, useCallback, useMemo } from 'react'
-import { positionForPath, samePath, BooqPath, BooqRange } from 'core'
+import { positionForPath, samePath, BooqPath, BooqRange } from '@/core'
 import {
     BooqData, BooqAnchor, useSettings, useReportHistory,
     useFilteredHighlights, colorForGroup, quoteColor, pageForPosition,
-} from 'app'
-import { headerHeight, bookFont, vars, boldWeight } from 'controls/theme'
-import { BorderButton, IconButton } from 'controls/Buttons'
-import { BooqLink, FeedLink } from 'controls/Links'
-import { Spinner } from 'controls/Spinner'
-import { usePopoverSingleton } from 'controls/Popover'
-import { Themer } from 'components/Themer'
-import { SignIn } from 'components/SignIn'
+} from '@/app'
+import { headerHeight, bookFont, vars, boldWeight } from '@/controls/theme'
+import { BorderButton, IconButton } from '@/controls/Buttons'
+import { BooqLink, FeedLink } from '@/controls/Links'
+import { Spinner } from '@/controls/Spinner'
+import { usePopoverSingleton } from '@/controls/Popover'
+import { Themer } from '@/components/Themer'
+import { SignIn } from '@/components/SignIn'
 import {
     BooqContent, Augmentation, getAugmentationRect, getAugmentationText,
 } from './BooqContent'

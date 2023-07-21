@@ -1,10 +1,10 @@
 import { atom, useRecoilValue, useRecoilState } from 'recoil'
 import { groupBy } from 'lodash'
-import { pathInRange } from 'core'
+import { pathInRange } from '@/core'
 import {
     TocItem, Highlight, useToc, useHighlights, UserData,
-} from 'app'
-import { syncStorageCell } from 'plat'
+} from '@/app'
+import { syncStorageCell } from '@/plat'
 import { useAuth } from './auth'
 import { useMemo } from 'react'
 

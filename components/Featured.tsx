@@ -1,13 +1,13 @@
 import React from 'react'
 import {
     useAddToCollection, useCollection, useRemoveFromCollection, useFeatured,
-} from 'app'
-import { TextButton } from 'controls/Buttons'
-import { Panel } from 'controls/Panel'
-import { BooqTags } from 'controls/BooqTags'
-import { BooqCover } from 'controls/BooqCover'
-import { boldWeight, meter } from 'controls/theme'
-import { BooqLink } from 'controls/Links'
+} from '@/app'
+import { TextButton } from '@/controls/Buttons'
+import { Panel } from '@/controls/Panel'
+import { BooqTags } from '@/controls/BooqTags'
+import { BooqCover } from '@/controls/BooqCover'
+import { boldWeight, meter } from '@/controls/theme'
+import { BooqLink } from '@/controls/Links'
 
 export function Featured({ cards }: {
     cards: FeaturedItem[],

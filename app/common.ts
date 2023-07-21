@@ -1,4 +1,4 @@
-import { pathToString, BooqPath, pathFromString } from 'core'
+import { pathToString, BooqPath, pathFromString } from '@/core'
 
 const idPrefix = 'path:'
 export function pathToId(path: BooqPath): string {

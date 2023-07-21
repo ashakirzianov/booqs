@@ -1,6 +1,6 @@
 import gql from 'graphql-tag'
 import { useQuery } from '@apollo/react-hooks'
-import { BooqPath } from 'core'
+import { BooqPath } from '@/core'
 
 const TocQuery = gql`query TocQuery($booqId: ID!) {
     booq(id: $booqId) {

@@ -1,5 +1,5 @@
-import { pathLessThan } from 'core'
-import { pathFromId } from 'app'
+import { pathLessThan } from '@/core'
+import { pathFromId } from '@/app'
 import type { BooqSelection } from './BooqContent'
 
 export type AnchorRect = {

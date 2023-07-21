@@ -1,7 +1,7 @@
 import React, { ReactNode } from 'react'
 import {
     meter, headerHeight, vars, smallScreenWidth,
-} from 'controls/theme'
+} from '@/controls/theme'
 
 type ControlsProps = {
     isControlsVisible: boolean,

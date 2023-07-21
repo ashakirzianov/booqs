@@ -1,8 +1,8 @@
 import React from 'react'
-import { useHistory, pageForPosition, useAuth } from 'app'
-import { BooqPreview } from 'controls/BooqPreview'
-import { meter, vars } from 'controls/theme'
-import { BooqLink } from 'controls/Links'
+import { useHistory, pageForPosition, useAuth } from '@/app'
+import { BooqPreview } from '@/controls/BooqPreview'
+import { meter, vars } from '@/controls/theme'
+import { BooqLink } from '@/controls/Links'
 import { useSignInModal } from './SignIn'
 
 const historyPanelHeight = '15em'
@@ -23,7 +23,7 @@ function SignInPanel() {
     return <div className='container'>
         <span className='label'>
             <span className='sign-in-link' onClick={openModal}>Sign in</span> to see history
-            </span>
+        </span>
         {ModalContent}
         <style jsx>{`
             .container {

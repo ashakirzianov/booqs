@@ -1,8 +1,8 @@
 import { GetStaticPaths, GetStaticProps } from 'next'
-import { pathFromString, rangeFromString, BooqPath, BooqRange } from 'core'
-import { fetchBooqFragment, fetchFeatured } from 'app'
-import { BooqPage, BooqPageProps } from 'reader'
-import { booqHref } from 'controls/Links'
+import { pathFromString, rangeFromString, BooqPath, BooqRange } from '@/core'
+import { fetchBooqFragment, fetchFeatured } from '@/app'
+import { BooqPage, BooqPageProps } from '@/reader'
+import { booqHref } from '@/controls/Links'
 
 type QueryParams = {
     slug: string[],

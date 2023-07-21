@@ -1,4 +1,4 @@
-import { BooqPath } from 'core'
+import { BooqPath } from '@/core'
 import {
     bookFont, meter, radius, panelShadow, panelShadowHover, vars
 } from './theme'

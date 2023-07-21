@@ -1,9 +1,9 @@
 import React from 'react'
-import { useSearch, SearchResult } from 'app'
-import { normalWeight, meter, radius, vars } from 'controls/theme'
-import { BooqCover } from 'controls/BooqCover'
-import { Spinner } from 'controls/Spinner'
-import { BooqLink } from 'controls/Links'
+import { useSearch, SearchResult } from '@/app'
+import { normalWeight, meter, radius, vars } from '@/controls/theme'
+import { BooqCover } from '@/controls/BooqCover'
+import { Spinner } from '@/controls/Spinner'
+import { BooqLink } from '@/controls/Links'
 
 export function Search() {
     const { query, doQuery, results, loading } = useSearch()

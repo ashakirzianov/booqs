@@ -1,5 +1,5 @@
 import { atom, useRecoilValue, useSetRecoilState } from 'recoil'
-import { syncStorageCell } from 'plat'
+import { syncStorageCell } from '@/plat'
 
 type Palette = {
     background: string,

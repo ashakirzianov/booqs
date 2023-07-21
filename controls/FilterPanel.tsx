@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { meter, vars } from 'controls/theme'
+import { meter, vars } from '@/controls/theme'
 
 type FilterItem = {
     text: string,

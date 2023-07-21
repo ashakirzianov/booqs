@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo } from 'react'
-import { BooqPath, BooqRange, BooqNode } from 'core'
-import { pathFromId } from 'app'
-import { useDocumentEvent } from 'controls/utils'
+import { BooqPath, BooqRange, BooqNode } from '@/core'
+import { pathFromId } from '@/app'
+import { useDocumentEvent } from '@/controls/utils'
 import { renderNodes } from './render'
 import { useOnScroll } from './scroll'
 

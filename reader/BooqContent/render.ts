@@ -2,9 +2,9 @@ import { ReactNode, createElement } from 'react'
 import {
     BooqPath, BooqRange, BooqElementNode, BooqNode, pathToString,
     pathInRange, samePath, pathLessThan,
-} from 'core'
-import { pathToId } from 'app'
-import { booqHref } from 'controls/Links'
+} from '@/core'
+import { pathToId } from '@/app'
+import { booqHref } from '@/controls/Links'
 import type { Augmentation } from './BooqContent'
 
 type RenderContext = {

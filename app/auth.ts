@@ -4,7 +4,7 @@ import gql from 'graphql-tag'
 import {
     atom, useRecoilValue, useSetRecoilState, SetterOrUpdater,
 } from 'recoil'
-import { syncStorageCell, sdks } from 'plat'
+import { syncStorageCell, sdks } from '@/plat'
 
 export type UserData = {
     id: string,

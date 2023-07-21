@@ -1,13 +1,13 @@
 import React, { useCallback, ReactNode, useRef, useState } from 'react'
-import { useDocumentEvent } from 'controls/utils'
-import { vars, radius, meter } from 'controls/theme'
-import { Overlay } from 'controls/Popover'
+import { useDocumentEvent } from '@/controls/utils'
+import { vars, radius, meter } from '@/controls/theme'
+import { Overlay } from '@/controls/Popover'
 import {
     getBooqSelection, AnchorRect, getSelectionRect, getAugmentationRect,
 } from './BooqContent'
 import { ContextMenuContent, ContextMenuTarget } from './ContextMenuContent'
 import { throttle } from 'lodash'
-import { useAuth } from 'app'
+import { useAuth } from '@/app'
 
 export function useContextMenu(booqId: string) {
     const { menuState, setMenuState } = useMenuState()
