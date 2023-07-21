@@ -13,7 +13,6 @@ import { AppProps } from 'next/app'
 import { AppProvider } from '@/app'
 
 import { Lato, Lora } from 'next/font/google'
-import { boldWeight, extraBoldWeight, normalWeight } from '@/controls/theme'
 
 const lato = Lato({
     subsets: ['latin'],

@@ -140,7 +140,7 @@ function AuthorItem({ name, pictureUrl }: {
                 align-items: center;
                 padding: ${meter.large};
                 font-size: smaller;
-                font-family: var(--font-menu);
+                font-family: var(--font-main);
                 font-weight: ${boldWeight};
                 user-select: none;
             }
