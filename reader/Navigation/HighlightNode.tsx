@@ -3,7 +3,7 @@ import { isSmallScreen, meter, vars, boldWeight } from '@/controls/theme'
 import { BooqLink } from '@/controls/Links'
 import { Overlay } from '@/controls/Popover'
 import { Icon } from '@/controls/Icon'
-import { ContextMenuContent } from 'reader/ContextMenuContent'
+import { ContextMenuContent } from '@/reader/ContextMenuContent'
 import { ProfileBadge } from '@/controls/ProfilePicture'
 
 export function HighlightNodeComp({ booqId, highlight, self }: {

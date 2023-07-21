@@ -44,7 +44,7 @@ export function AppProvider({ children }: {
     )
 }
 
-export function doQuery<Data = any, Vars = OperationVariables>(options: QueryOptions<Vars>) {
+export function doQuery<Data = any, Vars extends OperationVariables = OperationVariables>(options: QueryOptions<Vars>) {
     return client.query<Data, Vars>({
         ...options,
         fetchPolicy: 'network-only',

@@ -65,7 +65,7 @@ export function useFilteredHighlights(booqId: string) {
         )
 
         return filteredHighlights
-    }, [highlights, self?.id, showAuthors])
+    }, [highlights, self?.id, showAuthors, showHighlights])
 }
 
 export function useNavigationState() {

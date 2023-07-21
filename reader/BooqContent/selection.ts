@@ -27,7 +27,7 @@ export function getSelectionRect(): AnchorRect | undefined {
 export function getAugmentationRect(augmentationId: string): AnchorRect | undefined {
     const elements = window.document.querySelectorAll(`span[data-augmentation-id='${augmentationId}']`)
     let curr: AnchorRect | undefined = undefined
-    for (const [_, element] of elements.entries()) {
+    for (const element of Array.from(elements)) {
         const domRect = element.getBoundingClientRect()
         const anchorRect = {
             top: domRect.top, left: domRect.left,
@@ -43,9 +43,9 @@ export function getAugmentationRect(augmentationId: string): AnchorRect | undefi
 }
 
 export function getAugmentationText(augmentationId: string): string {
-    const elements = window.document.querySelectorAll(`span[data-augmentation-id='${augmentationId}']`)
+    const elements = Array.from(window.document.querySelectorAll(`span[data-augmentation-id='${augmentationId}']`))
     let text = ''
-    for (const [_, element] of elements.entries()) {
+    for (const element of elements) {
         text += element.textContent
     }
     return text
