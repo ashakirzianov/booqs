@@ -1,7 +1,7 @@
-import { ReactNode } from 'react';
-import { UserData, useNavigationState } from "app";
-import { ProfileBadge } from 'controls/ProfilePicture';
-import { meter, boldWeight, vars, radius } from 'controls/theme';
+import { ReactNode } from 'react'
+import { UserData, useNavigationState } from 'app'
+import { ProfileBadge } from 'controls/ProfilePicture'
+import { meter, boldWeight, vars, radius } from 'controls/theme'
 
 export function NavigationFilter({ authors }: {
     self: UserData | undefined,
@@ -10,7 +10,7 @@ export function NavigationFilter({ authors }: {
     const {
         showAuthors, showChapters, showHighlights,
         toggleAuthor, toggleChapters, toggleHighlights,
-    } = useNavigationState();
+    } = useNavigationState()
     return <div className='container'>
         <div className='item'>
             <FilterButton
@@ -28,7 +28,7 @@ export function NavigationFilter({ authors }: {
         </div>
         {
             authors.map(author => {
-                const [first] = author.name?.split(' ') ?? ['Incognito'];
+                const [first] = author.name?.split(' ') ?? ['Incognito']
                 return <div className='item' key={author.id}>
                     <FilterButton
                         text={first ?? 'Incognito'}
@@ -41,7 +41,7 @@ export function NavigationFilter({ authors }: {
                             picture={author.pictureUrl ?? undefined}
                         />}
                     />
-                </div>;
+                </div>
             })
         }
         <style jsx>{`
@@ -92,5 +92,5 @@ function FilterButton({ text, selected, toggle, Badge }: {
                 font-weight: ${boldWeight};
             }
             `}</style>
-    </div>;
+    </div>
 }

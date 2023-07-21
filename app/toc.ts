@@ -1,6 +1,6 @@
-import gql from "graphql-tag";
-import { useQuery } from "@apollo/react-hooks";
-import { BooqPath } from "core";
+import gql from 'graphql-tag'
+import { useQuery } from '@apollo/react-hooks'
+import { BooqPath } from 'core'
 
 const TocQuery = gql`query TocQuery($booqId: ID!) {
     booq(id: $booqId) {
@@ -13,7 +13,7 @@ const TocQuery = gql`query TocQuery($booqId: ID!) {
             level
         }
     }
-}`;
+}`
 type TocData = {
     booq: {
         title?: string,
@@ -31,11 +31,11 @@ export function useToc(booqId: string) {
     const { loading, data } = useQuery<TocData>(
         TocQuery,
         { variables: { booqId } },
-    );
+    )
 
     return {
         loading,
         title: data?.booq.title,
         toc: data?.booq.tableOfContents ?? [],
-    };
+    }
 }

@@ -1,5 +1,5 @@
-import React from 'react';
-import { menuFontPrimary, normalWeight } from './theme';
+import React from 'react'
+import { menuFontPrimary, normalWeight } from './theme'
 
 export function Logo() {
     return <div>

@@ -1,7 +1,7 @@
-import React, { ReactNode } from 'react';
-import { IconName, Icon } from './Icon';
-import { meter, menuFont, boldWeight, vars, smallScreenWidth } from './theme';
-import { Spinner } from './Spinner';
+import React, { ReactNode } from 'react'
+import { IconName, Icon } from './Icon'
+import { meter, menuFont, boldWeight, vars, smallScreenWidth } from './theme'
+import { Spinner } from './Spinner'
 
 export function Menu({ callback, children }: {
     children: ReactNode,
@@ -17,7 +17,7 @@ export function Menu({ callback, children }: {
                 flex: 1;
             }
             `}</style>
-    </div>;
+    </div>
 }
 
 export function MenuItem({ icon, text, callback, spinner }: {
@@ -81,5 +81,5 @@ export function MenuItem({ icon, text, callback, spinner }: {
                 }
             }
             `}</style>
-    </div>;
+    </div>
 }

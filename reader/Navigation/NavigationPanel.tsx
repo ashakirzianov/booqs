@@ -1,43 +1,43 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo } from 'react'
 import {
     useAuth, UserData, useNavigationNodes, NavigationNode,
-} from 'app';
+} from 'app'
 import {
     meter, vars, boldWeight, isSmallScreen, smallScreenWidth,
-} from 'controls/theme';
-import { IconButton } from 'controls/Buttons';
-import { TocNodeComp } from './TocNode';
-import { HighlightNodeComp } from './HighlightNode';
-import { PathHighlightsNodeComp } from './PathHighlightsNode';
-import { NavigationFilter } from './Filter';
+} from 'controls/theme'
+import { IconButton } from 'controls/Buttons'
+import { TocNodeComp } from './TocNode'
+import { HighlightNodeComp } from './HighlightNode'
+import { PathHighlightsNodeComp } from './PathHighlightsNode'
+import { NavigationFilter } from './Filter'
 
 export function useNavigationPanel(booqId: string) {
-    const [navigationOpen, setOpen] = useState(false);
+    const [navigationOpen, setOpen] = useState(false)
     const NavigationButton = <IconButton
         icon='toc'
         onClick={() => setOpen(!navigationOpen)}
         isSelected={navigationOpen}
-    />;
+    />
     const NavigationContent = <Navigation
         booqId={booqId}
         closeSelf={() => {
             if (isSmallScreen()) {
-                setOpen(false);
+                setOpen(false)
             }
         }}
-    />;
+    />
     return {
         navigationOpen, NavigationButton, NavigationContent,
-    };
+    }
 }
 
 function Navigation({ booqId, closeSelf }: {
     booqId: string,
     closeSelf: () => void,
 }) {
-    const self = useAuth();
-    const { nodes, authors } = useNavigationNodes(booqId);
-    const exceptSelf = authors.filter(a => a.id !== self?.id);
+    const self = useAuth()
+    const { nodes, authors } = useNavigationNodes(booqId)
+    const exceptSelf = authors.filter(a => a.id !== self?.id)
     return useMemo(() => {
         return <div className='safe-area'>
             <div className='container'>
@@ -120,10 +120,10 @@ function Navigation({ booqId, closeSelf }: {
                 }
             }
             `}</style>
-        </div>;
+        </div>
     }, [
         nodes,
-    ]);
+    ])
 }
 
 function NavigationNodeComp({ booqId, self, node }: {
@@ -136,20 +136,20 @@ function NavigationNodeComp({ booqId, self, node }: {
             return <TocNodeComp
                 booqId={booqId}
                 node={node}
-            />;
+            />
         case 'highlight':
             return <HighlightNodeComp
                 booqId={booqId}
                 self={self}
                 highlight={node.highlight}
-            />;
+            />
         case 'highlights':
             return <PathHighlightsNodeComp
                 booqId={booqId}
                 self={self}
                 node={node}
-            />;
+            />
         default:
-            return null;
+            return null
     }
 }

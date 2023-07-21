@@ -1,7 +1,7 @@
-import React from 'react';
-import { radius } from './theme';
+import React from 'react'
+import { radius } from './theme'
 
-const defaultSize = 70;
+const defaultSize = 70
 
 export function BooqCover({ cover, title, author, size }: {
     cover?: string,
@@ -9,7 +9,7 @@ export function BooqCover({ cover, title, author, size }: {
     author?: string,
     size?: number,
 }) {
-    size = size ?? defaultSize;
+    size = size ?? defaultSize
     return <div>
         {
             cover
@@ -27,7 +27,7 @@ export function BooqCover({ cover, title, author, size }: {
                 overflow: hidden;
             }
             `}</style>
-    </div>;
+    </div>
 }
 
 function BooqImageCover({ cover, title }: {
@@ -45,7 +45,7 @@ function BooqImageCover({ cover, title }: {
                 background-repeat: no-repeat;
             }
             `}</style>
-    </div>;
+    </div>
 }
 
 function BooqDefaultCover({ title, author, size }: {
@@ -53,7 +53,7 @@ function BooqDefaultCover({ title, author, size }: {
     author?: string,
     size: number,
 }) {
-    const { back, text } = colorForString(title ?? 'no-title' + author);
+    const { back, text } = colorForString(title ?? 'no-title' + author)
     return <div title={title} className='container'>
         <div className='cover'>
             {title}
@@ -80,20 +80,20 @@ function BooqDefaultCover({ title, author, size }: {
                 color: ${text};
             }
             `}</style>
-    </div>;
+    </div>
 }
 
 // TODO: rethink this
 function calcFontSize(title: string, size: number) {
     const words = title
         .split(' ')
-        .sort((a, b) => b.length - a.length);
-    const maxLength = words[0]?.length ?? 0;
-    const count = title.length / 10;
-    const width = (size * 2) / maxLength;
-    const height = (size * 3) / count * 0.75;
-    const result = Math.floor(Math.min(width, height));
-    return `${result}px`;
+        .sort((a, b) => b.length - a.length)
+    const maxLength = words[0]?.length ?? 0
+    const count = title.length / 10
+    const width = (size * 2) / maxLength
+    const height = (size * 3) / count * 0.75
+    const result = Math.floor(Math.min(width, height))
+    return `${result}px`
 }
 
 function colorForString(s: string) {
@@ -123,12 +123,12 @@ function colorForString(s: string) {
             back: 'black',
             text: 'white',
         },
-    ];
+    ]
 
     const rand = s
         .split('')
-        .reduce((n, ch) => n + ch.charCodeAt(0), s.length);
-    const idx = rand % coverColors.length;
+        .reduce((n, ch) => n + ch.charCodeAt(0), s.length)
+    const idx = rand % coverColors.length
 
-    return coverColors[idx];
+    return coverColors[idx]
 }

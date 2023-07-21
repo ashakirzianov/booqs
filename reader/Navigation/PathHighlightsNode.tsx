@@ -1,8 +1,8 @@
-import { Fragment } from 'react';
-import { TocItem, UserData, PathHighlightsNode } from 'app';
-import { BooqLink } from 'controls/Links';
-import { meter, boldWeight } from 'controls/theme';
-import { HighlightNodeComp } from './HighlightNode';
+import { Fragment } from 'react'
+import { TocItem, UserData, PathHighlightsNode } from 'app'
+import { BooqLink } from 'controls/Links'
+import { meter, boldWeight } from 'controls/theme'
+import { HighlightNodeComp } from './HighlightNode'
 
 export function PathHighlightsNodeComp({
     booqId, self,
@@ -31,7 +31,7 @@ export function PathHighlightsNodeComp({
                 margin: ${meter.regular} 0;
             }
             `}</style>
-    </div>;
+    </div>
 }
 
 function Path({ items, booqId }: {
@@ -67,5 +67,5 @@ function Path({ items, booqId }: {
                 margin: 0 ${meter.regular} 0 0;
             }
             `}</style>
-    </div>;
+    </div>
 }

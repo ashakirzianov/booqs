@@ -1,6 +1,6 @@
-import { pageForPosition, TocNode } from "app";
-import { BooqLink } from "controls/Links";
-import { boldWeight, vars, meter } from "controls/theme";
+import { pageForPosition, TocNode } from 'app'
+import { BooqLink } from 'controls/Links'
+import { boldWeight, vars, meter } from 'controls/theme'
 
 
 export function TocNodeComp({
@@ -31,5 +31,5 @@ export function TocNodeComp({
             margin-left: ${meter.regular};
         }
         `}</style>
-    </>;
+    </>
 }

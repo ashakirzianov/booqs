@@ -1,7 +1,7 @@
-import React, { ReactNode } from 'react';
-import Link from 'next/link';
-import { BooqPath, pathToString, BooqRange, rangeToString } from 'core';
-import { pathToId } from 'app';
+import React, { ReactNode } from 'react'
+import Link from 'next/link'
+import { BooqPath, pathToString, BooqRange, rangeToString } from 'core'
+import { pathToId } from 'app'
 
 export function BooqLink({ booqId, path, children }: {
     booqId: string,
@@ -13,7 +13,7 @@ export function BooqLink({ booqId, path, children }: {
         color: 'inherit',
     }}>
         {children}
-    </Link>;
+    </Link>
 }
 
 export function FeedLink({ children }: {
@@ -21,19 +21,19 @@ export function FeedLink({ children }: {
 }) {
     return <Link href='/'>
         {children}
-    </Link>;
+    </Link>
 }
 
 export function booqHref(booqId: string, path?: BooqPath) {
     return path?.length
         ? `/booq/${booqId}/path/${pathToString(path)}#${pathToId(path)}`
-        : `/booq/${booqId}`;
+        : `/booq/${booqId}`
 }
 
 export function quoteRef(booqId: string, range: BooqRange) {
-    return `/booq/${booqId}/quote/${rangeToString(range)}`;
+    return `/booq/${booqId}/quote/${rangeToString(range)}`
 }
 
 export function feedHref() {
-    return '/';
+    return '/'
 }

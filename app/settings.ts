@@ -1,5 +1,5 @@
-import { atom, useRecoilValue, useSetRecoilState } from 'recoil';
-import { syncStorageCell } from "plat";
+import { atom, useRecoilValue, useSetRecoilState } from 'recoil'
+import { syncStorageCell } from 'plat'
 
 type Palette = {
     background: string,
@@ -16,56 +16,56 @@ type SettingsData = {
     paletteName: PaletteName,
     fontScale: number,
 };
-const key = 'settings';
-const storage = syncStorageCell<SettingsData>(key);
+const key = 'settings'
+const storage = syncStorageCell<SettingsData>(key)
 const initialSettingsData: SettingsData = storage.restore() ?? {
     paletteName: 'light',
     fontScale: 100,
-};
-storage.store(initialSettingsData);
+}
+storage.store(initialSettingsData)
 const settingsState = atom({
     key,
     default: initialSettingsData,
-});
+})
 
 export function usePalette() {
-    return useSettings().palette;
+    return useSettings().palette
 }
 
 export function useSettings() {
-    const { paletteName, fontScale } = useRecoilValue(settingsState);
-    const palette = palettes[paletteName] ?? palettes.light;
+    const { paletteName, fontScale } = useRecoilValue(settingsState)
+    const palette = palettes[paletteName] ?? palettes.light
     return {
         palette,
         paletteName,
         fontScale,
-    };
+    }
 }
 export function useSetSettings() {
-    const setter = useSetRecoilState(settingsState);
+    const setter = useSetRecoilState(settingsState)
     return {
         setPalette(paletteName: PaletteName) {
             setter(curr => {
                 const next = {
                     ...curr,
                     paletteName,
-                };
-                storage.store(next);
-                return next;
-            });
+                }
+                storage.store(next)
+                return next
+            })
         },
         setFontScale(fontScale: number) {
             setter(curr => {
-                fontScale = Math.max(10, fontScale);
+                fontScale = Math.max(10, fontScale)
                 const next = {
                     ...curr,
                     fontScale,
-                };
-                storage.store(next);
-                return next;
-            });
+                }
+                storage.store(next)
+                return next
+            })
         },
-    };
+    }
 }
 
 export type PaletteName = 'light' | 'sepia' | 'dark';

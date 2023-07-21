@@ -1,17 +1,17 @@
-import React, { useCallback, ReactNode, useRef, useState } from 'react';
-import { useDocumentEvent } from 'controls/utils';
-import { vars, radius, meter } from 'controls/theme';
-import { Overlay } from 'controls/Popover';
+import React, { useCallback, ReactNode, useRef, useState } from 'react'
+import { useDocumentEvent } from 'controls/utils'
+import { vars, radius, meter } from 'controls/theme'
+import { Overlay } from 'controls/Popover'
 import {
     getBooqSelection, AnchorRect, getSelectionRect, getAugmentationRect,
-} from './BooqContent';
-import { ContextMenuContent, ContextMenuTarget } from './ContextMenuContent';
-import { throttle } from 'lodash';
-import { useAuth } from 'app';
+} from './BooqContent'
+import { ContextMenuContent, ContextMenuTarget } from './ContextMenuContent'
+import { throttle } from 'lodash'
+import { useAuth } from 'app'
 
 export function useContextMenu(booqId: string) {
-    const { menuState, setMenuState } = useMenuState();
-    const self = useAuth();
+    const { menuState, setMenuState } = useMenuState()
+    const self = useAuth()
     const ContextMenuNode = <ContextMenuLayout
         rect={menuState.rect}
         content={<ContextMenuContent
@@ -23,13 +23,13 @@ export function useContextMenu(booqId: string) {
                 target,
             })}
         />}
-    />;
+    />
 
     return {
         isVisible: menuState.target.kind !== 'empty',
         ContextMenuNode,
         setMenuState,
-    };
+    }
 }
 
 export type ContextMenuState = {
@@ -39,107 +39,107 @@ export type ContextMenuState = {
 function useMenuState() {
     const [menuState, setMenuState] = useState<ContextMenuState>({
         target: { kind: 'empty' },
-    });
+    })
     const handleSelectionChange = useCallback(() => setMenuState(prev => {
         if (prev.target.kind === 'empty' || prev.target.kind === 'selection') {
-            return getSelectionState();
+            return getSelectionState()
         } else {
-            return prev;
+            return prev
         }
-    }), []);
-    const locked = useRef(false);
-    const unhandled = useRef(false);
-    const lock = useCallback(() => locked.current = true, [locked]);
+    }), [])
+    const locked = useRef(false)
+    const unhandled = useRef(false)
+    const lock = useCallback(() => locked.current = true, [locked])
     const unlock = useCallback(() => {
-        locked.current = false;
-        handleSelectionChange();
-    }, [locked, unhandled, handleSelectionChange]);
-    useDocumentEvent('mousedown', lock);
-    useDocumentEvent('touchstart', lock);
-    useDocumentEvent('mouseup', unlock);
-    useDocumentEvent('touchend', unlock);
-    useDocumentEvent('mouseleave', unlock);
-    useDocumentEvent('touchcancel', unlock);
+        locked.current = false
+        handleSelectionChange()
+    }, [locked, unhandled, handleSelectionChange])
+    useDocumentEvent('mousedown', lock)
+    useDocumentEvent('touchstart', lock)
+    useDocumentEvent('mouseup', unlock)
+    useDocumentEvent('touchend', unlock)
+    useDocumentEvent('mouseleave', unlock)
+    useDocumentEvent('touchcancel', unlock)
 
     const selectionHandler = useCallback(() => {
         if (!locked.current) {
-            handleSelectionChange();
+            handleSelectionChange()
         } else {
-            unhandled.current = true;
+            unhandled.current = true
         }
-    }, []);
+    }, [])
 
-    useDocumentEvent('selectionchange', selectionHandler);
+    useDocumentEvent('selectionchange', selectionHandler)
 
     useDocumentEvent('scroll', useCallback(throttle(() => {
         setMenuState(prev => {
             if (prev.target.kind === 'selection') {
-                const rect = getSelectionRect();
+                const rect = getSelectionRect()
                 if (rect) {
                     return {
                         ...prev,
                         rect,
-                    };
+                    }
                 } else {
-                    return { target: { kind: 'empty' } };
+                    return { target: { kind: 'empty' } }
                 }
             } else if (prev.target.kind === 'highlight') {
-                const rect = getAugmentationRect(`highlight/${prev.target.highlight.id}`);
+                const rect = getAugmentationRect(`highlight/${prev.target.highlight.id}`)
                 if (rect) {
                     return {
                         ...prev,
                         rect,
-                    };
+                    }
                 } else {
-                    return { target: { kind: 'empty' } };
+                    return { target: { kind: 'empty' } }
                 }
             } else if (prev.target.kind === 'quote') {
-                const rect = getAugmentationRect('quote/0');
+                const rect = getAugmentationRect('quote/0')
                 if (rect) {
                     return {
                         ...prev,
                         rect,
-                    };
+                    }
                 } else {
-                    return { target: { kind: 'empty' } };
+                    return { target: { kind: 'empty' } }
                 }
             } else {
-                return prev;
+                return prev
             }
-        });
-    }, 200), []));
+        })
+    }, 200), []))
 
     useDocumentEvent('click', event => {
         if (!isWithinCtxMenu(event.target)) {
-            const selection = getBooqSelection();
+            const selection = getBooqSelection()
             if (!selection) {
                 setMenuState({
                     target: { kind: 'empty' },
-                });
+                })
             }
         }
-    });
+    })
 
     return {
         menuState,
         setMenuState,
-    };
+    }
 }
 
 function isWithinCtxMenu(target: any): boolean {
     if (!target) {
-        return false;
+        return false
     } else if (target.id === 'ctxmenu') {
-        return true;
+        return true
     } else {
-        return isWithinCtxMenu(target.parent);
+        return isWithinCtxMenu(target.parent)
     }
 }
 
 function getSelectionState(): ContextMenuState {
-    const rect = getSelectionRect();
+    const rect = getSelectionRect()
     if (rect) {
-        const selection = getBooqSelection();
+        const selection = getBooqSelection()
         if (selection) {
             return {
                 rect,
@@ -147,12 +147,12 @@ function getSelectionState(): ContextMenuState {
                     kind: 'selection',
                     selection,
                 },
-            };
+            }
         }
     }
     return {
         target: { kind: 'empty' },
-    };
+    }
 }
 
 function ContextMenuLayout({ content, rect }: {
@@ -164,7 +164,7 @@ function ContextMenuLayout({ content, rect }: {
             content={content}
             rect={rect}
         />
-        : null;
+        : null
 }
 
 function ContextMenuPopover({
@@ -187,14 +187,14 @@ function ContextMenuPopover({
             pointerEvents: 'none',
             top, left, width, height,
         }} />}
-    />;
+    />
 }
 
 function ContextMenuPanel({ content, rect }: {
     content: ReactNode,
     rect?: AnchorRect,
 }) {
-    const visibility = rect ? '' : 'hidden';
+    const visibility = rect ? '' : 'hidden'
     return <div id='ctxmenu' className='container'>
         <div className={`content ${visibility}`}>{content}</div>
         <style jsx>{`
@@ -223,5 +223,5 @@ function ContextMenuPanel({ content, rect }: {
                 opacity: 0;
             }
             `}</style>
-    </div>;
+    </div>
 }

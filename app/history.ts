@@ -1,7 +1,7 @@
-import { useQuery, useMutation } from "@apollo/react-hooks";
-import gql from "graphql-tag";
-import { BooqPath } from "core";
-import { currentSource } from "./common";
+import { useQuery, useMutation } from '@apollo/react-hooks'
+import gql from 'graphql-tag'
+import { BooqPath } from 'core'
+import { currentSource } from './common'
 
 const BooqHistoryQuery = gql`query BooqHistory {
     history {
@@ -14,7 +14,7 @@ const BooqHistoryQuery = gql`query BooqHistory {
         preview
         position
     }
-}`;
+}`
 type BooqHistoryData = {
     history: {
         booq: {
@@ -32,7 +32,7 @@ export function useHistory() {
     const { loading, data } = useQuery<BooqHistoryData>(
         BooqHistoryQuery,
         { fetchPolicy: 'cache-and-network' },
-    );
+    )
     return {
         loading,
         history: (data?.history ?? []).map(h => ({
@@ -43,12 +43,12 @@ export function useHistory() {
             position: h.position,
             length: h.booq.length,
         })),
-    };
+    }
 }
 
 const ReportHistoryMutation = gql`mutation ReportBooqHistory($event: BooqHistoryInput!) {
     addBooqHistory(event: $event)
-}`;
+}`
 type ReportHistoryData = { addBooqHistory: boolean };
 type ReportHistoryVariables = {
     event: {
@@ -61,7 +61,7 @@ type HistoryEvent = Omit<ReportHistoryVariables['event'], 'source'>;
 export function useReportHistory() {
     const [report] = useMutation<ReportHistoryData, ReportHistoryVariables>(
         ReportHistoryMutation,
-    );
+    )
     return {
         reportHistory(event: HistoryEvent) {
             report({
@@ -71,7 +71,7 @@ export function useReportHistory() {
                         source: currentSource(),
                     },
                 },
-            });
+            })
         },
-    };
+    }
 }

@@ -1,22 +1,22 @@
-import React, { useState, useCallback, useMemo } from 'react';
-import { positionForPath, samePath, BooqPath, BooqRange } from 'core';
+import React, { useState, useCallback, useMemo } from 'react'
+import { positionForPath, samePath, BooqPath, BooqRange } from 'core'
 import {
     BooqData, BooqAnchor, useSettings, useReportHistory,
     useFilteredHighlights, colorForGroup, quoteColor, pageForPosition,
-} from 'app';
-import { headerHeight, bookFont, vars, boldWeight } from 'controls/theme';
-import { BorderButton, IconButton } from 'controls/Buttons';
-import { BooqLink, FeedLink } from 'controls/Links';
-import { Spinner } from 'controls/Spinner';
-import { usePopoverSingleton } from 'controls/Popover';
-import { Themer } from 'components/Themer';
-import { SignIn } from 'components/SignIn';
+} from 'app'
+import { headerHeight, bookFont, vars, boldWeight } from 'controls/theme'
+import { BorderButton, IconButton } from 'controls/Buttons'
+import { BooqLink, FeedLink } from 'controls/Links'
+import { Spinner } from 'controls/Spinner'
+import { usePopoverSingleton } from 'controls/Popover'
+import { Themer } from 'components/Themer'
+import { SignIn } from 'components/SignIn'
 import {
     BooqContent, Augmentation, getAugmentationRect, getAugmentationText,
-} from './BooqContent';
-import { useContextMenu, ContextMenuState } from './ContextMenu';
-import { useNavigationPanel } from './Navigation';
-import { ReaderLayout } from './Layout';
+} from './BooqContent'
+import { useContextMenu, ContextMenuState } from './ContextMenu'
+import { useNavigationPanel } from './Navigation'
+import { ReaderLayout } from './Layout'
 
 export function Reader({
     booq, quote,
@@ -24,29 +24,29 @@ export function Reader({
     booq: BooqData,
     quote?: BooqRange,
 }) {
-    const { fontScale } = useSettings();
+    const { fontScale } = useSettings()
     const {
         onScroll, currentPath, currentPage, totalPages, leftPages,
-    } = useScrollHandler(booq);
+    } = useScrollHandler(booq)
     const range: BooqRange = useMemo(() => ({
         start: booq.fragment.current.path,
         end: booq.fragment.next?.path ?? [booq.fragment.nodes.length],
-    }), [booq]);
-    const { augmentations, menuStateForAugmentation } = useAugmentations(booq.id, quote);
-    const { visible, toggle } = useControlsVisibility();
+    }), [booq])
+    const { augmentations, menuStateForAugmentation } = useAugmentations(booq.id, quote)
+    const { visible, toggle } = useControlsVisibility()
 
-    const pagesLabel = `${currentPage} of ${totalPages}`;
+    const pagesLabel = `${currentPage} of ${totalPages}`
     const leftLabel = leftPages <= 1 ? 'Last page'
-        : `${leftPages} pages left`;
+        : `${leftPages} pages left`
 
-    const { singleton, SingletonNode } = usePopoverSingleton();
+    const { singleton, SingletonNode } = usePopoverSingleton()
     const {
         navigationOpen, NavigationButton, NavigationContent,
-    } = useNavigationPanel(booq.id);
+    } = useNavigationPanel(booq.id)
     const {
         ContextMenuNode, isVisible: contextMenuVisible,
         setMenuState,
-    } = useContextMenu(booq.id);
+    } = useContextMenu(booq.id)
 
     return <ReaderLayout
         isControlsVisible={!contextMenuVisible && visible}
@@ -64,9 +64,9 @@ export function Reader({
                 onScroll={onScroll}
                 onClick={toggle}
                 onAugmentationClick={id => {
-                    const next = menuStateForAugmentation(id);
+                    const next = menuStateForAugmentation(id)
                     if (next) {
-                        setMenuState(next);
+                        setMenuState(next)
                     }
                 }}
             />
@@ -91,7 +91,7 @@ export function Reader({
         CurrentPage={<PageLabel text={pagesLabel} />}
         PagesLeft={<PageLabel text={leftLabel} />}
         NavigationContent={NavigationContent}
-    />;
+    />
 }
 
 export function LoadingBooqScreen() {
@@ -121,57 +121,57 @@ export function LoadingBooqScreen() {
         CurrentPage={null}
         PagesLeft={null}
         NavigationContent={null}
-    />;
+    />
 }
 
 function useControlsVisibility() {
-    const [visible, setVisible] = useState(true);
+    const [visible, setVisible] = useState(true)
     return {
         visible,
         toggle: useCallback(() => {
             if (!isAnythingSelected()) {
-                setVisible(!visible);
+                setVisible(!visible)
             }
         }, [visible, setVisible]),
-    };
+    }
 }
 
 function isAnythingSelected() {
-    const selection = window.getSelection();
+    const selection = window.getSelection()
     if (!selection) {
-        return false;
+        return false
     }
     return selection.anchorNode !== selection.focusNode
-        || selection.anchorOffset !== selection.focusOffset;
+        || selection.anchorOffset !== selection.focusOffset
 }
 
 function useAugmentations(booqId: string, quote?: BooqRange) {
-    const highlights = useFilteredHighlights(booqId);
+    const highlights = useFilteredHighlights(booqId)
     const augmentations = useMemo(() => {
         const augmentations = highlights.map<Augmentation>(h => ({
             id: `highlight/${h.id}`,
             range: { start: h.start, end: h.end },
             color: colorForGroup(h.group),
-        }));
+        }))
         if (quote) {
             const quoteAugmentation: Augmentation = {
                 range: quote,
                 color: quoteColor,
                 id: 'quote/0',
-            };
-            return [quoteAugmentation, ...augmentations];
+            }
+            return [quoteAugmentation, ...augmentations]
         } else {
-            return augmentations;
+            return augmentations
         }
-    }, [quote, highlights]);
+    }, [quote, highlights])
     return {
         augmentations,
         menuStateForAugmentation(augmentationId: string): ContextMenuState | undefined {
-            const rect = getAugmentationRect(augmentationId);
+            const rect = getAugmentationRect(augmentationId)
             if (!rect) {
-                return undefined;
+                return undefined
             }
-            const [kind, id] = augmentationId.split('/');
+            const [kind, id] = augmentationId.split('/')
             switch (kind) {
                 case 'quote':
                     return quote
@@ -185,9 +185,9 @@ function useAugmentations(booqId: string, quote?: BooqRange) {
                                 },
                             },
                         }
-                        : undefined;
+                        : undefined
                 case 'highlight': {
-                    const highlight = highlights.find(hl => hl.id === id);
+                    const highlight = highlights.find(hl => hl.id === id)
                     return highlight
                         ? {
                             rect,
@@ -196,42 +196,42 @@ function useAugmentations(booqId: string, quote?: BooqRange) {
                                 highlight,
                             }
                         }
-                        : undefined;
+                        : undefined
                 }
                 default:
-                    return undefined;
+                    return undefined
             }
         },
-    };
+    }
 }
 
 function useScrollHandler({ id, fragment, length }: BooqData) {
-    const [currentPath, setCurrentPath] = useState(fragment.current.path);
-    const { reportHistory } = useReportHistory();
+    const [currentPath, setCurrentPath] = useState(fragment.current.path)
+    const { reportHistory } = useReportHistory()
 
-    const position = positionForPath(fragment.nodes, currentPath);
+    const position = positionForPath(fragment.nodes, currentPath)
     const nextChapter = fragment.next
         ? positionForPath(fragment.nodes, fragment.next.path)
-        : length;
-    const currentPage = pageForPosition(position) + 1;
-    const totalPages = pageForPosition(length);
-    const chapter = pageForPosition(nextChapter);
-    const leftPages = chapter - currentPage + 1;
+        : length
+    const currentPage = pageForPosition(position) + 1
+    const totalPages = pageForPosition(length)
+    const chapter = pageForPosition(nextChapter)
+    const leftPages = chapter - currentPage + 1
 
     const onScroll = function (path: BooqPath) {
         if (!samePath(path, currentPath)) {
-            setCurrentPath(path);
+            setCurrentPath(path)
             reportHistory({
                 booqId: id,
                 path,
-            });
+            })
         }
-    };
+    }
     return {
         currentPath,
         currentPage, totalPages, leftPages,
         onScroll,
-    };
+    }
 }
 
 function AnchorButton({ booqId, anchor, title }: {
@@ -240,7 +240,7 @@ function AnchorButton({ booqId, anchor, title }: {
     title: string,
 }) {
     if (!anchor) {
-        return null;
+        return null
     }
     return <BooqLink booqId={booqId} path={anchor.path}>
         <div className='container'>
@@ -253,7 +253,7 @@ function AnchorButton({ booqId, anchor, title }: {
                 height: ${headerHeight};
             }`}</style>
         </div>
-    </BooqLink>;
+    </BooqLink>
 }
 
 function PageLabel({ text }: {
@@ -268,5 +268,5 @@ function PageLabel({ text }: {
                 color: var(${vars.dimmed});
             }
             `}</style>
-    </span>;
+    </span>
 }

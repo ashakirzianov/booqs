@@ -1,7 +1,7 @@
-import React, { ReactNode, useState } from 'react';
-import Link from 'next/link';
-import { panelShadow, radius, meter, vars } from './theme';
-import { Icon, IconName } from './Icon';
+import React, { ReactNode, useState } from 'react'
+import Link from 'next/link'
+import { panelShadow, radius, meter, vars } from './theme'
+import { Icon, IconName } from './Icon'
 
 export type ModalDefinition = {
     body: ReactNode,
@@ -11,10 +11,10 @@ export type ModalRenderProps = {
     closeModal: () => void,
 };
 export function useModal(render: (props: ModalRenderProps) => ModalDefinition) {
-    const [isOpen, setIsOpen] = useState(false);
-    const openModal = () => setIsOpen(true);
-    const closeModal = () => setIsOpen(false);
-    const { body, buttons } = render({ closeModal });
+    const [isOpen, setIsOpen] = useState(false)
+    const openModal = () => setIsOpen(true)
+    const closeModal = () => setIsOpen(false)
+    const { body, buttons } = render({ closeModal })
     return {
         openModal, closeModal,
         ModalContent: <ModalContent
@@ -23,7 +23,7 @@ export function useModal(render: (props: ModalRenderProps) => ModalDefinition) {
             buttons={buttons}
             close={closeModal}
         />,
-    };
+    }
 }
 
 function ModalContent({
@@ -34,7 +34,7 @@ function ModalContent({
     content: ReactNode,
     buttons?: ButtonProps[],
 }) {
-    const openClass = isOpen ? 'open' : 'closed';
+    const openClass = isOpen ? 'open' : 'closed'
     return <div className={`screen ${openClass}`} onClick={close}>
         <div
             className={`container ${openClass}`}
@@ -85,7 +85,7 @@ function ModalContent({
                 opacity: 0;
             }
             `}</style>
-    </div>;
+    </div>
 }
 
 type ButtonProps = {
@@ -113,7 +113,7 @@ function ModalButton({ text, icon, onClick, href }: ButtonProps) {
                 text-decoration: none;
             }
             `}</style>
-    </div>;
+    </div>
     return <div className='container' onClick={onClick}>
         <hr />
         {

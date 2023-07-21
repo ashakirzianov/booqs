@@ -1,11 +1,11 @@
 import {
     PaletteName, palettes, useSetSettings, useSettings,
-} from 'app';
+} from 'app'
 import {
     bookFont, buttonShadow, meter, vars,
-} from "controls/theme";
-import { PopoverSingleton, Popover } from "controls/Popover";
-import { IconButton } from "controls/Buttons";
+} from 'controls/theme'
+import { PopoverSingleton, Popover } from 'controls/Popover'
+import { IconButton } from 'controls/Buttons'
 
 export function Themer({ singleton }: {
     singleton?: PopoverSingleton,
@@ -14,7 +14,7 @@ export function Themer({ singleton }: {
         singleton={singleton}
         anchor={<IconButton icon='appearance' />}
         content={<ThemerPanel />}
-    />;
+    />
 }
 
 function ThemerPanel() {
@@ -37,12 +37,12 @@ function ThemerPanel() {
                 border-top: 1px solid var(${vars.border});
             }
         `}</style>
-    </div>;
+    </div>
 }
 
 function FontSettings() {
-    const { fontScale } = useSettings();
-    const { setFontScale } = useSetSettings();
+    const { fontScale } = useSettings()
+    const { setFontScale } = useSetSettings()
     return <div className="container">
         <FontScaleButton scale='down' onClick={() => setFontScale(fontScale - 10)} />
         <FontScaleButton scale='up' onClick={() => setFontScale(fontScale + 10)} />
@@ -64,7 +64,7 @@ function FontScaleButton({ scale, onClick }: {
 }) {
     const fontSize = scale === 'up'
         ? 'xx-large'
-        : 'large';
+        : 'large'
     return <div onClick={onClick}>
         <span>Abc</span>
         <style jsx>{`
@@ -84,8 +84,8 @@ function FontScaleButton({ scale, onClick }: {
 }
 
 function PalettePicker() {
-    const { paletteName } = useSettings();
-    const { setPalette } = useSetSettings();
+    const { paletteName } = useSettings()
+    const { setPalette } = useSetSettings()
     return <div>
         <PaletteButton name='light' current={paletteName} onSelect={setPalette} />
         <PaletteButton name='sepia' current={paletteName} onSelect={setPalette} />
@@ -98,17 +98,17 @@ function PalettePicker() {
                 justify-content: space-around;
             }
             `}</style>
-    </div>;
+    </div>
 }
 
-const size = '3rem';
+const size = '3rem'
 function PaletteButton({ name, current, onSelect }: {
     name: PaletteName,
     current: PaletteName,
     onSelect: (name: PaletteName) => void,
 }) {
-    const checked = current === name;
-    const { background, highlight, primary } = palettes[name];
+    const checked = current === name
+    const { background, highlight, primary } = palettes[name]
     return <div className="container" onClick={() => onSelect(name)}>
         <div className="label">{name.substr(0, 1).toUpperCase()}</div>
         <style jsx>{`

@@ -1,12 +1,12 @@
-import React from 'react';
-import { useSearch, SearchResult } from 'app';
-import { normalWeight, meter, radius, vars } from 'controls/theme';
-import { BooqCover } from 'controls/BooqCover';
-import { Spinner } from 'controls/Spinner';
-import { BooqLink } from 'controls/Links';
+import React from 'react'
+import { useSearch, SearchResult } from 'app'
+import { normalWeight, meter, radius, vars } from 'controls/theme'
+import { BooqCover } from 'controls/BooqCover'
+import { Spinner } from 'controls/Spinner'
+import { BooqLink } from 'controls/Links'
 
 export function Search() {
-    const { query, doQuery, results, loading } = useSearch();
+    const { query, doQuery, results, loading } = useSearch()
     return <div className='container'>
         <div className='content'>
             <input
@@ -89,7 +89,7 @@ export function Search() {
             border: 1px solid var(${vars.border});
         }
         `}</style>
-    </div>;
+    </div>
 }
 
 function SearchResults({ loading, query, results }: {
@@ -98,7 +98,7 @@ function SearchResults({ loading, query, results }: {
     loading: boolean,
 }) {
     if (!results.length) {
-        return null;
+        return null
     }
     return <div className='container'>
         {
@@ -131,7 +131,7 @@ function SearchResults({ loading, query, results }: {
                 margin: ${meter.large};
             }
             `}</style>
-    </div>;
+    </div>
 }
 
 function SingleResult({ result, query }: {
@@ -176,14 +176,14 @@ function SingleResult({ result, query }: {
             }
             `}</style>
         </div>
-    </BooqLink>;
+    </BooqLink>
 }
 
 function EmphasizedSpan({ text, emphasis }: {
     text: string,
     emphasis: string,
 }) {
-    const spans = buildEmphasis(text, emphasis);
+    const spans = buildEmphasis(text, emphasis)
     return <span>
         {
             spans.map(
@@ -196,7 +196,7 @@ function EmphasizedSpan({ text, emphasis }: {
                 </span>
             )
         }
-    </span>;
+    </span>
 }
 
 type AttributedSpan = {
@@ -205,14 +205,14 @@ type AttributedSpan = {
 }
 function buildEmphasis(text: string, emphasis: string): AttributedSpan[] {
     if (!emphasis.length) {
-        return [{ text, emphasized: false }];
+        return [{ text, emphasized: false }]
     }
-    const index = text.toLowerCase().indexOf(emphasis.toLowerCase());
+    const index = text.toLowerCase().indexOf(emphasis.toLowerCase())
     if (index >= 0) {
-        const pre = text.substr(0, index);
-        const emp = text.substr(index, emphasis.length);
-        const next = text.substr(index + emphasis.length);
-        const nextSpans = buildEmphasis(next, emphasis);
+        const pre = text.substr(0, index)
+        const emp = text.substr(index, emphasis.length)
+        const next = text.substr(index + emphasis.length)
+        const nextSpans = buildEmphasis(next, emphasis)
         return [
             {
                 text: pre,
@@ -223,8 +223,8 @@ function buildEmphasis(text: string, emphasis: string): AttributedSpan[] {
                 emphasized: true,
             },
             ...nextSpans,
-        ];
+        ]
     } else {
-        return [{ text, emphasized: false }];
+        return [{ text, emphasized: false }]
     }
 }

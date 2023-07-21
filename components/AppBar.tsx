@@ -1,11 +1,11 @@
-import React from 'react';
-import { meter, headerHeight } from 'controls/theme';
-import { Logo } from 'controls/Logo';
-import { usePopoverSingleton } from 'controls/Popover';
-import { Search } from './Search';
-import { SignIn } from './SignIn';
-import { Themer } from './Themer';
-import { Upload } from './Upload';
+import React from 'react'
+import { meter, headerHeight } from 'controls/theme'
+import { Logo } from 'controls/Logo'
+import { usePopoverSingleton } from 'controls/Popover'
+import { Search } from './Search'
+import { SignIn } from './SignIn'
+import { Themer } from './Themer'
+import { Upload } from './Upload'
 
 
 export function AppBar() {
@@ -53,11 +53,11 @@ export function AppBar() {
                 max-width: 12rem;
             }
             `}</style>
-    </div>;
+    </div>
 }
 
 function AppButtons() {
-    const { singleton, SingletonNode } = usePopoverSingleton();
+    const { singleton, SingletonNode } = usePopoverSingleton()
     return <div className='buttons-row'>
         {SingletonNode}
         <Upload singleton={singleton} />
@@ -72,5 +72,5 @@ function AppButtons() {
                 align-items: center;
             }
             `}</style>
-    </div>;
+    </div>
 }

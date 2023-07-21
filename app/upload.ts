@@ -1,6 +1,6 @@
-import gql from 'graphql-tag';
-import { useMutation } from "@apollo/react-hooks";
-import { currentSource } from './common';
+import gql from 'graphql-tag'
+import { useMutation } from '@apollo/react-hooks'
+import { currentSource } from './common'
 
 export type FileData = any;
 
@@ -10,7 +10,7 @@ const UploadEpubMutation = gql`mutation UploadEpub($file: Upload!, $source: Stri
         title
         cover
     }
-}`;
+}`
 type UploadEpubData = {
     uploadEpub: {
         id: string,
@@ -30,14 +30,14 @@ export function useUpload() {
         { loading, data: uploadData },
     ] = useMutation<UploadEpubData, UploadEpubVariables>(
         UploadEpubMutation,
-    );
+    )
     return {
         uploading: loading,
         uploaded: uploadData?.uploadEpub,
         upload(file: FileData) {
             uploadEpub({
                 variables: { file, source: currentSource() },
-            });
+            })
         },
-    };
+    }
 }

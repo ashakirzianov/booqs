@@ -1,9 +1,9 @@
-import { BooqPath } from 'core';
+import { BooqPath } from 'core'
 import {
     bookFont, meter, radius, panelShadow, panelShadowHover, vars
-} from "./theme";
-import { panelWidth } from "./Panel";
-import { PropsType } from "./utils";
+} from './theme'
+import { panelWidth } from './Panel'
+import { PropsType } from './utils'
 
 export type BooqPreviewProps = PropsType<typeof BooqPreview>;
 export function BooqPreview({

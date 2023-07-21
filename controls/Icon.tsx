@@ -1,18 +1,18 @@
-import React from 'react';
+import React from 'react'
 
-import { FontAwesomeIcon, FontAwesomeIconProps } from '@fortawesome/react-fontawesome';
+import { FontAwesomeIcon, FontAwesomeIconProps } from '@fortawesome/react-fontawesome'
 import {
     faPlus, faFont as faFontCase, faSignInAlt as faSignIn, faSignOutAlt as faSignOut, faQuestion, faSearch,
     faFileAlt, faUser, faTimes, faListUl, faBookmark, faAngleLeft,
     faQuoteRight, faClone, faLink, faHighlighter, faTrashAlt,
     faEllipsisV,
-} from '@fortawesome/free-solid-svg-icons';
+} from '@fortawesome/free-solid-svg-icons'
 import {
     faFacebookF, faApple,
-} from '@fortawesome/free-brands-svg-icons';
+} from '@fortawesome/free-brands-svg-icons'
 import {
     faBookmark as faSolidBookmark,
-} from '@fortawesome/free-solid-svg-icons';
+} from '@fortawesome/free-solid-svg-icons'
 
 export type IconName =
     | 'back' | 'more'
@@ -28,61 +28,61 @@ export function Icon({ name, size }: {
     name: IconName,
     size?: FontAwesomeIconProps['size'],
 }) {
-    const icon = iconForName(name);
+    const icon = iconForName(name)
     return <FontAwesomeIcon
         icon={icon}
         size={size}
-    />;
+    />
 }
 
 function iconForName(name: IconName) {
     switch (name) {
         case 'back':
-            return faAngleLeft;
+            return faAngleLeft
         case 'more':
-            return faEllipsisV;
+            return faEllipsisV
         case 'user':
-            return faUser;
+            return faUser
         case 'sign-in':
-            return faSignIn;
+            return faSignIn
         case 'sign-out':
-            return faSignOut;
+            return faSignOut
         case 'close':
-            return faTimes;
+            return faTimes
         case 'remove':
-            return faTrashAlt;
+            return faTrashAlt
         case 'toc':
-            return faListUl;
+            return faListUl
         case 'bookmark-empty':
-            return faBookmark;
+            return faBookmark
         case 'bookmark-solid':
-            return faSolidBookmark;
+            return faSolidBookmark
         case 'appearance':
-            return faFontCase;
+            return faFontCase
         case 'upload':
-            return faPlus;
+            return faPlus
         case 'search':
-            return faSearch;
+            return faSearch
         case 'pages':
-            return faFileAlt;
+            return faFileAlt
         case 'facebook':
-            return faFacebookF;
+            return faFacebookF
         case 'apple':
-            return faApple;
+            return faApple
         case 'quote':
-            return faQuoteRight;
+            return faQuoteRight
         case 'copy':
-            return faClone;
+            return faClone
         case 'link':
-            return faLink;
+            return faLink
         case 'highlight':
-            return faHighlighter;
+            return faHighlighter
         default:
-            assertNever(name);
-            return faQuestion;
+            assertNever(name)
+            return faQuestion
     }
 }
 
 function assertNever(x: never) {
-    return x;
+    return x
 }

@@ -1,9 +1,9 @@
-import { useEffect } from "react";
-import { useRouter } from "next/router";
-import { useBooq, BooqData, pathToId } from "app";
-import { BooqPath, BooqRange } from 'core';
-import { Page } from "components/Page";
-import { Reader, LoadingBooqScreen } from "./Reader";
+import { useEffect } from 'react'
+import { useRouter } from 'next/router'
+import { useBooq, BooqData, pathToId } from 'app'
+import { BooqPath, BooqRange } from 'core'
+import { Page } from 'components/Page'
+import { Reader, LoadingBooqScreen } from './Reader'
 
 type PageData = {
     kind: 'preloaded',
@@ -29,30 +29,30 @@ export function BooqPage({ data }: BooqPageProps) {
                 booq={data.booq}
                 path={data.path ?? undefined}
                 quote={data.quote ?? undefined}
-            />;
+            />
         case 'client-side':
             return <ClientSidePage
                 booqId={data.booqId}
                 path={data.path ?? undefined}
                 quote={data.quote ?? undefined}
-            />;
+            />
         case 'not-found':
-            return <NotFoundPage />;
+            return <NotFoundPage />
         default:
-            return <LoadingPage />;
+            return <LoadingPage />
     }
 }
 
 function LoadingPage() {
     return <Page title='Loading...'>
         <LoadingBooqScreen />
-    </Page>;
+    </Page>
 }
 
 function NotFoundPage() {
     return <Page title='Booq not found'>
         <span>Not found</span>
-    </Page>;
+    </Page>
 }
 
 function ClientSidePage({ booqId, path, quote }: {
@@ -60,14 +60,14 @@ function ClientSidePage({ booqId, path, quote }: {
     path?: BooqPath,
     quote?: BooqRange,
 }) {
-    const { loading, booq } = useBooq(booqId, path);
+    const { loading, booq } = useBooq(booqId, path)
     if (loading) {
-        return <LoadingBooqScreen />;
+        return <LoadingBooqScreen />
     } else if (!booq) {
-        return <NotFoundPage />;
+        return <NotFoundPage />
     }
 
-    return <LoadedBooqPage booq={booq} path={path} quote={quote} />;
+    return <LoadedBooqPage booq={booq} path={path} quote={quote} />
 }
 
 function LoadedBooqPage({ booq, path, quote }: {
@@ -75,21 +75,21 @@ function LoadedBooqPage({ booq, path, quote }: {
     path?: BooqPath,
     quote?: BooqRange,
 }) {
-    usePathNavigation(path);
+    usePathNavigation(path)
     return <Page title={booq?.title ?? 'Booq'}>
         <Reader booq={booq} quote={quote} />
-    </Page>;
+    </Page>
 }
 
 function usePathNavigation(path?: BooqPath) {
-    const { replace, asPath } = useRouter();
+    const { replace, asPath } = useRouter()
     useEffect(() => {
         if (path) {
             setTimeout(() => {
-                const [withoutHash] = asPath.split('#');
-                const withHash = `${withoutHash}#${pathToId(path)}`;
-                replace(withHash, undefined, { shallow: true });
-            });
+                const [withoutHash] = asPath.split('#')
+                const withHash = `${withoutHash}#${pathToId(path)}`
+                replace(withHash, undefined, { shallow: true })
+            })
         }
-    }, []);
+    }, [])
 }

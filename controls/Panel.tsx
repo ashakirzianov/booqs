@@ -1,8 +1,8 @@
-import React from 'react';
-import { HasChildren } from './utils';
-import { meter, radius } from './theme';
+import React from 'react'
+import { HasChildren } from './utils'
+import { meter, radius } from './theme'
 
-export const panelWidth = '40rem';
+export const panelWidth = '40rem'
 
 export function Panel({ children }: HasChildren) {
     return <div className="panel">
@@ -19,5 +19,5 @@ export function Panel({ children }: HasChildren) {
                 overflow: hidden;
             }
             `}</style>
-    </div>;
+    </div>
 }

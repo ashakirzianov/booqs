@@ -1,17 +1,17 @@
-import { Highlight, colorForGroup, UserData } from "app";
-import { isSmallScreen, meter, vars, boldWeight } from "controls/theme";
-import { BooqLink } from "controls/Links";
-import { Overlay } from "controls/Popover";
-import { Icon } from "controls/Icon";
-import { ContextMenuContent } from "reader/ContextMenuContent";
-import { ProfileBadge } from "controls/ProfilePicture";
+import { Highlight, colorForGroup, UserData } from 'app'
+import { isSmallScreen, meter, vars, boldWeight } from 'controls/theme'
+import { BooqLink } from 'controls/Links'
+import { Overlay } from 'controls/Popover'
+import { Icon } from 'controls/Icon'
+import { ContextMenuContent } from 'reader/ContextMenuContent'
+import { ProfileBadge } from 'controls/ProfilePicture'
 
 export function HighlightNodeComp({ booqId, highlight, self }: {
     booqId: string,
     self: UserData | undefined,
     highlight: Highlight,
 }) {
-    const smallScreen = isSmallScreen();
+    const smallScreen = isSmallScreen()
     return <div className='container'>
         <div className='content'>
             <BooqLink booqId={booqId} path={highlight.start}>
@@ -96,5 +96,5 @@ export function HighlightNodeComp({ booqId, highlight, self }: {
                 pointer-events: auto;
             }
             `}</style>
-    </div>;
+    </div>
 }

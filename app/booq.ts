@@ -1,7 +1,7 @@
-import gql from "graphql-tag";
-import { useQuery } from "@apollo/react-hooks";
-import { doQuery } from "./provider";
-import { BooqNode, BooqPath } from "core";
+import gql from 'graphql-tag'
+import { useQuery } from '@apollo/react-hooks'
+import { doQuery } from './provider'
+import { BooqNode, BooqPath } from 'core'
 
 const BooqFragmentQuery = gql`query BooqFragment($id: ID!, $path: [Int!]) {
     booq(id: $id) {
@@ -23,7 +23,7 @@ const BooqFragmentQuery = gql`query BooqFragment($id: ID!, $path: [Int!]) {
             }
         }
     }
-}`;
+}`
 type BooqFragmentData = {
     booq: {
         id: string,
@@ -49,11 +49,11 @@ export async function fetchBooqFragment(id: string, path?: BooqPath) {
         variables: {
             id, path,
         },
-    });
+    })
     if (result.data) {
-        return result.data.booq;
+        return result.data.booq
     } else {
-        return undefined;
+        return undefined
     }
 }
 
@@ -61,10 +61,10 @@ export function useBooq(id: string, path?: BooqPath) {
     const { loading, data } = useQuery<BooqFragmentData>(
         BooqFragmentQuery,
         { variables: { id, path } },
-    );
+    )
 
     return {
         loading,
         booq: data?.booq,
-    };
+    }
 }

@@ -1,9 +1,9 @@
-import React, { useCallback, useMemo } from 'react';
-import { BooqPath, BooqRange, BooqNode } from 'core';
-import { pathFromId } from 'app';
-import { useDocumentEvent } from 'controls/utils';
-import { renderNodes } from './render';
-import { useOnScroll } from './scroll';
+import React, { useCallback, useMemo } from 'react'
+import { BooqPath, BooqRange, BooqNode } from 'core'
+import { pathFromId } from 'app'
+import { useDocumentEvent } from 'controls/utils'
+import { renderNodes } from './render'
+import { useOnScroll } from './scroll'
 
 export type BooqSelection = {
     range: BooqRange,
@@ -26,8 +26,8 @@ export function BooqContent({
     onScroll?: (path: BooqPath) => void,
     onClick?: () => void,
 }) {
-    useOnScroll(onScroll);
-    useOnClick(onClick);
+    useOnScroll(onScroll)
+    useOnClick(onClick)
     return useMemo(function () {
         return <div id='booq-root' className='container'>
             {
@@ -36,27 +36,27 @@ export function BooqContent({
                     booqId, range, augmentations, onAugmentationClick,
                 })
             }
-        </div>;
-    }, [nodes, booqId, range, augmentations]);
+        </div>
+    }, [nodes, booqId, range, augmentations])
 }
 
 function useOnClick(callback?: () => void) {
     const actual = useCallback((event: Event) => {
         if (callback && isEventOnContent(event)) {
-            callback();
+            callback()
         }
-    }, [callback]);
-    useDocumentEvent('click', actual);
+    }, [callback])
+    useDocumentEvent('click', actual)
 }
 
 function isEventOnContent(event: Event): boolean {
-    const id: string | undefined = (event.target as any).id;
+    const id: string | undefined = (event.target as any).id
     if (id === undefined) {
-        return false;
+        return false
     }
-    const path = pathFromId(id);
+    const path = pathFromId(id)
     if (path) {
-        return true;
+        return true
     }
-    return id === 'booq-root';
+    return id === 'booq-root'
 }

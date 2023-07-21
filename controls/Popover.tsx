@@ -1,8 +1,8 @@
-import React, { ReactNode, ReactElement } from 'react';
-import { roundArrow } from 'tippy.js';
-import Tippy, { useSingleton } from '@tippyjs/react';
+import React, { ReactNode, ReactElement } from 'react'
+import { roundArrow } from 'tippy.js'
+import Tippy, { useSingleton } from '@tippyjs/react'
 import css from 'styled-jsx/css'
-import { radius, vars } from './theme';
+import { radius, vars } from './theme'
 
 export type PopoverSingleton = ReturnType<typeof useSingleton>[1];
 
@@ -30,7 +30,7 @@ export function Overlay({
             className='overlay-theme'
         />
         <style jsx global>{overlayStyles}</style>
-    </>;
+    </>
 }
 
 // TODO: rethink div wrapping
@@ -55,11 +55,11 @@ export function Popover({ singleton, anchor, content }: {
                 flex: 1;
             }
         `}</style>
-    </div>;
+    </div>
 }
 
 export function usePopoverSingleton() {
-    const [source, target] = useSingleton();
+    const [source, target] = useSingleton()
     const SingletonNode = <>
         <Tippy
             singleton={source}
@@ -72,11 +72,11 @@ export function usePopoverSingleton() {
             animation='shift-away'
         />
         <style jsx global>{popoverStyles}</style>
-    </>;
+    </>
     return {
         SingletonNode,
         singleton: target,
-    };
+    }
 }
 
 const popoverStyles = css.global`
@@ -98,7 +98,7 @@ const popoverStyles = css.global`
 .popover-theme .tippy-svg-arrow > svg:last-child {
     fill: var(${vars.background});
 }
-`;
+`
 
 const overlayStyles = css.global`
 .tippy-box.overlay-theme {
@@ -113,4 +113,4 @@ const overlayStyles = css.global`
     box-shadow: 0px 0px 20px rgba(0,0,0,0.2);
     border-radius: ${radius};
 }
-`;
+`

@@ -1,5 +1,5 @@
-import { ReactNode, useEffect } from "react";
-import { smallScreenWidth } from "./theme";
+import { ReactNode, useEffect } from 'react'
+import { smallScreenWidth } from './theme'
 
 type FunctionComponent<P extends {}> = (props: P) => ReactNode;
 
@@ -9,12 +9,12 @@ export type PropsType<T extends FunctionComponent<any>> =
 export type HasChildren = { children: ReactNode };
 
 export function useDocumentEvent<K extends keyof DocumentEventMap>(name: K, listener: (e: DocumentEventMap[K]) => void) {
-    return useCustomDocumentEvent<DocumentEventMap[K]>(name, listener);
+    return useCustomDocumentEvent<DocumentEventMap[K]>(name, listener)
 }
 
 export function useCustomDocumentEvent<T>(name: string, listener: (e: T) => void) {
     useEffect(() => {
-        window.document.addEventListener(name as any, listener);
-        return () => window.document.removeEventListener(name as any, listener);
-    }, [listener]);
+        window.document.addEventListener(name as any, listener)
+        return () => window.document.removeEventListener(name as any, listener)
+    }, [listener])
 }

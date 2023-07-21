@@ -1,2 +1,2 @@
-export * from './syncStorage';
-export * from './sdks';
+export * from './syncStorage'
+export * from './sdks'

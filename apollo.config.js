@@ -5,4 +5,4 @@ module.exports = {
         url: process.env.NEXT_PUBLIC_BACKEND,
         includes: ['./app/**/*.ts'],
     },
-};
+}

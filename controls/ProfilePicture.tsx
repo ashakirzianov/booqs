@@ -1,4 +1,4 @@
-import { vars, boldWeight } from "./theme";
+import { vars, boldWeight } from './theme'
 
 export function ProfileBadge({
     picture, name, size, border,
@@ -13,16 +13,16 @@ export function ProfileBadge({
             picture={picture}
             size={size}
             border={border}
-        />;
+        />
     } else {
         const initials = name
             ? getInitials(name)
-            : 'X';
+            : 'X'
         return <ProfilePicturePlaceholder
             initials={initials}
             size={size}
             border={border}
-        />;
+        />
     }
 }
 
@@ -51,7 +51,7 @@ function ProfilePicture({ picture, size, border }: {
                 border: ${border ? `1.5px solid var(${vars.highlight})` : 'none'};
             }
             `}</style>
-    </div>;
+    </div>
 }
 
 function ProfilePicturePlaceholder({ initials, size, border }: {
@@ -85,14 +85,14 @@ function ProfilePicturePlaceholder({ initials, size, border }: {
                 color: var(${vars.highlight});
             }
             `}</style>
-    </div>;
+    </div>
 }
 
 function getInitials(name: string) {
-    const names = name.split(' ');
-    const first = names[0];
+    const names = name.split(' ')
+    const first = names[0]
     const last = names.length > 1
         ? names[names.length - 1]
-        : '';
-    return (first?.charAt(0) ?? '') + (last?.charAt(0) ?? '');
+        : ''
+    return (first?.charAt(0) ?? '') + (last?.charAt(0) ?? '')
 }

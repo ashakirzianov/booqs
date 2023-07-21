@@ -1,11 +1,11 @@
-import React from 'react';
-import { Icon, IconName } from "./Icon";
+import React from 'react'
+import { Icon, IconName } from './Icon'
 import {
     buttonShadow, meter, radius, vars, boldWeight,
-} from "./theme";
-import { Spinner } from './Spinner';
+} from './theme'
+import { Spinner } from './Spinner'
 
-const buttonSize = 50;
+const buttonSize = 50
 export function IconButton({ icon, onClick, isSelected }: {
     icon: IconName,
     onClick?: () => void,
@@ -41,7 +41,7 @@ export function IconButton({ icon, onClick, isSelected }: {
                 color: ${isSelected ? `var(${vars.highlight})` : `var(${vars.dimmed})`}
             }
             `}</style>
-    </button>;
+    </button>
 }
 
 export function ActionButton({ text, onClick }: {
@@ -69,7 +69,7 @@ export function ActionButton({ text, onClick }: {
                 background-color: var(${vars.highlight});
             }
             `}</style>
-    </>;
+    </>
 }
 
 export function TextButton({ text, onClick, loading }: {
@@ -98,7 +98,7 @@ export function TextButton({ text, onClick, loading }: {
             color: var(${vars.highlight});
         }
         `}</style>
-    </>;
+    </>
 }
 
 export function BorderButton({ text, icon, onClick }: {
@@ -133,5 +133,5 @@ export function BorderButton({ text, icon, onClick }: {
                 border-color: var(${vars.highlight});
             }
             `}</style>
-    </div>;
+    </div>
 }

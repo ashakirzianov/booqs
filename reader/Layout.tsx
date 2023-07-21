@@ -1,7 +1,7 @@
-import React, { ReactNode } from 'react';
+import React, { ReactNode } from 'react'
 import {
     meter, headerHeight, vars, smallScreenWidth,
-} from 'controls/theme';
+} from 'controls/theme'
 
 type ControlsProps = {
     isControlsVisible: boolean,
@@ -21,7 +21,7 @@ type LayoutProps = ControlsProps & {
     NextButton: ReactNode,
 };
 
-const contentWidth = '45rem';
+const contentWidth = '45rem'
 export function ReaderLayout({
     BooqContent, PrevButton, NextButton,
     ...controls
@@ -56,10 +56,10 @@ export function ReaderLayout({
                 }
             }
             `}</style>
-    </div>;
+    </div>
 }
 
-const buttonSize = '64px';
+const buttonSize = '64px'
 function BooqControls({
     isControlsVisible, isNavigationOpen,
     MainButton, NavigationButton,
@@ -68,7 +68,7 @@ function BooqControls({
     NavigationContent,
     ContextMenu,
 }: ControlsProps) {
-    const showControls = isControlsVisible || isNavigationOpen;
+    const showControls = isControlsVisible || isNavigationOpen
     return <div className='container'>
         <div className='main'>{MainButton}</div>
         <div className='nav'>{NavigationButton}</div>
@@ -199,5 +199,5 @@ function BooqControls({
                 }
             }
             `}</style>
-    </div>;
+    </div>
 }

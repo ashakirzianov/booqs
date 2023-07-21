@@ -1,23 +1,23 @@
-import { pathToString, BooqPath, pathFromString } from "core";
+import { pathToString, BooqPath, pathFromString } from 'core'
 
-const idPrefix = 'path:';
+const idPrefix = 'path:'
 export function pathToId(path: BooqPath): string {
-    return `${idPrefix}${pathToString(path)}`;
+    return `${idPrefix}${pathToString(path)}`
 }
 
 export function pathFromId(id: string): BooqPath | undefined {
     if (id.startsWith(idPrefix)) {
-        const pathString = id.substr(idPrefix.length);
-        return pathFromString(pathString);
+        const pathString = id.substr(idPrefix.length)
+        return pathFromString(pathString)
     } else {
-        return undefined;
+        return undefined
     }
 }
 
 export function pageForPosition(position: number): number {
-    return Math.ceil(position / 2500);
+    return Math.ceil(position / 2500)
 }
 
 export function currentSource(): string {
-    return 'default/0';
+    return 'default/0'
 }

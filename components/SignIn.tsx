@@ -1,14 +1,14 @@
-import React from "react";
-import { useSignInOptions, useAuth } from 'app';
-import { meter } from "controls/theme";
-import { Menu, MenuItem } from "controls/Menu";
-import { IconButton } from "controls/Buttons";
-import { PopoverSingleton, Popover } from "controls/Popover";
-import { ProfileBadge } from "controls/ProfilePicture";
-import { useModal } from "controls/Modal";
+import React from 'react'
+import { useSignInOptions, useAuth } from 'app'
+import { meter } from 'controls/theme'
+import { Menu, MenuItem } from 'controls/Menu'
+import { IconButton } from 'controls/Buttons'
+import { PopoverSingleton, Popover } from 'controls/Popover'
+import { ProfileBadge } from 'controls/ProfilePicture'
+import { useModal } from 'controls/Modal'
 
 export function useSignInModal() {
-    const { signWithApple, signWithFacebook } = useSignInOptions();
+    const { signWithApple, signWithFacebook } = useSignInOptions()
     const { openModal, ModalContent } = useModal(({ closeModal }) => ({
         body: <div className='content'>
             Choose provider
@@ -28,16 +28,16 @@ export function useSignInModal() {
                 text: 'Apple',
                 icon: 'apple',
                 onClick() {
-                    signWithApple();
-                    closeModal();
+                    signWithApple()
+                    closeModal()
                 },
             },
             {
                 text: 'Facebook',
                 icon: 'facebook',
                 onClick() {
-                    signWithFacebook();
-                    closeModal();
+                    signWithFacebook()
+                    closeModal()
                 },
             },
             {
@@ -45,11 +45,11 @@ export function useSignInModal() {
                 onClick: closeModal,
             },
         ],
-    }));
+    }))
     return {
         openModal,
         ModalContent,
-    };
+    }
 }
 
 export function SignIn({ singleton }: {
@@ -59,12 +59,12 @@ export function SignIn({ singleton }: {
         singleton={singleton}
         anchor={<SingInButton />}
         content={<SignInPanel />}
-    />;
+    />
 }
 
 function SingInButton() {
-    const state = useAuth();
-    const { openModal, ModalContent } = useSignInModal();
+    const state = useAuth()
+    const { openModal, ModalContent } = useSignInModal()
     return <>
         <div style={{
             cursor: 'pointer'
@@ -84,24 +84,24 @@ function SingInButton() {
             }
         </div>
         {ModalContent}
-    </>;
+    </>
 }
 
 function SignInPanel() {
-    const state = useAuth();
+    const state = useAuth()
     if (state?.signed) {
         return <Signed
             name={state.name}
-        />;
+        />
     } else {
-        return <NotSigned />;
+        return <NotSigned />
     }
 }
 
 function Signed({ name }: {
     name?: string,
 }) {
-    const { signOut } = useSignInOptions();
+    const { signOut } = useSignInOptions()
     return <div>
         <span>{name}</span>
         <Menu>
@@ -127,7 +127,7 @@ function Signed({ name }: {
             padding: ${meter.regular};
         }
         `}</style>
-    </div>;
+    </div>
 }
 
 function NotSigned() {
@@ -148,5 +148,5 @@ function NotSigned() {
             padding: ${meter.regular};
         }
         `}</style>
-    </div>;
+    </div>
 }

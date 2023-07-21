@@ -1,5 +1,5 @@
-import React from 'react';
-import { meter, vars } from './theme';
+import React from 'react'
+import { meter, vars } from './theme'
 
 export type BooqTag = {
     tag: string,
@@ -20,7 +20,7 @@ export function BooqTags({ tags }: {
                 flex-flow: row wrap;
             }
             `}</style>
-    </div>;
+    </div>
 }
 
 function BooqTagPill({ tag }: {
@@ -33,25 +33,25 @@ function BooqTagPill({ tag }: {
                     color="#4CAF50"
                     label={tag.value.toUpperCase()}
                 />
-                : null;
+                : null
         case 'subject':
             return <Pill
                 color="#673AB7"
                 label={tag.value ?? 'subject'}
-            />;
+            />
         case 'pg-index':
             return <Pill
                 color="pink"
                 label="Project Gutenberg"
                 title={tag.value}
-            />;
+            />
         case 'pages':
             return <Pill
                 color={`var(${vars.primary})`}
                 label={`${tag.value} pages`}
-            />;
+            />
         default:
-            return null;
+            return null
     }
 }
 

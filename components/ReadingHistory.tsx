@@ -1,25 +1,25 @@
-import React from 'react';
-import { useHistory, pageForPosition, useAuth } from "app";
-import { BooqPreview } from "controls/BooqPreview";
-import { meter, vars } from "controls/theme";
-import { BooqLink } from 'controls/Links';
-import { useSignInModal } from './SignIn';
+import React from 'react'
+import { useHistory, pageForPosition, useAuth } from 'app'
+import { BooqPreview } from 'controls/BooqPreview'
+import { meter, vars } from 'controls/theme'
+import { BooqLink } from 'controls/Links'
+import { useSignInModal } from './SignIn'
 
-const historyPanelHeight = '15em';
+const historyPanelHeight = '15em'
 export function ReadingHistory() {
-    const { signed } = useAuth() ?? {};
-    const { history } = useHistory();
+    const { signed } = useAuth() ?? {}
+    const { history } = useHistory()
     if (!signed) {
-        return <SignInPanel />;
+        return <SignInPanel />
     } else if (!history.length) {
-        return <EmptyHistory />;
+        return <EmptyHistory />
     } else {
-        return <HistoryItems items={history} />;
+        return <HistoryItems items={history} />
     }
 }
 
 function SignInPanel() {
-    const { openModal, ModalContent } = useSignInModal();
+    const { openModal, ModalContent } = useSignInModal()
     return <div className='container'>
         <span className='label'>
             <span className='sign-in-link' onClick={openModal}>Sign in</span> to see history
@@ -46,7 +46,7 @@ function SignInPanel() {
                 color: var(${vars.highlight});
             }
             `}</style>
-    </div>;
+    </div>
 }
 
 function EmptyHistory() {
@@ -64,7 +64,7 @@ function EmptyHistory() {
                 font-weight: bold;
             }
             `}</style>
-    </div>;
+    </div>
 }
 
 type HistoryItem = ReturnType<typeof useHistory>['history'][number];

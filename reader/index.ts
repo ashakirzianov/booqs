@@ -1,1 +1,1 @@
-export * from './ReaderPage';
+export * from './ReaderPage'

@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { meter, vars } from 'controls/theme';
+import React, { useState } from 'react'
+import { meter, vars } from 'controls/theme'
 
 type FilterItem = {
     text: string,
@@ -10,15 +10,15 @@ export function useFilterPanel({ items, initial }: {
     items: FilterItem[],
     initial?: string,
 }) {
-    const [filter, setFilter] = useState(initial ?? items[0].value);
+    const [filter, setFilter] = useState(initial ?? items[0].value)
     const FilterNode = <FilterPanel
         items={items}
         selected={filter}
         select={setFilter}
-    />;
+    />
     return {
         filter, FilterNode,
-    };
+    }
 }
 export function FilterPanel({
     items, selected, select,

@@ -1,14 +1,14 @@
-import React from 'react';
-import { useCollection } from 'app';
-import { BooqCover } from '../controls/BooqCover';
-import { Spinner } from '../controls/Spinner';
-import { meter, panelShadow } from '../controls/theme';
+import React from 'react'
+import { useCollection } from 'app'
+import { BooqCover } from '../controls/BooqCover'
+import { Spinner } from '../controls/Spinner'
+import { meter, panelShadow } from '../controls/theme'
 
 export function Collection({ name }: {
     name: string,
     title: string,
 }) {
-    const { booqs, loading } = useCollection(name);
+    const { booqs, loading } = useCollection(name)
     return <div>
         {
             loading
@@ -22,7 +22,7 @@ export function Collection({ name }: {
                 align-items: center;
             }
             `}</style>
-    </div>;
+    </div>
 }
 
 type CollectionItem = ReturnType<typeof useCollection>['booqs'][number];
@@ -63,12 +63,12 @@ function CollectionItemTile({
                 box-shadow: ${panelShadow};
             }
             `}</style>
-    </div>;
+    </div>
 }
 
 function composeTitle(title?: string, author?: string) {
     return title && author ? `${title} by ${author}`
         : title ? title
             : author ? author
-                : 'no title';
+                : 'no title'
 }

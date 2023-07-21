@@ -8,5 +8,5 @@ export function Label({ text }: {
                 font-size: x-large;
             }
             `}</style>
-    </span>;
+    </span>
 }
