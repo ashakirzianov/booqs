@@ -1,5 +1,4 @@
-import { atom, useRecoilValue, useSetRecoilState } from 'recoil'
-import { syncStorageCell } from '@/plat'
+import { useUserData, useUserDataUpdater } from './userData'
 
 type Palette = {
     background: string,
@@ -12,28 +11,17 @@ type Palette = {
 type Palettes = {
     [key in PaletteName]: Palette;
 };
-type SettingsData = {
+export type Settings = {
     paletteName: PaletteName,
     fontScale: number,
 };
-const key = 'settings'
-const storage = syncStorageCell<SettingsData>(key)
-const initialSettingsData: SettingsData = storage.restore() ?? {
-    paletteName: 'light',
-    fontScale: 100,
-}
-storage.store(initialSettingsData)
-const settingsState = atom({
-    key,
-    default: initialSettingsData,
-})
 
 export function usePalette() {
     return useSettings().palette
 }
 
 export function useSettings() {
-    const { paletteName, fontScale } = useRecoilValue(settingsState)
+    const { paletteName, fontScale } = useUserData().settings
     const palette = palettes[paletteName] ?? palettes.light
     return {
         palette,
@@ -42,28 +30,25 @@ export function useSettings() {
     }
 }
 export function useSetSettings() {
-    const setter = useSetRecoilState(settingsState)
+    const setter = useUserDataUpdater()
     return {
         setPalette(paletteName: PaletteName) {
-            setter(curr => {
-                const next = {
-                    ...curr,
+            setter(data => ({
+                ...data,
+                settings: {
+                    ...data.settings,
                     paletteName,
-                }
-                storage.store(next)
-                return next
-            })
+                },
+            }))
         },
         setFontScale(fontScale: number) {
-            setter(curr => {
-                fontScale = Math.max(10, fontScale)
-                const next = {
-                    ...curr,
-                    fontScale,
-                }
-                storage.store(next)
-                return next
-            })
+            setter(data => ({
+                ...data,
+                settings: {
+                    ...data.settings,
+                    fontScale: Math.max(10, fontScale),
+                },
+            }))
         },
     }
 }

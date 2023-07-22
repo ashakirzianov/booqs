@@ -1,32 +1,22 @@
 import { ApolloClient } from '@apollo/client'
 import { useApolloClient } from '@apollo/react-hooks'
 import gql from 'graphql-tag'
-import {
-    atom, useRecoilValue, useSetRecoilState, SetterOrUpdater,
-} from 'recoil'
-import { syncStorageCell, sdks } from '@/plat'
+import { sdks } from '@/plat'
+import { useUserData, useUserDataUpdater } from './userData'
 
-export type UserData = {
+export type UserInfo = {
     id: string,
     name?: string,
     pictureUrl?: string,
 };
 export type CurrentUser = {
-    user: UserData,
+    user: UserInfo,
     provider: string,
 } | undefined;
 
-const key = 'current-user'
-const storage = syncStorageCell<CurrentUser>(key, '0.1.0')
-const initialAuthData: CurrentUser = storage.restore() ?? undefined
-storage.store(initialAuthData)
-const authState = atom({
-    key,
-    default: initialAuthData,
-})
-
+type Setter<T> = (f: (value: T) => T) => void
 export function useAuth() {
-    const current = useRecoilValue(authState)
+    const current = useUserData().currentUser
 
     if (current) {
         return {
@@ -41,7 +31,13 @@ export function useAuth() {
 
 export function useSignInOptions() {
     const client = useApolloClient()
-    const setter = useSetRecoilState(authState)
+    const userDataSetter = useUserDataUpdater()
+    function authSetter(f: (value: CurrentUser) => CurrentUser) {
+        userDataSetter(data => ({
+            ...data,
+            currentUser: f(data.currentUser),
+        }))
+    }
 
     return {
         async signWithFacebook() {
@@ -49,7 +45,7 @@ export function useSignInOptions() {
             if (token) {
                 return signIn({
                     apolloClient: client,
-                    recoilSetter: setter,
+                    authSetter,
                     token,
                     provider: 'facebook',
                 })
@@ -63,19 +59,20 @@ export function useSignInOptions() {
                 return signIn({
                     provider: 'apple',
                     apolloClient: client,
-                    recoilSetter: setter,
+                    authSetter,
                     token,
                     name,
                 })
             }
         },
         async signOut() {
-            signOut(client, setter)
+            signOut(client, authSetter)
         },
     }
 }
 
-async function signOut(client: ApolloClient<unknown>, setter: SetterOrUpdater<CurrentUser>) {
+
+async function signOut(client: ApolloClient<unknown>, setter: (f: (value: CurrentUser) => CurrentUser) => void) {
     const result = await client.query<{ logout: boolean }>({
         query: gql`query Logout {
             logout
@@ -91,7 +88,6 @@ async function signOut(client: ApolloClient<unknown>, setter: SetterOrUpdater<Cu
             return undefined
         })
         client.resetStore()
-        storage.clear()
     }
 }
 
@@ -121,10 +117,10 @@ type AuthVariables = {
     name?: string,
 };
 async function signIn({
-    apolloClient, recoilSetter, token, name, provider,
+    apolloClient, authSetter, token, name, provider,
 }: {
     apolloClient: ApolloClient<object>,
-    recoilSetter: SetterOrUpdater<CurrentUser>,
+    authSetter: Setter<CurrentUser>,
     token: string,
     name?: string,
     provider: string,
@@ -143,9 +139,8 @@ async function signIn({
                 },
                 provider,
             }
-            : initialAuthData
-        storage.store(data)
-        recoilSetter(data)
+            : undefined
+        authSetter(() => data)
         apolloClient.reFetchObservableQueries(true)
     }
 

@@ -1,11 +1,11 @@
 import { ReactNode } from 'react'
-import { UserData, useNavigationState } from '@/application'
+import { UserInfo, useNavigationState } from '@/application'
 import { ProfileBadge } from '@/controls/ProfilePicture'
 import { meter, boldWeight, vars, radius } from '@/controls/theme'
 
 export function NavigationFilter({ authors }: {
-    self: UserData | undefined,
-    authors: UserData[],
+    self: UserInfo | undefined,
+    authors: UserInfo[],
 }) {
     const {
         showAuthors, showChapters, showHighlights,

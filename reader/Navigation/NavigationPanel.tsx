@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react'
 import {
-    useAuth, UserData, useNavigationNodes, NavigationNode,
+    useAuth, UserInfo, useNavigationNodes, NavigationNode,
 } from '@/application'
 import {
     meter, vars, boldWeight, isSmallScreen, smallScreenWidth,
@@ -128,7 +128,7 @@ function Navigation({ booqId, closeSelf }: {
 
 function NavigationNodeComp({ booqId, self, node }: {
     booqId: string,
-    self: UserData | undefined,
+    self: UserInfo | undefined,
     node: NavigationNode,
 }) {
     switch (node.kind) {

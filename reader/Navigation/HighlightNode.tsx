@@ -1,4 +1,4 @@
-import { Highlight, colorForGroup, UserData } from '@/application'
+import { Highlight, colorForGroup, UserInfo } from '@/application'
 import { isSmallScreen, meter, vars, boldWeight } from '@/controls/theme'
 import { BooqLink } from '@/controls/Links'
 import { Overlay } from '@/controls/Popover'
@@ -8,7 +8,7 @@ import { ProfileBadge } from '@/controls/ProfilePicture'
 
 export function HighlightNodeComp({ booqId, highlight, self }: {
     booqId: string,
-    self: UserData | undefined,
+    self: UserInfo | undefined,
     highlight: Highlight,
 }) {
     const smallScreen = isSmallScreen()

@@ -1,5 +1,5 @@
 import { Fragment } from 'react'
-import { TocItem, UserData, PathHighlightsNode } from '@/application'
+import { TocItem, UserInfo, PathHighlightsNode } from '@/application'
 import { BooqLink } from '@/controls/Links'
 import { meter, boldWeight } from '@/controls/theme'
 import { HighlightNodeComp } from './HighlightNode'
@@ -9,7 +9,7 @@ export function PathHighlightsNodeComp({
     node: { items, highlights },
 }: {
     booqId: string,
-    self: UserData | undefined,
+    self: UserInfo | undefined,
     node: PathHighlightsNode,
 }) {
     return <div>

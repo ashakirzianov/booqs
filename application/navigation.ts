@@ -1,12 +1,12 @@
-import { atom, useRecoilValue, useRecoilState } from 'recoil'
 import { groupBy } from 'lodash'
 import { pathInRange } from '@/core'
 import {
-    TocItem, Highlight, useToc, useHighlights, UserData,
+    TocItem, Highlight, useToc, useHighlights, UserInfo,
 } from '@/application'
 import { syncStorageCell } from '@/plat'
 import { useAuth } from './auth'
 import { useMemo } from 'react'
+import { useUserData, useUserDataUpdater } from './userData'
 
 export type TocNode = {
     kind: 'toc',
@@ -24,7 +24,7 @@ export type PathHighlightsNode = {
 export type NavigationNode = TocNode | HighlightNode | PathHighlightsNode;
 
 export function useNavigationNodes(booqId: string) {
-    const { showChapters, showHighlights, showAuthors } = useRecoilValue(navigationState)
+    const { showChapters, showHighlights, showAuthors } = useUserData().navigationState
     const self = useAuth()
     const { toc, title } = useToc(booqId)
     const { highlights } = useHighlights(booqId)
@@ -52,7 +52,7 @@ export function useNavigationNodes(booqId: string) {
 }
 
 export function useFilteredHighlights(booqId: string) {
-    const { showHighlights, showAuthors } = useRecoilValue(navigationState)
+    const { showHighlights, showAuthors } = useUserData().navigationState
     const self = useAuth()
     const { highlights } = useHighlights(booqId)
 
@@ -69,55 +69,47 @@ export function useFilteredHighlights(booqId: string) {
 }
 
 export function useNavigationState() {
-    const [{ showChapters, showHighlights, showAuthors }, setter] = useRecoilState(navigationState)
+    const { showChapters, showHighlights, showAuthors } = useUserData().navigationState
+    const setter = useUserDataUpdater()
     return {
         showChapters, showHighlights, showAuthors,
         toggleChapters() {
-            setter(prev => {
-                const next = { ...prev, showChapters: !prev.showChapters }
-                storage.store(next)
-                return next
-            })
+            setter(prev => ({
+                ...prev,
+                navigationState: {
+                    ...prev.navigationState,
+                    showChapters: !prev.navigationState.showChapters,
+                }
+            }))
         },
         toggleHighlights() {
-            setter(prev => {
-                const next = { ...prev, showHighlights: !prev.showHighlights }
-                storage.store(next)
-                return next
-            })
+            setter(prev => ({
+                ...prev,
+                navigationState: {
+                    ...prev.navigationState,
+                    showHighlights: !prev.navigationState.showHighlights,
+                }
+            }))
         },
         toggleAuthor(authorId: string) {
-            setter(prev => {
-                const next = {
-                    ...prev,
-                    showAuthors: prev.showAuthors.some(id => id === authorId)
-                        ? prev.showAuthors.filter(id => id !== authorId)
-                        : [authorId, ...prev.showAuthors],
+            setter(prev => ({
+                ...prev,
+                navigationState: {
+                    ...prev.navigationState,
+                    showAuthors: prev.navigationState.showAuthors.some(id => id === authorId)
+                        ? prev.navigationState.showAuthors.filter(id => id !== authorId)
+                        : [authorId, ...prev.navigationState.showAuthors],
                 }
-                storage.store(next)
-                return next
-            })
+            }))
         },
     }
 }
 
-type NavigationState = {
+export type NavigationState = {
     showChapters: boolean,
     showHighlights: boolean,
     showAuthors: string[],
 };
-const key = 'navigation'
-const storage = syncStorageCell<NavigationState>(key)
-const defaultState: NavigationState = storage.restore() ?? {
-    showChapters: true,
-    showHighlights: true,
-    showAuthors: [],
-}
-storage.store(defaultState)
-const navigationState = atom({
-    key,
-    default: defaultState,
-})
 
 function buildNodes({ toc, filter, highlights, title }: {
     title?: string,
@@ -170,7 +162,7 @@ function buildNodes({ toc, filter, highlights, title }: {
     return nodes
 }
 
-function highlightsAuthors(highlights: Highlight[]): UserData[] {
+function highlightsAuthors(highlights: Highlight[]): UserInfo[] {
     const grouped = groupBy(highlights, h => h.author.id)
     return Object.entries(grouped).map(
         ([_, [{ author }]]) => ({

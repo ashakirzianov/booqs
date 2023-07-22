@@ -3,7 +3,7 @@ import { ApolloProvider } from '@apollo/react-hooks'
 import { ApolloClient, OperationVariables, QueryOptions, InMemoryCache, ApolloLink } from '@apollo/client'
 import { onError } from '@apollo/client/link/error'
 import { createUploadLink } from 'apollo-upload-client'
-import { RecoilRoot } from 'recoil'
+import { UserDataProvider } from './userData'
 
 const link = ApolloLink.from([
     onError(({ graphQLErrors, networkError }) => {
@@ -36,7 +36,7 @@ export function AppProvider({ children }: {
         {
             client,
             children: createElement(
-                RecoilRoot,
+                UserDataProvider,
                 null,
                 children,
             ),

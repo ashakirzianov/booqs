@@ -3,7 +3,7 @@ import { useRouter } from 'next/router'
 import * as clipboard from 'clipboard-polyfill'
 import { BooqRange } from '@/core'
 import {
-    useHighlightMutations, Highlight, colorForGroup, groups, UserData,
+    useHighlightMutations, Highlight, colorForGroup, groups, UserInfo,
 } from '@/application'
 import { MenuItem } from '@/controls/Menu'
 import { useDocumentEvent } from '@/controls/utils'
@@ -35,7 +35,7 @@ export function ContextMenuContent({
 }: {
     target: ContextMenuTarget,
     booqId: string,
-    self: UserData | undefined,
+    self: UserInfo | undefined,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
     switch (target.kind) {
@@ -55,7 +55,7 @@ function SelectionTargetMenu({
 }: {
     target: SelectionTarget,
     booqId: string,
-    self: UserData | undefined,
+    self: UserInfo | undefined,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
     useCopyQuote(rest.booqId, selection)
@@ -71,7 +71,7 @@ function QuoteTargetMenu({
 }: {
     target: QuoteTarget,
     booqId: string,
-    self: UserData | undefined,
+    self: UserInfo | undefined,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
     return <>
@@ -85,7 +85,7 @@ function HighlightTargetMenu({
 }: {
     target: HighlightTarget,
     booqId: string,
-    self: UserData | undefined,
+    self: UserInfo | undefined,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
     const isOwnHighlight = self?.id === highlight.author.id
@@ -163,7 +163,7 @@ function AddHighlightItem({
 }: {
     selection: BooqSelection,
     booqId: string,
-    self: UserData | undefined,
+    self: UserInfo | undefined,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
     const { addHighlight } = useHighlightMutations(booqId)
