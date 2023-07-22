@@ -1,5 +1,6 @@
 /*global globalThis*/
 import Head from 'next/head'
+import Script from 'next/script'
 import { useEffect } from 'react'
 
 export function SdksHead() {
@@ -7,10 +8,10 @@ export function SdksHead() {
         initAppleSdk()
         initFbSdk()
     }, [])
-    return <Head>
-        <script async type="text/javascript" src="https://appleid.cdn-apple.com/appleauth/static/jsapi/appleid/1/en_US/appleid.auth.js" />
-        <script async defer src="https://connect.facebook.net/en_US/sdk.js" />
-    </Head>
+    return <>
+        <Script type="text/javascript" src="https://appleid.cdn-apple.com/appleauth/static/jsapi/appleid/1/en_US/appleid.auth.js" />
+        <Script async defer src="https://connect.facebook.net/en_US/sdk.js" />
+    </>
 }
 
 export function sdks() {

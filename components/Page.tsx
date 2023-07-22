@@ -34,7 +34,6 @@ export function Page({ title, children }: HasChildren & {
             <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=3.0,minimum-scale=1.0,viewport-fit=cover" />
             <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
             <link rel="manifest" href="/manifest.json" />
-            <script async defer src="https://connect.facebook.net/en_US/sdk.js"></script>
         </Head>
         <SdksHead />
         {children}
