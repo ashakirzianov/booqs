@@ -7,12 +7,28 @@ import {
     normalWeight, vars,
 } from '@/controls/theme'
 
+import { Lato, Lora } from 'next/font/google'
+
+const lato = Lato({
+    subsets: ['latin'],
+    display: 'swap',
+    weight: ['300', '400', '700'],
+    variable: '--font-main',
+})
+
+const lora = Lora({
+    subsets: ['latin-ext', 'cyrillic-ext'],
+    display: 'swap',
+    weight: ['400', '700'],
+    variable: '--font-book',
+})
+
 
 export function Page({ title, children }: HasChildren & {
     title: string,
 }) {
     const { paletteName, palette: { background, primary } } = useSettings()
-    return <div className={`page ${paletteName}`}>
+    return <div className={`page ${paletteName} ${lato.variable} ${lora.variable}`}>
         <Head>
             <title>{title}</title>
             <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=3.0,minimum-scale=1.0,viewport-fit=cover" />

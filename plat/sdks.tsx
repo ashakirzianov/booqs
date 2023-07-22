@@ -8,7 +8,7 @@ export function SdksHead() {
         initFbSdk()
     }, [])
     return <Head>
-        <script type="text/javascript" src="https://appleid.cdn-apple.com/appleauth/static/jsapi/appleid/1/en_US/appleid.auth.js" />
+        <script async type="text/javascript" src="https://appleid.cdn-apple.com/appleauth/static/jsapi/appleid/1/en_US/appleid.auth.js" />
         <script async defer src="https://connect.facebook.net/en_US/sdk.js" />
     </Head>
 }
