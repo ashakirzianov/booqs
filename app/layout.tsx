@@ -1,3 +1,4 @@
+import '@/app/globals.css'
 import { Lato, Lora } from 'next/font/google'
 import Script from 'next/script'
 import { Metadata } from 'next'
