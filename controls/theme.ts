@@ -3,8 +3,6 @@ export const normalWeight = 300
 export const boldWeight = 400
 export const extraBoldWeight = 700
 
-export const radius = '4px'
-
 export const headerHeight = '3rem'
 export const smallScreenWidth = '60rem'
 export function isSmallScreen(): boolean {

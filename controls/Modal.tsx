@@ -1,6 +1,6 @@
 import React, { ReactNode, useState } from 'react'
 import Link from 'next/link'
-import { panelShadow, radius, meter } from './theme'
+import { meter } from './theme'
 import { Icon, IconName } from './Icon'
 
 export type ModalDefinition = {

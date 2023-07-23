@@ -1,6 +1,6 @@
 import React from 'react'
 import { useSearch, SearchResult } from '@/application'
-import { normalWeight, meter, radius } from '@/controls/theme'
+import { normalWeight, meter } from '@/controls/theme'
 import { BooqCover } from '@/controls/BooqCover'
 import { Spinner } from '@/controls/Spinner'
 import { BooqLink } from '@/controls/Links'
@@ -8,21 +8,21 @@ import { BooqLink } from '@/controls/Links'
 export function Search() {
     const { query, doQuery, results, loading } = useSearch()
     return <div className='container'>
-        <div className='content'>
+        <div className='content rounded'>
             <input
                 type="text"
                 placeholder="Search..."
                 value={query}
                 onChange={e => doQuery(e.target.value)}
             />
-            <div className='results'>
+            <div className='results rounded-b'>
                 <SearchResults
                     results={results}
                     query={query}
                     loading={loading}
                 />
             </div>
-            <p className='shadow' />
+            <p className='shadow rounded' />
         </div>
         <style jsx>{`
         .container {
@@ -41,7 +41,6 @@ export function Search() {
             position: relative;
             flex-direction: column;
             background-color: var(--theme-background);
-            border-radius: ${radius};
         }
         input {
             display: flex;
@@ -65,8 +64,6 @@ export function Search() {
         .results {
             display: none;
             flex-direction: column;
-            border-bottom-left-radius: ${radius};
-            border-bottom-right-radius: ${radius};
             overflow: hidden;
         }
         input:focus + .results {
@@ -81,7 +78,6 @@ export function Search() {
             width: 100%;
             height: 100%;
             pointer-events: none;
-            border-radius: ${radius};
             transition: 250ms box-shadow;
         }
         input:focus ~ .shadow {

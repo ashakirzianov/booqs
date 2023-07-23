@@ -1,7 +1,7 @@
 import React from 'react'
 import { Icon, IconName } from './Icon'
 import {
-    meter, radius, boldWeight,
+    meter, boldWeight,
 } from './theme'
 import { Spinner } from './Spinner'
 
@@ -104,7 +104,7 @@ export function BorderButton({ text, icon, onClick }: {
     icon?: IconName,
     onClick?: () => void,
 }) {
-    return <div className='button' onClick={onClick}>
+    return <div className='button rounded' onClick={onClick}>
         {
             !icon ? null :
                 <div className='icon'><Icon name={icon} /></div>
@@ -119,7 +119,6 @@ export function BorderButton({ text, icon, onClick }: {
                 text-align: center;
                 color: var(--theme-dimmed);
                 border: 2px solid var(--theme-dimmed);
-                border-radius: ${radius};
                 font-weight: ${boldWeight};
                 text-decoration: none;
                 padding: ${meter.small} ${meter.regular};
