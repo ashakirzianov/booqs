@@ -4,7 +4,6 @@ import {
     BooqData, BooqAnchor, useSettings, useReportHistory,
     useFilteredHighlights, colorForGroup, quoteColor, pageForPosition,
 } from '@/application'
-import { headerHeight } from '@/controls/theme'
 import { BorderButton, IconButton } from '@/controls/Buttons'
 import { BooqLink, FeedLink } from '@/controls/Links'
 import { Spinner } from '@/controls/Spinner'
@@ -250,7 +249,7 @@ function AnchorButton({ booqId, anchor, title }: {
                 display: flex;
                 flex-flow: row;
                 align-items: center; 
-                height: ${headerHeight};
+                height: var(--header-height);
             }`}</style>
         </div>
     </BooqLink>

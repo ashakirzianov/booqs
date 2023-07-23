@@ -1,6 +1,6 @@
 import React, { ReactNode } from 'react'
 import {
-    meter, headerHeight, smallScreenWidth,
+    meter, smallScreenWidth,
 } from '@/controls/theme'
 
 type ControlsProps = {
@@ -92,7 +92,7 @@ function BooqControls({
                 align-items: center;
                 display: grid;
                 grid-template-columns: ${buttonSize} ${buttonSize} 1fr ${contentWidth} 1fr ${buttonSize} ${buttonSize};
-                grid-template-rows: ${headerHeight} 1fr ${headerHeight};
+                grid-template-rows: var(--header-height) 1fr var(--header-height);
                 grid-template-areas: 
                     "main nav  .    content .    themer account"
                     "navc navc navc content .    .      .      "
@@ -157,7 +157,7 @@ function BooqControls({
             @media (max-width: ${smallScreenWidth}) {
                 .container {
                     grid-template-columns: auto auto 1fr auto auto;
-                    grid-template-rows: ${headerHeight} 1fr ${headerHeight};
+                    grid-template-rows: var(--header-height) 1fr var(--header-height);
                     grid-template-areas: 
                         "main    nav     .       themer  account"
                         "content content content content content"
@@ -192,10 +192,10 @@ function BooqControls({
             }
             @media (max-width: ${smallScreenWidth}) {
                 .main, .nav, .themer, .account, .back-top {
-                    transform: ${showControls ? undefined : `translateY(-${headerHeight})`};
+                    transform: ${showControls ? undefined : `translateY(calc(-var(--header-height)))`};
                 }
                 .page, .left, .back-bottom {
-                    transform: ${showControls ? undefined : `translateY(${headerHeight})`};
+                    transform: ${showControls ? undefined : `translateY(var(--header-height))`};
                 }
             }
             `}</style>

@@ -32,6 +32,7 @@ module.exports = {
       },
       spacing: {
         xs: '0.125rem',
+        header: 'var(--header-height)',
       },
       boxShadow: {
         DEFAULT: '0px 0px 5px rgba(0, 0, 0, 0.1)',

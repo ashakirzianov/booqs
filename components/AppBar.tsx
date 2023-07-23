@@ -1,5 +1,5 @@
 import React from 'react'
-import { meter, headerHeight } from '@/controls/theme'
+import { meter } from '@/controls/theme'
 import { Logo } from '@/controls/Logo'
 import { usePopoverSingleton } from '@/controls/Popover'
 import { Search } from './Search'
@@ -9,7 +9,7 @@ import { Upload } from './Upload'
 
 
 export function AppBar() {
-    return <div className="appbar">
+    return <div className="appbar h-header">
         <div className="logo">
             <Logo />
         </div>
@@ -24,7 +24,6 @@ export function AppBar() {
                 display: flex;
                 flex-direction: row;
                 align-items: center;
-                height: ${headerHeight};
                 padding: ${meter.xLarge} ${meter.regular};
                 width: 100vw;
             }
