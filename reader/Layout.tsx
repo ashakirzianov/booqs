@@ -1,8 +1,5 @@
 import React, { ReactNode } from 'react'
 import styles from './ReaderLayout.module.css'
-import {
-    meter, smallScreenWidth,
-} from '@/controls/theme'
 
 type ControlsProps = {
     isControlsVisible: boolean,

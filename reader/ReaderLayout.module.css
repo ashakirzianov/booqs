@@ -1,6 +1,6 @@
 .layout {
     --button-size: 64px;
-    --content-width: 45rem;
+    --content-width: 720px;
     --meter-regular: 0.5rem;
     --meter-large: 1rem;
     --meter-xxlarge: 4rem;
@@ -19,16 +19,6 @@
     align-items: stretch;
     width: 100%;
     max-width: var(--content-width);
-}
-
-@media (max-width: 60rem) {
-    .booq {
-        padding: 0 var(--meter-large);
-    }
-
-    .layout {
-        padding: var(--meter-xxlarge) 0;
-    }
 }
 
 .reader {
@@ -129,7 +119,15 @@
     transition: 250ms transform;
 }
 
-@media (max-width: 60rem) {
+.navc {
+    transform: translateX(-100%);
+}
+
+.navc.navopen {
+    transform: initial;
+}
+
+@media (max-width: 1280px) {
     .reader {
         grid-template-columns: auto auto 1fr auto auto;
         grid-template-rows: var(--header-height) 1fr var(--header-height);
@@ -165,17 +163,14 @@
     .backBottom {
         grid-area: 3 / 1 / 3 / 6;
     }
-}
 
-.navc {
-    transform: translateX(-100%);
-}
+    .booq {
+        padding: 0 var(--meter-large);
+    }
 
-.navc.navopen {
-    transform: initial;
-}
-
-@media (max-width: 60rem) {
+    .layout {
+        padding: var(--meter-xxlarge) 0;
+    }
 
     .main,
     .nav,

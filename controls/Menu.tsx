@@ -1,6 +1,6 @@
 import React, { ReactNode } from 'react'
 import { IconName, Icon } from './Icon'
-import { meter, smallScreenWidth } from './theme'
+import { meter } from './theme'
 import { Spinner } from './Spinner'
 
 export function Menu({ callback, children }: {
@@ -51,7 +51,6 @@ export function MenuItem({ icon, text, callback, spinner }: {
                 align-items: center;
                 padding: ${meter.large};
                 cursor: pointer;
-                font-size: smaller;
                 font-family: var(--font-main);
                 user-select: none;
                 transition: 250ms color, 250ms background-color;
@@ -73,11 +72,6 @@ export function MenuItem({ icon, text, callback, spinner }: {
             .spinner {
                 display: flex;
                 flex: 0;
-            }
-            @media (max-width: ${smallScreenWidth}) {
-                .container {
-                    font-size: 1em;
-                }
             }
             `}</style>
     </div>

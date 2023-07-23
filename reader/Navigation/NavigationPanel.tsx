@@ -3,7 +3,7 @@ import {
     useAuth, UserInfo, useNavigationNodes, NavigationNode,
 } from '@/application'
 import {
-    meter, isSmallScreen, smallScreenWidth,
+    meter,
 } from '@/controls/theme'
 import { IconButton } from '@/controls/Buttons'
 import { TocNodeComp } from './TocNode'
@@ -21,9 +21,7 @@ export function useNavigationPanel(booqId: string) {
     const NavigationContent = <Navigation
         booqId={booqId}
         closeSelf={() => {
-            if (isSmallScreen()) {
-                setOpen(false)
-            }
+            setOpen(false)
         }}
     />
     return {
@@ -42,7 +40,7 @@ function Navigation({ booqId, closeSelf }: {
         return <div className='safe-area'>
             <div className='container'>
                 <div className='scrollable'>
-                    <div className='header'>
+                    <div className='header xl:py-0 xl:px-4'>
                         <div className='label font-bold'>CONTENTS</div>
                         <div className='filter'>
                             <NavigationFilter
@@ -51,7 +49,7 @@ function Navigation({ booqId, closeSelf }: {
                             />
                         </div>
                     </div>
-                    <div className='items'>
+                    <div className='items xl:py-0 xl:px-4'>
                         {
                             nodes.map(
                                 (node, idx) => <div key={idx}>
@@ -109,14 +107,6 @@ function Navigation({ booqId, closeSelf }: {
                 width: 85%;
                 border: none;
                 border-top: 0.5px solid var(--theme-border);
-            }
-            @media (min-width: ${smallScreenWidth}) {
-                .items {
-                    padding: 0 ${meter.large};
-                }
-                .header {
-                    padding: 0 ${meter.large};
-                }
             }
             `}</style>
         </div>

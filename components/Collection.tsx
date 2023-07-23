@@ -2,7 +2,7 @@ import React from 'react'
 import { useCollection } from '@/application'
 import { BooqCover } from '../controls/BooqCover'
 import { Spinner } from '../controls/Spinner'
-import { meter, panelShadow } from '../controls/theme'
+import { meter } from '../controls/theme'
 
 export function Collection({ name }: {
     name: string,

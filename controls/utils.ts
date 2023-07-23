@@ -1,5 +1,4 @@
 import { ReactNode, useEffect } from 'react'
-import { smallScreenWidth } from './theme'
 
 type FunctionComponent<P extends {}> = (props: P) => ReactNode;
 

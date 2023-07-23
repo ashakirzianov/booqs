@@ -1,5 +1,5 @@
 import { Highlight, colorForGroup, UserInfo } from '@/application'
-import { isSmallScreen, meter } from '@/controls/theme'
+import { meter } from '@/controls/theme'
 import { BooqLink } from '@/controls/Links'
 import { Overlay } from '@/controls/Popover'
 import { Icon } from '@/controls/Icon'
@@ -11,7 +11,6 @@ export function HighlightNodeComp({ booqId, highlight, self }: {
     self: UserInfo | undefined,
     highlight: Highlight,
 }) {
-    const smallScreen = isSmallScreen()
     return <div className='container'>
         <div className='content'>
             <BooqLink booqId={booqId} path={highlight.start}>
@@ -22,7 +21,7 @@ export function HighlightNodeComp({ booqId, highlight, self }: {
             <Overlay
                 placement='right-start'
                 hideOnClick={true}
-                anchor={<div className='more'>
+                anchor={<div className='more text-dimmed xl:text-background hover:text-highlight'>
                     <Icon name='more' />
                 </div>}
                 content={<div className='menu'>
@@ -81,11 +80,7 @@ export function HighlightNodeComp({ booqId, highlight, self }: {
                 justify-content: center;
                 cursor: pointer;
                 font-size: x-large;
-                color: ${smallScreen ? `var(--theme-dimmed)` : `var(--theme-background)`};
                 width: ${meter.large};
-            }
-            .more:hover {
-                color: var(--theme-highlight);
             }
             .menu {
                 width: 12rem;
