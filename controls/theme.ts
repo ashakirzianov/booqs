@@ -1,6 +1,5 @@
 // TODO: remove this file
 
-export const headerHeight = '3rem'
 export const smallScreenWidth = '60rem'
 export function isSmallScreen(): boolean {
     if (process.browser) {

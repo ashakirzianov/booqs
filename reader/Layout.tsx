@@ -69,20 +69,22 @@ function BooqControls({
     ContextMenu,
 }: ControlsProps) {
     const showControls = isControlsVisible || isNavigationOpen
-    return <div className='container'>
-        <div className='main'>{MainButton}</div>
-        <div className='nav'>{NavigationButton}</div>
-        <div className='themer'>{ThemerButton}</div>
-        <div className='account'>{AccountButton}</div>
-        <div className='page'>{CurrentPage}</div>
-        <div className='left'>{PagesLeft}</div>
-        <div className='content' />
-        <div className='back-top' />
-        <div className='back-bottom' />
-        <div className='ctx'>{ContextMenu}</div>
-        <div className='navc'>{NavigationContent}</div>
+    const showCtrlClass = showControls ? 'show-ctr' : ''
+    const navOpenClass = isNavigationOpen ? 'navopen' : ''
+    return <div className='reader'>
+        <div className={`main ${showCtrlClass}`}>{MainButton}</div>
+        <div className={`nav ${showCtrlClass}`}>{NavigationButton}</div>
+        <div className={`themer ${showCtrlClass}`}>{ThemerButton}</div>
+        <div className={`account ${showCtrlClass}`}>{AccountButton}</div>
+        <div className={`page ${showCtrlClass}`}>{CurrentPage}</div>
+        <div className={`left ${showCtrlClass}`}>{PagesLeft}</div>
+        <div className={`content ${showCtrlClass}`} />
+        <div className={`back-top ${showCtrlClass}`} />
+        <div className={`back-bottom ${showCtrlClass}`} />
+        <div className={`ctx ${showCtrlClass}`}>{ContextMenu}</div>
+        <div className={`navc ${navOpenClass}`}>{NavigationContent}</div>
         <style jsx>{`
-            .container {
+            .reader {
                 position: fixed;
                 top: 0; bottom: 0; left: 0; right: 0;
                 height: 100vh;
@@ -155,7 +157,7 @@ function BooqControls({
                 transition: 250ms transform;
             }
             @media (max-width: ${smallScreenWidth}) {
-                .container {
+                .reader {
                     grid-template-columns: auto auto 1fr auto auto;
                     grid-template-rows: var(--header-height) 1fr var(--header-height);
                     grid-template-areas: 
@@ -188,14 +190,23 @@ function BooqControls({
             `}</style>
         <style jsx>{`
             .navc {
-                transform: ${isNavigationOpen ? 'initial' : 'translateX(-100%)'};
+                transform: translateX(-100%);
+            }
+            .navc.navopen {
+                transform: initial;
             }
             @media (max-width: ${smallScreenWidth}) {
                 .main, .nav, .themer, .account, .back-top {
-                    transform: ${showControls ? undefined : `translateY(calc(-var(--header-height)))`};
+                    transform: translateY(calc(var(--header-height) * -1));
+                }
+                .main.show-ctr, .nav.show-ctr, .themer.show-ctr, .account.show-ctr, .back-top.show-ctr {
+                    transform: initial;
                 }
                 .page, .left, .back-bottom {
-                    transform: ${showControls ? undefined : `translateY(var(--header-height))`};
+                    transform: translateY(var(--header-height));
+                }
+                .page.show-ctr, .left.show-ctr, .back-bottom.show-ctr {
+                    transform: initial;
                 }
             }
             `}</style>
