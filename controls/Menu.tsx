@@ -1,6 +1,6 @@
 import React, { ReactNode } from 'react'
 import { IconName, Icon } from './Icon'
-import { meter, boldWeight, vars, smallScreenWidth } from './theme'
+import { meter, boldWeight, smallScreenWidth } from './theme'
 import { Spinner } from './Spinner'
 
 export function Menu({ callback, children }: {
@@ -58,8 +58,8 @@ export function MenuItem({ icon, text, callback, spinner }: {
                 transition: 250ms color, 250ms background-color;
             }
             .container:hover {
-                color: var(${vars.background});
-                background-color: var(${vars.highlight});
+                color: var(--theme-background);
+                background-color: var(--theme-highlight);
             }
             .icon {
                 display: flex;

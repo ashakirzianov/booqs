@@ -4,7 +4,7 @@ import {
     BooqData, BooqAnchor, useSettings, useReportHistory,
     useFilteredHighlights, colorForGroup, quoteColor, pageForPosition,
 } from '@/application'
-import { headerHeight, vars, boldWeight } from '@/controls/theme'
+import { headerHeight, boldWeight } from '@/controls/theme'
 import { BorderButton, IconButton } from '@/controls/Buttons'
 import { BooqLink, FeedLink } from '@/controls/Links'
 import { Spinner } from '@/controls/Spinner'
@@ -265,7 +265,7 @@ function PageLabel({ text }: {
             .label {
                 font-size: small;
                 font-weight: ${boldWeight};
-                color: var(${vars.dimmed});
+                color: var(--theme-dimmed);
             }
             `}</style>
     </span>

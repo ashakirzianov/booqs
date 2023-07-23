@@ -1,6 +1,6 @@
 import { pageForPosition, TocNode } from '@/application'
 import { BooqLink } from '@/controls/Links'
-import { boldWeight, vars, meter } from '@/controls/theme'
+import { boldWeight, meter } from '@/controls/theme'
 
 
 export function TocNodeComp({
@@ -25,7 +25,7 @@ export function TocNodeComp({
             font-weight: ${boldWeight};
         }
         .content:hover {
-            color: var(${vars.highlight});
+            color: var(--theme-highlight);
         }
         .page {
             margin-left: ${meter.regular};

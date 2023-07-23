@@ -1,4 +1,4 @@
-import { vars, boldWeight } from './theme'
+import { boldWeight } from './theme'
 
 export function ProfileBadge({
     picture, name, size, border,
@@ -38,7 +38,7 @@ function ProfilePicture({ picture, size, border }: {
                 display: flex;
                 flex-shrink: 0;
                 border-radius: 50%;
-                border: ${border ? `1.5px solid var(${vars.dimmed})` : 'none'};
+                border: ${border ? `1.5px solid var(--theme-dimmed)` : 'none'};
                 width: ${size}rem;
                 height: ${size}rem;
                 overflow: hidden;
@@ -48,7 +48,7 @@ function ProfilePicture({ picture, size, border }: {
                 transition: 250ms border;
             }
             .container:hover {
-                border: ${border ? `1.5px solid var(${vars.highlight})` : 'none'};
+                border: ${border ? `1.5px solid var(--theme-highlight)` : 'none'};
             }
             `}</style>
     </div>
@@ -70,19 +70,19 @@ function ProfilePicturePlaceholder({ initials, size, border }: {
                 padding: 0;
                 flex-shrink: 0;
                 border-radius: 50%;
-                border: ${border ? `1.5px solid var(${vars.dimmed})` : 'none'};
+                border: ${border ? `1.5px solid var(--theme-dimmed)` : 'none'};
                 width: ${size}rem;
                 height: ${size}rem;
                 overflow: hidden;
-                background: var(${vars.background});
-                color: var(${vars.dimmed});
+                background: var(--theme-background);
+                color: var(--theme-dimmed);
                 font-size: ${size / 2}rem;
                 font-weight: ${boldWeight};
                 transition: 250ms color, 250ms border;
             }
             .container:hover {
-                border: ${border ? `1.5px solid var(${vars.highlight})` : 'none'};
-                color: var(${vars.highlight});
+                border: ${border ? `1.5px solid var(--theme-highlight)` : 'none'};
+                color: var(--theme-highlight);
             }
             `}</style>
     </div>

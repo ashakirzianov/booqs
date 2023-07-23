@@ -1,6 +1,6 @@
 import React, { ReactNode } from 'react'
 import {
-    meter, headerHeight, vars, smallScreenWidth,
+    meter, headerHeight, smallScreenWidth,
 } from '@/controls/theme'
 
 type ControlsProps = {
@@ -119,7 +119,7 @@ function BooqControls({
                 align-self: stretch;
                 justify-self: stretch;
                 transition: 250ms transform;
-                background: var(${vars.background});
+                background: var(--theme-background);
             }
             .main, .nav, .themer, .account, .page, .left {
                 transition: 250ms transform;
@@ -175,7 +175,7 @@ function BooqControls({
                     z-index: -1;
                     align-self: stretch;
                     justify-self: stretch;
-                    background: var(${vars.background});
+                    background: var(--theme-background);
                     box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.1);
                 }
                 .back-top {

@@ -1,6 +1,6 @@
 import React, { useCallback, ReactNode, useRef, useState } from 'react'
 import { useDocumentEvent } from '@/controls/utils'
-import { vars, radius, meter } from '@/controls/theme'
+import { radius, meter } from '@/controls/theme'
 import { Overlay } from '@/controls/Popover'
 import {
     getBooqSelection, AnchorRect, getSelectionRect, getAugmentationRect,
@@ -212,9 +212,9 @@ function ContextMenuPanel({ content, rect }: {
             }
             .content {
                 pointer-events: auto;
-                background: var(${vars.background});
+                background: var(--theme-background);
                 border-radius: ${radius};
-                border: 1px solid var(${vars.border});
+                border: 1px solid var(--theme-border);
                 margin: ${meter.regular};
                 transition: 250ms transform;
             }

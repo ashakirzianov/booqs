@@ -1,5 +1,4 @@
 import React from 'react'
-import { radius } from './theme'
 
 const defaultSize = 70
 
@@ -10,23 +9,15 @@ export function BooqCover({ cover, title, author, size }: {
     size?: number,
 }) {
     size = size ?? defaultSize
-    return <div>
+    return <div className='flex shrink-0 items-stretch rounded overflow-hidden' style={{
+        width: size * 2,
+        height: size * 3,
+    }}>
         {
             cover
                 ? <BooqImageCover cover={cover} title={title} />
                 : <BooqDefaultCover title={title} author={author} size={size} />
         }
-        <style jsx>{`
-            div {
-                display: flex;
-                flex-shrink: 0;
-                width: ${size * 2}px;
-                height: ${size * 3}px;
-                align-items: stretch;
-                border-radius: ${radius};
-                overflow: hidden;
-            }
-            `}</style>
     </div>
 }
 
@@ -34,18 +25,9 @@ function BooqImageCover({ cover, title }: {
     cover: string,
     title?: string,
 }) {
-    return <div title={title}>
-        <style jsx>{`
-            div {
-                display: flex;
-                width: 100%;
-                height: 100%;
-                background-image: url(${cover});
-                background-size: cover;
-                background-repeat: no-repeat;
-            }
-            `}</style>
-    </div>
+    return <div title={title} className='flex w-full h-full bg-cover bg-no-repeat' style={{
+        backgroundImage: `url(${cover})`,
+    }} />
 }
 
 function BooqDefaultCover({ title, author, size }: {
@@ -54,32 +36,14 @@ function BooqDefaultCover({ title, author, size }: {
     size: number,
 }) {
     const { back, text } = colorForString(title ?? 'no-title' + author)
-    return <div title={title} className='container'>
-        <div className='cover'>
+    return <div title={title} className='flex flex-row grow items-stretch'>
+        <div className='flex flex-col grow items-center justify-center overflow-hidden text-ellipsis text-center p-[10%]' style={{
+            fontSize: calcFontSize(title ?? 'no-title', size),
+            background: back,
+            color: text,
+        }}>
             {title}
         </div>
-        <style jsx>{`
-            .container {
-                display: flex;
-                flex-direction: row;
-                flex: 1;
-                align-items: stretch;
-            }
-            .cover {
-                display: flex;
-                flex: 1;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                text-align: center;
-                padding: 10%;
-                font-size: ${calcFontSize(title ?? 'no-title', size)};
-                background: ${back};
-                color: ${text};
-            }
-            `}</style>
     </div>
 }
 

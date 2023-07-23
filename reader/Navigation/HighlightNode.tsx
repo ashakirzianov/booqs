@@ -1,5 +1,5 @@
 import { Highlight, colorForGroup, UserInfo } from '@/application'
-import { isSmallScreen, meter, vars, boldWeight } from '@/controls/theme'
+import { isSmallScreen, meter, boldWeight } from '@/controls/theme'
 import { BooqLink } from '@/controls/Links'
 import { Overlay } from '@/controls/Popover'
 import { Icon } from '@/controls/Icon'
@@ -59,7 +59,7 @@ export function HighlightNodeComp({ booqId, highlight, self }: {
             }
             .content {
                 width: 100%;
-                color: var(${vars.primary});
+                color: var(--theme-primary);
                 text-align: justify;
             }
             .badge {
@@ -78,18 +78,18 @@ export function HighlightNodeComp({ booqId, highlight, self }: {
                 font-weight: ${boldWeight};
             }
             .container:hover .more {
-                color: var(${vars.dimmed});
+                color: var(--theme-dimmed);
             }
             .more {
                 display: flex;
                 justify-content: center;
                 cursor: pointer;
                 font-size: x-large;
-                color: ${smallScreen ? `var(${vars.dimmed})` : `var(${vars.background})`};
+                color: ${smallScreen ? `var(--theme-dimmed)` : `var(--theme-background)`};
                 width: ${meter.large};
             }
             .more:hover {
-                color: var(${vars.highlight});
+                color: var(--theme-highlight);
             }
             .menu {
                 width: 12rem;

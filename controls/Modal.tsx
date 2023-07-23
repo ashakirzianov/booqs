@@ -1,6 +1,6 @@
 import React, { ReactNode, useState } from 'react'
 import Link from 'next/link'
-import { panelShadow, radius, meter, vars } from './theme'
+import { panelShadow, radius, meter } from './theme'
 import { Icon, IconName } from './Icon'
 
 export type ModalDefinition = {
@@ -74,7 +74,7 @@ function ModalContent({
                 overflow-y: auto;
                 overflow-x: hidden;
                 z-index: 10;
-                background: var(${vars.background});
+                background: var(--theme-background);
                 box-shadow: ${panelShadow};
                 border-radius: ${radius};
                 pointer-events: auto;
@@ -130,15 +130,15 @@ function ModalButton({ text, icon, onClick, href }: ButtonProps) {
                 flex-flow: column;
                 align-items: center;
                 cursor: pointer;
-                color: var(${vars.action});
+                color: var(--theme-action);
             }
             .container:hover {
-                color: var(${vars.highlight});
+                color: var(--theme-highlight);
             }
             hr {
                 width: 100%;
                 border: none;
-                border-top: 1px solid var(${vars.border});
+                border-top: 1px solid var(--theme-border);
                 margin: 0;
             }
             `}</style>

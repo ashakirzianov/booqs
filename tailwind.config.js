@@ -3,35 +3,37 @@ module.exports = {
   content: [
     './pages/**/*.{js,ts,jsx,tsx,mdx}',
     './components/**/*.{js,ts,jsx,tsx,mdx}',
+    './controls/**/*.{js,ts,jsx,tsx,mdx}',
+    './reader/**/*.{js,ts,jsx,tsx,mdx}',
     './app/**/*.{js,ts,jsx,tsx,mdx}',
   ],
   theme: {
-    colors: {
-      transparent: 'transparent',
-      background: 'white',
-      action: '#F57F17',
-      primary: 'black',
-      dimmed: '#867b6c',
-      border: '#ddd',
-      highlight: 'orange',
-      dark: {
-        background: 'black',
-        action: '#867b6c',
-        primary: '#999',
-        dimmed: '#888',
-        border: '#333',
-        highlight: 'white',
+    extend: {
+      colors: {
+        transparent: 'transparent',
+        background: 'var(--theme-background)',
+        action: 'var(--theme-action)',
+        primary: 'var(--theme-primary)',
+        dimmed: 'var(--theme-dimmed)',
+        border: 'var(--theme-border)',
+        highlight: 'var(--theme-highlight)',
       },
-    },
-    fontFamily: {
-      main: ['var(--font-main)', 'sans-serif'],
-      book: ['var(--font-book)', 'serif'],
-    },
-    fontWeight: {
-      normal: 300,
-      bold: 400,
-      extrabold: 700,
-    },
+      fontFamily: {
+        main: ['var(--font-main)', 'sans-serif'],
+        book: ['var(--font-book)', 'serif'],
+      },
+      fontWeight: {
+        normal: 300,
+        bold: 400,
+        extrabold: 700,
+      },
+      fontSize: {
+        '2xs': '0.625rem',
+      },
+      spacing: {
+        'xs': '0.125rem',
+      },
+    }
   },
   plugins: [],
 }

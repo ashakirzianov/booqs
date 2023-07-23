@@ -1,7 +1,7 @@
 import React from 'react'
 import { useHistory, pageForPosition, useAuth } from '@/application'
 import { BooqPreview } from '@/controls/BooqPreview'
-import { meter, vars } from '@/controls/theme'
+import { meter } from '@/controls/theme'
 import { BooqLink } from '@/controls/Links'
 import { useSignInModal } from './SignIn'
 
@@ -40,10 +40,10 @@ function SignInPanel() {
             .sign-in-link {
                 cursor: pointer;
                 text-decoration: 2px underline;
-                color: var(${vars.action});
+                color: var(--theme-action);
             }
             .sign-in-link:hover {
-                color: var(${vars.highlight});
+                color: var(--theme-highlight);
             }
             `}</style>
     </div>

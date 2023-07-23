@@ -1,6 +1,6 @@
 import React from 'react'
 import { useSearch, SearchResult } from '@/application'
-import { normalWeight, meter, radius, vars } from '@/controls/theme'
+import { normalWeight, meter, radius } from '@/controls/theme'
 import { BooqCover } from '@/controls/BooqCover'
 import { Spinner } from '@/controls/Spinner'
 import { BooqLink } from '@/controls/Links'
@@ -32,7 +32,7 @@ export function Search() {
             align-items: flex-start;
             justify-content: flex-start;
             margin: 0;
-            color: var(${vars.primary});
+            color: var(--theme-primary);
             max-height: 3rem;
             overflow: visible;
         }
@@ -40,7 +40,7 @@ export function Search() {
             display: flex;
             position: relative;
             flex-direction: column;
-            background-color: var(${vars.background});
+            background-color: var(--theme-background);
             border-radius: ${radius};
         }
         input {
@@ -51,7 +51,7 @@ export function Search() {
             font: inherit;
             font-size: x-large;
             font-weight: ${normalWeight};
-            color: var(${vars.primary});
+            color: var(--theme-primary);
             background-color: rgba(0,0,0,0);
         }
         input:focus {
@@ -60,7 +60,7 @@ export function Search() {
             outline: none;
         }
         input::placeholder {
-            color: var(${vars.dimmed});
+            color: var(--theme-dimmed);
         }
         .results {
             display: none;
@@ -86,7 +86,7 @@ export function Search() {
         }
         input:focus ~ .shadow {
             box-shadow: 0px 0px 7px rgba(0,0,0,0.1);
-            border: 1px solid var(${vars.border});
+            border: 1px solid var(--theme-border);
         }
         `}</style>
     </div>
@@ -166,8 +166,8 @@ function SingleResult({ result, query }: {
                 cursor: pointer;
             }
             .container:hover {
-                background-color: var(${vars.highlight});
-                color: var(${vars.background});
+                background-color: var(--theme-highlight);
+                color: var(--theme-background);
             }
             .details {
                 display: flex;

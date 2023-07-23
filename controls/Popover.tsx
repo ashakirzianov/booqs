@@ -2,7 +2,7 @@ import React, { ReactNode, ReactElement } from 'react'
 import { roundArrow } from 'tippy.js'
 import Tippy, { useSingleton } from '@tippyjs/react'
 import css from 'styled-jsx/css'
-import { radius, vars } from './theme'
+import { radius } from './theme'
 
 export type PopoverSingleton = ReturnType<typeof useSingleton>[1];
 
@@ -81,10 +81,10 @@ export function usePopoverSingleton() {
 
 const popoverStyles = css.global`
 .tippy-box.popover-theme {
-    color: var(${vars.primary});
-    background-color: var(${vars.background});
+    color: var(--theme-primary);
+    background-color: var(--theme-background);
     box-shadow: 0px 0px 5px rgba(0,0,0,0.1);
-    border: 1px solid var(${vars.border});
+    border: 1px solid var(--theme-border);
     border-radius: ${radius};
 }
 .popover-theme .tippy-content {
@@ -93,17 +93,17 @@ const popoverStyles = css.global`
     border-radius: ${radius};
 }
 .popover-theme .tippy-svg-arrow > svg:first-child {
-    fill: var(${vars.border});
+    fill: var(--theme-border);
 }
 .popover-theme .tippy-svg-arrow > svg:last-child {
-    fill: var(${vars.background});
+    fill: var(--theme-background);
 }
 `
 
 const overlayStyles = css.global`
 .tippy-box.overlay-theme {
-    color: var(${vars.primary});
-    background-color: var(${vars.background});
+    color: var(--theme-primary);
+    background-color: var(--theme-background);
     box-shadow: unset;
     border: unset;
 }

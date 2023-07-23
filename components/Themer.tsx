@@ -2,7 +2,7 @@ import {
     PaletteName, palettes, useSetSettings, useSettings,
 } from '@/application'
 import {
-    buttonShadow, meter, vars,
+    buttonShadow, meter,
 } from '@/controls/theme'
 import { PopoverSingleton, Popover } from '@/controls/Popover'
 import { IconButton } from '@/controls/Buttons'
@@ -34,7 +34,7 @@ function ThemerPanel() {
                 margin: ${meter.xLarge} 0;
                 align-self: center;
                 border: none;
-                border-top: 1px solid var(${vars.border});
+                border-top: 1px solid var(--theme-border);
             }
         `}</style>
     </div>
@@ -77,7 +77,7 @@ function FontScaleButton({ scale, onClick }: {
                 transition: color 0.25s;
             }
             span:hover {
-                color: var(${vars.highlight});
+                color: var(--theme-highlight);
             }
             `}</style>
     </div>

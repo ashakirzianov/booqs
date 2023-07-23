@@ -1,7 +1,7 @@
 import { ReactNode } from 'react'
 import { UserInfo, useNavigationState } from '@/application'
 import { ProfileBadge } from '@/controls/ProfilePicture'
-import { meter, boldWeight, vars, radius } from '@/controls/theme'
+import { meter, boldWeight } from '@/controls/theme'
 
 export function NavigationFilter({ authors }: {
     self: UserInfo | undefined,
@@ -77,13 +77,13 @@ function FilterButton({ text, selected, toggle, Badge }: {
                 padding: ${meter.small} ${meter.regular};
                 border-radius: 20px;
                 border: 2px dotted;
-                border-color: ${selected ? `var(${vars.dimmed})` : 'rgba(0,0,0,0)'};
+                border-color: ${selected ? `var(--theme-dimmed)` : 'rgba(0,0,0,0)'};
                 cursor: pointer;
                 transition: 250ms color, 250ms border;
             }
             .container:hover {
-                color: var(${vars.highlight});
-                border-color: var(${vars.highlight});
+                color: var(--theme-highlight);
+                border-color: var(--theme-highlight);
             }
             .badge {
                 margin-right: ${meter.regular};

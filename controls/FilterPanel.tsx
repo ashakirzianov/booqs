@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { meter, vars } from '@/controls/theme'
+import { meter } from '@/controls/theme'
 
 type FilterItem = {
     text: string,
@@ -50,10 +50,10 @@ export function FilterPanel({
                 padding: ${meter.small} ${meter.regular};
             }
             .item:hover {
-                border-bottom: 2px solid var(${vars.highlight});
+                border-bottom: 2px solid var(--theme-highlight);
             }
             .item.selected {
-                border-bottom: 2px solid var(${vars.highlight});
+                border-bottom: 2px solid var(--theme-highlight);
             }
             `}</style>
     </div>

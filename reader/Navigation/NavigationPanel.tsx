@@ -3,7 +3,7 @@ import {
     useAuth, UserInfo, useNavigationNodes, NavigationNode,
 } from '@/application'
 import {
-    meter, vars, boldWeight, isSmallScreen, smallScreenWidth,
+    meter, boldWeight, isSmallScreen, smallScreenWidth,
 } from '@/controls/theme'
 import { IconButton } from '@/controls/Buttons'
 import { TocNodeComp } from './TocNode'
@@ -78,7 +78,7 @@ function Navigation({ booqId, closeSelf }: {
                 display: flex;
                 flex: 1 1;
                 flex-flow: column;
-                color: var(${vars.dimmed});
+                color: var(--theme-dimmed);
                 font-size: 0.9rem;
                 max-height: 100%;
             }
@@ -109,7 +109,7 @@ function Navigation({ booqId, closeSelf }: {
             hr {
                 width: 85%;
                 border: none;
-                border-top: 0.5px solid var(${vars.border});
+                border-top: 0.5px solid var(--theme-border);
             }
             @media (min-width: ${smallScreenWidth}) {
                 .items {

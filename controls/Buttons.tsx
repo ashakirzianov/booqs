@@ -1,7 +1,7 @@
 import React from 'react'
 import { Icon, IconName } from './Icon'
 import {
-    buttonShadow, meter, radius, vars, boldWeight,
+    buttonShadow, meter, radius, boldWeight,
 } from './theme'
 import { Spinner } from './Spinner'
 
@@ -22,7 +22,7 @@ export function IconButton({ icon, onClick, isSelected }: {
                 margin: 0;
                 padding: 0;
                 height: ${buttonSize};
-                color: var(${vars.dimmed});
+                color: var(--theme-dimmed);
                 border: none;
                 font-size: x-large;
                 cursor: pointer;
@@ -30,7 +30,7 @@ export function IconButton({ icon, onClick, isSelected }: {
                 background-color: rgba(0, 0, 0, 0);
             }
             .button:hover {
-                color: var(${vars.highlight});
+                color: var(--theme-highlight);
             }
             .button:focus {
                 outline: 0;
@@ -38,7 +38,7 @@ export function IconButton({ icon, onClick, isSelected }: {
         `}</style>
         <style jsx>{`
             .button {
-                color: ${isSelected ? `var(${vars.highlight})` : `var(${vars.dimmed})`}
+                color: ${isSelected ? `var(--theme-highlight)` : `var(--theme-dimmed)`}
             }
             `}</style>
     </button>
@@ -56,8 +56,8 @@ export function ActionButton({ text, onClick }: {
             button {
                 border: none;
                 border-radius: ${radius};
-                background-color: var(${vars.action});
-                color: var(${vars.background});
+                background-color: var(--theme-action);
+                color: var(--theme-background);
                 box-shadow: ${buttonShadow};
                 font-size: large;
                 padding: ${meter.regular};
@@ -66,7 +66,7 @@ export function ActionButton({ text, onClick }: {
                 transition: background-color 0.25s;
             }
             button:hover {
-                background-color: var(${vars.highlight});
+                background-color: var(--theme-highlight);
             }
             `}</style>
     </>
@@ -88,14 +88,14 @@ export function TextButton({ text, onClick, loading }: {
         </span>
         <style jsx>{`
         .button {
-            color: var(${vars.action});
+            color: var(--theme-action);
             text-decoration: underline;
             font-size: large;
             cursor: pointer;
             transition: color 0.25s;
         }
         .button:hover {
-            color: var(${vars.highlight});
+            color: var(--theme-highlight);
         }
         `}</style>
     </>
@@ -119,8 +119,8 @@ export function BorderButton({ text, icon, onClick }: {
             .button {
                 display: flex;
                 text-align: center;
-                color: var(${vars.dimmed});
-                border: 2px solid var(${vars.dimmed});
+                color: var(--theme-dimmed);
+                border: 2px solid var(--theme-dimmed);
                 border-radius: ${radius};
                 font-weight: ${boldWeight};
                 text-decoration: none;
@@ -129,8 +129,8 @@ export function BorderButton({ text, icon, onClick }: {
                 transition: 250ms border-color, 250ms color;
             }
             .button:hover {
-                color: var(${vars.highlight});
-                border-color: var(${vars.highlight});
+                color: var(--theme-highlight);
+                border-color: var(--theme-highlight);
             }
             `}</style>
     </div>
