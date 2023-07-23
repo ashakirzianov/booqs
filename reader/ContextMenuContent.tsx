@@ -9,7 +9,7 @@ import { MenuItem } from '@/controls/Menu'
 import { useDocumentEvent } from '@/controls/utils'
 import { quoteRef } from '@/controls/Links'
 import { BooqSelection } from './BooqContent'
-import { meter, boldWeight } from '@/controls/theme'
+import { meter } from '@/controls/theme'
 import { ProfileBadge } from '@/controls/ProfilePicture'
 
 type EmptyTarget = {
@@ -118,7 +118,7 @@ function AuthorItem({ name, pictureUrl }: {
     name?: string,
     pictureUrl?: string,
 }) {
-    return <div className='container'>
+    return <div className='container font-bold'>
         {
             pictureUrl
                 ? <div className="picture">
@@ -141,7 +141,6 @@ function AuthorItem({ name, pictureUrl }: {
                 padding: ${meter.large};
                 font-size: smaller;
                 font-family: var(--font-main);
-                font-weight: ${boldWeight};
                 user-select: none;
             }
             .picture {

@@ -1,7 +1,7 @@
 import { Fragment } from 'react'
 import { TocItem, UserInfo, PathHighlightsNode } from '@/application'
 import { BooqLink } from '@/controls/Links'
-import { meter, boldWeight } from '@/controls/theme'
+import { meter } from '@/controls/theme'
 import { HighlightNodeComp } from './HighlightNode'
 
 export function PathHighlightsNodeComp({
@@ -43,7 +43,7 @@ function Path({ items, booqId }: {
             items.map((item, idx) => !item ? null
                 : <Fragment key={idx}>
                     {idx === 0 ? null : <div className='separator'>/</div>}
-                    <div className='element'>
+                    <div className='element font-bold'>
                         <BooqLink booqId={booqId} path={item.path}>
                             {item.title}
                         </BooqLink>
@@ -58,7 +58,6 @@ function Path({ items, booqId }: {
             }
             .element {
                 margin: 0 ${meter.regular} 0 0;
-                font-weight: ${boldWeight};
             }
             .element:hover {
                 text-decoration: underline;

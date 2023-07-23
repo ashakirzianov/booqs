@@ -1,5 +1,5 @@
 import { Highlight, colorForGroup, UserInfo } from '@/application'
-import { isSmallScreen, meter, boldWeight } from '@/controls/theme'
+import { isSmallScreen, meter } from '@/controls/theme'
 import { BooqLink } from '@/controls/Links'
 import { Overlay } from '@/controls/Popover'
 import { Icon } from '@/controls/Icon'
@@ -72,10 +72,6 @@ export function HighlightNodeComp({ booqId, highlight, self }: {
                 justify-content: space-between;
                 align-items: stretch;
                 margin-left: ${meter.large};
-            }
-            .page {
-                margin-top: ${meter.regular};
-                font-weight: ${boldWeight};
             }
             .container:hover .more {
                 color: var(--theme-dimmed);

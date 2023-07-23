@@ -1,6 +1,6 @@
 import { pageForPosition, TocNode } from '@/application'
 import { BooqLink } from '@/controls/Links'
-import { boldWeight, meter } from '@/controls/theme'
+import { meter } from '@/controls/theme'
 
 
 export function TocNodeComp({
@@ -11,7 +11,7 @@ export function TocNodeComp({
 }) {
     return <>
         <BooqLink booqId={booqId} path={path}>
-            <div className='content'>
+            <div className='content font-bold'>
                 <span className='title'>{title ?? 'no-title'}</span>
                 <span className='page'>{pageForPosition(position)}</span>
             </div>
@@ -22,7 +22,6 @@ export function TocNodeComp({
             flex-flow: row nowrap;
             flex: 1;
             justify-content: space-between;
-            font-weight: ${boldWeight};
         }
         .content:hover {
             color: var(--theme-highlight);

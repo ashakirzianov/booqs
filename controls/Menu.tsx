@@ -1,6 +1,6 @@
 import React, { ReactNode } from 'react'
 import { IconName, Icon } from './Icon'
-import { meter, boldWeight, smallScreenWidth } from './theme'
+import { meter, smallScreenWidth } from './theme'
 import { Spinner } from './Spinner'
 
 export function Menu({ callback, children }: {
@@ -27,7 +27,7 @@ export function MenuItem({ icon, text, callback, spinner }: {
     spinner?: boolean,
 }) {
     return <div
-        className='container'
+        className='container font-bold'
         // Note: prevent loosing selection on safari
         onMouseDown={e => e.preventDefault()}
         onClick={callback}
@@ -53,7 +53,6 @@ export function MenuItem({ icon, text, callback, spinner }: {
                 cursor: pointer;
                 font-size: smaller;
                 font-family: var(--font-main);
-                font-weight: ${boldWeight};
                 user-select: none;
                 transition: 250ms color, 250ms background-color;
             }

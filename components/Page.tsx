@@ -24,7 +24,7 @@ const lora = Lora({
 export function Page({ title, children }: HasChildren & {
     title: string,
 }) {
-    return <div className={`page ${lato.variable} ${lora.variable}`}>
+    return <div className={`page ${lato.variable} ${lora.variable} font-normal`}>
         <Head>
             <title>{title}</title>
             <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=3.0,minimum-scale=1.0,viewport-fit=cover" />
@@ -39,7 +39,6 @@ export function Page({ title, children }: HasChildren & {
                 flex: 1;
                 flex-direction: column;
                 font-family: var(--font-main);
-                font-weight: ${normalWeight};
                 overflow: hidden;
             }
         `}</style>

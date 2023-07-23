@@ -6,7 +6,7 @@ import { TextButton } from '@/controls/Buttons'
 import { Panel } from '@/controls/Panel'
 import { BooqTags } from '@/controls/BooqTags'
 import { BooqCover } from '@/controls/BooqCover'
-import { boldWeight, meter } from '@/controls/theme'
+import { meter } from '@/controls/theme'
 import { BooqLink } from '@/controls/Links'
 
 export function Featured({ cards }: {
@@ -98,17 +98,13 @@ function Header({ title, author }: {
     author?: string,
 }) {
     return <div>
-        <span className="title">{title}</span>
+        <span className="text-xl font-bold">{title}</span>
         <span className="author">by {author}</span>
         <style jsx>{`
             div {
                 display: flex;
                 flex-flow: column wrap;
                 align-items: baseline;
-            }
-            .title {
-                font-size: x-large;
-                font-weight: ${boldWeight};
             }
             .author {
                 font-size: large;

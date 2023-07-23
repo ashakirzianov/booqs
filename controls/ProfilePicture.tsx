@@ -1,5 +1,3 @@
-import { boldWeight } from './theme'
-
 export function ProfileBadge({
     picture, name, size, border,
 }: {
@@ -59,7 +57,7 @@ function ProfilePicturePlaceholder({ initials, size, border }: {
     size: number,
     border: boolean,
 }) {
-    return <div className='container'>
+    return <div className='container font-bold'>
         {initials}
         <style jsx>{`
             .container {
@@ -77,7 +75,6 @@ function ProfilePicturePlaceholder({ initials, size, border }: {
                 background: var(--theme-background);
                 color: var(--theme-dimmed);
                 font-size: ${size / 2}rem;
-                font-weight: ${boldWeight};
                 transition: 250ms color, 250ms border;
             }
             .container:hover {

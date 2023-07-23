@@ -1,7 +1,4 @@
 // TODO: remove this file
-export const normalWeight = 300
-export const boldWeight = 400
-export const extraBoldWeight = 700
 
 export const headerHeight = '3rem'
 export const smallScreenWidth = '60rem'

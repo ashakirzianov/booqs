@@ -3,7 +3,7 @@ import {
     useAuth, UserInfo, useNavigationNodes, NavigationNode,
 } from '@/application'
 import {
-    meter, boldWeight, isSmallScreen, smallScreenWidth,
+    meter, isSmallScreen, smallScreenWidth,
 } from '@/controls/theme'
 import { IconButton } from '@/controls/Buttons'
 import { TocNodeComp } from './TocNode'
@@ -43,7 +43,7 @@ function Navigation({ booqId, closeSelf }: {
             <div className='container'>
                 <div className='scrollable'>
                     <div className='header'>
-                        <div className='label'>CONTENTS</div>
+                        <div className='label font-bold'>CONTENTS</div>
                         <div className='filter'>
                             <NavigationFilter
                                 self={self}
@@ -96,7 +96,6 @@ function Navigation({ booqId, closeSelf }: {
             .label {
                 align-self: center;
                 letter-spacing: 0.1em;
-                font-weight: ${boldWeight};
             }
             .items {
                 display: flex;

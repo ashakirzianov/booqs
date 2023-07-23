@@ -4,7 +4,7 @@ import {
     BooqData, BooqAnchor, useSettings, useReportHistory,
     useFilteredHighlights, colorForGroup, quoteColor, pageForPosition,
 } from '@/application'
-import { headerHeight, boldWeight } from '@/controls/theme'
+import { headerHeight } from '@/controls/theme'
 import { BorderButton, IconButton } from '@/controls/Buttons'
 import { BooqLink, FeedLink } from '@/controls/Links'
 import { Spinner } from '@/controls/Spinner'
@@ -259,12 +259,11 @@ function AnchorButton({ booqId, anchor, title }: {
 function PageLabel({ text }: {
     text: string,
 }) {
-    return <span className='label'>
+    return <span className='label font-bold'>
         {text}
         <style jsx>{`
             .label {
                 font-size: small;
-                font-weight: ${boldWeight};
                 color: var(--theme-dimmed);
             }
             `}</style>

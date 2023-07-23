@@ -1,7 +1,7 @@
 import { ReactNode } from 'react'
 import { UserInfo, useNavigationState } from '@/application'
 import { ProfileBadge } from '@/controls/ProfilePicture'
-import { meter, boldWeight } from '@/controls/theme'
+import { meter } from '@/controls/theme'
 
 export function NavigationFilter({ authors }: {
     self: UserInfo | undefined,
@@ -69,7 +69,7 @@ function FilterButton({ text, selected, toggle, Badge }: {
                 ? <div className='badge'>{Badge}</div>
                 : null
         }
-        <span className='text'>{text}</span>
+        <span className='font-bold'>{text}</span>
         <style jsx>{`
             .container {
                 display: flex;
@@ -87,9 +87,6 @@ function FilterButton({ text, selected, toggle, Badge }: {
             }
             .badge {
                 margin-right: ${meter.regular};
-            }
-            .text {
-                font-weight: ${boldWeight};
             }
             `}</style>
     </div>

@@ -1,6 +1,6 @@
 import React from 'react'
 import { useSearch, SearchResult } from '@/application'
-import { normalWeight, meter } from '@/controls/theme'
+import { meter } from '@/controls/theme'
 import { BooqCover } from '@/controls/BooqCover'
 import { Spinner } from '@/controls/Spinner'
 import { BooqLink } from '@/controls/Links'
@@ -10,6 +10,7 @@ export function Search() {
     return <div className='container'>
         <div className='content rounded'>
             <input
+                className='font-normal'
                 type="text"
                 placeholder="Search..."
                 value={query}
@@ -49,7 +50,6 @@ export function Search() {
             margin: ${meter.regular} ${meter.large};
             font: inherit;
             font-size: x-large;
-            font-weight: ${normalWeight};
             color: var(--theme-primary);
             background-color: rgba(0,0,0,0);
         }
