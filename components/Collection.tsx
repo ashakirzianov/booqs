@@ -48,7 +48,7 @@ function CollectionItemTile({
     title, author, cover,
 }: CollectionItem) {
     return <div
-        className='tile'
+        className='tile shadow'
         title={composeTitle(title, author)}
     >
         <BooqCover
@@ -60,7 +60,6 @@ function CollectionItemTile({
         <style jsx>{`
             .tile {
                 margin: ${meter.regular};
-                box-shadow: ${panelShadow};
             }
             `}</style>
     </div>

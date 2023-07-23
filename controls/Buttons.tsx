@@ -1,7 +1,7 @@
 import React from 'react'
 import { Icon, IconName } from './Icon'
 import {
-    buttonShadow, meter, radius, boldWeight,
+    meter, radius, boldWeight,
 } from './theme'
 import { Spinner } from './Spinner'
 
@@ -49,16 +49,14 @@ export function ActionButton({ text, onClick }: {
     onClick?: () => void,
 }) {
     return <>
-        <button onClick={onClick}>
+        <button onClick={onClick} className='shadow-button rounded'>
             <span>{text}</span>
         </button>
         <style jsx>{`
             button {
                 border: none;
-                border-radius: ${radius};
                 background-color: var(--theme-action);
                 color: var(--theme-background);
-                box-shadow: ${buttonShadow};
                 font-size: large;
                 padding: ${meter.regular};
                 cursor: pointer;

@@ -37,7 +37,7 @@ function ModalContent({
     const openClass = isOpen ? 'open' : 'closed'
     return <div className={`screen ${openClass}`} onClick={close}>
         <div
-            className={`container ${openClass}`}
+            className={`container ${openClass} shadow rounded`}
             onClick={e => e.stopPropagation()}
         >
             <div className='content'>
@@ -75,8 +75,6 @@ function ModalContent({
                 overflow-x: hidden;
                 z-index: 10;
                 background: var(--theme-background);
-                box-shadow: ${panelShadow};
-                border-radius: ${radius};
                 pointer-events: auto;
                 transition: 250ms transform, 250ms opacity;
             }

@@ -2,7 +2,7 @@ import {
     PaletteName, palettes, useSetSettings, useSettings,
 } from '@/application'
 import {
-    buttonShadow, meter,
+    meter,
 } from '@/controls/theme'
 import { PopoverSingleton, Popover } from '@/controls/Popover'
 import { IconButton } from '@/controls/Buttons'
@@ -109,7 +109,7 @@ function PaletteButton({ name, current, onSelect }: {
 }) {
     const checked = current === name
     const { background, highlight, primary } = palettes[name]
-    return <div className="container" onClick={() => onSelect(name)}>
+    return <div className="container shadow-button" onClick={() => onSelect(name)}>
         <div className="label">{name.substr(0, 1).toUpperCase()}</div>
         <style jsx>{`
             .container {
@@ -126,7 +126,6 @@ function PaletteButton({ name, current, onSelect }: {
                 overflow: hidden;
                 background-color: ${background};
                 color: ${primary};
-                box-shadow: ${buttonShadow};
                 cursor: pointer;
                 transition: color 0.25s, border 0.25s;
             }
