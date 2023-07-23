@@ -2,19 +2,9 @@ import React, { ReactNode } from 'react'
 import {
     meter, smallScreenWidth,
 } from '@/controls/theme'
+import { BooqControls, ControlsProps } from './BooqControls'
 
-type ControlsProps = {
-    isControlsVisible: boolean,
-    isNavigationOpen: boolean,
-    MainButton: ReactNode,
-    NavigationButton: ReactNode,
-    ThemerButton: ReactNode,
-    AccountButton: ReactNode,
-    CurrentPage: ReactNode,
-    PagesLeft: ReactNode,
-    NavigationContent: ReactNode,
-    ContextMenu: ReactNode,
-};
+
 type LayoutProps = ControlsProps & {
     BooqContent: ReactNode,
     PrevButton: ReactNode,
@@ -26,7 +16,7 @@ export function ReaderLayout({
     BooqContent, PrevButton, NextButton,
     ...controls
 }: LayoutProps) {
-    return <div className='container'>
+    return <div className='layout'>
         {PrevButton}
         <div className='booq'>
             {BooqContent}
@@ -34,7 +24,7 @@ export function ReaderLayout({
         {NextButton}
         <BooqControls {...controls} />
         <style jsx>{`
-            .container {
+            .layout {
                 display: flex;
                 flex: 1;
                 flex-flow: column;
@@ -51,162 +41,8 @@ export function ReaderLayout({
                 .booq {
                     padding: 0 ${meter.large};
                 }
-                .container {
+                .layout {
                     padding: ${meter.xxLarge} 0;
-                }
-            }
-            `}</style>
-    </div>
-}
-
-const buttonSize = '64px'
-function BooqControls({
-    isControlsVisible, isNavigationOpen,
-    MainButton, NavigationButton,
-    ThemerButton, AccountButton,
-    CurrentPage, PagesLeft,
-    NavigationContent,
-    ContextMenu,
-}: ControlsProps) {
-    const showControls = isControlsVisible || isNavigationOpen
-    const showCtrlClass = showControls ? 'show-ctr' : ''
-    const navOpenClass = isNavigationOpen ? 'navopen' : ''
-    return <div className='reader'>
-        <div className={`main ${showCtrlClass}`}>{MainButton}</div>
-        <div className={`nav ${showCtrlClass}`}>{NavigationButton}</div>
-        <div className={`themer ${showCtrlClass}`}>{ThemerButton}</div>
-        <div className={`account ${showCtrlClass}`}>{AccountButton}</div>
-        <div className={`page ${showCtrlClass}`}>{CurrentPage}</div>
-        <div className={`left ${showCtrlClass}`}>{PagesLeft}</div>
-        <div className={`content ${showCtrlClass}`} />
-        <div className={`back-top ${showCtrlClass}`} />
-        <div className={`back-bottom ${showCtrlClass}`} />
-        <div className={`ctx ${showCtrlClass}`}>{ContextMenu}</div>
-        <div className={`navc ${navOpenClass}`}>{NavigationContent}</div>
-        <style jsx>{`
-            .reader {
-                position: fixed;
-                top: 0; bottom: 0; left: 0; right: 0;
-                height: 100vh;
-                width: 100vw;
-                pointer-events: none;
-                justify-items: center;
-                align-items: center;
-                display: grid;
-                grid-template-columns: ${buttonSize} ${buttonSize} 1fr ${contentWidth} 1fr ${buttonSize} ${buttonSize};
-                grid-template-rows: var(--header-height) 1fr var(--header-height);
-                grid-template-areas: 
-                    "main nav  .    content .    themer account"
-                    "navc navc navc content .    .      .      "
-                    "page page page content left left   left   ";
-            }
-            .content {
-                grid-area: content;
-                align-self: stretch;
-                justify-self: stretch;
-            }
-            .ctx {
-                grid-area: content;
-                pointer-events: none;
-                align-self: stretch;
-                justify-self: stretch;
-            }
-            .navc {
-                display: flex;
-                flex: 1 1;
-                grid-area: 2 / 1 / 4 / 4;
-                padding: ${meter.regular} 0 0 0;
-                pointer-events: auto;
-                overflow: hidden;
-                align-self: stretch;
-                justify-self: stretch;
-                transition: 250ms transform;
-                background: var(--theme-background);
-            }
-            .main, .nav, .themer, .account, .page, .left {
-                transition: 250ms transform;
-            }
-            .main, .nav, .themer, .account {
-                pointer-events: auto;
-                padding: 0 ${meter.large};
-            }
-            .main {
-                grid-area: main;
-            }
-            .nav {
-                grid-area: nav;
-            }
-            .themer {
-                grid-area: themer;
-            }
-            .account {
-                grid-area: account;
-            }
-            .page {
-                grid-area: page;
-                justify-self: flex-start;
-                padding: ${meter.large};
-            }
-            .left {
-                grid-area: left;
-                justify-self: flex-end;
-                padding: ${meter.large};
-            }
-            .back-top, .back-bottom {
-                display: none;
-                transition: 250ms transform;
-            }
-            @media (max-width: ${smallScreenWidth}) {
-                .reader {
-                    grid-template-columns: auto auto 1fr auto auto;
-                    grid-template-rows: var(--header-height) 1fr var(--header-height);
-                    grid-template-areas: 
-                        "main    nav     .       themer  account"
-                        "content content content content content"
-                        "page    page    .       left    left";
-                }
-                .ctx {
-                    grid-area: 2 / 1 / 4 / 6;
-                }
-                .navc {
-                    grid-area: 2 / 1 / 4 / 6;
-                    padding: ${meter.regular} ${meter.large} 0 ${meter.large};
-                }
-                .back-top, .back-bottom {
-                    display: block;
-                    z-index: -1;
-                    align-self: stretch;
-                    justify-self: stretch;
-                    background: var(--theme-background);
-                    box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.1);
-                }
-                .back-top {
-                    grid-area: 1 / 1 / 1 / 6;
-                }
-                .back-bottom {
-                    grid-area: 3 / 1 / 3 / 6;
-                }
-            }
-            `}</style>
-        <style jsx>{`
-            .navc {
-                transform: translateX(-100%);
-            }
-            .navc.navopen {
-                transform: initial;
-            }
-            @media (max-width: ${smallScreenWidth}) {
-                .main, .nav, .themer, .account, .back-top {
-                    transform: translateY(calc(var(--header-height) * -1));
-                }
-                .main.show-ctr, .nav.show-ctr, .themer.show-ctr, .account.show-ctr, .back-top.show-ctr {
-                    transform: initial;
-                }
-                .page, .left, .back-bottom {
-                    transform: translateY(var(--header-height));
-                }
-                .page.show-ctr, .left.show-ctr, .back-bottom.show-ctr {
-                    transform: initial;
                 }
             }
             `}</style>
