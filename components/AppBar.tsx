@@ -9,7 +9,7 @@ import { Upload } from './Upload'
 
 
 export function AppBar() {
-    return <div className="container">
+    return <div className="appbar">
         <div className="logo">
             <Logo />
         </div>
@@ -20,12 +20,13 @@ export function AppBar() {
             <AppButtons />
         </div>
         <style jsx>{`
-            .container {
+            .appbar {
                 display: flex;
                 flex-direction: row;
                 align-items: center;
                 height: ${headerHeight};
                 padding: ${meter.xLarge} ${meter.regular};
+                width: 100vw;
             }
             .logo {
                 display: none;
@@ -37,7 +38,7 @@ export function AppBar() {
                 .logo {
                     display: flex;
                 }
-                .container {
+                .appbar {
                     padding: ${meter.xLarge} ${meter.large};
                 }
             }

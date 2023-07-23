@@ -2,7 +2,6 @@ import React from 'react'
 import Head from 'next/head'
 import { SdksHead } from '@/plat'
 import { HasChildren } from '@/controls/utils'
-import { normalWeight } from '@/controls/theme'
 
 import { Lato, Lora } from 'next/font/google'
 
@@ -40,17 +39,6 @@ export function Page({ title, children }: HasChildren & {
                 flex-direction: column;
                 font-family: var(--font-main);
                 overflow: hidden;
-            }
-        `}</style>
-        <style jsx global>{`
-            * {
-                box-sizing: border-box;
-            }
-            body {
-                margin: 0;
-                padding: 0;
-                color: var(--theme-primary);
-                background: var(--theme-background);
             }
         `}</style>
     </div>
