@@ -10,7 +10,7 @@ export function SdksHead() {
     }, [])
     return <>
         <Script type="text/javascript" src="https://appleid.cdn-apple.com/appleauth/static/jsapi/appleid/1/en_US/appleid.auth.js" />
-        <Script async defer src="https://connect.facebook.net/en_US/sdk.js" />
+        <Script async defer crossOrigin='anonymous' src="https://connect.facebook.net/en_US/sdk.js" />
     </>
 }
 
@@ -85,24 +85,24 @@ function initFbSdk() {
         autoLogAppEvents: true,
         xfbml: false,
         status: true,
-        version: 'v7.0',
+        version: 'v17.0',
     })
 }
 
 function appleSdk() {
-    return process.browser
+    return typeof window !== 'undefined'
         ? globalThis.AppleID
         : undefined
 }
 
 function facebookSdk() {
-    return process.browser
+    return typeof window !== 'undefined'
         ? globalThis.FB
         : undefined
 }
 
 function redirectUri() {
-    const { protocol, host, pathname } = process.browser
+    const { protocol, host, pathname } = typeof window !== 'undefined'
         ? window.location
         : undefined ?? {}
     const url = `${protocol}//${host}/`
