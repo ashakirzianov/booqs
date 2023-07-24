@@ -23,6 +23,7 @@ module.exports = {
         book: ['var(--font-book)', 'serif'],
       },
       fontWeight: {
+        light: 100,
         normal: 300,
         bold: 400,
         extrabold: 700,
