@@ -26,29 +26,17 @@ export function FilterPanel({
     selected: string,
     select: (value: string) => void,
 }) {
-    return <div className='container my-base'>
+    return <div className='flex flex-row flex-wrap my-base'>
         {
             items.map(
                 (item, idx) => <div
                     key={idx}
-                    className={`item cursor-pointer my-sm mx-base ${item.value === selected ? 'selected' : ''}`}
+                    className={`item cursor-pointer my-sm mx-base border-2 border-transparent ${item.value === selected ? 'border-highlight' : ''} hover:border-highlight`}
                     onClick={() => select(item.value)}
                 >
                     {item.text}
                 </div>
             )
         }
-        <style jsx>{`
-            .container {
-                display: flex;
-                flex-flow: row wrap;
-            }
-            .item:hover {
-                border-bottom: 2px solid var(--theme-highlight);
-            }
-            .item.selected {
-                border-bottom: 2px solid var(--theme-highlight);
-            }
-            `}</style>
     </div>
 }

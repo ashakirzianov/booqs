@@ -6,16 +6,8 @@ export function Menu({ callback, children }: {
     children: ReactNode,
     callback?: () => void,
 }) {
-    return <div onClick={callback}>
+    return <div onClick={callback} className='flex flex-col items-stretch grow'>
         {children}
-        <style jsx>{`
-            div {
-                display: flex;
-                flex-direction: column;
-                align-items: stretch;
-                flex: 1;
-            }
-            `}</style>
     </div>
 }
 
@@ -26,50 +18,21 @@ export function MenuItem({ icon, text, callback, spinner }: {
     spinner?: boolean,
 }) {
     return <div
-        className='container font-bold p-lg'
+        className='container flex flex-row grow items-center cursor-pointer font-main select-none transition font-bold p-lg hover:bg-highlight hover:text-background'
         // Note: prevent loosing selection on safari
         onMouseDown={e => e.preventDefault()}
         onClick={callback}
     >
         {
             icon
-                ? <div className="icon mr-lg"><Icon name={icon} /></div>
+                ? <div className="flex justify-center items-center mr-lg"><Icon name={icon} /></div>
                 : null
         }
-        <span className='text'>{text}</span>
+        <span className='flex grow'>{text}</span>
         {
             spinner
-                ? <div className='spinner'><Spinner /></div>
+                ? <div className='flex grow-0'><Spinner /></div>
                 : null
         }
-        <style jsx>{`
-            .container {
-                display: flex;
-                flex: 1;
-                flex-direction: row;
-                align-items: center;
-                cursor: pointer;
-                font-family: var(--font-main);
-                user-select: none;
-                transition: 250ms color, 250ms background-color;
-            }
-            .container:hover {
-                color: var(--theme-background);
-                background-color: var(--theme-highlight);
-            }
-            .icon {
-                display: flex;
-                justify-content: center;
-                align-items: center;
-            }
-            .text {
-                display: flex;
-                flex: 1;
-            }
-            .spinner {
-                display: flex;
-                flex: 0;
-            }
-            `}</style>
     </div>
 }

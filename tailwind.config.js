@@ -27,13 +27,6 @@ module.exports = {
         bold: 400,
         extrabold: 700,
       },
-      fontSize: {
-        sm: '0.25rem',
-        base: '0.5rem',
-        lg: '1rem',
-        xl: '2rem',
-        '2xl': '4rem',
-      },
       spacing: {
         xs: '0.125rem',
         sm: '0.25rem',

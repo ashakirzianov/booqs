@@ -56,10 +56,8 @@ function Pill({ color, label, title }: {
     label: string,
     title?: string
 }) {
-    return <div title={title} className='pr-lg mt-sm mr-sm' style={{
-        fontSize: 'small',
+    return <div title={title} className='pr-lg mt-sm mr-sm text-sm' style={{
         color,
-        borderRadius: '100px',
     }}>
         {label}
     </div>

@@ -29,26 +29,16 @@ function ProfilePicture({ picture, size, border }: {
     size: number,
     border: boolean,
 }) {
-    return <div className='container'>
-        <style jsx>{`
-            .container {
-                font-size: x-large;
-                display: flex;
-                flex-shrink: 0;
-                border-radius: 50%;
-                border: ${border ? `1.5px solid var(--theme-dimmed)` : 'none'};
-                width: ${size}rem;
-                height: ${size}rem;
-                overflow: hidden;
-                background-image: url(${picture});
-                background-size: cover;
-                background-repeat: no-repeat;
-                transition: 250ms border;
-            }
-            .container:hover {
-                border: ${border ? `1.5px solid var(--theme-highlight)` : 'none'};
-            }
-            `}</style>
+    return <div className='text-xl flex shrink-0 overflow-hidden hover:border-highlight' style={{
+        borderRadius: '50%',
+        border: border ? `1.5px solid var(--theme-dimmed)` : 'none',
+        width: `${size}rem`,
+        height: `${size}rem`,
+        backgroundImage: `url(${picture})`,
+        backgroundSize: 'cover',
+        backgroundRepeat: 'no-repeat',
+        transition: '250ms border',
+    }}>
     </div>
 }
 
@@ -57,31 +47,15 @@ function ProfilePicturePlaceholder({ initials, size, border }: {
     size: number,
     border: boolean,
 }) {
-    return <div className='container font-bold'>
+    return <div className='container font-bold text-xl flex items-center justify-center p-0 shrink-0 overflow-hidden bg-background text-dimmed hover:border-highlight' style={{
+        borderRadius: '50%',
+        border: border ? `1.5px solid var(--theme-dimmed)` : 'none',
+        width: `${size}rem`,
+        height: `${size}rem`,
+        transition: '250ms color, 250ms border',
+        fontSize: `${size / 2}rem`,
+    }}>
         {initials}
-        <style jsx>{`
-            .container {
-                font-size: x-large;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                padding: 0;
-                flex-shrink: 0;
-                border-radius: 50%;
-                border: ${border ? `1.5px solid var(--theme-dimmed)` : 'none'};
-                width: ${size}rem;
-                height: ${size}rem;
-                overflow: hidden;
-                background: var(--theme-background);
-                color: var(--theme-dimmed);
-                font-size: ${size / 2}rem;
-                transition: 250ms color, 250ms border;
-            }
-            .container:hover {
-                border: ${border ? `1.5px solid var(--theme-highlight)` : 'none'};
-                color: var(--theme-highlight);
-            }
-            `}</style>
     </div>
 }
 

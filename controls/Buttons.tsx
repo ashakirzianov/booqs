@@ -8,36 +8,13 @@ export function IconButton({ icon, onClick, isSelected }: {
     onClick?: () => void,
     isSelected?: boolean,
 }) {
+    const selectedClass = isSelected
+        ? 'text-highlight' : 'text-dimmed'
     return <button
-        className='button'
+        className={`button flex text-dimmed text-2xl cursor-pointer transition bg-transparent hover:text-highlight focus:outline-none ${selectedClass}`}
         onClick={onClick}
     >
         <Icon name={icon} />
-        <style jsx>{`
-            .button {
-                display: flex;
-                margin: 0;
-                padding: 0;
-                height: ${buttonSize};
-                color: var(--theme-dimmed);
-                border: none;
-                font-size: x-large;
-                cursor: pointer;
-                transition: color 0.25s;
-                background-color: rgba(0, 0, 0, 0);
-            }
-            .button:hover {
-                color: var(--theme-highlight);
-            }
-            .button:focus {
-                outline: 0;
-            }
-        `}</style>
-        <style jsx>{`
-            .button {
-                color: ${isSelected ? `var(--theme-highlight)` : `var(--theme-dimmed)`}
-            }
-            `}</style>
     </button>
 }
 

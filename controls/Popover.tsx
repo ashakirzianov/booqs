@@ -41,18 +41,11 @@ export function Popover({ singleton, anchor, content }: {
         <Tippy
             singleton={singleton}
             className='popover-theme'
-            content={<div className='content'>
+            content={<div className='flex min-w-[15rem] grow'>
                 {content}
             </div>}
             children={<div>{anchor}</div>}
         />
-        <style jsx>{`
-            .content {
-                display: flex;
-                min-width: 15rem;
-                flex: 1;
-            }
-        `}</style>
     </div>
 }
 
