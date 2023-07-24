@@ -1,5 +1,5 @@
-import { ClientReader } from '@/app/booq/ClientReader'
-import { fetchBooqFragmentServer } from '@/app/booq/fetch'
+import { ClientReader } from '@/app/(booq)/booq/ClientReader'
+import { fetchBooqFragmentServer } from '@/app/(booq)/booq/fetch'
 import { rangeFromString } from '@/core'
 
 
