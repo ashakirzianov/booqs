@@ -1,6 +1,6 @@
 import { ReactNode, createElement } from 'react'
 import { ApolloProvider } from '@apollo/react-hooks'
-import { ApolloClient, OperationVariables, QueryOptions, InMemoryCache, ApolloLink } from '@apollo/client'
+import { ApolloClient, OperationVariables, QueryOptions, InMemoryCache, ApolloLink, DocumentNode } from '@apollo/client'
 import { onError } from '@apollo/client/link/error'
 import { createUploadLink } from 'apollo-upload-client'
 import { UserDataProvider } from './userData'
@@ -49,4 +49,24 @@ export function doQuery<Data = any, Vars extends OperationVariables = OperationV
         ...options,
         fetchPolicy: 'network-only',
     })
+}
+
+export async function doServerQuery(query: DocumentNode) {
+    const url = process.env.NEXT_PUBLIC_BACKEND
+    if (url === undefined)
+        throw new Error('NEXT_PUBLIC_BACKEND is undefined')
+    const response = await fetch(
+        url,
+        {
+            method: 'POST',
+            body: JSON.stringify({
+                query: query.loc?.source.body,
+            }),
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        }
+    )
+    const data = await response.json()
+    return data.data
 }
