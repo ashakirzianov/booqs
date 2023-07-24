@@ -12,11 +12,12 @@ import { usePopoverSingleton } from '@/controls/Popover'
 import { Themer } from '@/components/Themer'
 import { SignIn } from '@/components/SignIn'
 import {
-    BooqContent, Augmentation, getAugmentationRect, getAugmentationText,
+    BooqContent, getAugmentationRect, getAugmentationText,
 } from './BooqContent'
 import { useContextMenu, ContextMenuState } from './ContextMenu'
 import { useNavigationPanel } from './Navigation'
 import { ReaderLayout } from './ReaderLayout'
+import { Augmentation } from './BooqContent/render'
 
 export function Reader({
     booq, quote,
@@ -47,6 +48,14 @@ export function Reader({
         ContextMenuNode, isVisible: contextMenuVisible,
         setMenuState,
     } = useContextMenu(booq.id)
+    const onAugmentationClick = useMemo(() => {
+        return (id: string) => {
+            const next = menuStateForAugmentation(id)
+            if (next) {
+                setMenuState(next)
+            }
+        }
+    }, [menuStateForAugmentation, setMenuState])
 
     return <ReaderLayout
         isControlsVisible={!contextMenuVisible && visible}
@@ -63,12 +72,7 @@ export function Reader({
                 augmentations={augmentations}
                 onScroll={onScroll}
                 onClick={toggle}
-                onAugmentationClick={id => {
-                    const next = menuStateForAugmentation(id)
-                    if (next) {
-                        setMenuState(next)
-                    }
-                }}
+                onAugmentationClick={onAugmentationClick}
             />
         </div>}
         PrevButton={<AnchorButton
@@ -164,44 +168,45 @@ function useAugmentations(booqId: string, quote?: BooqRange) {
             return augmentations
         }
     }, [quote, highlights])
+    const menuStateForAugmentation = useCallback(function (augmentationId: string): ContextMenuState | undefined {
+        const rect = getAugmentationRect(augmentationId)
+        if (!rect) {
+            return undefined
+        }
+        const [kind, id] = augmentationId.split('/')
+        switch (kind) {
+            case 'quote':
+                return quote
+                    ? {
+                        rect,
+                        target: {
+                            kind: 'quote',
+                            selection: {
+                                range: quote,
+                                text: getAugmentationText('quote/0'),
+                            },
+                        },
+                    }
+                    : undefined
+            case 'highlight': {
+                const highlight = highlights.find(hl => hl.id === id)
+                return highlight
+                    ? {
+                        rect,
+                        target: {
+                            kind: 'highlight',
+                            highlight,
+                        }
+                    }
+                    : undefined
+            }
+            default:
+                return undefined
+        }
+    }, [quote, highlights])
     return {
         augmentations,
-        menuStateForAugmentation(augmentationId: string): ContextMenuState | undefined {
-            const rect = getAugmentationRect(augmentationId)
-            if (!rect) {
-                return undefined
-            }
-            const [kind, id] = augmentationId.split('/')
-            switch (kind) {
-                case 'quote':
-                    return quote
-                        ? {
-                            rect,
-                            target: {
-                                kind: 'quote',
-                                selection: {
-                                    range: quote,
-                                    text: getAugmentationText('quote/0'),
-                                },
-                            },
-                        }
-                        : undefined
-                case 'highlight': {
-                    const highlight = highlights.find(hl => hl.id === id)
-                    return highlight
-                        ? {
-                            rect,
-                            target: {
-                                kind: 'highlight',
-                                highlight,
-                            }
-                        }
-                        : undefined
-                }
-                default:
-                    return undefined
-            }
-        },
+        menuStateForAugmentation,
     }
 }
 

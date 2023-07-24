@@ -1,6 +1,10 @@
-import { pathLessThan } from '@/core'
+import { BooqRange, pathLessThan } from '@/core'
 import { pathFromId } from '@/application'
-import type { BooqSelection } from './BooqContent'
+
+export type BooqSelection = {
+    range: BooqRange,
+    text: string,
+};
 
 export type AnchorRect = {
     top: number,

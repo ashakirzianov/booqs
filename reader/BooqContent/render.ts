@@ -5,7 +5,12 @@ import {
 } from '@/core'
 import { pathToId } from '@/application'
 import { booqHref } from '@/controls/Links'
-import type { Augmentation } from './BooqContent'
+
+export type Augmentation = {
+    range: BooqRange,
+    id: string,
+    color?: string,
+};
 
 type RenderContext = {
     booqId: string,
