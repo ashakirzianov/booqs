@@ -1,6 +1,5 @@
 import React from 'react'
 import { useSignInOptions, useAuth } from '@/application'
-import { meter } from '@/controls/theme'
 import { Menu, MenuItem } from '@/controls/Menu'
 import { IconButton } from '@/controls/Buttons'
 import { PopoverSingleton, Popover } from '@/controls/Popover'
@@ -10,7 +9,7 @@ import { useModal } from '@/controls/Modal'
 export function useSignInModal() {
     const { signWithApple, signWithFacebook } = useSignInOptions()
     const { openModal, ModalContent } = useModal(({ closeModal }) => ({
-        body: <div className='content'>
+        body: <div className='content p-lg'>
             Choose provider
             <style jsx>{`
                 .content {
@@ -19,7 +18,6 @@ export function useSignInModal() {
                     align-items: center;
                     width: 15rem;
                     max-width: 100vw;
-                    padding: ${meter.large};
                 }
                 `}</style>
         </div>,
@@ -102,8 +100,8 @@ function Signed({ name }: {
     name?: string,
 }) {
     const { signOut } = useSignInOptions()
-    return <div>
-        <span>{name}</span>
+    return <div className='py-base'>
+        <span className='p-base'>{name}</span>
         <Menu>
             <MenuItem
                 icon='sign-out'
@@ -117,35 +115,31 @@ function Signed({ name }: {
             display: flex;
             flex-direction: column;
             flex: 1;
-            padding: ${meter.regular} 0;
             align-items: stretch;
         }
         span {
             width: 100%;
             text-align: center;
             font-weight: bold;
-            padding: ${meter.regular};
         }
         `}</style>
     </div>
 }
 
 function NotSigned() {
-    return <div>
-        <span>Sign In</span>
+    return <div className='py-base'>
+        <span className='p-base'>Sign In</span>
         <style jsx>{`
         div {
             display: flex;
             flex-direction: column;
             flex: 1;
-            padding: ${meter.regular} 0;
             align-items: stretch;
         }
         span {
             width: 100%;
             text-align: center;
             font-weight: bold;
-            padding: ${meter.regular};
         }
         `}</style>
     </div>

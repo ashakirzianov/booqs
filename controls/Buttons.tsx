@@ -1,8 +1,5 @@
 import React from 'react'
 import { Icon, IconName } from './Icon'
-import {
-    meter,
-} from './theme'
 import { Spinner } from './Spinner'
 
 const buttonSize = 50
@@ -49,7 +46,7 @@ export function ActionButton({ text, onClick }: {
     onClick?: () => void,
 }) {
     return <>
-        <button onClick={onClick} className='shadow-button rounded'>
+        <button onClick={onClick} className='shadow-button rounded p-base'>
             <span>{text}</span>
         </button>
         <style jsx>{`
@@ -58,7 +55,6 @@ export function ActionButton({ text, onClick }: {
                 background-color: var(--theme-action);
                 color: var(--theme-background);
                 font-size: large;
-                padding: ${meter.regular};
                 cursor: pointer;
                 font-weight: 100;
                 transition: background-color 0.25s;
@@ -104,23 +100,19 @@ export function BorderButton({ text, icon, onClick }: {
     icon?: IconName,
     onClick?: () => void,
 }) {
-    return <div className='button rounded font-bold' onClick={onClick}>
+    return <div className='button rounded font-bold py-sm px-base' onClick={onClick}>
         {
             !icon ? null :
-                <div className='icon'><Icon name={icon} /></div>
+                <div className='mr-base'><Icon name={icon} /></div>
         }
         {text}
         <style jsx>{`
-            .icon {
-                margin: 0 ${meter.regular} 0 0;
-            }
             .button {
                 display: flex;
                 text-align: center;
                 color: var(--theme-dimmed);
                 border: 2px solid var(--theme-dimmed);
                 text-decoration: none;
-                padding: ${meter.small} ${meter.regular};
                 cursor: pointer;
                 transition: 250ms border-color, 250ms color;
             }

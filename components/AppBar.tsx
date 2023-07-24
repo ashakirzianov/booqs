@@ -1,5 +1,4 @@
 import React from 'react'
-import { meter } from '@/controls/theme'
 import { Logo } from '@/controls/Logo'
 import { usePopoverSingleton } from '@/controls/Popover'
 import { Search } from './Search'
@@ -9,8 +8,8 @@ import { Upload } from './Upload'
 
 
 export function AppBar() {
-    return <div className="appbar h-header">
-        <div className="logo">
+    return <div className="appbar h-header py-xl px-base sm:py-xl sm:px-lg">
+        <div className="logo mr-xl hidden sm:flex">
             <Logo />
         </div>
         <div className="search">
@@ -24,22 +23,11 @@ export function AppBar() {
                 display: flex;
                 flex-direction: row;
                 align-items: center;
-                padding: ${meter.xLarge} ${meter.regular};
                 width: 100vw;
             }
             .logo {
-                display: none;
                 flex-direction: column;
                 flex: 0 0;
-                margin: 0 ${meter.xLarge} 0 0;
-            }
-            @media (min-width: 40rem) {
-                .logo {
-                    display: flex;
-                }
-                .appbar {
-                    padding: ${meter.xLarge} ${meter.large};
-                }
             }
             .search {
                 display: flex;

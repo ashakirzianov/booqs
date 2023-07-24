@@ -6,7 +6,6 @@ import { TextButton } from '@/controls/Buttons'
 import { Panel } from '@/controls/Panel'
 import { BooqTags } from '@/controls/BooqTags'
 import { BooqCover } from '@/controls/BooqCover'
-import { meter } from '@/controls/theme'
 import { BooqLink } from '@/controls/Links'
 
 export function Featured({ cards }: {
@@ -35,22 +34,22 @@ function FeaturedCard({
     item: FeaturedItem,
 }) {
     return <Panel>
-        <div className="container">
-            <div className='cover'>
+        <div className="container p-lg sm:flex-row sm:flex-wrap sm:items-stretch">
+            <div className='flex m-base sm:my-base sm:mr-2xl sm:ml-0'>
                 <BooqCover
                     title={item.title}
                     author={item.author}
                     cover={item.cover}
                 />
             </div>
-            <div className="details">
+            <div className="details py-base px-0">
                 <div className='header'>
                     <Header title={item.title} author={item.author} />
                 </div>
-                <div className='tags'>
+                <div className='mt-lg'>
                     <BooqTags tags={item.tags} />
                 </div>
-                <div className='actions'>
+                <div className='mt-lg'>
                     <Actions item={item} />
                 </div>
             </div>
@@ -59,33 +58,18 @@ function FeaturedCard({
                 display: flex;
                 flex-flow: column;
                 flex: 1;
-                padding: ${meter.large};
                 align-items: center;
-            }
-            .cover {
-                display: flex;
-                margin: ${meter.regular};
             }
             .details {
                 display: flex;
                 flex-direction: column;
                 flex: 1;
                 justify-content: space-between;
-                margin: ${meter.regular} 0 ${meter.regular} 0;
-            }
-            .tags {
-                margin: ${meter.large} 0 0 0;
-            }
-            .actions {
-                margin: ${meter.large} 0 0 0;
             }
             @media (min-width: 600px) {
                 .container {
                     flex-flow: row wrap;
                     align-items: stretch;
-                }
-                .cover {
-                    margin: ${meter.regular} ${meter.xxLarge} ${meter.regular} 0;
                 }
             }
             `}</style>
@@ -117,7 +101,7 @@ function Actions({ item }: {
     item: FeaturedItem,
 }) {
     return <div className='container'>
-        <div className='button'>
+        <div className='ml-xl'>
             <ReadButton item={item} />
         </div>
         <style jsx>{`
@@ -126,9 +110,6 @@ function Actions({ item }: {
             flex-flow: row wrap;
             align-self: stretch;
             justify-content: flex-end;
-        }
-        .button {
-            margin: 0 0 0 ${meter.xLarge};
         }
         `}</style>
     </div>

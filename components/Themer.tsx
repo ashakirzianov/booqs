@@ -1,9 +1,6 @@
 import {
     PaletteName, palettes, useSetSettings, useSettings,
 } from '@/application'
-import {
-    meter,
-} from '@/controls/theme'
 import { PopoverSingleton, Popover } from '@/controls/Popover'
 import { IconButton } from '@/controls/Buttons'
 
@@ -18,20 +15,18 @@ export function Themer({ singleton }: {
 }
 
 function ThemerPanel() {
-    return <div className="container">
+    return <div className="container py-xl px-base">
         <FontSettings />
-        <hr />
+        <hr className='my-xl' />
         <PalettePicker />
         <style jsx>{`
             .container {
                 display: flex;
                 flex: 1;
                 flex-direction: column;
-                padding: ${meter.xLarge} ${meter.regular};
             }
             hr {
                 width: 80%;
-                margin: ${meter.xLarge} 0;
                 align-self: center;
                 border: none;
                 border-top: 1px solid var(--theme-border);

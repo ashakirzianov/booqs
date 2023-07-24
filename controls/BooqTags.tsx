@@ -1,5 +1,4 @@
 import React from 'react'
-import { meter } from './theme'
 
 export type BooqTag = {
     tag: string,
@@ -57,12 +56,10 @@ function Pill({ color, label, title }: {
     label: string,
     title?: string
 }) {
-    return <div title={title} style={{
+    return <div title={title} className='pr-lg mt-sm mr-sm' style={{
         fontSize: 'small',
         color,
         borderRadius: '100px',
-        padding: `0 ${meter.large} 0 0`,
-        margin: `${meter.small} ${meter.small} 0 0`,
     }}>
         {label}
     </div>

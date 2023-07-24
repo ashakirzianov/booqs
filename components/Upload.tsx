@@ -1,6 +1,5 @@
 import { useAuth, useUpload } from '@/application'
 import { IconButton } from '@/controls/Buttons'
-import { meter } from '@/controls/theme'
 import { useSelectFileDialog } from '@/controls/SelectFileDialog'
 import { Spinner } from '@/controls/Spinner'
 import { PopoverSingleton, Popover } from '@/controls/Popover'
@@ -17,7 +16,7 @@ export function Upload({ singleton }: {
         body, buttons, clearFile,
     } = useModalDefinition()
     const { openModal, ModalContent } = useModal(({ closeModal }) => ({
-        body: <div className='content'>
+        body: <div className='content p-lg'>
             {body}
             <style jsx>{`
                 .content {
@@ -26,7 +25,6 @@ export function Upload({ singleton }: {
                     align-items: center;
                     width: 15rem;
                     max-width: 100vw;
-                    padding: ${meter.large};
                 }
                 `}</style>
         </div>,
@@ -125,11 +123,10 @@ function useModalDefinition() {
 function Label({ text }: {
     text: string,
 }) {
-    return <div>
+    return <div className='m-lg'>
         {text}
         <style jsx>{`
         div {
-            margin: ${meter.large};
             width: 100%;
             text-align: center;
             font-weight: bold;

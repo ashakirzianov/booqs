@@ -1,7 +1,6 @@
 import React from 'react'
 import { useHistory, pageForPosition, useAuth } from '@/application'
 import { BooqPreview } from '@/controls/BooqPreview'
-import { meter } from '@/controls/theme'
 import { BooqLink } from '@/controls/Links'
 import { useSignInModal } from './SignIn'
 
@@ -21,7 +20,7 @@ export function ReadingHistory() {
 function SignInPanel() {
     const { openModal, ModalContent } = useSignInModal()
     return <div className='container'>
-        <span className='label'>
+        <span className='font-bold mb-lg'>
             <span className='sign-in-link' onClick={openModal}>Sign in</span> to see history
         </span>
         {ModalContent}
@@ -32,10 +31,6 @@ function SignInPanel() {
                 align-items: center;
                 justify-content: center;
                 height: ${historyPanelHeight};
-            }
-            .label {
-                margin-bottom: ${meter.large};
-                font-weight: bold;
             }
             .sign-in-link {
                 cursor: pointer;
@@ -71,11 +66,11 @@ type HistoryItem = ReturnType<typeof useHistory>['history'][number];
 function HistoryItems({ items }: {
     items: HistoryItem[],
 }) {
-    return <div className='container'>
+    return <div className='container py-xl px-base'>
         {
             items.map(
                 (entry, idx) =>
-                    <div key={idx} className='preview'>
+                    <div key={idx} className='preview py-0 px-lg'>
                         <BooqLink booqId={entry.id} path={entry.path}>
                             <BooqPreview
                                 path={entry.path}
@@ -94,7 +89,6 @@ function HistoryItems({ items }: {
                 flex: 1 1;
                 flex-direction: row;
                 box-sizing: border-box;
-                padding: ${meter.xLarge} ${meter.regular};
                 overflow: auto;
                 scroll-snap-type: x mandatory;
                 scrollbar-width: none;
@@ -104,7 +98,6 @@ function HistoryItems({ items }: {
             }
             .preview {
                 display: flex;
-                padding: 0 ${meter.large};
                 scroll-snap-align: center;
             }
             `}</style>

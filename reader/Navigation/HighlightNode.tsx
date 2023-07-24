@@ -1,5 +1,4 @@
 import { Highlight, colorForGroup, UserInfo } from '@/application'
-import { meter } from '@/controls/theme'
 import { BooqLink } from '@/controls/Links'
 import { Overlay } from '@/controls/Popover'
 import { Icon } from '@/controls/Icon'
@@ -11,17 +10,17 @@ export function HighlightNodeComp({ booqId, highlight, self }: {
     self: UserInfo | undefined,
     highlight: Highlight,
 }) {
-    return <div className='container'>
+    return <div className='container pl-base'>
         <div className='content'>
             <BooqLink booqId={booqId} path={highlight.start}>
                 {highlight.text}
             </BooqLink>
         </div>
-        <div className='side'>
+        <div className='side ml-lg'>
             <Overlay
                 placement='right-start'
                 hideOnClick={true}
-                anchor={<div className='more text-dimmed xl:text-background hover:text-highlight'>
+                anchor={<div className='more text-dimmed xl:text-background hover:text-highlight w-lg'>
                     <Icon name='more' />
                 </div>}
                 content={<div className='menu'>
@@ -36,7 +35,7 @@ export function HighlightNodeComp({ booqId, highlight, self }: {
                     />
                 </div>}
             />
-            <div className='badge' title={highlight.author.name}>
+            <div className='badge mt-base' title={highlight.author.name}>
                 <ProfileBadge
                     size={1}
                     name={highlight.author.name}
@@ -52,7 +51,6 @@ export function HighlightNodeComp({ booqId, highlight, self }: {
                 flex-flow: row;
                 justify-content: space-between;
                 border-left: 3px solid ${colorForGroup(highlight.group)};
-                padding-left: ${meter.regular};
             }
             .container:hover {
             }
@@ -63,14 +61,12 @@ export function HighlightNodeComp({ booqId, highlight, self }: {
             }
             .badge {
                 display: ${self?.id === highlight.author.id ? 'none' : 'flex'};
-                margin-top: ${meter.regular};
             }
             .side {
                 display: flex;
                 flex-flow: column;
                 justify-content: space-between;
                 align-items: stretch;
-                margin-left: ${meter.large};
             }
             .container:hover .more {
                 color: var(--theme-dimmed);
@@ -80,7 +76,6 @@ export function HighlightNodeComp({ booqId, highlight, self }: {
                 justify-content: center;
                 cursor: pointer;
                 font-size: x-large;
-                width: ${meter.large};
             }
             .menu {
                 width: 12rem;

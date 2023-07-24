@@ -2,9 +2,6 @@ import React, { useState, useMemo } from 'react'
 import {
     useAuth, UserInfo, useNavigationNodes, NavigationNode,
 } from '@/application'
-import {
-    meter,
-} from '@/controls/theme'
 import { IconButton } from '@/controls/Buttons'
 import { TocNodeComp } from './TocNode'
 import { HighlightNodeComp } from './HighlightNode'
@@ -39,7 +36,7 @@ function Navigation({ booqId, closeSelf }: {
     return useMemo(() => {
         return <div className='safe-area'>
             <div className='container'>
-                <div className='scrollable'>
+                <div className='scrollable mt-lg'>
                     <div className='header xl:py-0 xl:px-4'>
                         <div className='label font-bold'>CONTENTS</div>
                         <div className='filter'>
@@ -53,7 +50,7 @@ function Navigation({ booqId, closeSelf }: {
                         {
                             nodes.map(
                                 (node, idx) => <div key={idx}>
-                                    <div className='item' onClick={closeSelf}>
+                                    <div className='py-base' onClick={closeSelf}>
                                         <NavigationNodeComp
                                             booqId={booqId}
                                             self={self}
@@ -85,7 +82,6 @@ function Navigation({ booqId, closeSelf }: {
                 flex-flow: column;
                 flex: 1;
                 overflow: auto;
-                margin-top: ${meter.large};
             }
             .header {
                 display: flex;
@@ -99,9 +95,6 @@ function Navigation({ booqId, closeSelf }: {
                 display: flex;
                 flex-flow: column;
                 flex: 1 1;
-            }
-            .item {
-                padding: ${meter.regular} 0;
             }
             hr {
                 width: 85%;

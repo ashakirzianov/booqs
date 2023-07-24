@@ -1,6 +1,5 @@
 import { pageForPosition, TocNode } from '@/application'
 import { BooqLink } from '@/controls/Links'
-import { meter } from '@/controls/theme'
 
 
 export function TocNodeComp({
@@ -13,7 +12,7 @@ export function TocNodeComp({
         <BooqLink booqId={booqId} path={path}>
             <div className='content font-bold'>
                 <span className='title'>{title ?? 'no-title'}</span>
-                <span className='page'>{pageForPosition(position)}</span>
+                <span className='ml-base'>{pageForPosition(position)}</span>
             </div>
         </BooqLink>
         <style jsx>{`
@@ -25,9 +24,6 @@ export function TocNodeComp({
         }
         .content:hover {
             color: var(--theme-highlight);
-        }
-        .page {
-            margin-left: ${meter.regular};
         }
         `}</style>
     </>

@@ -9,7 +9,6 @@ import { MenuItem } from '@/controls/Menu'
 import { useDocumentEvent } from '@/controls/utils'
 import { quoteRef } from '@/controls/Links'
 import { BooqSelection } from './BooqContent'
-import { meter } from '@/controls/theme'
 import { ProfileBadge } from '@/controls/ProfilePicture'
 
 type EmptyTarget = {
@@ -118,10 +117,10 @@ function AuthorItem({ name, pictureUrl }: {
     name?: string,
     pictureUrl?: string,
 }) {
-    return <div className='container font-bold'>
+    return <div className='container font-bold p-lg'>
         {
             pictureUrl
-                ? <div className="picture">
+                ? <div className="picture mr-lg">
                     <ProfileBadge
                         border={false}
                         size={1.5}
@@ -138,7 +137,6 @@ function AuthorItem({ name, pictureUrl }: {
                 flex: 1;
                 flex-direction: row;
                 align-items: center;
-                padding: ${meter.large};
                 font-size: smaller;
                 font-family: var(--font-main);
                 user-select: none;
@@ -147,7 +145,6 @@ function AuthorItem({ name, pictureUrl }: {
                 display: flex;
                 justify-content: center;
                 align-items: center;
-                margin-right: ${meter.large};
             }
             .name {
                 display: flex;

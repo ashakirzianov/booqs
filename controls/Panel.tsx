@@ -1,11 +1,10 @@
 import React from 'react'
 import { HasChildren } from './utils'
-import { meter } from './theme'
 
 export const panelWidth = '40rem'
 
 export function Panel({ children }: HasChildren) {
-    return <div className="panel rounded">
+    return <div className="panel rounded m-xl">
         {children}
         <style jsx>{`
             .panel {
@@ -14,7 +13,6 @@ export function Panel({ children }: HasChildren) {
                 flex: 0 1;
                 width: 100%;
                 max-width: ${panelWidth};
-                margin: ${meter.xLarge};
                 overflow: hidden;
             }
             `}</style>

@@ -1,6 +1,5 @@
 import React, { ReactNode, useState } from 'react'
 import Link from 'next/link'
-import { meter } from './theme'
 import { Icon, IconName } from './Icon'
 
 export type ModalDefinition = {
@@ -70,6 +69,7 @@ function ModalContent({
             .container {
                 position: relative;
                 max-width: 50rem;
+                width: auto;
                 max-height: 100%;
                 overflow-y: auto;
                 overflow-x: hidden;
@@ -99,16 +99,12 @@ function ModalButton({ text, icon, onClick, href }: ButtonProps) {
                 ? <div><Icon name={icon} /></div>
                 : null
         }
-        <span className='text'>{text}</span>
+        <span className='m-lg no-underline'>{text}</span>
         <style jsx>{`
             .content {
                 display: flex;
                 flex-flow: row;
                 align-items: center;
-            }
-            .text {
-                margin: ${meter.large};
-                text-decoration: none;
             }
             `}</style>
     </div>

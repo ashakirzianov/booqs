@@ -2,7 +2,6 @@ import React from 'react'
 import { useCollection } from '@/application'
 import { BooqCover } from '../controls/BooqCover'
 import { Spinner } from '../controls/Spinner'
-import { meter } from '../controls/theme'
 
 export function Collection({ name }: {
     name: string,
@@ -48,7 +47,7 @@ function CollectionItemTile({
     title, author, cover,
 }: CollectionItem) {
     return <div
-        className='tile shadow'
+        className='m-base shadow'
         title={composeTitle(title, author)}
     >
         <BooqCover
@@ -57,11 +56,6 @@ function CollectionItemTile({
             cover={cover}
             size={40}
         />
-        <style jsx>{`
-            .tile {
-                margin: ${meter.regular};
-            }
-            `}</style>
     </div>
 }
 

@@ -1,6 +1,5 @@
 import React, { ReactNode } from 'react'
 import { IconName, Icon } from './Icon'
-import { meter } from './theme'
 import { Spinner } from './Spinner'
 
 export function Menu({ callback, children }: {
@@ -27,14 +26,14 @@ export function MenuItem({ icon, text, callback, spinner }: {
     spinner?: boolean,
 }) {
     return <div
-        className='container font-bold'
+        className='container font-bold p-lg'
         // Note: prevent loosing selection on safari
         onMouseDown={e => e.preventDefault()}
         onClick={callback}
     >
         {
             icon
-                ? <div className="icon"><Icon name={icon} /></div>
+                ? <div className="icon mr-lg"><Icon name={icon} /></div>
                 : null
         }
         <span className='text'>{text}</span>
@@ -49,7 +48,6 @@ export function MenuItem({ icon, text, callback, spinner }: {
                 flex: 1;
                 flex-direction: row;
                 align-items: center;
-                padding: ${meter.large};
                 cursor: pointer;
                 font-family: var(--font-main);
                 user-select: none;
@@ -63,7 +61,6 @@ export function MenuItem({ icon, text, callback, spinner }: {
                 display: flex;
                 justify-content: center;
                 align-items: center;
-                margin-right: ${meter.large};
             }
             .text {
                 display: flex;

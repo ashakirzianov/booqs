@@ -1,6 +1,5 @@
 import React, { useCallback, ReactNode, useRef, useState } from 'react'
 import { useDocumentEvent } from '@/controls/utils'
-import { meter } from '@/controls/theme'
 import { Overlay } from '@/controls/Popover'
 import {
     getBooqSelection, AnchorRect, getSelectionRect, getAugmentationRect,
@@ -196,7 +195,7 @@ function ContextMenuPanel({ content, rect }: {
 }) {
     const visibility = rect ? '' : 'hidden'
     return <div id='ctxmenu' className='container'>
-        <div className={`content ${visibility} rounded`}>{content}</div>
+        <div className={`content ${visibility} rounded m-base`}>{content}</div>
         <style jsx>{`
             .container {
                 display: flex;
@@ -214,7 +213,6 @@ function ContextMenuPanel({ content, rect }: {
                 pointer-events: auto;
                 background: var(--theme-background);
                 border: 1px solid var(--theme-border);
-                margin: ${meter.regular};
                 transition: 250ms transform;
             }
             .content.hidden {

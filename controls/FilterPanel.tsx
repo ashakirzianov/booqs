@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import { meter } from '@/controls/theme'
 
 type FilterItem = {
     text: string,
@@ -27,12 +26,12 @@ export function FilterPanel({
     selected: string,
     select: (value: string) => void,
 }) {
-    return <div className='container'>
+    return <div className='container my-base'>
         {
             items.map(
                 (item, idx) => <div
                     key={idx}
-                    className={`item ${item.value === selected ? 'selected' : ''}`}
+                    className={`item cursor-pointer my-sm mx-base ${item.value === selected ? 'selected' : ''}`}
                     onClick={() => select(item.value)}
                 >
                     {item.text}
@@ -43,11 +42,6 @@ export function FilterPanel({
             .container {
                 display: flex;
                 flex-flow: row wrap;
-                margin: ${meter.regular} 0;
-            }
-            .item {
-                cursor: pointer;
-                padding: ${meter.small} ${meter.regular};
             }
             .item:hover {
                 border-bottom: 2px solid var(--theme-highlight);

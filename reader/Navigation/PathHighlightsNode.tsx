@@ -1,7 +1,6 @@
 import { Fragment } from 'react'
 import { TocItem, UserInfo, PathHighlightsNode } from '@/application'
 import { BooqLink } from '@/controls/Links'
-import { meter } from '@/controls/theme'
 import { HighlightNodeComp } from './HighlightNode'
 
 export function PathHighlightsNodeComp({
@@ -17,7 +16,7 @@ export function PathHighlightsNodeComp({
         {
             highlights.map(
                 (hl) =>
-                    <div key={hl.id} className='highlight'>
+                    <div key={hl.id} className='my-base'>
                         <HighlightNodeComp
                             booqId={booqId}
                             self={self}
@@ -26,11 +25,6 @@ export function PathHighlightsNodeComp({
                     </div>
             )
         }
-        <style jsx>{`
-            .highlight {
-                margin: ${meter.regular} 0;
-            }
-            `}</style>
     </div>
 }
 
@@ -42,8 +36,8 @@ function Path({ items, booqId }: {
         {
             items.map((item, idx) => !item ? null
                 : <Fragment key={idx}>
-                    {idx === 0 ? null : <div className='separator'>/</div>}
-                    <div className='element font-bold'>
+                    {idx === 0 ? null : <div className='mr-base'>/</div>}
+                    <div className='font-bold mr-base hover:underline'>
                         <BooqLink booqId={booqId} path={item.path}>
                             {item.title}
                         </BooqLink>
@@ -55,15 +49,6 @@ function Path({ items, booqId }: {
             .container {
                 display: flex;
                 flex-flow: row wrap;
-            }
-            .element {
-                margin: 0 ${meter.regular} 0 0;
-            }
-            .element:hover {
-                text-decoration: underline;
-            }
-            .separator {
-                margin: 0 ${meter.regular} 0 0;
             }
             `}</style>
     </div>

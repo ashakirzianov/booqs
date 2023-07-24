@@ -1,6 +1,5 @@
 import React from 'react'
 import { useSearch, SearchResult } from '@/application'
-import { meter } from '@/controls/theme'
 import { BooqCover } from '@/controls/BooqCover'
 import { Spinner } from '@/controls/Spinner'
 import { BooqLink } from '@/controls/Links'
@@ -10,7 +9,7 @@ export function Search() {
     return <div className='container'>
         <div className='content rounded'>
             <input
-                className='font-normal'
+                className='font-normal my-base mx-lg'
                 type="text"
                 placeholder="Search..."
                 value={query}
@@ -47,7 +46,6 @@ export function Search() {
             display: flex;
             border: none;
             max-width: 7rem;
-            margin: ${meter.regular} ${meter.large};
             font: inherit;
             font-size: x-large;
             color: var(--theme-primary);
@@ -109,7 +107,7 @@ function SearchResults({ loading, query, results }: {
         }
         {
             loading
-                ? <div key='spinner' className='spinner'><Spinner /></div>
+                ? <div key='spinner' className='self-center m-lg'><Spinner /></div>
                 : null
         }
         <style jsx>{`
@@ -122,10 +120,6 @@ function SearchResults({ loading, query, results }: {
             .container:hover {
                 overflow: auto;
             }
-            .spinner {
-                align-self: center;
-                margin: ${meter.large};
-            }
             `}</style>
     </div>
 }
@@ -135,14 +129,14 @@ function SingleResult({ result, query }: {
     query: string,
 }) {
     return <BooqLink booqId={result.id} path={[0]}>
-        <div className='container'>
+        <div className='container p-base'>
             <BooqCover
                 cover={result.cover}
                 title={result.title}
                 author={result.author}
                 size={20}
             />
-            <div className='details'>
+            <div className='details my-0 mx-lg'>
                 <EmphasizedSpan
                     text={result.title ?? ''}
                     emphasis={query}
@@ -157,7 +151,6 @@ function SingleResult({ result, query }: {
                 display: flex;
                 flex-direction: row;
                 font-size: medium;
-                padding: ${meter.regular};
                 transition: background-color 0.25s, color 0.25s;
                 cursor: pointer;
             }
@@ -168,7 +161,6 @@ function SingleResult({ result, query }: {
             .details {
                 display: flex;
                 flex-direction: column;
-                margin: 0 ${meter.large};
             }
             `}</style>
         </div>
