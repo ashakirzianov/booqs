@@ -1,7 +1,6 @@
-import { DocumentNode } from 'graphql'
-import HomeClient from './client'
 import gql from 'graphql-tag'
 import { fetchQuery } from '@/application/server'
+import { Featured } from '@/components/Featured'
 
 async function fetchFeaturedServer() {
     const FeaturedQuery = gql`query Featured {
@@ -38,5 +37,5 @@ async function fetchFeaturedServer() {
 
 export default async function Home() {
     const featured = await fetchFeaturedServer()
-    return <HomeClient featured={featured} />
+    return <Featured cards={featured} />
 }

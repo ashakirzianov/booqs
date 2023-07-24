@@ -1,13 +1,20 @@
 import React from 'react'
-import {
-    FeaturedItem,
-} from '@/application/featured'
 import { TextButton } from '@/controls/Buttons'
 import { Panel } from '@/controls/Panel'
 import { BooqTags } from '@/controls/BooqTags'
 import { BooqCover } from '@/controls/BooqCover'
 import { BooqLink } from '@/controls/Links'
 
+type FeaturedItem = {
+    id: string,
+    title?: string,
+    author?: string,
+    cover?: string,
+    tags: Array<{
+        tag: string,
+        value?: string,
+    }>,
+}
 export function Featured({ cards }: {
     cards: FeaturedItem[],
 }) {
