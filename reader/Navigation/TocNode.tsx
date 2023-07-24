@@ -10,21 +10,10 @@ export function TocNodeComp({
 }) {
     return <>
         <BooqLink booqId={booqId} path={path}>
-            <div className='content font-bold'>
+            <div className='flex flex-nowrap flex-1 justify-between font-bold hover:text-highlight'>
                 <span className='title'>{title ?? 'no-title'}</span>
                 <span className='ml-base'>{pageForPosition(position)}</span>
             </div>
         </BooqLink>
-        <style jsx>{`
-        .content {
-            display: flex;
-            flex-flow: row nowrap;
-            flex: 1;
-            justify-content: space-between;
-        }
-        .content:hover {
-            color: var(--theme-highlight);
-        }
-        `}</style>
     </>
 }

@@ -34,11 +34,13 @@ function Navigation({ booqId, closeSelf }: {
     const { nodes, authors } = useNavigationNodes(booqId)
     const exceptSelf = authors.filter(a => a.id !== self?.id)
     return useMemo(() => {
-        return <div className='safe-area'>
-            <div className='container'>
-                <div className='scrollable mt-lg'>
-                    <div className='header xl:py-0 xl:px-4'>
-                        <div className='label font-bold'>CONTENTS</div>
+        return <div className='flex flex-1' style={{
+            padding: '0 env(safe-area-inset-right) 0 env(safe-area-inset-left)',
+        }}>
+            <div className='flex flex-1 flex-col text-dimmed max-h-full text-sm'>
+                <div className='flex flex-col flex-1 overflow-auto mt-lg'>
+                    <div className='flex flex-col xl:py-0 xl:px-4'>
+                        <div className='self-center tracking-widest font-bold'>CONTENTS</div>
                         <div className='filter'>
                             <NavigationFilter
                                 self={self}
@@ -46,7 +48,7 @@ function Navigation({ booqId, closeSelf }: {
                             />
                         </div>
                     </div>
-                    <div className='items xl:py-0 xl:px-4'>
+                    <div className='flex flex-col flex-1 xl:py-0 xl:px-4'>
                         {
                             nodes.map(
                                 (node, idx) => <div key={idx}>
@@ -63,45 +65,6 @@ function Navigation({ booqId, closeSelf }: {
                     </div>
                 </div>
             </div>
-            <style jsx>{`
-            .safe-area {
-                display: flex;
-                flex: 1;
-                padding: 0 env(safe-area-inset-right) 0 env(safe-area-inset-left);
-            }
-            .container {
-                display: flex;
-                flex: 1 1;
-                flex-flow: column;
-                color: var(--theme-dimmed);
-                font-size: 0.9rem;
-                max-height: 100%;
-            }
-            .scrollable {
-                display: flex;
-                flex-flow: column;
-                flex: 1;
-                overflow: auto;
-            }
-            .header {
-                display: flex;
-                flex-flow: column;
-            }
-            .label {
-                align-self: center;
-                letter-spacing: 0.1em;
-            }
-            .items {
-                display: flex;
-                flex-flow: column;
-                flex: 1 1;
-            }
-            hr {
-                width: 85%;
-                border: none;
-                border-top: 0.5px solid var(--theme-border);
-            }
-            `}</style>
         </div>
     }, [
         nodes,

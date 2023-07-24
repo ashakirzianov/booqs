@@ -194,31 +194,10 @@ function ContextMenuPanel({ content, rect }: {
     rect?: AnchorRect,
 }) {
     const visibility = rect ? '' : 'hidden'
-    return <div id='ctxmenu' className='container'>
-        <div className={`content ${visibility} rounded m-base`}>{content}</div>
-        <style jsx>{`
-            .container {
-                display: flex;
-                flex: 1;
-                height: 100%;
-                align-self: stretch;
-                pointer-events: none;
-                flex-flow: column;
-                justify-content: flex-end;
-                align-items: stretch;
-                user-select: none;
-                padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
-            }
-            .content {
-                pointer-events: auto;
-                background: var(--theme-background);
-                border: 1px solid var(--theme-border);
-                transition: 250ms transform;
-            }
-            .content.hidden {
-                transform: translateY(100%);
-                opacity: 0;
-            }
-            `}</style>
+    const visibilityClass = rect ? '' : 'translate-y-full opacity-0'
+    return <div id='ctxmenu' className='flex flex-1 flex-col h-full justify-end items-stretch self-stretch pointer-events-none select-none' style={{
+        padding: 'env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)',
+    }}>
+        <div className={`${visibilityClass} rounded m-base pointer-events-auto bg-background border border-border transition-all`}>{content}</div>
     </div>
 }

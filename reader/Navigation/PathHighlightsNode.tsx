@@ -32,7 +32,7 @@ function Path({ items, booqId }: {
     booqId: string,
     items: Array<TocItem | undefined>,
 }) {
-    return <div className='container'>
+    return <div className='flex flex-wrap'>
         {
             items.map((item, idx) => !item ? null
                 : <Fragment key={idx}>
@@ -45,11 +45,5 @@ function Path({ items, booqId }: {
                 </Fragment>
             )
         }
-        <style jsx>{`
-            .container {
-                display: flex;
-                flex-flow: row wrap;
-            }
-            `}</style>
     </div>
 }

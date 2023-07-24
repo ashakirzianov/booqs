@@ -53,27 +53,13 @@ function FilterButton({ text, selected, toggle, Badge }: {
     toggle: () => void,
     Badge?: ReactNode,
 }) {
-    return <div className='container py-sm px-base' onClick={toggle}>
+    const borderClass = selected ? 'border-dimmed' : 'border-transparent'
+    return <div className={`flex rounded-2xl border-2 border-dotted ${borderClass} cursor-pointer transition-all py-sm px-base hover:text-highlight hover:border-highlight`} onClick={toggle}>
         {
             Badge
                 ? <div className='mr-base'>{Badge}</div>
                 : null
         }
         <span className='font-bold'>{text}</span>
-        <style jsx>{`
-            .container {
-                display: flex;
-                flex-flow: row;
-                border-radius: 20px;
-                border: 2px dotted;
-                border-color: ${selected ? `var(--theme-dimmed)` : 'rgba(0,0,0,0)'};
-                cursor: pointer;
-                transition: 250ms color, 250ms border;
-            }
-            .container:hover {
-                color: var(--theme-highlight);
-                border-color: var(--theme-highlight);
-            }
-            `}</style>
     </div>
 }

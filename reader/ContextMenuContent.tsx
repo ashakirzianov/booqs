@@ -275,23 +275,10 @@ function GroupSelectionButton({ color, selected, callback }: {
     return <div
         // Note: prevent loosing selection on safari
         onMouseDown={e => e.preventDefault()}
-        onClick={callback} className='button'>
-        <style jsx>{`
-            .button {
-                display: flex;
-                flex: 1;
-                align-self: stretch;
-                background: ${color};
-                color: rgba(0, 0, 0, 0);
-                cursor: pointer;
-                border-bottom: 0.5rem solid ${selected ? `${color}` : `rgba(0,0,0,0)`};
-                height: 2.5rem;
-                transition: 250ms border;
-            }
-            .button:hover {
-                border-bottom: 0.5rem solid ${color};
-            }
-            `}</style>
+        onClick={callback} className='flex flex-1 self-stretch text-transparent cursor-pointer h-10 transition-all' style={{
+            background: color,
+            borderBottom: `0.5rem solid ${selected ? `${color}` : `rgba(0,0,0,0)`}`,
+        }}>
     </div>
 }
 

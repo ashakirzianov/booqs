@@ -15,7 +15,7 @@ import {
 } from './BooqContent'
 import { useContextMenu, ContextMenuState } from './ContextMenu'
 import { useNavigationPanel } from './Navigation'
-import { ReaderLayout } from './Layout'
+import { ReaderLayout } from './ReaderLayout'
 
 export function Reader({
     booq, quote,
@@ -242,15 +242,8 @@ function AnchorButton({ booqId, anchor, title }: {
         return null
     }
     return <BooqLink booqId={booqId} path={anchor.path}>
-        <div className='container'>
+        <div className='flex items-center h-header'>
             <BorderButton text={anchor.title ?? title} />
-            <style jsx>{`
-            .container {
-                display: flex;
-                flex-flow: row;
-                align-items: center; 
-                height: var(--header-height);
-            }`}</style>
         </div>
     </BooqLink>
 }
@@ -258,13 +251,7 @@ function AnchorButton({ booqId, anchor, title }: {
 function PageLabel({ text }: {
     text: string,
 }) {
-    return <span className='label font-bold'>
+    return <span className='text-sm text-dimmed font-bold'>
         {text}
-        <style jsx>{`
-            .label {
-                font-size: small;
-                color: var(--theme-dimmed);
-            }
-            `}</style>
     </span>
 }

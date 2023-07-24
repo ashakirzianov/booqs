@@ -10,20 +10,24 @@ export function HighlightNodeComp({ booqId, highlight, self }: {
     self: UserInfo | undefined,
     highlight: Highlight,
 }) {
-    return <div className='container pl-base'>
-        <div className='content'>
+    const badgeClass = self?.id === highlight.author.id
+        ? 'hidden' : 'flex'
+    return <div className='container flex flex-1 justify-between pl-base' style={{
+        borderLeft: `3px solid ${colorForGroup(highlight.group)}`,
+    }}>
+        <div className='w-full text-primary text-justify'>
             <BooqLink booqId={booqId} path={highlight.start}>
                 {highlight.text}
             </BooqLink>
         </div>
-        <div className='side ml-lg'>
+        <div className='flex flex-col justify-between items-stretch ml-lg'>
             <Overlay
                 placement='right-start'
                 hideOnClick={true}
-                anchor={<div className='more text-dimmed xl:text-background hover:text-highlight w-lg'>
+                anchor={<div className='flex justify-center cursor-pointer text-xl text-dimmed xl:text-background hover:text-highlight w-lg'>
                     <Icon name='more' />
                 </div>}
-                content={<div className='menu'>
+                content={<div className='w-48 pointer-events-auto'>
                     <ContextMenuContent
                         booqId={booqId}
                         self={self}
@@ -35,7 +39,7 @@ export function HighlightNodeComp({ booqId, highlight, self }: {
                     />
                 </div>}
             />
-            <div className='badge mt-base' title={highlight.author.name}>
+            <div className={`${badgeClass} mt-base`} title={highlight.author.name}>
                 <ProfileBadge
                     size={1}
                     name={highlight.author.name}
@@ -44,43 +48,5 @@ export function HighlightNodeComp({ booqId, highlight, self }: {
                 />
             </div>
         </div>
-        <style jsx>{`
-            .container {
-                display: flex;
-                flex: 1;
-                flex-flow: row;
-                justify-content: space-between;
-                border-left: 3px solid ${colorForGroup(highlight.group)};
-            }
-            .container:hover {
-            }
-            .content {
-                width: 100%;
-                color: var(--theme-primary);
-                text-align: justify;
-            }
-            .badge {
-                display: ${self?.id === highlight.author.id ? 'none' : 'flex'};
-            }
-            .side {
-                display: flex;
-                flex-flow: column;
-                justify-content: space-between;
-                align-items: stretch;
-            }
-            .container:hover .more {
-                color: var(--theme-dimmed);
-            }
-            .more {
-                display: flex;
-                justify-content: center;
-                cursor: pointer;
-                font-size: x-large;
-            }
-            .menu {
-                width: 12rem;
-                pointer-events: auto;
-            }
-            `}</style>
     </div>
 }
