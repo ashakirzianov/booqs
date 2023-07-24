@@ -7,7 +7,7 @@ import {
 } from '@/application'
 import { MenuItem } from '@/controls/Menu'
 import { useDocumentEvent } from '@/controls/utils'
-import { quoteRef } from '@/controls/Links'
+import { quoteHref } from '@/controls/Links'
 import { BooqSelection } from './BooqContent'
 import { ProfileBadge } from '@/controls/ProfilePicture'
 
@@ -297,7 +297,7 @@ function CopyQuoteItem({
             const quote = generateQuote(booqId, selection.text, selection.range)
             clipboard.writeText(quote)
             removeSelection()
-            prefetch(quoteRef(booqId, selection.range))
+            prefetch(quoteHref(booqId, selection.range))
             setTarget({ kind: 'empty' })
         }}
     />
@@ -337,7 +337,7 @@ function CopyLinkItem({
             const link = generateLink(booqId, selection.range)
             clipboard.writeText(link)
             removeSelection()
-            prefetch(quoteRef(booqId, selection.range))
+            prefetch(quoteHref(booqId, selection.range))
             setTarget({ kind: 'empty' })
         }}
     />
@@ -350,7 +350,7 @@ function useCopyQuote(booqId: string, selection?: BooqSelection) {
             e.preventDefault()
             const selectionText = generateQuote(booqId, selection.text, selection.range)
             e.clipboardData.setData('text/plain', selectionText)
-            prefetch(quoteRef(booqId, selection.range))
+            prefetch(quoteHref(booqId, selection.range))
         }
     }, [selection, booqId, prefetch]))
 }
@@ -365,7 +365,7 @@ function generateQuote(booqId: string, text: string, range: BooqRange) {
 }
 
 function generateLink(booqId: string, range: BooqRange) {
-    return `${baseUrl()}${quoteRef(booqId, range)}`
+    return `${baseUrl()}${quoteHref(booqId, range)}`
 }
 
 function baseUrl() {

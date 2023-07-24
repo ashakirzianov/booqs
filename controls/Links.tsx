@@ -30,8 +30,8 @@ export function booqHref(booqId: string, path?: BooqPath) {
         : `/booq/${booqId}`
 }
 
-export function quoteRef(booqId: string, range: BooqRange) {
-    return `/booq/${booqId}/quote/${rangeToString(range)}`
+export function quoteHref(booqId: string, range: BooqRange) {
+    return `/booq/${booqId}/quote/${rangeToString(range)}#${pathToId(range.start)}`
 }
 
 export function feedHref() {
