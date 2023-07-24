@@ -38,7 +38,5 @@ async function fetchFeaturedServer() {
 
 export default async function Home() {
     const featured = await fetchFeaturedServer()
-    return <div className='flex flex-1 flex-col font-normal font-main overflow-hidden'>
-        <HomeClient featured={featured} />
-    </div>
+    return <HomeClient featured={featured} />
 }
