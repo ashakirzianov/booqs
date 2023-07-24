@@ -1,7 +1,7 @@
 import React from 'react'
 import {
-    useAddToCollection, useCollection, useRemoveFromCollection, useFeatured,
-} from '@/application'
+    FeaturedItem,
+} from '@/application/featured'
 import { TextButton } from '@/controls/Buttons'
 import { Panel } from '@/controls/Panel'
 import { BooqTags } from '@/controls/BooqTags'
@@ -20,7 +20,6 @@ export function Featured({ cards }: {
     </div>
 }
 
-type FeaturedItem = ReturnType<typeof useFeatured>['cards'][number];
 function FeaturedCard({
     item,
 }: {
@@ -54,37 +53,19 @@ function Header({ title, author }: {
     title?: string,
     author?: string,
 }) {
-    return <div>
+    return <div className='flex flex-col items-baseline'>
         <span className="text-xl font-bold">{title}</span>
-        <span className="author">by {author}</span>
-        <style jsx>{`
-            div {
-                display: flex;
-                flex-flow: column wrap;
-                align-items: baseline;
-            }
-            .author {
-                font-size: large;
-            }
-            `}</style>
+        <span className="text-lg">by {author}</span>
     </div>
 }
 
 function Actions({ item }: {
     item: FeaturedItem,
 }) {
-    return <div className='container'>
+    return <div className='flex self-stretch justify-end'>
         <div className='ml-xl'>
             <ReadButton item={item} />
         </div>
-        <style jsx>{`
-        .container {
-            display: flex;
-            flex-flow: row wrap;
-            align-self: stretch;
-            justify-content: flex-end;
-        }
-        `}</style>
     </div>
 }
 
@@ -94,34 +75,4 @@ function ReadButton({ item }: {
     return <BooqLink booqId={item.id} path={[0]}>
         <TextButton text="Read" />
     </BooqLink>
-}
-
-function AddToReadingListButton({ item }: {
-    item: FeaturedItem,
-}) {
-    const { booqs } = useCollection('my-books')
-    const { addToCollection, loading } = useAddToCollection()
-    const { removeFromCollection } = useRemoveFromCollection()
-    const isInReadingList = booqs.some(b => b.id === item.id)
-    if (isInReadingList) {
-        return <TextButton
-            text="Remove"
-            onClick={() => removeFromCollection({
-                booqId: item.id,
-                name: 'my-books',
-            })}
-        />
-    } else {
-        return <TextButton
-            text="Add"
-            onClick={() => addToCollection({
-                name: 'my-books',
-                booqId: item.id,
-                title: item.title,
-                author: item.author,
-                cover: item.cover,
-            })}
-            loading={loading}
-        />
-    }
 }
