@@ -9,17 +9,8 @@ import { useModal } from '@/controls/Modal'
 export function useSignInModal() {
     const { signWithApple, signWithFacebook } = useSignInOptions()
     const { openModal, ModalContent } = useModal(({ closeModal }) => ({
-        body: <div className='content p-lg'>
+        body: <div className='flex flex-col items-center max-w-[100vw] w-60 p-lg'>
             Choose provider
-            <style jsx>{`
-                .content {
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                    width: 15rem;
-                    max-width: 100vw;
-                }
-                `}</style>
         </div>,
         buttons: [
             {
@@ -64,9 +55,7 @@ function SingInButton() {
     const state = useAuth()
     const { openModal, ModalContent } = useSignInModal()
     return <>
-        <div style={{
-            cursor: 'pointer'
-        }}>
+        <div className='cursor-pointer'>
             {
                 state?.signed
                     ? <ProfileBadge
@@ -100,8 +89,8 @@ function Signed({ name }: {
     name?: string,
 }) {
     const { signOut } = useSignInOptions()
-    return <div className='py-base'>
-        <span className='p-base'>{name}</span>
+    return <div className='py-base flex flex-col flex-1 items-stretch'>
+        <span className='p-base w-full text-center font-bold'>{name}</span>
         <Menu>
             <MenuItem
                 icon='sign-out'
@@ -110,37 +99,11 @@ function Signed({ name }: {
                 spinner={false}
             />
         </Menu>
-        <style jsx>{`
-        div {
-            display: flex;
-            flex-direction: column;
-            flex: 1;
-            align-items: stretch;
-        }
-        span {
-            width: 100%;
-            text-align: center;
-            font-weight: bold;
-        }
-        `}</style>
     </div>
 }
 
 function NotSigned() {
-    return <div className='py-base'>
-        <span className='p-base'>Sign In</span>
-        <style jsx>{`
-        div {
-            display: flex;
-            flex-direction: column;
-            flex: 1;
-            align-items: stretch;
-        }
-        span {
-            width: 100%;
-            text-align: center;
-            font-weight: bold;
-        }
-        `}</style>
+    return <div className='py-base flex flex-col flex-1 items-stretch'>
+        <span className='p-base w-full text-center font-bold'>Sign In</span>
     </div>
 }

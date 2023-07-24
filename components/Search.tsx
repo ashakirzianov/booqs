@@ -3,86 +3,30 @@ import { useSearch, SearchResult } from '@/application'
 import { BooqCover } from '@/controls/BooqCover'
 import { Spinner } from '@/controls/Spinner'
 import { BooqLink } from '@/controls/Links'
+import styles from './Search.module.css'
 
 export function Search() {
     const { query, doQuery, results, loading } = useSearch()
-    return <div className='container'>
-        <div className='content rounded'>
+    return <div className='flex grow-0 items-start justify-start text-primary max-h-12 overflow-visible'>
+        <div className='flex flex-col relative rounded bg-background'>
             <input
-                className='font-normal my-base mx-lg'
+                className={`${styles.input} font-normal my-base mx-lg flex border-none max-w-[7rem] text-xl text-primary bg-transparent
+                focus:max-w-auto focus:outline-none focus:ring-0 focus:border-none
+                placeholder:text-dimmed`}
                 type="text"
                 placeholder="Search..."
                 value={query}
                 onChange={e => doQuery(e.target.value)}
             />
-            <div className='results rounded-b'>
+            <div className={`${styles.results} flex-col overflow-hidden rounded-b`}>
                 <SearchResults
                     results={results}
                     query={query}
                     loading={loading}
                 />
             </div>
-            <p className='shadow rounded' />
+            <p className={`${styles.shadow} shadow rounded`} />
         </div>
-        <style jsx>{`
-        .container {
-            display: flex;
-            flex-direction: row;
-            flex: 0 1;
-            align-items: flex-start;
-            justify-content: flex-start;
-            margin: 0;
-            color: var(--theme-primary);
-            max-height: 3rem;
-            overflow: visible;
-        }
-        .content {
-            display: flex;
-            position: relative;
-            flex-direction: column;
-            background-color: var(--theme-background);
-        }
-        input {
-            display: flex;
-            border: none;
-            max-width: 7rem;
-            font: inherit;
-            font-size: x-large;
-            color: var(--theme-primary);
-            background-color: rgba(0,0,0,0);
-        }
-        input:focus {
-            max-width: auto;
-            border: none;
-            outline: none;
-        }
-        input::placeholder {
-            color: var(--theme-dimmed);
-        }
-        .results {
-            display: none;
-            flex-direction: column;
-            overflow: hidden;
-        }
-        input:focus + .results {
-            display: flex;
-        }
-        .results:hover {
-            display: flex;
-        }
-        .shadow {
-            position: absolute;
-            margin: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            transition: 250ms box-shadow;
-        }
-        input:focus ~ .shadow {
-            box-shadow: 0px 0px 7px rgba(0,0,0,0.1);
-            border: 1px solid var(--theme-border);
-        }
-        `}</style>
     </div>
 }
 
@@ -94,7 +38,7 @@ function SearchResults({ loading, query, results }: {
     if (!results.length) {
         return null
     }
-    return <div className='container'>
+    return <div className='flex flex-col max-h-80 overflow-hidden hover:overflow-auto'>
         {
             results.map(
                 (result, idx) => <div key={idx} className='result'>
@@ -110,17 +54,6 @@ function SearchResults({ loading, query, results }: {
                 ? <div key='spinner' className='self-center m-lg'><Spinner /></div>
                 : null
         }
-        <style jsx>{`
-            .container {
-                display: flex;
-                flex-direction: column;
-                max-height: 19rem;
-                overflow: hidden;
-            }
-            .container:hover {
-                overflow: auto;
-            }
-            `}</style>
     </div>
 }
 
@@ -129,14 +62,14 @@ function SingleResult({ result, query }: {
     query: string,
 }) {
     return <BooqLink booqId={result.id} path={[0]}>
-        <div className='container p-base'>
+        <div className='flex text-base transition-all duration-300 cursor-pointer p-base hover:bg-highlight hover:text-background'>
             <BooqCover
                 cover={result.cover}
                 title={result.title}
                 author={result.author}
                 size={20}
             />
-            <div className='details my-0 mx-lg'>
+            <div className='flex flex-col my-0 mx-lg'>
                 <EmphasizedSpan
                     text={result.title ?? ''}
                     emphasis={query}
@@ -146,23 +79,6 @@ function SingleResult({ result, query }: {
                     emphasis={query}
                 />
             </div>
-            <style jsx>{`
-            .container {
-                display: flex;
-                flex-direction: row;
-                font-size: medium;
-                transition: background-color 0.25s, color 0.25s;
-                cursor: pointer;
-            }
-            .container:hover {
-                background-color: var(--theme-highlight);
-                color: var(--theme-background);
-            }
-            .details {
-                display: flex;
-                flex-direction: column;
-            }
-            `}</style>
         </div>
     </BooqLink>
 }
@@ -197,9 +113,9 @@ function buildEmphasis(text: string, emphasis: string): AttributedSpan[] {
     }
     const index = text.toLowerCase().indexOf(emphasis.toLowerCase())
     if (index >= 0) {
-        const pre = text.substr(0, index)
-        const emp = text.substr(index, emphasis.length)
-        const next = text.substr(index + emphasis.length)
+        const pre = text.substring(0, index)
+        const emp = text.substring(index, index + emphasis.length)
+        const next = text.substring(index + emphasis.length)
         const nextSpans = buildEmphasis(next, emphasis)
         return [
             {

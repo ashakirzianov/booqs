@@ -16,17 +16,8 @@ export function Upload({ singleton }: {
         body, buttons, clearFile,
     } = useModalDefinition()
     const { openModal, ModalContent } = useModal(({ closeModal }) => ({
-        body: <div className='content p-lg'>
+        body: <div className='flex flex-col items-center w-60 max-w-[100vw] p-lg'>
             {body}
-            <style jsx>{`
-                .content {
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                    width: 15rem;
-                    max-width: 100vw;
-                }
-                `}</style>
         </div>,
         buttons: [...buttons, {
             text: 'Dismiss',
@@ -123,14 +114,7 @@ function useModalDefinition() {
 function Label({ text }: {
     text: string,
 }) {
-    return <div className='m-lg'>
+    return <div className='m-lg w-full text-center font-bold'>
         {text}
-        <style jsx>{`
-        div {
-            width: 100%;
-            text-align: center;
-            font-weight: bold;
-        }
-        `}</style>
     </div>
 }

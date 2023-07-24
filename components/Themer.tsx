@@ -15,41 +15,19 @@ export function Themer({ singleton }: {
 }
 
 function ThemerPanel() {
-    return <div className="container py-xl px-base">
+    return <div className="flex flex-1 flex-col py-xl px-base">
         <FontSettings />
-        <hr className='my-xl' />
+        <hr className='my-xl w-4/5 self-center border-t border-border' />
         <PalettePicker />
-        <style jsx>{`
-            .container {
-                display: flex;
-                flex: 1;
-                flex-direction: column;
-            }
-            hr {
-                width: 80%;
-                align-self: center;
-                border: none;
-                border-top: 1px solid var(--theme-border);
-            }
-        `}</style>
     </div>
 }
 
 function FontSettings() {
     const { fontScale } = useSettings()
     const { setFontScale } = useSetSettings()
-    return <div className="container">
+    return <div className="flex flex-row flex-1 items-center justify-around">
         <FontScaleButton scale='down' onClick={() => setFontScale(fontScale - 10)} />
         <FontScaleButton scale='up' onClick={() => setFontScale(fontScale + 10)} />
-        <style jsx>{`
-            .container {
-                display: flex;
-                flex-direction: row;
-                flex: 1;
-                align-items: center;
-                justify-content: space-around;
-            }
-            `}</style>
     </div>
 }
 
@@ -57,42 +35,21 @@ function FontScaleButton({ scale, onClick }: {
     scale: 'up' | 'down',
     onClick: () => void,
 }) {
-    const fontSize = scale === 'up'
-        ? 'xx-large'
-        : 'large'
-    return <div onClick={onClick}>
-        <span>Abc</span>
-        <style jsx>{`
-            div {
-                cursor: pointer;
-            }
-            span {
-                font-size: ${fontSize};
-                font-family: var(--font-book);
-                transition: color 0.25s;
-            }
-            span:hover {
-                color: var(--theme-highlight);
-            }
-            `}</style>
+    const fontSizeClass = scale === 'up'
+        ? 'text-2xl'
+        : 'text-lg'
+    return <div className='cursor-pointer' onClick={onClick}>
+        <span className={`${fontSizeClass} font-book transition hover:text-highlight`}>Abc</span>
     </div>
 }
 
 function PalettePicker() {
     const { paletteName } = useSettings()
     const { setPalette } = useSetSettings()
-    return <div>
+    return <div className='flex flex-1 justify-around'>
         <PaletteButton name='light' current={paletteName} onSelect={setPalette} />
         <PaletteButton name='sepia' current={paletteName} onSelect={setPalette} />
         <PaletteButton name='dark' current={paletteName} onSelect={setPalette} />
-        <style jsx>{`
-            div {
-                display: flex;
-                flex-direction: row;
-                flex: 1;
-                justify-content: space-around;
-            }
-            `}</style>
     </div>
 }
 
@@ -104,30 +61,14 @@ function PaletteButton({ name, current, onSelect }: {
 }) {
     const checked = current === name
     const { background, highlight, primary } = palettes[name]
-    return <div className="container shadow-button" onClick={() => onSelect(name)}>
-        <div className="label">{name.substr(0, 1).toUpperCase()}</div>
-        <style jsx>{`
-            .container {
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                font-size: x-large;
-                font-family: var(--font-book);
-                padding: 0;
-                width: ${size};
-                height: ${size};
-                border-radius: ${size};
-                border: ${checked ? `3px solid ${highlight}` : 'none'};
-                overflow: hidden;
-                background-color: ${background};
-                color: ${primary};
-                cursor: pointer;
-                transition: color 0.25s, border 0.25s;
-            }
-            .container:hover {
-                color: ${highlight};
-                border: 3px solid ${highlight};
-            }
-            `}</style>
+    return <div className="flex justify-center items-center text-xl font-book shadow-button overflow-hidden bg-background text-primary cursor-pointer transition-all hover:text-highlight hover:border-highlight" onClick={() => onSelect(name)} style={{
+        width: size,
+        height: size,
+        borderRadius: size,
+        border: checked ? `3px solid ${highlight}` : 'none',
+        background,
+        color: primary,
+    }}>
+        <div>{name.substring(0, 1).toUpperCase()}</div>
     </div>
 }
