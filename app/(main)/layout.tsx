@@ -15,13 +15,14 @@ export const metadata: Metadata = {
 }
 
 export default function MainLayout({
-    children, buttons,
+    children, buttons, search,
 }: {
     children: ReactNode,
     buttons?: ReactNode,
+    search?: ReactNode,
 }) {
     return <div className='flex flex-1 flex-col font-normal font-main overflow-hidden'>
-        <AppBar AppButtons={buttons} />
+        <AppBar AppButtons={buttons} Search={search} />
         {children}
     </div>
 }
