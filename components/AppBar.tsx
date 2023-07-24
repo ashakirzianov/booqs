@@ -8,57 +8,25 @@ import { Upload } from './Upload'
 
 
 export function AppBar() {
-    return <div className="appbar h-header py-xl px-base sm:py-xl sm:px-lg">
-        <div className="logo mr-xl hidden sm:flex">
+    return <div className="flex flex-row items-center w-screen h-header py-xl px-base sm:py-xl sm:px-lg">
+        <div className="mr-xl hidden sm:flex grow-0">
             <Logo />
         </div>
-        <div className="search">
+        <div className="flex grow">
             <Search />
         </div>
-        <div className="buttons">
+        <div className="flex flex-col">
             <AppButtons />
         </div>
-        <style jsx>{`
-            .appbar {
-                display: flex;
-                flex-direction: row;
-                align-items: center;
-                width: 100vw;
-            }
-            .logo {
-                flex-direction: column;
-                flex: 0 0;
-            }
-            .search {
-                display: flex;
-                flex-direction: column;
-                flex: 1;
-            }
-            .buttons {
-                display: flex;
-                flex-direction: column;
-                flex: 1;
-                max-width: 12rem;
-            }
-            `}</style>
     </div>
 }
 
 function AppButtons() {
     const { singleton, SingletonNode } = usePopoverSingleton()
-    return <div className='buttons-row'>
+    return <div className='flex flex-row grow justify-between items-center gap-4'>
         {SingletonNode}
         <Upload singleton={singleton} />
         <Themer singleton={singleton} />
         <SignIn singleton={singleton} />
-        <style jsx>{`
-            .buttons-row {
-                display: flex;
-                flex: 1;
-                flex-direction: row;
-                justify-content: space-between;
-                align-items: center;
-            }
-            `}</style>
     </div>
 }

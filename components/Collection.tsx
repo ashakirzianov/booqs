@@ -8,19 +8,12 @@ export function Collection({ name }: {
     title: string,
 }) {
     const { booqs, loading } = useCollection(name)
-    return <div>
+    return <div className='flex flex-col items-center'>
         {
             loading
                 ? <Spinner />
                 : <CollectionItems booqs={booqs} />
         }
-        <style jsx>{`
-            div {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-            }
-            `}</style>
     </div>
 }
 
@@ -28,19 +21,12 @@ type CollectionItem = ReturnType<typeof useCollection>['booqs'][number];
 function CollectionItems({ booqs }: {
     booqs: CollectionItem[],
 }) {
-    return <div className='container'>
+    return <div className='flex overflow-auto'>
         {
             booqs.map(
                 (booq, idx) => <CollectionItemTile key={idx} {...booq} />,
             )
         }
-        <style jsx>{`
-            .container {
-                display: flex;
-                flex-direction: row;
-                overflow: auto;
-            }
-            `}</style>
     </div>
 }
 function CollectionItemTile({

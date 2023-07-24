@@ -11,19 +11,12 @@ import { BooqLink } from '@/controls/Links'
 export function Featured({ cards }: {
     cards: FeaturedItem[],
 }) {
-    return <div>
+    return <div className='flex flex-col items-center'>
         {
             cards.map(
                 (item, idx) => <FeaturedCard key={idx} item={item} />
             )
         }
-        <style jsx>{`
-            div {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-            }
-            `}</style>
     </div>
 }
 
@@ -34,7 +27,7 @@ function FeaturedCard({
     item: FeaturedItem,
 }) {
     return <Panel>
-        <div className="container p-lg sm:flex-row sm:flex-wrap sm:items-stretch">
+        <div className="flex flex-col grow items-center p-lg sm:flex-row sm:flex-wrap sm:items-stretch">
             <div className='flex m-base sm:my-base sm:mr-2xl sm:ml-0'>
                 <BooqCover
                     title={item.title}
@@ -42,7 +35,7 @@ function FeaturedCard({
                     cover={item.cover}
                 />
             </div>
-            <div className="details py-base px-0">
+            <div className="flex flex-col flex-1 justify-between py-base px-0">
                 <div className='header'>
                     <Header title={item.title} author={item.author} />
                 </div>
@@ -53,26 +46,6 @@ function FeaturedCard({
                     <Actions item={item} />
                 </div>
             </div>
-            <style jsx>{`
-            .container {
-                display: flex;
-                flex-flow: column;
-                flex: 1;
-                align-items: center;
-            }
-            .details {
-                display: flex;
-                flex-direction: column;
-                flex: 1;
-                justify-content: space-between;
-            }
-            @media (min-width: 600px) {
-                .container {
-                    flex-flow: row wrap;
-                    align-items: stretch;
-                }
-            }
-            `}</style>
         </div>
     </Panel>
 }
