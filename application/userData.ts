@@ -1,4 +1,4 @@
-import { ReactNode, createContext, createElement, useContext, useState } from 'react'
+import { ReactNode, createContext, createElement, useContext, useEffect, useState } from 'react'
 import { syncStorageCell } from '@/plat'
 import { CurrentUser } from './auth'
 import { Settings } from './settings'
@@ -35,6 +35,25 @@ export function UserDataProvider({ children }: {
     children: ReactNode,
 }) {
     const [data, setData] = useState(storage.restore() ?? initialData)
+    // Handle storage events from this tab
+    useEffect(() => {
+        return storage.subscribe(setData)
+    }, [])
+    // Handle storage events from other tabs
+    useEffect(() => {
+        function handleStorage(e: StorageEvent) {
+            if (e.key === key) {
+                let restored = storage.restore()
+                if (restored) {
+                    setData(restored)
+                }
+            }
+        }
+        window.addEventListener('storage', handleStorage)
+        return () => {
+            window.removeEventListener('storage', handleStorage)
+        }
+    }, [])
     return createElement(
         userContext.Provider,
         {
@@ -43,10 +62,10 @@ export function UserDataProvider({ children }: {
                 setData(setter) {
                     if (typeof setter === 'function') {
                         const value = setter(data)
-                        setData(value)
+                        // setData(value)
                         storage.store(value)
                     } else {
-                        setData(data)
+                        // setData(data)
                         storage.store(data)
                     }
                 }

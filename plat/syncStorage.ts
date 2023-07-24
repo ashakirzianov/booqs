@@ -3,14 +3,16 @@ type CellValue<T> = {
     version: string | undefined,
 };
 export function syncStorageCell<T>(key: string, version?: string) {
-    const storage = process.browser
+    const storage = typeof window !== 'undefined'
         ? window.localStorage
         : undefined
+    const listeners: ((value: T) => void)[] = []
     function store(value: T) {
         const cellValue = {
             value, version,
         }
         storage?.setItem(key, JSON.stringify(cellValue))
+        listeners.forEach(listener => listener(value))
     }
     function restore(): T | undefined {
         try {
@@ -39,7 +41,16 @@ export function syncStorageCell<T>(key: string, version?: string) {
     function clear() {
         storage?.removeItem(key)
     }
+    function subscribe(listener: (value: T) => void) {
+        listeners.push(listener)
+        return function unsubscribe() {
+            const index = listeners.indexOf(listener)
+            if (index > -1) {
+                listeners.splice(index, 1)
+            }
+        }
+    }
     return {
-        store, update, restore, clear,
+        store, update, restore, clear, subscribe,
     }
 }
