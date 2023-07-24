@@ -1,7 +1,8 @@
 import { DocumentNode } from 'graphql'
 
-export async function fetchQuery<T = any>({ query }: {
-    query: DocumentNode
+export async function fetchQuery<T = any>({ query, variables }: {
+    query: DocumentNode,
+    variables?: Object,
 }): Promise<{ data: T }> {
     const url = process.env.NEXT_PUBLIC_BACKEND
     if (url === undefined)
@@ -12,6 +13,7 @@ export async function fetchQuery<T = any>({ query }: {
             method: 'POST',
             body: JSON.stringify({
                 query: query.loc?.source.body,
+                variables,
             }),
             headers: {
                 'Content-Type': 'application/json',

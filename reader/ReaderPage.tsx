@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { useRouter } from 'next/router'
+import { usePathname, useRouter } from 'next/navigation'
 import { useBooq, BooqData, pathToId } from '@/application'
 import { BooqPath, BooqRange } from '@/core'
 import { Page } from '@/components/Page'
@@ -82,14 +82,16 @@ function LoadedBooqPage({ booq, path, quote }: {
 }
 
 function usePathNavigation(path?: BooqPath) {
-    const { replace, asPath } = useRouter()
+    const { replace } = useRouter()
+    const withoutHash = usePathname()
+    const withHash = path && withoutHash
+        ? `${withoutHash}#${pathToId(path)}`
+        : undefined
     useEffect(() => {
-        if (path) {
+        if (withHash) {
             setTimeout(() => {
-                const [withoutHash] = asPath.split('#')
-                const withHash = `${withoutHash}#${pathToId(path)}`
-                replace(withHash, undefined, { shallow: true })
+                replace(withHash, { scroll: true })
             })
         }
-    }, [])
+    }, [withHash, replace])
 }

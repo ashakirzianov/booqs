@@ -1,3 +1,4 @@
+'use client'
 import React, { useState, useCallback, useMemo } from 'react'
 import { positionForPath, samePath, BooqPath, BooqRange } from '@/core'
 import {
