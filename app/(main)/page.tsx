@@ -7,7 +7,7 @@ import ReadingHistory from '@/components/ReadingHistory'
 import { AppButtons } from '@/components/AppButtons'
 import { WiredSearch } from './client'
 
-async function fetchFeaturedServer() {
+export async function fetchFeaturedServer() {
     const FeaturedQuery = gql`query Featured {
         featured(limit: 10) {
             id
