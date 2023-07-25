@@ -1,5 +1,4 @@
 /*global globalThis*/
-import Head from 'next/head'
 import Script from 'next/script'
 import { useEffect } from 'react'
 
@@ -104,7 +103,8 @@ function facebookSdk() {
 function redirectUri() {
     const { protocol, host, pathname } = typeof window !== 'undefined'
         ? window.location
-        : undefined ?? {}
+        : undefined
+        ?? {}
     const url = `${protocol}//${host}/`
     return url
 }
