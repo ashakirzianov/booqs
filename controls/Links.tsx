@@ -8,7 +8,7 @@ export function BooqLink({ booqId, path, children }: {
     path?: BooqPath,
     children: ReactNode,
 }) {
-    return <Link href='/booq/[...slug]' as={booqHref(booqId, path)} style={{
+    return <Link href={booqHref(booqId, path)} style={{
         textDecoration: 'none',
         color: 'inherit',
     }}>
