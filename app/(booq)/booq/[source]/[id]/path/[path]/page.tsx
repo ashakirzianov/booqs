@@ -7,7 +7,7 @@ import { Reader } from '@/reader/Reader'
 export async function generateStaticParams() {
     const featured = await fetchFeaturedServer()
     return featured.map(({ id }) => ({
-        id, path: [0],
+        id, path: '0',
     }))
 }
 
