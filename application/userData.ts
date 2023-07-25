@@ -34,7 +34,16 @@ const userContext = createContext({
 export function UserDataProvider({ children }: {
     children: ReactNode,
 }) {
-    const [data, setData] = useState(storage.restore() ?? initialData)
+    const [data, setData] = useState(initialData)
+    // Restore on mount
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            let restored = storage.restore()
+            if (restored) {
+                setData(restored)
+            }
+        }
+    }, [])
     // Handle storage events from this tab
     useEffect(() => {
         return storage.subscribe(setData)
