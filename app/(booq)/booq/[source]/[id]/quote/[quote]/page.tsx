@@ -2,6 +2,7 @@ import { fetchBooqFragmentServer } from '@/app/(booq)/booq/fetch'
 import { AppProvider } from '@/application/provider'
 import { rangeFromString } from '@/core'
 import { Reader } from '@/reader/Reader'
+import { notFound } from 'next/navigation'
 
 
 export default async function BooqPathPage({
@@ -16,10 +17,10 @@ export default async function BooqPathPage({
     const booqId = `${source}/${id}`
     const booqRange = rangeFromString(quote)
     if (!booqRange)
-        return null
+        return notFound()
     const booq = await fetchBooqFragmentServer(booqId, booqRange.start)
     if (!booq)
-        return null
+        return notFound()
     return <AppProvider>
         <Reader booq={booq} quote={booqRange} />
     </AppProvider>

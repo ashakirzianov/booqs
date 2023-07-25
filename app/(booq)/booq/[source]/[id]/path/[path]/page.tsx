@@ -3,6 +3,7 @@ import { fetchFeaturedServer } from '@/app/(main)/page'
 import { AppProvider } from '@/application/provider'
 import { pathFromString } from '@/core'
 import { Reader } from '@/reader/Reader'
+import { notFound } from 'next/navigation'
 
 export async function generateStaticParams() {
     const featured = await fetchFeaturedServer()
@@ -24,7 +25,7 @@ export default async function BooqPathPage({
     const booqPath = pathFromString(path)
     const booq = await fetchBooqFragmentServer(booqId, booqPath ?? undefined)
     if (!booq)
-        return null
+        return notFound()
     return <AppProvider>
         <Reader booq={booq} />
     </AppProvider>
