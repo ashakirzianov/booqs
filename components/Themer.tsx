@@ -1,14 +1,11 @@
 import {
     PaletteName, palettes, useSetSettings, useSettings,
 } from '@/application'
-import { PopoverSingleton, Popover } from '@/controls/Popover'
+import { Popover } from '@/controls/Popover'
 import { IconButton } from '@/controls/Buttons'
 
-export function Themer({ singleton }: {
-    singleton?: PopoverSingleton,
-}) {
+export function Themer() {
     return <Popover
-        singleton={singleton}
         anchor={<IconButton icon='appearance' />}
         content={<ThemerPanel />}
     />

@@ -2,7 +2,7 @@ import React from 'react'
 import { useSignInOptions, useAuth } from '@/application'
 import { Menu, MenuItem } from '@/controls/Menu'
 import { IconButton } from '@/controls/Buttons'
-import { PopoverSingleton, Popover } from '@/controls/Popover'
+import { Popover } from '@/controls/Popover'
 import { ProfileBadge } from '@/controls/ProfilePicture'
 import { useModal } from '@/controls/Modal'
 
@@ -41,13 +41,11 @@ export function useSignInModal() {
     }
 }
 
-export function SignIn({ singleton }: {
-    singleton?: PopoverSingleton,
-}) {
+export function SignIn() {
     return <Popover
-        singleton={singleton}
         anchor={<SingInButton />}
         content={<SignInPanel />}
+        hasAction={true}
     />
 }
 

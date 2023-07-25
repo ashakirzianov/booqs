@@ -2,15 +2,13 @@ import { useAuth, useUpload } from '@/application'
 import { IconButton } from '@/controls/Buttons'
 import { useSelectFileDialog } from '@/controls/SelectFileDialog'
 import { Spinner } from '@/controls/Spinner'
-import { PopoverSingleton, Popover } from '@/controls/Popover'
+import { Popover } from '@/controls/Popover'
 import { useModal } from '@/controls/Modal'
 import { BooqCover } from '@/controls/BooqCover'
 import { booqHref } from '@/controls/Links'
 import { useSignInModal } from './SignIn'
 
-export function Upload({ singleton }: {
-    singleton?: PopoverSingleton,
-}) {
+export function Upload() {
     const { signed } = useAuth() ?? {}
     const {
         body, buttons, clearFile,
@@ -34,7 +32,6 @@ export function Upload({ singleton }: {
 
     return <>
         <Popover
-            singleton={singleton}
             anchor={<>
                 <IconButton
                     icon='upload'

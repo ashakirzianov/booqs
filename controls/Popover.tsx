@@ -1,11 +1,13 @@
-import React, { ReactNode, ReactElement } from 'react'
-import { roundArrow } from 'tippy.js'
-import Tippy, { useSingleton } from '@tippyjs/react'
-import css from 'styled-jsx/css'
+'use client'
+import React, { ReactNode, ReactElement, useState, useRef } from 'react'
+import {
+    useFloating, autoUpdate, offset, flip, shift,
+    useDismiss, useRole, useClick, useInteractions,
+    FloatingFocusManager, useId, useHover,
+    safePolygon, FloatingArrow, arrow,
+} from '@floating-ui/react'
 
-export type PopoverSingleton = ReturnType<typeof useSingleton>[1];
-
-// TODO: combine 'Popover' & 'Overlay' ?
+// TODO: implement
 export function Overlay({
     anchor, content, placement, visible, hideOnClick,
 }: {
@@ -15,56 +17,87 @@ export function Overlay({
     visible?: boolean,
     hideOnClick?: boolean,
 }) {
-    return <>
-        <Tippy
-            popperOptions={{ strategy: 'fixed' }}
-            arrow={false}
-            interactive={true}
-            placement={placement ?? 'bottom'}
-            visible={visible}
-            hideOnClick={hideOnClick}
-            animation='shift-away'
-            content={<div>{content}</div>}
-            children={anchor}
-            className='overlay-theme'
-        />
-    </>
+    return anchor
 }
 
-// TODO: rethink div wrapping
-export function Popover({ singleton, anchor, content }: {
-    singleton?: PopoverSingleton,
+export function Popover({
+    anchor, content, hasAction,
+}: {
     anchor: ReactNode,
     content: ReactNode,
+    hasAction?: boolean,
 }) {
-    return <div>
-        <Tippy
-            singleton={singleton}
-            className='popover-theme'
-            content={<div className='flex min-w-[15rem] grow'>
-                {content}
-            </div>}
-            children={<div>{anchor}</div>}
-        />
-    </div>
-}
+    const [isOpen, setIsOpen] = useState(false)
+    const arrowRef = useRef(null)
 
-export function usePopoverSingleton() {
-    const [source, target] = useSingleton()
-    const SingletonNode = <>
-        <Tippy
-            singleton={source}
-            className='popover-theme'
-            popperOptions={{ strategy: 'fixed' }}
-            arrow={roundArrow + roundArrow}
-            placement='bottom'
-            interactive={true}
-            hideOnClick={true}
-            animation='shift-away'
-        />
-    </>
-    return {
-        SingletonNode,
-        singleton: target,
-    }
+    const { refs, floatingStyles, context } = useFloating({
+        open: isOpen,
+        onOpenChange: setIsOpen,
+        middleware: [
+            offset(10),
+            flip({
+                fallbackAxisSideDirection: 'none'
+            }),
+            shift(),
+            arrow({
+                element: arrowRef,
+            }),
+            // hide(),
+        ],
+        whileElementsMounted: autoUpdate,
+    })
+
+    const click = useClick(context, {
+        enabled: !hasAction,
+    })
+    const dismiss = useDismiss(context, {
+        referencePress: hasAction,
+    })
+    const role = useRole(context)
+    const hover = useHover(context, {
+        handleClose: safePolygon(),
+    })
+
+    const { getReferenceProps, getFloatingProps } = useInteractions([
+        click,
+        dismiss,
+        role,
+        hover,
+    ])
+
+    const headingId = useId()
+
+    return (
+        <>
+            <div ref={refs.setReference} {...getReferenceProps()}>
+                {anchor}
+            </div>
+            {isOpen && (
+                <FloatingFocusManager
+                    context={context}
+                    order={['reference', 'content']}
+                >
+                    <div
+                        ref={refs.setFloating}
+                        style={floatingStyles}
+                        aria-labelledby={headingId}
+                        {...getFloatingProps()}
+                        className='px-4'
+                    >
+                        <div
+                            className='bg-background rounded drop-shadow min-w-[10rem] min-h-[5rem] flex items-center justify-center'
+                        >
+                            <FloatingArrow
+                                ref={arrowRef}
+                                context={context}
+                                fill='var(--theme-background)'
+                                stroke='var(--theme-border)'
+                            />
+                            {content}
+                        </div>
+                    </div>
+                </FloatingFocusManager>
+            )}
+        </>
+    )
 }

@@ -8,7 +8,6 @@ import {
 import { BorderButton, IconButton } from '@/controls/Buttons'
 import { BooqLink, FeedLink } from '@/controls/Links'
 import { Spinner } from '@/controls/Spinner'
-import { usePopoverSingleton } from '@/controls/Popover'
 import { Themer } from '@/components/Themer'
 import { SignIn } from '@/components/SignIn'
 import {
@@ -40,7 +39,6 @@ export function Reader({
     const leftLabel = leftPages <= 1 ? 'Last page'
         : `${leftPages} pages left`
 
-    const { singleton, SingletonNode } = usePopoverSingleton()
     const {
         navigationOpen, NavigationButton, NavigationContent,
     } = useNavigationPanel(booq.id)
@@ -64,7 +62,6 @@ export function Reader({
             fontFamily: 'var(--font-book)',
             fontSize: `${fontScale}%`,
         }}>
-            {SingletonNode}
             <BooqContent
                 booqId={booq.id}
                 nodes={booq.fragment.nodes}
@@ -90,8 +87,8 @@ export function Reader({
             <IconButton icon='back' />
         </FeedLink>}
         NavigationButton={NavigationButton}
-        ThemerButton={<Themer singleton={singleton} />}
-        AccountButton={<SignIn singleton={singleton} />}
+        ThemerButton={<Themer />}
+        AccountButton={<SignIn />}
         CurrentPage={<PageLabel text={pagesLabel} />}
         PagesLeft={<PageLabel text={leftLabel} />}
         NavigationContent={NavigationContent}
@@ -129,7 +126,7 @@ export function LoadingBooqScreen() {
 }
 
 function useControlsVisibility() {
-    const [visible, setVisible] = useState(false)
+    const [visible, setVisible] = useState(true)
     return {
         visible,
         toggle: useCallback(() => {

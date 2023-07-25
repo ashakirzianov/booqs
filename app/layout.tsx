@@ -2,12 +2,6 @@ import '@/app/globals.css'
 import Script from 'next/script'
 import { Metadata } from 'next'
 
-// Tippy styles
-import 'tippy.js/dist/tippy.css'
-import 'tippy.js/dist/svg-arrow.css'
-import 'tippy.js/dist/border.css'
-import 'tippy.js/animations/shift-away.css'
-
 // FontAwesome support
 import { config } from '@fortawesome/fontawesome-svg-core'
 import '@fortawesome/fontawesome-svg-core/styles.css'
