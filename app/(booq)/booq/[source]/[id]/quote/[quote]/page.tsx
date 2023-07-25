@@ -1,4 +1,4 @@
-import { fetchBooqFragmentServer } from '@/app/(booq)/booq/fetch'
+import { fetchBooqFragmentServer } from '@/app/fetch'
 import { AppProvider } from '@/application/provider'
 import { rangeFromString } from '@/core'
 import { Reader } from '@/reader/Reader'

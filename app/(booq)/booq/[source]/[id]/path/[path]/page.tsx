@@ -1,5 +1,4 @@
-import { fetchBooqFragmentServer } from '@/app/(booq)/booq/fetch'
-import { fetchFeaturedServer } from '@/app/(main)/page'
+import { fetchBooqFragmentServer, fetchFeaturedServer } from '@/app/fetch'
 import { AppProvider } from '@/application/provider'
 import { pathFromString } from '@/core'
 import { Reader } from '@/reader/Reader'
