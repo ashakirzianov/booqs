@@ -1,19 +1,19 @@
 import { ReactNode } from 'react'
 
-export function AppBar({ AppButtons, Search }: {
-    AppButtons?: ReactNode,
-    Search?: ReactNode,
+export function AppBar({ left, right }: {
+    left?: ReactNode,
+    right?: ReactNode,
 }) {
     return <div className="flex flex-row items-center w-screen h-header py-xl px-base sm:py-xl sm:px-lg">
         <div className="mr-xl hidden sm:flex grow-0">
             <Logo />
         </div>
         <div className="flex grow">
-            {Search}
+            {left}
         </div>
         <div className="flex flex-col">
             <div className='flex flex-row grow justify-between items-center gap-4'>
-                {AppButtons}
+                {right}
             </div>
         </div>
     </div>

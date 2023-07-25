@@ -1,12 +1,22 @@
 import React from 'react'
-import { useSearch, SearchResult } from '@/application'
 import { BooqCover } from '@/controls/BooqCover'
 import { Spinner } from '@/controls/Spinner'
 import { BooqLink } from '@/controls/Links'
 import styles from './Search.module.css'
 
-export function Search() {
-    const { query, doQuery, results, loading } = useSearch()
+type SearchResult = {
+    id: string,
+    title?: string,
+    author?: string,
+    cover?: string,
+}
+
+export function Search({ query, doQuery, results, loading }: {
+    query: string,
+    doQuery: (query: string) => void,
+    results: SearchResult[],
+    loading: boolean,
+}) {
     return <div className='flex grow-0 items-start justify-start text-primary max-h-12 overflow-visible'>
         <div className='flex flex-col relative rounded bg-background'>
             <input

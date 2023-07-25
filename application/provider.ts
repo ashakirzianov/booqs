@@ -1,6 +1,9 @@
+'use client'
 import { ReactNode, createElement } from 'react'
 import { ApolloProvider } from '@apollo/react-hooks'
-import { ApolloClient, OperationVariables, QueryOptions, InMemoryCache, ApolloLink, DocumentNode } from '@apollo/client'
+import {
+    ApolloClient, OperationVariables, QueryOptions, InMemoryCache, ApolloLink,
+} from '@apollo/client'
 import { onError } from '@apollo/client/link/error'
 import { createUploadLink } from 'apollo-upload-client'
 import { UserDataProvider } from './userData'

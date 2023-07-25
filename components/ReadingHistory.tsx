@@ -1,10 +1,11 @@
+'use client'
 import React from 'react'
 import { useHistory, pageForPosition, useAuth } from '@/application'
 import { BooqPreview } from '@/controls/BooqPreview'
 import { BooqLink } from '@/controls/Links'
 import { useSignInModal } from './SignIn'
 
-export function ReadingHistory() {
+export default function ReadingHistory() {
     const { signed } = useAuth() ?? {}
     const { history } = useHistory()
     if (!signed) {
