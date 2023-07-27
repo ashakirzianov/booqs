@@ -19,6 +19,7 @@ import { useSettings } from '@/application/settings'
 import { useFilteredHighlights } from '@/application/navigation'
 import { colorForGroup, pageForPosition, quoteColor } from '@/application/common'
 import { useReportHistory } from '@/application/history'
+import { User, useAuth } from '@/application/auth'
 
 export function Reader({
     booq, quote,
@@ -26,6 +27,7 @@ export function Reader({
     booq: BooqData,
     quote?: BooqRange,
 }) {
+    const self = useAuth()
     const { fontScale } = useSettings()
     const {
         onScroll, currentPath, currentPage, totalPages, leftPages,
@@ -37,7 +39,7 @@ export function Reader({
         start: booq.fragment.current.path,
         end: booq.fragment.next?.path ?? [booq.fragment.nodes.length],
     }), [booq])
-    const { augmentations, menuStateForAugmentation } = useAugmentations(booq.id, quote)
+    const { augmentations, menuStateForAugmentation } = useAugmentations(booq.id, quote, self)
     const { visible, toggle } = useControlsVisibility()
     useOnBooqClick(toggle)
 
@@ -47,11 +49,11 @@ export function Reader({
 
     const {
         navigationOpen, NavigationButton, NavigationContent,
-    } = useNavigationPanel(booq.id)
+    } = useNavigationPanel(booq.id, self)
     const {
         ContextMenuNode, isOpen: contextMenuVisible,
         updateMenuState: setMenuState,
-    } = useContextMenu(booq.id)
+    } = useContextMenu(booq.id, self)
     const onAugmentationClick = useMemo(() => {
         return (id: string) => {
             const next = menuStateForAugmentation(id)
@@ -151,8 +153,8 @@ function isAnythingSelected() {
         || selection.anchorOffset !== selection.focusOffset
 }
 
-function useAugmentations(booqId: string, quote?: BooqRange) {
-    const highlights = useFilteredHighlights(booqId)
+function useAugmentations(booqId: string, quote?: BooqRange, self?: User) {
+    const highlights = useFilteredHighlights(booqId, self)
     const augmentations = useMemo(() => {
         const augmentations = highlights.map<Augmentation>(h => ({
             id: `highlight/${h.id}`,

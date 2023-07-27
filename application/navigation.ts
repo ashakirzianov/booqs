@@ -1,6 +1,6 @@
 import { groupBy } from 'lodash'
 import { pathInRange } from '@/core'
-import { User, useAuth } from './auth'
+import { User } from './auth'
 import { useMemo } from 'react'
 import { useUserData, useUserDataUpdater } from './userData'
 import { TocItem, useToc } from './toc'
@@ -21,9 +21,8 @@ export type PathHighlightsNode = {
 }
 export type NavigationNode = TocNode | HighlightNode | PathHighlightsNode;
 
-export function useNavigationNodes(booqId: string) {
+export function useNavigationNodes(booqId: string, self?: User) {
     const { showChapters, showHighlights, showAuthors } = useUserData().navigationState
-    const self = useAuth()
     const { toc, title } = useToc(booqId)
     const { highlights } = useHighlights(booqId)
     const authors = highlightsAuthors(highlights)
@@ -49,9 +48,8 @@ export function useNavigationNodes(booqId: string) {
     }
 }
 
-export function useFilteredHighlights(booqId: string) {
+export function useFilteredHighlights(booqId: string, self: User | undefined) {
     const { showHighlights, showAuthors } = useUserData().navigationState
-    const self = useAuth()
     const { highlights } = useHighlights(booqId)
 
     return useMemo(() => {
