@@ -42,6 +42,7 @@ export async function fetchBooqFragmentServer(id: string, path: BooqPath | undef
             id
             title
             length
+            preview(path: $path)
             fragment(path: $path) {
                 nodes
                 previous {
@@ -63,6 +64,7 @@ export async function fetchBooqFragmentServer(id: string, path: BooqPath | undef
             id: string,
             title?: string,
             length: number,
+            preview: string,
             fragment: {
                 nodes: BooqNode[],
                 previous?: BooqAnchor,
