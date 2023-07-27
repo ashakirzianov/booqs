@@ -1,60 +1,30 @@
 import {
     PaletteName, palettes, useSetSettings, useSettings,
-} from 'app';
-import {
-    bookFont, buttonShadow, meter, vars,
-} from "controls/theme";
-import { PopoverSingleton, Popover } from "controls/Popover";
-import { IconButton } from "controls/Buttons";
+} from '@/application'
+import { Popover } from '@/controls/Popover'
+import { IconButton } from '@/controls/Buttons'
 
-export function Themer({ singleton }: {
-    singleton?: PopoverSingleton,
-}) {
+export function Themer() {
     return <Popover
-        singleton={singleton}
         anchor={<IconButton icon='appearance' />}
         content={<ThemerPanel />}
-    />;
+    />
 }
 
 function ThemerPanel() {
-    return <div className="container">
+    return <div className="flex flex-1 flex-col py-xl px-base">
         <FontSettings />
-        <hr />
-        <PalettePicker />
-        <style jsx>{`
-            .container {
-                display: flex;
-                flex: 1;
-                flex-direction: column;
-                padding: ${meter.xLarge} ${meter.regular};
-            }
-            hr {
-                width: 80%;
-                margin: ${meter.xLarge} 0;
-                align-self: center;
-                border: none;
-                border-top: 1px solid var(${vars.border});
-            }
-        `}</style>
-    </div>;
+        {/* <hr className='my-xl w-4/5 self-center border-t border-border' />
+        <PalettePicker /> */}
+    </div>
 }
 
 function FontSettings() {
-    const { fontScale } = useSettings();
-    const { setFontScale } = useSetSettings();
-    return <div className="container">
+    const { fontScale } = useSettings()
+    const { setFontScale } = useSetSettings()
+    return <div className="flex flex-row flex-1 items-center justify-around">
         <FontScaleButton scale='down' onClick={() => setFontScale(fontScale - 10)} />
         <FontScaleButton scale='up' onClick={() => setFontScale(fontScale + 10)} />
-        <style jsx>{`
-            .container {
-                display: flex;
-                flex-direction: row;
-                flex: 1;
-                align-items: center;
-                justify-content: space-around;
-            }
-            `}</style>
     </div>
 }
 
@@ -62,78 +32,40 @@ function FontScaleButton({ scale, onClick }: {
     scale: 'up' | 'down',
     onClick: () => void,
 }) {
-    const fontSize = scale === 'up'
-        ? 'xx-large'
-        : 'large';
-    return <div onClick={onClick}>
-        <span>Abc</span>
-        <style jsx>{`
-            div {
-                cursor: pointer;
-            }
-            span {
-                font-size: ${fontSize};
-                font-family: ${bookFont};
-                transition: color 0.25s;
-            }
-            span:hover {
-                color: var(${vars.highlight});
-            }
-            `}</style>
+    const fontSizeClass = scale === 'up'
+        ? 'text-2xl'
+        : 'text-lg'
+    return <div className='cursor-pointer' onClick={onClick}>
+        <span className={`${fontSizeClass} font-book transition text-action hover:text-highlight drop-shadow-md`}>Abc</span>
     </div>
 }
 
 function PalettePicker() {
-    const { paletteName } = useSettings();
-    const { setPalette } = useSetSettings();
-    return <div>
+    const { paletteName } = useSettings()
+    const { setPalette } = useSetSettings()
+    return <div className='flex flex-1 justify-around'>
         <PaletteButton name='light' current={paletteName} onSelect={setPalette} />
         <PaletteButton name='sepia' current={paletteName} onSelect={setPalette} />
         <PaletteButton name='dark' current={paletteName} onSelect={setPalette} />
-        <style jsx>{`
-            div {
-                display: flex;
-                flex-direction: row;
-                flex: 1;
-                justify-content: space-around;
-            }
-            `}</style>
-    </div>;
+    </div>
 }
 
-const size = '3rem';
+const size = '3rem'
 function PaletteButton({ name, current, onSelect }: {
     name: PaletteName,
     current: PaletteName,
     onSelect: (name: PaletteName) => void,
 }) {
-    const checked = current === name;
-    const { background, highlight, primary } = palettes[name];
-    return <div className="container" onClick={() => onSelect(name)}>
-        <div className="label">{name.substr(0, 1).toUpperCase()}</div>
-        <style jsx>{`
-            .container {
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                font-size: x-large;
-                font-family: ${bookFont};
-                padding: 0;
-                width: ${size};
-                height: ${size};
-                border-radius: ${size};
-                border: ${checked ? `3px solid ${highlight}` : 'none'};
-                overflow: hidden;
-                background-color: ${background};
-                color: ${primary};
-                box-shadow: ${buttonShadow};
-                cursor: pointer;
-                transition: color 0.25s, border 0.25s;
-            }
-            .container:hover {
-                color: ${highlight};
-                border: 3px solid ${highlight};
-            }
-            `}</style>
+    const checked = current === name
+    const { background, highlight, primary } = palettes[name]
+    return <div className="flex justify-center items-center text-xl font-book shadow-button overflow-hidden bg-background text-primary cursor-pointer transition-all hover:text-highlight hover:border-highlight" onClick={() => onSelect(name)} style={{
+        width: size,
+        height: size,
+        borderRadius: size,
+        border: checked ? `3px solid ${highlight}` : 'none',
+        background,
+        color: primary,
+    }}>
+        <div>{name.substring(0, 1).toUpperCase()}</div>
     </div>
 }

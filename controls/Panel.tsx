@@ -1,23 +1,10 @@
-import React from 'react';
-import { HasChildren } from './utils';
-import { meter, radius } from './theme';
+import React from 'react'
+import { HasChildren } from './utils'
 
-export const panelWidth = '40rem';
+export const panelWidth = '40rem'
 
 export function Panel({ children }: HasChildren) {
-    return <div className="panel">
+    return <div className="panel rounded m-xl flex flex-row grow-0 shrink w-full max-w-2xl overflow-hidden">
         {children}
-        <style jsx>{`
-            .panel {
-                display: flex;
-                flex-direction: row;
-                flex: 0 1;
-                width: 100%;
-                max-width: ${panelWidth};
-                margin: ${meter.xLarge};
-                border-radius: ${radius};
-                overflow: hidden;
-            }
-            `}</style>
-    </div>;
+    </div>
 }

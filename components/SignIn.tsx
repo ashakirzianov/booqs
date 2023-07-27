@@ -1,43 +1,32 @@
-import React from "react";
-import { useSignInOptions, useAuth } from 'app';
-import { meter } from "controls/theme";
-import { Menu, MenuItem } from "controls/Menu";
-import { IconButton } from "controls/Buttons";
-import { PopoverSingleton, Popover } from "controls/Popover";
-import { ProfileBadge } from "controls/ProfilePicture";
-import { useModal } from "controls/Modal";
+import React from 'react'
+import { useSignInOptions, useAuth } from '@/application'
+import { Menu, MenuItem } from '@/controls/Menu'
+import { IconButton } from '@/controls/Buttons'
+import { Popover } from '@/controls/Popover'
+import { ProfileBadge } from '@/controls/ProfilePicture'
+import { useModal } from '@/controls/Modal'
 
 export function useSignInModal() {
-    const { signWithApple, signWithFacebook } = useSignInOptions();
+    const { signWithApple, signWithFacebook } = useSignInOptions()
     const { openModal, ModalContent } = useModal(({ closeModal }) => ({
-        body: <div className='content'>
+        body: <div className='flex flex-col items-center max-w-[100vw] w-60 p-lg'>
             Choose provider
-            <style jsx>{`
-                .content {
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                    width: 15rem;
-                    max-width: 100vw;
-                    padding: ${meter.large};
-                }
-                `}</style>
         </div>,
         buttons: [
             {
                 text: 'Apple',
                 icon: 'apple',
                 onClick() {
-                    signWithApple();
-                    closeModal();
+                    signWithApple()
+                    closeModal()
                 },
             },
             {
                 text: 'Facebook',
                 icon: 'facebook',
                 onClick() {
-                    signWithFacebook();
-                    closeModal();
+                    signWithFacebook()
+                    closeModal()
                 },
             },
             {
@@ -45,30 +34,22 @@ export function useSignInModal() {
                 onClick: closeModal,
             },
         ],
-    }));
+    }))
     return {
         openModal,
         ModalContent,
-    };
+    }
 }
 
-export function SignIn({ singleton }: {
-    singleton?: PopoverSingleton,
-}) {
-    return <Popover
-        singleton={singleton}
-        anchor={<SingInButton />}
-        content={<SignInPanel />}
-    />;
+export function SignIn() {
+    return <SingInButton />
 }
 
 function SingInButton() {
-    const state = useAuth();
-    const { openModal, ModalContent } = useSignInModal();
+    const state = useAuth()
+    const { openModal, ModalContent } = useSignInModal()
     return <>
-        <div style={{
-            cursor: 'pointer'
-        }}>
+        <div className='cursor-pointer'>
             {
                 state?.signed
                     ? <ProfileBadge
@@ -84,26 +65,26 @@ function SingInButton() {
             }
         </div>
         {ModalContent}
-    </>;
+    </>
 }
 
 function SignInPanel() {
-    const state = useAuth();
+    const state = useAuth()
     if (state?.signed) {
         return <Signed
             name={state.name}
-        />;
+        />
     } else {
-        return <NotSigned />;
+        return <NotSigned />
     }
 }
 
 function Signed({ name }: {
     name?: string,
 }) {
-    const { signOut } = useSignInOptions();
-    return <div>
-        <span>{name}</span>
+    const { signOut } = useSignInOptions()
+    return <div className='py-base flex flex-col flex-1 items-stretch'>
+        <span className='p-base w-full text-center font-bold'>{name}</span>
         <Menu>
             <MenuItem
                 icon='sign-out'
@@ -112,41 +93,11 @@ function Signed({ name }: {
                 spinner={false}
             />
         </Menu>
-        <style jsx>{`
-        div {
-            display: flex;
-            flex-direction: column;
-            flex: 1;
-            padding: ${meter.regular} 0;
-            align-items: stretch;
-        }
-        span {
-            width: 100%;
-            text-align: center;
-            font-weight: bold;
-            padding: ${meter.regular};
-        }
-        `}</style>
-    </div>;
+    </div>
 }
 
 function NotSigned() {
-    return <div>
-        <span>Sign In</span>
-        <style jsx>{`
-        div {
-            display: flex;
-            flex-direction: column;
-            flex: 1;
-            padding: ${meter.regular} 0;
-            align-items: stretch;
-        }
-        span {
-            width: 100%;
-            text-align: center;
-            font-weight: bold;
-            padding: ${meter.regular};
-        }
-        `}</style>
-    </div>;
+    return <div className='py-base flex flex-col flex-1 items-stretch'>
+        <span className='p-base w-full text-center font-bold'>Sign In</span>
+    </div>
 }

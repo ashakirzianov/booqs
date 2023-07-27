@@ -1,47 +1,20 @@
-import React from 'react';
-import { Icon, IconName } from "./Icon";
-import {
-    buttonShadow, meter, radius, vars, boldWeight,
-} from "./theme";
-import { Spinner } from './Spinner';
+import React from 'react'
+import { Icon, IconName } from './Icon'
+import { Spinner } from './Spinner'
 
-const buttonSize = 50;
 export function IconButton({ icon, onClick, isSelected }: {
     icon: IconName,
     onClick?: () => void,
     isSelected?: boolean,
 }) {
+    const selectedClass = isSelected
+        ? 'text-highlight' : 'text-dimmed'
     return <button
-        className='button'
+        className={`button flex text-dimmed text-2xl cursor-pointer transition bg-transparent hover:text-highlight focus:outline-none ${selectedClass}`}
         onClick={onClick}
     >
         <Icon name={icon} />
-        <style jsx>{`
-            .button {
-                display: flex;
-                margin: 0;
-                padding: 0;
-                height: ${buttonSize};
-                color: var(${vars.dimmed});
-                border: none;
-                font-size: x-large;
-                cursor: pointer;
-                transition: color 0.25s;
-                background-color: rgba(0, 0, 0, 0);
-            }
-            .button:hover {
-                color: var(${vars.highlight});
-            }
-            .button:focus {
-                outline: 0;
-            }
-        `}</style>
-        <style jsx>{`
-            .button {
-                color: ${isSelected ? `var(${vars.highlight})` : `var(${vars.dimmed})`}
-            }
-            `}</style>
-    </button>;
+    </button>
 }
 
 export function ActionButton({ text, onClick }: {
@@ -49,27 +22,10 @@ export function ActionButton({ text, onClick }: {
     onClick?: () => void,
 }) {
     return <>
-        <button onClick={onClick}>
+        <button onClick={onClick} className='shadow-button rounded p-base border-none bg-action text-lg cursor-pointer font-light transition duration-300 hover:bg-highlight'>
             <span>{text}</span>
         </button>
-        <style jsx>{`
-            button {
-                border: none;
-                border-radius: ${radius};
-                background-color: var(${vars.action});
-                color: var(${vars.background});
-                box-shadow: ${buttonShadow};
-                font-size: large;
-                padding: ${meter.regular};
-                cursor: pointer;
-                font-weight: 100;
-                transition: background-color 0.25s;
-            }
-            button:hover {
-                background-color: var(${vars.highlight});
-            }
-            `}</style>
-    </>;
+    </>
 }
 
 export function TextButton({ text, onClick, loading }: {
@@ -78,7 +34,7 @@ export function TextButton({ text, onClick, loading }: {
     loading?: boolean,
 }) {
     return <>
-        <span className='button' onClick={onClick}>
+        <span className='text-action underline text-lg cursor-pointer transition duration-300 hover:text-highlight' onClick={onClick}>
             {text}
             {
                 loading
@@ -86,19 +42,7 @@ export function TextButton({ text, onClick, loading }: {
                     : null
             }
         </span>
-        <style jsx>{`
-        .button {
-            color: var(${vars.action});
-            text-decoration: underline;
-            font-size: large;
-            cursor: pointer;
-            transition: color 0.25s;
-        }
-        .button:hover {
-            color: var(${vars.highlight});
-        }
-        `}</style>
-    </>;
+    </>
 }
 
 export function BorderButton({ text, icon, onClick }: {
@@ -106,32 +50,11 @@ export function BorderButton({ text, icon, onClick }: {
     icon?: IconName,
     onClick?: () => void,
 }) {
-    return <div className='button' onClick={onClick}>
+    return <div className='flex text-center text-dimmed border-2 border-dimmed no-underline cursor-pointer transition-all duration-300 hover:text-highlight hover:border-highlight rounded font-bold py-sm px-base' onClick={onClick}>
         {
             !icon ? null :
-                <div className='icon'><Icon name={icon} /></div>
+                <div className='mr-base'><Icon name={icon} /></div>
         }
         {text}
-        <style jsx>{`
-            .icon {
-                margin: 0 ${meter.regular} 0 0;
-            }
-            .button {
-                display: flex;
-                text-align: center;
-                color: var(${vars.dimmed});
-                border: 2px solid var(${vars.dimmed});
-                border-radius: ${radius};
-                font-weight: ${boldWeight};
-                text-decoration: none;
-                padding: ${meter.small} ${meter.regular};
-                cursor: pointer;
-                transition: 250ms border-color, 250ms color;
-            }
-            .button:hover {
-                color: var(${vars.highlight});
-                border-color: var(${vars.highlight});
-            }
-            `}</style>
-    </div>;
+    </div>
 }

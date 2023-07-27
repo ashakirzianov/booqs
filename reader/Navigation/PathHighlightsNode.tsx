@@ -1,15 +1,14 @@
-import { Fragment } from 'react';
-import { TocItem, UserData, PathHighlightsNode } from 'app';
-import { BooqLink } from 'controls/Links';
-import { meter, boldWeight } from 'controls/theme';
-import { HighlightNodeComp } from './HighlightNode';
+import { Fragment } from 'react'
+import { TocItem, UserInfo, PathHighlightsNode } from '@/application'
+import { BooqLink } from '@/controls/Links'
+import { HighlightNodeComp } from './HighlightNode'
 
 export function PathHighlightsNodeComp({
     booqId, self,
     node: { items, highlights },
 }: {
     booqId: string,
-    self: UserData | undefined,
+    self: UserInfo | undefined,
     node: PathHighlightsNode,
 }) {
     return <div>
@@ -17,7 +16,7 @@ export function PathHighlightsNodeComp({
         {
             highlights.map(
                 (hl) =>
-                    <div key={hl.id} className='highlight'>
+                    <div key={hl.id} className='my-base'>
                         <HighlightNodeComp
                             booqId={booqId}
                             self={self}
@@ -26,24 +25,19 @@ export function PathHighlightsNodeComp({
                     </div>
             )
         }
-        <style jsx>{`
-            .highlight {
-                margin: ${meter.regular} 0;
-            }
-            `}</style>
-    </div>;
+    </div>
 }
 
 function Path({ items, booqId }: {
     booqId: string,
     items: Array<TocItem | undefined>,
 }) {
-    return <div className='container'>
+    return <div className='flex flex-wrap'>
         {
             items.map((item, idx) => !item ? null
                 : <Fragment key={idx}>
-                    {idx === 0 ? null : <div className='separator'>/</div>}
-                    <div className='element'>
+                    {idx === 0 ? null : <div className='mr-base'>/</div>}
+                    <div className='font-bold mr-base hover:underline'>
                         <BooqLink booqId={booqId} path={item.path}>
                             {item.title}
                         </BooqLink>
@@ -51,21 +45,5 @@ function Path({ items, booqId }: {
                 </Fragment>
             )
         }
-        <style jsx>{`
-            .container {
-                display: flex;
-                flex-flow: row wrap;
-            }
-            .element {
-                margin: 0 ${meter.regular} 0 0;
-                font-weight: ${boldWeight};
-            }
-            .element:hover {
-                text-decoration: underline;
-            }
-            .separator {
-                margin: 0 ${meter.regular} 0 0;
-            }
-            `}</style>
-    </div>;
+    </div>
 }

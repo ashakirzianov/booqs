@@ -1,116 +1,110 @@
-import React, { ReactNode, ReactElement } from 'react';
-import { roundArrow } from 'tippy.js';
-import Tippy, { useSingleton } from '@tippyjs/react';
-import css from 'styled-jsx/css'
-import { radius, vars } from './theme';
+'use client'
+import React, { ReactNode, useState, useRef } from 'react'
+import {
+    useFloating, autoUpdate, offset, flip, shift,
+    useDismiss, useRole, useClick, useInteractions,
+    FloatingFocusManager, useId, useHover,
+    safePolygon, FloatingArrow, arrow,
+    useTransitionStyles,
+} from '@floating-ui/react'
 
-export type PopoverSingleton = ReturnType<typeof useSingleton>[1];
-
-// TODO: combine 'Popover' & 'Overlay' ?
-export function Overlay({
-    anchor, content, placement, visible, hideOnClick,
+export function Popover({
+    anchor, content, hasAction, placement,
 }: {
-    anchor: ReactElement,
-    content: ReactNode,
-    placement: 'bottom' | 'right-start',
-    visible?: boolean,
-    hideOnClick?: boolean,
-}) {
-    return <>
-        <Tippy
-            popperOptions={{ strategy: 'fixed' }}
-            arrow={false}
-            interactive={true}
-            placement={placement ?? 'bottom'}
-            visible={visible}
-            hideOnClick={hideOnClick}
-            animation='shift-away'
-            content={<div>{content}</div>}
-            children={anchor}
-            className='overlay-theme'
-        />
-        <style jsx global>{overlayStyles}</style>
-    </>;
-}
-
-// TODO: rethink div wrapping
-export function Popover({ singleton, anchor, content }: {
-    singleton?: PopoverSingleton,
     anchor: ReactNode,
     content: ReactNode,
+    hasAction?: boolean,
+    placement?: 'bottom' | 'right-start',
 }) {
-    return <div>
-        <Tippy
-            singleton={singleton}
-            className='popover-theme'
-            content={<div className='content'>
-                {content}
-            </div>}
-            children={<div>{anchor}</div>}
-        />
-        <style jsx>{`
-            .content {
-                display: flex;
-                min-width: 15rem;
-                flex: 1;
+    const [isOpen, setIsOpen] = useState(false)
+    const arrowRef = useRef(null)
+
+    const { refs, floatingStyles, context } = useFloating({
+        open: isOpen,
+        onOpenChange: setIsOpen,
+        middleware: [
+            offset(10),
+            flip({
+                fallbackAxisSideDirection: 'none'
+            }),
+            shift(),
+            arrow({
+                element: arrowRef,
+            }),
+        ],
+        whileElementsMounted: autoUpdate,
+        placement,
+    })
+
+    const click = useClick(context, {
+        enabled: !hasAction,
+    })
+    const dismiss = useDismiss(context, {
+        referencePress: hasAction,
+    })
+    const role = useRole(context)
+    const hover = useHover(context, {
+        handleClose: safePolygon(),
+    })
+
+    const { getReferenceProps, getFloatingProps } = useInteractions([
+        click,
+        dismiss,
+        role,
+        hover,
+    ])
+
+    const { styles: transitionStyles } = useTransitionStyles(context, {
+        duration: 300,
+        initial({ side }) {
+            const translate = side === 'top' ? 'translateY(-20%)'
+                : side === 'bottom' ? 'translateY(20%)'
+                    : side === 'left' ? 'translateX(-20%)'
+                        : 'translateX(20%)'
+            return {
+                opacity: 0,
+                transform: `${translate} scale(0.9)`,
             }
-        `}</style>
-    </div>;
-}
+        },
+    })
 
-export function usePopoverSingleton() {
-    const [source, target] = useSingleton();
-    const SingletonNode = <>
-        <Tippy
-            singleton={source}
-            className='popover-theme'
-            popperOptions={{ strategy: 'fixed' }}
-            arrow={roundArrow + roundArrow}
-            placement='bottom'
-            interactive={true}
-            hideOnClick={true}
-            animation='shift-away'
-        />
-        <style jsx global>{popoverStyles}</style>
-    </>;
-    return {
-        SingletonNode,
-        singleton: target,
-    };
-}
+    const headingId = useId()
 
-const popoverStyles = css.global`
-.tippy-box.popover-theme {
-    color: var(${vars.primary});
-    background-color: var(${vars.background});
-    box-shadow: 0px 0px 5px rgba(0,0,0,0.1);
-    border: 1px solid var(${vars.border});
-    border-radius: ${radius};
+    return (
+        <>
+            <div ref={refs.setReference} {...getReferenceProps()}>
+                {anchor}
+            </div>
+            {isOpen && (
+                <FloatingFocusManager
+                    context={context}
+                    order={['reference', 'content']}
+                >
+                    <div
+                        ref={refs.setFloating}
+                        style={{
+                            ...floatingStyles,
+                            filter: 'drop-shadow(0 0 2px var(--theme-border))',
+                        }}
+                        aria-labelledby={headingId}
+                        {...getFloatingProps()}
+                    >
+                        <div
+                            className='bg-background rounded min-w-[10rem] min-h-[5rem] flex items-center justify-center'
+                            style={transitionStyles}
+                        >
+                            <FloatingArrow
+                                ref={arrowRef}
+                                context={context}
+                                fill='var(--theme-background)'
+                                stroke='var(--theme-border)'
+                                tipRadius={4}
+                            />
+                            {content}
+                        </div>
+                    </div>
+                </FloatingFocusManager>
+            )}
+        </>
+    )
 }
-.popover-theme .tippy-content {
-    padding: 0;
-    overflow: hidden;
-    border-radius: ${radius};
-}
-.popover-theme .tippy-svg-arrow > svg:first-child {
-    fill: var(${vars.border});
-}
-.popover-theme .tippy-svg-arrow > svg:last-child {
-    fill: var(${vars.background});
-}
-`;
-
-const overlayStyles = css.global`
-.tippy-box.overlay-theme {
-    color: var(${vars.primary});
-    background-color: var(${vars.background});
-    box-shadow: unset;
-    border: unset;
-}
-.overlay-theme > .tippy-content {
-    padding: 0;
-    overflow: hidden;
-    box-shadow: 0px 0px 20px rgba(0,0,0,0.2);
-    border-radius: ${radius};
-}
-`;

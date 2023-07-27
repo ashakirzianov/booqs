@@ -1,227 +1,181 @@
-import React, { useCallback, ReactNode, useRef, useState } from 'react';
-import { useDocumentEvent } from 'controls/utils';
-import { vars, radius, meter } from 'controls/theme';
-import { Overlay } from 'controls/Popover';
+import { useCallback, ReactNode, useState, useEffect } from 'react'
 import {
-    getBooqSelection, AnchorRect, getSelectionRect, getAugmentationRect,
-} from './BooqContent';
-import { ContextMenuContent, ContextMenuTarget } from './ContextMenuContent';
-import { throttle } from 'lodash';
-import { useAuth } from 'app';
-
-export function useContextMenu(booqId: string) {
-    const { menuState, setMenuState } = useMenuState();
-    const self = useAuth();
-    const ContextMenuNode = <ContextMenuLayout
-        rect={menuState.rect}
-        content={<ContextMenuContent
-            booqId={booqId}
-            self={self}
-            target={menuState.target}
-            setTarget={target => setMenuState({
-                ...menuState,
-                target,
-            })}
-        />}
-    />;
-
-    return {
-        isVisible: menuState.target.kind !== 'empty',
-        ContextMenuNode,
-        setMenuState,
-    };
-}
+    useFloating, useDismiss, useInteractions, useTransitionStyles,
+    flip, shift, inline, autoUpdate
+} from '@floating-ui/react'
+import {
+    getBooqSelection, VirtualElement, getSelectionElement,
+} from './BooqContent'
+import { ContextMenuContent, ContextMenuTarget } from './ContextMenuContent'
+import { useAuth } from '@/application'
 
 export type ContextMenuState = {
     target: ContextMenuTarget,
-    rect?: AnchorRect,
+    anchor?: VirtualElement,
 };
-function useMenuState() {
+
+export function useContextMenu(booqId: string) {
+    const self = useAuth()
     const [menuState, setMenuState] = useState<ContextMenuState>({
         target: { kind: 'empty' },
-    });
-    const handleSelectionChange = useCallback(() => setMenuState(prev => {
-        if (prev.target.kind === 'empty' || prev.target.kind === 'selection') {
-            return getSelectionState();
-        } else {
-            return prev;
+    })
+    const [locked, setLocked] = useState(false)
+    const isOpen = menuState.target.kind !== 'empty' && !locked
+    function setIsOpen(open: boolean) {
+        if (!open) {
+            setMenuState({ target: { kind: 'empty' } })
         }
-    }), []);
-    const locked = useRef(false);
-    const unhandled = useRef(false);
-    const lock = useCallback(() => locked.current = true, [locked]);
-    const unlock = useCallback(() => {
-        locked.current = false;
-        handleSelectionChange();
-    }, [locked, unhandled, handleSelectionChange]);
-    useDocumentEvent('mousedown', lock);
-    useDocumentEvent('touchstart', lock);
-    useDocumentEvent('mouseup', unlock);
-    useDocumentEvent('touchend', unlock);
-    useDocumentEvent('mouseleave', unlock);
-    useDocumentEvent('touchcancel', unlock);
+    }
+    const {
+        refs: { floating, setReference, setFloating },
+        floatingStyles, context,
+    } = useFloating({
+        placement: 'bottom',
+        open: isOpen,
+        onOpenChange: setIsOpen,
+        middleware: [inline(), flip(), shift()],
+        whileElementsMounted: autoUpdate
+    })
 
-    const selectionHandler = useCallback(() => {
-        if (!locked.current) {
-            handleSelectionChange();
-        } else {
-            unhandled.current = true;
-        }
-    }, []);
+    const dismiss = useDismiss(context)
 
-    useDocumentEvent('selectionchange', selectionHandler);
+    const { getFloatingProps } = useInteractions([
+        dismiss,
+    ])
 
-    useDocumentEvent('scroll', useCallback(throttle(() => {
-        setMenuState(prev => {
-            if (prev.target.kind === 'selection') {
-                const rect = getSelectionRect();
-                if (rect) {
-                    return {
-                        ...prev,
-                        rect,
-                    };
-                } else {
-                    return { target: { kind: 'empty' } };
-                }
-            } else if (prev.target.kind === 'highlight') {
-                const rect = getAugmentationRect(`highlight/${prev.target.highlight.id}`);
-                if (rect) {
-                    return {
-                        ...prev,
-                        rect,
-                    };
-                } else {
-                    return { target: { kind: 'empty' } };
-                }
-            } else if (prev.target.kind === 'quote') {
-                const rect = getAugmentationRect('quote/0');
-                if (rect) {
-                    return {
-                        ...prev,
-                        rect,
-                    };
-                } else {
-                    return { target: { kind: 'empty' } };
-                }
-            } else {
-                return prev;
+    const { styles: transitionStyles } = useTransitionStyles(context, {
+        duration: 300,
+        initial({ side }) {
+            const translate = side === 'top' ? 'translateY(-20%)'
+                : side === 'bottom' ? 'translateY(20%)'
+                    : side === 'left' ? 'translateX(-20%)'
+                        : 'translateX(20%)'
+            return {
+                opacity: 0,
+                transform: `${translate} scale(0.9)`,
             }
-        });
-    }, 200), []));
+        },
+    })
 
-    useDocumentEvent('click', event => {
-        if (!isWithinCtxMenu(event.target)) {
-            const selection = getBooqSelection();
-            if (!selection) {
-                setMenuState({
-                    target: { kind: 'empty' },
-                });
+    type ContextMenuStateSetter = (prev: ContextMenuState) => ContextMenuState
+    const updateMenuState = useCallback(function (setterOrValue: ContextMenuStateSetter | ContextMenuState) {
+        function setAnchor(anchor?: VirtualElement) {
+            if (anchor) {
+                setReference(anchor)
             }
         }
-    });
+        if (typeof setterOrValue === 'function') {
+            setMenuState(prev => {
+                let next = setterOrValue(prev)
+                setAnchor(next.anchor)
+                return next
+            })
+        } else {
+            setAnchor(setterOrValue.anchor)
+            setMenuState(setterOrValue)
+        }
+    }, [setMenuState, setReference])
+
+    useEffect(() => {
+        function isWithinCtxMenu(event: Event) {
+            return floating.current?.contains(event.target as Element | null)
+        }
+        function handleSelectionChange() {
+            updateMenuState(prev => {
+                if (prev.target.kind === 'empty' || prev.target.kind === 'selection') {
+                    return getSelectionState()
+                } else {
+                    return prev
+                }
+            })
+        }
+        function lock(event: MouseEvent | TouchEvent) {
+            if (!isWithinCtxMenu(event)) {
+                setLocked(true)
+            }
+        }
+        function unlock() {
+            setLocked(false)
+            setTimeout(() => {
+                handleSelectionChange()
+            }, 150)
+        }
+        window.document.addEventListener('mousedown', lock)
+        window.document.addEventListener('touchstart', lock)
+        window.document.addEventListener('mouseup', unlock)
+        window.document.addEventListener('touchend', unlock)
+        window.document.addEventListener('mouseleave', unlock)
+        window.document.addEventListener('touchcancel', unlock)
+        window.document.addEventListener('selectionchange', handleSelectionChange)
+        return () => {
+            window.document.removeEventListener('mousedown', lock)
+            window.document.removeEventListener('touchstart', lock)
+            window.document.removeEventListener('mouseup', unlock)
+            window.document.removeEventListener('touchend', unlock)
+            window.document.removeEventListener('mouseleave', unlock)
+            window.document.removeEventListener('touchcancel', unlock)
+            window.document.removeEventListener('selectionchange', handleSelectionChange)
+        }
+    }, [updateMenuState, setLocked, floating])
+
+    const ContextMenuNode = isOpen ? (
+        <div
+            ref={setFloating}
+            style={{
+                ...floatingStyles,
+            }}
+            {...getFloatingProps()}
+        >
+            <div className='bg-background rounded drop-shadow-2xl border border-border pointer-events-auto w-40' style={transitionStyles}>
+                <ContextMenuContent
+                    booqId={booqId}
+                    self={self}
+                    target={menuState.target}
+                    setTarget={target => setMenuState({
+                        ...menuState,
+                        target,
+                    })}
+                />
+            </div>
+        </div>
+    ) : null
 
     return {
-        menuState,
-        setMenuState,
-    };
-}
-
-function isWithinCtxMenu(target: any): boolean {
-    if (!target) {
-        return false;
-    } else if (target.id === 'ctxmenu') {
-        return true;
-    } else {
-        return isWithinCtxMenu(target.parent);
+        isOpen,
+        ContextMenuNode,
+        updateMenuState,
     }
 }
 
 function getSelectionState(): ContextMenuState {
-    const rect = getSelectionRect();
-    if (rect) {
-        const selection = getBooqSelection();
+    const element = getSelectionElement()
+    if (element) {
+        const selection = getBooqSelection()
         if (selection) {
             return {
-                rect,
+                anchor: element,
                 target: {
                     kind: 'selection',
                     selection,
                 },
-            };
+            }
         }
     }
     return {
         target: { kind: 'empty' },
-    };
+    }
 }
 
-function ContextMenuLayout({ content, rect }: {
-    content: ReactNode,
-    rect?: AnchorRect,
-}) {
-    return rect
-        ? <ContextMenuPopover
-            content={content}
-            rect={rect}
-        />
-        : null;
-}
 
-function ContextMenuPopover({
-    content, rect: { top, left, width, height },
-}: {
+function ContextMenuPanel({ content, anchor }: {
     content: ReactNode,
-    rect: AnchorRect,
+    anchor?: VirtualElement,
 }) {
-    return <Overlay
-        placement='bottom'
-        visible={true}
-        content={<div id='ctxmenu' style={{
-            width: '12rem',
-            pointerEvents: 'auto',
-        }}>
-            {content}
-        </div>}
-        anchor={<div style={{
-            position: 'fixed',
-            pointerEvents: 'none',
-            top, left, width, height,
-        }} />}
-    />;
-}
-
-function ContextMenuPanel({ content, rect }: {
-    content: ReactNode,
-    rect?: AnchorRect,
-}) {
-    const visibility = rect ? '' : 'hidden';
-    return <div id='ctxmenu' className='container'>
-        <div className={`content ${visibility}`}>{content}</div>
-        <style jsx>{`
-            .container {
-                display: flex;
-                flex: 1;
-                height: 100%;
-                align-self: stretch;
-                pointer-events: none;
-                flex-flow: column;
-                justify-content: flex-end;
-                align-items: stretch;
-                user-select: none;
-                padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
-            }
-            .content {
-                pointer-events: auto;
-                background: var(${vars.background});
-                border-radius: ${radius};
-                border: 1px solid var(${vars.border});
-                margin: ${meter.regular};
-                transition: 250ms transform;
-            }
-            .content.hidden {
-                transform: translateY(100%);
-                opacity: 0;
-            }
-            `}</style>
-    </div>;
+    const visibility = anchor ? '' : 'hidden'
+    const visibilityClass = anchor ? '' : 'translate-y-full opacity-0'
+    return <div id='ctxmenu' className='flex flex-1 flex-col h-full justify-end items-stretch self-stretch pointer-events-none select-none' style={{
+        padding: 'env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)',
+    }}>
+        <div className={`${visibilityClass} rounded m-base pointer-events-auto bg-background border border-border transition-all`}>{content}</div>
+    </div>
 }

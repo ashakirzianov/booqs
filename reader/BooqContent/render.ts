@@ -1,11 +1,16 @@
-import { ReactNode, createElement } from "react";
+import { ReactNode, createElement } from 'react'
 import {
     BooqPath, BooqRange, BooqElementNode, BooqNode, pathToString,
     pathInRange, samePath, pathLessThan,
-} from "core";
-import { pathToId } from "app";
-import { booqHref } from "controls/Links";
-import type { Augmentation } from "./BooqContent";
+} from '@/core'
+import { pathToId } from '@/application'
+import { booqHref } from '@/controls/Links'
+
+export type Augmentation = {
+    range: BooqRange,
+    id: string,
+    color?: string,
+};
 
 type RenderContext = {
     booqId: string,
@@ -22,20 +27,20 @@ export function renderNodes(nodes: BooqNode[], ctx: RenderContext): ReactNode {
             ...ctx,
             path: [...ctx.path, idx],
         }),
-    );
-    return result;
+    )
+    return result
 }
 function renderNode(node: BooqNode, ctx: RenderContext): ReactNode {
     switch (node.kind) {
         case 'text':
             switch (ctx.parent?.name) {
                 case 'table': case 'tbody': case 'tr':
-                    return null;
+                    return null
                 default:
-                    return renderTextNode(node.content, ctx);
+                    return renderTextNode(node.content, ctx)
             }
         case 'stub':
-            return null;
+            return null
         case 'element':
             return createElement(
                 node.name === 'a' && ctx.withinAnchor
@@ -43,7 +48,7 @@ function renderNode(node: BooqNode, ctx: RenderContext): ReactNode {
                     : node.name,
                 getProps(node, ctx),
                 getChildren(node, ctx),
-            );
+            )
     }
 }
 
@@ -55,7 +60,7 @@ function renderTextNode(text: string, {
         id: undefined,
     },
         augmentations,
-    );
+    )
     return createElement(
         'span',
         {
@@ -63,7 +68,7 @@ function renderTextNode(text: string, {
             id: pathToId(path),
         },
         spans.map(span => {
-            const augmentationId = span.id;
+            const augmentationId = span.id
             const augmentationProps = augmentationId ? {
                 'data-augmentation-id': augmentationId,
                 style: {
@@ -73,7 +78,7 @@ function renderTextNode(text: string, {
                 onClick: onAugmentationClick
                     ? () => onAugmentationClick(augmentationId)
                     : undefined,
-            } : {};
+            } : {}
             return createElement(
                 'span',
                 {
@@ -82,9 +87,9 @@ function renderTextNode(text: string, {
                     ...augmentationProps,
                 },
                 span.text,
-            );
+            )
         }),
-    );
+    )
 }
 
 function getProps(node: BooqElementNode, { path, booqId, range }: RenderContext) {
@@ -105,22 +110,22 @@ function getProps(node: BooqElementNode, { path, booqId, range }: RenderContext)
                     : imageFullSrc(booqId, node.attrs.src)
             )
             : undefined,
-    };
+    }
 }
 
 function isExternalSrc(src: string) {
-    return src.startsWith('http://') || src.startsWith('https://') || src.startsWith('www.');
+    return src.startsWith('http://') || src.startsWith('https://') || src.startsWith('www.')
 }
 
 function imageFullSrc(booqId: string, src: string) {
-    return `https://booqs-images.s3.amazonaws.com/${booqId}/${src}`;
+    return `https://booqs-images.s3.amazonaws.com/${booqId}/${src}`
 }
 
 function hrefForPath(path: BooqPath, booqId: string, range: BooqRange): string {
     if (pathInRange(path, range)) {
-        return `#${pathToId(path)}`;
+        return `#${pathToId(path)}`
     } else {
-        return booqHref(booqId, path);
+        return booqHref(booqId, path)
     }
 }
 
@@ -131,7 +136,7 @@ function getChildren(node: BooqElementNode, ctx: RenderContext) {
             parent: node,
             withinAnchor: ctx.withinAnchor || node.name === 'a',
         })
-        : null;
+        : null
 }
 
 // --- Augmentation
@@ -146,52 +151,52 @@ type AugmentedSpan = {
 function applyAugmentations(span: AugmentedSpan, augmentations: Augmentation[]) {
     return augmentations.reduce(
         (res, col) => {
-            const spans = applyAugmentationOnSpans(res, col);
-            return spans;
+            const spans = applyAugmentationOnSpans(res, col)
+            return spans
         },
         [span],
-    );
+    )
 }
 
 function applyAugmentationOnSpans(spans: AugmentedSpan[], augmentation: Augmentation) {
     return spans.reduce<AugmentedSpan[]>(
         (res, span) => {
-            const spans = applyAugmentationOnSpan(span, augmentation);
-            res.push(...spans);
-            return res;
+            const spans = applyAugmentationOnSpan(span, augmentation)
+            res.push(...spans)
+            return res
         },
-        []);
+        [])
 }
 
 function applyAugmentationOnSpan(span: AugmentedSpan, { range, color, id }: Augmentation): AugmentedSpan[] {
-    const [prefix, offset] = breakPath(span.path);
-    const [startPrefix, startOffset] = breakPath(range.start);
+    const [prefix, offset] = breakPath(span.path)
+    const [startPrefix, startOffset] = breakPath(range.start)
     const [endPrefix, endOffset] = range.end
         ? breakPath(range.end)
-        : [undefined, undefined];
+        : [undefined, undefined]
 
-    const len = span.text.length;
+    const len = span.text.length
     const start = samePath(startPrefix, prefix) ? startOffset - offset
         : pathLessThan(startPrefix, prefix) ? 0
-            : len;
+            : len
     const end = endPrefix !== undefined && endOffset !== undefined
         ? (
             samePath(prefix, endPrefix) ? endOffset - offset
                 : pathLessThan(prefix, endPrefix) ? len : 0
         )
-        : 0;
-    const pointA = 0;
-    const pointB = Math.min(Math.max(start, 0), len);
-    const pointC = Math.min(Math.max(end, 0), len);
-    const pointD = len;
-    const result: AugmentedSpan[] = [];
+        : 0
+    const pointA = 0
+    const pointB = Math.min(Math.max(start, 0), len)
+    const pointC = Math.min(Math.max(end, 0), len)
+    const pointD = len
+    const result: AugmentedSpan[] = []
     if (pointA < pointB) {
         result.push({
             text: span.text.substring(pointA, pointB),
             path: span.path,
             color: span.color,
             id: span.id,
-        });
+        })
     }
     if (pointB < pointC) {
         result.push({
@@ -208,11 +213,11 @@ function applyAugmentationOnSpan(span: AugmentedSpan, { range, color, id }: Augm
             id: span.id,
         })
     }
-    return result;
+    return result
 }
 
 function breakPath(path: BooqPath) {
-    const head = path.slice(0, path.length - 1);
-    const tail = path[path.length - 1];
-    return [head, tail] as const;
+    const head = path.slice(0, path.length - 1)
+    const tail = path[path.length - 1]
+    return [head, tail] as const
 }

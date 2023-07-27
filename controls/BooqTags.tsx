@@ -1,5 +1,4 @@
-import React from 'react';
-import { meter, vars } from './theme';
+import React from 'react'
 
 export type BooqTag = {
     tag: string,
@@ -8,19 +7,16 @@ export type BooqTag = {
 export function BooqTags({ tags }: {
     tags: BooqTag[],
 }) {
-    return <div>
+    return <div style={{
+        display: 'flex',
+        flexFlow: 'row wrap',
+    }}>
         {
             tags.map(
                 (tag, idx) => <BooqTagPill key={idx} tag={tag} />
             )
         }
-        <style jsx>{`
-            div {
-                display: flex;
-                flex-flow: row wrap;
-            }
-            `}</style>
-    </div>;
+    </div>
 }
 
 function BooqTagPill({ tag }: {
@@ -33,25 +29,25 @@ function BooqTagPill({ tag }: {
                     color="#4CAF50"
                     label={tag.value.toUpperCase()}
                 />
-                : null;
+                : null
         case 'subject':
             return <Pill
                 color="#673AB7"
                 label={tag.value ?? 'subject'}
-            />;
+            />
         case 'pg-index':
             return <Pill
                 color="pink"
                 label="Project Gutenberg"
                 title={tag.value}
-            />;
+            />
         case 'pages':
             return <Pill
-                color={`var(${vars.primary})`}
+                color='var(--theme-primary)'
                 label={`${tag.value} pages`}
-            />;
+            />
         default:
-            return null;
+            return null
     }
 }
 
@@ -60,16 +56,9 @@ function Pill({ color, label, title }: {
     label: string,
     title?: string
 }) {
-    return <div title={title}>
+    return <div title={title} className='pr-lg mt-sm mr-sm text-sm' style={{
+        color,
+    }}>
         {label}
-        <style jsx>{`
-            div {
-                font-size: small;
-                color: ${color};
-                border-radius: 100px;
-                padding: 0 ${meter.large} 0 0;
-                margin: ${meter.small} ${meter.small} 0 0;
-            }
-            `}</style>
     </div>
 }

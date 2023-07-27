@@ -1,6 +1,5 @@
-import { pageForPosition, TocNode } from "app";
-import { BooqLink } from "controls/Links";
-import { boldWeight, vars, meter } from "controls/theme";
+import { pageForPosition, TocNode } from '@/application'
+import { BooqLink } from '@/controls/Links'
 
 
 export function TocNodeComp({
@@ -11,25 +10,10 @@ export function TocNodeComp({
 }) {
     return <>
         <BooqLink booqId={booqId} path={path}>
-            <div className='content'>
+            <div className='flex flex-nowrap flex-1 justify-between font-bold hover:text-highlight'>
                 <span className='title'>{title ?? 'no-title'}</span>
-                <span className='page'>{pageForPosition(position)}</span>
+                <span className='ml-base'>{pageForPosition(position)}</span>
             </div>
         </BooqLink>
-        <style jsx>{`
-        .content {
-            display: flex;
-            flex-flow: row nowrap;
-            flex: 1;
-            justify-content: space-between;
-            font-weight: ${boldWeight};
-        }
-        .content:hover {
-            color: var(${vars.highlight});
-        }
-        .page {
-            margin-left: ${meter.regular};
-        }
-        `}</style>
-    </>;
+    </>
 }

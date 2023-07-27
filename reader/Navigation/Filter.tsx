@@ -1,25 +1,25 @@
-import { ReactNode } from 'react';
-import { UserData, useNavigationState } from "app";
-import { ProfileBadge } from 'controls/ProfilePicture';
-import { meter, boldWeight, vars, radius } from 'controls/theme';
+import { ReactNode } from 'react'
+import { UserInfo, useNavigationState } from '@/application'
+import { ProfileBadge } from '@/controls/ProfilePicture'
 
 export function NavigationFilter({ authors }: {
-    self: UserData | undefined,
-    authors: UserData[],
+    self: UserInfo | undefined,
+    authors: UserInfo[],
 }) {
     const {
         showAuthors, showChapters, showHighlights,
         toggleAuthor, toggleChapters, toggleHighlights,
-    } = useNavigationState();
-    return <div className='container'>
-        <div className='item'>
+    } = useNavigationState()
+    const itemClass = 'mt-base mr-base'
+    return <div className='flex flex-row flex-wrap my-lg'>
+        <div className={itemClass}>
             <FilterButton
                 text='Chapters'
                 selected={showChapters}
                 toggle={toggleChapters}
             />
         </div>
-        <div className='item'>
+        <div className={itemClass}>
             <FilterButton
                 text='Highlights'
                 selected={showHighlights}
@@ -28,8 +28,8 @@ export function NavigationFilter({ authors }: {
         </div>
         {
             authors.map(author => {
-                const [first] = author.name?.split(' ') ?? ['Incognito'];
-                return <div className='item' key={author.id}>
+                const [first] = author.name?.split(' ') ?? ['Incognito']
+                return <div className={itemClass} key={author.id}>
                     <FilterButton
                         text={first ?? 'Incognito'}
                         selected={showAuthors.some(id => id === author.id)}
@@ -41,19 +41,9 @@ export function NavigationFilter({ authors }: {
                             picture={author.pictureUrl ?? undefined}
                         />}
                     />
-                </div>;
+                </div>
             })
         }
-        <style jsx>{`
-            .container {
-                display: flex;
-                flex-flow: row wrap;
-                margin: ${meter.large} 0;
-            }
-            .item {
-                margin: ${meter.regular} ${meter.regular} 0 0;
-            }
-            `}</style>
     </div>
 }
 
@@ -63,34 +53,13 @@ function FilterButton({ text, selected, toggle, Badge }: {
     toggle: () => void,
     Badge?: ReactNode,
 }) {
-    return <div className='container' onClick={toggle}>
+    const borderClass = selected ? 'border-dimmed' : 'border-transparent'
+    return <div className={`flex rounded-2xl border-2 border-dotted ${borderClass} cursor-pointer transition-all py-sm px-base hover:text-highlight hover:border-highlight`} onClick={toggle}>
         {
             Badge
-                ? <div className='badge'>{Badge}</div>
+                ? <div className='mr-base'>{Badge}</div>
                 : null
         }
-        <span className='text'>{text}</span>
-        <style jsx>{`
-            .container {
-                display: flex;
-                flex-flow: row;
-                padding: ${meter.small} ${meter.regular};
-                border-radius: 20px;
-                border: 2px dotted;
-                border-color: ${selected ? `var(${vars.dimmed})` : 'rgba(0,0,0,0)'};
-                cursor: pointer;
-                transition: 250ms color, 250ms border;
-            }
-            .container:hover {
-                color: var(${vars.highlight});
-                border-color: var(${vars.highlight});
-            }
-            .badge {
-                margin-right: ${meter.regular};
-            }
-            .text {
-                font-weight: ${boldWeight};
-            }
-            `}</style>
-    </div>;
+        <span className='font-bold'>{text}</span>
+    </div>
 }

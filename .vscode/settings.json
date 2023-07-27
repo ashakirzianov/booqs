@@ -3,6 +3,7 @@
     "css.lint.unknownProperties": "ignore",
     "css.validate": false,
     "files.exclude": {
+        "package-lock.json": true,
         "**/.DS_Store": true,
         "**/node_modules/**": true
     },

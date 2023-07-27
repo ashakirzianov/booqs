@@ -1,1 +1,1 @@
-export * from './NavigationPanel';
+export * from './NavigationPanel'

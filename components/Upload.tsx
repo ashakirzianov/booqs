@@ -1,51 +1,37 @@
-import { useAuth, useUpload } from "app";
-import { IconButton } from "controls/Buttons";
-import { meter } from "controls/theme";
-import { useSelectFileDialog } from "controls/SelectFileDialog";
-import { Spinner } from "controls/Spinner";
-import { PopoverSingleton, Popover } from "controls/Popover";
-import { useModal } from "controls/Modal";
-import { BooqCover } from "controls/BooqCover";
-import { booqHref } from "controls/Links";
-import { useSignInModal } from "./SignIn";
+import { useAuth, useUpload } from '@/application'
+import { IconButton } from '@/controls/Buttons'
+import { useSelectFileDialog } from '@/controls/SelectFileDialog'
+import { Spinner } from '@/controls/Spinner'
+import { Popover } from '@/controls/Popover'
+import { useModal } from '@/controls/Modal'
+import { BooqCover } from '@/controls/BooqCover'
+import { booqHref } from '@/controls/Links'
+import { useSignInModal } from './SignIn'
 
-export function Upload({ singleton }: {
-    singleton?: PopoverSingleton,
-}) {
-    const { signed } = useAuth() ?? {};
+export function Upload() {
+    const { signed } = useAuth() ?? {}
     const {
         body, buttons, clearFile,
-    } = useModalDefinition();
+    } = useModalDefinition()
     const { openModal, ModalContent } = useModal(({ closeModal }) => ({
-        body: <div className='content'>
+        body: <div className='flex flex-col items-center w-60 max-w-[100vw] p-lg'>
             {body}
-            <style jsx>{`
-                .content {
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                    width: 15rem;
-                    max-width: 100vw;
-                    padding: ${meter.large};
-                }
-                `}</style>
         </div>,
         buttons: [...buttons, {
             text: 'Dismiss',
             onClick() {
-                closeModal();
-                clearFile();
+                closeModal()
+                clearFile()
             }
         }],
-    }));
+    }))
     const {
         openModal: openSignIn,
         ModalContent: SignInModalContent,
-    } = useSignInModal();
+    } = useSignInModal()
 
     return <>
         <Popover
-            singleton={singleton}
             anchor={<>
                 <IconButton
                     icon='upload'
@@ -61,19 +47,20 @@ export function Upload({ singleton }: {
                     ? 'Click to select epub'
                     : 'Sign in to upload'
             } />}
+            hasAction={true}
         />
         {ModalContent}
         {SignInModalContent}
-    </>;
+    </>
 }
 
 function useModalDefinition() {
     const {
         file, openDialog, dialogContent, clearFile,
-    } = useSelectFileDialog({ accept: 'application/epub+zip' });
+    } = useSelectFileDialog({ accept: 'application/epub+zip' })
     const {
         uploaded, uploading, upload,
-    } = useUpload();
+    } = useUpload()
     if (!file) {
         return {
             clearFile,
@@ -85,7 +72,7 @@ function useModalDefinition() {
                 text: 'Select .epub',
                 onClick: openDialog,
             }],
-        };
+        }
     } else if (uploaded) {
         return {
             clearFile,
@@ -100,7 +87,7 @@ function useModalDefinition() {
                 text: 'Read now',
                 href: booqHref(uploaded.id, [0]),
             }],
-        };
+        }
     } else if (uploading) {
         return {
             clearFile,
@@ -109,7 +96,7 @@ function useModalDefinition() {
                 <Spinner />
             </>,
             buttons: [],
-        };
+        }
     } else {
         return {
             clearFile,
@@ -118,22 +105,14 @@ function useModalDefinition() {
                 text: 'Upload',
                 onClick: () => upload(file),
             }],
-        };
+        }
     }
 }
 
 function Label({ text }: {
     text: string,
 }) {
-    return <div>
+    return <div className='m-lg w-full text-center font-bold'>
         {text}
-        <style jsx>{`
-        div {
-            margin: ${meter.large};
-            width: 100%;
-            text-align: center;
-            font-weight: bold;
-        }
-        `}</style>
-    </div>;
+    </div>
 }

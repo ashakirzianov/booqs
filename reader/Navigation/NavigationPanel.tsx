@@ -1,49 +1,46 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo } from 'react'
 import {
-    useAuth, UserData, useNavigationNodes, NavigationNode,
-} from 'app';
-import {
-    meter, vars, boldWeight, isSmallScreen, smallScreenWidth,
-} from 'controls/theme';
-import { IconButton } from 'controls/Buttons';
-import { TocNodeComp } from './TocNode';
-import { HighlightNodeComp } from './HighlightNode';
-import { PathHighlightsNodeComp } from './PathHighlightsNode';
-import { NavigationFilter } from './Filter';
+    useAuth, UserInfo, useNavigationNodes, NavigationNode,
+} from '@/application'
+import { IconButton } from '@/controls/Buttons'
+import { TocNodeComp } from './TocNode'
+import { HighlightNodeComp } from './HighlightNode'
+import { PathHighlightsNodeComp } from './PathHighlightsNode'
+import { NavigationFilter } from './Filter'
 
 export function useNavigationPanel(booqId: string) {
-    const [navigationOpen, setOpen] = useState(false);
+    const [navigationOpen, setOpen] = useState(false)
     const NavigationButton = <IconButton
         icon='toc'
         onClick={() => setOpen(!navigationOpen)}
         isSelected={navigationOpen}
-    />;
+    />
     const NavigationContent = <Navigation
         booqId={booqId}
         closeSelf={() => {
-            if (isSmallScreen()) {
-                setOpen(false);
-            }
+            setOpen(false)
         }}
-    />;
+    />
     return {
         navigationOpen, NavigationButton, NavigationContent,
-    };
+    }
 }
 
 function Navigation({ booqId, closeSelf }: {
     booqId: string,
     closeSelf: () => void,
 }) {
-    const self = useAuth();
-    const { nodes, authors } = useNavigationNodes(booqId);
-    const exceptSelf = authors.filter(a => a.id !== self?.id);
+    const self = useAuth()
+    const { nodes, authors } = useNavigationNodes(booqId)
+    const exceptSelf = authors.filter(a => a.id !== self?.id)
     return useMemo(() => {
-        return <div className='safe-area'>
-            <div className='container'>
-                <div className='scrollable'>
-                    <div className='header'>
-                        <div className='label'>CONTENTS</div>
+        return <div className='flex flex-1' style={{
+            padding: '0 env(safe-area-inset-right) 0 env(safe-area-inset-left)',
+        }}>
+            <div className='flex flex-1 flex-col text-dimmed max-h-full text-sm'>
+                <div className='flex flex-col flex-1 overflow-auto mt-lg'>
+                    <div className='flex flex-col xl:py-0 xl:px-4'>
+                        <div className='self-center tracking-widest font-bold'>CONTENTS</div>
                         <div className='filter'>
                             <NavigationFilter
                                 self={self}
@@ -51,11 +48,11 @@ function Navigation({ booqId, closeSelf }: {
                             />
                         </div>
                     </div>
-                    <div className='items'>
+                    <div className='flex flex-col flex-1 xl:py-0 xl:px-4'>
                         {
                             nodes.map(
                                 (node, idx) => <div key={idx}>
-                                    <div className='item' onClick={closeSelf}>
+                                    <div className='py-base' onClick={closeSelf}>
                                         <NavigationNodeComp
                                             booqId={booqId}
                                             self={self}
@@ -68,67 +65,15 @@ function Navigation({ booqId, closeSelf }: {
                     </div>
                 </div>
             </div>
-            <style jsx>{`
-            .safe-area {
-                display: flex;
-                flex: 1;
-                padding: 0 env(safe-area-inset-right) 0 env(safe-area-inset-left);
-            }
-            .container {
-                display: flex;
-                flex: 1 1;
-                flex-flow: column;
-                color: var(${vars.dimmed});
-                font-size: 0.9rem;
-                max-height: 100%;
-            }
-            .scrollable {
-                display: flex;
-                flex-flow: column;
-                flex: 1;
-                overflow: auto;
-                margin-top: ${meter.large};
-            }
-            .header {
-                display: flex;
-                flex-flow: column;
-            }
-            .label {
-                align-self: center;
-                letter-spacing: 0.1em;
-                font-weight: ${boldWeight};
-            }
-            .items {
-                display: flex;
-                flex-flow: column;
-                flex: 1 1;
-            }
-            .item {
-                padding: ${meter.regular} 0;
-            }
-            hr {
-                width: 85%;
-                border: none;
-                border-top: 0.5px solid var(${vars.border});
-            }
-            @media (min-width: ${smallScreenWidth}) {
-                .items {
-                    padding: 0 ${meter.large};
-                }
-                .header {
-                    padding: 0 ${meter.large};
-                }
-            }
-            `}</style>
-        </div>;
+        </div>
     }, [
         nodes,
-    ]);
+    ])
 }
 
 function NavigationNodeComp({ booqId, self, node }: {
     booqId: string,
-    self: UserData | undefined,
+    self: UserInfo | undefined,
     node: NavigationNode,
 }) {
     switch (node.kind) {
@@ -136,20 +81,20 @@ function NavigationNodeComp({ booqId, self, node }: {
             return <TocNodeComp
                 booqId={booqId}
                 node={node}
-            />;
+            />
         case 'highlight':
             return <HighlightNodeComp
                 booqId={booqId}
                 self={self}
                 highlight={node.highlight}
-            />;
+            />
         case 'highlights':
             return <PathHighlightsNodeComp
                 booqId={booqId}
                 self={self}
                 node={node}
-            />;
+            />
         default:
-            return null;
+            return null
     }
 }

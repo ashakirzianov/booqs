@@ -1,23 +1,14 @@
-import React, { ReactNode } from 'react';
-import { IconName, Icon } from './Icon';
-import { meter, menuFont, boldWeight, vars, smallScreenWidth } from './theme';
-import { Spinner } from './Spinner';
+import React, { ReactNode } from 'react'
+import { IconName, Icon } from './Icon'
+import { Spinner } from './Spinner'
 
 export function Menu({ callback, children }: {
     children: ReactNode,
     callback?: () => void,
 }) {
-    return <div onClick={callback}>
+    return <div onClick={callback} className='flex flex-col items-stretch grow'>
         {children}
-        <style jsx>{`
-            div {
-                display: flex;
-                flex-direction: column;
-                align-items: stretch;
-                flex: 1;
-            }
-            `}</style>
-    </div>;
+    </div>
 }
 
 export function MenuItem({ icon, text, callback, spinner }: {
@@ -27,59 +18,21 @@ export function MenuItem({ icon, text, callback, spinner }: {
     spinner?: boolean,
 }) {
     return <div
-        className='container'
+        className='container flex flex-row grow items-center cursor-pointer font-main select-none transition font-bold p-lg hover:bg-highlight hover:text-background'
         // Note: prevent loosing selection on safari
         onMouseDown={e => e.preventDefault()}
         onClick={callback}
     >
         {
             icon
-                ? <div className="icon"><Icon name={icon} /></div>
+                ? <div className="flex justify-center items-center mr-lg"><Icon name={icon} /></div>
                 : null
         }
-        <span className='text'>{text}</span>
+        <span className='flex grow'>{text}</span>
         {
             spinner
-                ? <div className='spinner'><Spinner /></div>
+                ? <div className='flex grow-0'><Spinner /></div>
                 : null
         }
-        <style jsx>{`
-            .container {
-                display: flex;
-                flex: 1;
-                flex-direction: row;
-                align-items: center;
-                padding: ${meter.large};
-                cursor: pointer;
-                font-size: smaller;
-                font-family: ${menuFont};
-                font-weight: ${boldWeight};
-                user-select: none;
-                transition: 250ms color, 250ms background-color;
-            }
-            .container:hover {
-                color: var(${vars.background});
-                background-color: var(${vars.highlight});
-            }
-            .icon {
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                margin-right: ${meter.large};
-            }
-            .text {
-                display: flex;
-                flex: 1;
-            }
-            .spinner {
-                display: flex;
-                flex: 0;
-            }
-            @media (max-width: ${smallScreenWidth}) {
-                .container {
-                    font-size: 1em;
-                }
-            }
-            `}</style>
-    </div>;
+    </div>
 }

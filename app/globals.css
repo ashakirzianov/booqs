@@ -1,0 +1,38 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    color: var(--theme-primary);
+    background: var(--theme-background);
+}
+
+:root {
+    --header-height: 3rem;
+}
+
+:root {
+    --theme-background: white;
+    --theme-action: #F57F17;
+    --theme-primary: black;
+    --theme-dimmed: #867b6c;
+    --theme-border: #ddd;
+    --theme-highlight: orange;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --theme-background: black;
+        --theme-action: #867b6c;
+        --theme-primary: #999;
+        --theme-dimmed: #888;
+        --theme-border: #333;
+        --theme-highlight: white;
+    }
+}

@@ -1,16 +1,15 @@
-import React, { useCallback } from 'react';
-import { useRouter } from 'next/router';
-import * as clipboard from 'clipboard-polyfill';
-import { BooqRange } from 'core';
+import React, { useCallback } from 'react'
+import { useRouter } from 'next/navigation'
+import * as clipboard from 'clipboard-polyfill'
+import { BooqRange } from '@/core'
 import {
-    useHighlightMutations, Highlight, colorForGroup, groups, UserData,
-} from 'app';
-import { MenuItem } from 'controls/Menu';
-import { useDocumentEvent } from 'controls/utils';
-import { quoteRef } from 'controls/Links';
-import { BooqSelection } from './BooqContent';
-import { meter, menuFont, boldWeight } from 'controls/theme';
-import { ProfileBadge } from 'controls/ProfilePicture';
+    useHighlightMutations, Highlight, colorForGroup, groups, UserInfo,
+} from '@/application'
+import { MenuItem } from '@/controls/Menu'
+import { useDocumentEvent } from '@/controls/utils'
+import { quoteHref } from '@/controls/Links'
+import { BooqSelection } from './BooqContent'
+import { ProfileBadge } from '@/controls/ProfilePicture'
 
 type EmptyTarget = {
     kind: 'empty',
@@ -35,18 +34,18 @@ export function ContextMenuContent({
 }: {
     target: ContextMenuTarget,
     booqId: string,
-    self: UserData | undefined,
+    self: UserInfo | undefined,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
     switch (target.kind) {
         case 'selection':
-            return <SelectionTargetMenu target={target} {...rest} />;
+            return <SelectionTargetMenu target={target} {...rest} />
         case 'quote':
-            return <QuoteTargetMenu target={target} {...rest} />;
+            return <QuoteTargetMenu target={target} {...rest} />
         case 'highlight':
-            return <HighlightTargetMenu target={target} {...rest} />;
+            return <HighlightTargetMenu target={target} {...rest} />
         default:
-            return null;
+            return null
     }
 }
 
@@ -55,15 +54,15 @@ function SelectionTargetMenu({
 }: {
     target: SelectionTarget,
     booqId: string,
-    self: UserData | undefined,
+    self: UserInfo | undefined,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
-    useCopyQuote(rest.booqId, selection);
+    useCopyQuote(rest.booqId, selection)
     return <>
         <AddHighlightItem {...rest} selection={selection} />
         <CopyQuoteItem {...rest} selection={selection} />
         <CopyLinkItem {...rest} selection={selection} />
-    </>;
+    </>
 }
 
 function QuoteTargetMenu({
@@ -71,13 +70,13 @@ function QuoteTargetMenu({
 }: {
     target: QuoteTarget,
     booqId: string,
-    self: UserData | undefined,
+    self: UserInfo | undefined,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
     return <>
         <AddHighlightItem {...rest} selection={selection} />
         <CopyTextItem {...rest} selection={selection} />
-    </>;
+    </>
 }
 
 function HighlightTargetMenu({
@@ -85,17 +84,17 @@ function HighlightTargetMenu({
 }: {
     target: HighlightTarget,
     booqId: string,
-    self: UserData | undefined,
+    self: UserInfo | undefined,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
-    const isOwnHighlight = self?.id === highlight.author.id;
+    const isOwnHighlight = self?.id === highlight.author.id
     const selection = {
         range: {
             start: highlight.start,
             end: highlight.end,
         },
         text: highlight.text,
-    };
+    }
     return <>
         {isOwnHighlight ? null :
             <AuthorItem
@@ -111,17 +110,17 @@ function HighlightTargetMenu({
         }
         <CopyQuoteItem {...rest} selection={selection} />
         <CopyLinkItem {...rest} selection={selection} />
-    </>;
+    </>
 }
 
 function AuthorItem({ name, pictureUrl }: {
     name?: string,
     pictureUrl?: string,
 }) {
-    return <div className='container'>
+    return <div className='container font-bold p-lg'>
         {
             pictureUrl
-                ? <div className="picture">
+                ? <div className="picture mr-lg">
                     <ProfileBadge
                         border={false}
                         size={1.5}
@@ -138,24 +137,21 @@ function AuthorItem({ name, pictureUrl }: {
                 flex: 1;
                 flex-direction: row;
                 align-items: center;
-                padding: ${meter.large};
                 font-size: smaller;
-                font-family: ${menuFont};
-                font-weight: ${boldWeight};
+                font-family: var(--font-main);
                 user-select: none;
             }
             .picture {
                 display: flex;
                 justify-content: center;
                 align-items: center;
-                margin-right: ${meter.large};
             }
             .name {
                 display: flex;
                 flex: 1;
             }
             `}</style>
-    </div>;
+    </div>
 }
 
 function AddHighlightItem({
@@ -163,12 +159,12 @@ function AddHighlightItem({
 }: {
     selection: BooqSelection,
     booqId: string,
-    self: UserData | undefined,
+    self: UserInfo | undefined,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
-    const { addHighlight } = useHighlightMutations(booqId);
+    const { addHighlight } = useHighlightMutations(booqId)
     if (!self?.id) {
-        return null;
+        return null
     }
     return <div className='container'>
         {
@@ -184,12 +180,12 @@ function AddHighlightItem({
                             end: selection.range.end ?? selection.range.start,
                             text: selection.text,
                             author: self,
-                        });
+                        })
                         setTarget({
                             kind: 'highlight',
                             highlight,
-                        });
-                        removeSelection();
+                        })
+                        removeSelection()
                     }}
                 />,
             )
@@ -206,7 +202,7 @@ function AddHighlightItem({
                 user-select: none;
             }
             `}</style>
-    </div>;
+    </div>
 }
 
 function RemoveHighlightItem({
@@ -216,15 +212,15 @@ function RemoveHighlightItem({
     booqId: string,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
-    const { removeHighlight } = useHighlightMutations(booqId);
+    const { removeHighlight } = useHighlightMutations(booqId)
     return <MenuItem
         text='Remove'
         icon='remove'
         callback={() => {
-            removeHighlight(highlight.id);
-            setTarget({ kind: 'empty' });
+            removeHighlight(highlight.id)
+            setTarget({ kind: 'empty' })
         }}
-    />;
+    />
 }
 
 function SelectHighlightGroupItem({
@@ -234,7 +230,7 @@ function SelectHighlightGroupItem({
     booqId: string,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
-    const { updateHighlight } = useHighlightMutations(booqId);
+    const { updateHighlight } = useHighlightMutations(booqId)
     return <div className='container'>
         {
             groups.map(
@@ -243,7 +239,7 @@ function SelectHighlightGroupItem({
                     selected={group === highlight.group}
                     color={colorForGroup(group)}
                     callback={() => {
-                        updateHighlight(highlight.id, group);
+                        updateHighlight(highlight.id, group)
                         // Note: hackie way of updating selection
                         setTarget({
                             kind: 'highlight',
@@ -268,7 +264,7 @@ function SelectHighlightGroupItem({
                 user-select: none;
             }
             `}</style>
-    </div>;
+    </div>
 }
 
 function GroupSelectionButton({ color, selected, callback }: {
@@ -279,24 +275,11 @@ function GroupSelectionButton({ color, selected, callback }: {
     return <div
         // Note: prevent loosing selection on safari
         onMouseDown={e => e.preventDefault()}
-        onClick={callback} className='button'>
-        <style jsx>{`
-            .button {
-                display: flex;
-                flex: 1;
-                align-self: stretch;
-                background: ${color};
-                color: rgba(0, 0, 0, 0);
-                cursor: pointer;
-                border-bottom: 0.5rem solid ${selected ? `${color}` : `rgba(0,0,0,0)`};
-                height: 2.5rem;
-                transition: 250ms border;
-            }
-            .button:hover {
-                border-bottom: 0.5rem solid ${color};
-            }
-            `}</style>
-    </div>;
+        onClick={callback} className='flex flex-1 self-stretch text-transparent cursor-pointer h-10 transition-all' style={{
+            background: color,
+            borderBottom: `0.5rem solid ${selected ? `${color}` : `rgba(0,0,0,0)`}`,
+        }}>
+    </div>
 }
 
 function CopyQuoteItem({
@@ -306,18 +289,18 @@ function CopyQuoteItem({
     booqId: string,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
-    const { prefetch } = useRouter();
+    const { prefetch } = useRouter()
     return <MenuItem
         text='Copy quote'
         icon='quote'
         callback={() => {
-            const quote = generateQuote(booqId, selection.text, selection.range);
-            clipboard.writeText(quote);
-            removeSelection();
-            prefetch(quoteRef(booqId, selection.range));
-            setTarget({ kind: 'empty' });
+            const quote = generateQuote(booqId, selection.text, selection.range)
+            clipboard.writeText(quote)
+            removeSelection()
+            prefetch(quoteHref(booqId, selection.range))
+            setTarget({ kind: 'empty' })
         }}
-    />;
+    />
 }
 
 function CopyTextItem({
@@ -331,12 +314,12 @@ function CopyTextItem({
         text='Copy text'
         icon='copy'
         callback={() => {
-            const text = selection.text;
-            clipboard.writeText(text);
-            removeSelection();
-            setTarget({ kind: 'empty' });
+            const text = selection.text
+            clipboard.writeText(text)
+            removeSelection()
+            setTarget({ kind: 'empty' })
         }}
-    />;
+    />
 }
 
 function CopyLinkItem({
@@ -346,46 +329,46 @@ function CopyLinkItem({
     booqId: string,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
-    const { prefetch } = useRouter();
+    const { prefetch } = useRouter()
     return <MenuItem
         text='Copy link'
         icon='link'
         callback={() => {
-            const link = generateLink(booqId, selection.range);
-            clipboard.writeText(link);
-            removeSelection();
-            prefetch(quoteRef(booqId, selection.range));
-            setTarget({ kind: 'empty' });
+            const link = generateLink(booqId, selection.range)
+            clipboard.writeText(link)
+            removeSelection()
+            prefetch(quoteHref(booqId, selection.range))
+            setTarget({ kind: 'empty' })
         }}
-    />;
+    />
 }
 
 function useCopyQuote(booqId: string, selection?: BooqSelection) {
-    const { prefetch } = useRouter();
+    const { prefetch } = useRouter()
     useDocumentEvent('copy', useCallback(e => {
         if (selection && e.clipboardData) {
-            e.preventDefault();
-            const selectionText = generateQuote(booqId, selection.text, selection.range);
-            e.clipboardData.setData('text/plain', selectionText);
-            prefetch(quoteRef(booqId, selection.range));
+            e.preventDefault()
+            const selectionText = generateQuote(booqId, selection.text, selection.range)
+            e.clipboardData.setData('text/plain', selectionText)
+            prefetch(quoteHref(booqId, selection.range))
         }
-    }, [selection, booqId, prefetch]));
+    }, [selection, booqId, prefetch]))
 }
 
 function removeSelection() {
-    window.getSelection()?.empty();
+    window.getSelection()?.empty()
 }
 
 function generateQuote(booqId: string, text: string, range: BooqRange) {
-    const link = generateLink(booqId, range);
-    return `"${text}"\n${link}`;
+    const link = generateLink(booqId, range)
+    return `"${text}"\n${link}`
 }
 
 function generateLink(booqId: string, range: BooqRange) {
-    return `${baseUrl()}${quoteRef(booqId, range)}`;
+    return `${baseUrl()}${quoteHref(booqId, range)}`
 }
 
 function baseUrl() {
-    const current = window.location;
-    return `${current.protocol}//${current.host}`;
+    const current = window.location
+    return `${current.protocol}//${current.host}`
 }

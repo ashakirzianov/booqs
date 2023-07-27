@@ -1,76 +1,35 @@
-import React from 'react';
-import { meter, headerHeight } from 'controls/theme';
-import { Logo } from 'controls/Logo';
-import { usePopoverSingleton } from 'controls/Popover';
-import { Search } from './Search';
-import { SignIn } from './SignIn';
-import { Themer } from './Themer';
-import { Upload } from './Upload';
+import { ReactNode } from 'react'
 
-
-export function AppBar() {
-    return <div className="container">
-        <div className="logo">
+export function AppBar({ left, right }: {
+    left?: ReactNode,
+    right?: ReactNode,
+}) {
+    return <div className="flex flex-row items-center w-screen h-header py-xl px-base sm:py-xl sm:px-lg">
+        <div className="mr-xl hidden sm:flex grow-0">
             <Logo />
         </div>
-        <div className="search">
-            <Search />
+        <div className="flex grow">
+            {left}
         </div>
-        <div className="buttons">
-            <AppButtons />
+        <div className="flex flex-col">
+            <div className='flex flex-row grow justify-between items-center gap-4'>
+                {right}
+            </div>
         </div>
-        <style jsx>{`
-            .container {
-                display: flex;
-                flex-direction: row;
-                align-items: center;
-                height: ${headerHeight};
-                padding: ${meter.xLarge} ${meter.regular};
-            }
-            .logo {
-                display: none;
-                flex-direction: column;
-                flex: 0 0;
-                margin: 0 ${meter.xLarge} 0 0;
-            }
-            @media (min-width: 40rem) {
-                .logo {
-                    display: flex;
-                }
-                .container {
-                    padding: ${meter.xLarge} ${meter.large};
-                }
-            }
-            .search {
-                display: flex;
-                flex-direction: column;
-                flex: 1;
-            }
-            .buttons {
-                display: flex;
-                flex-direction: column;
-                flex: 1;
-                max-width: 12rem;
-            }
-            `}</style>
-    </div>;
+    </div>
 }
 
-function AppButtons() {
-    const { singleton, SingletonNode } = usePopoverSingleton();
-    return <div className='buttons-row'>
-        {SingletonNode}
-        <Upload singleton={singleton} />
-        <Themer singleton={singleton} />
-        <SignIn singleton={singleton} />
-        <style jsx>{`
-            .buttons-row {
-                display: flex;
-                flex: 1;
-                flex-direction: row;
-                justify-content: space-between;
-                align-items: center;
-            }
-            `}</style>
-    </div>;
+function Logo() {
+    return <div className='font-normal' style={{
+        color: 'rgba(253,163,2,1)',
+        fontFamily: 'var(--font-main)',
+        fontSize: 'x-large',
+        background: '-webkit-linear-gradient(180deg, rgba(253,163,2,1) 50%, rgb(200, 145, 2) 100%)',
+        WebkitBackgroundClip: 'text',
+        WebkitTextFillColor: 'transparent',
+        cursor: 'default',
+        userSelect: 'none',
+    }}>
+        BOOQS
+    </div>
 }

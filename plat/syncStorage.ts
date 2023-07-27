@@ -3,43 +3,54 @@ type CellValue<T> = {
     version: string | undefined,
 };
 export function syncStorageCell<T>(key: string, version?: string) {
-    const storage = process.browser
+    const storage = typeof window !== 'undefined'
         ? window.localStorage
-        : undefined;
+        : undefined
+    const listeners: ((value: T) => void)[] = []
     function store(value: T) {
         const cellValue = {
             value, version,
-        };
-        storage?.setItem(key, JSON.stringify(cellValue));
+        }
+        storage?.setItem(key, JSON.stringify(cellValue))
+        listeners.forEach(listener => listener(value))
     }
     function restore(): T | undefined {
         try {
-            const value = storage?.getItem(key);
+            const value = storage?.getItem(key)
             const parsed = value
                 ? JSON.parse(value) as CellValue<T>
-                : undefined;
+                : undefined
             if (version === parsed?.version) {
-                return parsed?.value;
+                return parsed?.value
             } else {
-                return undefined;
+                return undefined
             }
         } catch {
-            return undefined;
+            return undefined
         }
     }
     function update(value: Partial<T>) {
-        const prev = restore();
+        const prev = restore()
         if (prev) {
             store({
                 ...prev,
                 ...value,
-            });
+            })
         }
     }
     function clear() {
-        storage?.removeItem(key);
+        storage?.removeItem(key)
+    }
+    function subscribe(listener: (value: T) => void) {
+        listeners.push(listener)
+        return function unsubscribe() {
+            const index = listeners.indexOf(listener)
+            if (index > -1) {
+                listeners.splice(index, 1)
+            }
+        }
     }
     return {
-        store, update, restore, clear,
-    };
+        store, update, restore, clear, subscribe,
+    }
 }

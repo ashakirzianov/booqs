@@ -1,31 +1,33 @@
-import { Highlight, colorForGroup, UserData } from "app";
-import { isSmallScreen, meter, vars, boldWeight } from "controls/theme";
-import { BooqLink } from "controls/Links";
-import { Overlay } from "controls/Popover";
-import { Icon } from "controls/Icon";
-import { ContextMenuContent } from "reader/ContextMenuContent";
-import { ProfileBadge } from "controls/ProfilePicture";
+import { Highlight, colorForGroup, UserInfo } from '@/application'
+import { BooqLink } from '@/controls/Links'
+import { Popover } from '@/controls/Popover'
+import { Icon } from '@/controls/Icon'
+import { ContextMenuContent } from '@/reader/ContextMenuContent'
+import { ProfileBadge } from '@/controls/ProfilePicture'
 
 export function HighlightNodeComp({ booqId, highlight, self }: {
     booqId: string,
-    self: UserData | undefined,
+    self: UserInfo | undefined,
     highlight: Highlight,
 }) {
-    const smallScreen = isSmallScreen();
-    return <div className='container'>
-        <div className='content'>
+    const badgeClass = self?.id === highlight.author.id
+        ? 'hidden' : 'flex'
+    return <div className='container flex flex-1 justify-between pl-base' style={{
+        borderLeft: `3px solid ${colorForGroup(highlight.group)}`,
+    }}>
+        <div className='w-full text-primary text-justify'>
             <BooqLink booqId={booqId} path={highlight.start}>
                 {highlight.text}
             </BooqLink>
         </div>
-        <div className='side'>
-            <Overlay
+        <div className='flex flex-col justify-between items-stretch ml-lg'>
+            <Popover
                 placement='right-start'
-                hideOnClick={true}
-                anchor={<div className='more'>
+                hasAction={true}
+                anchor={<div className='flex justify-center cursor-pointer text-xl text-dimmed xl:text-background hover:text-highlight w-lg'>
                     <Icon name='more' />
                 </div>}
-                content={<div className='menu'>
+                content={<div className='w-48 pointer-events-auto text-primary'>
                     <ContextMenuContent
                         booqId={booqId}
                         self={self}
@@ -37,7 +39,7 @@ export function HighlightNodeComp({ booqId, highlight, self }: {
                     />
                 </div>}
             />
-            <div className='badge' title={highlight.author.name}>
+            <div className={`${badgeClass} mt-base`} title={highlight.author.name}>
                 <ProfileBadge
                     size={1}
                     name={highlight.author.name}
@@ -46,55 +48,5 @@ export function HighlightNodeComp({ booqId, highlight, self }: {
                 />
             </div>
         </div>
-        <style jsx>{`
-            .container {
-                display: flex;
-                flex: 1;
-                flex-flow: row;
-                justify-content: space-between;
-                border-left: 3px solid ${colorForGroup(highlight.group)};
-                padding-left: ${meter.regular};
-            }
-            .container:hover {
-            }
-            .content {
-                width: 100%;
-                color: var(${vars.primary});
-                text-align: justify;
-            }
-            .badge {
-                display: ${self?.id === highlight.author.id ? 'none' : 'flex'};
-                margin-top: ${meter.regular};
-            }
-            .side {
-                display: flex;
-                flex-flow: column;
-                justify-content: space-between;
-                align-items: stretch;
-                margin-left: ${meter.large};
-            }
-            .page {
-                margin-top: ${meter.regular};
-                font-weight: ${boldWeight};
-            }
-            .container:hover .more {
-                color: var(${vars.dimmed});
-            }
-            .more {
-                display: flex;
-                justify-content: center;
-                cursor: pointer;
-                font-size: x-large;
-                color: ${smallScreen ? `var(${vars.dimmed})` : `var(${vars.background})`};
-                width: ${meter.large};
-            }
-            .more:hover {
-                color: var(${vars.highlight});
-            }
-            .menu {
-                width: 12rem;
-                pointer-events: auto;
-            }
-            `}</style>
-    </div>;
+    </div>
 }
