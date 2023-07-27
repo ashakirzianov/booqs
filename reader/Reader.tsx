@@ -126,7 +126,7 @@ export function LoadingBooqScreen() {
 }
 
 function useControlsVisibility() {
-    const [visible, setVisible] = useState(true)
+    const [visible, setVisible] = useState(false)
     return {
         visible,
         toggle: useCallback(() => {
