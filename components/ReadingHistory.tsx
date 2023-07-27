@@ -7,7 +7,7 @@ import { useAuth } from '@/application/auth'
 import { useHistory } from '@/application/history'
 import { pageForPosition } from '@/application/common'
 import { useIsMounted } from '@/application/utils'
-import { Ellipsis, Spinner } from './Loading'
+import { Ellipsis } from './Loading'
 
 export default function ReadingHistory() {
     const { signed } = useAuth() ?? {}
@@ -34,12 +34,6 @@ function SignInPanel() {
         </span>
         {ModalContent}
     </Panel>
-}
-
-function EmptyHistory() {
-    return <div className='flex flex-col items-center justify-center h-60'>
-        <span className='font-bold'>Your reading history will appear here</span>
-    </div>
 }
 
 function Panel({ children }: {
