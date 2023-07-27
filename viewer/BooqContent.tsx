@@ -1,22 +1,18 @@
-import React, { useCallback, useMemo } from 'react'
-import { BooqPath, BooqRange, BooqNode } from '@/core'
-import { useDocumentEvent } from '@/controls/utils'
-import { useOnBooqScroll } from './scroll'
+import React, { useEffect, useMemo } from 'react'
+import { BooqRange, BooqNode } from '@/core'
 import { DumbBooqContent, isEventOnContent } from './DumbBooqContent'
 import { Augmentation } from './render'
 
 export function BooqContent({
     booqId, nodes, range, augmentations,
-    onAugmentationClick, onClick,
+    onAugmentationClick,
 }: {
     booqId: string,
     nodes: BooqNode[],
     range: BooqRange,
     augmentations: Augmentation[],
     onAugmentationClick?: (id: string) => void,
-    onClick?: () => void,
 }) {
-    useOnClick(onClick)
     return useMemo(function () {
         return <DumbBooqContent
             booqId={booqId}
@@ -28,11 +24,19 @@ export function BooqContent({
     }, [nodes, booqId, range, augmentations, onAugmentationClick])
 }
 
-function useOnClick(callback?: () => void) {
-    const actual = useCallback((event: Event) => {
-        if (callback && isEventOnContent(event)) {
-            callback()
+// TODO: remove this
+export function useOnBooqClick(callback?: () => void) {
+    useEffect(() => {
+        if (callback) {
+            const actual = (event: Event) => {
+                if (isEventOnContent(event)) {
+                    callback()
+                }
+            }
+            window.addEventListener('click', actual)
+            return () => {
+                window.removeEventListener('click', actual)
+            }
         }
     }, [callback])
-    useDocumentEvent('click', actual)
 }

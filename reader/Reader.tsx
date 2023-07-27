@@ -13,6 +13,7 @@ import { SignIn } from '@/components/SignIn'
 import {
     BooqContent, getAugmentationElement, getAugmentationText,
     Augmentation,
+    useOnBooqClick,
 } from '@/viewer'
 import { useContextMenu, ContextMenuState } from './ContextMenu'
 import { useNavigationPanel } from './Navigation'
@@ -36,6 +37,7 @@ export function Reader({
     }), [booq])
     const { augmentations, menuStateForAugmentation } = useAugmentations(booq.id, quote)
     const { visible, toggle } = useControlsVisibility()
+    useOnBooqClick(toggle)
 
     const pagesLabel = `${currentPage} of ${totalPages}`
     const leftLabel = leftPages <= 1 ? 'Last page'
@@ -69,7 +71,6 @@ export function Reader({
                 nodes={booq.fragment.nodes}
                 range={range}
                 augmentations={augmentations}
-                onClick={toggle}
                 onAugmentationClick={onAugmentationClick}
             />
         </div>}
