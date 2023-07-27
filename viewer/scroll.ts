@@ -1,7 +1,6 @@
 import { useEffect } from 'react'
 import { throttle } from 'lodash'
-import { BooqPath } from '@/core'
-import { pathFromId } from '@/application'
+import { BooqPath, pathFromId } from '@/core'
 
 export function useOnBooqScroll(callback?: (path: BooqPath) => void) {
     useEffect(() => {

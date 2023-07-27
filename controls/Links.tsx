@@ -1,7 +1,6 @@
 import React, { ReactNode } from 'react'
 import Link from 'next/link'
-import { BooqPath, pathToString, BooqRange, rangeToString } from '@/core'
-import { pathToId } from '@/application/common'
+import { BooqPath, pathToString, BooqRange, rangeToString, pathToId } from '@/core'
 
 export function BooqLink({ booqId, path, children }: {
     booqId: string,

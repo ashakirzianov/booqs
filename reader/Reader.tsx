@@ -6,7 +6,7 @@ import {
     useFilteredHighlights, colorForGroup, quoteColor, pageForPosition,
 } from '@/application'
 import { BorderButton, IconButton } from '@/controls/Buttons'
-import { BooqLink, FeedLink } from '@/controls/Links'
+import { BooqLink, FeedLink, booqHref } from '@/controls/Links'
 import { Spinner } from '@/controls/Spinner'
 import { Themer } from '@/components/Themer'
 import { SignIn } from '@/components/SignIn'
@@ -72,6 +72,7 @@ export function Reader({
                 range={range}
                 augmentations={augmentations}
                 onAugmentationClick={onAugmentationClick}
+                hrefForPath={booqHref}
             />
         </div>}
         PrevButton={<AnchorButton

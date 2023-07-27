@@ -1,10 +1,8 @@
 import { ReactNode, createElement } from 'react'
 import {
-    BooqPath, BooqRange, BooqElementNode, BooqNode, pathToString,
-    pathInRange, samePath, pathLessThan,
+    BooqElementNode, BooqNode, pathToString,
+    pathInRange, samePath, pathLessThan, BooqPath, BooqRange, pathToId,
 } from '@/core'
-import { pathToId } from '@/application'
-import { booqHref } from '@/controls/Links'
 
 export type Augmentation = {
     range: BooqRange,
@@ -20,6 +18,7 @@ type RenderContext = {
     withinAnchor?: boolean,
     augmentations: Augmentation[],
     onAugmentationClick?: (id: string) => void,
+    hrefForPath?: (booqId: string, path: BooqPath) => string,
 };
 export function renderNodes(nodes: BooqNode[], ctx: RenderContext): ReactNode {
     const result = nodes.map(
@@ -92,7 +91,7 @@ function renderTextNode(text: string, {
     )
 }
 
-function getProps(node: BooqElementNode, { path, booqId, range }: RenderContext) {
+function getProps(node: BooqElementNode, { path, booqId, range, hrefForPath }: RenderContext) {
     return {
         ...node.attrs,
         id: pathToId(path),
@@ -101,7 +100,13 @@ function getProps(node: BooqElementNode, { path, booqId, range }: RenderContext)
         style: node.style,
         key: pathToString(path),
         href: node.ref
-            ? hrefForPath(node.ref, booqId, range)
+            ? (
+                pathInRange(node.ref, range)
+                    ? `#${pathToId(node.ref)}`
+                    : hrefForPath ?
+                        hrefForPath(booqId, node.ref)
+                        : node.attrs?.href
+            )
             : node.attrs?.href,
         src: node.attrs?.src
             ? (
@@ -119,14 +124,6 @@ function isExternalSrc(src: string) {
 
 function imageFullSrc(booqId: string, src: string) {
     return `https://booqs-images.s3.amazonaws.com/${booqId}/${src}`
-}
-
-function hrefForPath(path: BooqPath, booqId: string, range: BooqRange): string {
-    if (pathInRange(path, range)) {
-        return `#${pathToId(path)}`
-    } else {
-        return booqHref(booqId, path)
-    }
 }
 
 function getChildren(node: BooqElementNode, ctx: RenderContext) {

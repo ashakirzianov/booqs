@@ -1,17 +1,17 @@
 import { useEffect, useMemo } from 'react'
-import { BooqRange, BooqNode } from '@/core'
 import { Augmentation, renderNodes } from './render'
-import { pathFromId } from '@/application'
+import { BooqNode, BooqPath, BooqRange, pathFromId } from '@/core'
 
 export function BooqContent({
     booqId, nodes, range, augmentations,
-    onAugmentationClick,
+    onAugmentationClick, hrefForPath,
 }: {
     booqId: string,
     nodes: BooqNode[],
     range: BooqRange,
     augmentations: Augmentation[],
     onAugmentationClick?: (id: string) => void,
+    hrefForPath?: (booqId: string, path: BooqPath) => string,
 }) {
     return useMemo(function () {
         return <div id='booq-root' className='container'>
@@ -19,10 +19,11 @@ export function BooqContent({
                 renderNodes(nodes, {
                     path: [],
                     booqId, range, augmentations, onAugmentationClick,
+                    hrefForPath,
                 })
             }
         </div>
-    }, [nodes, booqId, range, augmentations, onAugmentationClick])
+    }, [nodes, booqId, range, augmentations, onAugmentationClick, hrefForPath])
 }
 
 // TODO: remove this
