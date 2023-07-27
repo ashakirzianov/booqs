@@ -28,7 +28,7 @@ const description = 'Your personal reading assistant'
 export const metadata: Metadata = {
     title, description,
     themeColor: '#FFA500',
-    manifest: `${process.env.NEXT_PUBLIC_URL}/manifest.json`,
+    manifest: `/manifest.json`,
 }
 
 export default function RootLayout({
