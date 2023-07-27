@@ -106,7 +106,7 @@ export function useContextMenu(booqId: string) {
 
     const ContextMenuNode = isOpen ? (
         <div
-            className='bg-background rounded shadow border border-border pointer-events-auto w-40'
+            className='bg-background rounded drop-shadow-2xl border border-border pointer-events-auto w-40'
             ref={setFloating}
             style={{
                 ...floatingStyles,
