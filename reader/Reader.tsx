@@ -30,7 +30,9 @@ export function Reader({
     const {
         onScroll, currentPath, currentPage, totalPages, leftPages,
     } = useScrollHandler(booq)
-    useOnBooqScroll(onScroll)
+    useOnBooqScroll(onScroll, {
+        throttle: 500,
+    })
     const range: BooqRange = useMemo(() => ({
         start: booq.fragment.current.path,
         end: booq.fragment.next?.path ?? [booq.fragment.nodes.length],

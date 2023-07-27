@@ -1,20 +1,27 @@
 import { useEffect } from 'react'
-import { throttle } from 'lodash'
 import { BooqPath, pathFromId } from '@/core'
 
-export function useOnBooqScroll(callback?: (path: BooqPath) => void) {
+export type BooqScrollContext = {
+    getCurrentPath?: () => BooqPath | undefined,
+}
+export function useOnBooqScroll(callback?: (path: BooqPath) => void, options?: {
+    throttle?: number,
+}) {
     useEffect(() => {
         if (callback) {
-            const handleScroll = throttle(function () {
+            let handleScroll = function () {
                 const path = getCurrentPath()
                 if (path) {
                     callback(path)
                 }
-            }, 500)
+            }
+            if (options?.throttle) {
+                handleScroll = throttle(handleScroll, options.throttle)
+            }
             window.addEventListener('scroll', handleScroll)
             return () => window.removeEventListener('scroll', handleScroll)
         }
-    }, [callback])
+    }, [callback, options?.throttle])
 }
 
 function getCurrentPath() {
@@ -53,4 +60,15 @@ function isPartiallyVisible(element: Element): boolean {
     }
 
     return false
+}
+
+function throttle<Args extends any[]>(func: (...args: Args) => void, limit: number): (...args: Args) => void {
+    let inThrottle: boolean = false
+    return function (...args) {
+        if (!inThrottle) {
+            func(...args)
+            inThrottle = true
+            setTimeout(() => inThrottle = false, limit)
+        }
+    }
 }
