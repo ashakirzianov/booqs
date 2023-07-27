@@ -1,7 +1,7 @@
 'use client'
 import { IconButton } from '@/components/Buttons'
 import { useSelectFileDialog } from '@/components/SelectFileDialog'
-import { Spinner } from '@/components/Spinner'
+import { Spinner } from '@/components/Loading'
 import { Popover } from '@/components/Popover'
 import { useModal } from '@/components/Modal'
 import { BooqCover } from '@/components/BooqCover'

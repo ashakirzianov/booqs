@@ -1,6 +1,6 @@
 import React from 'react'
 import { BooqCover } from '@/components/BooqCover'
-import { Spinner } from '@/components/Spinner'
+import { Spinner } from '@/components/Loading'
 import { useCollection } from '@/application/collections'
 
 export function Collection({ name }: {

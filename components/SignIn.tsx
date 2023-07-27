@@ -7,7 +7,7 @@ import { useModal } from '@/components/Modal'
 import { User, useAuth, useSignInOptions } from '@/application/auth'
 import { Popover } from './Popover'
 import { useIsMounted } from '@/application/utils'
-import { Spinner } from './Spinner'
+import { Spinner } from './Loading'
 
 export function useSignInModal() {
     const { signWithApple, signWithFacebook } = useSignInOptions()

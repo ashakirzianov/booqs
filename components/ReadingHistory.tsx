@@ -1,19 +1,26 @@
 'use client'
-import React from 'react'
+import React, { ReactNode } from 'react'
 import { BooqPreview } from '@/components/BooqPreview'
 import { BooqLink } from '@/components/Links'
 import { useSignInModal } from './SignIn'
 import { useAuth } from '@/application/auth'
 import { useHistory } from '@/application/history'
 import { pageForPosition } from '@/application/common'
+import { useIsMounted } from '@/application/utils'
+import { Ellipsis, Spinner } from './Loading'
 
 export default function ReadingHistory() {
     const { signed } = useAuth() ?? {}
     const { history } = useHistory()
-    if (!signed) {
+    const mounted = useIsMounted()
+    if (!mounted) {
+        return <Panel><Ellipsis /></Panel>
+    } else if (!signed) {
         return <SignInPanel />
     } else if (!history.length) {
-        return <EmptyHistory />
+        return <Panel>
+            <span className='font-bold'>Your reading history will appear here</span>
+        </Panel>
     } else {
         return <HistoryItems items={history} />
     }
@@ -21,17 +28,25 @@ export default function ReadingHistory() {
 
 function SignInPanel() {
     const { openModal, ModalContent } = useSignInModal()
-    return <div className='flex flex-col items-center justify-center h-60'>
+    return <Panel>
         <span className='font-bold mb-lg'>
             <span className='cursor-pointer underline decoration-2 text-action hover:text-highlight' onClick={openModal}>Sign in</span> to see history
         </span>
         {ModalContent}
-    </div>
+    </Panel>
 }
 
 function EmptyHistory() {
     return <div className='flex flex-col items-center justify-center h-60'>
         <span className='font-bold'>Your reading history will appear here</span>
+    </div>
+}
+
+function Panel({ children }: {
+    children: ReactNode,
+}) {
+    return <div className='flex flex-col items-center justify-center h-60'>
+        {children}
     </div>
 }
 

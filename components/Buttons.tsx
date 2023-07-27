@@ -1,6 +1,6 @@
 import React from 'react'
 import { Icon, IconName } from './Icon'
-import { Spinner } from './Spinner'
+import { Spinner } from './Loading'
 
 export function IconButton({ icon, onClick, isSelected }: {
     icon: IconName,

@@ -3,7 +3,7 @@ import React, { useState, useCallback, useMemo } from 'react'
 import { positionForPath, samePath, BooqPath, BooqRange } from '@/core'
 import { BorderButton, IconButton } from '@/components/Buttons'
 import { BooqLink, FeedLink, booqHref } from '@/components/Links'
-import { Spinner } from '@/components/Spinner'
+import { Spinner } from '@/components/Loading'
 import { Themer } from '@/components/Themer'
 import { SignIn } from '@/components/SignIn'
 import {
