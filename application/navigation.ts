@@ -2,7 +2,7 @@ import { groupBy } from 'lodash'
 import { pathInRange } from '@/core'
 import { User } from './auth'
 import { useMemo } from 'react'
-import { useUserData, useUserDataUpdater } from './userData'
+import { useAppState, useAppStateSetter } from './state'
 import { TocItem, useToc } from './toc'
 import { Highlight, useHighlights } from './highlights'
 
@@ -22,7 +22,7 @@ export type PathHighlightsNode = {
 export type NavigationNode = TocNode | HighlightNode | PathHighlightsNode;
 
 export function useNavigationNodes(booqId: string, self?: User) {
-    const { showChapters, showHighlights, showAuthors } = useUserData().navigationState
+    const { showChapters, showHighlights, showAuthors } = useAppState().navigationState
     const { toc, title } = useToc(booqId)
     const { highlights } = useHighlights(booqId)
     const authors = highlightsAuthors(highlights)
@@ -49,7 +49,7 @@ export function useNavigationNodes(booqId: string, self?: User) {
 }
 
 export function useFilteredHighlights(booqId: string, self: User | undefined) {
-    const { showHighlights, showAuthors } = useUserData().navigationState
+    const { showHighlights, showAuthors } = useAppState().navigationState
     const { highlights } = useHighlights(booqId)
 
     return useMemo(() => {
@@ -65,8 +65,8 @@ export function useFilteredHighlights(booqId: string, self: User | undefined) {
 }
 
 export function useNavigationState() {
-    const { showChapters, showHighlights, showAuthors } = useUserData().navigationState
-    const setter = useUserDataUpdater()
+    const { showChapters, showHighlights, showAuthors } = useAppState().navigationState
+    const setter = useAppStateSetter()
     return {
         showChapters, showHighlights, showAuthors,
         toggleChapters() {

@@ -1,4 +1,4 @@
-import { useUserData, useUserDataUpdater } from './userData'
+import { useAppState, useAppStateSetter } from './state'
 
 type Palette = {
     background: string,
@@ -21,7 +21,7 @@ export function usePalette() {
 }
 
 export function useSettings() {
-    const { paletteName, fontScale } = useUserData().settings
+    const { paletteName, fontScale } = useAppState().settings
     const palette = palettes[paletteName] ?? palettes.light
     return {
         palette,
@@ -30,7 +30,7 @@ export function useSettings() {
     }
 }
 export function useSetSettings() {
-    const setter = useUserDataUpdater()
+    const setter = useAppStateSetter()
     return {
         setPalette(paletteName: PaletteName) {
             setter(data => ({

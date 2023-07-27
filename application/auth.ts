@@ -2,7 +2,7 @@ import { ApolloClient } from '@apollo/client'
 import { useApolloClient } from '@apollo/react-hooks'
 import gql from 'graphql-tag'
 import { social } from './social'
-import { useUserData, useUserDataUpdater } from './userData'
+import { useAppState, useAppStateSetter } from './state'
 
 export type User = {
     id: string,
@@ -15,7 +15,7 @@ export type AuthState = User & {
 type AuthStateSetter = (f: (value?: AuthState) => AuthState | undefined) => void
 
 export function useAuth() {
-    const current = useUserData().currentUser
+    const current = useAppState().currentUser
 
     if (current) {
         return {
@@ -30,7 +30,7 @@ export function useAuth() {
 
 export function useSignInOptions() {
     const client = useApolloClient()
-    const userDataSetter = useUserDataUpdater()
+    const userDataSetter = useAppStateSetter()
     function authSetter(f: (value?: AuthState) => AuthState | undefined) {
         userDataSetter(data => ({
             ...data,

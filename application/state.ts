@@ -5,15 +5,15 @@ import { Settings } from './settings'
 import { NavigationState } from './navigation'
 
 export type SetterOrUpdater<T> = (value: T | ((prev: T) => T)) => void
-export type UserData = {
+export type AppState = {
     currentUser?: AuthState,
     settings: Settings,
     navigationState: NavigationState,
 }
 
 const key = 'user-data'
-const storage = syncStorageCell<UserData>(key, '0.1.0')
-const initialData: UserData = {
+const storage = syncStorageCell<AppState>(key, '0.1.0')
+const initialData: AppState = {
     currentUser: undefined,
     settings: {
         paletteName: 'light',
@@ -28,10 +28,10 @@ const initialData: UserData = {
 
 const userContext = createContext({
     data: initialData,
-    setData: (data: UserData | ((v: UserData) => UserData)) => { },
+    setData: (data: AppState | ((v: AppState) => AppState)) => { },
 })
 
-export function UserDataProvider({ children }: {
+export function AppStateProvider({ children }: {
     children: ReactNode,
 }) {
     const [data, setData] = useState(initialData)
@@ -84,10 +84,10 @@ export function UserDataProvider({ children }: {
     )
 }
 
-export function useUserData() {
+export function useAppState() {
     return useContext(userContext).data
 }
 
-export function useUserDataUpdater() {
+export function useAppStateSetter() {
     return useContext(userContext).setData
 }
