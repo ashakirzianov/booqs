@@ -13,12 +13,11 @@ import { SignIn } from '@/components/SignIn'
 import {
     BooqContent, getAugmentationElement, getAugmentationText,
     Augmentation,
-    useOnBooqClick,
+    useOnBooqClick, useOnBooqScroll,
 } from '@/viewer'
 import { useContextMenu, ContextMenuState } from './ContextMenu'
 import { useNavigationPanel } from './Navigation'
 import { ReaderLayout } from './ReaderLayout'
-import { useOnBooqScroll } from '@/viewer/scroll'
 
 export function Reader({
     booq, quote,
