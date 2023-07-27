@@ -27,6 +27,8 @@ const title = 'Booqs'
 const description = 'Your personal reading assistant'
 export const metadata: Metadata = {
     title, description,
+    themeColor: '#FFA500',
+    manifest: `${process.env.NEXT_PUBLIC_URL}/manifest.json`,
 }
 
 export default function RootLayout({
