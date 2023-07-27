@@ -14,8 +14,8 @@ export function Themer() {
 function ThemerPanel() {
     return <div className="flex flex-1 flex-col py-xl px-base">
         <FontSettings />
-        <hr className='my-xl w-4/5 self-center border-t border-border' />
-        <PalettePicker />
+        {/* <hr className='my-xl w-4/5 self-center border-t border-border' />
+        <PalettePicker /> */}
     </div>
 }
 
@@ -36,7 +36,7 @@ function FontScaleButton({ scale, onClick }: {
         ? 'text-2xl'
         : 'text-lg'
     return <div className='cursor-pointer' onClick={onClick}>
-        <span className={`${fontSizeClass} font-book transition hover:text-highlight`}>Abc</span>
+        <span className={`${fontSizeClass} font-book transition text-action hover:text-highlight drop-shadow-md`}>Abc</span>
     </div>
 }
 
