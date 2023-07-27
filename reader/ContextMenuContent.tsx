@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import * as clipboard from 'clipboard-polyfill'
 import { BooqRange } from '@/core'
@@ -6,7 +6,6 @@ import {
     useHighlightMutations, Highlight, colorForGroup, groups, UserInfo,
 } from '@/application'
 import { MenuItem } from '@/controls/Menu'
-import { useDocumentEvent } from '@/controls/utils'
 import { quoteHref } from '@/controls/Links'
 import { BooqSelection } from '@/viewer'
 import { ProfileBadge } from '@/controls/ProfilePicture'
@@ -345,14 +344,20 @@ function CopyLinkItem({
 
 function useCopyQuote(booqId: string, selection?: BooqSelection) {
     const { prefetch } = useRouter()
-    useDocumentEvent('copy', useCallback(e => {
-        if (selection && e.clipboardData) {
-            e.preventDefault()
-            const selectionText = generateQuote(booqId, selection.text, selection.range)
-            e.clipboardData.setData('text/plain', selectionText)
-            prefetch(quoteHref(booqId, selection.range))
+    useEffect(() => {
+        function handleCopy(e: ClipboardEvent) {
+            if (selection && e.clipboardData) {
+                e.preventDefault()
+                const selectionText = generateQuote(booqId, selection.text, selection.range)
+                e.clipboardData.setData('text/plain', selectionText)
+                prefetch(quoteHref(booqId, selection.range))
+            }
         }
-    }, [selection, booqId, prefetch]))
+        window.addEventListener('copy', handleCopy)
+        return () => {
+            window.removeEventListener('copy', handleCopy)
+        }
+    }, [selection, booqId, prefetch])
 }
 
 function removeSelection() {

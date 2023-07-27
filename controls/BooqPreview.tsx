@@ -1,7 +1,4 @@
 import { BooqPath } from '@/core'
-import { PropsType } from './utils'
-
-export type BooqPreviewProps = PropsType<typeof BooqPreview>;
 
 export function BooqPreview({
     text,
