@@ -2,13 +2,13 @@ import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import * as clipboard from 'clipboard-polyfill'
 import { BooqRange } from '@/core'
-import {
-    useHighlightMutations, Highlight, colorForGroup, groups, UserInfo,
-} from '@/application'
 import { MenuItem } from '@/controls/Menu'
 import { quoteHref } from '@/controls/Links'
 import { BooqSelection } from '@/viewer'
 import { ProfileBadge } from '@/controls/ProfilePicture'
+import { Highlight, useHighlightMutations } from '@/application/highlights'
+import { UserInfo } from '@/application/auth'
+import { colorForGroup, groups } from '@/application/common'
 
 type EmptyTarget = {
     kind: 'empty',

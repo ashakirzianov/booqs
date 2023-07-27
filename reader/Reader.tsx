@@ -1,10 +1,6 @@
 'use client'
 import React, { useState, useCallback, useMemo } from 'react'
 import { positionForPath, samePath, BooqPath, BooqRange } from '@/core'
-import {
-    BooqData, BooqAnchor, useSettings, useReportHistory,
-    useFilteredHighlights, colorForGroup, quoteColor, pageForPosition,
-} from '@/application'
 import { BorderButton, IconButton } from '@/controls/Buttons'
 import { BooqLink, FeedLink, booqHref } from '@/controls/Links'
 import { Spinner } from '@/controls/Spinner'
@@ -18,6 +14,11 @@ import {
 import { useContextMenu, ContextMenuState } from './ContextMenu'
 import { useNavigationPanel } from './Navigation'
 import { ReaderLayout } from './ReaderLayout'
+import { BooqAnchor, BooqData } from '@/application/booq'
+import { useSettings } from '@/application/settings'
+import { useFilteredHighlights } from '@/application/navigation'
+import { colorForGroup, pageForPosition, quoteColor } from '@/application/common'
+import { useReportHistory } from '@/application/history'
 
 export function Reader({
     booq, quote,

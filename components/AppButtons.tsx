@@ -1,5 +1,4 @@
-'use client'
-import { AppProvider } from '@/application'
+import { AppProvider } from '@/application/provider'
 import { SignIn } from '@/components/SignIn'
 import { Upload } from '@/components/Upload'
 

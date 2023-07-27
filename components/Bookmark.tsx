@@ -1,7 +1,9 @@
+'use client'
 import React from 'react'
 import { BooqPath, samePath } from '@/core'
-import { useBookmarks, useBookmarkMutations, useAuth } from '@/application'
 import { IconButton } from '@/controls/Buttons'
+import { useAuth } from '@/application/auth'
+import { useBookmarkMutations, useBookmarks } from '@/application/bookmarks'
 
 export function BookmarkButton({ booqId, path }: {
     booqId: string,

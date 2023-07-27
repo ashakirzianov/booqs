@@ -2,8 +2,8 @@ import { BooqPath, BooqRange, BooqNode } from '@/core'
 import { BorderButton, IconButton } from '@/controls/Buttons'
 import { BooqLink, FeedLink } from '@/controls/Links'
 import { ReaderLayout } from './ReaderLayout'
-import { quoteColor } from '@/application'
 import { Augmentation, BooqContent } from '@/viewer'
+import { quoteColor } from '@/application/common'
 
 type BooqAnchor = {
     title?: string,

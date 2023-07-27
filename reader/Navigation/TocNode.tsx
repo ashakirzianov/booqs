@@ -1,4 +1,5 @@
-import { pageForPosition, TocNode } from '@/application'
+import { pageForPosition } from '@/application/common'
+import { TocNode } from '@/application/navigation'
 import { BooqLink } from '@/controls/Links'
 
 

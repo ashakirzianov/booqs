@@ -1,10 +1,10 @@
+'use client'
 import React from 'react'
-import { useSignInOptions, useAuth } from '@/application'
 import { Menu, MenuItem } from '@/controls/Menu'
 import { IconButton } from '@/controls/Buttons'
-import { Popover } from '@/controls/Popover'
 import { ProfileBadge } from '@/controls/ProfilePicture'
 import { useModal } from '@/controls/Modal'
+import { useAuth, useSignInOptions } from '@/application/auth'
 
 export function useSignInModal() {
     const { signWithApple, signWithFacebook } = useSignInOptions()

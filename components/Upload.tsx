@@ -1,4 +1,4 @@
-import { useAuth, useUpload } from '@/application'
+'use client'
 import { IconButton } from '@/controls/Buttons'
 import { useSelectFileDialog } from '@/controls/SelectFileDialog'
 import { Spinner } from '@/controls/Spinner'
@@ -7,6 +7,8 @@ import { useModal } from '@/controls/Modal'
 import { BooqCover } from '@/controls/BooqCover'
 import { booqHref } from '@/controls/Links'
 import { useSignInModal } from './SignIn'
+import { useAuth } from '@/application/auth'
+import { useUpload } from '@/application/upload'
 
 export function Upload() {
     const { signed } = useAuth() ?? {}

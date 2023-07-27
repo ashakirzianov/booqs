@@ -1,12 +1,10 @@
 import { groupBy } from 'lodash'
 import { pathInRange } from '@/core'
-import {
-    TocItem, Highlight, useToc, useHighlights, UserInfo,
-} from '@/application'
-import { syncStorageCell } from '@/plat'
-import { useAuth } from './auth'
+import { UserInfo, useAuth } from './auth'
 import { useMemo } from 'react'
 import { useUserData, useUserDataUpdater } from './userData'
+import { TocItem, useToc } from './toc'
+import { Highlight, useHighlights } from './highlights'
 
 export type TocNode = {
     kind: 'toc',

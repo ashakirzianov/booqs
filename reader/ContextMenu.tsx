@@ -7,7 +7,7 @@ import {
     getBooqSelection, VirtualElement, getSelectionElement,
 } from '@/viewer'
 import { ContextMenuContent, ContextMenuTarget } from './ContextMenuContent'
-import { useAuth } from '@/application'
+import { useAuth } from '@/application/auth'
 
 export type ContextMenuState = {
     target: ContextMenuTarget,

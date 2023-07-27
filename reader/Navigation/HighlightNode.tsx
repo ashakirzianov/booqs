@@ -1,9 +1,11 @@
-import { Highlight, colorForGroup, UserInfo } from '@/application'
 import { BooqLink } from '@/controls/Links'
 import { Popover } from '@/controls/Popover'
 import { Icon } from '@/controls/Icon'
 import { ContextMenuContent } from '@/reader/ContextMenuContent'
 import { ProfileBadge } from '@/controls/ProfilePicture'
+import { Highlight } from '@/application/highlights'
+import { UserInfo } from '@/application/auth'
+import { colorForGroup } from '@/application/common'
 
 export function HighlightNodeComp({ booqId, highlight, self }: {
     booqId: string,
