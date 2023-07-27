@@ -5,6 +5,7 @@ import {
     useDismiss, useRole, useClick, useInteractions,
     FloatingFocusManager, useId, useHover,
     safePolygon, FloatingArrow, arrow,
+    useTransitionStyles,
 } from '@floating-ui/react'
 
 export function Popover({
@@ -53,6 +54,20 @@ export function Popover({
         hover,
     ])
 
+    const { styles: transitionStyles } = useTransitionStyles(context, {
+        duration: 300,
+        initial({ side }) {
+            const translate = side === 'top' ? 'translateY(-20%)'
+                : side === 'bottom' ? 'translateY(20%)'
+                    : side === 'left' ? 'translateX(-20%)'
+                        : 'translateX(20%)'
+            return {
+                opacity: 0,
+                transform: `${translate} scale(0.9)`,
+            }
+        },
+    })
+
     const headingId = useId()
 
     return (
@@ -76,6 +91,7 @@ export function Popover({
                     >
                         <div
                             className='bg-background rounded min-w-[10rem] min-h-[5rem] flex items-center justify-center'
+                            style={transitionStyles}
                         >
                             <FloatingArrow
                                 ref={arrowRef}
