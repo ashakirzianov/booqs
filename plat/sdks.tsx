@@ -1,16 +1,15 @@
 'use client'
 /*global globalThis*/
 import Script from 'next/script'
-import { useEffect } from 'react'
 
 export function SdksHead() {
-    useEffect(() => {
-        initAppleSdk()
-        initFbSdk()
-    }, [])
     return <>
-        <Script type="text/javascript" src="https://appleid.cdn-apple.com/appleauth/static/jsapi/appleid/1/en_US/appleid.auth.js" />
-        <Script async defer crossOrigin='anonymous' src="https://connect.facebook.net/en_US/sdk.js" />
+        <Script type="text/javascript" src="https://appleid.cdn-apple.com/appleauth/static/jsapi/appleid/1/en_US/appleid.auth.js"
+            onLoad={initAppleSdk}
+        />
+        <Script async defer crossOrigin='anonymous' src="https://connect.facebook.net/en_US/sdk.js"
+            onLoad={initFbSdk}
+        />
     </>
 }
 
