@@ -1,5 +1,5 @@
 'use client'
-import React, { ReactNode, ReactElement, useState, useRef } from 'react'
+import React, { ReactNode, useState, useRef } from 'react'
 import {
     useFloating, autoUpdate, offset, flip, shift,
     useDismiss, useRole, useClick, useInteractions,
@@ -7,25 +7,13 @@ import {
     safePolygon, FloatingArrow, arrow,
 } from '@floating-ui/react'
 
-// TODO: implement
-export function Overlay({
-    anchor, content, placement, visible, hideOnClick,
-}: {
-    anchor: ReactElement,
-    content: ReactNode,
-    placement: 'bottom' | 'right-start',
-    visible?: boolean,
-    hideOnClick?: boolean,
-}) {
-    return anchor
-}
-
 export function Popover({
-    anchor, content, hasAction,
+    anchor, content, hasAction, placement,
 }: {
     anchor: ReactNode,
     content: ReactNode,
     hasAction?: boolean,
+    placement?: 'bottom' | 'right-start',
 }) {
     const [isOpen, setIsOpen] = useState(false)
     const arrowRef = useRef(null)
@@ -42,9 +30,9 @@ export function Popover({
             arrow({
                 element: arrowRef,
             }),
-            // hide(),
         ],
         whileElementsMounted: autoUpdate,
+        placement,
     })
 
     const click = useClick(context, {
@@ -79,19 +67,23 @@ export function Popover({
                 >
                     <div
                         ref={refs.setFloating}
-                        style={floatingStyles}
+                        style={{
+                            ...floatingStyles,
+                            filter: 'drop-shadow(0 0 2px var(--theme-border))',
+                        }}
                         aria-labelledby={headingId}
                         {...getFloatingProps()}
-                        className='px-4'
                     >
                         <div
-                            className='bg-background rounded drop-shadow min-w-[10rem] min-h-[5rem] flex items-center justify-center'
+                            className='bg-background rounded min-w-[10rem] min-h-[5rem] flex items-center justify-center'
                         >
                             <FloatingArrow
                                 ref={arrowRef}
                                 context={context}
                                 fill='var(--theme-background)'
                                 stroke='var(--theme-border)'
+                                // strokeWidth={1}
+                                tipRadius={4}
                             />
                             {content}
                         </div>

@@ -1,4 +1,4 @@
-import React, { useCallback, ReactNode, useState, useEffect, useRef } from 'react'
+import { useCallback, ReactNode, useState, useEffect } from 'react'
 import {
     useFloating, useDismiss, useInteractions,
     flip, shift, inline, autoUpdate
@@ -37,7 +37,6 @@ export function useContextMenu(booqId: string) {
         whileElementsMounted: autoUpdate
     })
 
-    // TODO: do we need this?
     const dismiss = useDismiss(context)
 
     const { getFloatingProps } = useInteractions([

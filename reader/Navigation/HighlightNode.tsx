@@ -1,6 +1,6 @@
 import { Highlight, colorForGroup, UserInfo } from '@/application'
 import { BooqLink } from '@/controls/Links'
-import { Overlay } from '@/controls/Popover'
+import { Popover } from '@/controls/Popover'
 import { Icon } from '@/controls/Icon'
 import { ContextMenuContent } from '@/reader/ContextMenuContent'
 import { ProfileBadge } from '@/controls/ProfilePicture'
@@ -21,13 +21,13 @@ export function HighlightNodeComp({ booqId, highlight, self }: {
             </BooqLink>
         </div>
         <div className='flex flex-col justify-between items-stretch ml-lg'>
-            <Overlay
+            <Popover
                 placement='right-start'
-                hideOnClick={true}
+                hasAction={true}
                 anchor={<div className='flex justify-center cursor-pointer text-xl text-dimmed xl:text-background hover:text-highlight w-lg'>
                     <Icon name='more' />
                 </div>}
-                content={<div className='w-48 pointer-events-auto'>
+                content={<div className='w-48 pointer-events-auto text-primary'>
                     <ContextMenuContent
                         booqId={booqId}
                         self={self}
