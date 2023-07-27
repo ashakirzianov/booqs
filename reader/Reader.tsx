@@ -1,22 +1,24 @@
 'use client'
 import React, { useState, useCallback, useMemo } from 'react'
 import { positionForPath, samePath, BooqPath, BooqRange } from '@/core'
-import {
-    BooqData, BooqAnchor, useSettings, useReportHistory,
-    useFilteredHighlights, colorForGroup, quoteColor, pageForPosition,
-} from '@/application'
-import { BorderButton, IconButton } from '@/controls/Buttons'
-import { BooqLink, FeedLink } from '@/controls/Links'
-import { Spinner } from '@/controls/Spinner'
+import { BorderButton, IconButton } from '@/components/Buttons'
+import { BooqLink, FeedLink, booqHref } from '@/components/Links'
+import { Spinner } from '@/components/Spinner'
 import { Themer } from '@/components/Themer'
 import { SignIn } from '@/components/SignIn'
 import {
     BooqContent, getAugmentationElement, getAugmentationText,
-} from './BooqContent'
+    Augmentation,
+    useOnBooqClick, useOnBooqScroll,
+} from '@/viewer'
 import { useContextMenu, ContextMenuState } from './ContextMenu'
 import { useNavigationPanel } from './Navigation'
 import { ReaderLayout } from './ReaderLayout'
-import { Augmentation } from './BooqContent/render'
+import { BooqAnchor, BooqData } from '@/application/booq'
+import { useSettings } from '@/application/settings'
+import { useFilteredHighlights } from '@/application/navigation'
+import { colorForGroup, pageForPosition, quoteColor } from '@/application/common'
+import { useReportHistory } from '@/application/history'
 
 export function Reader({
     booq, quote,
@@ -28,12 +30,16 @@ export function Reader({
     const {
         onScroll, currentPath, currentPage, totalPages, leftPages,
     } = useScrollHandler(booq)
+    useOnBooqScroll(onScroll, {
+        throttle: 500,
+    })
     const range: BooqRange = useMemo(() => ({
         start: booq.fragment.current.path,
         end: booq.fragment.next?.path ?? [booq.fragment.nodes.length],
     }), [booq])
     const { augmentations, menuStateForAugmentation } = useAugmentations(booq.id, quote)
     const { visible, toggle } = useControlsVisibility()
+    useOnBooqClick(toggle)
 
     const pagesLabel = `${currentPage} of ${totalPages}`
     const leftLabel = leftPages <= 1 ? 'Last page'
@@ -67,9 +73,8 @@ export function Reader({
                 nodes={booq.fragment.nodes}
                 range={range}
                 augmentations={augmentations}
-                onScroll={onScroll}
-                onClick={toggle}
                 onAugmentationClick={onAugmentationClick}
+                hrefForPath={booqHref}
             />
         </div>}
         PrevButton={<AnchorButton

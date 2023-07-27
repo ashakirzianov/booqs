@@ -8,6 +8,7 @@ import '@fortawesome/fontawesome-svg-core/styles.css'
 config.autoAddCss = false
 
 import { Lato, Lora } from 'next/font/google'
+import { SdksHead } from '@/plat'
 
 const lato = Lato({
     subsets: ['latin'],
@@ -38,8 +39,7 @@ export default function RootLayout({
 }) {
     return (
         <html lang="en">
-            <Script type="text/javascript" src="https://appleid.cdn-apple.com/appleauth/static/jsapi/appleid/1/en_US/appleid.auth.js" />
-            <Script async defer crossOrigin='anonymous' src="https://connect.facebook.net/en_US/sdk.js" />
+            <SdksHead />
             <body className={`${lato.variable} ${lora.variable}`}>
                 <main>
                     {children}

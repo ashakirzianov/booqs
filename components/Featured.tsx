@@ -1,9 +1,9 @@
 import React from 'react'
-import { TextButton } from '@/controls/Buttons'
-import { Panel } from '@/controls/Panel'
-import { BooqTags } from '@/controls/BooqTags'
-import { BooqCover } from '@/controls/BooqCover'
-import { BooqLink } from '@/controls/Links'
+import { TextButton } from '@/components/Buttons'
+import { Panel } from '@/components/Panel'
+import { BooqTags } from '@/components/BooqTags'
+import { BooqCover } from '@/components/BooqCover'
+import { BooqLink } from '@/components/Links'
 
 type FeaturedItem = {
     id: string,

@@ -1,3 +1,4 @@
+'use client'
 /*global globalThis*/
 import Script from 'next/script'
 import { useEffect } from 'react'

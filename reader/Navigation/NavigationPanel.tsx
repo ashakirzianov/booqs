@@ -1,12 +1,11 @@
 import React, { useState, useMemo } from 'react'
-import {
-    useAuth, UserInfo, useNavigationNodes, NavigationNode,
-} from '@/application'
-import { IconButton } from '@/controls/Buttons'
+import { IconButton } from '@/components/Buttons'
 import { TocNodeComp } from './TocNode'
 import { HighlightNodeComp } from './HighlightNode'
 import { PathHighlightsNodeComp } from './PathHighlightsNode'
 import { NavigationFilter } from './Filter'
+import { UserInfo, useAuth } from '@/application/auth'
+import { NavigationNode, useNavigationNodes } from '@/application/navigation'
 
 export function useNavigationPanel(booqId: string) {
     const [navigationOpen, setOpen] = useState(false)

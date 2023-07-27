@@ -1,12 +1,14 @@
-import { useAuth, useUpload } from '@/application'
-import { IconButton } from '@/controls/Buttons'
-import { useSelectFileDialog } from '@/controls/SelectFileDialog'
-import { Spinner } from '@/controls/Spinner'
-import { Popover } from '@/controls/Popover'
-import { useModal } from '@/controls/Modal'
-import { BooqCover } from '@/controls/BooqCover'
-import { booqHref } from '@/controls/Links'
+'use client'
+import { IconButton } from '@/components/Buttons'
+import { useSelectFileDialog } from '@/components/SelectFileDialog'
+import { Spinner } from '@/components/Spinner'
+import { Popover } from '@/components/Popover'
+import { useModal } from '@/components/Modal'
+import { BooqCover } from '@/components/BooqCover'
+import { booqHref } from '@/components/Links'
 import { useSignInModal } from './SignIn'
+import { useAuth } from '@/application/auth'
+import { useUpload } from '@/application/upload'
 
 export function Upload() {
     const { signed } = useAuth() ?? {}

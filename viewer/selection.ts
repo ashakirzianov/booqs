@@ -1,5 +1,4 @@
-import { BooqRange, pathLessThan } from '@/core'
-import { pathFromId } from '@/application'
+import { BooqRange, pathLessThan, pathFromId } from '@/core'
 
 export type BooqSelection = {
     range: BooqRange,

@@ -1,6 +1,7 @@
 import { ReactNode } from 'react'
-import { UserInfo, useNavigationState } from '@/application'
-import { ProfileBadge } from '@/controls/ProfilePicture'
+import { ProfileBadge } from '@/components/ProfilePicture'
+import { UserInfo } from '@/application/auth'
+import { useNavigationState } from '@/application/navigation'
 
 export function NavigationFilter({ authors }: {
     self: UserInfo | undefined,

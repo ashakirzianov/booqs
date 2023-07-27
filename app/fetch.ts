@@ -36,7 +36,7 @@ export async function fetchFeaturedServer() {
 }
 
 export type BooqData = Exclude<Awaited<ReturnType<typeof fetchBooqFragmentServer>>, undefined>
-export async function fetchBooqFragmentServer(id: string, path: BooqPath | undefined) {
+export async function fetchBooqFragmentServer(id: string, path?: BooqPath) {
     const BooqFragmentQuery = gql`query BooqFragment($id: ID!, $path: [Int!]) {
         booq(id: $id) {
             id

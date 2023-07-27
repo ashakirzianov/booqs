@@ -1,4 +1,4 @@
-import { FeedLink } from '@/controls/Links'
+import { FeedLink } from '@/components/Links'
 
 export default function BooqNotFound() {
     return <div className='flex flex-col items-center justify-center h-screen w-screen font-main overflow-hidden text-2xl'>

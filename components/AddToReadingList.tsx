@@ -1,9 +1,7 @@
 import React from 'react'
-import {
-    FeaturedItem,
-    useAddToCollection, useCollection, useRemoveFromCollection,
-} from '@/application'
-import { TextButton } from '@/controls/Buttons'
+import { TextButton } from '@/components/Buttons'
+import { FeaturedItem } from '@/application/featured'
+import { useAddToCollection, useCollection, useRemoveFromCollection } from '@/application/collections'
 
 export function AddToReadingListButton({ item }: {
     item: FeaturedItem,

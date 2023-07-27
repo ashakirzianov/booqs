@@ -1,5 +1,6 @@
-import { pageForPosition, TocNode } from '@/application'
-import { BooqLink } from '@/controls/Links'
+import { pageForPosition } from '@/application/common'
+import { TocNode } from '@/application/navigation'
+import { BooqLink } from '@/components/Links'
 
 
 export function TocNodeComp({

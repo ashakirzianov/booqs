@@ -1,7 +1,7 @@
 import React from 'react'
-import { useCollection } from '@/application'
-import { BooqCover } from '../controls/BooqCover'
-import { Spinner } from '../controls/Spinner'
+import { BooqCover } from '@/components/BooqCover'
+import { Spinner } from '@/components/Spinner'
+import { useCollection } from '@/application/collections'
 
 export function Collection({ name }: {
     name: string,

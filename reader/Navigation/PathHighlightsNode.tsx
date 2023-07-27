@@ -1,7 +1,9 @@
 import { Fragment } from 'react'
-import { TocItem, UserInfo, PathHighlightsNode } from '@/application'
-import { BooqLink } from '@/controls/Links'
+import { BooqLink } from '@/components/Links'
 import { HighlightNodeComp } from './HighlightNode'
+import { UserInfo } from '@/application/auth'
+import { PathHighlightsNode } from '@/application/navigation'
+import { TocItem } from '@/application/toc'
 
 export function PathHighlightsNodeComp({
     booqId, self,
