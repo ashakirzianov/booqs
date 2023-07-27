@@ -1,9 +1,9 @@
 'use client'
 import React from 'react'
-import { Menu, MenuItem } from '@/controls/Menu'
-import { IconButton } from '@/controls/Buttons'
-import { ProfileBadge } from '@/controls/ProfilePicture'
-import { useModal } from '@/controls/Modal'
+import { Menu, MenuItem } from '@/components/Menu'
+import { IconButton } from '@/components/Buttons'
+import { ProfileBadge } from '@/components/ProfilePicture'
+import { useModal } from '@/components/Modal'
 import { useAuth, useSignInOptions } from '@/application/auth'
 
 export function useSignInModal() {

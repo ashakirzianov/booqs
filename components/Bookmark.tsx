@@ -1,7 +1,7 @@
 'use client'
 import React from 'react'
 import { BooqPath, samePath } from '@/core'
-import { IconButton } from '@/controls/Buttons'
+import { IconButton } from '@/components/Buttons'
 import { useAuth } from '@/application/auth'
 import { useBookmarkMutations, useBookmarks } from '@/application/bookmarks'
 

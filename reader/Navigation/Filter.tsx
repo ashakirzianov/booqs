@@ -1,5 +1,5 @@
 import { ReactNode } from 'react'
-import { ProfileBadge } from '@/controls/ProfilePicture'
+import { ProfileBadge } from '@/components/ProfilePicture'
 import { UserInfo } from '@/application/auth'
 import { useNavigationState } from '@/application/navigation'
 

@@ -1,7 +1,7 @@
 import React from 'react'
-import { BooqCover } from '@/controls/BooqCover'
-import { Spinner } from '@/controls/Spinner'
-import { BooqLink } from '@/controls/Links'
+import { BooqCover } from '@/components/BooqCover'
+import { Spinner } from '@/components/Spinner'
+import { BooqLink } from '@/components/Links'
 import styles from './Search.module.css'
 
 type SearchResult = {

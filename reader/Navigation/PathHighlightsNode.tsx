@@ -1,5 +1,5 @@
 import { Fragment } from 'react'
-import { BooqLink } from '@/controls/Links'
+import { BooqLink } from '@/components/Links'
 import { HighlightNodeComp } from './HighlightNode'
 import { UserInfo } from '@/application/auth'
 import { PathHighlightsNode } from '@/application/navigation'

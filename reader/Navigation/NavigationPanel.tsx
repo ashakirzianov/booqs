@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react'
-import { IconButton } from '@/controls/Buttons'
+import { IconButton } from '@/components/Buttons'
 import { TocNodeComp } from './TocNode'
 import { HighlightNodeComp } from './HighlightNode'
 import { PathHighlightsNodeComp } from './PathHighlightsNode'

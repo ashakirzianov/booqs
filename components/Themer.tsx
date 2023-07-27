@@ -1,5 +1,5 @@
-import { Popover } from '@/controls/Popover'
-import { IconButton } from '@/controls/Buttons'
+import { Popover } from '@/components/Popover'
+import { IconButton } from '@/components/Buttons'
 import { PaletteName, palettes, useSetSettings, useSettings } from '@/application/settings'
 
 export function Themer() {

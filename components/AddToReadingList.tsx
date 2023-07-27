@@ -1,5 +1,5 @@
 import React from 'react'
-import { TextButton } from '@/controls/Buttons'
+import { TextButton } from '@/components/Buttons'
 import { FeaturedItem } from '@/application/featured'
 import { useAddToCollection, useCollection, useRemoveFromCollection } from '@/application/collections'
 
