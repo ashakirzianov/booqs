@@ -1,18 +1,21 @@
-import { useCallback } from 'react'
+import { useCallback, useEffect } from 'react'
 import { throttle } from 'lodash'
 import { BooqPath } from '@/core'
 import { pathFromId } from '@/application'
-import { useDocumentEvent } from '@/controls/utils'
 
-export function useOnScroll(callback?: (path: BooqPath) => void) {
-    useDocumentEvent('scroll', useCallback(throttle(function () {
+export function useOnBooqScroll(callback?: (path: BooqPath) => void) {
+    useEffect(() => {
         if (callback) {
-            const path = getCurrentPath()
-            if (path) {
-                callback(path)
-            }
+            const handleScroll = throttle(function () {
+                const path = getCurrentPath()
+                if (path) {
+                    callback(path)
+                }
+            }, 500)
+            window.addEventListener('scroll', handleScroll)
+            return () => window.removeEventListener('scroll', handleScroll)
         }
-    }, 500), [callback]))
+    }, [callback])
 }
 
 function getCurrentPath() {

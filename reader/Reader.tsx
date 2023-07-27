@@ -17,6 +17,7 @@ import {
 import { useContextMenu, ContextMenuState } from './ContextMenu'
 import { useNavigationPanel } from './Navigation'
 import { ReaderLayout } from './ReaderLayout'
+import { useOnBooqScroll } from '@/viewer/scroll'
 
 export function Reader({
     booq, quote,
@@ -28,6 +29,7 @@ export function Reader({
     const {
         onScroll, currentPath, currentPage, totalPages, leftPages,
     } = useScrollHandler(booq)
+    useOnBooqScroll(onScroll)
     const range: BooqRange = useMemo(() => ({
         start: booq.fragment.current.path,
         end: booq.fragment.next?.path ?? [booq.fragment.nodes.length],
@@ -67,7 +69,6 @@ export function Reader({
                 nodes={booq.fragment.nodes}
                 range={range}
                 augmentations={augmentations}
-                onScroll={onScroll}
                 onClick={toggle}
                 onAugmentationClick={onAugmentationClick}
             />
