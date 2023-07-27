@@ -1,7 +1,7 @@
 import { ApolloClient } from '@apollo/client'
 import { useApolloClient } from '@apollo/react-hooks'
 import gql from 'graphql-tag'
-import { sdks } from '@/plat'
+import { social } from './social'
 import { useUserData, useUserDataUpdater } from './userData'
 
 export type UserInfo = {
@@ -41,7 +41,7 @@ export function useSignInOptions() {
 
     return {
         async signWithFacebook() {
-            const { token } = await sdks().facebook.signIn() ?? {}
+            const { token } = await social().facebook.signIn() ?? {}
             if (token) {
                 return signIn({
                     apolloClient: client,
@@ -54,7 +54,7 @@ export function useSignInOptions() {
             }
         },
         async signWithApple() {
-            const { token, name } = await sdks().apple.signIn() ?? {}
+            const { token, name } = await social().apple.signIn() ?? {}
             if (token) {
                 return signIn({
                     provider: 'apple',
@@ -82,7 +82,7 @@ async function signOut(client: ApolloClient<unknown>, setter: (f: (value: Curren
         setter(prev => {
             switch (prev?.provider) {
                 case 'facebook':
-                    sdks().facebook.signOut()
+                    social().facebook.signOut()
                     break
             }
             return undefined

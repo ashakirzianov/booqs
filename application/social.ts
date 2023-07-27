@@ -2,18 +2,25 @@
 /*global globalThis*/
 import Script from 'next/script'
 
-export function SdksHead() {
-    return <>
-        <Script type="text/javascript" src="https://appleid.cdn-apple.com/appleauth/static/jsapi/appleid/1/en_US/appleid.auth.js"
-            onLoad={initAppleSdk}
-        />
-        <Script async defer crossOrigin='anonymous' src="https://connect.facebook.net/en_US/sdk.js"
-            onLoad={initFbSdk}
-        />
-    </>
+
+export function SocialScripts() {
+    return (
+        Script({
+            type: 'text/javascript',
+            src: 'https://appleid.cdn-apple.com/appleauth/static/jsapi/appleid/1/en_US/appleid.auth.js',
+            onLoad: initAppleSdk
+        }),
+        Script({
+            async: true,
+            defer: true,
+            crossOrigin: 'anonymous',
+            src: 'https://connect.facebook.net/en_US/sdk.js',
+            onLoad: initFbSdk
+        })
+    )
 }
 
-export function sdks() {
+export function social() {
     return {
         apple: {
             async signIn() {

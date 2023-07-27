@@ -1,5 +1,5 @@
 import { ReactNode, createContext, createElement, useContext, useEffect, useState } from 'react'
-import { syncStorageCell } from '@/plat'
+import { syncStorageCell } from './storage'
 import { CurrentUser } from './auth'
 import { Settings } from './settings'
 import { NavigationState } from './navigation'
