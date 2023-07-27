@@ -47,6 +47,7 @@ export function Upload() {
                     ? 'Click to select epub'
                     : 'Sign in to upload'
             } />}
+            hasAction={true}
         />
         {ModalContent}
         {SignInModalContent}

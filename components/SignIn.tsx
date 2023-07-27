@@ -42,11 +42,7 @@ export function useSignInModal() {
 }
 
 export function SignIn() {
-    return <Popover
-        anchor={<SingInButton />}
-        content={<SignInPanel />}
-        hasAction={true}
-    />
+    return <SingInButton />
 }
 
 function SingInButton() {

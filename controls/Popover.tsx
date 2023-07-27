@@ -82,7 +82,6 @@ export function Popover({
                                 context={context}
                                 fill='var(--theme-background)'
                                 stroke='var(--theme-border)'
-                                // strokeWidth={1}
                                 tipRadius={4}
                             />
                             {content}
