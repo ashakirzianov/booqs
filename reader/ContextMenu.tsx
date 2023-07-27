@@ -5,7 +5,7 @@ import {
 } from '@floating-ui/react'
 import {
     getBooqSelection, VirtualElement, getSelectionElement,
-} from './BooqContent'
+} from '@/viewer'
 import { ContextMenuContent, ContextMenuTarget } from './ContextMenuContent'
 import { useAuth } from '@/application'
 

@@ -12,11 +12,11 @@ import { Themer } from '@/components/Themer'
 import { SignIn } from '@/components/SignIn'
 import {
     BooqContent, getAugmentationElement, getAugmentationText,
-} from './BooqContent'
+    Augmentation,
+} from '@/viewer'
 import { useContextMenu, ContextMenuState } from './ContextMenu'
 import { useNavigationPanel } from './Navigation'
 import { ReaderLayout } from './ReaderLayout'
-import { Augmentation } from './BooqContent/render'
 
 export function Reader({
     booq, quote,

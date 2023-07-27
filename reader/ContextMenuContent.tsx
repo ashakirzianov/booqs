@@ -8,7 +8,7 @@ import {
 import { MenuItem } from '@/controls/Menu'
 import { useDocumentEvent } from '@/controls/utils'
 import { quoteHref } from '@/controls/Links'
-import { BooqSelection } from './BooqContent'
+import { BooqSelection } from '@/viewer'
 import { ProfileBadge } from '@/controls/ProfilePicture'
 
 type EmptyTarget = {
