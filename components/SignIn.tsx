@@ -4,7 +4,8 @@ import { Menu, MenuItem } from '@/components/Menu'
 import { IconButton } from '@/components/Buttons'
 import { ProfileBadge } from '@/components/ProfilePicture'
 import { useModal } from '@/components/Modal'
-import { useAuth, useSignInOptions } from '@/application/auth'
+import { UserInfo, useAuth, useSignInOptions } from '@/application/auth'
+import { Popover } from './Popover'
 
 export function useSignInModal() {
     const { signWithApple, signWithFacebook } = useSignInOptions()
@@ -42,41 +43,43 @@ export function useSignInModal() {
 }
 
 export function SignIn() {
-    return <SingInButton />
+    const state = useAuth()
+
+    return <div className='cursor-pointer'>
+        {
+            state?.signed
+                ? <SignedButton
+                    user={state}
+                />
+                : <NotSignedButton />
+        }
+    </div>
 }
 
-function SingInButton() {
-    const state = useAuth()
+function SignedButton({ user }: {
+    user: UserInfo,
+}) {
+    return <Popover
+        content={<Signed
+            name={user.name}
+        />}
+        anchor={<ProfileBadge
+            name={user.name}
+            picture={user.pictureUrl ?? undefined}
+            size={2}
+            border={true}
+        />}
+    />
+}
+
+function NotSignedButton() {
     const { openModal, ModalContent } = useSignInModal()
     return <>
-        <div className='cursor-pointer'>
-            {
-                state?.signed
-                    ? <ProfileBadge
-                        name={state.name}
-                        picture={state.pictureUrl ?? undefined}
-                        size={2}
-                        border={true}
-                    />
-                    : <IconButton
-                        icon='sign-in'
-                        onClick={openModal}
-                    />
-            }
-        </div>
+        <IconButton
+            icon='sign-in'
+            onClick={openModal} />
         {ModalContent}
     </>
-}
-
-function SignInPanel() {
-    const state = useAuth()
-    if (state?.signed) {
-        return <Signed
-            name={state.name}
-        />
-    } else {
-        return <NotSigned />
-    }
 }
 
 function Signed({ name }: {
@@ -93,11 +96,5 @@ function Signed({ name }: {
                 spinner={false}
             />
         </Menu>
-    </div>
-}
-
-function NotSigned() {
-    return <div className='py-base flex flex-col flex-1 items-stretch'>
-        <span className='p-base w-full text-center font-bold'>Sign In</span>
     </div>
 }
