@@ -3,7 +3,7 @@ import { BorderButton, IconButton } from '@/controls/Buttons'
 import { BooqLink, FeedLink } from '@/controls/Links'
 import { ReaderLayout } from './ReaderLayout'
 import { quoteColor } from '@/application'
-import { Augmentation, DumbBooqContent } from '@/viewer'
+import { Augmentation, BooqContent } from '@/viewer'
 
 type BooqAnchor = {
     title?: string,
@@ -47,7 +47,7 @@ export function LoadingReader({
             fontSize: `100%`,
         }}>
 
-            <DumbBooqContent
+            <BooqContent
                 booqId={booq.id}
                 nodes={booq.fragment.nodes}
                 range={range}

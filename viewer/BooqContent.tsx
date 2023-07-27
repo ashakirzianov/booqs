@@ -1,7 +1,7 @@
-import React, { useEffect, useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { BooqRange, BooqNode } from '@/core'
-import { DumbBooqContent, isEventOnContent } from './DumbBooqContent'
-import { Augmentation } from './render'
+import { Augmentation, renderNodes } from './render'
+import { pathFromId } from '@/application'
 
 export function BooqContent({
     booqId, nodes, range, augmentations,
@@ -14,13 +14,14 @@ export function BooqContent({
     onAugmentationClick?: (id: string) => void,
 }) {
     return useMemo(function () {
-        return <DumbBooqContent
-            booqId={booqId}
-            nodes={nodes}
-            range={range}
-            augmentations={augmentations}
-            onAugmentationClick={onAugmentationClick}
-        />
+        return <div id='booq-root' className='container'>
+            {
+                renderNodes(nodes, {
+                    path: [],
+                    booqId, range, augmentations, onAugmentationClick,
+                })
+            }
+        </div>
     }, [nodes, booqId, range, augmentations, onAugmentationClick])
 }
 
@@ -39,4 +40,16 @@ export function useOnBooqClick(callback?: () => void) {
             }
         }
     }, [callback])
+}
+
+function isEventOnContent(event: Event): boolean {
+    const id: string | undefined = (event.target as any).id
+    if (id === undefined) {
+        return false
+    }
+    const path = pathFromId(id)
+    if (path) {
+        return true
+    }
+    return id === 'booq-root'
 }

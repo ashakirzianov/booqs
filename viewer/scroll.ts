@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react'
+import { useEffect } from 'react'
 import { throttle } from 'lodash'
 import { BooqPath } from '@/core'
 import { pathFromId } from '@/application'
