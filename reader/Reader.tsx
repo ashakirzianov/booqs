@@ -11,7 +11,7 @@ import { Spinner } from '@/controls/Spinner'
 import { Themer } from '@/components/Themer'
 import { SignIn } from '@/components/SignIn'
 import {
-    BooqContent, getAugmentationRect, getAugmentationText,
+    BooqContent, getAugmentationElement, getAugmentationText,
 } from './BooqContent'
 import { useContextMenu, ContextMenuState } from './ContextMenu'
 import { useNavigationPanel } from './Navigation'
@@ -43,8 +43,8 @@ export function Reader({
         navigationOpen, NavigationButton, NavigationContent,
     } = useNavigationPanel(booq.id)
     const {
-        ContextMenuNode, isVisible: contextMenuVisible,
-        setMenuState,
+        ContextMenuNode, isOpen: contextMenuVisible,
+        updateMenuState: setMenuState,
     } = useContextMenu(booq.id)
     const onAugmentationClick = useMemo(() => {
         return (id: string) => {
@@ -166,8 +166,8 @@ function useAugmentations(booqId: string, quote?: BooqRange) {
         }
     }, [quote, highlights])
     const menuStateForAugmentation = useCallback(function (augmentationId: string): ContextMenuState | undefined {
-        const rect = getAugmentationRect(augmentationId)
-        if (!rect) {
+        const anchor = getAugmentationElement(augmentationId)
+        if (!anchor) {
             return undefined
         }
         const [kind, id] = augmentationId.split('/')
@@ -175,7 +175,7 @@ function useAugmentations(booqId: string, quote?: BooqRange) {
             case 'quote':
                 return quote
                     ? {
-                        rect,
+                        anchor,
                         target: {
                             kind: 'quote',
                             selection: {
@@ -189,7 +189,7 @@ function useAugmentations(booqId: string, quote?: BooqRange) {
                 const highlight = highlights.find(hl => hl.id === id)
                 return highlight
                     ? {
-                        rect,
+                        anchor,
                         target: {
                             kind: 'highlight',
                             highlight,
