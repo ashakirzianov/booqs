@@ -6,6 +6,8 @@ import { ProfileBadge } from '@/components/ProfilePicture'
 import { useModal } from '@/components/Modal'
 import { User, useAuth, useSignInOptions } from '@/application/auth'
 import { Popover } from './Popover'
+import { useIsMounted } from '@/application/utils'
+import { Spinner } from './Spinner'
 
 export function useSignInModal() {
     const { signWithApple, signWithFacebook } = useSignInOptions()
@@ -44,6 +46,11 @@ export function useSignInModal() {
 
 export function SignIn() {
     const state = useAuth()
+    const mounted = useIsMounted()
+
+    if (!mounted) {
+        return <Spinner />
+    }
 
     return <div className='cursor-pointer'>
         {

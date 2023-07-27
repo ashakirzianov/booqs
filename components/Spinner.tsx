@@ -1,10 +1,12 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faSpinner as faSpinnerThird } from '@fortawesome/free-solid-svg-icons'
+import { faCircleNotch as faSpinnerThird } from '@fortawesome/free-solid-svg-icons'
 
 export function Spinner() {
-    return <FontAwesomeIcon
-        icon={faSpinnerThird}
-        color={`var(--theme-highlight)`}
-        spin
-    />
+    return <div className='flex text-2xl w-8 h-8 items-center justify-center'>
+        <FontAwesomeIcon
+            icon={faSpinnerThird}
+            color={`var(--theme-dimmed)`}
+            spin
+        />
+    </div>
 }
