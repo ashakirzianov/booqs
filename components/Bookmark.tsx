@@ -12,7 +12,7 @@ export function BookmarkButton({ booqId, path }: {
     const { signed } = useAuth() ?? {}
     const { bookmarks } = useBookmarks(booqId)
     const { addBookmark, removeBookmark } = useBookmarkMutations(booqId)
-    if (signed) {
+    if (!signed) {
         return null
     }
     const current = bookmarks.find(b => samePath(b.path, path))

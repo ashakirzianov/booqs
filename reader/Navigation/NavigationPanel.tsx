@@ -4,7 +4,7 @@ import { TocNodeComp } from './TocNode'
 import { HighlightNodeComp } from './HighlightNode'
 import { PathHighlightsNodeComp } from './PathHighlightsNode'
 import { NavigationFilter } from './Filter'
-import { UserInfo, useAuth } from '@/application/auth'
+import { User, useAuth } from '@/application/auth'
 import { NavigationNode, useNavigationNodes } from '@/application/navigation'
 
 export function useNavigationPanel(booqId: string) {
@@ -72,7 +72,7 @@ function Navigation({ booqId, closeSelf }: {
 
 function NavigationNodeComp({ booqId, self, node }: {
     booqId: string,
-    self: UserInfo | undefined,
+    self: User | undefined,
     node: NavigationNode,
 }) {
     switch (node.kind) {

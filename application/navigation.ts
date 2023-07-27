@@ -1,6 +1,6 @@
 import { groupBy } from 'lodash'
 import { pathInRange } from '@/core'
-import { UserInfo, useAuth } from './auth'
+import { User, useAuth } from './auth'
 import { useMemo } from 'react'
 import { useUserData, useUserDataUpdater } from './userData'
 import { TocItem, useToc } from './toc'
@@ -160,7 +160,7 @@ function buildNodes({ toc, filter, highlights, title }: {
     return nodes
 }
 
-function highlightsAuthors(highlights: Highlight[]): UserInfo[] {
+function highlightsAuthors(highlights: Highlight[]): User[] {
     const grouped = groupBy(highlights, h => h.author.id)
     return Object.entries(grouped).map(
         ([_, [{ author }]]) => ({

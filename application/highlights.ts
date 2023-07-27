@@ -1,7 +1,7 @@
 import gql from 'graphql-tag'
 import { useQuery, useMutation } from '@apollo/react-hooks'
 import { BooqPath, uniqueId } from '@/core'
-import { UserInfo } from './auth'
+import { User } from './auth'
 
 const HighlightsQuery = gql`query HighlightsQuery($booqId: ID!) {
     booq(id: $booqId) {
@@ -94,7 +94,7 @@ export function useHighlightMutations(booqId: string) {
             end: BooqPath,
             group: string,
             text: string,
-            author: UserInfo,
+            author: User,
         }): Highlight {
             const highlight = {
                 booqId,

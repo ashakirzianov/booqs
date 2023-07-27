@@ -1,12 +1,12 @@
 import { ReactNode, createContext, createElement, useContext, useEffect, useState } from 'react'
 import { syncStorageCell } from './storage'
-import { CurrentUser } from './auth'
+import type { AuthState } from './auth'
 import { Settings } from './settings'
 import { NavigationState } from './navigation'
 
 export type SetterOrUpdater<T> = (value: T | ((prev: T) => T)) => void
 export type UserData = {
-    currentUser: CurrentUser,
+    currentUser?: AuthState,
     settings: Settings,
     navigationState: NavigationState,
 }

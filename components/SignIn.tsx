@@ -4,7 +4,7 @@ import { Menu, MenuItem } from '@/components/Menu'
 import { IconButton } from '@/components/Buttons'
 import { ProfileBadge } from '@/components/ProfilePicture'
 import { useModal } from '@/components/Modal'
-import { UserInfo, useAuth, useSignInOptions } from '@/application/auth'
+import { User, useAuth, useSignInOptions } from '@/application/auth'
 import { Popover } from './Popover'
 
 export function useSignInModal() {
@@ -57,7 +57,7 @@ export function SignIn() {
 }
 
 function SignedButton({ user }: {
-    user: UserInfo,
+    user: User,
 }) {
     return <Popover
         content={<Signed

@@ -4,25 +4,24 @@ import gql from 'graphql-tag'
 import { social } from './social'
 import { useUserData, useUserDataUpdater } from './userData'
 
-export type UserInfo = {
+export type User = {
     id: string,
     name?: string,
     pictureUrl?: string,
 };
-export type CurrentUser = {
-    user: UserInfo,
+export type AuthState = User & {
     provider: string,
-} | undefined;
+}
+type AuthStateSetter = (f: (value?: AuthState) => AuthState | undefined) => void
 
-type Setter<T> = (f: (value: T) => T) => void
 export function useAuth() {
     const current = useUserData().currentUser
 
     if (current) {
         return {
-            signed: true,
+            signed: true, // TODO: remove?
+            ...current,
             provider: current.provider,
-            ...current.user,
         } as const
     } else {
         return undefined
@@ -32,7 +31,7 @@ export function useAuth() {
 export function useSignInOptions() {
     const client = useApolloClient()
     const userDataSetter = useUserDataUpdater()
-    function authSetter(f: (value: CurrentUser) => CurrentUser) {
+    function authSetter(f: (value?: AuthState) => AuthState | undefined) {
         userDataSetter(data => ({
             ...data,
             currentUser: f(data.currentUser),
@@ -72,7 +71,7 @@ export function useSignInOptions() {
 }
 
 
-async function signOut(client: ApolloClient<unknown>, setter: (f: (value: CurrentUser) => CurrentUser) => void) {
+async function signOut(client: ApolloClient<unknown>, setter: AuthStateSetter) {
     const result = await client.query<{ logout: boolean }>({
         query: gql`query Logout {
             logout
@@ -120,7 +119,7 @@ async function signIn({
     apolloClient, authSetter, token, name, provider,
 }: {
     apolloClient: ApolloClient<object>,
-    authSetter: Setter<CurrentUser>,
+    authSetter: AuthStateSetter,
     token: string,
     name?: string,
     provider: string,
@@ -130,13 +129,11 @@ async function signIn({
         variables: { token, provider, name },
     })
     if (auth) {
-        const data: CurrentUser = auth
+        const data: AuthState | undefined = auth
             ? {
-                user: {
-                    id: auth.user.id,
-                    name: auth.user.name ?? undefined,
-                    pictureUrl: auth.user.pictureUrl ?? undefined,
-                },
+                id: auth.user.id,
+                name: auth.user.name ?? undefined,
+                pictureUrl: auth.user.pictureUrl ?? undefined,
                 provider,
             }
             : undefined
