@@ -1,6 +1,6 @@
 import { useCallback, ReactNode, useState, useEffect } from 'react'
 import {
-    useFloating, useDismiss, useInteractions,
+    useFloating, useDismiss, useInteractions, useTransitionStyles,
     flip, shift, inline, autoUpdate
 } from '@floating-ui/react'
 import {
@@ -42,6 +42,20 @@ export function useContextMenu(booqId: string) {
     const { getFloatingProps } = useInteractions([
         dismiss,
     ])
+
+    const { styles: transitionStyles } = useTransitionStyles(context, {
+        duration: 300,
+        initial({ side }) {
+            const translate = side === 'top' ? 'translateY(-20%)'
+                : side === 'bottom' ? 'translateY(20%)'
+                    : side === 'left' ? 'translateX(-20%)'
+                        : 'translateX(20%)'
+            return {
+                opacity: 0,
+                transform: `${translate} scale(0.9)`,
+            }
+        },
+    })
 
     type ContextMenuStateSetter = (prev: ContextMenuState) => ContextMenuState
     const updateMenuState = useCallback(function (setterOrValue: ContextMenuStateSetter | ContextMenuState) {
@@ -106,22 +120,23 @@ export function useContextMenu(booqId: string) {
 
     const ContextMenuNode = isOpen ? (
         <div
-            className='bg-background rounded drop-shadow-2xl border border-border pointer-events-auto w-40'
             ref={setFloating}
             style={{
                 ...floatingStyles,
             }}
             {...getFloatingProps()}
         >
-            <ContextMenuContent
-                booqId={booqId}
-                self={self}
-                target={menuState.target}
-                setTarget={target => setMenuState({
-                    ...menuState,
-                    target,
-                })}
-            />
+            <div className='bg-background rounded drop-shadow-2xl border border-border pointer-events-auto w-40' style={transitionStyles}>
+                <ContextMenuContent
+                    booqId={booqId}
+                    self={self}
+                    target={menuState.target}
+                    setTarget={target => setMenuState({
+                        ...menuState,
+                        target,
+                    })}
+                />
+            </div>
         </div>
     ) : null
 
