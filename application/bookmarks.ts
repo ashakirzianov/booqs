@@ -1,5 +1,4 @@
-import gql from 'graphql-tag'
-import { useQuery, useMutation } from '@apollo/react-hooks'
+import { useQuery, useMutation, gql } from '@apollo/client'
 import { BooqPath, uniqueId } from '@/core'
 
 const BookmarksQuery = gql`query BookmarksQuery($booqId: ID!) {

@@ -10,8 +10,7 @@
     "https": "next dev -p 3001 & npx local-ssl-proxy --source 3000 --target 3001"
   },
   "dependencies": {
-    "@apollo/client": "^3.7.5",
-    "@apollo/react-hooks": "^4.0.0",
+    "@apollo/client": "^3.7.17",
     "@floating-ui/react": "^0.24.8",
     "@fortawesome/fontawesome-svg-core": "^6.2.1",
     "@fortawesome/free-brands-svg-icons": "^6.2.1",
@@ -22,8 +21,7 @@
     "clipboard-polyfill": "^3.0.3",
     "eslint": "8.45.0",
     "eslint-config-next": "^13.4.12",
-    "graphql": "^16.6.0",
-    "graphql-tag": "^2.12.6",
+    "graphql": "^16.7.1",
     "lodash": "^4.17.21",
     "next": "^13.4.12",
     "postcss": "8.4.26",

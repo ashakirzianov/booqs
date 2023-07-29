@@ -1,6 +1,4 @@
-import { ApolloClient } from '@apollo/client'
-import { useApolloClient } from '@apollo/react-hooks'
-import gql from 'graphql-tag'
+import { ApolloClient, useApolloClient, gql } from '@apollo/client'
 import { social } from './social'
 import { useAppState, useAppStateSetter } from './state'
 
