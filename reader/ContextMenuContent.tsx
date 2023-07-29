@@ -7,7 +7,7 @@ import { quoteHref } from '@/components/Links'
 import { BooqSelection } from '@/viewer'
 import { ProfileBadge } from '@/components/ProfilePicture'
 import { Highlight, useHighlightMutations } from '@/application/highlights'
-import { UserInfo } from '@/application/auth'
+import { User } from '@/application/auth'
 import { colorForGroup, groups } from '@/application/common'
 
 type EmptyTarget = {
@@ -33,7 +33,7 @@ export function ContextMenuContent({
 }: {
     target: ContextMenuTarget,
     booqId: string,
-    self: UserInfo | undefined,
+    self: User | undefined,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
     switch (target.kind) {
@@ -53,7 +53,7 @@ function SelectionTargetMenu({
 }: {
     target: SelectionTarget,
     booqId: string,
-    self: UserInfo | undefined,
+    self: User | undefined,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
     useCopyQuote(rest.booqId, selection)
@@ -69,7 +69,7 @@ function QuoteTargetMenu({
 }: {
     target: QuoteTarget,
     booqId: string,
-    self: UserInfo | undefined,
+    self: User | undefined,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
     return <>
@@ -83,7 +83,7 @@ function HighlightTargetMenu({
 }: {
     target: HighlightTarget,
     booqId: string,
-    self: UserInfo | undefined,
+    self: User | undefined,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
     const isOwnHighlight = self?.id === highlight.author.id
@@ -158,7 +158,7 @@ function AddHighlightItem({
 }: {
     selection: BooqSelection,
     booqId: string,
-    self: UserInfo | undefined,
+    self: User | undefined,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
     const { addHighlight } = useHighlightMutations(booqId)

@@ -1,5 +1,4 @@
-import { useQuery, useMutation } from '@apollo/react-hooks'
-import gql from 'graphql-tag'
+import { useQuery, useMutation, gql } from '@apollo/client'
 
 const CollectionQuery = gql`query Collection($name: String!) {
     collection(name: $name) {

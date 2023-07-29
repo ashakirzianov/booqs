@@ -7,15 +7,14 @@ import {
     getBooqSelection, VirtualElement, getSelectionElement,
 } from '@/viewer'
 import { ContextMenuContent, ContextMenuTarget } from './ContextMenuContent'
-import { useAuth } from '@/application/auth'
+import { User } from '@/application/auth'
 
 export type ContextMenuState = {
     target: ContextMenuTarget,
     anchor?: VirtualElement,
 };
 
-export function useContextMenu(booqId: string) {
-    const self = useAuth()
+export function useContextMenu(booqId: string, self?: User) {
     const [menuState, setMenuState] = useState<ContextMenuState>({
         target: { kind: 'empty' },
     })

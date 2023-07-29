@@ -1,6 +1,6 @@
 import React from 'react'
 import { Icon, IconName } from './Icon'
-import { Spinner } from './Spinner'
+import { Spinner } from './Loading'
 
 export function IconButton({ icon, onClick, isSelected }: {
     icon: IconName,
@@ -10,7 +10,7 @@ export function IconButton({ icon, onClick, isSelected }: {
     const selectedClass = isSelected
         ? 'text-highlight' : 'text-dimmed'
     return <button
-        className={`button flex text-dimmed text-2xl cursor-pointer transition bg-transparent hover:text-highlight focus:outline-none ${selectedClass}`}
+        className={`button flex text-dimmed text-2xl cursor-pointer transition bg-transparent hover:text-highlight focus:outline-none ${selectedClass} w-8 h-8 justify-center items-center`}
         onClick={onClick}
     >
         <Icon name={icon} />

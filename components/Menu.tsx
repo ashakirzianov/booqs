@@ -1,6 +1,6 @@
 import React, { ReactNode } from 'react'
 import { IconName, Icon } from './Icon'
-import { Spinner } from './Spinner'
+import { Spinner } from './Loading'
 
 export function Menu({ callback, children }: {
     children: ReactNode,

@@ -3,7 +3,13 @@ import { DocumentNode } from 'graphql'
 export async function fetchQuery<T = any>({ query, variables }: {
     query: DocumentNode,
     variables?: Object,
-}): Promise<{ data: T }> {
+}): Promise<{
+    success: true,
+    data: T,
+} | {
+    success: false,
+    error: string,
+}> {
     const url = process.env.NEXT_PUBLIC_BACKEND
     if (url === undefined)
         throw new Error('NEXT_PUBLIC_BACKEND is undefined')
@@ -20,6 +26,15 @@ export async function fetchQuery<T = any>({ query, variables }: {
             },
         }
     )
+    if (!response.ok) {
+        return {
+            success: false,
+            error: `${response.status}: ${response.statusText}`,
+        }
+    }
     const data = await response.json()
-    return data
+    return {
+        success: true,
+        data: data.data,
+    }
 }

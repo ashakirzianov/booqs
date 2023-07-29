@@ -4,10 +4,10 @@ import { TocNodeComp } from './TocNode'
 import { HighlightNodeComp } from './HighlightNode'
 import { PathHighlightsNodeComp } from './PathHighlightsNode'
 import { NavigationFilter } from './Filter'
-import { UserInfo, useAuth } from '@/application/auth'
+import { User } from '@/application/auth'
 import { NavigationNode, useNavigationNodes } from '@/application/navigation'
 
-export function useNavigationPanel(booqId: string) {
+export function useNavigationPanel(booqId: string, self: User | undefined) {
     const [navigationOpen, setOpen] = useState(false)
     const NavigationButton = <IconButton
         icon='toc'
@@ -16,6 +16,7 @@ export function useNavigationPanel(booqId: string) {
     />
     const NavigationContent = <Navigation
         booqId={booqId}
+        self={self}
         closeSelf={() => {
             setOpen(false)
         }}
@@ -25,12 +26,12 @@ export function useNavigationPanel(booqId: string) {
     }
 }
 
-function Navigation({ booqId, closeSelf }: {
+function Navigation({ booqId, self, closeSelf }: {
     booqId: string,
+    self: User | undefined,
     closeSelf: () => void,
 }) {
-    const self = useAuth()
-    const { nodes, authors } = useNavigationNodes(booqId)
+    const { nodes, authors } = useNavigationNodes(booqId, self)
     const exceptSelf = authors.filter(a => a.id !== self?.id)
     return useMemo(() => {
         return <div className='flex flex-1' style={{
@@ -66,13 +67,13 @@ function Navigation({ booqId, closeSelf }: {
             </div>
         </div>
     }, [
-        nodes,
+        nodes, // TODO: add missing deps
     ])
 }
 
 function NavigationNodeComp({ booqId, self, node }: {
     booqId: string,
-    self: UserInfo | undefined,
+    self: User | undefined,
     node: NavigationNode,
 }) {
     switch (node.kind) {

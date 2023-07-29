@@ -4,12 +4,12 @@ import { Icon } from '@/components/Icon'
 import { ContextMenuContent } from '@/reader/ContextMenuContent'
 import { ProfileBadge } from '@/components/ProfilePicture'
 import { Highlight } from '@/application/highlights'
-import { UserInfo } from '@/application/auth'
+import { User } from '@/application/auth'
 import { colorForGroup } from '@/application/common'
 
 export function HighlightNodeComp({ booqId, highlight, self }: {
     booqId: string,
-    self: UserInfo | undefined,
+    self: User | undefined,
     highlight: Highlight,
 }) {
     const badgeClass = self?.id === highlight.author.id

@@ -31,7 +31,10 @@ export async function fetchFeaturedServer() {
     const result = await fetchQuery<FeaturedData>({
         query: FeaturedQuery,
     })
-    return (result.data?.featured ?? [])
+    const featured = result.success
+        ? result.data?.featured ?? []
+        : []
+    return featured
         .filter(f => f !== null && f !== undefined)
 }
 
@@ -78,15 +81,21 @@ export async function fetchBooqFragmentServer(id: string, path?: BooqPath) {
         path: BooqPath,
     };
     type BooqData = BooqFragmentData['booq'];
-    const result = await fetchQuery<BooqFragmentData>({
-        query: BooqFragmentQuery,
-        variables: {
-            id, path,
-        },
-    })
-    if (result.data) {
-        return result.data.booq
-    } else {
+    try {
+        const result = await fetchQuery<BooqFragmentData>({
+            query: BooqFragmentQuery,
+            variables: {
+                id, path,
+            },
+        })
+        if (result.success) {
+            return result.data.booq
+        } else {
+            console.error(result.error)
+            return undefined
+        }
+    } catch (e) {
+        console.error(e)
         return undefined
     }
 }

@@ -1,5 +1,4 @@
 import '@/app/globals.css'
-import Script from 'next/script'
 import { Metadata } from 'next'
 
 // FontAwesome support
@@ -8,7 +7,7 @@ import '@fortawesome/fontawesome-svg-core/styles.css'
 config.autoAddCss = false
 
 import { Lato, Lora } from 'next/font/google'
-import { SdksHead } from '@/plat'
+import { SocialScripts } from '@/application/social'
 
 const lato = Lato({
     subsets: ['latin'],
@@ -39,7 +38,7 @@ export default function RootLayout({
 }) {
     return (
         <html lang="en">
-            <SdksHead />
+            <SocialScripts />
             <body className={`${lato.variable} ${lora.variable}`}>
                 <main>
                     {children}
