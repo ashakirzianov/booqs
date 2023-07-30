@@ -3,8 +3,6 @@ import { startServerAndCreateNextHandler } from '@as-integrations/next'
 import { ApolloServer } from '@apollo/server'
 import { readTypeDefs, resolvers, context } from '@/server/graphql'
 import { connectDb } from '@/server/mongoose'
-import { ApolloServerPluginSchemaReporting } from '@apollo/server/plugin/schemaReporting'
-import { ApolloServerPluginUsageReporting } from '@apollo/server/plugin/usageReporting'
 import { serialize } from 'cookie'
 
 type Handler = Awaited<ReturnType<typeof startServerAndCreateNextHandler<NextRequest>>>
@@ -19,10 +17,6 @@ export async function makeHandler() {
             graphVariant: process.env.NODE_ENV !== 'development'
                 ? 'current' : 'dev',
         },
-        plugins: [
-            ApolloServerPluginUsageReporting(),
-            ApolloServerPluginSchemaReporting(),
-        ],
     })
     await db
     return startServerAndCreateNextHandler<NextRequest>(server, {
