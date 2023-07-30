@@ -9,7 +9,7 @@ export async function connectDb() {
         const dbUri = config().mongodbUri
         if (dbUri) {
             console.log('Connecting to db...')
-            db = await connect(dbUri)
+            db = await connect(dbUri, { dbName: 'production' })
             console.log('Connected to db')
         } else {
             console.warn('MONGODB_URI is not set')
