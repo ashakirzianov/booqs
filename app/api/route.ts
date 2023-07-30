@@ -7,7 +7,7 @@ import { serialize } from 'cookie'
 
 type Handler = Awaited<ReturnType<typeof startServerAndCreateNextHandler<NextRequest>>>
 const handlerPromise: Promise<Handler> = makeHandler()
-export async function makeHandler() {
+async function makeHandler() {
     const db = connectDb()
 
     const server = new ApolloServer({
