@@ -1,6 +1,5 @@
 import { ApolloServer } from '@apollo/server'
 import { readTypeDefs, resolvers, context } from './graphql'
-import { connectDb } from './mongoose'
 import { booqsWorker } from './books'
 import { expressMiddleware } from '@apollo/server/express4'
 import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer'
@@ -11,11 +10,10 @@ import cors from 'cors'
 import express from 'express'
 import bodyParser from 'body-parser'
 import { serialize } from 'cookie'
-import { config } from './config'
+import { mongoDbConnection } from './mongoose'
 
 export async function startup() {
-    const db = connectDb()
-
+    mongoDbConnection()
     // Required logic for integrating with Express
     const app = express()
     // Our httpServer handles incoming requests to our Express app.
@@ -78,7 +76,6 @@ export async function startup() {
         }),
     )
 
-    await db
     // Modified server startup
     const port = process.env.PORT
         ? parseInt(process.env.PORT)
