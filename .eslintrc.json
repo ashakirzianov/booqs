@@ -1,6 +1,11 @@
 {
   "extends": "next/core-web-vitals",
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "project": "./tsconfig.json"
+  },
   "rules": {
+    "no-iterator": "off",
     "react/no-children-prop": "off",
     "quotes": [
       "error",
