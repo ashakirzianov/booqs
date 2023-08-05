@@ -1,7 +1,6 @@
 import { fromCookie } from '../auth'
 import { DbUser } from '../users'
 import { config } from '../config'
-import { serialize } from 'cookie'
 
 export type ResolverContext = {
     user?: DbUser & { _id?: string },

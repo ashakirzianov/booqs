@@ -2,23 +2,23 @@ import { BooqNode, BooqNodeStyle, BooqElementNode } from '../core'
 import {
     xmlStringParser, XmlElement, findByName, xml2string, childrenOf, nameOf, attributesOf, textOf, asObject, XmlAttributes,
 } from './xmlTree';
-import { EpubSection, EpubFile } from './epubFile';
+import { EpubSection, EpubPackage } from './epub';
 import { parseCss, Stylesheet, StyleRule, applyRules } from './css';
 import { Result, Diagnostic } from './result';
 import { transformHref } from './parserUtils';
 import { capitalize } from 'lodash';
+import { resolveRelativePath } from './path';
+import { isComment } from 'domutils';
 
-export async function parseSection(section: EpubSection, file: EpubFile): Promise<Result<BooqNode>> {
+export async function parseSection(section: EpubSection, file: EpubPackage): Promise<Result<BooqNode>> {
     const diags: Diagnostic[] = [];
     const node = await processSectionContent(section.content, {
         fileName: section.fileName,
         stylesheet: { rules: [] },
         report: d => diags.push(d),
         resolveTextFile: async href => {
-            const buffer = await file.itemResolver(href);
-            return buffer
-                ? Buffer.from(buffer).toString('utf8')
-                : undefined;
+            let resolved = resolveRelativePath(href, section.fileName)
+            return file.textResolver(resolved);
         },
     });
     return {
@@ -40,7 +40,7 @@ async function processSectionContent(content: string, env: Env): Promise<BooqNod
     const body = findByName(elements, 'body');
     if (!body) {
         env.report({
-            diag: 'missing body node',
+            message: 'missing body node',
             data: { xml: xml2string(...elements) },
         });
         return undefined;
@@ -75,9 +75,9 @@ async function processHead(head: XmlElement, env: Env) {
                 // TODO: handle ?
                 break;
             default:
-                if (!isEmptyText(ch)) {
+                if (!(isEmptyText(ch) || isComment(ch))) {
                     env.report({
-                        diag: 'unexpected head node',
+                        message: 'unexpected head node',
                         data: { xml: xml2string(ch) },
                     });
                 }
@@ -92,10 +92,11 @@ async function processLink(link: XmlElement, env: Env) {
         case 'stylesheet':
             break;
         case 'coverpage':
+        case 'icon':
             return [];
         default:
             env.report({
-                diag: `unexpected link rel: ${rel}`,
+                message: `unexpected link rel: ${rel}`,
                 data: { xml: xml2string(link) },
             });
             return [];
@@ -108,14 +109,18 @@ async function processLink(link: XmlElement, env: Env) {
             return [];
         // Note: unknown unsupported
         default:
-            env.report({
-                diag: `unexpected link type: ${type}`,
-            });
-            return [];
+            if (rel !== 'stylesheet') {
+                env.report({
+                    message: `unexpected link type: ${type}`,
+                    data: { xml: xml2string(link) },
+                });
+                return [];
+            }
+            break
     }
     if (href === undefined) {
         env.report({
-            diag: 'missing href on link',
+            message: 'missing href on link',
             data: { xml: xml2string(link) },
         });
         return [];
@@ -123,7 +128,8 @@ async function processLink(link: XmlElement, env: Env) {
     const content = await env.resolveTextFile(href);
     if (content === undefined) {
         env.report({
-            diag: `couldn't load css: ${href}`,
+            message: `couldn't load css: ${href}`,
+            data: { xml: xml2string(link) },
         });
         return [];
     } else {
@@ -139,7 +145,7 @@ async function processStyleElement(style: XmlElement, env: Env) {
     const text = content && textOf(content);
     if (type !== 'text/css' || text === undefined) {
         env.report({
-            diag: 'unsupported style tag',
+            message: 'unsupported style tag',
             data: { xml: xml2string(style) },
         });
         return [];
@@ -155,6 +161,7 @@ function processBody(body: XmlElement, env: Env) {
         ? {
             ...node,
             id: env.fileName,
+            fileName: env.fileName,
             name: 'div',
             style: undefined, // Note: ignore body-level styles
         }

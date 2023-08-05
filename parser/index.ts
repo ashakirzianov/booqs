@@ -1,19 +1,18 @@
 import { Booq, BooqMeta } from '../core'
-import { Diagnoser } from './result'
-import { openEpub } from './epubFile'
+import { Diagnostic } from './result'
 import { processEpub } from './book'
 import { getMetadata } from './metadata'
+import { openFirstEpubPackage } from './epub'
 
 export * from './result'
 
 export async function parseEpub({ fileData, diagnoser }: {
     fileData: Buffer,
-    diagnoser?: Diagnoser,
+    diagnoser?: (diag: Diagnostic) => void,
 }): Promise<Booq | undefined> {
     diagnoser = diagnoser ?? (() => undefined)
     try {
-        const { value: file, diags: fileDiags } = await openEpub({ fileData })
-        fileDiags.forEach(diagnoser)
+        const file = await openFirstEpubPackage({ fileData, diagnoser })
         if (!file) {
             return undefined
         }
@@ -22,7 +21,7 @@ export async function parseEpub({ fileData, diagnoser }: {
         return book
     } catch (err) {
         diagnoser({
-            diag: 'Unhandled exception on parsing',
+            message: 'Unhandled exception on parsing',
             data: err as object,
         })
         return undefined
@@ -36,11 +35,10 @@ export type ExtractedMetadata = {
 export async function extractMetadata({ fileData, extractCover, diagnoser }: {
     fileData: Buffer,
     extractCover?: boolean,
-    diagnoser?: Diagnoser,
+    diagnoser?: (diag: Diagnostic) => void,
 }): Promise<ExtractedMetadata | undefined> {
     diagnoser = diagnoser ?? (() => undefined)
-    const { value: epub, diags: fileDiags } = await openEpub({ fileData })
-    fileDiags.forEach(diagnoser)
+    const epub = await openFirstEpubPackage({ fileData, diagnoser })
     if (!epub) {
         return undefined
     }
@@ -48,10 +46,10 @@ export async function extractMetadata({ fileData, extractCover, diagnoser }: {
     if (extractCover) {
         const coverHref = metadata.cover
         if (typeof coverHref === 'string') {
-            const coverBuffer = await epub.imageResolver(coverHref)
+            const coverBuffer = await epub.bufferResolver(coverHref)
             if (!coverBuffer) {
                 diagnoser({
-                    diag: `couldn't load cover image: ${coverHref}`,
+                    message: `couldn't load cover image: ${coverHref}`,
                 })
                 return { metadata }
             } else {
