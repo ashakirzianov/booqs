@@ -1,22 +1,13 @@
 import { NextRequest } from 'next/server'
 import { startServerAndCreateNextHandler } from '@as-integrations/next'
-import { ApolloServer } from '@apollo/server'
-import { readTypeDefs, resolvers, context } from '@/server/graphql'
+import { context } from '@/server/graphql'
 import { serialize } from 'cookie'
-import { mongoDbConnection } from '@/server/mongoose'
+import { prepareServer } from '@/server/prepare'
 
 type Handler = Awaited<ReturnType<typeof startServerAndCreateNextHandler<NextRequest>>>
 const handlerPromise: Promise<Handler> = makeHandler()
 async function makeHandler() {
-    mongoDbConnection()
-    const server = new ApolloServer({
-        typeDefs: await readTypeDefs(),
-        resolvers,
-        apollo: {
-            graphVariant: process.env.NODE_ENV !== 'development'
-                ? 'current' : 'dev',
-        },
-    })
+    const server = await prepareServer()
     return startServerAndCreateNextHandler<NextRequest>(server, {
         context(req) {
             return context({
