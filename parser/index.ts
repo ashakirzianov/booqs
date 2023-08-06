@@ -1,30 +1,29 @@
+import { Diagnostic, diagnoser } from 'booqs-epub'
 import { Booq, BooqMeta } from '../core'
-import { Diagnostic } from './result'
 import { processEpub } from './book'
-import { getMetadata } from './metadata'
 import { openFirstEpubPackage } from './epub'
+import { buildMeta } from './metadata'
 
-export * from './result'
-
-export async function parseEpub({ fileData, diagnoser }: {
+export async function parseEpub({ fileData }: {
     fileData: Buffer,
-    diagnoser?: (diag: Diagnostic) => void,
-}): Promise<Booq | undefined> {
-    diagnoser = diagnoser ?? (() => undefined)
+}): Promise<{
+    value: Booq | undefined,
+    diags: Diagnostic[],
+}> {
+    let diags = diagnoser('parse epub')
     try {
-        const file = await openFirstEpubPackage({ fileData, diagnoser })
+        const file = await openFirstEpubPackage({ fileData, diagnoser: diags })
         if (!file) {
-            return undefined
+            return { value: undefined, diags: diags.all() }
         }
-        const { value: book, diags: bookDiags } = await processEpub(file)
-        bookDiags.forEach(diagnoser)
-        return book
+        const book = await processEpub(file, diags)
+        return { value: book, diags: diags.all() }
     } catch (err) {
-        diagnoser({
+        diags?.push({
             message: 'Unhandled exception on parsing',
             data: err as object,
         })
-        return undefined
+        return { value: undefined, diags: diags.all() }
     }
 }
 
@@ -32,34 +31,36 @@ export type ExtractedMetadata = {
     metadata: BooqMeta,
     cover?: string,
 };
-export async function extractMetadata({ fileData, extractCover, diagnoser }: {
+export async function extractMetadata({ fileData, extractCover }: {
     fileData: Buffer,
     extractCover?: boolean,
-    diagnoser?: (diag: Diagnostic) => void,
-}): Promise<ExtractedMetadata | undefined> {
-    diagnoser = diagnoser ?? (() => undefined)
-    const epub = await openFirstEpubPackage({ fileData, diagnoser })
+}): Promise<{
+    value: ExtractedMetadata | undefined,
+    diags: Diagnostic[],
+}> {
+    let diags = diagnoser('extract metadata')
+    const epub = await openFirstEpubPackage({ fileData, diagnoser: diags })
     if (!epub) {
-        return undefined
+        return { value: undefined, diags: diags.all() }
     }
-    const metadata = await getMetadata(epub)
+    const metadata = buildMeta(epub, diags)
     if (extractCover) {
-        const coverHref = metadata.cover
+        const coverHref = metadata.cover?.href
         if (typeof coverHref === 'string') {
             const coverBuffer = await epub.bufferResolver(coverHref)
             if (!coverBuffer) {
-                diagnoser({
+                diags.push({
                     message: `couldn't load cover image: ${coverHref}`,
                 })
-                return { metadata }
+                return { value: { metadata }, diags: diags.all() }
             } else {
                 const cover = Buffer.from(coverBuffer).toString('base64')
-                return { cover, metadata }
+                return { value: { cover, metadata }, diags: diags.all() }
             }
         } else {
-            return { metadata }
+            return { value: { metadata }, diags: diags.all() }
         }
     } else {
-        return { metadata }
+        return { value: { metadata }, diags: diags.all() }
     }
 }
