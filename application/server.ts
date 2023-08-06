@@ -11,7 +11,6 @@ export async function fetchQuery<T = any>({ query, variables }: {
     success: false,
     error: string,
 }> {
-    console.log('HERE')
     let server = await prepareServer()
     let res = await server.executeOperation({
         query, variables,
