@@ -1,19 +1,16 @@
-import { ReactNode, useState, useEffect } from 'react'
+import { ReactNode } from 'react'
 import {
     useFloating, useDismiss, useInteractions, useTransitionStyles,
     flip, shift, inline, autoUpdate
 } from '@floating-ui/react'
 
 export function useFloater({
-    isOpen, setIsOpen, handleSelectionChange, Content,
+    isOpen, setIsOpen, Content,
 }: {
     isOpen: boolean,
     setIsOpen: (open: boolean) => void,
-    handleSelectionChange: () => void,
     Content: ReactNode,
 }) {
-    const [locked, setLocked] = useState(false)
-    isOpen = isOpen && !locked
     const {
         refs: { floating, setReference, setFloating },
         floatingStyles, context,
@@ -45,39 +42,6 @@ export function useFloater({
         },
     })
 
-    useEffect(() => {
-        function isWithinCtxMenu(event: Event) {
-            return floating.current?.contains(event.target as Element | null)
-        }
-        function lock(event: MouseEvent | TouchEvent) {
-            if (!isWithinCtxMenu(event)) {
-                setLocked(true)
-            }
-        }
-        function unlock() {
-            setLocked(false)
-            setTimeout(() => {
-                handleSelectionChange()
-            }, 150)
-        }
-        window.document.addEventListener('mousedown', lock)
-        window.document.addEventListener('touchstart', lock)
-        window.document.addEventListener('mouseup', unlock)
-        window.document.addEventListener('touchend', unlock)
-        window.document.addEventListener('mouseleave', unlock)
-        window.document.addEventListener('touchcancel', unlock)
-        window.document.addEventListener('selectionchange', handleSelectionChange)
-        return () => {
-            window.document.removeEventListener('mousedown', lock)
-            window.document.removeEventListener('touchstart', lock)
-            window.document.removeEventListener('mouseup', unlock)
-            window.document.removeEventListener('touchend', unlock)
-            window.document.removeEventListener('mouseleave', unlock)
-            window.document.removeEventListener('touchcancel', unlock)
-            window.document.removeEventListener('selectionchange', handleSelectionChange)
-        }
-    }, [handleSelectionChange, setLocked, floating])
-
     const FloaterNode = isOpen ? (
         <div
             ref={setFloating}
@@ -95,6 +59,7 @@ export function useFloater({
     return {
         isOpen,
         setReference,
+        floating,
         FloaterNode,
     }
 }

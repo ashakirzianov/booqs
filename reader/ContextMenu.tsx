@@ -1,4 +1,4 @@
-import { useCallback, ReactNode, useState } from 'react'
+import { useCallback, ReactNode, useState, useEffect } from 'react'
 import {
     getBooqSelection, VirtualElement, getSelectionElement,
 } from '@/viewer'
@@ -15,25 +15,17 @@ export function useContextMenu(booqId: string, self?: User) {
     const [menuState, setMenuState] = useState<ContextMenuState>({
         target: { kind: 'empty' },
     })
-    const isOpen = menuState.target.kind !== 'empty'
+    const [locked, setLocked] = useState(false)
+    const isOpen = menuState.target.kind !== 'empty' && !locked
     function setIsOpen(open: boolean) {
         if (!open) {
             setMenuState({ target: { kind: 'empty' } })
         }
     }
 
-    let { FloaterNode, setReference } = useFloater({
+    let { FloaterNode, setReference, floating } = useFloater({
         isOpen,
         setIsOpen,
-        handleSelectionChange() {
-            updateMenuState(prev => {
-                if (prev.target.kind === 'empty' || prev.target.kind === 'selection') {
-                    return getSelectionState()
-                } else {
-                    return prev
-                }
-            })
-        },
         Content: <ContextMenuContent
             booqId={booqId}
             self={self}
@@ -63,6 +55,48 @@ export function useContextMenu(booqId: string, self?: User) {
             setMenuState(setterOrValue)
         }
     }, [setMenuState, setReference])
+
+    useEffect(() => {
+        function handleSelectionChange() {
+            updateMenuState(prev => {
+                if (prev.target.kind === 'empty' || prev.target.kind === 'selection') {
+                    return getSelectionState()
+                } else {
+                    return prev
+                }
+            })
+        }
+        function isWithinCtxMenu(event: Event) {
+            return floating.current?.contains(event.target as Element | null)
+        }
+        function lock(event: MouseEvent | TouchEvent) {
+            if (!isWithinCtxMenu(event)) {
+                setLocked(true)
+            }
+        }
+        function unlock() {
+            setLocked(false)
+            setTimeout(() => {
+                handleSelectionChange()
+            }, 150)
+        }
+        window.document.addEventListener('mousedown', lock)
+        window.document.addEventListener('touchstart', lock)
+        window.document.addEventListener('mouseup', unlock)
+        window.document.addEventListener('touchend', unlock)
+        window.document.addEventListener('mouseleave', unlock)
+        window.document.addEventListener('touchcancel', unlock)
+        window.document.addEventListener('selectionchange', handleSelectionChange)
+        return () => {
+            window.document.removeEventListener('mousedown', lock)
+            window.document.removeEventListener('touchstart', lock)
+            window.document.removeEventListener('mouseup', unlock)
+            window.document.removeEventListener('touchend', unlock)
+            window.document.removeEventListener('mouseleave', unlock)
+            window.document.removeEventListener('touchcancel', unlock)
+            window.document.removeEventListener('selectionchange', handleSelectionChange)
+        }
+    }, [updateMenuState, setLocked, floating])
 
     return {
         isOpen,
