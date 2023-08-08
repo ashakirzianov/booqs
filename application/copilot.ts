@@ -59,8 +59,6 @@ export function useCopilotAnswer(context: CopilotContext, question: string) {
         AnswerQuery,
         {
             variables: { context, question },
-            fetchPolicy: 'no-cache',
-            nextFetchPolicy: 'no-cache',
         },
     )
     return {
