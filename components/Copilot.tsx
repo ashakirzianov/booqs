@@ -28,7 +28,7 @@ export function useCopilot(booq: BooqData) {
             }
         },
         Content: <div
-            className='container flex flex-col grow items-center font-main select-none transition font-bold p-lg w-60'
+            className='container flex flex-col grow items-center font-main select-none transition font-bold p-lg w-prose'
         >
             <CopilotStateContent state={state} booq={booq} />
         </div>,
