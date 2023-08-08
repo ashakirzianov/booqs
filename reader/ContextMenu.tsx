@@ -1,6 +1,6 @@
 import { useCallback, ReactNode, useState, useEffect } from 'react'
 import {
-    getBooqSelection, VirtualElement, getSelectionElement,
+    getBooqSelection, VirtualElement, getSelectionElement, BooqSelection,
 } from '@/viewer'
 import { ContextMenuContent, ContextMenuTarget } from './ContextMenuContent'
 import { User } from '@/application/auth'
@@ -11,12 +11,19 @@ export type ContextMenuState = {
     anchor?: VirtualElement,
 };
 
-export function useContextMenu(booqId: string, self?: User) {
+export function useContextMenu({
+    booqId, self, updateCopilot, closed,
+}: {
+    booqId: string,
+    self: User | undefined,
+    closed: boolean,
+    updateCopilot: (selection: BooqSelection, anchor: VirtualElement) => void,
+}) {
     const [menuState, setMenuState] = useState<ContextMenuState>({
         target: { kind: 'empty' },
     })
     const [locked, setLocked] = useState(false)
-    const isOpen = menuState.target.kind !== 'empty' && !locked
+    const isOpen = menuState.target.kind !== 'empty' && !locked && !closed
     function setIsOpen(open: boolean) {
         if (!open) {
             setMenuState({ target: { kind: 'empty' } })
@@ -34,6 +41,12 @@ export function useContextMenu(booqId: string, self?: User) {
                 ...menuState,
                 target,
             })}
+            updateCopilot={selection => {
+                let element = getSelectionElement()
+                if (element) {
+                    updateCopilot(selection, element)
+                }
+            }}
         />,
     })
 

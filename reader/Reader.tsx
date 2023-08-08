@@ -20,6 +20,7 @@ import { useFilteredHighlights } from '@/application/navigation'
 import { colorForGroup, pageForPosition, quoteColor } from '@/application/common'
 import { useReportHistory } from '@/application/history'
 import { User, useAuth } from '@/application/auth'
+import { useCopilot } from '@/components/Copilot'
 
 export function Reader({
     booq, quote,
@@ -50,10 +51,28 @@ export function Reader({
     const {
         navigationOpen, NavigationButton, NavigationContent,
     } = useNavigationPanel(booq.id, self)
+    let {
+        state: copilotState,
+        setState,
+        CopilotNode,
+    } = useCopilot(booq)
     const {
         ContextMenuNode, isOpen: contextMenuVisible,
         updateMenuState: setMenuState,
-    } = useContextMenu(booq.id, self)
+    } = useContextMenu({
+        booqId: booq.id,
+        self,
+        closed: copilotState.kind !== 'empty',
+        updateCopilot(selection, anchor) {
+            setState({
+                kind: 'selected',
+                selection,
+                anchor,
+                // TODO: implement context generation
+                context: selection.text,
+            })
+        },
+    })
     const onAugmentationClick = useMemo(() => {
         return (id: string) => {
             const next = menuStateForAugmentation(id)
@@ -90,6 +109,7 @@ export function Reader({
             title='Next'
         />}
         ContextMenu={ContextMenuNode}
+        Copilot={CopilotNode}
         MainButton={<FeedLink>
             <IconButton icon='back' />
         </FeedLink>}
@@ -120,6 +140,7 @@ export function LoadingBooqScreen() {
         PrevButton={null}
         NextButton={null}
         ContextMenu={null}
+        Copilot={null}
         MainButton={<FeedLink>
             <IconButton icon='back' />
         </FeedLink>}
