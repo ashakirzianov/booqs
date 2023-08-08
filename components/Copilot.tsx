@@ -72,9 +72,8 @@ function CopilotSelectedContent({ state, booq }: {
         context: state.context,
         booqId: booq.id,
         title: booq.title ?? 'Unknown',
-        // TODO: fetch author and language from booq
-        author: 'Unknown author', // booq.author ?? 'Unknown author',
-        language: 'en', // booq.language,
+        author: booq.author ?? 'Unknown author',
+        language: booq.language ?? 'en-US',
         start: state.selection.range.start,
         end: state.selection.range.end,
     }

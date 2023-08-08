@@ -44,6 +44,8 @@ export async function fetchBooqFragmentServer(id: string, path?: BooqPath) {
         booq(id: $id) {
             id
             title
+            author
+            language
             length
             preview(path: $path)
             fragment(path: $path) {
@@ -66,6 +68,8 @@ export async function fetchBooqFragmentServer(id: string, path?: BooqPath) {
         booq: {
             id: string,
             title?: string,
+            author?: string,
+            language?: string,
             length: number,
             preview: string,
             fragment: {

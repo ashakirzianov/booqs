@@ -6,6 +6,8 @@ const BooqFragmentQuery = gql`query BooqFragment($id: ID!, $path: [Int!]) {
     booq(id: $id) {
         id
         title
+        author
+        language
         length
         fragment(path: $path) {
             nodes
@@ -27,6 +29,8 @@ type BooqFragmentData = {
     booq: {
         id: string,
         title?: string,
+        author?: string,
+        language?: string,
         length: number,
         fragment: {
             nodes: BooqNode[],
