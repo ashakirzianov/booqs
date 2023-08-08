@@ -1,6 +1,6 @@
 'use client'
 import React, { useState, useCallback, useMemo } from 'react'
-import { positionForPath, samePath, BooqPath, BooqRange } from '@/core'
+import { positionForPath, samePath, BooqPath, BooqRange, contextForRange } from '@/core'
 import { BorderButton, IconButton } from '@/components/Buttons'
 import { BooqLink, FeedLink, booqHref } from '@/components/Links'
 import { Spinner } from '@/components/Loading'
@@ -20,6 +20,7 @@ import { useFilteredHighlights } from '@/application/navigation'
 import { colorForGroup, pageForPosition, quoteColor } from '@/application/common'
 import { useReportHistory } from '@/application/history'
 import { User, useAuth } from '@/application/auth'
+import { useCopilot } from '@/components/Copilot'
 
 export function Reader({
     booq, quote,
@@ -50,10 +51,28 @@ export function Reader({
     const {
         navigationOpen, NavigationButton, NavigationContent,
     } = useNavigationPanel(booq.id, self)
+    let {
+        state: copilotState,
+        setState,
+        CopilotNode,
+    } = useCopilot(booq)
+    let copilotVisible = copilotState.kind !== 'empty'
     const {
         ContextMenuNode, isOpen: contextMenuVisible,
         updateMenuState: setMenuState,
-    } = useContextMenu(booq.id, self)
+    } = useContextMenu({
+        booqId: booq.id,
+        self,
+        closed: copilotState.kind !== 'empty',
+        updateCopilot(selection, anchor) {
+            setState({
+                kind: 'selected',
+                selection,
+                anchor,
+                context: contextForRange(booq.fragment.nodes, selection.range, 1000) ?? 'failed',
+            })
+        },
+    })
     const onAugmentationClick = useMemo(() => {
         return (id: string) => {
             const next = menuStateForAugmentation(id)
@@ -64,7 +83,7 @@ export function Reader({
     }, [menuStateForAugmentation, setMenuState])
 
     return <ReaderLayout
-        isControlsVisible={!contextMenuVisible && visible}
+        isControlsVisible={!contextMenuVisible && !copilotVisible && visible}
         isNavigationOpen={navigationOpen}
         BooqContent={<div style={{
             fontFamily: 'var(--font-book)',
@@ -90,6 +109,7 @@ export function Reader({
             title='Next'
         />}
         ContextMenu={ContextMenuNode}
+        Copilot={CopilotNode}
         MainButton={<FeedLink>
             <IconButton icon='back' />
         </FeedLink>}
@@ -120,6 +140,7 @@ export function LoadingBooqScreen() {
         PrevButton={null}
         NextButton={null}
         ContextMenu={null}
+        Copilot={null}
         MainButton={<FeedLink>
             <IconButton icon='back' />
         </FeedLink>}

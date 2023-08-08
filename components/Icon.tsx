@@ -22,6 +22,7 @@ export type IconName =
     | 'search' | 'pages'
     | 'facebook' | 'apple'
     | 'quote' | 'copy' | 'link' | 'highlight'
+    | 'question'
     ;
 
 export function Icon({ name, size }: {
@@ -77,6 +78,8 @@ function iconForName(name: IconName) {
             return faLink
         case 'highlight':
             return faHighlighter
+        case 'question':
+            return faQuestion
         default:
             assertNever(name)
             return faQuestion

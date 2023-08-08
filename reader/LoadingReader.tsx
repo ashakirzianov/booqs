@@ -65,6 +65,7 @@ export function LoadingReader({
             title='Next'
         />}
         ContextMenu={null}
+        Copilot={null}
         MainButton={<FeedLink>
             <IconButton icon='back' />
         </FeedLink>}

@@ -1,59 +1,57 @@
 import { useCallback, ReactNode, useState, useEffect } from 'react'
 import {
-    useFloating, useDismiss, useInteractions, useTransitionStyles,
-    flip, shift, inline, autoUpdate
-} from '@floating-ui/react'
-import {
-    getBooqSelection, VirtualElement, getSelectionElement,
+    getBooqSelection, VirtualElement, getSelectionElement, BooqSelection,
 } from '@/viewer'
 import { ContextMenuContent, ContextMenuTarget } from './ContextMenuContent'
 import { User } from '@/application/auth'
+import { useFloater } from '@/components/Floater'
 
 export type ContextMenuState = {
     target: ContextMenuTarget,
     anchor?: VirtualElement,
 };
 
-export function useContextMenu(booqId: string, self?: User) {
+export function useContextMenu({
+    booqId, self, updateCopilot, closed,
+}: {
+    booqId: string,
+    self: User | undefined,
+    closed: boolean,
+    updateCopilot: (selection: BooqSelection, anchor: VirtualElement) => void,
+}) {
     const [menuState, setMenuState] = useState<ContextMenuState>({
         target: { kind: 'empty' },
     })
     const [locked, setLocked] = useState(false)
-    const isOpen = menuState.target.kind !== 'empty' && !locked
+    const isOpen = menuState.target.kind !== 'empty' && !locked && !closed
     function setIsOpen(open: boolean) {
         if (!open) {
             setMenuState({ target: { kind: 'empty' } })
         }
     }
-    const {
-        refs: { floating, setReference, setFloating },
-        floatingStyles, context,
-    } = useFloating({
-        placement: 'bottom',
-        open: isOpen,
-        onOpenChange: setIsOpen,
-        middleware: [inline(), flip(), shift()],
-        whileElementsMounted: autoUpdate
-    })
 
-    const dismiss = useDismiss(context)
-
-    const { getFloatingProps } = useInteractions([
-        dismiss,
-    ])
-
-    const { styles: transitionStyles } = useTransitionStyles(context, {
-        duration: 300,
-        initial({ side }) {
-            const translate = side === 'top' ? 'translateY(-20%)'
-                : side === 'bottom' ? 'translateY(20%)'
-                    : side === 'left' ? 'translateX(-20%)'
-                        : 'translateX(20%)'
-            return {
-                opacity: 0,
-                transform: `${translate} scale(0.9)`,
-            }
-        },
+    let { FloaterNode, setReference, floating } = useFloater({
+        isOpen,
+        setIsOpen,
+        Content: <div className='w-40'><ContextMenuContent
+            booqId={booqId}
+            self={self}
+            target={menuState.target}
+            setTarget={target => setMenuState({
+                ...menuState,
+                target,
+            })}
+            updateCopilot={selection => {
+                if (menuState.anchor) {
+                    let anchor = menuState.anchor
+                    updateMenuState({
+                        target: { kind: 'empty' },
+                    })
+                    updateCopilot(selection, anchor)
+                }
+            }}
+        />
+        </div>,
     })
 
     type ContextMenuStateSetter = (prev: ContextMenuState) => ContextMenuState
@@ -76,9 +74,6 @@ export function useContextMenu(booqId: string, self?: User) {
     }, [setMenuState, setReference])
 
     useEffect(() => {
-        function isWithinCtxMenu(event: Event) {
-            return floating.current?.contains(event.target as Element | null)
-        }
         function handleSelectionChange() {
             updateMenuState(prev => {
                 if (prev.target.kind === 'empty' || prev.target.kind === 'selection') {
@@ -87,6 +82,9 @@ export function useContextMenu(booqId: string, self?: User) {
                     return prev
                 }
             })
+        }
+        function isWithinCtxMenu(event: Event) {
+            return floating.current?.contains(event.target as Element | null)
         }
         function lock(event: MouseEvent | TouchEvent) {
             if (!isWithinCtxMenu(event)) {
@@ -117,31 +115,9 @@ export function useContextMenu(booqId: string, self?: User) {
         }
     }, [updateMenuState, setLocked, floating])
 
-    const ContextMenuNode = isOpen ? (
-        <div
-            ref={setFloating}
-            style={{
-                ...floatingStyles,
-            }}
-            {...getFloatingProps()}
-        >
-            <div className='bg-background rounded drop-shadow-2xl border border-border pointer-events-auto w-40' style={transitionStyles}>
-                <ContextMenuContent
-                    booqId={booqId}
-                    self={self}
-                    target={menuState.target}
-                    setTarget={target => setMenuState({
-                        ...menuState,
-                        target,
-                    })}
-                />
-            </div>
-        </div>
-    ) : null
-
     return {
         isOpen,
-        ContextMenuNode,
+        ContextMenuNode: FloaterNode,
         updateMenuState,
     }
 }

@@ -12,6 +12,7 @@ type ControlsProps = {
     PagesLeft: ReactNode,
     NavigationContent: ReactNode,
     ContextMenu: ReactNode,
+    Copilot: ReactNode,
 };
 
 type LayoutProps = ControlsProps & {
@@ -40,7 +41,7 @@ function BooqControls({
     ThemerButton, AccountButton,
     CurrentPage, PagesLeft,
     NavigationContent,
-    ContextMenu,
+    ContextMenu, Copilot,
 }: ControlsProps) {
     const showControls = isControlsVisible || isNavigationOpen
     const showCtrlClass = showControls ? styles.showCtr : ''
@@ -55,7 +56,7 @@ function BooqControls({
         <div className={`${styles.content} ${showCtrlClass}`} />
         <div className={`${styles.backTop} ${showCtrlClass}`} />
         <div className={`${styles.backBottom} ${showCtrlClass}`} />
-        <div className={`${styles.ctx} ${showCtrlClass}`}>{ContextMenu}</div>
+        <div className={`${styles.ctx} ${showCtrlClass}`}>{ContextMenu}{Copilot}</div>
         <div className={`${styles.navc} ${navOpenClass}`}>{NavigationContent}</div>
     </div>
 }
