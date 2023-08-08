@@ -34,9 +34,37 @@ export function useCopilotSuggestions(context: CopilotContext) {
             nextFetchPolicy: 'no-cache',
         },
     )
-    console.log(data)
     return {
         loading,
         suggestions: (data?.copilot.suggestions ?? []),
+    }
+}
+
+const AnswerQuery = gql`query AnswerQuery($context: CopilotContext!, $question: String!) {
+    copilot(context: $context) {
+        answer(question: $question)
+    }
+}`
+type AnswerData = {
+    copilot: {
+        answer: string,
+    }
+};
+type AnserVars = {
+    context: CopilotContext,
+    question: string,
+}
+export function useCopilotAnswer(context: CopilotContext, question: string) {
+    const { loading, data } = useQuery<AnswerData, AnserVars>(
+        AnswerQuery,
+        {
+            variables: { context, question },
+            fetchPolicy: 'no-cache',
+            nextFetchPolicy: 'no-cache',
+        },
+    )
+    return {
+        loading,
+        answer: (data?.copilot.answer ?? ''),
     }
 }

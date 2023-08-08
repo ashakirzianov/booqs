@@ -2,7 +2,7 @@ import { BooqSelection, VirtualElement } from '@/viewer'
 import { useEffect, useState } from 'react'
 import { useFloater } from './Floater'
 import { BooqData } from '@/application/booq'
-import { useCopilotSuggestions } from '@/application/copilot'
+import { CopilotContext, useCopilotAnswer, useCopilotSuggestions } from '@/application/copilot'
 import { Spinner } from './Loading'
 
 type CopilotEmpty = {
@@ -67,7 +67,7 @@ function CopilotSelectedContent({ state, booq }: {
     state: CopilotSelected,
     booq: BooqData,
 }) {
-    let { loading, suggestions } = useCopilotSuggestions({
+    let context = {
         text: state.selection.text,
         context: state.context,
         booqId: booq.id,
@@ -77,15 +77,31 @@ function CopilotSelectedContent({ state, booq }: {
         language: 'en', // booq.language,
         start: state.selection.range.start,
         end: state.selection.range.end,
-    })
-    console.log(loading, suggestions)
+    }
+    let { loading, suggestions } = useCopilotSuggestions(context)
+    let [question, askQuestion] = useState(undefined as string | undefined)
+    if (question) {
+        return <CopilotQuestion context={context} question={question} />
+    }
     return loading
         ? <Spinner />
         : <div className='font-menu text-blue-400 font-bold'>
             {suggestions.map(
-                (s, i) => <div key={i} className='cursor-pointer hover:underline decoration-dotted'>
+                (s, i) => <div key={i} className='cursor-pointer hover:underline decoration-dotted' onClick={() => askQuestion(s)}>
                     {`${i + 1}. ${s}`}
                 </div>)
             }
+        </div>
+}
+
+function CopilotQuestion({ context, question }: {
+    context: CopilotContext,
+    question: string,
+}) {
+    let { loading, answer } = useCopilotAnswer(context, question)
+    return loading
+        ? <Spinner />
+        : <div className='font-menu'>
+            {answer}
         </div>
 }
