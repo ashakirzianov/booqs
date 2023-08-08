@@ -33,7 +33,7 @@ export function useContextMenu({
     let { FloaterNode, setReference, floating } = useFloater({
         isOpen,
         setIsOpen,
-        Content: <ContextMenuContent
+        Content: <div className='w-40'><ContextMenuContent
             booqId={booqId}
             self={self}
             target={menuState.target}
@@ -47,7 +47,8 @@ export function useContextMenu({
                     updateCopilot(selection, element)
                 }
             }}
-        />,
+        />
+        </div>,
     })
 
     type ContextMenuStateSetter = (prev: ContextMenuState) => ContextMenuState

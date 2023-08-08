@@ -26,7 +26,7 @@ export function useCopilot(booq: BooqData) {
             }
         },
         Content: <div
-            className='container flex flex-col grow items-center font-main select-none transition font-bold p-lg'
+            className='container flex flex-col grow items-center font-main select-none transition font-bold p-lg w-60'
         >
             Copilot for fragment:
             {state.kind === 'selected' ?
