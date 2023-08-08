@@ -35,7 +35,7 @@ export function ContextMenuContent({
     booqId: string,
     self: User | undefined,
     setTarget: (target: ContextMenuTarget) => void,
-    updateCopilot: (selection: BooqSelection) => void,
+    updateCopilot?: (selection: BooqSelection) => void,
 }) {
     switch (target.kind) {
         case 'selection':
@@ -56,7 +56,7 @@ function SelectionTargetMenu({
     booqId: string,
     self: User | undefined,
     setTarget: (target: ContextMenuTarget) => void,
-    updateCopilot: (selection: BooqSelection) => void,
+    updateCopilot?: (selection: BooqSelection) => void,
 }) {
     useCopyQuote(rest.booqId, selection)
     return <>
@@ -74,7 +74,7 @@ function QuoteTargetMenu({
     booqId: string,
     self: User | undefined,
     setTarget: (target: ContextMenuTarget) => void,
-    updateCopilot: (selection: BooqSelection) => void,
+    updateCopilot?: (selection: BooqSelection) => void,
 }) {
     return <>
         <AddHighlightItem {...rest} selection={selection} />
@@ -90,7 +90,7 @@ function HighlightTargetMenu({
     booqId: string,
     self: User | undefined,
     setTarget: (target: ContextMenuTarget) => void,
-    updateCopilot: (selection: BooqSelection) => void,
+    updateCopilot?: (selection: BooqSelection) => void,
 }) {
     const isOwnHighlight = self?.id === highlight.author.id
     const selection = {
@@ -121,8 +121,11 @@ function HighlightTargetMenu({
 
 function CopilotItem({ selection, updateCopilot }: {
     selection: BooqSelection,
-    updateCopilot: (selection: BooqSelection) => void,
+    updateCopilot?: (selection: BooqSelection) => void,
 }) {
+    if (updateCopilot === undefined) {
+        return null
+    }
     return <MenuItem
         text='Ask copilot'
         icon='question'
