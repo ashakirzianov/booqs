@@ -84,10 +84,10 @@ function CopilotSelectedContent({ state, booq }: {
     }
     return loading
         ? <Spinner />
-        : <div className='font-menu text-blue-400 font-bold'>
+        : <div className='flex flex-col font-menu text-blue-400 font-bold'>
             {suggestions.map(
-                (s, i) => <div key={i} className='cursor-pointer hover:underline decoration-dotted' onClick={() => askQuestion(s)}>
-                    {`${i + 1}. ${s}`}
+                (s, i) => <div key={i} className='flex cursor-pointer hover:underline decoration-dotted' onClick={() => askQuestion(s)}>
+                    {`${i}. ${s}`}<br />
                 </div>)
             }
         </div>
