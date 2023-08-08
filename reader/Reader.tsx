@@ -56,6 +56,7 @@ export function Reader({
         setState,
         CopilotNode,
     } = useCopilot(booq)
+    let copilotVisible = copilotState.kind !== 'empty'
     const {
         ContextMenuNode, isOpen: contextMenuVisible,
         updateMenuState: setMenuState,
@@ -83,7 +84,7 @@ export function Reader({
     }, [menuStateForAugmentation, setMenuState])
 
     return <ReaderLayout
-        isControlsVisible={!contextMenuVisible && visible}
+        isControlsVisible={!contextMenuVisible && !copilotVisible && visible}
         isNavigationOpen={navigationOpen}
         BooqContent={<div style={{
             fontFamily: 'var(--font-book)',
