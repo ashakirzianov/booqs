@@ -1,6 +1,6 @@
 'use client'
 import React, { useState, useCallback, useMemo } from 'react'
-import { positionForPath, samePath, BooqPath, BooqRange } from '@/core'
+import { positionForPath, samePath, BooqPath, BooqRange, contextForRange } from '@/core'
 import { BorderButton, IconButton } from '@/components/Buttons'
 import { BooqLink, FeedLink, booqHref } from '@/components/Links'
 import { Spinner } from '@/components/Loading'
@@ -69,8 +69,7 @@ export function Reader({
                 kind: 'selected',
                 selection,
                 anchor,
-                // TODO: implement context generation
-                context: selection.text,
+                context: contextForRange(booq.fragment.nodes, selection.range, 1000) ?? 'failed',
             })
         },
     })
