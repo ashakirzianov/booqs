@@ -42,9 +42,12 @@ export function useContextMenu({
                 target,
             })}
             updateCopilot={selection => {
-                let element = getSelectionElement()
-                if (element) {
-                    updateCopilot(selection, element)
+                if (menuState.anchor) {
+                    let anchor = menuState.anchor
+                    updateMenuState({
+                        target: { kind: 'empty' },
+                    })
+                    updateCopilot(selection, anchor)
                 }
             }}
         />
