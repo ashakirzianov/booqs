@@ -9,7 +9,7 @@ import { SignIn } from '@/components/SignIn'
 import {
     BooqContent, getAugmentationElement, getAugmentationText,
     Augmentation,
-    useOnBooqClick, useOnBooqScroll,
+    useOnBooqClick, useOnBooqScroll, BooqSelection,
 } from '@/viewer'
 import { useContextMenu, ContextMenuState } from './ContextMenu'
 import { useNavigationPanel } from './Navigation'
@@ -20,7 +20,8 @@ import { useFilteredHighlights } from '@/application/navigation'
 import { colorForGroup, pageForPosition, quoteColor } from '@/application/common'
 import { useReportHistory } from '@/application/history'
 import { User, useAuth } from '@/application/auth'
-import { useCopilot } from '@/components/Copilot'
+import { Copilot, CopilotState } from '@/components/Copilot'
+import { VirtualElement } from '@floating-ui/react'
 
 export function Reader({
     booq, quote,
@@ -51,11 +52,9 @@ export function Reader({
     const {
         navigationOpen, NavigationButton, NavigationContent,
     } = useNavigationPanel(booq.id, self)
-    let {
-        state: copilotState,
-        setState,
-        CopilotNode,
-    } = useCopilot(booq)
+    let [copilotState, setCopilotState] = useState<CopilotState>({
+        kind: 'empty',
+    })
     let copilotVisible = copilotState.kind !== 'empty'
     const {
         ContextMenuNode, isOpen: contextMenuVisible,
@@ -65,7 +64,7 @@ export function Reader({
         self,
         closed: copilotState.kind !== 'empty',
         updateCopilot(selection, anchor) {
-            setState({
+            setCopilotState({
                 kind: 'selected',
                 selection,
                 anchor,
@@ -109,7 +108,11 @@ export function Reader({
             title='Next'
         />}
         ContextMenu={ContextMenuNode}
-        Copilot={CopilotNode}
+        Copilot={<Copilot
+            state={copilotState}
+            setState={setCopilotState}
+            booq={booq}
+        />}
         MainButton={<FeedLink>
             <IconButton icon='back' />
         </FeedLink>}

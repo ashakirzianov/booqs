@@ -17,22 +17,6 @@ type CopilotSelected = {
     anchor: VirtualElement,
 }
 export type CopilotState = CopilotEmpty | CopilotSelected
-
-export function useCopilot(booq: BooqData) {
-    let [state, setState] = useState<CopilotState>({
-        kind: 'empty',
-    })
-    return {
-        state,
-        setState,
-        CopilotNode: <Copilot
-            state={state}
-            setState={setState}
-            booq={booq}
-        />,
-    }
-}
-
 type CopilotProps = {
     state: CopilotState,
     setState: (state: CopilotState) => void,
