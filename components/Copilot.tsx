@@ -40,7 +40,7 @@ function CopilotFloating({ state, setState, booq }: CopilotProps) {
             }
         },
         Content: <div
-            className='container flex flex-col grow items-center font-main select-none transition font-bold p-lg w-prose'
+            className='container flex flex-col grow items-center font-main select-none transition font-bold p-lg max-w-[var(--content-width)]'
         >
             <CopilotStateContent state={state} booq={booq} />
         </div>,
