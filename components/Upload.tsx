@@ -3,13 +3,13 @@ import { IconButton } from '@/components/Buttons'
 import { useSelectFileDialog } from '@/components/SelectFileDialog'
 import { Spinner } from '@/components/Loading'
 import { Popover } from '@/components/Popover'
-import { ModalButton, ModalDivider, ModalLabel, useModal } from '@/components/Modal'
+import { Modal, ModalButton, ModalDivider, ModalLabel } from '@/components/Modal'
 import { BooqCover } from '@/components/BooqCover'
 import { booqHref } from '@/components/Links'
 import { useSignInModal } from './SignIn'
 import { useAuth } from '@/application/auth'
 import { useUpload } from '@/application/upload'
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 
 export function Upload() {
     const { signed } = useAuth() ?? {}
@@ -17,16 +17,17 @@ export function Upload() {
     function openModal() {
         setIsOpen(true)
     }
-    function closeModal() {
+    let closeModal = useCallback(() => {
         setIsOpen(false)
-    }
-    const { ModalContent } = useModal({
-        isOpen,
-        setIsOpen,
-        content: <div className='flex flex-col items-center w-60 max-w-[100vw]'>
+    }, [setIsOpen])
+    const ModalContent = <Modal
+        isOpen={isOpen}
+        closeModal={closeModal}
+    >
+        <div className='flex flex-col items-center w-60 max-w-[100vw]'>
             <UploadModalContent closeModal={closeModal} />
-        </div>,
-    })
+        </div>
+    </Modal>
     const {
         openModal: openSignIn,
         ModalContent: SignInModalContent,

@@ -1,40 +1,67 @@
-import React, { ReactNode } from 'react'
+'use client'
+import React, { ReactNode, useEffect, useRef } from 'react'
 import { Icon, IconName } from './Icon'
 import Link from 'next/link'
 
 export function useModal({
-    isOpen, setIsOpen, content,
+    isOpen, setIsOpen, content
 }: {
     isOpen: boolean,
     setIsOpen: (isOpen: boolean) => void,
     content: ReactNode,
 }) {
-    const closeModal = () => setIsOpen(false)
     return {
         ModalContent: <Modal
             isOpen={isOpen}
-            close={closeModal}
+            closeModal={() => setIsOpen(false)}
         >{content}</Modal>,
     }
 }
 
 export function Modal({
-    isOpen, children, close,
+    isOpen, children, closeModal
 }: {
     isOpen: boolean,
-    close: () => void,
+    closeModal: () => void,
     children: ReactNode,
 }) {
-    const screenClosedClass = isOpen ? '' : 'invisible bg-transparent'
     const containerClosedClass = isOpen ? '' : 'opacity-0 translate-y-1/4'
-    return <div className={`flex flex-col fixed justify-center items-center bg-black/25 z-10 transition-all top-0 right-0 bottom-0 left-0 ${screenClosedClass}`} onClick={close}>
-        <div
-            className={`relative pointer-events-auto transition duration-300 shadow rounded bg-background ${containerClosedClass}`}
-            onClick={e => e.stopPropagation()}
-        >
-            {children}
-        </div>
-    </div>
+    const dialogRef = useRef<HTMLDialogElement>(null)
+    useEffect(() => {
+        let ref: HTMLDialogElement | null = null
+        if (isOpen) {
+            dialogRef.current?.showModal()
+            ref = dialogRef.current
+        } else {
+            dialogRef.current?.close()
+        }
+        return () => {
+            ref?.close()
+        }
+    }, [isOpen])
+    useEffect(() => {
+        function handleClick(e: MouseEvent) {
+            if (e.target === dialogRef.current) {
+                closeModal()
+            }
+        }
+        function handleKey(e: KeyboardEvent) {
+            if (e.key === 'Escape') {
+                closeModal()
+            }
+        }
+        document.addEventListener('keydown', handleKey)
+        document.addEventListener('mousedown', handleClick)
+        return () => {
+            document.removeEventListener('keydown', handleKey)
+            document.removeEventListener('mousedown', handleClick)
+        }
+    }, [closeModal])
+    return <dialog ref={dialogRef}
+        className={`relative pointer-events-auto transition duration-300 shadow rounded bg-background opacity-0 translate-y-full open:opacity-100 open:translate-y-0 p-0`}
+    >
+        {children}
+    </dialog>
 }
 
 
