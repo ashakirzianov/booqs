@@ -1,68 +1,58 @@
-import React, { ReactNode, useState } from 'react'
-import Link from 'next/link'
+import React, { ReactNode } from 'react'
 import { Icon, IconName } from './Icon'
+import Link from 'next/link'
 
-export type ModalDefinition = {
-    body: ReactNode,
-    buttons?: ButtonProps[],
-};
-export type ModalRenderProps = {
-    closeModal: () => void,
-};
-export function useModal(render: (props: ModalRenderProps) => ModalDefinition) {
-    const [isOpen, setIsOpen] = useState(false)
-    const openModal = () => setIsOpen(true)
+export function useModal({
+    isOpen, setIsOpen, content,
+}: {
+    isOpen: boolean,
+    setIsOpen: (isOpen: boolean) => void,
+    content: ReactNode,
+}) {
     const closeModal = () => setIsOpen(false)
-    const { body, buttons } = render({ closeModal })
     return {
-        openModal, closeModal,
-        ModalContent: <ModalContent
+        ModalContent: <Modal
             isOpen={isOpen}
-            content={body}
-            buttons={buttons}
             close={closeModal}
-        />,
+        >{content}</Modal>,
     }
 }
 
-function ModalContent({
-    isOpen, content, buttons, close,
+export function Modal({
+    isOpen, children, close,
 }: {
     isOpen: boolean,
     close: () => void,
-    content: ReactNode,
-    buttons?: ButtonProps[],
+    children: ReactNode,
 }) {
-    const openClass = isOpen ? 'open' : 'closed'
     const screenClosedClass = isOpen ? '' : 'invisible bg-transparent'
     const containerClosedClass = isOpen ? '' : 'opacity-0 translate-y-1/4'
     return <div className={`flex flex-col fixed justify-center items-center bg-black/25 z-10 transition-all top-0 right-0 bottom-0 left-0 ${screenClosedClass}`} onClick={close}>
         <div
-            className={`relative max-w-3xl w-auto max-h-full overflow-x-hidden overflow-y-auto z-10 bg-background pointer-events-auto transition duration-300 shadow rounded ${containerClosedClass}`}
+            className={`relative pointer-events-auto transition duration-300 shadow rounded bg-background ${containerClosedClass}`}
             onClick={e => e.stopPropagation()}
         >
-            <div>
-                {content}
-            </div>
-            <div>
-                {
-                    (buttons ?? []).map(
-                        (props, idx) => <ModalButton key={idx} {...props} />
-                    )
-                }
-            </div>
+            {children}
         </div>
     </div>
 }
 
-type ButtonProps = {
+
+export function ModalLabel({ text }: { text: string }) {
+    return <span className='p-lg'>{text}</span>
+}
+
+export function ModalDivider() {
+    return <hr className='w-full border-b-0 border-l-0 border-r-0 border-t-border border-t m-0' />
+}
+
+export function ModalButton({ text, icon, href, onClick }: {
     text: string,
     icon?: IconName,
-    onClick?: () => void,
     href?: string,
-};
-function ModalButton({ text, icon, onClick, href }: ButtonProps) {
-    const Content = <div className='flex flex-row items-center'>
+    onClick?: () => void,
+}) {
+    let content = <div className='flex flex-row items-center'>
         {
             icon
                 ? <div><Icon name={icon} /></div>
@@ -71,13 +61,10 @@ function ModalButton({ text, icon, onClick, href }: ButtonProps) {
         <span className='m-lg no-underline'>{text}</span>
     </div>
     return <div className='flex grow flex-col items-center cursor-pointer text-action hover:text-highlight' onClick={onClick}>
-        <hr className='w-full border-b-0 border-l-0 border-r-0 border-t-border border-t m-0' />
         {
             href
-                ? <Link href={href}>
-                    {Content}
-                </Link>
-                : Content
+                ? <Link href={href}>{content}</Link>
+                : content
         }
     </div>
 }
