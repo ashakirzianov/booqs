@@ -19,13 +19,14 @@ export function useModal({
 }
 
 export function Modal({
-    isOpen, children, closeModal
+    isOpen, children, closeModal, fullScreen,
 }: {
     isOpen: boolean,
+    fullScreen?: boolean,
     closeModal: () => void,
     children: ReactNode,
 }) {
-    const containerClosedClass = isOpen ? '' : 'opacity-0 translate-y-1/4'
+    const fullScreenClasses = fullScreen ? 'w-screen h-screen m-0' : ''
     const dialogRef = useRef<HTMLDialogElement>(null)
     useEffect(() => {
         let ref: HTMLDialogElement | null = null
@@ -58,7 +59,7 @@ export function Modal({
         }
     }, [closeModal])
     return <dialog ref={dialogRef}
-        className={`relative pointer-events-auto transition duration-300 shadow rounded bg-background opacity-0 translate-y-full open:opacity-100 open:translate-y-0 p-0`}
+        className={`pointer-events-auto transition duration-300 shadow rounded bg-background opacity-0 translate-y-full open:opacity-100 open:translate-y-0 p-0 ${fullScreenClasses}`}
     >
         {children}
     </dialog>
