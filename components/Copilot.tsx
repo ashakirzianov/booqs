@@ -1,9 +1,11 @@
 import { BooqSelection, VirtualElement } from '@/viewer'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useFloater } from './Floater'
 import { BooqData } from '@/application/booq'
 import { CopilotContext, useCopilotAnswer, useCopilotSuggestions } from '@/application/copilot'
 import { Spinner } from './Loading'
+import { Modal, ModalDivider, ModalHeader } from './Modal'
+import { useIsSmallScreen } from '@/application/utils'
 
 type CopilotEmpty = {
     kind: 'empty',
@@ -15,11 +17,21 @@ type CopilotSelected = {
     anchor: VirtualElement,
 }
 export type CopilotState = CopilotEmpty | CopilotSelected
+type CopilotProps = {
+    state: CopilotState,
+    setState: (state: CopilotState) => void,
+    booq: BooqData,
+}
+export function Copilot(props: CopilotProps) {
+    let small = useIsSmallScreen()
+    if (!small) {
+        return <CopilotFloating {...props} />
+    } else {
+        return <CopilotModal {...props} />
+    }
+}
 
-export function useCopilot(booq: BooqData) {
-    let [state, setState] = useState<CopilotState>({
-        kind: 'empty',
-    })
+function CopilotFloating({ state, setState, booq }: CopilotProps) {
     let { FloaterNode, setReference } = useFloater({
         isOpen: state.kind !== 'empty',
         setIsOpen: open => {
@@ -28,7 +40,7 @@ export function useCopilot(booq: BooqData) {
             }
         },
         Content: <div
-            className='container flex flex-col grow items-center font-main select-none transition font-bold p-lg w-prose'
+            className='container flex flex-col grow items-center font-main select-none transition font-bold p-lg max-w-[var(--content-width)]'
         >
             <CopilotStateContent state={state} booq={booq} />
         </div>,
@@ -38,11 +50,21 @@ export function useCopilot(booq: BooqData) {
             setReference(state.anchor)
         }
     }, [state, setReference])
-    return {
-        state,
-        setState,
-        CopilotNode: FloaterNode,
-    }
+    return FloaterNode
+}
+
+function CopilotModal({ state, setState, booq }: CopilotProps) {
+    let isOpen = state.kind !== 'empty'
+    let closeModal = useCallback(() => {
+        setState({ kind: 'empty' })
+    }, [setState])
+    return <Modal isOpen={isOpen} closeModal={closeModal}>
+        <ModalHeader text='Ask Copilot' onClose={closeModal} />
+        <ModalDivider />
+        <div className='container flex flex-col grow items-center font-main select-none transition font-bold p-4'>
+            <CopilotStateContent state={state} booq={booq} />
+        </div>
+    </Modal>
 }
 
 function CopilotStateContent({ state, booq }: {

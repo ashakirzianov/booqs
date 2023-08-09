@@ -1,68 +1,86 @@
-import React, { ReactNode, useState } from 'react'
-import Link from 'next/link'
+'use client'
+import React, { ReactNode, useEffect, useRef } from 'react'
 import { Icon, IconName } from './Icon'
+import Link from 'next/link'
 
-export type ModalDefinition = {
-    body: ReactNode,
-    buttons?: ButtonProps[],
-};
-export type ModalRenderProps = {
-    closeModal: () => void,
-};
-export function useModal(render: (props: ModalRenderProps) => ModalDefinition) {
-    const [isOpen, setIsOpen] = useState(false)
-    const openModal = () => setIsOpen(true)
-    const closeModal = () => setIsOpen(false)
-    const { body, buttons } = render({ closeModal })
+export function useModal({
+    isOpen, setIsOpen, content
+}: {
+    isOpen: boolean,
+    setIsOpen: (isOpen: boolean) => void,
+    content: ReactNode,
+}) {
     return {
-        openModal, closeModal,
-        ModalContent: <ModalContent
+        ModalContent: <Modal
             isOpen={isOpen}
-            content={body}
-            buttons={buttons}
-            close={closeModal}
-        />,
+            closeModal={() => setIsOpen(false)}
+        >{content}</Modal>,
     }
 }
 
-function ModalContent({
-    isOpen, content, buttons, close,
+export function Modal({
+    isOpen, children, closeModal, fullScreen,
 }: {
     isOpen: boolean,
-    close: () => void,
-    content: ReactNode,
-    buttons?: ButtonProps[],
+    fullScreen?: boolean,
+    closeModal: () => void,
+    children: ReactNode,
 }) {
-    const openClass = isOpen ? 'open' : 'closed'
-    const screenClosedClass = isOpen ? '' : 'invisible bg-transparent'
-    const containerClosedClass = isOpen ? '' : 'opacity-0 translate-y-1/4'
-    return <div className={`flex flex-col fixed justify-center items-center bg-black/25 z-10 transition-all top-0 right-0 bottom-0 left-0 ${screenClosedClass}`} onClick={close}>
-        <div
-            className={`relative max-w-3xl w-auto max-h-full overflow-x-hidden overflow-y-auto z-10 bg-background pointer-events-auto transition duration-300 shadow rounded ${containerClosedClass}`}
-            onClick={e => e.stopPropagation()}
-        >
-            <div>
-                {content}
-            </div>
-            <div>
-                {
-                    (buttons ?? []).map(
-                        (props, idx) => <ModalButton key={idx} {...props} />
-                    )
-                }
-            </div>
-        </div>
-    </div>
+    const fullScreenClasses = fullScreen ? 'w-screen h-screen m-0' : ''
+    const dialogRef = useRef<HTMLDialogElement>(null)
+    useEffect(() => {
+        let ref: HTMLDialogElement | null = null
+        if (isOpen) {
+            dialogRef.current?.showModal()
+            ref = dialogRef.current
+        } else {
+            dialogRef.current?.close()
+        }
+        return () => {
+            ref?.close()
+        }
+    }, [isOpen])
+    useEffect(() => {
+        function handleClick(e: MouseEvent) {
+            if (e.target === dialogRef.current) {
+                closeModal()
+            }
+        }
+        function handleKey(e: KeyboardEvent) {
+            if (e.key === 'Escape') {
+                closeModal()
+            }
+        }
+        document.addEventListener('keydown', handleKey)
+        document.addEventListener('mousedown', handleClick)
+        return () => {
+            document.removeEventListener('keydown', handleKey)
+            document.removeEventListener('mousedown', handleClick)
+        }
+    }, [closeModal])
+    return <dialog ref={dialogRef}
+        className={`pointer-events-auto transition duration-300 shadow rounded bg-background opacity-0 translate-y-full open:opacity-100 open:translate-y-0 p-0 ${fullScreenClasses}`}
+    >
+        {children}
+    </dialog>
 }
 
-type ButtonProps = {
+
+export function ModalLabel({ text }: { text: string }) {
+    return <span className='p-lg'>{text}</span>
+}
+
+export function ModalDivider() {
+    return <hr className='w-full border-b-0 border-l-0 border-r-0 border-t-border border-t m-0' />
+}
+
+export function ModalButton({ text, icon, href, onClick }: {
     text: string,
     icon?: IconName,
-    onClick?: () => void,
     href?: string,
-};
-function ModalButton({ text, icon, onClick, href }: ButtonProps) {
-    const Content = <div className='flex flex-row items-center'>
+    onClick?: () => void,
+}) {
+    let content = <div className='flex flex-row items-center'>
         {
             icon
                 ? <div><Icon name={icon} /></div>
@@ -71,13 +89,27 @@ function ModalButton({ text, icon, onClick, href }: ButtonProps) {
         <span className='m-lg no-underline'>{text}</span>
     </div>
     return <div className='flex grow flex-col items-center cursor-pointer text-action hover:text-highlight' onClick={onClick}>
-        <hr className='w-full border-b-0 border-l-0 border-r-0 border-t-border border-t m-0' />
         {
             href
-                ? <Link href={href}>
-                    {Content}
-                </Link>
-                : Content
+                ? <Link href={href}>{content}</Link>
+                : content
         }
+    </div>
+}
+
+export function ModalHeader({ text, onClose }: {
+    text: string,
+    onClose: () => void,
+}) {
+    return <div className='grid grid-cols-3 text-dimmed min-w-full p-4'>
+        <div className='col-start-1 col-end-2' />
+        <div className='col-start-2 col-end-3 flex text-center items-center'>
+            {text}
+        </div>
+        <div className='col-start-3 col-end-4 flex justify-end w-full items-center' >
+            <div onClick={onClose} className='hover:text-highlight cursor-pointer'>
+                <Icon name='close' />
+            </div>
+        </div>
     </div>
 }

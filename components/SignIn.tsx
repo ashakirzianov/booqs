@@ -1,43 +1,53 @@
 'use client'
-import React from 'react'
+import React, { useState } from 'react'
 import { Menu, MenuItem } from '@/components/Menu'
 import { IconButton } from '@/components/Buttons'
 import { ProfileBadge } from '@/components/ProfilePicture'
-import { useModal } from '@/components/Modal'
+import { ModalButton, ModalDivider, ModalLabel, useModal } from '@/components/Modal'
 import { User, useAuth, useSignInOptions } from '@/application/auth'
-import { Popover } from './Popover'
+import { Popover } from '@/components/Popover'
 import { useIsMounted } from '@/application/utils'
-import { Spinner } from './Loading'
+import { Spinner } from '@/components/Loading'
 
 export function useSignInModal() {
+    let [isOpen, setIsOpen] = useState(false)
+    function openModal() {
+        setIsOpen(true)
+    }
+    function closeModal() {
+        setIsOpen(false)
+    }
     const { signWithApple, signWithFacebook } = useSignInOptions()
-    const { openModal, ModalContent } = useModal(({ closeModal }) => ({
-        body: <div className='flex flex-col items-center max-w-[100vw] w-60 p-lg'>
-            Choose provider
-        </div>,
-        buttons: [
-            {
-                text: 'Apple',
-                icon: 'apple',
-                onClick() {
+    const { ModalContent } = useModal({
+        isOpen,
+        setIsOpen,
+        content: <div className='flex flex-col items-center max-w-[100vw] w-60'>
+            <ModalLabel text='Choose provider' />
+            <ModalDivider />
+            <ModalButton
+                text='Apple'
+                icon='apple'
+                onClick={() => {
                     signWithApple()
                     closeModal()
-                },
-            },
-            {
-                text: 'Facebook',
-                icon: 'facebook',
-                onClick() {
+                }}
+            />
+            <ModalDivider />
+            <ModalButton
+                text='Facebook'
+                icon='facebook'
+                onClick={() => {
                     signWithFacebook()
                     closeModal()
-                },
-            },
-            {
-                text: 'Dismiss',
-                onClick: closeModal,
-            },
-        ],
-    }))
+                }}
+            />
+            <ModalDivider />
+            <ModalButton
+                text='Dismiss'
+                onClick={closeModal}
+            />
+        </div>,
+    })
     return {
         openModal,
         ModalContent,
