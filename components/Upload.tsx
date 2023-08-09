@@ -23,7 +23,7 @@ export function Upload() {
     const { ModalContent } = useModal({
         isOpen,
         setIsOpen,
-        content: <div className='flex flex-col items-center w-60 max-w-[100vw] p-lg'>
+        content: <div className='flex flex-col items-center w-60 max-w-[100vw]'>
             <UploadModalContent closeModal={closeModal} />
         </div>,
     })
