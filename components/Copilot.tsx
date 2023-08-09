@@ -1,10 +1,10 @@
 import { BooqSelection, VirtualElement } from '@/viewer'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useFloater } from './Floater'
 import { BooqData } from '@/application/booq'
 import { CopilotContext, useCopilotAnswer, useCopilotSuggestions } from '@/application/copilot'
 import { Spinner } from './Loading'
-import { Modal } from './Modal'
+import { Modal, ModalDivider, ModalHeader } from './Modal'
 import { useIsSmallScreen } from '@/application/utils'
 
 type CopilotEmpty = {
@@ -55,9 +55,13 @@ function CopilotFloating({ state, setState, booq }: CopilotProps) {
 
 function CopilotModal({ state, setState, booq }: CopilotProps) {
     let isOpen = state.kind !== 'empty'
-    let closeModal = () => setState({ kind: 'empty' })
+    let closeModal = useCallback(() => {
+        setState({ kind: 'empty' })
+    }, [setState])
     return <Modal isOpen={isOpen} closeModal={closeModal}>
-        <div className='container flex flex-col grow items-center font-main select-none transition font-bold p-lg'>
+        <ModalHeader text='Ask Copilot' onClose={closeModal} />
+        <ModalDivider />
+        <div className='container flex flex-col grow items-center font-main select-none transition font-bold p-4'>
             <CopilotStateContent state={state} booq={booq} />
         </div>
     </Modal>

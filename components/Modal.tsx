@@ -96,3 +96,20 @@ export function ModalButton({ text, icon, href, onClick }: {
         }
     </div>
 }
+
+export function ModalHeader({ text, onClose }: {
+    text: string,
+    onClose: () => void,
+}) {
+    return <div className='grid grid-cols-3 text-dimmed min-w-full p-4'>
+        <div className='col-start-1 col-end-2' />
+        <div className='col-start-2 col-end-3 flex text-center items-center'>
+            {text}
+        </div>
+        <div className='col-start-3 col-end-4 flex justify-end w-full items-center' >
+            <div onClick={onClose} className='hover:text-highlight cursor-pointer'>
+                <Icon name='close' />
+            </div>
+        </div>
+    </div>
+}
