@@ -27,13 +27,19 @@ export function useSignInModal() {
             <ModalButton
                 text='Apple'
                 icon='apple'
-                onClick={signWithApple}
+                onClick={() => {
+                    signWithApple()
+                    closeModal()
+                }}
             />
             <ModalDivider />
             <ModalButton
                 text='Facebook'
                 icon='facebook'
-                onClick={signWithFacebook}
+                onClick={() => {
+                    signWithFacebook()
+                    closeModal()
+                }}
             />
             <ModalDivider />
             <ModalButton
