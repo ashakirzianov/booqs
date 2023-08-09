@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "https": "next dev -p 3001 & npx local-ssl-proxy --source 3000 --target 3001"
+    "https": "next dev -p 3001 & npx local-ssl-proxy --key ../localhost-key.pem --cert ../localhost.pem --source 3000 --target 3001"
   },
   "dependencies": {
     "@apollo/client": "^3.7.17",
