@@ -119,12 +119,18 @@ export function useHighlightMutations(booqId: string) {
                 optimisticResponse: { addHighlight: true },
                 update(cache, { data }) {
                     if (data?.addHighlight) {
-                        const cached = cache.readQuery<HighlightsData>({
+                        let cached = cache.readQuery<HighlightsData>({
                             query: HighlightsQuery,
                             variables: { booqId },
                         })
                         if (cached) {
-                            cached.booq.highlights.unshift(created)
+                            cached = {
+                                ...cached,
+                                booq: {
+                                    ...cached.booq,
+                                    highlights: [created, ...cached.booq.highlights],
+                                },
+                            }
                             cache.writeQuery({
                                 query: HighlightsQuery,
                                 variables: { booqId },
@@ -142,14 +148,20 @@ export function useHighlightMutations(booqId: string) {
                 optimisticResponse: { removeHighlight: true },
                 update(cache, { data }) {
                     if (data?.removeHighlight) {
-                        const cached = cache.readQuery<HighlightsData>({
+                        let cached = cache.readQuery<HighlightsData>({
                             query: HighlightsQuery,
                             variables: { booqId },
                         })
                         if (cached) {
-                            cached.booq.highlights = cached.booq.highlights.filter(
-                                h => h.id !== id,
-                            )
+                            cached = {
+                                ...cached,
+                                booq: {
+                                    ...cached.booq,
+                                    highlights: cached.booq.highlights.filter(
+                                        h => h.id !== id,
+                                    ),
+                                },
+                            }
                             cache.writeQuery<HighlightsData>({
                                 query: HighlightsQuery,
                                 variables: { booqId },
@@ -166,7 +178,7 @@ export function useHighlightMutations(booqId: string) {
                 optimisticResponse: { updateHighlight: true },
                 update(cache, { data }) {
                     if (data?.updateHighlight) {
-                        const cached = cache.readQuery<HighlightsData>({
+                        let cached = cache.readQuery<HighlightsData>({
                             query: HighlightsQuery,
                             variables: { booqId },
                         })
@@ -175,7 +187,15 @@ export function useHighlightMutations(booqId: string) {
                                 h => h.id === id,
                             )
                             if (target) {
-                                target.group = group
+                                cached = {
+                                    ...cached,
+                                    booq: {
+                                        ...cached.booq,
+                                        highlights: cached.booq.highlights.map(
+                                            h => h.id === id ? { ...h, group } : h,
+                                        ),
+                                    },
+                                }
                                 cache.writeQuery<HighlightsData>({
                                     query: HighlightsQuery,
                                     variables: { booqId },

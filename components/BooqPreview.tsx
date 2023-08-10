@@ -12,9 +12,9 @@ export function BooqPreview({
     total: number,
 }) {
     return (
-        <div className="flex-grow shrink-0 basis-auto w-[75vw] rounded items-center font-book text-lg cursor-pointer px-8 py-12 max-w-[400px] border border-gray-300 shadow-md transition-shadow hover:shadow-lg">
-            <span className="text-dimmed dark:text-dark-dimmed text-center overflow-hidden overflow-ellipsis whitespace-nowrap">{title}</span>
-            <div className="text-justify text-gray-700 my-4 line-clamp-6">{text}</div>
+        <div className="flex flex-col flex-grow shrink-0 basis-auto w-[90vw] rounded items-center font-book text-lg cursor-pointer px-8 p-4 max-w-[400px] border border-gray-300 shadow-md transition-shadow hover:shadow-lg">
+            <span className="truncate text-dimmed dark:text-dark-dimmed text-center w-full p-1">{title}</span>
+            <div className="text-justify text-gray-700 text-sm my-4 line-clamp-6">{text}</div>
             <div className="text-dimmed dark:text-dark-dimmed">{page}</div>
         </div>
     )

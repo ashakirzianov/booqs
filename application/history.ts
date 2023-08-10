@@ -30,18 +30,22 @@ type BooqHistoryData = {
 export function useHistory() {
     const { loading, data } = useQuery<BooqHistoryData>(
         BooqHistoryQuery,
-        { fetchPolicy: 'cache-and-network' },
+        {
+            fetchPolicy: 'no-cache',
+            nextFetchPolicy: 'no-cache',
+        },
     )
+    let history = (data?.history ?? []).map(h => ({
+        id: h.booq.id,
+        title: h.booq.title,
+        path: h.path,
+        preview: h.preview,
+        position: h.position,
+        length: h.booq.length,
+    }))
     return {
         loading,
-        history: (data?.history ?? []).map(h => ({
-            id: h.booq.id,
-            title: h.booq.title,
-            path: h.path,
-            preview: h.preview,
-            position: h.position,
-            length: h.booq.length,
-        })),
+        history,
     }
 }
 

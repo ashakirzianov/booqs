@@ -16,8 +16,7 @@ const storage = syncStorageCell<AppState>(key, '0.1.0')
 const initialData: AppState = {
     currentUser: undefined,
     settings: {
-        paletteName: 'light',
-        fontScale: 100,
+        fontScale: 120,
     },
     navigationState: {
         showChapters: true,
