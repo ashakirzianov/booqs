@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import { Menu, MenuItem } from '@/components/Menu'
 import { IconButton } from '@/components/Buttons'
 import { ProfileBadge } from '@/components/ProfilePicture'
-import { ModalButton, ModalDivider, ModalLabel, useModal } from '@/components/Modal'
+import { ModalButton, ModalDivider, ModalLabel, Modal } from '@/components/Modal'
 import { User, useAuth, useSignInOptions } from '@/application/auth'
 import { Popover } from '@/components/Popover'
 import { useIsMounted } from '@/application/utils'
@@ -18,10 +18,11 @@ export function useSignInModal() {
         setIsOpen(false)
     }
     const { signWithApple, signWithFacebook } = useSignInOptions()
-    const { ModalContent } = useModal({
-        isOpen,
-        setIsOpen,
-        content: <div className='flex flex-col items-center max-w-[100vw] w-60'>
+    const ModalContent = <Modal
+        isOpen={isOpen}
+        closeModal={closeModal}
+    >
+        <div className='flex flex-col items-center max-w-[100vw] w-60'>
             <ModalLabel text='Choose provider' />
             <ModalDivider />
             <ModalButton
@@ -46,8 +47,8 @@ export function useSignInModal() {
                 text='Dismiss'
                 onClick={closeModal}
             />
-        </div>,
-    })
+        </div>
+    </Modal>
     return {
         openModal,
         ModalContent,

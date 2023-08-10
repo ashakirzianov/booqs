@@ -3,30 +3,14 @@ import React, { ReactNode, useEffect, useRef } from 'react'
 import { Icon, IconName } from './Icon'
 import Link from 'next/link'
 
-export function useModal({
-    isOpen, setIsOpen, content
-}: {
-    isOpen: boolean,
-    setIsOpen: (isOpen: boolean) => void,
-    content: ReactNode,
-}) {
-    return {
-        ModalContent: <Modal
-            isOpen={isOpen}
-            closeModal={() => setIsOpen(false)}
-        >{content}</Modal>,
-    }
-}
-
 export function Modal({
-    isOpen, children, closeModal, fullScreen,
+    isOpen, children, closeModal
 }: {
     isOpen: boolean,
     fullScreen?: boolean,
     closeModal: () => void,
     children: ReactNode,
 }) {
-    const fullScreenClasses = fullScreen ? 'w-screen h-screen m-0' : ''
     const dialogRef = useRef<HTMLDialogElement>(null)
     useEffect(() => {
         let ref: HTMLDialogElement | null = null
@@ -59,7 +43,7 @@ export function Modal({
         }
     }, [closeModal])
     return <dialog ref={dialogRef}
-        className={`pointer-events-auto transition duration-300 shadow rounded bg-background opacity-0 translate-y-full open:opacity-100 open:translate-y-0 p-0 ${fullScreenClasses}`}
+        className={`pointer-events-auto transition duration-300 shadow rounded bg-background opacity-0 translate-y-full open:opacity-100 open:translate-y-0 p-0`}
     >
         {children}
     </dialog>
@@ -76,6 +60,26 @@ export function ModalFullScreen({
         className={`fixed top-0 right-0 bottom-0 left-0 flex flex-col pointer-events-auto transition duration-300 bg-background h-screen w-screen max-h-screen ${containerClosedClass}`}
     >
         {children}
+    </div>
+}
+
+export function ModalAsDiv({
+    isOpen, children, closeModal
+}: {
+    isOpen: boolean,
+    fullScreen?: boolean,
+    closeModal: () => void,
+    children: ReactNode,
+}) {
+    const screenClosedClass = isOpen ? '' : 'invisible bg-transparent'
+    const containerClosedClass = isOpen ? '' : 'opacity-0 translate-y-1/4'
+    return <div className={`flex flex-col fixed justify-center items-center bg-black/25 z-10 transition-all top-0 right-0 bottom-0 left-0 ${screenClosedClass}`} onClick={closeModal}>
+        <div
+            className={`relative pointer-events-auto transition duration-300 shadow rounded bg-background ${containerClosedClass}`}
+            onClick={e => e.stopPropagation()}
+        >
+            {children}
+        </div>
     </div>
 }
 
