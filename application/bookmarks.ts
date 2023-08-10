@@ -59,15 +59,22 @@ export function useBookmarkMutations(booqId: string) {
                 optimisticResponse: { addBookmark: true },
                 update(cache, { data }) {
                     if (data?.addBookmark) {
-                        const cached = cache.readQuery<BookmarksData>({
+                        let cached = cache.readQuery<BookmarksData>({
                             query: BookmarksQuery,
                             variables: { booqId },
                         })
                         if (cached) {
-                            cached.booq.bookmarks.push({
+                            let bm = {
                                 __typename: 'Bookmark',
                                 id, path,
-                            })
+                            } as const
+                            cached = {
+                                ...cached,
+                                booq: {
+                                    ...cached.booq,
+                                    bookmarks: [bm, ...cached.booq.bookmarks],
+                                },
+                            }
                             cache.writeQuery({
                                 query: BookmarksQuery,
                                 variables: { booqId },
@@ -84,14 +91,20 @@ export function useBookmarkMutations(booqId: string) {
                 optimisticResponse: { removeBookmark: true },
                 update(cache, { data }) {
                     if (data?.removeBookmark) {
-                        const cached = cache.readQuery<BookmarksData>({
+                        let cached = cache.readQuery<BookmarksData>({
                             query: BookmarksQuery,
                             variables: { booqId },
                         })
                         if (cached) {
-                            cached.booq.bookmarks = cached.booq.bookmarks.filter(
-                                bm => bm.id !== id,
-                            )
+                            cached = {
+                                ...cached,
+                                booq: {
+                                    ...cached.booq,
+                                    bookmarks: cached.booq.bookmarks.filter(
+                                        bm => bm.id !== id,
+                                    ),
+                                },
+                            }
                             cache.writeQuery({
                                 query: BookmarksQuery,
                                 variables: { booqId },

@@ -59,20 +59,27 @@ export function useAddToCollection() {
                 optimisticResponse: { addToCollection: true },
                 update(cache, { data }) {
                     if (data?.addToCollection) {
-                        const stored = cache.readQuery<CollectionData>({
+                        let cached = cache.readQuery<CollectionData>({
                             query: CollectionQuery,
                             variables: { name },
                         })
-                        if (stored) {
-                            stored.collection.booqs.push({
+                        if (cached) {
+                            let item = {
                                 __typename: 'Booq',
                                 id: booqId,
                                 title, author, cover,
-                            })
+                            } as const
+                            cached = {
+                                ...cached,
+                                collection: {
+                                    ...cached.collection,
+                                    booqs: [item, ...cached.collection.booqs],
+                                },
+                            }
                             cache.writeQuery({
                                 query: CollectionQuery,
                                 variables: { name },
-                                data: stored,
+                                data: cached,
                             })
                         }
                     }
