@@ -15,13 +15,12 @@ import { useContextMenu, ContextMenuState } from './ContextMenu'
 import { useNavigationPanel } from './Navigation'
 import { ReaderLayout } from './ReaderLayout'
 import { BooqAnchor, BooqData } from '@/application/booq'
-import { useSettings } from '@/application/settings'
+import { useFontScale } from '@/application/settings'
 import { useFilteredHighlights } from '@/application/navigation'
 import { colorForGroup, pageForPosition, quoteColor } from '@/application/common'
 import { useReportHistory } from '@/application/history'
 import { User, useAuth } from '@/application/auth'
 import { Copilot, CopilotState } from '@/components/Copilot'
-import { VirtualElement } from '@floating-ui/react'
 
 export function Reader({
     booq, quote,
@@ -30,7 +29,7 @@ export function Reader({
     quote?: BooqRange,
 }) {
     const self = useAuth()
-    const { fontScale } = useSettings()
+    const fontScale = useFontScale()
     const {
         onScroll, currentPath, currentPage, totalPages, leftPages,
     } = useScrollHandler(booq)
