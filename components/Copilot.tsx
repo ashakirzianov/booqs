@@ -40,7 +40,7 @@ function CopilotFloating({ state, setState, booq }: CopilotProps) {
             }
         },
         Content: <div
-            className='container flex flex-col grow items-center font-main select-none transition font-bold p-lg max-w-[var(--content-width)]'
+            className='container flex flex-col grow items-center font-main select-none transition font-bold max-w-[var(--content-width)]'
         >
             <CopilotStateContent state={state} booq={booq} />
         </div>,
@@ -61,7 +61,7 @@ function CopilotModal({ state, setState, booq }: CopilotProps) {
     return <ModalFullScreen isOpen={isOpen}>
         <ModalHeader text='Ask Copilot' onClose={closeModal} />
         <ModalDivider />
-        <div className='flex flex-col grow items-center justify-start font-main select-none transition font-bold p-4 overflow-y-auto'>
+        <div className='flex flex-col grow items-center justify-start font-main select-none transition font-bold overflow-y-auto'>
             <CopilotStateContent state={state} booq={booq} />
         </div>
     </ModalFullScreen>
@@ -105,12 +105,15 @@ function CopilotSelectedContent({ state, booq }: {
         return <CopilotQuestion context={context} question={question} />
     }
     return loading
-        ? <Spinner />
-        : <div className='flex flex-col font-menu text-blue-400 font-bold'>
+        ? <div className='p-lg'><Spinner /></div>
+        : <div className='flex flex-col font-menu text-primary text-lg font-bold'>
             {suggestions.map(
-                (s, i) => <div key={i} className='flex cursor-pointer hover:underline decoration-dotted' onClick={() => askQuestion(s)}>
-                    {`${i + 1}. ${s}`}<br />
-                </div>)
+                (s, i) => <>
+                    <div key={i} className='flex cursor-pointer decoration-dotted text-dimmed hover:underline hover:text-highlight p-lg' onClick={() => askQuestion(s)}>
+                        {`${i + 1}. ${s}`}<br />
+                    </div>
+                    <ModalDivider />
+                </>)
             }
         </div>
 }
@@ -121,8 +124,8 @@ function CopilotQuestion({ context, question }: {
 }) {
     let { loading, answer } = useCopilotAnswer(context, question)
     return loading
-        ? <Spinner />
-        : <div className='flex font-menu'>
+        ? <div className='p-lg'><Spinner /></div>
+        : <div className='flex font-menu p-lg'>
             {answer}
         </div>
 }
