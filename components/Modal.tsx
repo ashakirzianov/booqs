@@ -65,6 +65,20 @@ export function Modal({
     </dialog>
 }
 
+export function ModalFullScreen({
+    isOpen, children,
+}: {
+    isOpen: boolean,
+    children: ReactNode,
+}) {
+    const containerClosedClass = isOpen ? '' : 'invisible opacity-0 translate-y-1/4'
+    return <div
+        className={`fixed top-0 right-0 bottom-0 left-0 flex flex-col pointer-events-auto transition duration-300 bg-background h-screen w-screen max-h-screen ${containerClosedClass}`}
+    >
+        {children}
+    </div>
+}
+
 
 export function ModalLabel({ text }: { text: string }) {
     return <span className='p-lg'>{text}</span>
@@ -101,8 +115,9 @@ export function ModalHeader({ text, onClose }: {
     text: string,
     onClose: () => void,
 }) {
-    return <div className='grid grid-cols-3 text-dimmed min-w-full p-4'>
-        <div className='col-start-1 col-end-2' />
+    return <div className='grid text-dimmed min-w-full p-lg text-xl text-bold' style={{
+        gridTemplateColumns: '1fr auto 1fr',
+    }}>
         <div className='col-start-2 col-end-3 flex text-center items-center'>
             {text}
         </div>

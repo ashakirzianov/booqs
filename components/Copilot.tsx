@@ -4,7 +4,7 @@ import { useFloater } from './Floater'
 import { BooqData } from '@/application/booq'
 import { CopilotContext, useCopilotAnswer, useCopilotSuggestions } from '@/application/copilot'
 import { Spinner } from './Loading'
-import { Modal, ModalDivider, ModalHeader } from './Modal'
+import { Modal, ModalDivider, ModalHeader, ModalFullScreen } from './Modal'
 import { useIsSmallScreen } from '@/application/utils'
 
 type CopilotEmpty = {
@@ -58,13 +58,13 @@ function CopilotModal({ state, setState, booq }: CopilotProps) {
     let closeModal = useCallback(() => {
         setState({ kind: 'empty' })
     }, [setState])
-    return <Modal isOpen={isOpen} closeModal={closeModal}>
+    return <ModalFullScreen isOpen={isOpen}>
         <ModalHeader text='Ask Copilot' onClose={closeModal} />
         <ModalDivider />
-        <div className='container flex flex-col grow items-center font-main select-none transition font-bold p-4'>
+        <div className='flex flex-col grow items-center justify-start font-main select-none transition font-bold p-4 overflow-y-auto'>
             <CopilotStateContent state={state} booq={booq} />
         </div>
-    </Modal>
+    </ModalFullScreen>
 }
 
 function CopilotStateContent({ state, booq }: {
@@ -122,7 +122,7 @@ function CopilotQuestion({ context, question }: {
     let { loading, answer } = useCopilotAnswer(context, question)
     return loading
         ? <Spinner />
-        : <div className='font-menu'>
+        : <div className='flex font-menu'>
             {answer}
         </div>
 }
