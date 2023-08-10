@@ -48,13 +48,13 @@ type HistoryItem = ReturnType<typeof useHistory>['history'][number];
 function HistoryItems({ items }: {
     items: HistoryItem[],
 }) {
-    return <div className='flex flex-1 box-border overflow-auto snap-x py-xl px-base' style={{
+    return <div className='flex flex-1 gap-3 box-border overflow-auto snap-x snap-mandatory py-xl px-base' style={{
         scrollbarWidth: 'none',
     }}>
         {
             items.map(
                 (entry, idx) =>
-                    <div key={idx} className='flex snap-center py-0 px-lg'>
+                    <div key={idx} className='flex snap-center'>
                         <BooqLink booqId={entry.id} path={entry.path}>
                             <BooqPreview
                                 path={entry.path}
