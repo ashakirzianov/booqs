@@ -1,10 +1,10 @@
 import { DocumentNode } from 'graphql'
 
-export async function fetchQuery<T = any>({
+export async function fetchQuery<T = any, V = any>({
     query, variables, options,
 }: {
     query: DocumentNode,
-    variables?: Object,
+    variables?: V,
     options?: {
         cache?: RequestCache,
         headers?: HeadersInit,
