@@ -4,6 +4,7 @@ import { useAppState, useAppStateSetter } from './state'
 
 export type User = {
     id: string,
+    username: string,
     name?: string,
     pictureUrl?: string,
 };
@@ -93,6 +94,7 @@ const AuthQuery = gql`query Auth($token: String!, $provider: String!) {
         token
         user {
             id
+            username
             name
             pictureUrl
         }
@@ -103,6 +105,7 @@ type AuthData = {
         token: string,
         user: {
             id: string,
+            username: string,
             name: string | null,
             pictureUrl: string | null,
         },
@@ -130,6 +133,7 @@ async function signIn({
         const data: AuthState | undefined = auth
             ? {
                 id: auth.user.id,
+                username: auth.user.username,
                 name: auth.user.name ?? undefined,
                 pictureUrl: auth.user.pictureUrl ?? undefined,
                 provider,
