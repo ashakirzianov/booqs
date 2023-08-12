@@ -1,8 +1,14 @@
 import { DocumentNode } from 'graphql'
 
-export async function fetchQuery<T = any>({ query, variables }: {
+export async function fetchQuery<T = any>({
+    query, variables, options,
+}: {
     query: DocumentNode,
     variables?: Object,
+    options?: {
+        cache?: RequestCache,
+        headers?: HeadersInit,
+    },
 }): Promise<{
     success: true,
     data: T,
@@ -17,6 +23,7 @@ export async function fetchQuery<T = any>({ query, variables }: {
         const response = await fetch(
             url,
             {
+                ...options,
                 method: 'POST',
                 body: JSON.stringify({
                     query: query.loc?.source.body,
@@ -24,6 +31,7 @@ export async function fetchQuery<T = any>({ query, variables }: {
                 }),
                 headers: {
                     'Content-Type': 'application/json',
+                    ...options?.headers,
                 },
             }
         )

@@ -8,6 +8,8 @@ import { User, useAuth, useSignInOptions } from '@/application/auth'
 import { Popover } from '@/components/Popover'
 import { useIsMounted } from '@/application/utils'
 import { Spinner } from '@/components/Loading'
+import Link from 'next/link'
+import { accountHref } from './Links'
 
 export function useSignInModal() {
     let [isOpen, setIsOpen] = useState(false)
@@ -105,7 +107,9 @@ function Signed({ name }: {
 }) {
     const { signOut } = useSignInOptions()
     return <div className='py-base flex flex-col flex-1 items-stretch'>
-        <span className='p-base w-full text-center font-bold'>{name}</span>
+        <Link href={accountHref()}>
+            <span className='p-base w-full text-center font-bold'>{name}</span>
+        </Link>
         <Menu>
             <MenuItem
                 icon='sign-out'

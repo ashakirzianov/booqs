@@ -2,6 +2,45 @@ import gql from 'graphql-tag'
 import { BooqNode, BooqPath } from '@/core'
 import { fetchQuery } from '@/application/server'
 
+// TODO: decompose this file
+
+export async function fetchMeServer(cookies: Array<{
+    name: string,
+    value: string,
+}>) {
+    const MeQuery = gql`query Me {
+        me {
+            username
+            name
+            pictureUrl
+            joined
+        }
+    }`
+    type MeData = {
+        me: {
+            username: string,
+            joined: string,
+            name?: string,
+            pictureUrl?: string,
+        },
+    };
+
+    let cookie = cookies.map(c => `${c.name}=${c.value}`).join('; ')
+    const result = await fetchQuery<MeData>({
+        query: MeQuery,
+        options: {
+            headers: {
+                'Cookie': cookie,
+            },
+            cache: 'no-cache',
+        }
+    })
+    console.log(result)
+    return result.success
+        ? result.data?.me
+        : undefined
+}
+
 export async function fetchFeaturedServer() {
     const FeaturedQuery = gql`query Featured {
         featured(limit: 10) {
