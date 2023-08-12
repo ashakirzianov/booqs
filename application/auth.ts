@@ -71,12 +71,12 @@ export function useSignInOptions() {
 
 
 async function signOut(client: ApolloClient<unknown>, setter: AuthStateSetter) {
-    const result = await client.query<{ logout: boolean }>({
-        query: gql`query Logout {
-            logout
+    const result = await client.mutate<{ signout: boolean }>({
+        mutation: gql`mutation Signout {
+            signout
         }`,
     })
-    if (result?.data?.logout) {
+    if (result?.data?.signout) {
         setter(prev => {
             switch (prev?.provider) {
                 case 'facebook':
@@ -89,7 +89,7 @@ async function signOut(client: ApolloClient<unknown>, setter: AuthStateSetter) {
     }
 }
 
-const AuthQuery = gql`query Auth($token: String!, $provider: String!) {
+const AuthMutation = gql`mutation Auth($token: String!, $provider: String!) {
     auth(token: $token, provider: $provider) {
         token
         user {
@@ -125,11 +125,12 @@ async function signIn({
     name?: string,
     provider: string,
 }) {
-    const { data: { auth } } = await apolloClient.query<AuthData, AuthVariables>({
-        query: AuthQuery,
+    const result = await apolloClient.mutate<AuthData, AuthVariables>({
+        mutation: AuthMutation,
         variables: { token, provider, name },
     })
-    if (auth) {
+    if (result.data) {
+        let auth = result.data.auth
         const data: AuthState | undefined = auth
             ? {
                 id: auth.user.id,
@@ -141,7 +142,8 @@ async function signIn({
             : undefined
         authSetter(() => data)
         apolloClient.reFetchObservableQueries(true)
+        return auth
+    } else {
+        return undefined
     }
-
-    return auth
 }
