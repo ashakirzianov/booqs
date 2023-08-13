@@ -1,27 +1,22 @@
 'use client'
 import React, { useState } from 'react'
+import Link from 'next/link'
+import { User, useAuth, useSignInOptions } from '@/application/auth'
+import { useIsMounted } from '@/application/utils'
 import { Menu, MenuItem } from '@/components/Menu'
 import { IconButton } from '@/components/Buttons'
 import { ProfileBadge } from '@/components/ProfilePicture'
 import { ModalButton, ModalDivider, ModalLabel, Modal } from '@/components/Modal'
-import { User, useAuth, useSignInOptions } from '@/application/auth'
 import { Popover } from '@/components/Popover'
-import { useIsMounted } from '@/application/utils'
 import { Spinner } from '@/components/Loading'
-import Link from 'next/link'
-import { accountHref } from './Links'
+import { accountHref } from '@/components/Links'
 
-// TODO: make a normal component
-export function useSignInModal() {
-    let [isOpen, setIsOpen] = useState(false)
-    function openModal() {
-        setIsOpen(true)
-    }
-    function closeModal() {
-        setIsOpen(false)
-    }
+export function SignInModal({ isOpen, closeModal }: {
+    isOpen: boolean,
+    closeModal: () => void,
+}) {
     const { signWithApple, signWithFacebook } = useSignInOptions()
-    const ModalContent = <Modal
+    return <Modal
         isOpen={isOpen}
         closeModal={closeModal}
     >
@@ -52,10 +47,6 @@ export function useSignInModal() {
             />
         </div>
     </Modal>
-    return {
-        openModal,
-        ModalContent,
-    }
 }
 
 export function SignIn() {
@@ -81,7 +72,7 @@ function SignedButton({ user }: {
     user: User,
 }) {
     return <Popover
-        content={<Signed
+        content={<AccountMenu
             name={user.name}
         />}
         anchor={<ProfileBadge
@@ -94,16 +85,19 @@ function SignedButton({ user }: {
 }
 
 function NotSignedButton() {
-    const { openModal, ModalContent } = useSignInModal()
+    let [isOpen, setIsOpen] = useState(false)
     return <>
         <IconButton
             icon='sign-in'
-            onClick={openModal} />
-        {ModalContent}
+            onClick={() => setIsOpen(true)} />
+        <SignInModal
+            isOpen={isOpen}
+            closeModal={() => setIsOpen(false)}
+        />
     </>
 }
 
-function Signed({ name }: {
+function AccountMenu({ name }: {
     name?: string,
 }) {
     const { signOut } = useSignInOptions()

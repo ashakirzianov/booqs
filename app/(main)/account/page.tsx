@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { use, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { AppProvider } from '@/application/provider'
 import { useAuth } from '@/application/auth'
@@ -8,7 +8,7 @@ import { useDeleteAccount } from '@/application/auth'
 import { Spinner } from '@/components/Loading'
 import { feedHref } from '@/components/Links'
 import { Modal } from '@/components/Modal'
-import { useSignInModal } from '@/components/SignIn'
+import { SignInModal } from '@/components/SignIn'
 
 export default function Account() {
     const mounted = useIsMounted()
@@ -76,11 +76,14 @@ function formatDate(date: string) {
 }
 
 function NotSigned() {
-    const { openModal, ModalContent } = useSignInModal()
+    let [isOpen, setIsOpen] = useState(false)
     return <div className='flex flex-col w-full items-center justify-center h-60'>
         <span className='font-bold mb-lg'>
-            <span className='cursor-pointer underline decoration-2 text-action hover:text-highlight' onClick={openModal}>Sign in</span> to see account details
+            <span className='cursor-pointer underline decoration-2 text-action hover:text-highlight' onClick={() => setIsOpen(true)}>Sign in</span> to see account details
         </span>
-        {ModalContent}
+        <SignInModal
+            isOpen={isOpen}
+            closeModal={() => setIsOpen(false)}
+        />
     </div>
 }
