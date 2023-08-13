@@ -1,16 +1,19 @@
 import { fetchQuery } from '@/application/server'
 import { gql } from '@apollo/client'
 import { cookies } from 'next/headers'
+import SignedIn from './signed'
+import { AppProvider } from '@/application/provider'
+import NotSigned from './not-signed'
 
 export default async function Account() {
     let me = await fetchMe()
-    return (
-        <div>
-            <h1>Account</h1>
-            <p>{me?.name ?? 'undef'}</p>
-            <p>{me?.joined}</p>
-        </div>
-    )
+    return me
+        ? <AppProvider>
+            <SignedIn account={me} />
+        </AppProvider>
+        : <AppProvider>
+            <NotSigned />
+        </AppProvider>
 }
 
 async function fetchMe() {
@@ -26,7 +29,7 @@ async function fetchMe() {
         me: {
             username: string,
             joined: string,
-            name?: string,
+            name: string,
             pictureUrl?: string,
         },
     };

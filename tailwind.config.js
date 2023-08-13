@@ -16,6 +16,7 @@ module.exports = {
         dimmed: 'var(--theme-dimmed)',
         border: 'var(--theme-border)',
         highlight: 'var(--theme-highlight)',
+        alert: 'var(--theme-alert)',
       },
       fontFamily: {
         main: ['var(--font-main)', 'sans-serif'],

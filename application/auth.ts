@@ -1,4 +1,5 @@
-import { ApolloClient, useApolloClient, gql } from '@apollo/client'
+'use client'
+import { ApolloClient, useApolloClient, gql, useMutation } from '@apollo/client'
 import { social } from './social'
 import { useAppState, useAppStateSetter } from './state'
 
@@ -145,5 +146,26 @@ async function signIn({
         return auth
     } else {
         return undefined
+    }
+}
+
+export function useDeleteAccount() {
+    let client = useApolloClient()
+    const userDataSetter = useAppStateSetter()
+    let [deleteAccount, { loading, data, error }] = useMutation<{ deleteAccound: boolean }>(gql`mutation DeleteAccount {
+        deleteAccount
+    }`)
+    return {
+        loading,
+        data,
+        error,
+        async deleteAccount() {
+            await deleteAccount()
+            userDataSetter(data_1 => ({
+                ...data_1,
+                currentUser: undefined,
+            }))
+            client.resetStore()
+        },
     }
 }

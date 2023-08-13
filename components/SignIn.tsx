@@ -11,6 +11,7 @@ import { Spinner } from '@/components/Loading'
 import Link from 'next/link'
 import { accountHref } from './Links'
 
+// TODO: make a normal component
 export function useSignInModal() {
     let [isOpen, setIsOpen] = useState(false)
     function openModal() {
