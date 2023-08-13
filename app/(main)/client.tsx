@@ -2,13 +2,13 @@
 import { AppProvider } from '@/application/provider'
 import { useSearch } from '@/application/search'
 import { Search } from '@/components/Search'
-import { SignIn } from '@/components/SignIn'
-import { Upload } from '@/components/Upload'
+import { SignInButton } from '@/components/SignIn'
+import { UploadButton } from '@/components/Upload'
 
 export function AppButtons() {
     return <AppProvider>
-        <Upload />
-        <SignIn />
+        <UploadButton />
+        <SignInButton />
     </AppProvider>
 }
 

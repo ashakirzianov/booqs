@@ -11,7 +11,7 @@ import { useAuth } from '@/application/auth'
 import { useUpload } from '@/application/upload'
 import { useCallback, useState } from 'react'
 
-export function Upload() {
+export function UploadButton() {
     const { signed } = useAuth() ?? {}
     const [isOpen, setIsOpen] = useState(false)
     function openModal() {

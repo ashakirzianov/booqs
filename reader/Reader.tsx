@@ -4,8 +4,8 @@ import { positionForPath, samePath, BooqPath, BooqRange, contextForRange, BooqNo
 import { BorderButton, IconButton } from '@/components/Buttons'
 import { BooqLink, FeedLink, booqHref } from '@/components/Links'
 import { Spinner } from '@/components/Loading'
-import { Themer } from '@/components/Themer'
-import { SignIn } from '@/components/SignIn'
+import { ThemerButton } from '@/components/Themer'
+import { SignInButton } from '@/components/SignIn'
 import {
     BooqContent, getAugmentationElement, getAugmentationText,
     Augmentation,
@@ -132,8 +132,8 @@ export function Reader({
             <IconButton icon='back' />
         </FeedLink>}
         NavigationButton={NavigationButton}
-        ThemerButton={<Themer />}
-        AccountButton={<SignIn />}
+        ThemerButton={<ThemerButton />}
+        AccountButton={<SignInButton />}
         CurrentPage={<PageLabel text={pagesLabel} />}
         PagesLeft={<PageLabel text={leftLabel} />}
         NavigationContent={NavigationContent}
@@ -163,8 +163,8 @@ export function LoadingBooqScreen() {
             <IconButton icon='back' />
         </FeedLink>}
         NavigationButton={null}
-        ThemerButton={<Themer />}
-        AccountButton={<SignIn />}
+        ThemerButton={<ThemerButton />}
+        AccountButton={<SignInButton />}
         CurrentPage={null}
         PagesLeft={null}
         NavigationContent={null}

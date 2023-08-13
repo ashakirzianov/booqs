@@ -49,7 +49,7 @@ export function SignInModal({ isOpen, closeModal }: {
     </Modal>
 }
 
-export function SignIn() {
+export function SignInButton() {
     const state = useAuth()
     const mounted = useIsMounted()
 
