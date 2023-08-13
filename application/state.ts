@@ -45,7 +45,10 @@ export function AppStateProvider({ children }: {
     }, [])
     // Handle storage events from this tab
     useEffect(() => {
-        return storage.subscribe(setData)
+        return storage.subscribe(data => {
+            console.log('storage updated', data)
+            setData(data)
+        })
     }, [])
     // Handle storage events from other tabs
     useEffect(() => {

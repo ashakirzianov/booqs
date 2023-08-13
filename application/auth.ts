@@ -6,7 +6,8 @@ import { useAppState, useAppStateSetter } from './state'
 export type User = {
     id: string,
     username: string,
-    name?: string,
+    name: string,
+    joined: string,
     pictureUrl?: string,
 };
 export type AuthState = User & {
@@ -97,6 +98,7 @@ const AuthMutation = gql`mutation Auth($token: String!, $provider: String!) {
             id
             username
             name
+            joined
             pictureUrl
         }
     }
@@ -107,7 +109,8 @@ type AuthData = {
         user: {
             id: string,
             username: string,
-            name: string | null,
+            name: string,
+            joined: string,
             pictureUrl: string | null,
         },
     },
@@ -138,6 +141,7 @@ async function signIn({
                 username: auth.user.username,
                 name: auth.user.name ?? undefined,
                 pictureUrl: auth.user.pictureUrl ?? undefined,
+                joined: auth.user.joined,
                 provider,
             }
             : undefined
