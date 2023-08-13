@@ -35,6 +35,7 @@ module.exports = {
         xl: '2rem',
         '2xl': '4rem',
         header: 'var(--header-height)',
+        panel: 'var(--panel-width)',
       },
       boxShadow: {
         DEFAULT: '0px 0px 5px rgba(0, 0, 0, 0.1)',
