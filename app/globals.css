@@ -15,6 +15,7 @@ body {
 
 :root {
     --header-height: 3rem;
+    --panel-width: 420pt;
 }
 
 :root {
@@ -24,6 +25,7 @@ body {
     --theme-dimmed: #867b6c;
     --theme-border: #ddd;
     --theme-highlight: orange;
+    --theme-alert: #f00;
 }
 
 @media (prefers-color-scheme: dark) {

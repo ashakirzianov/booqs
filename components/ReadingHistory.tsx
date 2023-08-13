@@ -1,8 +1,8 @@
 'use client'
-import React, { ReactNode } from 'react'
+import React, { ReactNode, useState } from 'react'
 import { BooqPreview } from '@/components/BooqPreview'
 import { BooqLink } from '@/components/Links'
-import { useSignInModal } from './SignIn'
+import { SignInModal } from './SignIn'
 import { useAuth } from '@/application/auth'
 import { useHistory } from '@/application/history'
 import { pageForPosition } from '@/application/common'
@@ -27,12 +27,15 @@ export default function ReadingHistory() {
 }
 
 function SignInPanel() {
-    const { openModal, ModalContent } = useSignInModal()
+    let [isOpen, setIsOpen] = useState(false)
     return <Panel>
         <span className='font-bold mb-lg'>
-            <span className='cursor-pointer underline decoration-2 text-action hover:text-highlight' onClick={openModal}>Sign in</span> to see history
+            <span className='cursor-pointer underline decoration-2 text-action hover:text-highlight' onClick={() => setIsOpen(true)}>Sign in</span> to see history
         </span>
-        {ModalContent}
+        <SignInModal
+            isOpen={isOpen}
+            closeModal={() => setIsOpen(false)}
+        />
     </Panel>
 }
 

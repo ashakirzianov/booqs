@@ -34,7 +34,7 @@ type HighlightsData = {
             author: {
                 __typename: 'User',
                 id: string,
-                name?: string,
+                name: string,
                 pictureUrl: string | null,
             },
         }[],

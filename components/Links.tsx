@@ -36,3 +36,7 @@ export function quoteHref(booqId: string, range: BooqRange) {
 export function feedHref() {
     return '/'
 }
+
+export function accountHref() {
+    return '/account'
+}

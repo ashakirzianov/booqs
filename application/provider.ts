@@ -17,6 +17,7 @@ const link = ApolloLink.from([
             )
         if (networkError) console.log(`[Network error]: ${networkError}`)
     }),
+    // TODO: remove
     createUploadLink({
         uri: process.env.NEXT_PUBLIC_BACKEND,
         credentials: 'include',

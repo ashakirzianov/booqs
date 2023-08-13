@@ -16,6 +16,7 @@ module.exports = {
         dimmed: 'var(--theme-dimmed)',
         border: 'var(--theme-border)',
         highlight: 'var(--theme-highlight)',
+        alert: 'var(--theme-alert)',
       },
       fontFamily: {
         main: ['var(--font-main)', 'sans-serif'],
@@ -35,6 +36,7 @@ module.exports = {
         xl: '2rem',
         '2xl': '4rem',
         header: 'var(--header-height)',
+        panel: 'var(--panel-width)',
       },
       boxShadow: {
         DEFAULT: '0px 0px 5px rgba(0, 0, 0, 0.1)',

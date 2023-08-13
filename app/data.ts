@@ -2,29 +2,15 @@ import gql from 'graphql-tag'
 import { BooqNode, BooqPath } from '@/core'
 import { fetchQuery } from '@/application/server'
 
-export async function fetchFeaturedServer() {
+export async function fetchFeaturedIds() {
     const FeaturedQuery = gql`query Featured {
         featured(limit: 10) {
             id
-            title
-            author
-            cover(size: 210)
-            tags {
-                tag
-                value
-            }
         }
     }`
     type FeaturedData = {
         featured: {
             id: string,
-            title?: string,
-            author?: string,
-            cover?: string,
-            tags: {
-                tag: string,
-                value?: string,
-            }[],
         }[],
     };
 
@@ -38,8 +24,7 @@ export async function fetchFeaturedServer() {
         .filter(f => f !== null && f !== undefined)
 }
 
-export type BooqData = Exclude<Awaited<ReturnType<typeof fetchBooqFragmentServer>>, undefined>
-export async function fetchBooqFragmentServer(id: string, path?: BooqPath) {
+export async function fetchBooqFragment(id: string, path?: BooqPath) {
     const BooqFragmentQuery = gql`query BooqFragment($id: ID!, $path: [Int!]) {
         booq(id: $id) {
             id
@@ -84,22 +69,48 @@ export async function fetchBooqFragmentServer(id: string, path?: BooqPath) {
         title?: string,
         path: BooqPath,
     };
-    type BooqData = BooqFragmentData['booq'];
-    try {
-        const result = await fetchQuery<BooqFragmentData>({
-            query: BooqFragmentQuery,
-            variables: {
-                id, path,
-            },
-        })
-        if (result.success) {
-            return result.data.booq
-        } else {
-            console.error(result.error)
-            return undefined
+    const result = await fetchQuery<BooqFragmentData>({
+        query: BooqFragmentQuery,
+        variables: {
+            id, path,
+        },
+    })
+    if (result.success) {
+        return result.data.booq
+    } else {
+        console.error(result.error)
+        return undefined
+    }
+}
+
+export async function fetchBooqMeta(id: string, start?: BooqPath, end?: BooqPath) {
+    const BooqMetaQuery = gql`query BooqMeta($id: ID!, $start: [Int!], $end: [Int!]) {
+        booq(id: $id) {
+            title
+            preview(path: $start, end: $end)
         }
-    } catch (e) {
-        console.error(e)
+    }`
+    type BooqMetaData = {
+        booq: {
+            title?: string,
+            preview: string,
+        },
+    };
+    type BooqMetaVars = {
+        id: string,
+        start?: BooqPath,
+        end?: BooqPath,
+    }
+    const result = await fetchQuery<BooqMetaData, BooqMetaVars>({
+        query: BooqMetaQuery,
+        variables: {
+            id, start, end
+        },
+    })
+    if (result.success) {
+        return result.data.booq
+    } else {
+        console.error(result.error)
         return undefined
     }
 }

@@ -6,12 +6,12 @@ import { Popover } from '@/components/Popover'
 import { Modal, ModalButton, ModalDivider, ModalLabel } from '@/components/Modal'
 import { BooqCover } from '@/components/BooqCover'
 import { booqHref } from '@/components/Links'
-import { useSignInModal } from './SignIn'
+import { SignInModal } from './SignIn'
 import { useAuth } from '@/application/auth'
 import { useUpload } from '@/application/upload'
 import { useCallback, useState } from 'react'
 
-export function Upload() {
+export function UploadButton() {
     const { signed } = useAuth() ?? {}
     const [isOpen, setIsOpen] = useState(false)
     function openModal() {
@@ -28,10 +28,10 @@ export function Upload() {
             <UploadModalContent closeModal={closeModal} />
         </div>
     </Modal>
-    const {
-        openModal: openSignIn,
-        ModalContent: SignInModalContent,
-    } = useSignInModal()
+    let [isSignInOpen, setIsSignInOpen] = useState(false)
+    function openSignIn() {
+        setIsSignInOpen(true)
+    }
 
     return <>
         <Popover
@@ -53,7 +53,10 @@ export function Upload() {
             hasAction={true}
         />
         {ModalContent}
-        {SignInModalContent}
+        <SignInModal
+            isOpen={isSignInOpen}
+            closeModal={() => setIsSignInOpen(false)}
+        />
     </>
 }
 

@@ -158,7 +158,12 @@ function buildNodes({ toc, filter, highlights, title }: {
     return nodes
 }
 
-function highlightsAuthors(highlights: Highlight[]): User[] {
+export type HighlightAuthor = {
+    id: string,
+    name: string,
+    pictureUrl?: string,
+}
+function highlightsAuthors(highlights: Highlight[]): HighlightAuthor[] {
     const grouped = groupBy(highlights, h => h.author.id)
     return Object.entries(grouped).map(
         ([_, [{ author }]]) => ({

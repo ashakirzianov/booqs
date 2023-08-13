@@ -1,4 +1,4 @@
-import { fetchBooqFragmentServer, fetchFeaturedServer } from '@/app/fetch'
+import { fetchBooqFragment, fetchBooqMeta, fetchFeaturedIds } from '@/app/data'
 import { AppProvider } from '@/application/provider'
 import { pathFromString } from '@/core'
 import { Reader } from '@/reader/Reader'
@@ -6,7 +6,7 @@ import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 
 export async function generateStaticParams() {
-    const featured = await fetchFeaturedServer()
+    const featured = await fetchFeaturedIds()
     return featured.map(({ id }) => ({
         id, path: '0',
     }))
@@ -23,10 +23,10 @@ export async function generateMetadata({
 }): Promise<Metadata> {
     const booqId = `${source}/${id}`
     const booqPath = pathFromString(path)
-    const booq = await fetchBooqFragmentServer(booqId, booqPath ?? undefined)
+    const meta = await fetchBooqMeta(booqId, booqPath)
     return {
-        title: booq?.title ?? 'Booq',
-        description: booq?.preview,
+        title: meta?.title ?? 'Booq',
+        description: meta?.preview,
     }
 }
 
@@ -41,7 +41,7 @@ export default async function BooqPathPage({
 }) {
     const booqId = `${source}/${id}`
     const booqPath = pathFromString(path)
-    const booq = await fetchBooqFragmentServer(booqId, booqPath ?? undefined)
+    const booq = await fetchBooqFragment(booqId, booqPath ?? undefined)
     if (!booq)
         return notFound()
     return <AppProvider>

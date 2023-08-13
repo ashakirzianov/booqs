@@ -1,10 +1,13 @@
-import { ApolloClient, useApolloClient, gql } from '@apollo/client'
+'use client'
+import { ApolloClient, useApolloClient, gql, useMutation } from '@apollo/client'
 import { social } from './social'
 import { useAppState, useAppStateSetter } from './state'
 
 export type User = {
     id: string,
-    name?: string,
+    username: string,
+    name: string,
+    joined: string,
     pictureUrl?: string,
 };
 export type AuthState = User & {
@@ -70,12 +73,12 @@ export function useSignInOptions() {
 
 
 async function signOut(client: ApolloClient<unknown>, setter: AuthStateSetter) {
-    const result = await client.query<{ logout: boolean }>({
-        query: gql`query Logout {
-            logout
+    const result = await client.mutate<{ signout: boolean }>({
+        mutation: gql`mutation Signout {
+            signout
         }`,
     })
-    if (result?.data?.logout) {
+    if (result?.data?.signout) {
         setter(prev => {
             switch (prev?.provider) {
                 case 'facebook':
@@ -88,12 +91,14 @@ async function signOut(client: ApolloClient<unknown>, setter: AuthStateSetter) {
     }
 }
 
-const AuthQuery = gql`query Auth($token: String!, $provider: String!) {
+const AuthMutation = gql`mutation Auth($token: String!, $provider: String!) {
     auth(token: $token, provider: $provider) {
         token
         user {
             id
+            username
             name
+            joined
             pictureUrl
         }
     }
@@ -103,7 +108,9 @@ type AuthData = {
         token: string,
         user: {
             id: string,
-            name: string | null,
+            username: string,
+            name: string,
+            joined: string,
             pictureUrl: string | null,
         },
     },
@@ -122,22 +129,47 @@ async function signIn({
     name?: string,
     provider: string,
 }) {
-    const { data: { auth } } = await apolloClient.query<AuthData, AuthVariables>({
-        query: AuthQuery,
+    const result = await apolloClient.mutate<AuthData, AuthVariables>({
+        mutation: AuthMutation,
         variables: { token, provider, name },
     })
-    if (auth) {
+    if (result.data) {
+        let auth = result.data.auth
         const data: AuthState | undefined = auth
             ? {
                 id: auth.user.id,
+                username: auth.user.username,
                 name: auth.user.name ?? undefined,
                 pictureUrl: auth.user.pictureUrl ?? undefined,
+                joined: auth.user.joined,
                 provider,
             }
             : undefined
         authSetter(() => data)
         apolloClient.reFetchObservableQueries(true)
+        return auth
+    } else {
+        return undefined
     }
+}
 
-    return auth
+export function useDeleteAccount() {
+    let client = useApolloClient()
+    const userDataSetter = useAppStateSetter()
+    let [deleteAccount, { loading, data, error }] = useMutation<{ deleteAccound: boolean }>(gql`mutation DeleteAccount {
+        deleteAccount
+    }`)
+    return {
+        loading,
+        data,
+        error,
+        async deleteAccount() {
+            await deleteAccount()
+            userDataSetter(data_1 => ({
+                ...data_1,
+                currentUser: undefined,
+            }))
+            client.resetStore()
+        },
+    }
 }

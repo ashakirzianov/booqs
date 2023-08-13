@@ -1,20 +1,19 @@
 'use client'
 import React, { useState, useCallback, useMemo } from 'react'
-import { positionForPath, samePath, BooqPath, BooqRange, contextForRange } from '@/core'
+import { positionForPath, samePath, BooqPath, BooqRange, contextForRange, BooqNode } from '@/core'
 import { BorderButton, IconButton } from '@/components/Buttons'
 import { BooqLink, FeedLink, booqHref } from '@/components/Links'
 import { Spinner } from '@/components/Loading'
-import { Themer } from '@/components/Themer'
-import { SignIn } from '@/components/SignIn'
+import { ThemerButton } from '@/components/Themer'
+import { SignInButton } from '@/components/SignIn'
 import {
     BooqContent, getAugmentationElement, getAugmentationText,
     Augmentation,
-    useOnBooqClick, useOnBooqScroll, BooqSelection,
+    useOnBooqClick, useOnBooqScroll,
 } from '@/viewer'
 import { useContextMenu, ContextMenuState } from './ContextMenu'
 import { useNavigationPanel } from './Navigation'
 import { ReaderLayout } from './ReaderLayout'
-import { BooqAnchor, BooqData } from '@/application/booq'
 import { useFontScale } from '@/application/settings'
 import { useFilteredHighlights } from '@/application/navigation'
 import { colorForGroup, pageForPosition, quoteColor } from '@/application/common'
@@ -22,10 +21,27 @@ import { useReportHistory } from '@/application/history'
 import { User, useAuth } from '@/application/auth'
 import { Copilot, CopilotState } from '@/components/Copilot'
 
+type ReaderBooq = {
+    id: string,
+    title?: string,
+    author?: string,
+    language?: string,
+    length: number,
+    fragment: {
+        nodes: BooqNode[],
+        previous?: ReaderAnchor,
+        current: ReaderAnchor,
+        next?: ReaderAnchor,
+    }
+}
+type ReaderAnchor = {
+    title?: string,
+    path: BooqPath,
+}
 export function Reader({
     booq, quote,
 }: {
-    booq: BooqData,
+    booq: ReaderBooq,
     quote?: BooqRange,
 }) {
     const self = useAuth()
@@ -116,8 +132,8 @@ export function Reader({
             <IconButton icon='back' />
         </FeedLink>}
         NavigationButton={NavigationButton}
-        ThemerButton={<Themer />}
-        AccountButton={<SignIn />}
+        ThemerButton={<ThemerButton />}
+        AccountButton={<SignInButton />}
         CurrentPage={<PageLabel text={pagesLabel} />}
         PagesLeft={<PageLabel text={leftLabel} />}
         NavigationContent={NavigationContent}
@@ -147,8 +163,8 @@ export function LoadingBooqScreen() {
             <IconButton icon='back' />
         </FeedLink>}
         NavigationButton={null}
-        ThemerButton={<Themer />}
-        AccountButton={<SignIn />}
+        ThemerButton={<ThemerButton />}
+        AccountButton={<SignInButton />}
         CurrentPage={null}
         PagesLeft={null}
         NavigationContent={null}
@@ -237,7 +253,7 @@ function useAugmentations(booqId: string, quote?: BooqRange, self?: User) {
     }
 }
 
-function useScrollHandler({ id, fragment, length }: BooqData) {
+function useScrollHandler({ id, fragment, length }: ReaderBooq) {
     const [currentPath, setCurrentPath] = useState(fragment.current.path)
     const { reportHistory } = useReportHistory()
 
@@ -268,7 +284,7 @@ function useScrollHandler({ id, fragment, length }: BooqData) {
 
 function AnchorButton({ booqId, anchor, title }: {
     booqId: string,
-    anchor?: BooqAnchor,
+    anchor?: ReaderAnchor,
     title: string,
 }) {
     if (!anchor) {

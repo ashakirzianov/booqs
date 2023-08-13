@@ -25,7 +25,6 @@ export function social() {
         apple: {
             async signIn() {
                 const result = await appleSdk()?.auth.signIn()
-                console.log('apple sign', result)
                 if (result) {
                     return {
                         token: result.authorization.id_token,
