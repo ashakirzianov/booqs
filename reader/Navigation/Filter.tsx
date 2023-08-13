@@ -1,11 +1,11 @@
 import { ReactNode } from 'react'
 import { ProfileBadge } from '@/components/ProfilePicture'
 import { User } from '@/application/auth'
-import { useNavigationState } from '@/application/navigation'
+import { HighlightAuthor, useNavigationState } from '@/application/navigation'
 
 export function NavigationFilter({ authors }: {
     self: User | undefined,
-    authors: User[],
+    authors: HighlightAuthor[],
 }) {
     const {
         showAuthors, showChapters, showHighlights,
