@@ -1,7 +1,19 @@
 'use client'
-import React, { ReactNode, useEffect, useRef } from 'react'
+import { ReactNode, useEffect, useRef, useState } from 'react'
 import { Icon, IconName } from './Icon'
 import Link from 'next/link'
+
+export function useModalState() {
+    const [isOpen, setIsOpen] = useState(false)
+    function openModal() {
+        setIsOpen(true)
+    }
+    function closeModal() {
+        console.log('close modal')
+        setIsOpen(false)
+    }
+    return { isOpen, openModal, closeModal }
+}
 
 export function Modal({
     isOpen, children, closeModal

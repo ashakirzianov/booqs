@@ -1,8 +1,9 @@
-import React from 'react'
+'use client'
+import { useEffect, useRef, useState } from 'react'
 import { BooqCover } from '@/components/BooqCover'
 import { Spinner } from '@/components/Loading'
 import { BooqLink } from '@/components/Links'
-import styles from './Search.module.css'
+import { Modal, useModalState } from './Modal'
 
 type SearchResult = {
     id: string,
@@ -17,27 +18,71 @@ export function Search({ query, doQuery, results, loading }: {
     results: SearchResult[],
     loading: boolean,
 }) {
-    return <div className='flex grow-0 items-start justify-start text-primary max-h-12 overflow-visible'>
-        <div className='flex flex-col relative rounded bg-background'>
+    let { isOpen, openModal, closeModal } = useModalState()
+    return <>
+        <input
+            className='font-normal border-none text-xl shadow rounded p-4
+            max-h-12 w-40 
+            focus:max-w-auto focus:outline-none focus:ring-0 focus:border-none
+            placeholder:text-dimmed'
+            type="text"
+            placeholder="Search..."
+            value={query}
+            onClick={openModal}
+            readOnly
+        />
+        <SearchModal
+            isOpen={isOpen}
+            closeModal={closeModal}
+            query={query}
+            doQuery={doQuery}
+            results={results}
+            loading={loading}
+        />
+    </>
+}
+
+function SearchModal({
+    isOpen, closeModal,
+    query, doQuery, results, loading,
+}: {
+    isOpen: boolean,
+    closeModal: () => void,
+    query: string,
+    doQuery: (query: string) => void,
+    results: SearchResult[],
+    loading: boolean,
+}) {
+    let inputRef = useRef<HTMLInputElement>(null)
+    useEffect(() => {
+        if (isOpen && inputRef.current) {
+            inputRef.current.focus()
+        }
+    }, [isOpen])
+    return <Modal
+        isOpen={isOpen}
+        closeModal={closeModal}
+    >
+        <div className='w-panel' tabIndex={-1}>
             <input
-                className={`${styles.input} font-normal my-base mx-lg flex border-none max-w-[7rem] text-xl text-primary bg-transparent
-                focus:max-w-auto focus:outline-none focus:ring-0 focus:border-none
-                placeholder:text-dimmed`}
+                ref={inputRef}
+                className='font-normal border-none text-xl p-4 w-full
+            max-h-12
+            focus:outline-none focus:ring-0 focus:border-none
+            placeholder:text-dimmed'
+                tabIndex={1}
                 type="text"
                 placeholder="Search..."
                 value={query}
                 onChange={e => doQuery(e.target.value)}
             />
-            <div className={`${styles.results} flex-col overflow-hidden rounded-b`}>
-                <SearchResults
-                    results={results}
-                    query={query}
-                    loading={loading}
-                />
-            </div>
-            <p className={`${styles.shadow} shadow rounded`} />
+            <SearchResults
+                query={query}
+                results={results}
+                loading={loading}
+            />
         </div>
-    </div>
+    </Modal>
 }
 
 function SearchResults({ loading, query, results }: {
