@@ -82,7 +82,7 @@ function SearchModal({
             <div className='flex flex-col grow overflow-y-auto'>
                 {authors.length > 0
                     ? <div>
-                        <h1 className='font-bold p-2'>Authors</h1>
+                        <h1 className='font-bold p-2 text-xl'>Authors</h1>
                         <ul>
                             {authors.map((result, idx) => <SearchResultItem
                                 key={idx}
@@ -98,7 +98,7 @@ function SearchModal({
                     : null}
                 {booqs.length > 0
                     ? <div>
-                        <h1 className='font-bold p-2'>Books</h1>
+                        <h1 className='font-bold p-2 text-xl'>Books</h1>
                         <ul>
                             {booqs.map((result, idx) => <SearchResultItem
                                 key={idx}
