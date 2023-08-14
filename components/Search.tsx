@@ -44,13 +44,14 @@ function SearchModal({
     useEffect(() => {
         if (isOpen && inputRef.current) {
             inputRef.current.focus()
+            inputRef.current.select()
         }
     }, [isOpen])
     return <Modal
         isOpen={isOpen}
         closeModal={closeModal}
     >
-        <div className='flex flex-col max-h-[90vh] w-panel overflow-hidden' tabIndex={-1}>
+        <div className='flex flex-col h-[40rem] max-h-[90vh] w-panel max-w-[90vw] overflow-hidden' tabIndex={-1}>
             <input
                 ref={inputRef}
                 className='font-normal border-none text-xl p-4 w-full
@@ -77,9 +78,6 @@ function SearchResults({ loading, query, results }: {
     query: string,
     loading: boolean,
 }) {
-    if (!results?.length) {
-        return null
-    }
     return <div className='flex flex-col grow overflow-y-auto'>
         {
             results.map(
@@ -94,7 +92,11 @@ function SearchResults({ loading, query, results }: {
         {
             loading
                 ? <div key='spinner' className='self-center m-lg'><Spinner /></div>
-                : null
+                : results.length === 0
+                    ? <div className='text-center text-dimmed p-base'>
+                        No results
+                    </div>
+                    : null
         }
     </div>
 }
