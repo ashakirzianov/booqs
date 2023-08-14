@@ -42,7 +42,7 @@ function SignInPanel() {
 function Panel({ children }: {
     children: ReactNode,
 }) {
-    return <div className='flex flex-col items-center justify-center h-60'>
+    return <div className='flex flex-col items-center justify-center h-80'>
         {children}
     </div>
 }
@@ -51,7 +51,7 @@ type HistoryItem = ReturnType<typeof useHistory>['history'][number];
 function HistoryItems({ items }: {
     items: HistoryItem[],
 }) {
-    return <div className='flex flex-1 gap-3 box-border overflow-auto snap-x snap-mandatory py-xl px-base' style={{
+    return <div className='flex gap-3 overflow-auto snap-x snap-mandatory py-xl px-4 h-80' style={{
         scrollbarWidth: 'none',
     }}>
         {
