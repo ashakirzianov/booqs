@@ -54,7 +54,10 @@ export function Modal({
         }
     }, [closeModal])
     return <dialog ref={dialogRef}
-        className={`pointer-events-auto transition duration-300 shadow rounded bg-background opacity-0 translate-y-full open:opacity-100 open:translate-y-0 p-0`}
+        className={`pointer-events-auto transition duration-300 shadow-xl rounded bg-background
+        dark:shadow-slate-800 dark:shadow
+        backdrop:backdrop-blur-sm
+        opacity-0 translate-y-full open:opacity-100 open:translate-y-0 p-0`}
     >
         {children}
     </dialog>
