@@ -2,7 +2,8 @@ import React from 'react'
 import { TextButton } from '@/components/Buttons'
 import { BooqTags } from '@/components/BooqTags'
 import { BooqCover } from '@/components/BooqCover'
-import { BooqLink } from '@/components/Links'
+import { BooqLink, authorHref } from '@/components/Links'
+import Link from 'next/link'
 
 type FeaturedItem = {
     id: string,
@@ -61,7 +62,14 @@ function Header({ title, author }: {
 }) {
     return <div className='flex flex-col items-baseline'>
         <span className="text-xl font-bold">{title}</span>
-        <span className="text-lg">by {author}</span>
+        {
+            author &&
+            <span className="text-lg">by <Link href={authorHref(author)}
+                className='hover:underline'
+            >
+                {author}
+            </Link></span>
+        }
     </div>
 }
 

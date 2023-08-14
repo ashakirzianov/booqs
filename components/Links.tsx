@@ -40,3 +40,7 @@ export function feedHref() {
 export function accountHref() {
     return '/account'
 }
+
+export function authorHref(name: string) {
+    return `/author/${encodeURIComponent(name)}`
+}
