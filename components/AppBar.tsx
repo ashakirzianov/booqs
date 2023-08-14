@@ -6,8 +6,8 @@ export function AppBar({ left, right }: {
     left?: ReactNode,
     right?: ReactNode,
 }) {
-    return <div className="flex flex-row items-center w-screen h-header py-xl px-base sm:py-xl sm:px-lg">
-        <div className="mr-xl hidden sm:flex grow-0">
+    return <div className="flex flex-row items-center w-screen h-header py-xl px-4 gap-4">
+        <div className="hidden sm:flex grow-0">
             <Link href={feedHref()}>
                 <Logo />
             </Link>
