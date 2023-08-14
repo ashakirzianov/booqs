@@ -2,6 +2,7 @@ import React, { ReactNode } from 'react'
 import Link from 'next/link'
 import { BooqPath, pathToString, BooqRange, rangeToString, pathToId } from '@/core'
 
+// TODO: remove this
 export function BooqLink({ booqId, path, children }: {
     booqId: string,
     path?: BooqPath,
