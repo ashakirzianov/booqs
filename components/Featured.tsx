@@ -1,14 +1,7 @@
-import { BooqCard, BooqCardData } from '@/components/BooqCard'
+import { BooqCardData } from '@/components/BooqCard'
+import { BooqCollection } from './BooqCollection'
 export function Featured({ cards }: {
     cards: BooqCardData[],
 }) {
-    return <div className='flex flex-row justify-center'>
-        <div className='flex flex-col items-center w-panel gap-1'>
-            {
-                cards.map(
-                    (item, idx) => <BooqCard key={idx} card={item} />
-                )
-            }
-        </div>
-    </div>
+    return <BooqCollection cards={cards} title='Featured Books' />
 }
