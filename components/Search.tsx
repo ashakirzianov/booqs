@@ -41,7 +41,7 @@ function SearchModal({
                 autoFocus={true}
                 onFocus={e => e.target.select()}
                 className='font-normal border-none text-xl p-4 w-full
-            max-h-12 bg-background text-primary
+            max-h-12 bg-background text-primary shadow
             focus:outline-none focus:ring-0 focus:border-none
             placeholder:text-dimmed'
                 tabIndex={1}
