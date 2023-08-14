@@ -1,7 +1,9 @@
 import { ReactNode } from 'react'
-import { AppButtons } from '@/components/AppButtons'
-import { WiredSearch } from './client'
 import { AppBar } from '@/components/AppBar'
+import { Search } from '@/components/Search'
+import { UploadButton } from '@/components/Upload'
+import { SignInButton } from '@/components/SignIn'
+import { AppProvider } from '@/application/provider'
 
 export default function MainLayout({
     children,
@@ -9,10 +11,15 @@ export default function MainLayout({
     children: ReactNode,
 }) {
     return <div className='flex flex-1 flex-col font-normal font-main overflow-hidden'>
-        <AppBar
-            left={<WiredSearch />}
-            right={<AppButtons />}
-        />
-        {children}
+        <AppProvider>
+            <AppBar
+                left={<Search />}
+                right={<>
+                    <UploadButton />
+                    <SignInButton />
+                </>}
+            />
+            {children}
+        </AppProvider>
     </div>
 }

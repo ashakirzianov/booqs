@@ -1,43 +1,70 @@
-import React from 'react'
+'use client'
+import { useEffect, useRef } from 'react'
 import { BooqCover } from '@/components/BooqCover'
 import { Spinner } from '@/components/Loading'
-import { BooqLink } from '@/components/Links'
-import styles from './Search.module.css'
+import { BooqLink, authorHref } from '@/components/Links'
+import { Modal, useModalState } from './Modal'
+import { AuthorSearchResult, BooqSearchResult, SearchResult, isAuthorSearchResult, isBooqSearchResult, useSearch } from '@/application/search'
+import Link from 'next/link'
 
-type SearchResult = {
-    id: string,
-    title?: string,
-    author?: string,
-    cover?: string,
+export function Search() {
+    let { isOpen, openModal, closeModal } = useModalState()
+    return <>
+        <input
+            className='font-normal border-none text-xl shadow rounded p-4
+            max-h-12 w-40 
+            focus:max-w-auto focus:outline-none focus:ring-0 focus:border-none
+            placeholder:text-dimmed'
+            type="text"
+            placeholder="Search..."
+            onClick={openModal}
+            readOnly
+        />
+        <SearchModal
+            isOpen={isOpen}
+            closeModal={closeModal}
+        />
+    </>
 }
 
-export function Search({ query, doQuery, results, loading }: {
-    query: string,
-    doQuery: (query: string) => void,
-    results: SearchResult[],
-    loading: boolean,
+function SearchModal({
+    isOpen, closeModal,
+}: {
+    isOpen: boolean,
+    closeModal: () => void,
 }) {
-    return <div className='flex grow-0 items-start justify-start text-primary max-h-12 overflow-visible'>
-        <div className='flex flex-col relative rounded bg-background'>
+    const { query, doQuery, results, loading } = useSearch()
+    let inputRef = useRef<HTMLInputElement>(null)
+    useEffect(() => {
+        if (isOpen && inputRef.current) {
+            inputRef.current.focus()
+            inputRef.current.select()
+        }
+    }, [isOpen])
+    return <Modal
+        isOpen={isOpen}
+        closeModal={closeModal}
+    >
+        <div className='flex flex-col h-[40rem] max-h-[90vh] w-panel max-w-[90vw] overflow-hidden' tabIndex={-1}>
             <input
-                className={`${styles.input} font-normal my-base mx-lg flex border-none max-w-[7rem] text-xl text-primary bg-transparent
-                focus:max-w-auto focus:outline-none focus:ring-0 focus:border-none
-                placeholder:text-dimmed`}
+                ref={inputRef}
+                className='font-normal border-none text-xl p-4 w-full
+            max-h-12
+            focus:outline-none focus:ring-0 focus:border-none
+            placeholder:text-dimmed'
+                tabIndex={1}
                 type="text"
                 placeholder="Search..."
                 value={query}
                 onChange={e => doQuery(e.target.value)}
             />
-            <div className={`${styles.results} flex-col overflow-hidden rounded-b`}>
-                <SearchResults
-                    results={results}
-                    query={query}
-                    loading={loading}
-                />
-            </div>
-            <p className={`${styles.shadow} shadow rounded`} />
+            <SearchResults
+                query={query}
+                results={results}
+                loading={loading}
+            />
         </div>
-    </div>
+    </Modal>
 }
 
 function SearchResults({ loading, query, results }: {
@@ -45,30 +72,64 @@ function SearchResults({ loading, query, results }: {
     query: string,
     loading: boolean,
 }) {
-    if (!results.length) {
-        return null
-    }
-    return <div className='flex flex-col max-h-80 overflow-hidden hover:overflow-auto'>
+    let booqs = results.filter(isBooqSearchResult)
+    let authors = results.filter(isAuthorSearchResult)
+    let booqsNode = booqs.length > 0
+        ? <div>
+            <h1 className='font-bold p-2'>Books</h1>
+            {
+                booqs.map(
+                    (result, idx) => <div key={idx} className='result'>
+                        <BooqSearchResult
+                            result={result}
+                            query={query}
+                        />
+                    </div>
+                )
+            }
+        </div>
+        : null
+    let authorsNode = authors.length > 0
+        ? <div>
+            <h1 className='font-bold p-2'>Authors</h1>
+            {
+                authors.map(
+                    (result, idx) => <div key={idx} className='result'>
+                        <AuthorSearchResult
+                            result={result}
+                            query={query}
+                        />
+                    </div>
+                )
+            }
+        </div>
+        : null
+    return <div className='flex flex-col grow overflow-y-auto'>
         {
-            results.map(
-                (result, idx) => <div key={idx} className='result'>
-                    <SingleResult
-                        result={result}
-                        query={query}
-                    />
-                </div>
-            )
+            results[0]?.__typename === 'Author'
+                ? <>
+                    {authorsNode}
+                    {booqsNode}
+                </>
+                : <>
+                    {booqsNode}
+                    {authorsNode}
+                </>
         }
         {
             loading
                 ? <div key='spinner' className='self-center m-lg'><Spinner /></div>
-                : null
+                : results.length === 0
+                    ? <div className='text-center text-dimmed p-base'>
+                        No results
+                    </div>
+                    : null
         }
     </div>
 }
 
-function SingleResult({ result, query }: {
-    result: SearchResult,
+function BooqSearchResult({ result, query }: {
+    result: BooqSearchResult,
     query: string,
 }) {
     return <BooqLink booqId={result.id} path={[0]}>
@@ -84,13 +145,26 @@ function SingleResult({ result, query }: {
                     text={result.title ?? ''}
                     emphasis={query}
                 />
+                <span>{result.author}</span>
+            </div>
+        </div>
+    </BooqLink>
+}
+
+function AuthorSearchResult({ result, query }: {
+    result: AuthorSearchResult,
+    query: string,
+}) {
+    return <Link href={authorHref(result.name)}>
+        <div className='flex text-base transition-all duration-300 cursor-pointer p-base hover:bg-highlight hover:text-background'>
+            <div className='flex flex-col my-0'>
                 <EmphasizedSpan
-                    text={result.author ?? ''}
+                    text={result.name}
                     emphasis={query}
                 />
             </div>
         </div>
-    </BooqLink>
+    </Link>
 }
 
 function EmphasizedSpan({ text, emphasis }: {
