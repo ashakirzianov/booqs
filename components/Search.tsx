@@ -4,6 +4,7 @@ import { BooqCover } from '@/components/BooqCover'
 import { Spinner } from '@/components/Loading'
 import { BooqLink } from '@/components/Links'
 import { Modal, useModalState } from './Modal'
+import { useSearch } from '@/application/search'
 
 type SearchResult = {
     id: string,
@@ -12,12 +13,7 @@ type SearchResult = {
     cover?: string,
 }
 
-export function Search({ query, doQuery, results, loading }: {
-    query: string,
-    doQuery: (query: string) => void,
-    results: SearchResult[],
-    loading: boolean,
-}) {
+export function Search() {
     let { isOpen, openModal, closeModal } = useModalState()
     return <>
         <input
@@ -27,32 +23,23 @@ export function Search({ query, doQuery, results, loading }: {
             placeholder:text-dimmed'
             type="text"
             placeholder="Search..."
-            value={query}
             onClick={openModal}
             readOnly
         />
         <SearchModal
             isOpen={isOpen}
             closeModal={closeModal}
-            query={query}
-            doQuery={doQuery}
-            results={results}
-            loading={loading}
         />
     </>
 }
 
 function SearchModal({
     isOpen, closeModal,
-    query, doQuery, results, loading,
 }: {
     isOpen: boolean,
     closeModal: () => void,
-    query: string,
-    doQuery: (query: string) => void,
-    results: SearchResult[],
-    loading: boolean,
 }) {
+    const { query, doQuery, results, loading } = useSearch()
     let inputRef = useRef<HTMLInputElement>(null)
     useEffect(() => {
         if (isOpen && inputRef.current) {
@@ -63,7 +50,7 @@ function SearchModal({
         isOpen={isOpen}
         closeModal={closeModal}
     >
-        <div className='w-panel' tabIndex={-1}>
+        <div className='flex flex-col max-h-[90vh] w-panel overflow-hidden' tabIndex={-1}>
             <input
                 ref={inputRef}
                 className='font-normal border-none text-xl p-4 w-full
@@ -90,10 +77,10 @@ function SearchResults({ loading, query, results }: {
     query: string,
     loading: boolean,
 }) {
-    if (!results.length) {
+    if (!results?.length) {
         return null
     }
-    return <div className='flex flex-col max-h-80 overflow-hidden hover:overflow-auto'>
+    return <div className='flex flex-col grow overflow-y-auto'>
         {
             results.map(
                 (result, idx) => <div key={idx} className='result'>

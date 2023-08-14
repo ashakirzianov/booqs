@@ -9,7 +9,6 @@ export function useModalState() {
         setIsOpen(true)
     }
     function closeModal() {
-        console.log('close modal')
         setIsOpen(false)
     }
     return { isOpen, openModal, closeModal }
