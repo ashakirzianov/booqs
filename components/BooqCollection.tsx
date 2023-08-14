@@ -1,10 +1,28 @@
 import { BooqCard, BooqCardData } from '@/components/BooqCard'
 export function BooqCollection({
     cards, title,
+    collection, addToCollection, removeFromCollection,
 }: {
     title?: string,
     cards: BooqCardData[],
+    collection?: string[],
+    addToCollection?: (id: string) => void,
+    removeFromCollection?: (id: string) => void,
 }) {
+    function isInCollection(id: string) {
+        if (collection === undefined) {
+            return undefined
+        } else {
+            return collection.includes(id)
+        }
+    }
+    function toggleCollection(id: string) {
+        if (isInCollection(id)) {
+            removeFromCollection?.(id)
+        } else {
+            addToCollection?.(id)
+        }
+    }
     return (
         <div className='flex flex-row justify-center'>
             <div className='flex flex-col items-center max-w-[100rem]'>
@@ -15,7 +33,11 @@ export function BooqCollection({
                 <ul className='flex flex-row flex-wrap lg:justify-between justify-center gap-4 p-4'>
                     {cards.map(card => (
                         <li key={card.id} className='w-[30rem] max-w-[90vw] rounded shadow py-2 px-4'>
-                            <BooqCard card={card} />
+                            <BooqCard
+                                card={card}
+                                inCollection={isInCollection(card.id)}
+                                toggleCollection={() => toggleCollection(card.id)}
+                            />
                         </li>
                     ))}
                 </ul>

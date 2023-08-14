@@ -15,8 +15,11 @@ export type BooqCardData = {
 }
 export function BooqCard({
     card: { id, title, author, cover, tags },
+    inCollection, toggleCollection,
 }: {
     card: BooqCardData,
+    inCollection?: boolean,
+    toggleCollection?: () => void,
 }) {
     return <div className="flex flex-col grow gap-4 items-center sm:flex-row sm:flex-wrap sm:items-stretch h-full">
         <BooqCover
@@ -31,8 +34,15 @@ export function BooqCard({
             <div className='mt-4'>
                 <BooqTags tags={tags} />
             </div>
-            <div className='mt-4'>
-                <Actions booqId={id} />
+            <div className='mt-4 flex gap-2 self-stretch justify-end ml-xl'>
+                {
+                    inCollection !== undefined && toggleCollection
+                        ? <CollectionButton
+                            inCollection={inCollection} toggleCollection={toggleCollection}
+                        />
+                        : null
+                }
+                <ReadButton booqId={id} />
             </div>
         </div>
     </div>
@@ -55,16 +65,6 @@ function Header({ title, author }: {
     </div>
 }
 
-function Actions({ booqId }: {
-    booqId: string,
-}) {
-    return <div className='flex self-stretch justify-end'>
-        <div className='ml-xl'>
-            <ReadButton booqId={booqId} />
-        </div>
-    </div>
-}
-
 function ReadButton({ booqId }: {
     booqId: string,
 }) {
@@ -73,4 +73,19 @@ function ReadButton({ booqId }: {
             Read
         </span>
     </Link>
+}
+
+function CollectionButton({ inCollection, toggleCollection }: {
+    inCollection: boolean,
+    toggleCollection: () => void,
+}) {
+    return <span className='text-action underline text-lg cursor-pointer transition duration-300 hover:text-highlight'
+        onClick={toggleCollection}
+    >
+        {
+            inCollection
+                ? 'Remove'
+                : 'Add'
+        }
+    </span>
 }
