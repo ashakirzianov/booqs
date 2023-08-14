@@ -1,17 +1,11 @@
 'use client'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import { BooqCover } from '@/components/BooqCover'
 import { Spinner } from '@/components/Loading'
-import { BooqLink } from '@/components/Links'
+import { BooqLink, authorHref } from '@/components/Links'
 import { Modal, useModalState } from './Modal'
-import { useSearch } from '@/application/search'
-
-type SearchResult = {
-    id: string,
-    title?: string,
-    author?: string,
-    cover?: string,
-}
+import { AuthorSearchResult, BooqSearchResult, SearchResult, isAuthorSearchResult, isBooqSearchResult, useSearch } from '@/application/search'
+import Link from 'next/link'
 
 export function Search() {
     let { isOpen, openModal, closeModal } = useModalState()
@@ -78,16 +72,49 @@ function SearchResults({ loading, query, results }: {
     query: string,
     loading: boolean,
 }) {
+    let booqs = results.filter(isBooqSearchResult)
+    let authors = results.filter(isAuthorSearchResult)
+    let booqsNode = booqs.length > 0
+        ? <div>
+            <h1 className='font-bold p-2'>Books</h1>
+            {
+                booqs.map(
+                    (result, idx) => <div key={idx} className='result'>
+                        <BooqSearchResult
+                            result={result}
+                            query={query}
+                        />
+                    </div>
+                )
+            }
+        </div>
+        : null
+    let authorsNode = authors.length > 0
+        ? <div>
+            <h1 className='font-bold p-2'>Authors</h1>
+            {
+                authors.map(
+                    (result, idx) => <div key={idx} className='result'>
+                        <AuthorSearchResult
+                            result={result}
+                            query={query}
+                        />
+                    </div>
+                )
+            }
+        </div>
+        : null
     return <div className='flex flex-col grow overflow-y-auto'>
         {
-            results.map(
-                (result, idx) => <div key={idx} className='result'>
-                    <SingleResult
-                        result={result}
-                        query={query}
-                    />
-                </div>
-            )
+            results[0]?.__typename === 'Author'
+                ? <>
+                    {authorsNode}
+                    {booqsNode}
+                </>
+                : <>
+                    {booqsNode}
+                    {authorsNode}
+                </>
         }
         {
             loading
@@ -101,8 +128,8 @@ function SearchResults({ loading, query, results }: {
     </div>
 }
 
-function SingleResult({ result, query }: {
-    result: SearchResult,
+function BooqSearchResult({ result, query }: {
+    result: BooqSearchResult,
     query: string,
 }) {
     return <BooqLink booqId={result.id} path={[0]}>
@@ -118,13 +145,26 @@ function SingleResult({ result, query }: {
                     text={result.title ?? ''}
                     emphasis={query}
                 />
+                <span>{result.author}</span>
+            </div>
+        </div>
+    </BooqLink>
+}
+
+function AuthorSearchResult({ result, query }: {
+    result: AuthorSearchResult,
+    query: string,
+}) {
+    return <Link href={authorHref(result.name)}>
+        <div className='flex text-base transition-all duration-300 cursor-pointer p-base hover:bg-highlight hover:text-background'>
+            <div className='flex flex-col my-0'>
                 <EmphasizedSpan
-                    text={result.author ?? ''}
+                    text={result.name}
                     emphasis={query}
                 />
             </div>
         </div>
-    </BooqLink>
+    </Link>
 }
 
 function EmphasizedSpan({ text, emphasis }: {

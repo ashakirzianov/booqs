@@ -12,7 +12,7 @@ export default async function Author({
     return (
         <div className='flex flex-row justify-center'>
             <div className='flex flex-col items-center w-panel gap-1'>
-                <h1 className='font-bold p-4'>Books by {decoded}</h1>
+                <h1 className='font-bold p-4 text-2xl'>Books by {decoded}</h1>
                 <ul>
                     {booqs.map(booq => (
                         <li key={booq.id}>
