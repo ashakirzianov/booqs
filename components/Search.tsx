@@ -11,9 +11,8 @@ export function Search() {
     let { isOpen, openModal, closeModal } = useModalState()
     return <>
         <input
-            className='font-normal border-none text-xl shadow rounded p-4
-            max-h-12 w-40 
-            focus:max-w-auto focus:outline-none focus:ring-0 focus:border-none
+            className='font-normal border-none text-xl shadow rounded p-4 max-h-12 w-40 bg-background
+            focus:max-w-auto focus:outline-none focus:ring-0 focus:border-none dark:shadow-slate-800
             placeholder:text-dimmed'
             type="text"
             placeholder="Search..."
@@ -49,7 +48,7 @@ function SearchModal({
             <input
                 ref={inputRef}
                 className='font-normal border-none text-xl p-4 w-full
-            max-h-12
+            max-h-12 bg-background text-primary
             focus:outline-none focus:ring-0 focus:border-none
             placeholder:text-dimmed'
                 tabIndex={1}
