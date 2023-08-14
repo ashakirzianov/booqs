@@ -3,7 +3,7 @@ import { BooqCover } from '@/components/BooqCover'
 import { BooqTags } from '@/components/BooqTags'
 import { authorHref, booqHref } from '@/components/Links'
 
-export type BooqCardProps = {
+export type BooqCardData = {
     id: string,
     title?: string,
     author?: string,
@@ -14,8 +14,10 @@ export type BooqCardProps = {
     }>,
 }
 export function BooqCard({
-    id, title, author, cover, tags,
-}: BooqCardProps) {
+    card: { id, title, author, cover, tags },
+}: {
+    card: BooqCardData,
+}) {
     return <div className="flex flex-col grow items-center p-lg sm:flex-row sm:flex-wrap sm:items-stretch">
         <div className='flex m-base sm:my-base sm:mr-2xl sm:ml-0'>
             <BooqCover

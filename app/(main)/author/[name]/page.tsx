@@ -16,7 +16,7 @@ export default async function Author({
                 <ul>
                     {booqs.map(booq => (
                         <li key={booq.id}>
-                            <BooqCard {...booq} />
+                            <BooqCard card={booq} />
                         </li>
                     ))}
                 </ul>
