@@ -6,6 +6,7 @@ import {
     faFileAlt, faUser, faTimes, faListUl, faBookmark, faAngleLeft,
     faQuoteRight, faClone, faLink, faHighlighter, faTrashAlt,
     faEllipsisV,
+    faGear, faBook,
 } from '@fortawesome/free-solid-svg-icons'
 import {
     faFacebookF, faApple,
@@ -23,6 +24,8 @@ export type IconName =
     | 'facebook' | 'apple'
     | 'quote' | 'copy' | 'link' | 'highlight'
     | 'question'
+    | 'settings'
+    | 'books'
     ;
 
 export function Icon({ name, size }: {
@@ -80,6 +83,10 @@ function iconForName(name: IconName) {
             return faHighlighter
         case 'question':
             return faQuestion
+        case 'settings':
+            return faGear
+        case 'books':
+            return faBook
         default:
             assertNever(name)
             return faQuestion

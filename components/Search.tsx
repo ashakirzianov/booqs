@@ -1,19 +1,22 @@
 'use client'
-import { useEffect, useRef } from 'react'
 import { BooqCover } from '@/components/BooqCover'
 import { Spinner } from '@/components/Loading'
-import { BooqLink, authorHref } from '@/components/Links'
+import { BooqLink, authorHref, booqHref } from '@/components/Links'
 import { Modal, useModalState } from './Modal'
-import { AuthorSearchResult, BooqSearchResult, SearchResult, isAuthorSearchResult, isBooqSearchResult, useSearch } from '@/application/search'
+import {
+    AuthorSearchResult, BooqSearchResult,
+    isAuthorSearchResult, isBooqSearchResult, useSearch,
+} from '@/application/search'
 import Link from 'next/link'
+import { ReactNode, useEffect, useRef, useState } from 'react'
+import { useRouter } from 'next/navigation'
 
 export function Search() {
     let { isOpen, openModal, closeModal } = useModalState()
     return <>
         <input
-            className='font-normal border-none text-xl shadow rounded p-4
-            max-h-12 w-40 
-            focus:max-w-auto focus:outline-none focus:ring-0 focus:border-none
+            className='font-normal border-none text-xl shadow rounded p-4 max-h-12 w-40 bg-background cursor-pointer
+            focus:max-w-auto focus:outline-none focus:ring-0 focus:border-none dark:shadow-slate-800
             placeholder:text-dimmed'
             type="text"
             placeholder="Search..."
@@ -33,23 +36,41 @@ function SearchModal({
     isOpen: boolean,
     closeModal: () => void,
 }) {
+    let { push } = useRouter()
     const { query, doQuery, results, loading } = useSearch()
-    let inputRef = useRef<HTMLInputElement>(null)
-    useEffect(() => {
-        if (isOpen && inputRef.current) {
-            inputRef.current.focus()
-            inputRef.current.select()
-        }
-    }, [isOpen])
+    let [selected, setSelected] = useState(0)
+    let booqs = results.filter(isBooqSearchResult)
+    let authors = results.filter(isAuthorSearchResult)
     return <Modal
         isOpen={isOpen}
         closeModal={closeModal}
     >
-        <div className='flex flex-col h-[40rem] max-h-[90vh] w-panel max-w-[90vw] overflow-hidden' tabIndex={-1}>
+        <div className='flex flex-col h-[40rem] max-h-[90vh] w-panel max-w-[90vw] overflow-hidden' tabIndex={-1}
+            onKeyDown={e => {
+                if (e.key === 'Escape') {
+                    closeModal()
+                } else if (e.key === 'ArrowUp') {
+                    setSelected(Math.max(0, selected - 1))
+                } else if (e.key === 'ArrowDown') {
+                    setSelected(Math.min(results.length - 1, selected + 1))
+                } else if (e.key === 'Enter' && results.length > 0) {
+                    if (selected < authors.length) {
+                        let author = authors[selected]
+                        console.log(author)
+                        push(authorHref(author.name))
+                    } else {
+                        let booq = booqs[selected - authors.length]
+                        push(booqHref(booq.id, [0]))
+                    }
+                    closeModal()
+                }
+            }}
+        >
             <input
-                ref={inputRef}
+                autoFocus={true}
+                onFocus={e => e.target.select()}
                 className='font-normal border-none text-xl p-4 w-full
-            max-h-12
+            max-h-12 bg-background text-primary shadow
             focus:outline-none focus:ring-0 focus:border-none
             placeholder:text-dimmed'
                 tabIndex={1}
@@ -58,112 +79,106 @@ function SearchModal({
                 value={query}
                 onChange={e => doQuery(e.target.value)}
             />
-            <SearchResults
-                query={query}
-                results={results}
-                loading={loading}
-            />
+            <div className='flex flex-col grow overflow-y-auto'>
+                {authors.length > 0
+                    ? <div>
+                        <h1 className='font-bold p-2 text-xl'>Authors</h1>
+                        <ul>
+                            {authors.map((result, idx) => <SearchResultItem
+                                key={idx}
+                                selected={selected === idx}
+                            >
+                                <AuthorSearchResultContent
+                                    result={result}
+                                    query={query}
+                                />
+                            </SearchResultItem>)}
+                        </ul>
+                    </div>
+                    : null}
+                {booqs.length > 0
+                    ? <div>
+                        <h1 className='font-bold p-2 text-xl'>Books</h1>
+                        <ul>
+                            {booqs.map((result, idx) => <SearchResultItem
+                                key={idx}
+                                selected={selected === (idx + authors.length)}
+                            >
+                                <BooqSearchResultContent
+                                    result={result}
+                                    query={query}
+                                />
+                            </SearchResultItem>)}
+                        </ul>
+                    </div>
+                    : null}
+                {
+                    loading
+                        ? <div key='spinner' className='self-center m-lg'><Spinner /></div>
+                        : results.length === 0
+                            ? <div className='text-center text-dimmed p-base'>
+                                No results
+                            </div>
+                            : null
+                }
+            </div>
         </div>
     </Modal>
 }
 
-function SearchResults({ loading, query, results }: {
-    results: SearchResult[],
-    query: string,
-    loading: boolean,
+function SearchResultItem({ selected, children }: {
+    selected?: boolean,
+    children: ReactNode,
 }) {
-    let booqs = results.filter(isBooqSearchResult)
-    let authors = results.filter(isAuthorSearchResult)
-    let booqsNode = booqs.length > 0
-        ? <div>
-            <h1 className='font-bold p-2'>Books</h1>
-            {
-                booqs.map(
-                    (result, idx) => <div key={idx} className='result'>
-                        <BooqSearchResult
-                            result={result}
-                            query={query}
-                        />
-                    </div>
-                )
-            }
-        </div>
-        : null
-    let authorsNode = authors.length > 0
-        ? <div>
-            <h1 className='font-bold p-2'>Authors</h1>
-            {
-                authors.map(
-                    (result, idx) => <div key={idx} className='result'>
-                        <AuthorSearchResult
-                            result={result}
-                            query={query}
-                        />
-                    </div>
-                )
-            }
-        </div>
-        : null
-    return <div className='flex flex-col grow overflow-y-auto'>
-        {
-            results[0]?.__typename === 'Author'
-                ? <>
-                    {authorsNode}
-                    {booqsNode}
-                </>
-                : <>
-                    {booqsNode}
-                    {authorsNode}
-                </>
+    let ref = useRef<HTMLLIElement>(null)
+    useEffect(() => {
+        if (selected && ref.current) {
+            ref.current.scrollIntoView({
+                behavior: 'smooth',
+                block: 'nearest',
+                inline: 'nearest',
+            })
         }
-        {
-            loading
-                ? <div key='spinner' className='self-center m-lg'><Spinner /></div>
-                : results.length === 0
-                    ? <div className='text-center text-dimmed p-base'>
-                        No results
-                    </div>
-                    : null
-        }
-    </div>
+    }, [selected])
+    return <li ref={ref} className='flex text-base transition-all duration-300 cursor-pointer p-base hover:bg-highlight hover:text-background' style={{
+        background: selected ? 'var(--theme-highlight)' : undefined,
+        color: selected ? 'var(--theme-background)' : undefined,
+    }}>
+        {children}
+    </li>
 }
 
-function BooqSearchResult({ result, query }: {
+function BooqSearchResultContent({ result, query }: {
     result: BooqSearchResult,
     query: string,
 }) {
-    return <BooqLink booqId={result.id} path={[0]}>
-        <div className='flex text-base transition-all duration-300 cursor-pointer p-base hover:bg-highlight hover:text-background'>
-            <BooqCover
-                cover={result.cover}
-                title={result.title}
-                author={result.author}
-                size={20}
+    return <Link href={booqHref(result.id, [0])} className='flex flex-row'>
+        <BooqCover
+            cover={result.cover}
+            title={result.title}
+            author={result.author}
+            size={20}
+        />
+        <div className='flex flex-col my-0 mx-lg'>
+            <EmphasizedSpan
+                text={result.title ?? ''}
+                emphasis={query}
             />
-            <div className='flex flex-col my-0 mx-lg'>
-                <EmphasizedSpan
-                    text={result.title ?? ''}
-                    emphasis={query}
-                />
-                <span>{result.author}</span>
-            </div>
+            <span>{result.author}</span>
         </div>
-    </BooqLink>
+    </Link>
 }
 
-function AuthorSearchResult({ result, query }: {
+function AuthorSearchResultContent({ result, query, selected }: {
     result: AuthorSearchResult,
     query: string,
+    selected?: boolean,
 }) {
     return <Link href={authorHref(result.name)}>
-        <div className='flex text-base transition-all duration-300 cursor-pointer p-base hover:bg-highlight hover:text-background'>
-            <div className='flex flex-col my-0'>
-                <EmphasizedSpan
-                    text={result.name}
-                    emphasis={query}
-                />
-            </div>
-        </div>
+        <EmphasizedSpan
+            text={result.name}
+            emphasis={query}
+        />
     </Link>
 }
 

@@ -1,5 +1,6 @@
+import { READING_LIST_COLLECTION } from '@/application/collections'
 import { fetchQuery } from '@/application/server'
-import { BooqCard } from '@/components/BooqCard'
+import { BooqCollection } from '@/components/BooqCollection'
 import { gql } from '@apollo/client'
 
 export default async function Author({
@@ -9,20 +10,11 @@ export default async function Author({
 }) {
     let decoded = decodeURIComponent(name)
     let booqs = await fetchBooqsForAuthor(decoded)
-    return (
-        <div className='flex flex-row justify-center'>
-            <div className='flex flex-col items-center w-panel gap-1'>
-                <h1 className='font-bold p-4 text-2xl'>Books by {decoded}</h1>
-                <ul>
-                    {booqs.map(booq => (
-                        <li key={booq.id}>
-                            <BooqCard {...booq} />
-                        </li>
-                    ))}
-                </ul>
-            </div>
-        </div>
-    )
+    return <BooqCollection
+        title={`Books by ${decoded}`}
+        cards={booqs}
+        collection={READING_LIST_COLLECTION}
+    />
 }
 
 async function fetchBooqsForAuthor(name: string) {

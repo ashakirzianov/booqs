@@ -42,6 +42,10 @@ export function accountHref() {
     return '/account'
 }
 
+export function myBooqsHref() {
+    return `/account/collection`
+}
+
 export function authorHref(name: string) {
     return `/author/${encodeURIComponent(name)}`
 }

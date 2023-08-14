@@ -1,36 +1,33 @@
 import { useQuery, useMutation, gql } from '@apollo/client'
 
-const CollectionQuery = gql`query Collection($name: String!) {
+export const READING_LIST_COLLECTION = 'reading-list'
+
+const CollectionIdsQuery = gql`query CollectionIds($name: String!) {
     collection(name: $name) {
         booqs {
             id
-            title
-            author
-            cover(size: 120)
         }
     }
 }`
-type CollectionData = {
+type CollectionIdsData = {
     collection: {
         booqs: {
-            __typename: 'Booq',
             id: string,
-            title?: string,
-            author?: string,
-            cover?: string,
         }[],
     },
-};
-export type CollectionItem = CollectionData['collection']['booqs'][number];
-
-export function useCollection(name: string) {
-    const { loading, data } = useQuery<CollectionData>(
-        CollectionQuery,
+}
+type CollectionIdsVars = {
+    name: string,
+}
+export function useCollectionIds(name: string) {
+    const { loading, data } = useQuery<CollectionIdsData, CollectionIdsVars>(
+        CollectionIdsQuery,
         { variables: { name } }
     )
+    let ids = data?.collection?.booqs.map(b => b.id) ?? []
     return {
         loading,
-        booqs: data?.collection?.booqs ?? [],
+        ids,
     }
 }
 
@@ -41,33 +38,26 @@ mutation AddToCollection($name: String!, $booqId: ID!) {
 type AddToCollectionData = {
     addToCollection: boolean,
 };
-export function useAddToCollection() {
+export function useAddToCollection(name: string) {
     const [doAdd, { loading }] = useMutation<AddToCollectionData>(
         AddToCollectionMutation,
     )
     return {
         loading,
-        addToCollection({ booqId, name, cover, title, author }: {
-            booqId: string,
-            name: string,
-            title?: string,
-            author?: string,
-            cover?: string,
-        }) {
+        addToCollection(booqId: string) {
             doAdd({
                 variables: { name, booqId },
                 optimisticResponse: { addToCollection: true },
                 update(cache, { data }) {
                     if (data?.addToCollection) {
-                        let cached = cache.readQuery<CollectionData>({
-                            query: CollectionQuery,
+                        let cached = cache.readQuery<CollectionIdsData, CollectionIdsVars>({
+                            query: CollectionIdsQuery,
                             variables: { name },
                         })
                         if (cached) {
                             let item = {
                                 __typename: 'Booq',
                                 id: booqId,
-                                title, author, cover,
                             } as const
                             cached = {
                                 ...cached,
@@ -77,7 +67,7 @@ export function useAddToCollection() {
                                 },
                             }
                             cache.writeQuery({
-                                query: CollectionQuery,
+                                query: CollectionIdsQuery,
                                 variables: { name },
                                 data: cached,
                             })
@@ -96,28 +86,25 @@ mutation RemoveFromCollection($name: String!, $booqId: ID!) {
 type RemoveFromCollectionData = {
     removeFromCollection: boolean,
 };
-export function useRemoveFromCollection() {
+export function useRemoveFromCollection(name: string) {
     const [doRemove, { loading }] = useMutation<RemoveFromCollectionData>(
         RemoveFromCollectionMutation,
     )
     return {
         loading,
-        removeFromCollection({ booqId, name }: {
-            booqId: string,
-            name: string,
-        }) {
+        removeFromCollection(booqId: string) {
             doRemove({
                 variables: { name, booqId },
                 optimisticResponse: { removeFromCollection: true },
                 update(cache, { data }) {
                     if (data?.removeFromCollection) {
-                        const stored = cache.readQuery<CollectionData>({
-                            query: CollectionQuery,
+                        const stored = cache.readQuery<CollectionIdsData, CollectionIdsVars>({
+                            query: CollectionIdsQuery,
                             variables: { name },
                         })
                         const booqs = (stored?.collection?.booqs ?? []).filter(b => b.id !== booqId)
-                        cache.writeQuery<CollectionData>({
-                            query: CollectionQuery,
+                        cache.writeQuery<CollectionIdsData, CollectionIdsVars>({
+                            query: CollectionIdsQuery,
                             variables: { name },
                             data: {
                                 ...stored,

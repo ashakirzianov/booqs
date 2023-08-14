@@ -27,7 +27,13 @@ const title = 'Booqs'
 const description = 'Your personal reading assistant'
 export const metadata: Metadata = {
     title, description,
-    themeColor: '#FFA500',
+    themeColor: [{
+        color: '#FFA500',
+        media: '(prefers-color-scheme: light)',
+    }, {
+        color: '#000000',
+        media: '(prefers-color-scheme: dark)',
+    }],
     manifest: `/manifest.json`,
 }
 

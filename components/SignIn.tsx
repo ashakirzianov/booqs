@@ -9,7 +9,7 @@ import { ProfileBadge } from '@/components/ProfilePicture'
 import { ModalButton, ModalDivider, ModalLabel, Modal } from '@/components/Modal'
 import { Popover } from '@/components/Popover'
 import { Spinner } from '@/components/Loading'
-import { accountHref } from '@/components/Links'
+import { accountHref, myBooqsHref } from '@/components/Links'
 
 export function SignInModal({ isOpen, closeModal }: {
     isOpen: boolean,
@@ -101,11 +101,19 @@ function AccountMenu({ name }: {
     name?: string,
 }) {
     const { signOut } = useSignInOptions()
-    return <div className='py-base flex flex-col flex-1 items-stretch'>
-        <Link href={accountHref()}>
-            <span className='p-base w-full text-center font-bold'>{name}</span>
-        </Link>
+    return <div className='flex flex-col flex-1 items-stretch'>
+        <span className='p-4 w-full text-center font-bold'>{name}</span>
         <Menu>
+            <MenuItem
+                text='My Booqs'
+                icon='books'
+                href={myBooqsHref()}
+            />
+            <MenuItem
+                text='Settings'
+                icon='settings'
+                href={accountHref()}
+            />
             <MenuItem
                 icon='sign-out'
                 text='Sing Out'

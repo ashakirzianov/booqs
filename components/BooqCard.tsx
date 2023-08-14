@@ -2,8 +2,9 @@ import Link from 'next/link'
 import { BooqCover } from '@/components/BooqCover'
 import { BooqTags } from '@/components/BooqTags'
 import { authorHref, booqHref } from '@/components/Links'
+import { ReactNode } from 'react'
 
-export type BooqCardProps = {
+export type BooqCardData = {
     id: string,
     title?: string,
     author?: string,
@@ -14,25 +15,27 @@ export type BooqCardProps = {
     }>,
 }
 export function BooqCard({
-    id, title, author, cover, tags,
-}: BooqCardProps) {
-    return <div className="flex flex-col grow items-center p-lg sm:flex-row sm:flex-wrap sm:items-stretch">
-        <div className='flex m-base sm:my-base sm:mr-2xl sm:ml-0'>
-            <BooqCover
-                title={title}
-                author={author}
-                cover={cover}
-            />
-        </div>
-        <div className="flex flex-col flex-1 justify-between py-base px-0">
+    card: { id, title, author, cover, tags },
+    actions,
+}: {
+    card: BooqCardData,
+    actions?: ReactNode,
+}) {
+    return <div className="flex flex-col grow gap-4 items-center sm:flex-row sm:flex-wrap sm:items-stretch h-full">
+        <BooqCover
+            title={title}
+            author={author}
+            cover={cover}
+        />
+        <div className="flex flex-col flex-1 justify-between">
             <div className='header'>
                 <Header title={title} author={author} />
             </div>
-            <div className='mt-lg'>
+            <div className='mt-4'>
                 <BooqTags tags={tags} />
             </div>
-            <div className='mt-lg'>
-                <Actions booqId={id} />
+            <div className='mt-4 flex gap-2 self-stretch justify-end ml-xl'>
+                {actions}
             </div>
         </div>
     </div>
@@ -53,24 +56,4 @@ function Header({ title, author }: {
             </Link></span>
         }
     </div>
-}
-
-function Actions({ booqId }: {
-    booqId: string,
-}) {
-    return <div className='flex self-stretch justify-end'>
-        <div className='ml-xl'>
-            <ReadButton booqId={booqId} />
-        </div>
-    </div>
-}
-
-function ReadButton({ booqId }: {
-    booqId: string,
-}) {
-    return <Link href={booqHref(booqId, [0])}>
-        <span className='text-action underline text-lg cursor-pointer transition duration-300 hover:text-highlight'>
-            Read
-        </span>
-    </Link>
 }

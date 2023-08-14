@@ -1,6 +1,7 @@
 import React, { ReactNode } from 'react'
 import { IconName, Icon } from './Icon'
 import { Spinner } from './Loading'
+import Link from 'next/link'
 
 export function Menu({ callback, children }: {
     children: ReactNode,
@@ -11,13 +12,16 @@ export function Menu({ callback, children }: {
     </div>
 }
 
-export function MenuItem({ icon, text, callback, spinner }: {
+export function MenuItem({
+    icon, text, callback, spinner, href,
+}: {
     text: string,
     icon?: IconName,
     callback?: () => void,
     spinner?: boolean,
+    href?: string,
 }) {
-    return <div
+    let content = <div
         className='container flex flex-row grow items-center cursor-pointer font-main select-none transition font-bold p-lg hover:bg-highlight hover:text-background'
         // Note: prevent loosing selection on safari
         onMouseDown={e => e.preventDefault()}
@@ -35,4 +39,7 @@ export function MenuItem({ icon, text, callback, spinner }: {
                 : null
         }
     </div>
+    return href
+        ? <Link href={href}>{content}</Link>
+        : content
 }

@@ -1,12 +1,16 @@
+import Link from 'next/link'
 import { ReactNode } from 'react'
+import { feedHref } from './Links'
 
 export function AppBar({ left, right }: {
     left?: ReactNode,
     right?: ReactNode,
 }) {
-    return <div className="flex flex-row items-center w-screen h-header py-xl px-base sm:py-xl sm:px-lg">
-        <div className="mr-xl hidden sm:flex grow-0">
-            <Logo />
+    return <div className="flex flex-row items-center w-screen h-header py-xl px-4 gap-4">
+        <div className="hidden sm:flex grow-0">
+            <Link href={feedHref()}>
+                <Logo />
+            </Link>
         </div>
         <div className="flex grow">
             {left}
@@ -27,7 +31,6 @@ function Logo() {
         background: '-webkit-linear-gradient(180deg, rgba(253,163,2,1) 50%, rgb(200, 145, 2) 100%)',
         WebkitBackgroundClip: 'text',
         WebkitTextFillColor: 'transparent',
-        cursor: 'default',
         userSelect: 'none',
     }}>
         BOOQS

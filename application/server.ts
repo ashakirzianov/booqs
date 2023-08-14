@@ -1,7 +1,7 @@
 import { DocumentNode } from 'graphql'
 
 export async function fetchQuery<T = any, V = any>({
-    query, variables, options,
+    query, variables, options, cookies,
 }: {
     query: DocumentNode,
     variables?: V,
@@ -9,6 +9,10 @@ export async function fetchQuery<T = any, V = any>({
         cache?: RequestCache,
         headers?: HeadersInit,
     },
+    cookies?: Array<{
+        name: string,
+        value: string,
+    }>,
 }): Promise<{
     success: true,
     data: T,
@@ -20,6 +24,8 @@ export async function fetchQuery<T = any, V = any>({
     if (url === undefined)
         throw new Error('NEXT_PUBLIC_BACKEND is undefined')
     try {
+        let cookieString = cookies?.map(c => `${c.name}=${c.value}`).join('; ')
+        let cookieHeader = cookieString ? { Cookie: cookieString } : undefined
         const response = await fetch(
             url,
             {
@@ -31,6 +37,7 @@ export async function fetchQuery<T = any, V = any>({
                 }),
                 headers: {
                     'Content-Type': 'application/json',
+                    ...cookieHeader,
                     ...options?.headers,
                 },
             }
