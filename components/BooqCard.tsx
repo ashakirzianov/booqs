@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { BooqCover } from '@/components/BooqCover'
 import { BooqTags } from '@/components/BooqTags'
 import { authorHref, booqHref } from '@/components/Links'
+import { ReactNode } from 'react'
 
 export type BooqCardData = {
     id: string,
@@ -15,11 +16,10 @@ export type BooqCardData = {
 }
 export function BooqCard({
     card: { id, title, author, cover, tags },
-    inCollection, toggleCollection,
+    actions,
 }: {
     card: BooqCardData,
-    inCollection?: boolean,
-    toggleCollection?: () => void,
+    actions?: ReactNode,
 }) {
     return <div className="flex flex-col grow gap-4 items-center sm:flex-row sm:flex-wrap sm:items-stretch h-full">
         <BooqCover
@@ -35,14 +35,7 @@ export function BooqCard({
                 <BooqTags tags={tags} />
             </div>
             <div className='mt-4 flex gap-2 self-stretch justify-end ml-xl'>
-                {
-                    inCollection !== undefined && toggleCollection
-                        ? <CollectionButton
-                            inCollection={inCollection} toggleCollection={toggleCollection}
-                        />
-                        : null
-                }
-                <ReadButton booqId={id} />
+                {actions}
             </div>
         </div>
     </div>
@@ -63,29 +56,4 @@ function Header({ title, author }: {
             </Link></span>
         }
     </div>
-}
-
-function ReadButton({ booqId }: {
-    booqId: string,
-}) {
-    return <Link href={booqHref(booqId, [0])}>
-        <span className='text-action underline text-lg cursor-pointer transition duration-300 hover:text-highlight'>
-            Read
-        </span>
-    </Link>
-}
-
-function CollectionButton({ inCollection, toggleCollection }: {
-    inCollection: boolean,
-    toggleCollection: () => void,
-}) {
-    return <span className='text-action underline text-lg cursor-pointer transition duration-300 hover:text-highlight'
-        onClick={toggleCollection}
-    >
-        {
-            inCollection
-                ? 'Remove'
-                : 'Add'
-        }
-    </span>
 }

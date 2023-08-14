@@ -1,28 +1,14 @@
 import { BooqCard, BooqCardData } from '@/components/BooqCard'
+import Link from 'next/link'
+import { booqHref } from './Links'
+import { CollectionButton } from './CollectionButton'
 export function BooqCollection({
-    cards, title,
-    collection, addToCollection, removeFromCollection,
+    cards, title, collection,
 }: {
     title?: string,
     cards: BooqCardData[],
-    collection?: string[],
-    addToCollection?: (id: string) => void,
-    removeFromCollection?: (id: string) => void,
+    collection?: string,
 }) {
-    function isInCollection(id: string) {
-        if (collection === undefined) {
-            return undefined
-        } else {
-            return collection.includes(id)
-        }
-    }
-    function toggleCollection(id: string) {
-        if (isInCollection(id)) {
-            removeFromCollection?.(id)
-        } else {
-            addToCollection?.(id)
-        }
-    }
     return (
         <div className='flex flex-row justify-center'>
             <div className='flex flex-col items-center max-w-[100rem]'>
@@ -35,8 +21,10 @@ export function BooqCollection({
                         <li key={card.id} className='w-[30rem] max-w-[90vw] rounded shadow py-2 px-4'>
                             <BooqCard
                                 card={card}
-                                inCollection={isInCollection(card.id)}
-                                toggleCollection={() => toggleCollection(card.id)}
+                                actions={<>
+                                    <CollectionButton booqId={card.id} collection={collection} />
+                                    <ReadButton booqId={card.id} />
+                                </>}
                             />
                         </li>
                     ))}
@@ -44,4 +32,14 @@ export function BooqCollection({
             </div>
         </div>
     )
+}
+
+function ReadButton({ booqId }: {
+    booqId: string,
+}) {
+    return <Link href={booqHref(booqId, [0])}>
+        <span className='text-action underline text-lg cursor-pointer transition duration-300 hover:text-highlight'>
+            Read
+        </span>
+    </Link>
 }

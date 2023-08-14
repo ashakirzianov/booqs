@@ -1,3 +1,4 @@
+import { READING_LIST_COLLECTION } from '@/application/collections'
 import { fetchQuery } from '@/application/server'
 import { BooqCollection } from '@/components/BooqCollection'
 import { gql } from '@apollo/client'
@@ -12,6 +13,7 @@ export default async function Author({
     return <BooqCollection
         title={`Books by ${decoded}`}
         cards={booqs}
+        collection={READING_LIST_COLLECTION}
     />
 }
 
