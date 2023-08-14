@@ -18,22 +18,20 @@ export function BooqCard({
 }: {
     card: BooqCardData,
 }) {
-    return <div className="flex flex-col grow items-center p-lg sm:flex-row sm:flex-wrap sm:items-stretch">
-        <div className='flex m-base sm:my-base sm:mr-2xl sm:ml-0'>
-            <BooqCover
-                title={title}
-                author={author}
-                cover={cover}
-            />
-        </div>
-        <div className="flex flex-col flex-1 justify-between py-base px-0">
+    return <div className="flex flex-col grow gap-4 items-center sm:flex-row sm:flex-wrap sm:items-stretch h-full">
+        <BooqCover
+            title={title}
+            author={author}
+            cover={cover}
+        />
+        <div className="flex flex-col flex-1 justify-between">
             <div className='header'>
                 <Header title={title} author={author} />
             </div>
-            <div className='mt-lg'>
+            <div className='mt-4'>
                 <BooqTags tags={tags} />
             </div>
-            <div className='mt-lg'>
+            <div className='mt-4'>
                 <Actions booqId={id} />
             </div>
         </div>
