@@ -1,5 +1,4 @@
 'use client'
-import { useEffect, useRef } from 'react'
 import { BooqCover } from '@/components/BooqCover'
 import { Spinner } from '@/components/Loading'
 import { BooqLink, authorHref } from '@/components/Links'
@@ -11,7 +10,7 @@ export function Search() {
     let { isOpen, openModal, closeModal } = useModalState()
     return <>
         <input
-            className='font-normal border-none text-xl shadow rounded p-4 max-h-12 w-40 bg-background
+            className='font-normal border-none text-xl shadow rounded p-4 max-h-12 w-40 bg-background cursor-pointer
             focus:max-w-auto focus:outline-none focus:ring-0 focus:border-none dark:shadow-slate-800
             placeholder:text-dimmed'
             type="text"
@@ -33,20 +32,14 @@ function SearchModal({
     closeModal: () => void,
 }) {
     const { query, doQuery, results, loading } = useSearch()
-    let inputRef = useRef<HTMLInputElement>(null)
-    useEffect(() => {
-        if (isOpen && inputRef.current) {
-            inputRef.current.focus()
-            inputRef.current.select()
-        }
-    }, [isOpen])
     return <Modal
         isOpen={isOpen}
         closeModal={closeModal}
     >
         <div className='flex flex-col h-[40rem] max-h-[90vh] w-panel max-w-[90vw] overflow-hidden' tabIndex={-1}>
             <input
-                ref={inputRef}
+                autoFocus={true}
+                onFocus={e => e.target.select()}
                 className='font-normal border-none text-xl p-4 w-full
             max-h-12 bg-background text-primary
             focus:outline-none focus:ring-0 focus:border-none
