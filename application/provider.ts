@@ -19,7 +19,7 @@ const link = ApolloLink.from([
     }),
     // TODO: remove
     createUploadLink({
-        uri: process.env.NEXT_PUBLIC_BACKEND,
+        uri: `${process.env.NEXT_PUBLIC_BACKEND}/graphql`,
         credentials: 'include',
         fetch,
     }),
