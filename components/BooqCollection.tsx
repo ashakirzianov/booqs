@@ -19,7 +19,7 @@ export function BooqCollection({
                 <ul className='flex flex-row flex-wrap lg:justify-between justify-center gap-4 p-4'>
                     {
                         cards.length === 0
-                            ? <div className='text-xl text-gray-500 w-[30rem]'>Nothing here yet</div>
+                            ? <div className='text-xl text-gray-500 w-[30rem] max-w-[90vw]'>Nothing here yet</div>
                             : null
                     }
                     {cards.map(card => (
