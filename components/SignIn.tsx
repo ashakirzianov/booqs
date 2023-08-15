@@ -1,6 +1,5 @@
 'use client'
 import React, { useState } from 'react'
-import Link from 'next/link'
 import { User, useAuth, useSignInOptions } from '@/application/auth'
 import { useIsMounted } from '@/application/utils'
 import { Menu, MenuItem } from '@/components/Menu'
@@ -10,12 +9,14 @@ import { ModalButton, ModalDivider, ModalLabel, Modal } from '@/components/Modal
 import { Popover } from '@/components/Popover'
 import { Spinner } from '@/components/Loading'
 import { accountHref, myBooqsHref } from '@/components/Links'
+import { useRouter } from 'next/navigation'
 
 export function SignInModal({ isOpen, closeModal }: {
     isOpen: boolean,
     closeModal: () => void,
 }) {
     const { signWithApple, signWithFacebook } = useSignInOptions()
+    let router = useRouter()
     return <Modal
         isOpen={isOpen}
         closeModal={closeModal}
@@ -29,6 +30,7 @@ export function SignInModal({ isOpen, closeModal }: {
                 onClick={() => {
                     signWithApple()
                     closeModal()
+                    router.refresh()
                 }}
             />
             <ModalDivider />
@@ -38,6 +40,7 @@ export function SignInModal({ isOpen, closeModal }: {
                 onClick={() => {
                     signWithFacebook()
                     closeModal()
+                    router.refresh()
                 }}
             />
             <ModalDivider />
@@ -101,6 +104,7 @@ function AccountMenu({ name }: {
     name?: string,
 }) {
     const { signOut } = useSignInOptions()
+    let router = useRouter()
     return <div className='flex flex-col flex-1 items-stretch'>
         <span className='p-4 w-full text-center font-bold'>{name}</span>
         <Menu>
@@ -117,7 +121,10 @@ function AccountMenu({ name }: {
             <MenuItem
                 icon='sign-out'
                 text='Sing Out'
-                callback={signOut}
+                callback={() => {
+                    signOut()
+                    router.refresh()
+                }}
                 spinner={false}
             />
         </Menu>
