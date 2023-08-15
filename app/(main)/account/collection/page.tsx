@@ -6,7 +6,13 @@ import { cookies } from 'next/headers'
 
 export default async function MyBooqs() {
     let readingList = await fetchCollection(READING_LIST_COLLECTION)
+    let uploads = await fetchCollection('uploads')
     return <>
+        <BooqCollection
+            title='Uploads'
+            cards={uploads}
+            collection='uploads'
+        />
         <BooqCollection
             title='My Booqs'
             cards={readingList}

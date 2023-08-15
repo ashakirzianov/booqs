@@ -1,6 +1,7 @@
 import { useQuery, useMutation, gql } from '@apollo/client'
 
 export const READING_LIST_COLLECTION = 'reading-list'
+export const UPLOADS_COLLECTION = 'uploads'
 
 const CollectionIdsQuery = gql`query CollectionIds($name: String!) {
     collection(name: $name) {
