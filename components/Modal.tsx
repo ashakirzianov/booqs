@@ -99,7 +99,7 @@ export function ModalAsDiv({
 
 
 export function ModalLabel({ text }: { text: string }) {
-    return <div className='p-lg break-words max-w-full'>{text}</div>
+    return <div className='p-lg break-words max-w-full text-primary'>{text}</div>
 }
 
 export function ModalDivider() {
