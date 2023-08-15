@@ -4,6 +4,7 @@ import { BooqCollection } from '@/components/BooqCollection'
 import { gql } from '@apollo/client'
 import { cookies } from 'next/headers'
 
+export const revalidate = 1
 export default async function MyBooqs() {
     let readingList = await fetchCollection(READING_LIST_COLLECTION)
     let uploads = await fetchCollection('uploads')
