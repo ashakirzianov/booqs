@@ -4,13 +4,7 @@ import { BooqCollection } from '@/components/BooqCollection'
 import { gql } from '@apollo/client'
 import { cookies } from 'next/headers'
 
-export const revalidate = 1
-export const dynamic = 'force-dynamic'
-
 export default async function MyBooqs() {
-    console.log('COOKIES', cookies().getAll())
-    console.log('DYNAMIC', dynamic)
-    console.log('COLLECTIONS')
     let readingList = await fetchCollection(READING_LIST_COLLECTION)
     let uploads = await fetchCollection('uploads')
     return <>
@@ -57,7 +51,6 @@ async function fetchCollection(collection: string) {
         name: string,
     }
 
-    console.log('COOKIES', cookies().getAll())
     const result = await fetchQuery<CollectionData, CollectionVars>({
         query: CollectionQuery,
         variables: { name: collection },
@@ -66,7 +59,6 @@ async function fetchCollection(collection: string) {
             cache: 'no-store',
             headers: {
                 'booqs-operation': `collection:${collection}`,
-                'booqs-version': '1.0',
             },
         },
     })
