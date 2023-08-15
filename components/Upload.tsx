@@ -90,10 +90,12 @@ function UploadModalContent({ closeModal }: {
     } else if (result) {
         return <>
             <ModalLabel text={`${result.title}`} />
-            <BooqCover
-                title={result.title}
-                cover={result.cover}
-            />
+            <div className='p-4'>
+                <BooqCover
+                    title={result.title}
+                    cover={result.cover}
+                />
+            </div>
             <ModalDivider />
             <ModalButton
                 text='Read now'

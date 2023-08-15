@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { BooqCover } from '@/components/BooqCover'
 import { BooqTags } from '@/components/BooqTags'
-import { authorHref, booqHref } from '@/components/Links'
+import { authorHref } from '@/components/Links'
 import { ReactNode } from 'react'
 
 export type BooqCardData = {
@@ -15,7 +15,7 @@ export type BooqCardData = {
     }>,
 }
 export function BooqCard({
-    card: { id, title, author, cover, tags },
+    card: { title, author, cover, tags },
     actions,
 }: {
     card: BooqCardData,
