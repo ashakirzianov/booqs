@@ -60,6 +60,7 @@ async function fetchCollection(collection: string) {
             cache: 'no-store',
             headers: {
                 'booqs-operation': `collection:${collection}`,
+                'booqs-version': '1.0',
             },
         },
     })
