@@ -1,10 +1,9 @@
 'use client'
 import { ReactNode, createElement } from 'react'
 import {
-    ApolloClient, OperationVariables, QueryOptions, InMemoryCache, ApolloLink, ApolloProvider,
+    ApolloClient, OperationVariables, QueryOptions, InMemoryCache, ApolloLink, ApolloProvider, HttpLink,
 } from '@apollo/client'
 import { onError } from '@apollo/client/link/error'
-import { createUploadLink } from 'apollo-upload-client'
 import { AppStateProvider } from './state'
 
 const link = ApolloLink.from([
@@ -17,11 +16,9 @@ const link = ApolloLink.from([
             )
         if (networkError) console.log(`[Network error]: ${networkError}`)
     }),
-    // TODO: remove
-    createUploadLink({
-        uri: process.env.NEXT_PUBLIC_BACKEND,
+    new HttpLink({
+        uri: `${process.env.NEXT_PUBLIC_BACKEND}/graphql`,
         credentials: 'include',
-        fetch,
     }),
 ])
 

@@ -17,6 +17,11 @@ export function BooqCollection({
                     : null
                 }
                 <ul className='flex flex-row flex-wrap lg:justify-between justify-center gap-4 p-4'>
+                    {
+                        cards.length === 0
+                            ? <div className='text-xl text-gray-500 w-[30rem]'>Nothing here yet</div>
+                            : null
+                    }
                     {cards.map(card => (
                         <li key={card.id} className='w-[30rem] max-w-[90vw] rounded shadow py-2 px-4'>
                             <BooqCard
