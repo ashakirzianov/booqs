@@ -8,6 +8,9 @@ export const revalidate = 1
 export const dynamic = 'force-dynamic'
 
 export default async function MyBooqs() {
+    console.log('COOKIES', cookies().getAll())
+    console.log('DYNAMIC', dynamic)
+    console.log('COLLECTIONS')
     let readingList = await fetchCollection(READING_LIST_COLLECTION)
     let uploads = await fetchCollection('uploads')
     return <>
