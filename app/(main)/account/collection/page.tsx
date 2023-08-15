@@ -11,7 +11,6 @@ export default async function MyBooqs() {
         <BooqCollection
             title='Uploads'
             cards={uploads}
-            collection='uploads'
         />
         <BooqCollection
             title='My Booqs'
