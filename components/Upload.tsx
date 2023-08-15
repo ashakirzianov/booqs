@@ -20,14 +20,6 @@ export function UploadButton() {
     let closeModal = useCallback(() => {
         setIsOpen(false)
     }, [setIsOpen])
-    const ModalContent = <Modal
-        isOpen={isOpen}
-        closeModal={closeModal}
-    >
-        <div className='flex flex-col items-center w-60 max-w-[100vw]'>
-            <UploadModalContent closeModal={closeModal} />
-        </div>
-    </Modal>
     let [isSignInOpen, setIsSignInOpen] = useState(false)
     function openSignIn() {
         setIsSignInOpen(true)
@@ -52,7 +44,14 @@ export function UploadButton() {
             </div>}
             hasAction={true}
         />
-        {ModalContent}
+        <Modal
+            isOpen={isOpen}
+            closeModal={closeModal}
+        >
+            <div className='flex flex-col items-center w-60 max-w-[100vw]'>
+                <UploadModalContent closeModal={closeModal} />
+            </div>
+        </Modal>
         <SignInModal
             isOpen={isSignInOpen}
             closeModal={() => setIsSignInOpen(false)}
@@ -67,8 +66,12 @@ function UploadModalContent({ closeModal }: {
         file, openDialog, dialogContent, clearFile,
     } = useSelectFileDialog({ accept: 'application/epub+zip' })
     const {
-        uploaded, uploading, upload,
+        uploadFile, loading, result, error,
     } = useUpload()
+    function closeAndClear() {
+        closeModal()
+        clearFile()
+    }
     if (!file) {
         return <>
             <ModalLabel text='Select file to upload' />
@@ -81,35 +84,50 @@ function UploadModalContent({ closeModal }: {
             <ModalDivider />
             <ModalButton
                 text='Dismiss'
-                onClick={closeModal}
+                onClick={closeAndClear}
             />
         </>
-    } else if (uploaded) {
+    } else if (result) {
         return <>
-            <ModalLabel text={`${uploaded.title}`} />
+            <ModalLabel text={`${result.title}`} />
             <BooqCover
-                title={uploaded.title}
-                cover={uploaded.cover}
+                title={result.title}
+                cover={result.cover}
             />
             <ModalDivider />
             <ModalButton
                 text='Read now'
-                href={booqHref(uploaded.id, [0])}
+                href={booqHref(result.id, [0])}
             />
             <ModalDivider />
             <ModalButton
                 text='Dismiss'
-                onClick={closeModal}
+                onClick={closeAndClear}
             />
         </>
-    } else if (uploading) {
+    } else if (loading) {
         return <>
             <ModalLabel text={`Uploading ${file.name}...`} />
             <Spinner />
             <ModalDivider />
             <ModalButton
                 text='Dismiss'
-                onClick={closeModal}
+                onClick={closeAndClear}
+            />
+        </>
+    } else if (error !== undefined) {
+        return <>
+            <ModalLabel text={`Error while uploading: ${file.name}`} />
+            <ModalLabel text={error} />
+            <ModalDivider />
+            <ModalButton
+                text='Retry'
+                onClick={() => uploadFile(file)}
+            />
+            <ModalDivider />
+            <ModalButton
+                text='Dismiss'
+                onClick={closeAndClear}
             />
         </>
     } else {
@@ -118,12 +136,12 @@ function UploadModalContent({ closeModal }: {
             <ModalDivider />
             <ModalButton
                 text='Upload'
-                onClick={() => upload(file)}
+                onClick={() => uploadFile(file)}
             />
             <ModalDivider />
             <ModalButton
                 text='Dismiss'
-                onClick={closeModal}
+                onClick={closeAndClear}
             />
         </>
     }
