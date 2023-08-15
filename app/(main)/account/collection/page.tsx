@@ -54,12 +54,12 @@ async function fetchCollection(collection: string) {
     const result = await fetchQuery<CollectionData, CollectionVars>({
         query: CollectionQuery,
         variables: { name: collection },
-        cookies: [
-            ...cookies().getAll(),
-            { name: 'booqs-test', value: '2023' },
-        ],
+        cookies: cookies().getAll(),
         options: {
             cache: 'no-store',
+            headers: {
+                'booqs-operation': `collection:${collection}`,
+            },
         },
     })
     return result.success ? result.data.collection.booqs : []
