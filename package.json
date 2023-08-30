@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@apollo/client": "^3.7.17",
-    "@apollo/server": "^4.9.0",
+    "@apollo/server": "^4.9.3",
     "@as-integrations/next": "^2.0.1",
     "@aws-sdk/client-s3": "^3.379.1",
     "@floating-ui/react": "^0.24.8",
