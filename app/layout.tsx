@@ -1,5 +1,5 @@
 import '@/app/globals.css'
-import { Metadata } from 'next'
+import { Metadata, Viewport } from 'next'
 
 // FontAwesome support
 import { config } from '@fortawesome/fontawesome-svg-core'
@@ -26,15 +26,9 @@ const lora = Lora({
 const title = 'Booqs'
 const description = 'Your personal reading assistant'
 export const metadata: Metadata = {
-    title, description,
-    themeColor: [{
-        color: '#FFA500',
-        media: '(prefers-color-scheme: light)',
-    }, {
-        color: '#000000',
-        media: '(prefers-color-scheme: dark)',
-    }],
-    manifest: `/manifest.json`,
+    title,
+    description,
+    manifest: `/manifest.json`
 }
 
 export default function RootLayout({
@@ -52,4 +46,14 @@ export default function RootLayout({
             </body>
         </html>
     )
+}
+
+export const viewport: Viewport = {
+    themeColor: [{
+        color: '#FFA500',
+        media: '(prefers-color-scheme: light)',
+    }, {
+        color: '#000000',
+        media: '(prefers-color-scheme: dark)',
+    }]
 }
