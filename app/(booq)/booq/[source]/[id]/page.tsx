@@ -10,14 +10,17 @@ export async function generateStaticParams() {
     }))
 }
 
+type Params = Promise<{
+    source: string,
+    id: string,
+}>
+
 export async function generateMetadata({
-    params: { source, id },
+    params,
 }: {
-    params: {
-        source: string,
-        id: string,
-    },
+    params: Params,
 }): Promise<Metadata> {
+    const { source, id } = await params
     const booqId = `${source}/${id}`
     const meta = await fetchBooqMeta(booqId)
     return {
@@ -27,13 +30,11 @@ export async function generateMetadata({
 }
 
 export default async function BooqPathPage({
-    params: { source, id },
+    params,
 }: {
-    params: {
-        source: string,
-        id: string,
-    },
+    params: Params,
 }) {
+    const { source, id } = await params
     const booqId = `${source}/${id}`
     const booq = await fetchBooqFragment(booqId)
     if (!booq)

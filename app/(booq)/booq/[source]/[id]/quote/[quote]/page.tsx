@@ -5,15 +5,18 @@ import { Reader } from '@/reader/Reader'
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 
+type Params = Promise<{
+    source: string,
+    id: string,
+    quote: string,
+}>
+
 export async function generateMetadata({
-    params: { source, id, quote },
+    params,
 }: {
-    params: {
-        source: string,
-        id: string,
-        quote: string,
-    },
+    params: Params,
 }): Promise<Metadata> {
+    const { source, id, quote } = await params
     const booqId = `${source}/${id}`
     const booqRange = rangeFromString(quote)
     const meta = await fetchBooqMeta(booqId, booqRange?.start, booqRange?.end)
@@ -24,14 +27,11 @@ export async function generateMetadata({
 }
 
 export default async function BooqPathPage({
-    params: { source, id, quote },
+    params,
 }: {
-    params: {
-        source: string,
-        id: string,
-        quote: string,
-    },
+    params: Params,
 }) {
+    const { source, id, quote } = await params
     const booqId = `${source}/${id}`
     const booqRange = rangeFromString(quote)
     if (!booqRange)

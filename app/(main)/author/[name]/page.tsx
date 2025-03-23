@@ -4,10 +4,11 @@ import { BooqCollection } from '@/components/BooqCollection'
 import { gql } from '@apollo/client'
 
 export default async function Author({
-    params: { name },
+    params,
 }: {
-    params: { name: string },
+    params: Promise<{ name: string }>,
 }) {
+    const { name } = await params
     let decoded = decodeURIComponent(name)
     let booqs = await fetchBooqsForAuthor(decoded)
     return <BooqCollection
