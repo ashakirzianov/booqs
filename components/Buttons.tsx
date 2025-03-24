@@ -10,7 +10,7 @@ export function IconButton({ icon, onClick, isSelected }: {
     const selectedClass = isSelected
         ? 'text-highlight' : 'text-dimmed'
     return <button
-        className={`button flex text-dimmed text-2xl cursor-pointer transition bg-transparent hover:text-highlight focus:outline-none ${selectedClass} w-8 h-8 justify-center items-center`}
+        className={`button flex text-dimmed text-2xl cursor-pointer transition bg-transparent hover:text-highlight focus:outline-hidden ${selectedClass} w-8 h-8 justify-center items-center`}
         onClick={onClick}
     >
         <Icon name={icon} />
@@ -22,7 +22,7 @@ export function ActionButton({ text, onClick }: {
     onClick?: () => void,
 }) {
     return <>
-        <button onClick={onClick} className='shadow-button rounded p-base border-none bg-action text-lg cursor-pointer font-light transition duration-300 hover:bg-highlight'>
+        <button onClick={onClick} className='shadow-button rounded-sm p-base border-none bg-action text-lg cursor-pointer font-light transition duration-300 hover:bg-highlight'>
             <span>{text}</span>
         </button>
     </>
@@ -50,7 +50,7 @@ export function BorderButton({ text, icon, onClick }: {
     icon?: IconName,
     onClick?: () => void,
 }) {
-    return <div className='flex text-center text-dimmed border-2 border-dimmed no-underline cursor-pointer transition-all duration-300 hover:text-highlight hover:border-highlight rounded font-bold py-sm px-base' onClick={onClick}>
+    return <div className='flex text-center text-dimmed border-2 border-dimmed no-underline cursor-pointer transition-all duration-300 hover:text-highlight hover:border-highlight rounded-sm font-bold py-sm px-base' onClick={onClick}>
         {
             !icon ? null :
                 <div className='mr-base'><Icon name={icon} /></div>

@@ -9,7 +9,7 @@ export function BooqCover({ cover, title, author, size }: {
     size?: number,
 }) {
     size = size ?? defaultSize
-    return <div className='flex shrink-0 items-stretch rounded overflow-hidden' style={{
+    return <div className='flex shrink-0 items-stretch rounded-sm overflow-hidden' style={{
         width: size * 2,
         height: size * 3,
     }}>
