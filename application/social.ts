@@ -107,9 +107,9 @@ function facebookSdk() {
 }
 
 function redirectUri() {
-    const { protocol, host, pathname } = typeof window !== 'undefined'
+    const { protocol, host } = (typeof window !== 'undefined'
         ? window.location
-        : undefined
+        : undefined)
         ?? {}
     const url = `${protocol}//${host}/`
     return url

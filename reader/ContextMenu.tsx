@@ -151,6 +151,6 @@ function ContextMenuPanel({ content, anchor }: {
     return <div id='ctxmenu' className='flex flex-1 flex-col h-full justify-end items-stretch self-stretch pointer-events-none select-none' style={{
         padding: 'env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)',
     }}>
-        <div className={`${visibilityClass} rounded m-base pointer-events-auto bg-background border border-border transition-all`}>{content}</div>
+        <div className={`${visibilityClass} rounded-sm m-base pointer-events-auto bg-background border border-border transition-all`}>{content}</div>
     </div>
 }

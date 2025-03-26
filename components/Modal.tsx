@@ -56,7 +56,7 @@ export function Modal({
     return <dialog ref={dialogRef}
         className={`pointer-events-auto transition duration-300 shadow-xl rounded bg-background
         dark:shadow-slate-800 dark:shadow
-        backdrop:backdrop-blur-sm
+        backdrop:backdrop-blur-xs
         opacity-0 translate-y-full open:opacity-100 open:translate-y-0 p-0`}
     >
         {children}
@@ -89,7 +89,7 @@ export function ModalAsDiv({
     const containerClosedClass = isOpen ? '' : 'opacity-0 translate-y-1/4'
     return <div className={`flex flex-col fixed justify-center items-center bg-black/25 z-10 transition-all top-0 right-0 bottom-0 left-0 ${screenClosedClass}`} onClick={closeModal}>
         <div
-            className={`relative pointer-events-auto transition duration-300 shadow rounded bg-background ${containerClosedClass}`}
+            className={`relative pointer-events-auto transition duration-300 shadow rounded-sm bg-background ${containerClosedClass}`}
             onClick={e => e.stopPropagation()}
         >
             {children}

@@ -1,47 +1,98 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+
+/* TODO: rething use of vars and @theme */
+@theme {
+  --color-transparent: transparent;
+  --color-background: var(--theme-background);
+  --color-action: var(--theme-action);
+  --color-primary: var(--theme-primary);
+  --color-dimmed: var(--theme-dimmed);
+  --color-border: var(--theme-border);
+  --color-highlight: var(--theme-highlight);
+  --color-alert: var(--theme-alert);
+
+  --font-main: var(--font-main), sans-serif;
+  --font-book: var(--font-book), serif;
+
+  --font-weight-light: 100;
+  --font-weight-normal: 300;
+  --font-weight-bold: 400;
+  --font-weight-extrabold: 700;
+
+  --spacing-xs: 0.125rem;
+  --spacing-sm: 0.25rem;
+  --spacing-base: 0.5rem;
+  --spacing-lg: 1rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 4rem;
+  --spacing-header: var(--header-height);
+  --spacing-panel: var(--panel-width);
+
+  --shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
+  --shadow-hover: 0px 5px 15px rgba(0, 0, 0, 0.1);
+  --shadow-button: 0px 3px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* TODO: remove this? */
+/*
+  The default border color has changed to `currentColor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentColor);
+  }
+}
 
 * {
-    box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 body {
-    margin: 0;
-    padding: 0;
-    color: var(--theme-primary);
-    background: var(--theme-background);
+  margin: 0;
+  padding: 0;
+  color: var(--theme-primary);
+  background: var(--theme-background);
 }
 
 :root {
-    --header-height: 3rem;
-    --panel-width: 420pt;
+  --header-height: 3rem;
+  --panel-width: 420pt;
 }
 
 :root {
-    --theme-background: white;
-    --theme-action: #F57F17;
-    --theme-primary: black;
-    --theme-dimmed: #867b6c;
-    --theme-border: #ddd;
-    --theme-highlight: orange;
-    --theme-alert: #f00;
+  --theme-background: white;
+  --theme-action: #F57F17;
+  --theme-primary: black;
+  --theme-dimmed: #867b6c;
+  --theme-border: #ddd;
+  --theme-highlight: orange;
+  --theme-alert: #f00;
 }
 
 @media (prefers-color-scheme: dark) {
-    :root {
-        --theme-background: black;
-        --theme-action: #867b6c;
-        --theme-primary: #999;
-        --theme-dimmed: #888;
-        --theme-border: #333;
-        --theme-highlight: white;
-    }
+  :root {
+    --theme-background: black;
+    --theme-action: #867b6c;
+    --theme-primary: #999;
+    --theme-dimmed: #888;
+    --theme-border: #333;
+    --theme-highlight: white;
+  }
 }
 
 @media only screen and (max-device-width: 1024px) and (-webkit-min-device-pixel-ratio: 1) {
-    :root {
-        font-size: 120%;
-        /* Adjust as needed */
-    }
+  :root {
+    font-size: 120%;
+    /* Adjust as needed */
+  }
 }

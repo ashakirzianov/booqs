@@ -90,7 +90,7 @@ export function Popover({
                         {...getFloatingProps()}
                     >
                         <div
-                            className='bg-background rounded min-w-[10rem] min-h-[5rem] flex items-center justify-center'
+                            className='bg-background rounded-sm min-w-[10rem] min-h-[5rem] flex items-center justify-center'
                             style={transitionStyles}
                         >
                             <FloatingArrow

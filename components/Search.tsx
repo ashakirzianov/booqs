@@ -16,7 +16,7 @@ export function Search() {
     return <>
         <input
             className='font-normal border-none text-xl shadow rounded p-4 max-h-12 w-40 bg-background cursor-pointer
-            focus:max-w-auto focus:outline-none focus:ring-0 focus:border-none dark:shadow-slate-800
+            focus:max-w-auto focus:outline-hidden focus:ring-0 focus:border-none dark:shadow-slate-800
             placeholder:text-dimmed'
             type="text"
             placeholder="Search..."
@@ -71,7 +71,7 @@ function SearchModal({
                 onFocus={e => e.target.select()}
                 className='font-normal border-none text-xl p-4 w-full
             max-h-12 bg-background text-primary shadow
-            focus:outline-none focus:ring-0 focus:border-none
+            focus:outline-hidden focus:ring-0 focus:border-none
             placeholder:text-dimmed'
                 tabIndex={1}
                 type="text"

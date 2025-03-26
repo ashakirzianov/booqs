@@ -51,10 +51,11 @@ async function fetchCollection(collection: string) {
         name: string,
     }
 
+    const allCookies = (await cookies()).getAll()
     const result = await fetchQuery<CollectionData, CollectionVars>({
         query: CollectionQuery,
         variables: { name: collection },
-        cookies: cookies().getAll(),
+        cookies: allCookies,
         options: {
             cache: 'no-store',
             headers: {
