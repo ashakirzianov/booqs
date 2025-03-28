@@ -26,7 +26,6 @@ export type IconName =
     | 'question'
     | 'settings'
     | 'books'
-    ;
 
 export function Icon({ name, size }: {
     name: IconName,

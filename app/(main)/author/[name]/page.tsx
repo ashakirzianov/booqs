@@ -9,8 +9,8 @@ export default async function Author({
     params: Promise<{ name: string }>,
 }) {
     const { name } = await params
-    let decoded = decodeURIComponent(name)
-    let booqs = await fetchBooqsForAuthor(decoded)
+    const decoded = decodeURIComponent(name)
+    const booqs = await fetchBooqsForAuthor(decoded)
     return <BooqCollection
         title={`Books by ${decoded}`}
         cards={booqs}
@@ -44,7 +44,7 @@ async function fetchBooqsForAuthor(name: string) {
                 }>,
             }[],
         }
-    };
+    }
     type AuthorVars = {
         name: string,
     }

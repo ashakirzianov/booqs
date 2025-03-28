@@ -16,7 +16,7 @@ export function SignInModal({ isOpen, closeModal }: {
     closeModal: () => void,
 }) {
     const { signWithApple, signWithFacebook } = useSocialSignIn()
-    let router = useRouter()
+    const router = useRouter()
     return <Modal
         isOpen={isOpen}
         closeModal={closeModal}
@@ -88,7 +88,7 @@ function SignedButton({ user }: {
 }
 
 function NotSignedButton() {
-    let [isOpen, setIsOpen] = useState(false)
+    const [isOpen, setIsOpen] = useState(false)
     return <>
         <IconButton
             icon='sign-in'
@@ -104,7 +104,7 @@ function AccountMenu({ name }: {
     name?: string,
 }) {
     const { signOut } = useSocialSignIn()
-    let router = useRouter()
+    const router = useRouter()
     return <div className='flex flex-col flex-1 items-stretch'>
         <span className='p-4 w-full text-center font-bold'>{name}</span>
         <Menu>

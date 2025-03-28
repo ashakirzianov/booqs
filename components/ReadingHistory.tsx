@@ -27,7 +27,7 @@ export default function ReadingHistory() {
 }
 
 function SignInPanel() {
-    let [isOpen, setIsOpen] = useState(false)
+    const [isOpen, setIsOpen] = useState(false)
     return <Panel>
         <span className='font-bold mb-lg'>
             <span className='cursor-pointer underline decoration-2 text-action hover:text-highlight' onClick={() => setIsOpen(true)}>Sign in</span> to see history
@@ -47,7 +47,7 @@ function Panel({ children }: {
     </div>
 }
 
-type HistoryItem = ReturnType<typeof useHistory>['history'][number];
+type HistoryItem = ReturnType<typeof useHistory>['history'][number]
 function HistoryItems({ items }: {
     items: HistoryItem[],
 }) {

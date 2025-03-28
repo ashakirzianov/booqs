@@ -21,7 +21,7 @@ export function MenuItem({
     spinner?: boolean,
     href?: string,
 }) {
-    let content = <div
+    const content = <div
         className='container flex flex-row grow items-center cursor-pointer font-main select-none transition font-bold p-lg hover:bg-highlight hover:text-background'
         // Note: prevent loosing selection on safari
         onMouseDown={e => e.preventDefault()}

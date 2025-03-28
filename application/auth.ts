@@ -107,8 +107,8 @@ export function usePasskeyAuthn() {
                 setState({
                     state: 'error',
                     error: 'Your browser does not support WebAuthn',
-                });
-                return;
+                })
+                return
             }
             setState({
                 state: 'registering',

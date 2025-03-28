@@ -17,10 +17,10 @@ export function UploadButton() {
     function openModal() {
         setIsOpen(true)
     }
-    let closeModal = useCallback(() => {
+    const closeModal = useCallback(() => {
         setIsOpen(false)
     }, [setIsOpen])
-    let [isSignInOpen, setIsSignInOpen] = useState(false)
+    const [isSignInOpen, setIsSignInOpen] = useState(false)
     function openSignIn() {
         setIsSignInOpen(true)
     }
