@@ -13,13 +13,13 @@ export type TocNode = {
 export type HighlightNode = {
     kind: 'highlight',
     highlight: Highlight,
-};
+}
 export type PathHighlightsNode = {
     kind: 'highlights',
     items: Array<TocItem | undefined>,
     highlights: Highlight[],
 }
-export type NavigationNode = TocNode | HighlightNode | PathHighlightsNode;
+export type NavigationNode = TocNode | HighlightNode | PathHighlightsNode
 
 export function useNavigationNodes(booqId: string, self?: User) {
     const { showChapters, showHighlights, showAuthors } = useAppState().navigationState
@@ -105,7 +105,7 @@ export type NavigationState = {
     showChapters: boolean,
     showHighlights: boolean,
     showAuthors: string[],
-};
+}
 
 function buildNodes({ toc, filter, highlights, title }: {
     title?: string,
@@ -160,7 +160,7 @@ function buildNodes({ toc, filter, highlights, title }: {
 
 export type HighlightAuthor = {
     id: string,
-    name: string,
+    name?: string,
     pictureUrl?: string,
 }
 function highlightsAuthors(highlights: Highlight[]): HighlightAuthor[] {
@@ -168,7 +168,7 @@ function highlightsAuthors(highlights: Highlight[]): HighlightAuthor[] {
     return Object.entries(grouped).map(
         ([_, [{ author }]]) => ({
             id: author.id,
-            name: author.name,
+            name: author.name ?? undefined,
             pictureUrl: author.pictureUrl ?? undefined,
         })
     )
