@@ -7,6 +7,7 @@ import {
     faQuoteRight, faClone, faLink, faHighlighter, faTrashAlt,
     faEllipsisV,
     faGear, faBook,
+    faKey,
 } from '@fortawesome/free-solid-svg-icons'
 import {
     faFacebookF, faApple,
@@ -26,6 +27,7 @@ export type IconName =
     | 'question'
     | 'settings'
     | 'books'
+    | 'new-passkey' | 'signin-passkey'
 
 export function Icon({ name, size }: {
     name: IconName,
@@ -86,6 +88,10 @@ function iconForName(name: IconName) {
             return faGear
         case 'books':
             return faBook
+        case 'new-passkey':
+            return faPlus
+        case 'signin-passkey':
+            return faKey
         default:
             assertNever(name)
             return faQuestion

@@ -1,6 +1,6 @@
 'use client'
 import React, { useState } from 'react'
-import { User, useAuth, useSocialSignIn } from '@/application/auth'
+import { User, useAuth, usePasskeyAuthn, useSocialSignIn } from '@/application/auth'
 import { useIsMounted } from '@/application/utils'
 import { Menu, MenuItem } from '@/components/Menu'
 import { IconButton } from '@/components/Buttons'
@@ -15,7 +15,7 @@ export function SignInModal({ isOpen, closeModal }: {
     isOpen: boolean,
     closeModal: () => void,
 }) {
-    const { signWithApple, signWithFacebook } = useSocialSignIn()
+    const { register, signIn } = usePasskeyAuthn()
     const router = useRouter()
     return <Modal
         isOpen={isOpen}
@@ -25,20 +25,20 @@ export function SignInModal({ isOpen, closeModal }: {
             <ModalLabel text='Choose provider' />
             <ModalDivider />
             <ModalButton
-                text='Apple'
-                icon='apple'
+                text='Register with Passkey'
+                icon='new-passkey'
                 onClick={() => {
-                    signWithApple()
+                    register()
                     closeModal()
                     router.refresh()
                 }}
             />
             <ModalDivider />
             <ModalButton
-                text='Facebook'
-                icon='facebook'
+                text='Sign in with Passkey'
+                icon='signin-passkey'
                 onClick={() => {
-                    signWithFacebook()
+                    signIn()
                     closeModal()
                     router.refresh()
                 }}
