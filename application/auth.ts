@@ -1,7 +1,12 @@
 'use client'
 import { ApolloClient, useApolloClient, gql, useMutation } from '@apollo/client'
+import {
+    browserSupportsWebAuthn, startRegistration,
+    RegistrationResponseJSON, PublicKeyCredentialCreationOptionsJSON,
+} from '@simplewebauthn/browser'
 import { social } from './social'
 import { useAppState, useAppStateSetter } from './state'
+import { useState } from 'react'
 
 export type User = {
     id: string,
@@ -67,6 +72,91 @@ export function useSocialSignIn() {
         },
         async signOut() {
             signOut(client, authSetter)
+        },
+    }
+}
+
+export function usePasskeyAuthn() {
+    const InitPasskeyRegistrationMutation = gql`mutation InitPasskeyRegistration($username: String!) {
+        initPasskeyRegistration
+    }`
+
+    type InitPasskeyRegistrationData = {
+        initPasskeyRegistration: {
+            id: string,
+            options: PublicKeyCredentialCreationOptionsJSON,
+        },
+    };
+    const [initPasskeyRegistration] = useMutation<InitPasskeyRegistrationData>(InitPasskeyRegistrationMutation)
+
+    const VerifyPasskeyRegistrationMutation = gql`mutation VerifyPasskeyRegistration($response: String!, $id: String!) {
+        verifyPasskeyRegistration(response: $response, id: $id)
+    }`
+    type VerifyPasskeyRegistrationData = {
+        verifyPasskeyRegistration: boolean,
+    }
+    type VerifyPasskeyRegistrationVariables = {
+        response: RegistrationResponseJSON,
+        id: string,
+    }
+    const [verifyPasskeyRegistration] = useMutation<VerifyPasskeyRegistrationData, VerifyPasskeyRegistrationVariables>(VerifyPasskeyRegistrationMutation)
+
+    type AuthnState = {
+        state: 'not-started',
+    } | {
+        state: 'error',
+        error: string,
+    } | {
+        state: 'registred',
+    }
+    const [state, setState] = useState<AuthnState>({ state: 'not-started' })
+
+    return {
+        state,
+        async registerPasskey() {
+            if (!browserSupportsWebAuthn()) {
+                setState({
+                    state: 'error',
+                    error: 'Your browser does not support WebAuthn',
+                });
+                return;
+            }
+            try {
+                const initResult = await initPasskeyRegistration()
+                if (!initResult.data?.initPasskeyRegistration) {
+                    setState({
+                        state: 'error',
+                        error: 'Failed to get registration options',
+                    });
+                    return;
+                }
+                const { id, options } = initResult.data?.initPasskeyRegistration
+
+                const attestationResponse = await startRegistration({
+                    optionsJSON: options,
+                })
+                const verifyResult = await verifyPasskeyRegistration({
+                    variables: {
+                        id,
+                        response: attestationResponse,
+                    }
+                });
+                if (!verifyResult.data?.verifyPasskeyRegistration) {
+                    setState({
+                        state: 'error',
+                        error: 'Failed to verify registration',
+                    });
+                    return;
+                }
+                setState({
+                    state: 'registred',
+                });
+            } catch (e: any) {
+                setState({
+                    state: 'error',
+                    error: e?.toString(),
+                });
+            }
         },
     }
 }
