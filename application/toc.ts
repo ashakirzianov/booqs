@@ -23,9 +23,9 @@ type TocData = {
             path: BooqPath,
         }[],
     },
-};
+}
 
-export type TocItem = TocData['booq']['tableOfContents'][number];
+export type TocItem = TocData['booq']['tableOfContents'][number]
 export function useToc(booqId: string) {
     const { loading, data } = useQuery<TocData>(
         TocQuery,

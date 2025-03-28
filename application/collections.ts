@@ -25,7 +25,7 @@ export function useCollectionIds(name: string) {
         CollectionIdsQuery,
         { variables: { name } }
     )
-    let ids = data?.collection?.booqs.map(b => b.id) ?? []
+    const ids = data?.collection?.booqs.map(b => b.id) ?? []
     return {
         loading,
         ids,
@@ -38,7 +38,7 @@ mutation AddToCollection($name: String!, $booqId: ID!) {
 }`
 type AddToCollectionData = {
     addToCollection: boolean,
-};
+}
 export function useAddToCollection(name: string) {
     const [doAdd, { loading }] = useMutation<AddToCollectionData>(
         AddToCollectionMutation,
@@ -56,7 +56,7 @@ export function useAddToCollection(name: string) {
                             variables: { name },
                         })
                         if (cached) {
-                            let item = {
+                            const item = {
                                 __typename: 'Booq',
                                 id: booqId,
                             } as const
@@ -86,7 +86,7 @@ mutation RemoveFromCollection($name: String!, $booqId: ID!) {
 }`
 type RemoveFromCollectionData = {
     removeFromCollection: boolean,
-};
+}
 export function useRemoveFromCollection(name: string) {
     const [doRemove, { loading }] = useMutation<RemoveFromCollectionData>(
         RemoveFromCollectionMutation,

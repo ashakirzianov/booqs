@@ -47,7 +47,7 @@ export function Reader({
     const self = useAuth()
     const fontScale = useFontScale()
     const {
-        onScroll, currentPath, currentPage, totalPages, leftPages,
+        onScroll, currentPage, totalPages, leftPages,
     } = useScrollHandler(booq)
     useOnBooqScroll(onScroll, {
         throttle: 500,
@@ -67,10 +67,10 @@ export function Reader({
     const {
         navigationOpen, NavigationButton, NavigationContent,
     } = useNavigationPanel(booq.id, self)
-    let [copilotState, setCopilotState] = useState<CopilotState>({
+    const [copilotState, setCopilotState] = useState<CopilotState>({
         kind: 'empty',
     })
-    let copilotVisible = copilotState.kind !== 'empty'
+    const copilotVisible = copilotState.kind !== 'empty'
     const {
         ContextMenuNode, isOpen: contextMenuVisible,
         updateMenuState: setMenuState,

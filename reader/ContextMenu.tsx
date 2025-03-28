@@ -9,7 +9,7 @@ import { useFloater } from '@/components/Floater'
 export type ContextMenuState = {
     target: ContextMenuTarget,
     anchor?: VirtualElement,
-};
+}
 
 export function useContextMenu({
     booqId, self, updateCopilot, closed,
@@ -30,7 +30,7 @@ export function useContextMenu({
         }
     }
 
-    let { FloaterNode, setReference, floating } = useFloater({
+    const { FloaterNode, setReference, floating } = useFloater({
         isOpen,
         setIsOpen,
         Content: <div className='w-40'><ContextMenuContent
@@ -43,7 +43,7 @@ export function useContextMenu({
             })}
             updateCopilot={selection => {
                 if (menuState.anchor) {
-                    let anchor = menuState.anchor
+                    const anchor = menuState.anchor
                     updateMenuState({
                         target: { kind: 'empty' },
                     })
@@ -63,7 +63,7 @@ export function useContextMenu({
         }
         if (typeof setterOrValue === 'function') {
             setMenuState(prev => {
-                let next = setterOrValue(prev)
+                const next = setterOrValue(prev)
                 setAnchor(next.anchor)
                 return next
             })
@@ -141,12 +141,12 @@ function getSelectionState(): ContextMenuState {
     }
 }
 
-
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function ContextMenuPanel({ content, anchor }: {
     content: ReactNode,
     anchor?: VirtualElement,
 }) {
-    const visibility = anchor ? '' : 'hidden'
+    // const visibility = anchor ? '' : 'hidden'
     const visibilityClass = anchor ? '' : 'translate-y-full opacity-0'
     return <div id='ctxmenu' className='flex flex-1 flex-col h-full justify-end items-stretch self-stretch pointer-events-none select-none' style={{
         padding: 'env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)',

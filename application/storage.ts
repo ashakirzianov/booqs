@@ -1,7 +1,7 @@
 type CellValue<T> = {
     value: T,
     version: string | undefined,
-};
+}
 export function syncStorageCell<T>(key: string, version?: string) {
     const storage = typeof window !== 'undefined'
         ? window.localStorage

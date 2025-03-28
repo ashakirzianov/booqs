@@ -8,7 +8,7 @@ import { quoteColor } from '@/application/common'
 type BooqAnchor = {
     title?: string,
     path: BooqPath,
-};
+}
 type BooqData = {
     id: string,
     title?: string,

@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react'
 
 export function useIsMounted() {
-    let [mounted, setMounted] = useState(false)
+    const [mounted, setMounted] = useState(false)
     useEffect(() => {
         setMounted(true)
     }, [])
@@ -10,10 +10,10 @@ export function useIsMounted() {
 }
 
 export function useIsSmallScreen() {
-    let [small, setSmall] = useState(false)
+    const [small, setSmall] = useState(false)
     useEffect(() => {
-        let mq = window.matchMedia('(max-width: 600px)')
-        let listener = () => setSmall(mq.matches)
+        const mq = window.matchMedia('(max-width: 600px)')
+        const listener = () => setSmall(mq.matches)
         mq.addEventListener('change', listener)
         listener()
         return () => mq.removeEventListener('change', listener)

@@ -25,7 +25,7 @@ type BooqHistoryData = {
         preview: string,
         position: number,
     }[],
-};
+}
 
 export function useHistory() {
     const { loading, data } = useQuery<BooqHistoryData>(
@@ -35,7 +35,7 @@ export function useHistory() {
             nextFetchPolicy: 'no-cache',
         },
     )
-    let history = (data?.history ?? []).map(h => ({
+    const history = (data?.history ?? []).map(h => ({
         id: h.booq.id,
         title: h.booq.title,
         path: h.path,
@@ -52,15 +52,15 @@ export function useHistory() {
 const ReportHistoryMutation = gql`mutation ReportBooqHistory($event: BooqHistoryInput!) {
     addBooqHistory(event: $event)
 }`
-type ReportHistoryData = { addBooqHistory: boolean };
+type ReportHistoryData = { addBooqHistory: boolean }
 type ReportHistoryVariables = {
     event: {
         booqId: string,
         source: string,
         path: BooqPath,
     },
-};
-type HistoryEvent = Omit<ReportHistoryVariables['event'], 'source'>;
+}
+type HistoryEvent = Omit<ReportHistoryVariables['event'], 'source'>
 export function useReportHistory() {
     const [report] = useMutation<ReportHistoryData, ReportHistoryVariables>(
         ReportHistoryMutation,

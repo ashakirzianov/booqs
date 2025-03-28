@@ -15,7 +15,7 @@ export type User = {
     joined: string,
     name?: string,
     pictureUrl?: string,
-};
+}
 export type AuthState = User & {
     provider: string,
 }
@@ -112,7 +112,7 @@ export function usePasskeyAuthn() {
             }
             setState({
                 state: 'registering',
-            });
+            })
             const result = await registerPasskey(client)
             if (result.success) {
                 setState({
@@ -138,12 +138,12 @@ export function usePasskeyAuthn() {
                 setState({
                     state: 'error',
                     error: 'Your browser does not support WebAuthn',
-                });
-                return;
+                })
+                return
             }
             setState({
                 state: 'signing',
-            });
+            })
             const result = await signInWithPasskey(client)
             if (result.success) {
                 setState({
@@ -177,7 +177,7 @@ async function registerPasskey(client: ApolloClient<unknown>) {
                 id: string,
                 options: PublicKeyCredentialCreationOptionsJSON,
             },
-        };
+        }
         const initResult = await client.mutate<InitPasskeyRegistrationData>({
             mutation: InitPasskeyRegistrationMutation,
         })
@@ -221,7 +221,7 @@ async function registerPasskey(client: ApolloClient<unknown>) {
                 id,
                 response: attestationResponse,
             }
-        });
+        })
         if (!verifyResult.data?.verifyPasskeyRegistration) {
             return {
                 success: false as const,
@@ -250,7 +250,7 @@ async function signInWithPasskey(client: ApolloClient<unknown>) {
                 id: string,
                 options: PublicKeyCredentialRequestOptionsJSON,
             },
-        };
+        }
         const initResult = await client.mutate<InitPasskeyLoginData>({
             mutation: InitPasskeyLoginMutation,
         })
@@ -294,7 +294,7 @@ async function signInWithPasskey(client: ApolloClient<unknown>) {
                 id,
                 response: attestationResponse,
             }
-        });
+        })
         if (!verifyResult.data?.verifyPasskeyLogin) {
             return {
                 success: false as const,
@@ -355,12 +355,12 @@ type AuthData = {
             pictureUrl: string | null,
         },
     },
-};
+}
 type AuthVariables = {
     token: string,
     provider: string,
     name?: string,
-};
+}
 async function signIn({
     apolloClient, authSetter, token, name, provider,
 }: {
@@ -375,7 +375,7 @@ async function signIn({
         variables: { token, provider, name },
     })
     if (result.data) {
-        let auth = result.data.auth
+        const auth = result.data.auth
         const data: AuthState | undefined = auth
             ? {
                 id: auth.user.id,
@@ -395,9 +395,9 @@ async function signIn({
 }
 
 export function useDeleteAccount() {
-    let client = useApolloClient()
+    const client = useApolloClient()
     const userDataSetter = useAppStateSetter()
-    let [deleteAccount, { loading, data, error }] = useMutation<{ deleteAccound: boolean }>(gql`mutation DeleteAccount {
+    const [deleteAccount, { loading, data, error }] = useMutation<{ deleteAccound: boolean }>(gql`mutation DeleteAccount {
         deleteAccount
     }`)
     return {

@@ -27,7 +27,7 @@ const initialData: AppState = {
 
 const userContext = createContext({
     data: initialData,
-    setData: (data: AppState | ((v: AppState) => AppState)) => { },
+    setData: (_: AppState | ((v: AppState) => AppState)) => { },
 })
 
 export function AppStateProvider({ children }: {
@@ -37,7 +37,7 @@ export function AppStateProvider({ children }: {
     // Restore on mount
     useEffect(() => {
         if (typeof window !== 'undefined') {
-            let restored = storage.restore()
+            const restored = storage.restore()
             if (restored) {
                 setData(restored)
             }
@@ -54,7 +54,7 @@ export function AppStateProvider({ children }: {
     useEffect(() => {
         function handleStorage(e: StorageEvent) {
             if (e.key === key) {
-                let restored = storage.restore()
+                const restored = storage.restore()
                 if (restored) {
                     setData(restored)
                 }

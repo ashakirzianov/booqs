@@ -34,6 +34,16 @@ const eslintConfig = [
                     'allowTemplateLiterals': true
                 }
             ],
+            '@typescript-eslint/no-explicit-any': 'off',
+            '@typescript-eslint/no-unused-vars': [
+                'error',
+                {
+                    argsIgnorePattern: '^_',
+                    varsIgnorePattern: '^_',
+                    ignoreRestSiblings: true,
+                    args: 'after-used'
+                }
+            ],
         }
     },
 ]
