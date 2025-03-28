@@ -1,6 +1,6 @@
 'use client'
 import React, { useState } from 'react'
-import { User, useAuth, useSignInOptions } from '@/application/auth'
+import { User, useAuth, useSocialSignIn } from '@/application/auth'
 import { useIsMounted } from '@/application/utils'
 import { Menu, MenuItem } from '@/components/Menu'
 import { IconButton } from '@/components/Buttons'
@@ -15,7 +15,7 @@ export function SignInModal({ isOpen, closeModal }: {
     isOpen: boolean,
     closeModal: () => void,
 }) {
-    const { signWithApple, signWithFacebook } = useSignInOptions()
+    const { signWithApple, signWithFacebook } = useSocialSignIn()
     let router = useRouter()
     return <Modal
         isOpen={isOpen}
@@ -103,7 +103,7 @@ function NotSignedButton() {
 function AccountMenu({ name }: {
     name?: string,
 }) {
-    const { signOut } = useSignInOptions()
+    const { signOut } = useSocialSignIn()
     let router = useRouter()
     return <div className='flex flex-col flex-1 items-stretch'>
         <span className='p-4 w-full text-center font-bold'>{name}</span>

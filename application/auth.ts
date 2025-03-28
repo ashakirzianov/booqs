@@ -29,7 +29,7 @@ export function useAuth() {
     }
 }
 
-export function useSignInOptions() {
+export function useSocialSignIn() {
     const client = useApolloClient()
     const userDataSetter = useAppStateSetter()
     function authSetter(f: (value?: AuthState) => AuthState | undefined) {
