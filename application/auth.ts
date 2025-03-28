@@ -1,8 +1,9 @@
 'use client'
 import { ApolloClient, useApolloClient, gql, useMutation } from '@apollo/client'
 import {
-    browserSupportsWebAuthn, startRegistration,
-    RegistrationResponseJSON, PublicKeyCredentialCreationOptionsJSON,
+    browserSupportsWebAuthn, startRegistration, startAuthentication,
+    RegistrationResponseJSON, AuthenticationResponseJSON,
+    PublicKeyCredentialCreationOptionsJSON, PublicKeyCredentialRequestOptionsJSON,
 } from '@simplewebauthn/browser'
 import { social } from './social'
 import { useAppState, useAppStateSetter } from './state'
@@ -132,12 +133,43 @@ export function usePasskeyAuthn() {
                 })
             }
         },
+        async signIn() {
+            if (!browserSupportsWebAuthn()) {
+                setState({
+                    state: 'error',
+                    error: 'Your browser does not support WebAuthn',
+                });
+                return;
+            }
+            setState({
+                state: 'signing',
+            });
+            const result = await signInWithPasskey(client)
+            if (result.success) {
+                setState({
+                    state: 'signed',
+                    user: result.user,
+                })
+                userDataSetter(data => ({
+                    ...data,
+                    currentUser: {
+                        ...result.user,
+                        provider: 'passkey',
+                    },
+                }))
+            } else {
+                setState({
+                    state: 'error',
+                    error: result.error,
+                })
+            }
+        },
     }
 }
 
 async function registerPasskey(client: ApolloClient<unknown>) {
     try {
-        const InitPasskeyRegistrationMutation = gql`mutation InitPasskeyRegistration($username: String!) {
+        const InitPasskeyRegistrationMutation = gql`mutation InitPasskeyRegistration {
             initPasskeyRegistration
         }`
         type InitPasskeyRegistrationData = {
@@ -208,6 +240,78 @@ async function registerPasskey(client: ApolloClient<unknown>) {
     }
 }
 
+async function signInWithPasskey(client: ApolloClient<unknown>) {
+    try {
+        const InitPasskeyLoginMutation = gql`mutation InitPasskeyLogin {
+            initPasskeyLogin
+        }`
+        type InitPasskeyLoginData = {
+            initPasskeyLogin: {
+                id: string,
+                options: PublicKeyCredentialRequestOptionsJSON,
+            },
+        };
+        const initResult = await client.mutate<InitPasskeyLoginData>({
+            mutation: InitPasskeyLoginMutation,
+        })
+        if (!initResult.data?.initPasskeyLogin) {
+            return {
+                success: false as const,
+                error: 'Failed to initialize passkey login',
+            }
+        }
+
+        const { id, options } = initResult.data?.initPasskeyLogin
+        const attestationResponse = await startAuthentication({
+            optionsJSON: options,
+        })
+
+        const VerifyPasskeyLoginMutation = gql`mutation VerifyPasskeyLogin($response: String!, $id: String!) {
+            verifyPasskeyLogin(response: $response, id: $id) {
+                id
+                username
+                joined
+                name
+                pictureUrl
+            }
+        }`
+        type VerifyPasskeyLoginData = {
+            verifyPasskeyLogin?: {
+                id: string,
+                username: string,
+                joined: string,
+                name?: string,
+                pictureUrl?: string,
+            },
+        }
+        type VerifyPasskeyLoginVariables = {
+            response: AuthenticationResponseJSON,
+            id: string,
+        }
+        const verifyResult = await client.mutate<VerifyPasskeyLoginData, VerifyPasskeyLoginVariables>({
+            mutation: VerifyPasskeyLoginMutation,
+            variables: {
+                id,
+                response: attestationResponse,
+            }
+        });
+        if (!verifyResult.data?.verifyPasskeyLogin) {
+            return {
+                success: false as const,
+                error: 'Failed to verify passkey registration',
+            }
+        }
+        return {
+            success: true as const,
+            user: verifyResult.data.verifyPasskeyLogin,
+        }
+    } catch (e: any) {
+        return {
+            success: false as const,
+            error: e.toString(),
+        }
+    }
+}
 
 async function signOut(client: ApolloClient<unknown>, setter: AuthStateSetter) {
     const result = await client.mutate<{ signout: boolean }>({
