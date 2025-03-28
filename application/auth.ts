@@ -11,8 +11,8 @@ import { useState } from 'react'
 export type User = {
     id: string,
     username: string,
-    name: string,
     joined: string,
+    name?: string,
     pictureUrl?: string,
 };
 export type AuthState = User & {
@@ -77,43 +77,31 @@ export function useSocialSignIn() {
 }
 
 export function usePasskeyAuthn() {
-    const InitPasskeyRegistrationMutation = gql`mutation InitPasskeyRegistration($username: String!) {
-        initPasskeyRegistration
-    }`
-
-    type InitPasskeyRegistrationData = {
-        initPasskeyRegistration: {
-            id: string,
-            options: PublicKeyCredentialCreationOptionsJSON,
-        },
-    };
-    const [initPasskeyRegistration] = useMutation<InitPasskeyRegistrationData>(InitPasskeyRegistrationMutation)
-
-    const VerifyPasskeyRegistrationMutation = gql`mutation VerifyPasskeyRegistration($response: String!, $id: String!) {
-        verifyPasskeyRegistration(response: $response, id: $id)
-    }`
-    type VerifyPasskeyRegistrationData = {
-        verifyPasskeyRegistration: boolean,
-    }
-    type VerifyPasskeyRegistrationVariables = {
-        response: RegistrationResponseJSON,
-        id: string,
-    }
-    const [verifyPasskeyRegistration] = useMutation<VerifyPasskeyRegistrationData, VerifyPasskeyRegistrationVariables>(VerifyPasskeyRegistrationMutation)
-
-    type AuthnState = {
-        state: 'not-started',
-    } | {
-        state: 'error',
-        error: string,
-    } | {
-        state: 'registred',
-    }
+    const client = useApolloClient()
+    const userDataSetter = useAppStateSetter()
+    type AuthnState =
+        | {
+            state: 'not-started',
+        }
+        | {
+            state: 'error',
+            error: string,
+        }
+        | {
+            state: 'registering',
+        }
+        | {
+            state: 'signing',
+        }
+        | {
+            state: 'signed',
+            user: User,
+        }
     const [state, setState] = useState<AuthnState>({ state: 'not-started' })
 
     return {
         state,
-        async registerPasskey() {
+        async register() {
             if (!browserSupportsWebAuthn()) {
                 setState({
                     state: 'error',
@@ -121,43 +109,102 @@ export function usePasskeyAuthn() {
                 });
                 return;
             }
-            try {
-                const initResult = await initPasskeyRegistration()
-                if (!initResult.data?.initPasskeyRegistration) {
-                    setState({
-                        state: 'error',
-                        error: 'Failed to get registration options',
-                    });
-                    return;
-                }
-                const { id, options } = initResult.data?.initPasskeyRegistration
-
-                const attestationResponse = await startRegistration({
-                    optionsJSON: options,
-                })
-                const verifyResult = await verifyPasskeyRegistration({
-                    variables: {
-                        id,
-                        response: attestationResponse,
-                    }
-                });
-                if (!verifyResult.data?.verifyPasskeyRegistration) {
-                    setState({
-                        state: 'error',
-                        error: 'Failed to verify registration',
-                    });
-                    return;
-                }
+            setState({
+                state: 'registering',
+            });
+            const result = await registerPasskey(client)
+            if (result.success) {
                 setState({
-                    state: 'registred',
-                });
-            } catch (e: any) {
+                    state: 'signed',
+                    user: result.user,
+                })
+                userDataSetter(data => ({
+                    ...data,
+                    currentUser: {
+                        ...result.user,
+                        provider: 'passkey',
+                    },
+                }))
+            } else {
                 setState({
                     state: 'error',
-                    error: e?.toString(),
-                });
+                    error: result.error,
+                })
             }
         },
+    }
+}
+
+async function registerPasskey(client: ApolloClient<unknown>) {
+    try {
+        const InitPasskeyRegistrationMutation = gql`mutation InitPasskeyRegistration($username: String!) {
+            initPasskeyRegistration
+        }`
+        type InitPasskeyRegistrationData = {
+            initPasskeyRegistration: {
+                id: string,
+                options: PublicKeyCredentialCreationOptionsJSON,
+            },
+        };
+        const initResult = await client.mutate<InitPasskeyRegistrationData>({
+            mutation: InitPasskeyRegistrationMutation,
+        })
+        if (!initResult.data?.initPasskeyRegistration) {
+            return {
+                success: false as const,
+                error: 'Failed to initialize passkey registration',
+            }
+        }
+
+        const { id, options } = initResult.data?.initPasskeyRegistration
+        const attestationResponse = await startRegistration({
+            optionsJSON: options,
+        })
+
+        const VerifyPasskeyRegistrationMutation = gql`mutation VerifyPasskeyRegistration($response: String!, $id: String!) {
+            verifyPasskeyRegistration(response: $response, id: $id) {
+                id
+                username
+                joined
+                name
+                pictureUrl
+            }
+        }`
+        type VerifyPasskeyRegistrationData = {
+            verifyPasskeyRegistration?: {
+                id: string,
+                username: string,
+                joined: string,
+                name?: string,
+                pictureUrl?: string,
+            },
+        }
+        type VerifyPasskeyRegistrationVariables = {
+            response: RegistrationResponseJSON,
+            id: string,
+        }
+        const verifyResult = await client.mutate<VerifyPasskeyRegistrationData, VerifyPasskeyRegistrationVariables>({
+            mutation: VerifyPasskeyRegistrationMutation,
+            variables: {
+                id,
+                response: attestationResponse,
+            }
+        });
+        if (!verifyResult.data?.verifyPasskeyRegistration) {
+            return {
+                success: false as const,
+                error: 'Failed to verify passkey registration',
+            }
+        }
+        return {
+            success: true as const,
+            user: verifyResult.data.verifyPasskeyRegistration,
+        }
+    } catch (e: any) {
+        return {
+            success: false as const,
+            error: e.toString(),
+        }
     }
 }
 
