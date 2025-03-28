@@ -53,6 +53,7 @@
     "typescript": "5.8.2"
   },
   "devDependencies": {
+    "@stylistic/eslint-plugin-ts": "^4.2.0",
     "@types/apollo-upload-client": "^18.0.0",
     "@types/apple-signin-api": "^1.5.3",
     "@types/cors": "^2.8.17",
