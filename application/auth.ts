@@ -126,6 +126,7 @@ export function usePasskeyAuthn() {
                         provider: 'passkey',
                     },
                 }))
+                client.reFetchObservableQueries(true)
             } else {
                 setState({
                     state: 'error',
@@ -157,6 +158,7 @@ export function usePasskeyAuthn() {
                         provider: 'passkey',
                     },
                 }))
+                client.reFetchObservableQueries(true)
             } else {
                 setState({
                     state: 'error',
@@ -170,7 +172,10 @@ export function usePasskeyAuthn() {
 async function registerPasskey(client: ApolloClient<unknown>) {
     try {
         const InitPasskeyRegistrationMutation = gql`mutation InitPasskeyRegistration {
-            initPasskeyRegistration
+            initPasskeyRegistration {
+                id
+                options
+            }
         }`
         type InitPasskeyRegistrationData = {
             initPasskeyRegistration: {
@@ -193,22 +198,26 @@ async function registerPasskey(client: ApolloClient<unknown>) {
             optionsJSON: options,
         })
 
-        const VerifyPasskeyRegistrationMutation = gql`mutation VerifyPasskeyRegistration($response: String!, $id: String!) {
-            verifyPasskeyRegistration(response: $response, id: $id) {
-                id
-                username
-                joined
-                name
-                pictureUrl
+        const VerifyPasskeyRegistrationMutation = gql`mutation VerifyPasskeyRegistration($id: String!, $response: JSON!) {
+            verifyPasskeyRegistration(id: $id, response: $response) {
+                user {
+                    id
+                    username
+                    joined
+                    name
+                    pictureUrl
+                }
             }
         }`
         type VerifyPasskeyRegistrationData = {
             verifyPasskeyRegistration?: {
-                id: string,
-                username: string,
-                joined: string,
-                name?: string,
-                pictureUrl?: string,
+                user?: {
+                    id: string,
+                    username: string,
+                    joined: string,
+                    name?: string,
+                    pictureUrl?: string,
+                },
             },
         }
         type VerifyPasskeyRegistrationVariables = {
@@ -222,7 +231,7 @@ async function registerPasskey(client: ApolloClient<unknown>) {
                 response: attestationResponse,
             }
         })
-        if (!verifyResult.data?.verifyPasskeyRegistration) {
+        if (!verifyResult.data?.verifyPasskeyRegistration?.user) {
             return {
                 success: false as const,
                 error: 'Failed to verify passkey registration',
@@ -230,7 +239,7 @@ async function registerPasskey(client: ApolloClient<unknown>) {
         }
         return {
             success: true as const,
-            user: verifyResult.data.verifyPasskeyRegistration,
+            user: verifyResult.data.verifyPasskeyRegistration.user,
         }
     } catch (e: any) {
         return {
@@ -243,7 +252,10 @@ async function registerPasskey(client: ApolloClient<unknown>) {
 async function signInWithPasskey(client: ApolloClient<unknown>) {
     try {
         const InitPasskeyLoginMutation = gql`mutation InitPasskeyLogin {
-            initPasskeyLogin
+            initPasskeyLogin {
+                id
+                options
+            }
         }`
         type InitPasskeyLoginData = {
             initPasskeyLogin: {
@@ -266,22 +278,26 @@ async function signInWithPasskey(client: ApolloClient<unknown>) {
             optionsJSON: options,
         })
 
-        const VerifyPasskeyLoginMutation = gql`mutation VerifyPasskeyLogin($response: String!, $id: String!) {
+        const VerifyPasskeyLoginMutation = gql`mutation VerifyPasskeyLogin($response: JSON!, $id: String!) {
             verifyPasskeyLogin(response: $response, id: $id) {
-                id
-                username
-                joined
-                name
-                pictureUrl
+                user {
+                    id
+                    username
+                    joined
+                    name
+                    pictureUrl
+                }
             }
         }`
         type VerifyPasskeyLoginData = {
             verifyPasskeyLogin?: {
-                id: string,
-                username: string,
-                joined: string,
-                name?: string,
-                pictureUrl?: string,
+                user?: {
+                    id: string,
+                    username: string,
+                    joined: string,
+                    name?: string,
+                    pictureUrl?: string,
+                },
             },
         }
         type VerifyPasskeyLoginVariables = {
@@ -295,7 +311,7 @@ async function signInWithPasskey(client: ApolloClient<unknown>) {
                 response: attestationResponse,
             }
         })
-        if (!verifyResult.data?.verifyPasskeyLogin) {
+        if (!verifyResult.data?.verifyPasskeyLogin?.user) {
             return {
                 success: false as const,
                 error: 'Failed to verify passkey registration',
@@ -303,7 +319,7 @@ async function signInWithPasskey(client: ApolloClient<unknown>) {
         }
         return {
             success: true as const,
-            user: verifyResult.data.verifyPasskeyLogin,
+            user: verifyResult.data.verifyPasskeyLogin.user,
         }
     } catch (e: any) {
         return {
