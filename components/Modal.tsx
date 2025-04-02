@@ -112,7 +112,7 @@ export function ModalButton({ text, icon, href, onClick }: {
     href?: string,
     onClick?: () => void,
 }) {
-    let content = <div className='flex flex-row items-center'>
+    const content = <div className='flex flex-row items-center'>
         {
             icon
                 ? <div><Icon name={icon} /></div>

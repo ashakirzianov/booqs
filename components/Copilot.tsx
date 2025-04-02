@@ -4,7 +4,7 @@ import { useFloater } from './Floater'
 import { BooqData } from '@/application/booq'
 import { CopilotContext, useCopilotAnswer, useCopilotSuggestions } from '@/application/copilot'
 import { Spinner } from './Loading'
-import { Modal, ModalDivider, ModalHeader, ModalFullScreen } from './Modal'
+import { ModalDivider, ModalHeader, ModalFullScreen } from './Modal'
 import { useIsSmallScreen } from '@/application/utils'
 
 type CopilotEmpty = {
@@ -23,7 +23,7 @@ type CopilotProps = {
     booq: BooqData,
 }
 export function Copilot(props: CopilotProps) {
-    let small = useIsSmallScreen()
+    const small = useIsSmallScreen()
     if (!small) {
         return <CopilotFloating {...props} />
     } else {
@@ -32,7 +32,7 @@ export function Copilot(props: CopilotProps) {
 }
 
 function CopilotFloating({ state, setState, booq }: CopilotProps) {
-    let { FloaterNode, setReference } = useFloater({
+    const { FloaterNode, setReference } = useFloater({
         isOpen: state.kind !== 'empty',
         setIsOpen: open => {
             if (!open) {
@@ -54,8 +54,8 @@ function CopilotFloating({ state, setState, booq }: CopilotProps) {
 }
 
 function CopilotModal({ state, setState, booq }: CopilotProps) {
-    let isOpen = state.kind !== 'empty'
-    let closeModal = useCallback(() => {
+    const isOpen = state.kind !== 'empty'
+    const closeModal = useCallback(() => {
         setState({ kind: 'empty' })
     }, [setState])
     return <ModalFullScreen isOpen={isOpen}>
@@ -89,7 +89,7 @@ function CopilotSelectedContent({ state, booq }: {
     state: CopilotSelected,
     booq: BooqData,
 }) {
-    let context = {
+    const context = {
         text: state.selection.text,
         context: state.context,
         booqId: booq.id,
@@ -99,8 +99,8 @@ function CopilotSelectedContent({ state, booq }: {
         start: state.selection.range.start,
         end: state.selection.range.end,
     }
-    let { loading, suggestions } = useCopilotSuggestions(context)
-    let [question, askQuestion] = useState(undefined as string | undefined)
+    const { loading, suggestions } = useCopilotSuggestions(context)
+    const [question, askQuestion] = useState(undefined as string | undefined)
     if (question) {
         return <CopilotQuestion context={context} question={question} />
     }
@@ -122,7 +122,7 @@ function CopilotQuestion({ context, question }: {
     context: CopilotContext,
     question: string,
 }) {
-    let { loading, answer } = useCopilotAnswer(context, question)
+    const { loading, answer } = useCopilotAnswer(context, question)
     return loading
         ? <div className='p-lg'><Spinner /></div>
         : <div className='flex font-menu p-lg'>

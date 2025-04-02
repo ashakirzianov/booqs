@@ -38,7 +38,7 @@ async function fetchFeatured() {
                 value?: string,
             }[],
         }[],
-    };
+    }
 
     const result = await fetchQuery<FeaturedData>({
         query: FeaturedQuery,

@@ -21,7 +21,7 @@ type SuggestData = {
     copilot: {
         suggestions: string[],
     }
-};
+}
 type SuggestVars = {
     context: CopilotContext,
 }
@@ -49,7 +49,7 @@ type AnswerData = {
     copilot: {
         answer: string,
     }
-};
+}
 type AnserVars = {
     context: CopilotContext,
     question: string,

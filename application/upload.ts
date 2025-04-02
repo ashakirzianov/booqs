@@ -3,14 +3,14 @@ import { useState } from 'react'
 export type FileData = File
 
 export function useUpload() {
-    let [loading, setLoading] = useState(false)
-    let [result, setResult] = useState<UploadResult | undefined>(undefined)
-    let [error, setError] = useState<string | undefined>(undefined)
+    const [loading, setLoading] = useState(false)
+    const [result, setResult] = useState<UploadResult | undefined>(undefined)
+    const [error, setError] = useState<string | undefined>(undefined)
     async function uploadFile(file: FileData) {
         setLoading(true)
         setResult(undefined)
         setError(undefined)
-        let result = await fetchUploadFile(file)
+        const result = await fetchUploadFile(file)
         if (result.success) {
             setResult(result.data)
         } else {
@@ -62,7 +62,7 @@ async function fetchUploadFile(file: FileData) {
             }
         }
     } catch (err) {
-        let message = (err as any)?.message ?? 'Unknown error'
+        const message = (err as any)?.message ?? 'Unknown error'
         return {
             success: false,
             error: `An error occurred: ${message}`,

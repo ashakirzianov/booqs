@@ -24,8 +24,8 @@ type FeaturedData = {
             value?: string,
         }[],
     }[],
-};
-export type FeaturedItem = FeaturedData['featured'][number];
+}
+export type FeaturedItem = FeaturedData['featured'][number]
 export function useFeatured() {
     const { loading, data } = useQuery<FeaturedData>(FeaturedQuery)
     return {

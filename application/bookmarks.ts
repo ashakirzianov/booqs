@@ -18,8 +18,8 @@ type BookmarksData = {
             path: BooqPath,
         }[],
     },
-};
-export type Bookmark = BookmarksData['booq']['bookmarks'][number];
+}
+export type Bookmark = BookmarksData['booq']['bookmarks'][number]
 
 export function useBookmarks(booqId: string) {
     const { loading, data } = useQuery<BookmarksData>(
@@ -35,15 +35,15 @@ export function useBookmarks(booqId: string) {
 const AddBookmarkMutation = gql`mutation AddBookmark($bookmark: BookmarkInput!) {
     addBookmark(bookmark: $bookmark)
 }`
-type AddBookmarkData = { addBookmark: boolean };
+type AddBookmarkData = { addBookmark: boolean }
 type AddBookmarkVariables = {
     bookmark: { id: string, booqId: string, path: BooqPath },
-};
+}
 const RemoveBookmarkMutation = gql`mutation RemoveBookmark($id: ID!) {
     removeBookmark(id: $id)
 }`
-type RemoveBookmarkData = { removeBookmark: boolean };
-type RemoveBookmarkVariables = { id: string };
+type RemoveBookmarkData = { removeBookmark: boolean }
+type RemoveBookmarkVariables = { id: string }
 export function useBookmarkMutations(booqId: string) {
     const [add] = useMutation<AddBookmarkData, AddBookmarkVariables>(
         AddBookmarkMutation,
@@ -64,7 +64,7 @@ export function useBookmarkMutations(booqId: string) {
                             variables: { booqId },
                         })
                         if (cached) {
-                            let bm = {
+                            const bm = {
                                 __typename: 'Bookmark',
                                 id, path,
                             } as const

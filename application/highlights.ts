@@ -34,13 +34,13 @@ type HighlightsData = {
             author: {
                 __typename: 'User',
                 id: string,
-                name: string,
+                name: string | null,
                 pictureUrl: string | null,
             },
         }[],
     },
-};
-export type Highlight = HighlightsData['booq']['highlights'][number];
+}
+export type Highlight = HighlightsData['booq']['highlights'][number]
 export function useHighlights(booqId: string) {
     const { loading, data } = useQuery<HighlightsData>(
         HighlightsQuery,
@@ -55,7 +55,7 @@ export function useHighlights(booqId: string) {
 const AddHighlightMutation = gql`mutation AddHighlight($highlight: HighlightInput!) {
     addHighlight(highlight: $highlight)
 }`
-type AddHighlightData = { addHighlight: boolean };
+type AddHighlightData = { addHighlight: boolean }
 type AddHighlightVars = {
     highlight: {
         id: string,
@@ -64,18 +64,18 @@ type AddHighlightVars = {
         start: BooqPath,
         end: BooqPath,
     },
-};
+}
 const RemoveHighlightMutation = gql`mutation RemoveHighlight($id: ID!) {
     removeHighlight(id: $id)
 }`
-type RemoveHighlightData = { removeHighlight: boolean };
-type RemoveHighlightVars = { id: string };
+type RemoveHighlightData = { removeHighlight: boolean }
+type RemoveHighlightVars = { id: string }
 
 const UpdateHighlightMutation = gql`mutation UpdateHighlight($id: ID!, $group: String) {
     updateHighlight(id: $id, group: $group)
 }`
-type UpdateHighlightData = { updateHighlight: boolean };
-type UpdateHighlightVars = { id: string, group?: string };
+type UpdateHighlightData = { updateHighlight: boolean }
+type UpdateHighlightVars = { id: string, group?: string }
 
 export function useHighlightMutations(booqId: string) {
     const [add] = useMutation<AddHighlightData, AddHighlightVars>(
@@ -110,7 +110,7 @@ export function useHighlightMutations(booqId: string) {
                 author: {
                     __typename: 'User',
                     id: input.author.id,
-                    name: input.author.name,
+                    name: input.author.name ?? null,
                     pictureUrl: input.author.pictureUrl ?? null,
                 },
             } as const

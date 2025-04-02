@@ -1,6 +1,6 @@
 import { BooqNode, BooqRange, BooqPath } from './model'
 import {
-    findPath, rootIterator, firstLeaf, iteratorsNode, nextLeaf, prevNode, prevLeaf, BooqNodeIterator,
+    findPath, rootIterator, firstLeaf, iteratorsNode, nextLeaf, prevLeaf, BooqNodeIterator,
 } from './iterator'
 import { assertNever } from './misc'
 
@@ -48,7 +48,7 @@ export function contextForRange(nodes: BooqNode[], { start }: BooqRange, length:
 }
 
 export function contextForPath(nodes: BooqNode[], path: BooqPath, length: number) {
-    let iter = findPath(rootIterator(nodes), path)
+    const iter = findPath(rootIterator(nodes), path)
     if (!iter) {
         return undefined
     }

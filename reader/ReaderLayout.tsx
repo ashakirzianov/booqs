@@ -13,13 +13,13 @@ type ControlsProps = {
     NavigationContent: ReactNode,
     ContextMenu: ReactNode,
     Copilot: ReactNode,
-};
+}
 
 type LayoutProps = ControlsProps & {
     BooqContent: ReactNode,
     PrevButton: ReactNode,
     NextButton: ReactNode,
-};
+}
 
 export function ReaderLayout({
     BooqContent, PrevButton, NextButton,

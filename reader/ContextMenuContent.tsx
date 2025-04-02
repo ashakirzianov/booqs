@@ -12,21 +12,21 @@ import { colorForGroup, groups } from '@/application/common'
 
 type EmptyTarget = {
     kind: 'empty',
-};
+}
 type SelectionTarget = {
     kind: 'selection',
     selection: BooqSelection,
-};
+}
 type QuoteTarget = {
     kind: 'quote',
     selection: BooqSelection,
-};
+}
 type HighlightTarget = {
     kind: 'highlight',
     highlight: Highlight,
-};
+}
 export type ContextMenuTarget =
-    | EmptyTarget | SelectionTarget | QuoteTarget | HighlightTarget;
+    | EmptyTarget | SelectionTarget | QuoteTarget | HighlightTarget
 
 export function ContextMenuContent({
     target, ...rest
@@ -103,7 +103,7 @@ function HighlightTargetMenu({
     return <>
         {isOwnHighlight ? null :
             <AuthorItem
-                name={highlight.author.name}
+                name={highlight.author.name ?? undefined}
                 pictureUrl={highlight.author.pictureUrl ?? undefined}
             />
         }

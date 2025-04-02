@@ -39,12 +39,12 @@ type BooqFragmentData = {
             next?: BooqAnchor,
         }
     },
-};
+}
 export type BooqAnchor = {
     title?: string,
     path: BooqPath,
-};
-export type BooqData = BooqFragmentData['booq'];
+}
+export type BooqData = BooqFragmentData['booq']
 
 export async function fetchBooqFragment(id: string, path?: BooqPath) {
     const result = await doQuery<BooqFragmentData>({

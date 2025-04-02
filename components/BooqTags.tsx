@@ -3,7 +3,7 @@ import React from 'react'
 export type BooqTag = {
     tag: string,
     value?: string,
-};
+}
 export function BooqTags({ tags }: {
     tags: BooqTag[],
 }) {

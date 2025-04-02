@@ -25,8 +25,8 @@ export async function fetchQuery<T = any, V = any>({
         throw new Error('NEXT_PUBLIC_BACKEND is undefined')
     const url = `${back}/graphql`
     try {
-        let cookieString = cookies?.map(c => `${c.name}=${c.value}`).join('; ')
-        let cookieHeader = cookieString ? { Cookie: cookieString } : undefined
+        const cookieString = cookies?.map(c => `${c.name}=${c.value}`).join('; ')
+        const cookieHeader = cookieString ? { Cookie: cookieString } : undefined
         const response = await fetch(
             url,
             {

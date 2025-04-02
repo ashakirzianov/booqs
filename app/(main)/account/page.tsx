@@ -1,5 +1,5 @@
 'use client'
-import { use, useState } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { AppProvider } from '@/application/provider'
 import { useAuth } from '@/application/auth'
@@ -32,13 +32,13 @@ function AccountMounted() {
 
 function SignedIn({ account }: {
     account: {
-        name: string,
+        name?: string,
         joined: string,
     },
 }) {
-    let { deleteAccount } = useDeleteAccount()
-    let [modal, setModal] = useState(false)
-    let { push } = useRouter()
+    const { deleteAccount } = useDeleteAccount()
+    const [modal, setModal] = useState(false)
+    const { push } = useRouter()
     function openModal() {
         setModal(true)
     }
@@ -71,12 +71,12 @@ function SignedIn({ account }: {
 }
 
 function formatDate(date: string) {
-    let d = new Date(date)
+    const d = new Date(date)
     return `${d.toLocaleString('default', { month: 'long' })} ${d.getDate()}, ${d.getFullYear()}`
 }
 
 function NotSigned() {
-    let [isOpen, setIsOpen] = useState(false)
+    const [isOpen, setIsOpen] = useState(false)
     return <div className='flex flex-col w-full items-center justify-center h-60'>
         <span className='font-bold mb-lg'>
             <span className='cursor-pointer underline decoration-2 text-action hover:text-highlight' onClick={() => setIsOpen(true)}>Sign in</span> to see account details

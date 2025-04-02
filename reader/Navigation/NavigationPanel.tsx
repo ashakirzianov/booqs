@@ -66,9 +66,9 @@ function Navigation({ booqId, self, closeSelf }: {
                 </div>
             </div>
         </div>
-    }, [
-        nodes, // TODO: add missing deps
-    ])
+        // TODO: add missing deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [nodes])
 }
 
 function NavigationNodeComp({ booqId, self, node }: {

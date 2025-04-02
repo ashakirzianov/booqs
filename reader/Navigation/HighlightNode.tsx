@@ -41,10 +41,10 @@ export function HighlightNodeComp({ booqId, highlight, self }: {
                     />
                 </div>}
             />
-            <div className={`${badgeClass} mt-base`} title={highlight.author.name}>
+            <div className={`${badgeClass} mt-base`} title={highlight.author.name ?? undefined}>
                 <ProfileBadge
                     size={1}
-                    name={highlight.author.name}
+                    name={highlight.author.name ?? undefined}
                     picture={undefined}
                     border={false}
                 />

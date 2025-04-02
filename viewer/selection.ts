@@ -3,7 +3,7 @@ import { BooqRange, pathLessThan, pathFromId } from '@/core'
 export type BooqSelection = {
     range: BooqRange,
     text: string,
-};
+}
 
 // TODO: naming?
 type ClientRect = {
@@ -118,6 +118,7 @@ function getSelectionPath(node: Node, offset: number) {
     return undefined
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function unionRect(a: ClientRect, b: ClientRect): ClientRect {
     const top = Math.min(a.top, b.top)
     const left = Math.min(a.left, b.left)
@@ -145,8 +146,9 @@ function fromDomClientRects(domClientRects: DomClientRects): ClientRects {
     return rects
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function toDomClientRects(rects: ClientRects): DomClientRects {
-    let object: DomClientRects = {
+    const object: DomClientRects = {
         length: rects.length,
         item(index: number) {
             return rects[index]

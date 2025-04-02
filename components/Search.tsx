@@ -1,7 +1,7 @@
 'use client'
 import { BooqCover } from '@/components/BooqCover'
 import { Spinner } from '@/components/Loading'
-import { BooqLink, authorHref, booqHref } from '@/components/Links'
+import { authorHref, booqHref } from '@/components/Links'
 import { Modal, useModalState } from './Modal'
 import {
     AuthorSearchResult, BooqSearchResult,
@@ -12,7 +12,7 @@ import { ReactNode, useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 
 export function Search() {
-    let { isOpen, openModal, closeModal } = useModalState()
+    const { isOpen, openModal, closeModal } = useModalState()
     return <>
         <input
             className='font-normal border-none text-xl shadow rounded p-4 max-h-12 w-40 bg-background cursor-pointer
@@ -36,11 +36,11 @@ function SearchModal({
     isOpen: boolean,
     closeModal: () => void,
 }) {
-    let { push } = useRouter()
+    const { push } = useRouter()
     const { query, doQuery, results, loading } = useSearch()
-    let [selected, setSelected] = useState(0)
-    let booqs = results.filter(isBooqSearchResult)
-    let authors = results.filter(isAuthorSearchResult)
+    const [selected, setSelected] = useState(0)
+    const booqs = results.filter(isBooqSearchResult)
+    const authors = results.filter(isAuthorSearchResult)
     return <Modal
         isOpen={isOpen}
         closeModal={closeModal}
@@ -55,11 +55,11 @@ function SearchModal({
                     setSelected(Math.min(results.length - 1, selected + 1))
                 } else if (e.key === 'Enter' && results.length > 0) {
                     if (selected < authors.length) {
-                        let author = authors[selected]
+                        const author = authors[selected]
                         console.log(author)
                         push(authorHref(author.name))
                     } else {
-                        let booq = booqs[selected - authors.length]
+                        const booq = booqs[selected - authors.length]
                         push(booqHref(booq.id, [0]))
                     }
                     closeModal()
@@ -130,7 +130,7 @@ function SearchResultItem({ selected, children }: {
     selected?: boolean,
     children: ReactNode,
 }) {
-    let ref = useRef<HTMLLIElement>(null)
+    const ref = useRef<HTMLLIElement>(null)
     useEffect(() => {
         if (selected && ref.current) {
             ref.current.scrollIntoView({
@@ -169,7 +169,7 @@ function BooqSearchResultContent({ result, query }: {
     </Link>
 }
 
-function AuthorSearchResultContent({ result, query, selected }: {
+function AuthorSearchResultContent({ result, query }: {
     result: AuthorSearchResult,
     query: string,
     selected?: boolean,

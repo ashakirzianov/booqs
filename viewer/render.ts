@@ -8,7 +8,7 @@ export type Augmentation = {
     range: BooqRange,
     id: string,
     color?: string,
-};
+}
 
 type RenderContext = {
     booqId: string,
@@ -19,7 +19,7 @@ type RenderContext = {
     augmentations: Augmentation[],
     onAugmentationClick?: (id: string) => void,
     hrefForPath?: (booqId: string, path: BooqPath) => string,
-};
+}
 export function renderNodes(nodes: BooqNode[], ctx: RenderContext): ReactNode {
     const result = nodes.map(
         (n, idx) => renderNode(n, {
@@ -143,7 +143,7 @@ type AugmentedSpan = {
     text: string,
     color?: string,
     id: string | undefined,
-};
+}
 
 function applyAugmentations(span: AugmentedSpan, augmentations: Augmentation[]) {
     return augmentations.reduce(

@@ -7,7 +7,7 @@ export function CollectionButton({ booqId, collection }: {
     booqId: string,
     collection?: string,
 }) {
-    let { signed } = useAuth() ?? {}
+    const { signed } = useAuth() ?? {}
     if (!signed || !collection) {
         return null
     } else {
@@ -19,10 +19,10 @@ function CollectionButtonImpl({ booqId, collection }: {
     booqId: string,
     collection: string,
 }) {
-    let { ids, loading } = useCollectionIds(collection)
-    let { addToCollection } = useAddToCollection(collection)
-    let { removeFromCollection } = useRemoveFromCollection(collection)
-    let inCollection = ids.includes(booqId)
+    const { ids, loading } = useCollectionIds(collection)
+    const { addToCollection } = useAddToCollection(collection)
+    const { removeFromCollection } = useRemoveFromCollection(collection)
+    const inCollection = ids.includes(booqId)
     function toggle() {
         if (inCollection) {
             removeFromCollection(booqId)

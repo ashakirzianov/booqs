@@ -12,7 +12,7 @@ export async function fetchFeaturedIds() {
         featured: {
             id: string,
         }[],
-    };
+    }
 
     const result = await fetchQuery<FeaturedData>({
         query: FeaturedQuery,
@@ -64,11 +64,11 @@ export async function fetchBooqFragment(id: string, path?: BooqPath) {
                 next?: BooqAnchor,
             }
         },
-    };
+    }
     type BooqAnchor = {
         title?: string,
         path: BooqPath,
-    };
+    }
     const result = await fetchQuery<BooqFragmentData>({
         query: BooqFragmentQuery,
         variables: {
@@ -95,7 +95,7 @@ export async function fetchBooqMeta(id: string, start?: BooqPath, end?: BooqPath
             title?: string,
             preview: string,
         },
-    };
+    }
     type BooqMetaVars = {
         id: string,
         start?: BooqPath,

@@ -1,6 +1,6 @@
 'use client'
 import React, { useState } from 'react'
-import { User, useAuth, useSignInOptions } from '@/application/auth'
+import { User, useAuth, usePasskeyAuthn, useSocialSignIn } from '@/application/auth'
 import { useIsMounted } from '@/application/utils'
 import { Menu, MenuItem } from '@/components/Menu'
 import { IconButton } from '@/components/Buttons'
@@ -15,8 +15,8 @@ export function SignInModal({ isOpen, closeModal }: {
     isOpen: boolean,
     closeModal: () => void,
 }) {
-    const { signWithApple, signWithFacebook } = useSignInOptions()
-    let router = useRouter()
+    const { register, signIn } = usePasskeyAuthn()
+    const router = useRouter()
     return <Modal
         isOpen={isOpen}
         closeModal={closeModal}
@@ -25,20 +25,20 @@ export function SignInModal({ isOpen, closeModal }: {
             <ModalLabel text='Choose provider' />
             <ModalDivider />
             <ModalButton
-                text='Apple'
-                icon='apple'
+                text='Register with Passkey'
+                icon='new-passkey'
                 onClick={() => {
-                    signWithApple()
+                    register()
                     closeModal()
                     router.refresh()
                 }}
             />
             <ModalDivider />
             <ModalButton
-                text='Facebook'
-                icon='facebook'
+                text='Sign in with Passkey'
+                icon='signin-passkey'
                 onClick={() => {
-                    signWithFacebook()
+                    signIn()
                     closeModal()
                     router.refresh()
                 }}
@@ -88,7 +88,7 @@ function SignedButton({ user }: {
 }
 
 function NotSignedButton() {
-    let [isOpen, setIsOpen] = useState(false)
+    const [isOpen, setIsOpen] = useState(false)
     return <>
         <IconButton
             icon='sign-in'
@@ -103,8 +103,8 @@ function NotSignedButton() {
 function AccountMenu({ name }: {
     name?: string,
 }) {
-    const { signOut } = useSignInOptions()
-    let router = useRouter()
+    const { signOut } = useSocialSignIn()
+    const router = useRouter()
     return <div className='flex flex-col flex-1 items-stretch'>
         <span className='p-4 w-full text-center font-bold'>{name}</span>
         <Menu>

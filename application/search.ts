@@ -26,7 +26,7 @@ export type AuthorSearchResult = {
     __typename: 'Author',
     name: string,
 }
-export type SearchResult = BooqSearchResult | AuthorSearchResult;
+export type SearchResult = BooqSearchResult | AuthorSearchResult
 type SearchData = {
     search: SearchResult[],
 }
