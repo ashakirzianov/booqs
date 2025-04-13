@@ -1,6 +1,5 @@
-import { fetchBooqFragment, fetchBooqMeta } from '@/app/data'
-import { AppProvider } from '@/application/provider'
 import { rangeFromString } from '@/core'
+import { booqFragment, booqPreview } from '@/data/booqs'
 import { Reader } from '@/reader/Reader'
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
@@ -19,7 +18,7 @@ export async function generateMetadata({
     const { source, id, quote } = await params
     const booqId = `${source}/${id}`
     const booqRange = rangeFromString(quote)
-    const meta = await fetchBooqMeta(booqId, booqRange?.start, booqRange?.end)
+    const meta = await booqPreview(booqId, booqRange?.start, booqRange?.end)
     return {
         title: meta?.title ?? 'Booq',
         description: meta?.preview,
@@ -33,13 +32,11 @@ export default async function BooqPathPage({
 }) {
     const { source, id, quote } = await params
     const booqId = `${source}/${id}`
-    const booqRange = rangeFromString(quote)
-    if (!booqRange)
+    const quoteRange = rangeFromString(quote)
+    if (!quoteRange)
         return notFound()
-    const booq = await fetchBooqFragment(booqId, booqRange.start)
+    const booq = await booqFragment(booqId, quoteRange.start)
     if (!booq)
         return notFound()
-    return <AppProvider>
-        <Reader booq={booq} quote={booqRange} />
-    </AppProvider>
+    return <Reader booq={booq} quote={quoteRange} />
 }

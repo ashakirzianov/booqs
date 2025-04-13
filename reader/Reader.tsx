@@ -45,6 +45,7 @@ export function Reader({
     self?: ReaderUser,
     fontScale?: number,
 }) {
+    fontScale = fontScale ?? 120
     // const {
     //     onScroll, currentPage, totalPages, leftPages,
     // } = useScrollHandler(booq)
