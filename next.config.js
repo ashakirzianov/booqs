@@ -2,7 +2,13 @@
 const nextConfig = {
     eslint: {
         dirs: [
-            'app', 'application', 'backend', 'data', 'components', 'core', 'reader', 'viewer',
+            'app', 'application',
+            'backend',
+            'components', 'core',
+            'data',
+            'parser',
+            'reader',
+            'viewer',
         ],
     },
 }
