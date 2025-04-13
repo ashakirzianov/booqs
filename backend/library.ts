@@ -2,6 +2,8 @@ import { filterUndefined, makeId, parseId } from '@/core'
 import { groupBy } from 'lodash'
 import { Booq } from '../core'
 import { pgSource } from './pg'
+import { logTime } from './utils'
+import { parseEpub } from '@/parser'
 
 export type LibraryCard = {
     id: string,
@@ -54,6 +56,11 @@ export function processCard(prefix: string) {
     })
 }
 
+export async function forId(id: string) {
+    const [result] = await forIds([id])
+    return result
+}
+
 export async function forIds(ids: string[]): Promise<Array<LibraryCard | undefined>> {
     const parsed = filterUndefined(
         ids.map(idString => {
@@ -81,4 +88,40 @@ export async function forIds(ids: string[]): Promise<Array<LibraryCard | undefin
     return ids.map(
         id => results.find(r => r.id === id),
     )
+}
+
+const cache: {
+    [booqId: string]: Promise<Booq | undefined>,
+} = {}
+
+export async function booqForId(booqId: string) {
+    const cached = cache[booqId]
+    if (cached) {
+        return cached
+    } else {
+        const promise = parseBooqForId(booqId)
+        cache[booqId] = promise
+        return promise
+    }
+}
+
+async function parseBooqForId(booqId: string) {
+    const file = await fileForId(booqId)
+    if (!file) {
+        return undefined
+    }
+    const { value: booq, diags } = await logTime(() => parseEpub({
+        fileData: file.file,
+        title: booqId,
+    }), 'Parser')
+    diags.forEach(console.log)
+    return booq
+}
+
+async function fileForId(booqId: string) {
+    const [prefix, id] = parseId(booqId)
+    const source = sources[prefix]
+    return source && id
+        ? source.fileForId(id)
+        : undefined
 }
