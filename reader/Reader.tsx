@@ -1,6 +1,6 @@
 'use client'
 import React, { useCallback, useMemo, useState } from 'react'
-import { BooqRange } from '@/core'
+import { BooqPath, BooqRange, positionForPath, samePath } from '@/core'
 import { BorderButton, IconButton } from '@/components/Buttons'
 import { BooqLink, FeedLink, booqHref } from '@/components/Links'
 import { Spinner } from '@/components/Loading'
@@ -8,13 +8,15 @@ import {
     BooqContent, getAugmentationElement, getAugmentationText,
     Augmentation,
     useOnBooqClick,
+    useOnBooqScroll,
 } from '@/viewer'
 import type { ContextMenuState } from './ContextMenu'
 import { ReaderLayout } from './ReaderLayout'
-import { colorForGroup, quoteColor } from '@/application/common'
+import { colorForGroup, currentSource, pageForPosition, quoteColor } from '@/application/common'
 import { SignInButton } from '@/components/SignIn'
 import { ReaderAnchor, ReaderBooq, ReaderHighlight, ReaderUser } from './common'
 import { NavigationPanel, useNavigationState } from './NavigationPanel'
+import { reportBooqHistory } from '@/data/user'
 
 
 export function Reader({
@@ -26,12 +28,12 @@ export function Reader({
     fontScale?: number,
 }) {
     fontScale = fontScale ?? 120
-    // const {
-    //     onScroll, currentPage, totalPages, leftPages,
-    // } = useScrollHandler(booq)
-    // useOnBooqScroll(onScroll, {
-    //     throttle: 500,
-    // })
+    const {
+        onScroll, currentPage, totalPages, leftPages,
+    } = useScrollHandler(booq)
+    useOnBooqScroll(onScroll, {
+        throttle: 500,
+    })
     const range: BooqRange = useMemo(() => ({
         start: booq.fragment.current.path,
         end: booq.fragment.next?.path ?? [booq.fragment.nodes.length],
@@ -41,9 +43,9 @@ export function Reader({
     const { visible, toggle } = useControlsVisibility()
     useOnBooqClick(toggle)
 
-    // const pagesLabel = `${currentPage} of ${totalPages}`
-    // const leftLabel = leftPages <= 1 ? 'Last page'
-    //     : `${leftPages} pages left`
+    const pagesLabel = `${currentPage} of ${totalPages}`
+    const leftLabel = leftPages <= 1 ? 'Last page'
+        : `${leftPages} pages left`
 
     const {
         navigationOpen, navigationSelection,
@@ -135,8 +137,8 @@ export function Reader({
         NavigationButton={NavigationButton}
         // ThemerButton={<ThemerButton />}
         AccountButton={<SignInButton />}
-        // CurrentPage={<PageLabel text={pagesLabel} />}
-        // PagesLeft={<PageLabel text={leftLabel} />}
+        CurrentPage={<PageLabel text={pagesLabel} />}
+        PagesLeft={<PageLabel text={leftLabel} />}
         NavigationContent={NavigationContent}
     />
 }
@@ -255,34 +257,34 @@ function useAugmentations(booqId: string, quote?: BooqRange, _self?: ReaderUser)
     }
 }
 
-// function useScrollHandler({ id, fragment, length }: ReaderBooq) {
-//     const [currentPath, setCurrentPath] = useState(fragment.current.path)
-//     const { reportHistory } = useReportHistory()
+function useScrollHandler({ id, fragment, length }: ReaderBooq) {
+    const [currentPath, setCurrentPath] = useState(fragment.current.path)
 
-//     const position = positionForPath(fragment.nodes, currentPath)
-//     const nextChapter = fragment.next
-//         ? positionForPath(fragment.nodes, fragment.next.path)
-//         : length
-//     const currentPage = pageForPosition(position) + 1
-//     const totalPages = pageForPosition(length)
-//     const chapter = pageForPosition(nextChapter)
-//     const leftPages = chapter - currentPage + 1
+    const position = positionForPath(fragment.nodes, currentPath)
+    const nextChapter = fragment.next
+        ? positionForPath(fragment.nodes, fragment.next.path)
+        : length
+    const currentPage = pageForPosition(position) + 1
+    const totalPages = pageForPosition(length)
+    const chapter = pageForPosition(nextChapter)
+    const leftPages = chapter - currentPage + 1
 
-//     const onScroll = function (path: BooqPath) {
-//         if (!samePath(path, currentPath)) {
-//             setCurrentPath(path)
-//             reportHistory({
-//                 booqId: id,
-//                 path,
-//             })
-//         }
-//     }
-//     return {
-//         currentPath,
-//         currentPage, totalPages, leftPages,
-//         onScroll,
-//     }
-// }
+    const onScroll = function (path: BooqPath) {
+        if (!samePath(path, currentPath)) {
+            setCurrentPath(path)
+            reportBooqHistory({
+                booqId: id,
+                path,
+                source: currentSource(),
+            })
+        }
+    }
+    return {
+        currentPath,
+        currentPage, totalPages, leftPages,
+        onScroll,
+    }
+}
 
 function AnchorButton({ booqId, anchor, title }: {
     booqId: string,
@@ -299,10 +301,10 @@ function AnchorButton({ booqId, anchor, title }: {
     </BooqLink>
 }
 
-// function PageLabel({ text }: {
-//     text: string,
-// }) {
-//     return <span className='text-sm text-dimmed font-bold'>
-//         {text}
-//     </span>
-// }
+function PageLabel({ text }: {
+    text: string,
+}) {
+    return <span className='text-sm text-dimmed font-bold'>
+        {text}
+    </span>
+}
