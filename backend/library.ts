@@ -6,6 +6,7 @@ import { logTime } from './utils'
 import { parseEpub } from '@/parser'
 import { uploadBooqImages } from './images'
 import { uuSource } from './uu'
+import { loSource } from './lo'
 
 export type LibraryCard = {
     id: string,
@@ -48,7 +49,7 @@ const sources: {
 } = {
     pg: pgSource,
     uu: uuSource,
-    // lo: localBooqs,
+    lo: loSource,
 }
 
 export function processCard(prefix: string) {
