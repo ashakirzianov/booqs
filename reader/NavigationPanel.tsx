@@ -4,7 +4,7 @@ import { HighlightNodeComp } from './HighlightNode'
 import { PathHighlightsNodeComp } from './PathHighlightsNode'
 import { NavigationFilter } from './Filter'
 import { buildNavigationNodes, NavigationNode } from './nodes'
-import { NavigationSelection, ReaderHighlight, ReaderTocItem, ReaderUser } from '../common'
+import { NavigationSelection, ReaderHighlight, ReaderTocItem, ReaderUser } from './common'
 
 export function NavigationPanel({
     booqId, self, title, toc, highlights,

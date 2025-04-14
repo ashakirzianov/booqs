@@ -4,7 +4,7 @@ import { Icon } from '@/components/Icon'
 import { ContextMenuContent } from '@/reader/ContextMenuContent'
 import { ProfileBadge } from '@/components/ProfilePicture'
 import { colorForGroup } from '@/application/common'
-import { ReaderHighlight, ReaderUser } from '../common'
+import { ReaderHighlight, ReaderUser } from './common'
 
 export function HighlightNodeComp({ booqId, highlight, self }: {
     booqId: string,

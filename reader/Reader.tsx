@@ -13,7 +13,7 @@ import { ReaderLayout } from './ReaderLayout'
 import { colorForGroup, quoteColor } from '@/application/common'
 import { SignInButton } from '@/components/SignIn'
 import { NavigationSelection, ReaderAnchor, ReaderBooq, ReaderHighlight, ReaderUser } from './common'
-import { NavigationPanel } from './Navigation'
+import { NavigationPanel } from './NavigationPanel'
 
 
 export function Reader({

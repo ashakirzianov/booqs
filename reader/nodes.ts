@@ -1,6 +1,6 @@
 import { groupBy } from 'lodash'
 import { pathInRange } from '@/core'
-import { NavigationSelection, ReaderHighlight, ReaderTocItem, ReaderUser } from '../common'
+import { NavigationSelection, ReaderHighlight, ReaderTocItem, ReaderUser } from './common'
 
 export type TocNode = {
     kind: 'toc',

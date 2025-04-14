@@ -1,6 +1,6 @@
 import { ReactNode } from 'react'
 import { ProfileBadge } from '@/components/ProfilePicture'
-import { NavigationSelection } from '../common'
+import { NavigationSelection } from './common'
 
 export type HighlightAuthor = {
     id: string,
