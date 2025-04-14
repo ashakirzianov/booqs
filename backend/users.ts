@@ -1,21 +1,12 @@
 import { BooqPath } from '@/core'
 import { typedModel, TypeFromSchema, taggedObject } from './mongoose'
 import slugify from 'slugify'
-export const users = {
-    forId, createUser,
-    // forEmail,
-    // updateOrCreateForAppleUser, updateOrCreateForFacebookUser,
-    // userBookmarks, addBookmark, deleteBookmark,
-    // userCollection, addUpload, addToCollection, removeFromCollection,
-    // userBooqHistory, addBooqHistory, deleteBooqHistory,
-    // deleteForId,
-}
 
-async function forId(id: string) {
+export async function userForId(id: string) {
     return (await collection).findById(id).exec()
 }
 
-async function createUser(user: Omit<DbUser, '_id' | 'username' | 'joined'>) {
+export async function createUser(user: Omit<DbUser, '_id' | 'username' | 'joined'>) {
     const username = await proposeUsername(user)
     const toAdd: Omit<DbUser, '_id'> = {
         ...user,
@@ -30,7 +21,7 @@ type UserDataForNameGeneration = {
     name?: string,
     email?: string,
 }
-export async function proposeUsername(user: UserDataForNameGeneration) {
+async function proposeUsername(user: UserDataForNameGeneration) {
     const base = generateUsername(user)
     let current = base
     let next = current

@@ -1,5 +1,5 @@
 import { taggedObject, typedModel } from './mongoose'
-import { users } from './users'
+import { userForId, createUser } from './users'
 import {
     generateRegistrationOptions, verifyRegistrationResponse,
     generateAuthenticationOptions, verifyAuthenticationResponse,
@@ -34,7 +34,7 @@ export async function initiatePasskeyRegistration({
     return {
         success: true as const,
         options,
-        id: challengeRecord._id,
+        id: challengeRecord._id.toString(),
     }
 }
 
@@ -72,7 +72,7 @@ export async function verifyPasskeyRegistration({
             success: false as const,
         }
     }
-    const user = await users.createUser({})
+    const user = await createUser({})
 
     await saveUserCredential({
         userId: user._id,
@@ -111,10 +111,10 @@ export async function initiatePasskeyLogin({
     })
 
     return {
-        success: true as const,
+        success: true,
         options,
-        id: challengeRecord._id,
-    }
+        id: challengeRecord._id.toString(),
+    } as const
 }
 
 export async function verifyPasskeyLogin({
@@ -129,15 +129,15 @@ export async function verifyPasskeyLogin({
     if (!record || !record.userId) {
         return {
             error: 'Credential ID not registered',
-            success: false as const,
-        }
+            success: false,
+        } as const
     }
-    const user = await users.forId(record.userId)
+    const user = await userForId(record.userId)
     if (!user) {
         return {
             error: 'User not found',
-            success: false as const,
-        }
+            success: false,
+        } as const
     }
 
     // Retrieve expected challenge
@@ -147,8 +147,8 @@ export async function verifyPasskeyLogin({
     if (!expectedChallenge) {
         return {
             error: 'Authentication challenge not found or expired',
-            success: false as const,
-        }
+            success: false,
+        } as const
     }
 
     const userCredentials = record.credentials ?? []
@@ -156,8 +156,8 @@ export async function verifyPasskeyLogin({
     if (!matchingCredential) {
         return {
             error: 'Credential ID not registered for this user',
-            success: false as const,
-        }
+            success: false,
+        } as const
     }
 
     const { rpID, expectedOrigin } = getRPData(requestOrigin)
@@ -180,8 +180,8 @@ export async function verifyPasskeyLogin({
     if (!verified || !authenticationInfo) {
         return {
             error: 'Authentication verification failed',
-            success: false as const,
-        }
+            success: false,
+        } as const
     }
 
     // Authentication succeeded. Update the credential's counter to prevent replay attacks.
@@ -200,9 +200,9 @@ export async function verifyPasskeyLogin({
     await invalidateChallengeForId({ id })
 
     return {
-        success: true as const,
+        success: true,
         user,
-    }
+    } as const
 }
 
 const challengesSchema = {
@@ -292,13 +292,17 @@ async function saveUserCredential({ userId, credential }: {
 }
 
 function getRPData(requestOrigin: string | undefined) {
-    const rpID = requestOrigin === 'localhost'
+    const { localhost, secureLocalhost, production } = config().origins
+    const domain = config().domain
+    const rpID = requestOrigin === localhost || requestOrigin === secureLocalhost
         ? 'localhost'
-        : config().domain
+        : domain
 
-    const expectedOrigin = requestOrigin === 'localhost'
-        ? config().origins.secureLocalhost
-        : config().origins.production
+    const expectedOrigin = requestOrigin === production
+        || requestOrigin === localhost
+        || requestOrigin === secureLocalhost
+        ? requestOrigin
+        : production
 
     const rpName = config().appName
 

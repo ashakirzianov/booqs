@@ -8,6 +8,7 @@ config.autoAddCss = false
 
 import { Lato, Lora } from 'next/font/google'
 import { SocialScripts } from '@/application/social'
+import { AppProvider } from '@/application/provider'
 
 const lato = Lato({
     subsets: ['latin'],
@@ -41,7 +42,9 @@ export default function RootLayout({
             <SocialScripts />
             <body className={`${lato.variable} ${lora.variable}`}>
                 <main>
-                    {children}
+                    <AppProvider>
+                        {children}
+                    </AppProvider>
                 </main>
             </body>
         </html>

@@ -16,7 +16,7 @@ export function userIdFromHeader(header: string) {
 export function userIdFromToken(token: string) {
     try {
         const { userId } = verify(token, config().jwtSecret, { issuer }) as any
-        return userId
+        return userId as string
     } catch {
         return undefined
     }
