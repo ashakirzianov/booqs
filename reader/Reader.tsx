@@ -11,6 +11,7 @@ import type { ContextMenuState } from './ContextMenu'
 import { ReaderLayout } from './ReaderLayout'
 import { colorForGroup, quoteColor } from '@/application/common'
 import type { Highlight } from '@/application/highlights'
+import { SignInButton } from '@/components/SignIn'
 
 type ReaderBooq = {
     id: string,
@@ -136,9 +137,9 @@ export function Reader({
         MainButton={<FeedLink>
             <IconButton icon='back' />
         </FeedLink>}
-    // NavigationButton={NavigationButton}
-    // ThemerButton={<ThemerButton />}
-    // AccountButton={<SignInButton />}
+        // NavigationButton={NavigationButton}
+        // ThemerButton={<ThemerButton />}
+        AccountButton={<SignInButton />}
     // CurrentPage={<PageLabel text={pagesLabel} />}
     // PagesLeft={<PageLabel text={leftLabel} />}
     // NavigationContent={NavigationContent}
