@@ -1,13 +1,7 @@
 import {
     Schema, model, Document, connect, Model,
 } from 'mongoose'
-
-
-function config() {
-    return {
-        mongodbUri: process.env.MONGODB_URI,
-    }
-}
+import { config } from './config'
 
 let db: Promise<boolean> | undefined
 export async function mongoDbConnection() {
