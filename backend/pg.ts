@@ -209,5 +209,3 @@ async function searchAuthors({
     const unique = uniqBy(mapped, a => a.author.name)
     return unique
 }
-
-

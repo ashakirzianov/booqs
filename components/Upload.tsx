@@ -12,7 +12,7 @@ import { useUpload } from '@/application/upload'
 import { useCallback, useState } from 'react'
 
 export function UploadButton() {
-    const { signed } = useAuth() ?? {}
+    const { auth } = useAuth()
     const [isOpen, setIsOpen] = useState(false)
     function openModal() {
         setIsOpen(true)
@@ -24,6 +24,7 @@ export function UploadButton() {
     function openSignIn() {
         setIsSignInOpen(true)
     }
+    const signed = auth.state === 'signed'
 
     return <>
         <Popover

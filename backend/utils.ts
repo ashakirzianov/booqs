@@ -8,11 +8,11 @@ export function pretty(obj: any, depth?: number) {
 }
 
 export async function logTime<T>(f: () => Promise<T>, label?: string) {
-    console.log(`Start: ${label}`)
+    console.info(`Start: ${label}`)
     const start = Date.now()
     const result = await f()
     const end = Date.now()
-    console.log(`End: ${label}, time: ${end - start}`)
+    console.info(`End: ${label}, time: ${end - start}`)
     return result
 }
 

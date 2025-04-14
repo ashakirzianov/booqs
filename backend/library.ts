@@ -4,6 +4,8 @@ import { Booq } from '../core'
 import { pgSource } from './pg'
 import { logTime } from './utils'
 import { parseEpub } from '@/parser'
+import { uploadBooqImages } from './images'
+import { uuSource } from './uu'
 
 export type LibraryCard = {
     id: string,
@@ -45,7 +47,7 @@ const sources: {
     [prefix in string]?: LibrarySource;
 } = {
     pg: pgSource,
-    // uu: uuSource,
+    uu: uuSource,
     // lo: localBooqs,
 }
 
@@ -105,6 +107,20 @@ export async function booqForId(booqId: string) {
     }
 }
 
+export async function uploadToSource(sourcePrefix: string, fileBuffer: Buffer, userId: string) {
+    const uploadEpub = sources[sourcePrefix]?.uploadEpub
+    if (uploadEpub) {
+        const result = await uploadEpub(fileBuffer, userId)
+        if (result) {
+            if (result.booq) {
+                uploadBooqImages(`${sourcePrefix}/${result.card.id}`, result.booq)
+            }
+            return processCard(sourcePrefix)(result.card)
+        }
+    }
+    return undefined
+}
+
 async function parseBooqForId(booqId: string) {
     const file = await fileForId(booqId)
     if (!file) {
@@ -114,7 +130,7 @@ async function parseBooqForId(booqId: string) {
         fileData: file.file,
         title: booqId,
     }), 'Parser')
-    diags.forEach(console.log)
+    diags.forEach(console.info)
     return booq
 }
 
