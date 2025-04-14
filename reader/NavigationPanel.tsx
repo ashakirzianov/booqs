@@ -1,10 +1,35 @@
-import React, { useMemo } from 'react'
+'use client'
+import React, { useMemo, useState } from 'react'
 import { TocNodeComp } from './TocNode'
 import { HighlightNodeComp } from './HighlightNode'
 import { PathHighlightsNodeComp } from './PathHighlightsNode'
 import { NavigationFilter } from './Filter'
 import { buildNavigationNodes, NavigationNode } from './nodes'
 import { NavigationSelection, ReaderHighlight, ReaderTocItem, ReaderUser } from './common'
+
+export function useNavigationState() {
+    const [navigationOpen, setNavigationOpen] = useState(false)
+    const [navigationSelection, setNavigationSelection] = useState<NavigationSelection>({
+        chapters: true,
+        highlights: true,
+    })
+    return {
+        navigationOpen,
+        navigationSelection,
+        closeNavigation() {
+            setNavigationOpen(false)
+        },
+        toggleNavigationOpen() {
+            setNavigationOpen((prev) => !prev)
+        },
+        toggleNavigationSelection(item: string) {
+            setNavigationSelection(prev => ({
+                ...prev,
+                [item]: prev[item] !== true,
+            }))
+        },
+    }
+}
 
 export function NavigationPanel({
     booqId, self, title, toc, highlights,

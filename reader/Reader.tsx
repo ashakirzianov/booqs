@@ -7,13 +7,14 @@ import { Spinner } from '@/components/Loading'
 import {
     BooqContent, getAugmentationElement, getAugmentationText,
     Augmentation,
+    useOnBooqClick,
 } from '@/viewer'
 import type { ContextMenuState } from './ContextMenu'
 import { ReaderLayout } from './ReaderLayout'
 import { colorForGroup, quoteColor } from '@/application/common'
 import { SignInButton } from '@/components/SignIn'
-import { NavigationSelection, ReaderAnchor, ReaderBooq, ReaderHighlight, ReaderUser } from './common'
-import { NavigationPanel } from './NavigationPanel'
+import { ReaderAnchor, ReaderBooq, ReaderHighlight, ReaderUser } from './common'
+import { NavigationPanel, useNavigationState } from './NavigationPanel'
 
 
 export function Reader({
@@ -37,18 +38,18 @@ export function Reader({
     }), [booq])
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { augmentations, menuStateForAugmentation } = useAugmentations(booq.id, quote, self)
-    // const { visible, toggle } = useControlsVisibility()
-    // useOnBooqClick(toggle)
+    const { visible, toggle } = useControlsVisibility()
+    useOnBooqClick(toggle)
 
     // const pagesLabel = `${currentPage} of ${totalPages}`
     // const leftLabel = leftPages <= 1 ? 'Last page'
     //     : `${leftPages} pages left`
 
-    const [navigationOpen, setNavigationOpen] = useState(false)
-    const [navigationSelection, setNavigationSelection] = useState<NavigationSelection>({
-        chapters: true,
-        highlights: true,
-    })
+    const {
+        navigationOpen, navigationSelection,
+        toggleNavigationOpen, closeNavigation,
+        toggleNavigationSelection,
+    } = useNavigationState()
     const NavigationContent = <NavigationPanel
         booqId={booq.id}
         title={booq.title ?? 'Untitled'}
@@ -56,15 +57,12 @@ export function Reader({
         highlights={[]}
         selection={navigationSelection}
         self={self}
-        toggleSelection={item => setNavigationSelection(prev => ({
-            ...prev,
-            [item]: prev[item] !== true,
-        }))}
-        closeSelf={() => setNavigationOpen(false)}
+        toggleSelection={toggleNavigationSelection}
+        closeSelf={closeNavigation}
     />
     const NavigationButton = <IconButton
         icon='toc'
-        onClick={() => setNavigationOpen(!navigationOpen)}
+        onClick={toggleNavigationOpen}
         isSelected={navigationOpen}
     />
     // const [copilotState, setCopilotState] = useState<CopilotState>({
@@ -97,7 +95,7 @@ export function Reader({
     // }, [menuStateForAugmentation, setMenuState])
 
     // const isControlsVisible = !contextMenuVisible && !copilotVisible && visible
-    const isControlsVisible = true
+    const isControlsVisible = visible
 
     return <ReaderLayout
         isControlsVisible={isControlsVisible}
@@ -174,26 +172,26 @@ export function LoadingBooqScreen() {
     />
 }
 
-// function useControlsVisibility() {
-//     const [visible, setVisible] = useState(false)
-//     return {
-//         visible,
-//         toggle: useCallback(() => {
-//             if (!isAnythingSelected()) {
-//                 setVisible(!visible)
-//             }
-//         }, [visible, setVisible]),
-//     }
-// }
+function useControlsVisibility() {
+    const [visible, setVisible] = useState(false)
+    return {
+        visible,
+        toggle: useCallback(() => {
+            if (!isAnythingSelected()) {
+                setVisible(!visible)
+            }
+        }, [visible, setVisible]),
+    }
+}
 
-// function isAnythingSelected() {
-//     const selection = window.getSelection()
-//     if (!selection) {
-//         return false
-//     }
-//     return selection.anchorNode !== selection.focusNode
-//         || selection.anchorOffset !== selection.focusOffset
-// }
+function isAnythingSelected() {
+    const selection = window.getSelection()
+    if (!selection) {
+        return false
+    }
+    return selection.anchorNode !== selection.focusNode
+        || selection.anchorOffset !== selection.focusOffset
+}
 
 function useAugmentations(booqId: string, quote?: BooqRange, _self?: ReaderUser) {
     // const highlights = useFilteredHighlights(booqId, self)
