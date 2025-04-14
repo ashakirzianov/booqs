@@ -39,5 +39,5 @@ export default async function BooqPathPage({
     if (!booq)
         return null
 
-    return <Reader booq={booq} fontScale={1} />
+    return <Reader booq={booq} />
 }

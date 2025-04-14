@@ -1,6 +1,6 @@
 import { Popover } from '@/components/Popover'
 import { IconButton } from '@/components/Buttons'
-import { useFontScale, useSetFontScale } from '@/application/settings'
+import { useSetFontScale } from '@/application/theme'
 
 export function ThemerButton() {
     return <Popover
@@ -18,11 +18,10 @@ function ThemerPanel() {
 }
 
 function FontSettings() {
-    const fontScale = useFontScale()
     const setFontScale = useSetFontScale()
     return <div className="flex flex-row flex-1 items-center justify-around">
-        <FontScaleButton scale='down' onClick={() => setFontScale(fontScale - 10)} />
-        <FontScaleButton scale='up' onClick={() => setFontScale(fontScale + 10)} />
+        <FontScaleButton scale='down' onClick={() => setFontScale(current => Math.max(10, current - 10))} />
+        <FontScaleButton scale='up' onClick={() => setFontScale(current => current + 10)} />
     </div>
 }
 

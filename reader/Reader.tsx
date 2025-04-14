@@ -17,17 +17,18 @@ import { SignInButton } from '@/components/SignIn'
 import { ReaderAnchor, ReaderBooq, ReaderHighlight, ReaderUser } from './common'
 import { NavigationPanel, useNavigationState } from './NavigationPanel'
 import { reportBooqHistory } from '@/data/user'
+import { ThemerButton } from '@/components/Themer'
+import { useFontScale } from '@/application/theme'
 
 
 export function Reader({
-    booq, quote, self, fontScale,
+    booq, quote, self,
 }: {
     booq: ReaderBooq,
     quote?: BooqRange,
     self?: ReaderUser,
-    fontScale?: number,
 }) {
-    fontScale = fontScale ?? 120
+    const fontScale = useFontScale()
     const {
         onScroll, currentPage, totalPages, leftPages,
     } = useScrollHandler(booq)
@@ -135,7 +136,7 @@ export function Reader({
             <IconButton icon='back' />
         </FeedLink>}
         NavigationButton={NavigationButton}
-        // ThemerButton={<ThemerButton />}
+        ThemerButton={<ThemerButton />}
         AccountButton={<SignInButton />}
         CurrentPage={<PageLabel text={pagesLabel} />}
         PagesLeft={<PageLabel text={leftLabel} />}
