@@ -131,7 +131,7 @@ export async function fetchAuthData() {
         return undefined
     }
     return {
-        id: user._id,
+        id: user._id.toString(),
         name: user.name,
         pictureUrl: user.pictureUrl,
     }
