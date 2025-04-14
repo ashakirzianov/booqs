@@ -20,9 +20,9 @@ export async function mongoDbConnection() {
 async function connectToMongoDb() {
     const dbUri = config().mongodbUri
     if (dbUri) {
-        console.log('Connecting to db...')
+        console.info('Connecting to db...')
         await connect(dbUri, { dbName: 'production' })
-        console.log('Connected to db')
+        console.info('Connected to db')
         return true
     } else {
         console.warn('MONGODB_URI is not set')
