@@ -1,5 +1,6 @@
-import React, { useCallback, useMemo } from 'react'
-import { BooqPath, BooqRange, BooqNode } from '@/core'
+'use client'
+import React, { useCallback, useMemo, useState } from 'react'
+import { BooqRange } from '@/core'
 import { BorderButton, IconButton } from '@/components/Buttons'
 import { BooqLink, FeedLink, booqHref } from '@/components/Links'
 import { Spinner } from '@/components/Loading'
@@ -10,34 +11,11 @@ import {
 import type { ContextMenuState } from './ContextMenu'
 import { ReaderLayout } from './ReaderLayout'
 import { colorForGroup, quoteColor } from '@/application/common'
-import type { Highlight } from '@/application/highlights'
 import { SignInButton } from '@/components/SignIn'
+import { NavigationSelection, ReaderAnchor, ReaderBooq, ReaderHighlight, ReaderUser } from './common'
+import { NavigationPanel } from './Navigation'
 
-type ReaderBooq = {
-    id: string,
-    title?: string,
-    author?: string,
-    language?: string,
-    length: number,
-    fragment: {
-        nodes: BooqNode[],
-        previous?: ReaderAnchor,
-        current: ReaderAnchor,
-        next?: ReaderAnchor,
-    }
-}
-type ReaderAnchor = {
-    title?: string,
-    path: BooqPath,
-}
-// TODO: do we need all of those fields?
-type ReaderUser = {
-    id: string,
-    username: string,
-    joined: string,
-    name?: string,
-    pictureUrl?: string,
-}
+
 export function Reader({
     booq, quote, self, fontScale,
 }: {
@@ -66,9 +44,29 @@ export function Reader({
     // const leftLabel = leftPages <= 1 ? 'Last page'
     //     : `${leftPages} pages left`
 
-    // const {
-    //     navigationOpen, NavigationButton, NavigationContent,
-    // } = useNavigationPanel(booq.id, self)
+    const [navigationOpen, setNavigationOpen] = useState(false)
+    const [navigationSelection, setNavigationSelection] = useState<NavigationSelection>({
+        chapters: true,
+        highlights: true,
+    })
+    const NavigationContent = <NavigationPanel
+        booqId={booq.id}
+        title={booq.title ?? 'Untitled'}
+        toc={booq.toc}
+        highlights={[]}
+        selection={navigationSelection}
+        self={self}
+        toggleSelection={item => setNavigationSelection(prev => ({
+            ...prev,
+            [item]: prev[item] !== true,
+        }))}
+        closeSelf={() => setNavigationOpen(false)}
+    />
+    const NavigationButton = <IconButton
+        icon='toc'
+        onClick={() => setNavigationOpen(!navigationOpen)}
+        isSelected={navigationOpen}
+    />
     // const [copilotState, setCopilotState] = useState<CopilotState>({
     //     kind: 'empty',
     // })
@@ -100,7 +98,6 @@ export function Reader({
 
     // const isControlsVisible = !contextMenuVisible && !copilotVisible && visible
     const isControlsVisible = true
-    const navigationOpen = true
 
     return <ReaderLayout
         isControlsVisible={isControlsVisible}
@@ -137,12 +134,12 @@ export function Reader({
         MainButton={<FeedLink>
             <IconButton icon='back' />
         </FeedLink>}
-        // NavigationButton={NavigationButton}
+        NavigationButton={NavigationButton}
         // ThemerButton={<ThemerButton />}
         AccountButton={<SignInButton />}
-    // CurrentPage={<PageLabel text={pagesLabel} />}
-    // PagesLeft={<PageLabel text={leftLabel} />}
-    // NavigationContent={NavigationContent}
+        // CurrentPage={<PageLabel text={pagesLabel} />}
+        // PagesLeft={<PageLabel text={leftLabel} />}
+        NavigationContent={NavigationContent}
     />
 }
 
@@ -200,7 +197,7 @@ export function LoadingBooqScreen() {
 
 function useAugmentations(booqId: string, quote?: BooqRange, _self?: ReaderUser) {
     // const highlights = useFilteredHighlights(booqId, self)
-    const highlights: Highlight[] = useMemo(() => [], [])
+    const highlights: ReaderHighlight[] = useMemo(() => [], [])
     const augmentations = useMemo(() => {
         const augmentations = highlights.map<Augmentation>(h => ({
             id: `highlight/${h.id}`,
@@ -239,7 +236,7 @@ function useAugmentations(booqId: string, quote?: BooqRange, _self?: ReaderUser)
                     }
                     : undefined
             case 'highlight': {
-                const highlight = highlights.find(hl => hl.id === id)
+                const highlight = highlights.find(hl => hl.id === id) as any // TODO: remove this cast!
                 return highlight
                     ? {
                         anchor,

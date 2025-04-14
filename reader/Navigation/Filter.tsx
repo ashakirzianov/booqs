@@ -1,30 +1,33 @@
 import { ReactNode } from 'react'
 import { ProfileBadge } from '@/components/ProfilePicture'
-import { User } from '@/application/auth'
-import { HighlightAuthor, useNavigationState } from '@/application/navigation'
+import { NavigationSelection } from '../common'
 
-export function NavigationFilter({ authors }: {
-    self: User | undefined,
+export type HighlightAuthor = {
+    id: string,
+    name?: string,
+    pictureUrl?: string,
+}
+export function NavigationFilter({
+    authors, selection, toggle,
+}: {
     authors: HighlightAuthor[],
+    selection: NavigationSelection,
+    toggle: (id: string) => void,
 }) {
-    const {
-        showAuthors, showChapters, showHighlights,
-        toggleAuthor, toggleChapters, toggleHighlights,
-    } = useNavigationState()
     const itemClass = 'mt-base mr-base'
     return <div className='flex flex-row flex-wrap my-lg'>
         <div className={itemClass}>
             <FilterButton
                 text='Chapters'
-                selected={showChapters}
-                toggle={toggleChapters}
+                selected={selection.chapters}
+                toggle={() => toggle('chapters')}
             />
         </div>
         <div className={itemClass}>
             <FilterButton
                 text='Highlights'
-                selected={showHighlights}
-                toggle={toggleHighlights}
+                selected={selection.highlights}
+                toggle={() => toggle('highlights')}
             />
         </div>
         {
@@ -33,8 +36,8 @@ export function NavigationFilter({ authors }: {
                 return <div className={itemClass} key={author.id}>
                     <FilterButton
                         text={first ?? 'Incognito'}
-                        selected={showAuthors.some(id => id === author.id)}
-                        toggle={() => toggleAuthor(author.id)}
+                        selected={selection[`author:${author.id}`] ?? false}
+                        toggle={() => toggle(`author:${author.id}`)}
                         Badge={<ProfileBadge
                             size={1}
                             border={false}

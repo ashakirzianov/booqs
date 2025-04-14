@@ -1,5 +1,5 @@
 import { rangeFromString } from '@/core'
-import { booqFragment, booqPreview } from '@/data/booqs'
+import { booqPart, booqPreview } from '@/data/booqs'
 import { Reader } from '@/reader/Reader'
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
@@ -35,7 +35,7 @@ export default async function BooqPathPage({
     const quoteRange = rangeFromString(quote)
     if (!quoteRange)
         return notFound()
-    const booq = await booqFragment(booqId, quoteRange.start)
+    const booq = await booqPart(booqId, quoteRange.start)
     if (!booq)
         return notFound()
     return <Reader booq={booq} quote={quoteRange} />

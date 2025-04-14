@@ -3,14 +3,13 @@ import { Popover } from '@/components/Popover'
 import { Icon } from '@/components/Icon'
 import { ContextMenuContent } from '@/reader/ContextMenuContent'
 import { ProfileBadge } from '@/components/ProfilePicture'
-import { Highlight } from '@/application/highlights'
-import { User } from '@/application/auth'
 import { colorForGroup } from '@/application/common'
+import { ReaderHighlight, ReaderUser } from '../common'
 
 export function HighlightNodeComp({ booqId, highlight, self }: {
     booqId: string,
-    self: User | undefined,
-    highlight: Highlight,
+    self: ReaderUser | undefined,
+    highlight: ReaderHighlight,
 }) {
     const badgeClass = self?.id === highlight.author.id
         ? 'hidden' : 'flex'

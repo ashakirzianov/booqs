@@ -1,16 +1,15 @@
 import { Fragment } from 'react'
 import { BooqLink } from '@/components/Links'
 import { HighlightNodeComp } from './HighlightNode'
-import { User } from '@/application/auth'
-import { PathHighlightsNode } from '@/application/navigation'
-import { TocItem } from '@/application/toc'
+import { ReaderTocItem, ReaderUser } from '../common'
+import { PathHighlightsNode } from './nodes'
 
 export function PathHighlightsNodeComp({
     booqId, self,
     node: { items, highlights },
 }: {
     booqId: string,
-    self: User | undefined,
+    self: ReaderUser | undefined,
     node: PathHighlightsNode,
 }) {
     return <div>
@@ -32,7 +31,7 @@ export function PathHighlightsNodeComp({
 
 function Path({ items, booqId }: {
     booqId: string,
-    items: Array<TocItem | undefined>,
+    items: Array<ReaderTocItem | undefined>,
 }) {
     return <div className='flex flex-wrap'>
         {

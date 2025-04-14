@@ -1,4 +1,4 @@
-import { booqFragment, booqPreview, featuredIds } from '@/data/booqs'
+import { booqPart, booqPreview, featuredIds } from '@/data/booqs'
 import { Reader } from '@/reader/Reader'
 import { Metadata } from 'next'
 
@@ -35,9 +35,9 @@ export default async function BooqPathPage({
 }) {
     const { source, id } = await params
     const booqId = `${source}/${id}`
-    const fragment = await booqFragment(booqId)
-    if (!fragment)
+    const booq = await booqPart(booqId)
+    if (!booq)
         return null
 
-    return <Reader booq={fragment} fontScale={1} />
+    return <Reader booq={booq} fontScale={1} />
 }

@@ -1,10 +1,11 @@
+'use client'
 import { useCallback, ReactNode, useState, useEffect } from 'react'
 import {
     getBooqSelection, VirtualElement, getSelectionElement, BooqSelection,
 } from '@/viewer'
 import { ContextMenuContent, ContextMenuTarget } from './ContextMenuContent'
-import { User } from '@/application/auth'
 import { useFloater } from '@/components/Floater'
+import { ReaderUser } from './common'
 
 export type ContextMenuState = {
     target: ContextMenuTarget,
@@ -15,7 +16,7 @@ export function useContextMenu({
     booqId, self, updateCopilot, closed,
 }: {
     booqId: string,
-    self: User | undefined,
+    self: ReaderUser | undefined,
     closed: boolean,
     updateCopilot: (selection: BooqSelection, anchor: VirtualElement) => void,
 }) {

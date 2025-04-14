@@ -1,37 +1,32 @@
-import React, { useState, useMemo } from 'react'
-import { IconButton } from '@/components/Buttons'
+import React, { useMemo } from 'react'
 import { TocNodeComp } from './TocNode'
 import { HighlightNodeComp } from './HighlightNode'
 import { PathHighlightsNodeComp } from './PathHighlightsNode'
 import { NavigationFilter } from './Filter'
-import { User } from '@/application/auth'
-import { NavigationNode, useNavigationNodes } from '@/application/navigation'
+import { buildNavigationNodes, NavigationNode } from './nodes'
+import { NavigationSelection, ReaderHighlight, ReaderTocItem, ReaderUser } from '../common'
 
-export function useNavigationPanel(booqId: string, self: User | undefined) {
-    const [navigationOpen, setOpen] = useState(false)
-    const NavigationButton = <IconButton
-        icon='toc'
-        onClick={() => setOpen(!navigationOpen)}
-        isSelected={navigationOpen}
-    />
-    const NavigationContent = <Navigation
-        booqId={booqId}
-        self={self}
-        closeSelf={() => {
-            setOpen(false)
-        }}
-    />
-    return {
-        navigationOpen, NavigationButton, NavigationContent,
-    }
-}
-
-function Navigation({ booqId, self, closeSelf }: {
+export function NavigationPanel({
+    booqId, self, title, toc, highlights,
+    selection,
+    toggleSelection, closeSelf,
+}: {
     booqId: string,
-    self: User | undefined,
+    title: string
+    toc: ReaderTocItem[],
+    highlights: ReaderHighlight[],
+    selection: NavigationSelection,
+    self?: ReaderUser,
+    toggleSelection: (item: string) => void,
     closeSelf: () => void,
 }) {
-    const { nodes, authors } = useNavigationNodes(booqId, self)
+    const { nodes, authors } = useMemo(() => {
+        return buildNavigationNodes({
+            title, toc, highlights,
+            selection,
+            self,
+        })
+    }, [title, toc, highlights, selection, self])
     const exceptSelf = authors.filter(a => a.id !== self?.id)
     return useMemo(() => {
         return <div className='flex flex-1' style={{
@@ -43,8 +38,9 @@ function Navigation({ booqId, self, closeSelf }: {
                         <div className='self-center tracking-widest font-bold'>CONTENTS</div>
                         <div className='filter'>
                             <NavigationFilter
-                                self={self}
                                 authors={exceptSelf}
+                                selection={selection}
+                                toggle={toggleSelection}
                             />
                         </div>
                     </div>
@@ -73,7 +69,7 @@ function Navigation({ booqId, self, closeSelf }: {
 
 function NavigationNodeComp({ booqId, self, node }: {
     booqId: string,
-    self: User | undefined,
+    self: ReaderUser | undefined,
     node: NavigationNode,
 }) {
     switch (node.kind) {

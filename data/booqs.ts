@@ -1,6 +1,7 @@
 import {
     Booq, BooqPath, filterUndefined, previewForPath, textForRange,
     BooqFragment, buildFragment,
+    TableOfContentsItem,
 } from '@/core'
 import { booqImageUrl } from '@/backend/images'
 import { booqForId, forIds, LibraryCard } from '@/backend/library'
@@ -21,9 +22,10 @@ export type BooqPreview = {
     title: string,
     preview: string,
 }
-export type BooqFragmentData = {
+export type BooqPartData = {
     id: string,
     length: number,
+    toc: TableOfContentsItem[],
     fragment: BooqFragment,
 }
 
@@ -75,7 +77,7 @@ export async function booqPreview(booqId: string, path?: BooqPath, end?: BooqPat
     } satisfies BooqPreview
 }
 
-export async function booqFragment(booqId: string, path?: BooqPath) {
+export async function booqPart(booqId: string, path?: BooqPath) {
     const card = await booqCard(booqId)
     if (card === undefined) {
         return undefined
@@ -90,7 +92,8 @@ export async function booqFragment(booqId: string, path?: BooqPath) {
         id: booqId,
         length: card.length,
         fragment,
-    } satisfies BooqFragmentData
+        toc: booq.toc.items,
+    } satisfies BooqPartData
 }
 
 function previewForBooq(booq: Booq, path?: BooqPath, end?: BooqPath, length: number = 500): string | undefined {
