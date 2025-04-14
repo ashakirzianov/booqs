@@ -113,7 +113,12 @@ export async function uploadToSource(sourcePrefix: string, fileBuffer: Buffer, u
         const result = await uploadEpub(fileBuffer, userId)
         if (result) {
             if (result.booq) {
-                uploadBooqImages(`${sourcePrefix}/${result.card.id}`, result.booq)
+                const imageResults = await uploadBooqImages(`${sourcePrefix}/${result.card.id}`, result.booq)
+                for (const imageResult of imageResults) {
+                    if (!imageResult.success) {
+                        console.warn(`Failed to upload image ${imageResult.id} for ${sourcePrefix}/${result.card.id}`)
+                    }
+                }
             }
             return processCard(sourcePrefix)(result.card)
         }

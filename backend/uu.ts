@@ -242,9 +242,9 @@ export async function buildFileFromReadStream(fileStream: ReadStream) {
 }
 
 function report(label: string, data?: any) {
-    console.log('UU: \x1b[32m%s\x1b[0m', label)
+    console.warn('UU: \x1b[32m%s\x1b[0m', label)
     if (data) {
-        console.log(inspect(data, false, 3, true))
+        console.warn(inspect(data, false, 3, true))
     }
 }
 

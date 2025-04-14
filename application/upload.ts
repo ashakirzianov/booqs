@@ -23,7 +23,6 @@ export function useUpload() {
         state: 'not-started',
     })
     async function uploadFile(file: FileData) {
-        console.log('uploading file', file)
         setState({
             state: 'loading',
         })

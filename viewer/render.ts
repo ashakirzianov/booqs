@@ -123,6 +123,10 @@ function isExternalSrc(src: string) {
 }
 
 function imageFullSrc(booqId: string, src: string) {
+    // TODO: investigate why we need this hack for certain epubs
+    if (src.startsWith('../')) {
+        src = src.substring('../'.length)
+    }
     return `https://booqs-images.s3.amazonaws.com/${booqId}/${src}`
 }
 

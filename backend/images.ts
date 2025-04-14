@@ -37,8 +37,8 @@ async function uploadImage(base64: string, booqId: string, src: string, size?: n
         : buffer
     const result = await uploadAsset(bucket, id, toUpload)
     return result.$metadata
-        ? id
-        : undefined
+        ? { success: true, id }
+        : { success: false, id }
 }
 
 async function resizeImage(buffer: Buffer, height: number): Promise<Buffer> {
