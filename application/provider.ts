@@ -2,6 +2,7 @@
 import { createElement } from 'react'
 import { AuthProvider } from './auth'
 import { ThemeProvider } from './theme'
+import { ConnectedApolloProvider } from './apollo'
 
 export function AppProvider({ children }: {
     children: React.ReactNode,
@@ -12,7 +13,10 @@ export function AppProvider({ children }: {
             children: createElement(
                 ThemeProvider,
                 {
-                    children,
+                    children: createElement(
+                        ConnectedApolloProvider,
+                        { children },
+                    ),
                 },
             ),
         },
