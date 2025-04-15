@@ -19,7 +19,7 @@ export const loSource: LibrarySource = {
                 file,
             }
         } catch (err) {
-            console.log(`Couldn't open ${path}: ${err}`)
+            console.error(`Couldn't open ${path}: ${err}`)
             return undefined
         }
     },

@@ -13,6 +13,5 @@ export async function POST(request: Request) {
     const suggestions = await generateSuggestions({
         text, context, title, author, language,
     })
-    console.log('here 3', suggestions)
     return Response.json(suggestions)
 }
