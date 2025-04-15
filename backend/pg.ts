@@ -10,7 +10,7 @@ export const pgSource: LibrarySource = {
     forAuthor,
 }
 
-const pgEpubsBucket = 'pg-epubs'
+export const pgEpubsBucket = 'pg-epubs'
 
 const schema = {
     assetId: {
@@ -38,8 +38,8 @@ const schema = {
     meta: taggedObject<object>(),
 } as const
 
-type DbPgCard = TypeFromSchema<typeof schema>
-const pgCards = typedModel('pg-cards', schema)
+export type DbPgCard = TypeFromSchema<typeof schema>
+export const pgCards = typedModel('pg-cards', schema)
 
 
 async function cards(ids: string[]): Promise<LibraryCard[]> {
