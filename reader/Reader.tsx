@@ -1,6 +1,6 @@
 'use client'
 import React, { useCallback, useMemo, useState } from 'react'
-import { BooqPath, BooqRange, positionForPath, samePath } from '@/core'
+import { BooqPath, BooqRange, contextForRange, positionForPath, samePath } from '@/core'
 import { BorderButton, IconButton } from '@/components/Buttons'
 import { BooqLink, FeedLink, booqHref } from '@/components/Links'
 import { Spinner } from '@/components/Loading'
@@ -10,7 +10,7 @@ import {
     useOnBooqClick,
     useOnBooqScroll,
 } from '@/viewer'
-import type { ContextMenuState } from './ContextMenu'
+import { useContextMenu, type ContextMenuState } from './ContextMenu'
 import { ReaderLayout } from './ReaderLayout'
 import { colorForGroup, currentSource, pageForPosition, quoteColor } from '@/application/common'
 import { SignInButton } from '@/components/SignIn'
@@ -19,16 +19,22 @@ import { NavigationPanel, useNavigationState } from './NavigationPanel'
 import { reportBooqHistory } from '@/data/user'
 import { ThemerButton } from '@/components/Themer'
 import { useFontScale } from '@/application/theme'
+import { filterHighlights } from './nodes'
+import { useAuth } from '@/application/auth'
+import { Copilot, CopilotState } from '@/components/Copilot'
 
 
 export function Reader({
-    booq, quote, self,
+    booq, quote,
 }: {
     booq: ReaderBooq,
     quote?: BooqRange,
-    self?: ReaderUser,
 }) {
+    const { auth } = useAuth()
+    const self: ReaderUser | undefined = auth.user
     const fontScale = useFontScale()
+    const highlights: ReaderHighlight[] = useMemo(() => [], [])
+
     const {
         onScroll, currentPage, totalPages, leftPages,
     } = useScrollHandler(booq)
@@ -39,14 +45,6 @@ export function Reader({
         start: booq.fragment.current.path,
         end: booq.fragment.next?.path ?? [booq.fragment.nodes.length],
     }), [booq])
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { augmentations, menuStateForAugmentation } = useAugmentations(booq.id, quote, self)
-    const { visible, toggle } = useControlsVisibility()
-    useOnBooqClick(toggle)
-
-    const pagesLabel = `${currentPage} of ${totalPages}`
-    const leftLabel = leftPages <= 1 ? 'Last page'
-        : `${leftPages} pages left`
 
     const {
         navigationOpen, navigationSelection,
@@ -57,7 +55,7 @@ export function Reader({
         booqId={booq.id}
         title={booq.title ?? 'Untitled'}
         toc={booq.toc}
-        highlights={[]}
+        highlights={highlights}
         selection={navigationSelection}
         self={self}
         toggleSelection={toggleNavigationSelection}
@@ -68,37 +66,56 @@ export function Reader({
         onClick={toggleNavigationOpen}
         isSelected={navigationOpen}
     />
-    // const [copilotState, setCopilotState] = useState<CopilotState>({
-    //     kind: 'empty',
-    // })
-    // const copilotVisible = copilotState.kind !== 'empty'
-    // const {
-    //     ContextMenuNode, isOpen: contextMenuVisible,
-    //     updateMenuState: setMenuState,
-    // } = useContextMenu({
-    //     booqId: booq.id,
-    //     self,
-    //     closed: copilotState.kind !== 'empty',
-    //     updateCopilot(selection, anchor) {
-    //         setCopilotState({
-    //             kind: 'selected',
-    //             selection,
-    //             anchor,
-    //             context: contextForRange(booq.fragment.nodes, selection.range, 1000) ?? 'failed',
-    //         })
-    //     },
-    // })
-    // const onAugmentationClick = useMemo(() => {
-    //     return (id: string) => {
-    //         const next = menuStateForAugmentation(id)
-    //         if (next) {
-    //             setMenuState(next)
-    //         }
-    //     }
-    // }, [menuStateForAugmentation, setMenuState])
 
-    // const isControlsVisible = !contextMenuVisible && !copilotVisible && visible
-    const isControlsVisible = visible
+    const filteredHighlights = useMemo(
+        () => filterHighlights({
+            highlights,
+            selection: navigationSelection,
+            self,
+        }), [highlights, navigationSelection, self]
+    )
+
+    const { augmentations, menuStateForAugmentation } = useAugmentations({
+        highlights: filteredHighlights,
+        quote: quote,
+    })
+    const { visible, toggle } = useControlsVisibility()
+    useOnBooqClick(toggle)
+
+    const pagesLabel = `${currentPage} of ${totalPages}`
+    const leftLabel = leftPages <= 1 ? 'Last page'
+        : `${leftPages} pages left`
+
+    const [copilotState, setCopilotState] = useState<CopilotState>({
+        kind: 'empty',
+    })
+    const copilotVisible = copilotState.kind !== 'empty'
+    const {
+        ContextMenuNode, isOpen: contextMenuVisible,
+        updateMenuState: setMenuState,
+    } = useContextMenu({
+        booqId: booq.id,
+        self,
+        closed: copilotState.kind !== 'empty',
+        updateCopilot(selection, anchor) {
+            setCopilotState({
+                kind: 'selected',
+                selection,
+                anchor,
+                context: contextForRange(booq.fragment.nodes, selection.range, 1000) ?? 'failed',
+            })
+        },
+    })
+    const onAugmentationClick = useMemo(() => {
+        return (id: string) => {
+            const next = menuStateForAugmentation(id)
+            if (next) {
+                setMenuState(next)
+            }
+        }
+    }, [menuStateForAugmentation, setMenuState])
+
+    const isControlsVisible = !contextMenuVisible && !copilotVisible && visible
 
     return <ReaderLayout
         isControlsVisible={isControlsVisible}
@@ -112,7 +129,7 @@ export function Reader({
                 nodes={booq.fragment.nodes}
                 range={range}
                 augmentations={augmentations}
-                // onAugmentationClick={onAugmentationClick}
+                onAugmentationClick={onAugmentationClick}
                 hrefForPath={booqHref}
             />
         </div>}
@@ -126,12 +143,12 @@ export function Reader({
             anchor={booq.fragment.next}
             title='Next'
         />}
-        // ContextMenu={ContextMenuNode}
-        // Copilot={<Copilot
-        //     state={copilotState}
-        //     setState={setCopilotState}
-        //     booq={booq}
-        // />}
+        ContextMenu={ContextMenuNode}
+        Copilot={<Copilot
+            state={copilotState}
+            setState={setCopilotState}
+            booq={booq}
+        />}
         MainButton={<FeedLink>
             <IconButton icon='back' />
         </FeedLink>}
@@ -167,8 +184,8 @@ export function LoadingBooqScreen() {
             <IconButton icon='back' />
         </FeedLink>}
         NavigationButton={null}
-        // ThemerButton={<ThemerButton />}
-        // AccountButton={<SignInButton />}
+        ThemerButton={<ThemerButton />}
+        AccountButton={<SignInButton />}
         CurrentPage={null}
         PagesLeft={null}
         NavigationContent={null}
@@ -196,9 +213,12 @@ function isAnythingSelected() {
         || selection.anchorOffset !== selection.focusOffset
 }
 
-function useAugmentations(booqId: string, quote?: BooqRange, _self?: ReaderUser) {
-    // const highlights = useFilteredHighlights(booqId, self)
-    const highlights: ReaderHighlight[] = useMemo(() => [], [])
+function useAugmentations({
+    quote, highlights,
+}: {
+    highlights: ReaderHighlight[],
+    quote?: BooqRange,
+}) {
     const augmentations = useMemo(() => {
         const augmentations = highlights.map<Augmentation>(h => ({
             id: `highlight/${h.id}`,

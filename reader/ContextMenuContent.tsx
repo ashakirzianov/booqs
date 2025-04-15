@@ -7,7 +7,6 @@ import { MenuItem } from '@/components/Menu'
 import { quoteHref } from '@/components/Links'
 import { BooqSelection } from '@/viewer'
 import { ProfileBadge } from '@/components/ProfilePicture'
-import { useHighlightMutations } from '@/application/highlights'
 import { colorForGroup, groups } from '@/application/common'
 import { ReaderHighlight, ReaderUser } from './common'
 
@@ -185,7 +184,8 @@ function AddHighlightItem({
     self: ReaderUser | undefined,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
-    const { addHighlight } = useHighlightMutations(booqId)
+    // const { addHighlight } = useHighlightMutations(booqId)
+    function addHighlight(input: any) { }
     if (!self?.id) {
         return null
     }
@@ -235,7 +235,8 @@ function RemoveHighlightItem({
     booqId: string,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
-    const { removeHighlight } = useHighlightMutations(booqId)
+    // const { removeHighlight } = useHighlightMutations(booqId)
+    function removeHighlight(input: any) { }
     return <MenuItem
         text='Remove'
         icon='remove'
@@ -253,7 +254,8 @@ function SelectHighlightGroupItem({
     booqId: string,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
-    const { updateHighlight } = useHighlightMutations(booqId)
+    // const { updateHighlight } = useHighlightMutations(booqId)
+    function updateHighlight(input: any, second: any) { }
     return <div className='container'>
         {
             groups.map(

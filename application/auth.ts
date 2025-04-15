@@ -19,12 +19,14 @@ export type AuthUser = {
 }
 export type AuthState = {
     state: 'loading',
-    custom?: string,
+    user?: undefined,
 } | {
     state: 'not-signed',
+    user?: undefined,
 } | {
     state: 'error',
     error: string,
+    user?: undefined,
 } | {
     state: 'signed',
     user: AuthUser,
