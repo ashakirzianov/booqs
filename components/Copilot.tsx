@@ -1,7 +1,6 @@
 import { BooqSelection, VirtualElement } from '@/viewer'
 import { useCallback, useEffect, useState } from 'react'
 import { useFloater } from './Floater'
-import { BooqData } from '@/application/booq'
 import { CopilotContext, useCopilotAnswer, useCopilotSuggestions } from '@/application/copilot'
 import { Spinner } from './Loading'
 import { ModalDivider, ModalHeader, ModalFullScreen } from './Modal'
@@ -15,6 +14,13 @@ type CopilotSelected = {
     selection: BooqSelection,
     context: string,
     anchor: VirtualElement,
+}
+type BooqData = {
+    id: string,
+    title?: string,
+    author?: string,
+    language?: string,
+    length: number,
 }
 export type CopilotState = CopilotEmpty | CopilotSelected
 type CopilotProps = {

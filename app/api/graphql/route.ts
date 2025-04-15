@@ -3,13 +3,14 @@ import { createYoga, createSchema } from 'graphql-yoga'
 import { context, resolvers } from '@/graphql'
 import { ResolverContext } from '@/graphql/context'
 import { cookies, headers } from 'next/headers'
+import { NextRequest } from 'next/server'
 
 const schema = createSchema<ResolverContext>({
   typeDefs,
   resolvers,
 })
 
-const yoga = createYoga({
+const { handleRequest } = createYoga({
   schema,
   graphqlEndpoint: '/api/graphql',
   fetchAPI: { Request, Response },
@@ -29,11 +30,19 @@ const yoga = createYoga({
       setCookie(name, value, options) {
         cookieStore.set(name, value, options)
       },
-      clearCookie(name, options) {
+      clearCookie(name, _options) {
         cookieStore.delete(name)
       },
     })
   },
 })
 
-export { yoga as GET, yoga as POST }
+// export { handleRequest as GET, handleRequest as POST }
+
+export async function GET(request: NextRequest) {
+  return handleRequest(request, {})
+}
+
+export async function POST(request: NextRequest) {
+  return handleRequest(request, {})
+}

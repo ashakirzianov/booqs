@@ -15,6 +15,7 @@ import { useContext } from 'react'
 
 export type AuthUser = {
     id: string,
+    joined: string,
     name?: string,
     pictureUrl?: string,
 }

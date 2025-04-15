@@ -4,8 +4,8 @@ import { NavigationSelection } from './common'
 
 export type HighlightAuthor = {
     id: string,
-    name?: string,
-    pictureUrl?: string,
+    name?: string | null,
+    pictureUrl?: string | null,
 }
 export function NavigationFilter({
     authors, selection, toggle,
@@ -41,7 +41,7 @@ export function NavigationFilter({
                         Badge={<ProfileBadge
                             size={1}
                             border={false}
-                            name={author.name}
+                            name={author.name ?? undefined}
                             picture={author.pictureUrl ?? undefined}
                         />}
                     />

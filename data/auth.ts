@@ -46,6 +46,7 @@ export async function verifyPasskeyRegistrationAction({ id, response }: {
                     id: result.user._id.toString(),
                     name: result.user.name,
                     pictureUrl: result.user.pictureUrl,
+                    joined: result.user.joined.toString(),
                 },
             } as const
         } else {
@@ -98,6 +99,7 @@ export async function verifyPasskeySigninAction({ id, response }: {
                     id: result.user._id.toString(),
                     name: result.user.name,
                     pictureUrl: result.user.pictureUrl,
+                    joined: result.user.joined.toString(),
                 },
             } as const
         } else {
@@ -138,6 +140,7 @@ export async function fetchAuthData() {
         id: user._id.toString(),
         name: user.name,
         pictureUrl: user.pictureUrl,
+        joined: user.joined.toString(),
     }
 }
 
