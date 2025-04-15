@@ -291,6 +291,10 @@ async function saveUserCredential({ userId, credential }: {
     )
 }
 
+export async function deleteUserCredentials(userId: string) {
+    return (await credentialsCollection).deleteMany({ userId }).exec()
+}
+
 function getRPData(requestOrigin: string | undefined) {
     const { localhost, secureLocalhost, production } = config().origins
     const domain = config().domain

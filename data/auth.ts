@@ -4,7 +4,7 @@ import {
     initiatePasskeyLogin, verifyPasskeyLogin,
 } from '@/backend/passkey'
 import { generateToken, userIdFromToken } from '@/backend/token'
-import { userForId } from '@/backend/users'
+import { deleteUserForId, userForId } from '@/backend/users'
 import { RegistrationResponseJSON, AuthenticationResponseJSON } from '@simplewebauthn/browser'
 import { cookies, headers } from 'next/headers'
 
@@ -142,6 +142,18 @@ export async function fetchAuthData() {
         pictureUrl: user.pictureUrl,
         joined: user.joined.toString(),
     }
+}
+
+export async function deleteAccountAction() {
+    const userId = await getUserIdInsideRequest()
+    if (!userId) {
+        return false
+    }
+    const result = await deleteUserForId(userId)
+    if (result) {
+        setAuthToken(undefined)
+    }
+    return result
 }
 
 async function getOrigin() {

@@ -9,6 +9,7 @@ import {
     initPasskeySigninAction, verifyPasskeySigninAction,
     signOutAction,
     fetchAuthData,
+    deleteAccountAction,
 } from '@/data/auth'
 import { makeStateProvider } from './state'
 import { useContext } from 'react'
@@ -165,10 +166,23 @@ export function useAuth() {
             setData(current)
         }
     }
+    async function deleteAccount() {
+        setData({ state: 'loading' })
+        const result = await deleteAccountAction()
+        if (result) {
+            setData({ state: 'not-signed' })
+        } else {
+            setData({
+                state: 'error',
+                error: 'Failed to delete account',
+            })
+        }
+    }
 
     return {
         auth: data,
         registerWithPasskey, signInWithPasskey,
+        deleteAccount,
         signOut,
     }
 }

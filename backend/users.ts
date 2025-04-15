@@ -5,6 +5,7 @@ import { afterPrefix } from './utils'
 import { uniq } from 'lodash'
 import { userUploadsLibrary } from './uu'
 import { removeAllHighlightsForUserId } from './highlights'
+import { deleteUserCredentials } from './passkey'
 
 const schema = {
     joined: {
@@ -74,9 +75,16 @@ export async function deleteUserForId(id: string): Promise<boolean> {
     const deleteHighlightsPromise = removeAllHighlightsForUserId(id)
     const deleteBooksPromise = userUploadsLibrary.deleteAllBooksForUserId
         ? userUploadsLibrary.deleteAllBooksForUserId(id) : Promise.resolve(true)
+    const deleteCredentialsPromise = deleteUserCredentials(id)
 
-    const [deleteUserResult, deleteHighlightsResult, deleteBooksResult] = await Promise.all([
-        deleteUserPromise, deleteHighlightsPromise, deleteBooksPromise,
+    const [
+        deleteUserResult,
+        deleteHighlightsResult, deleteBooksResult,
+        _deleteCredentialsResult,
+    ] = await Promise.all([
+        deleteUserPromise,
+        deleteHighlightsPromise, deleteBooksPromise,
+        deleteCredentialsPromise,
     ])
     return deleteUserResult.deletedCount > 0 && deleteHighlightsResult && deleteBooksResult
 }

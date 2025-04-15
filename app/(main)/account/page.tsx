@@ -35,7 +35,7 @@ function SignedIn({ account }: {
         joined: string,
     },
 }) {
-    // const { deleteAccount } = useDeleteAccount()
+    const { deleteAccount } = useAuth()
     const [modal, setModal] = useState(false)
     const { push } = useRouter()
     function openModal() {
@@ -45,7 +45,7 @@ function SignedIn({ account }: {
         setModal(false)
     }
     async function performDelete() {
-        // await deleteAccount()
+        await deleteAccount()
         push(feedHref())
     }
     return (
