@@ -22,6 +22,7 @@ import { useFontScale } from '@/application/theme'
 import { filterHighlights } from './nodes'
 import { useAuth } from '@/application/auth'
 import { Copilot, CopilotState } from '@/components/Copilot'
+import { useHighlights } from '@/application/highlights'
 
 
 export function Reader({
@@ -33,7 +34,7 @@ export function Reader({
     const { auth } = useAuth()
     const self: ReaderUser | undefined = auth.user
     const fontScale = useFontScale()
-    const highlights: ReaderHighlight[] = useMemo(() => [], [])
+    const { highlights } = useHighlights(booq.id)
 
     const {
         onScroll, currentPage, totalPages, leftPages,
@@ -257,7 +258,7 @@ function useAugmentations({
                     }
                     : undefined
             case 'highlight': {
-                const highlight = highlights.find(hl => hl.id === id) as any // TODO: remove this cast!
+                const highlight = highlights.find(hl => hl.id === id)
                 return highlight
                     ? {
                         anchor,

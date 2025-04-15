@@ -21,8 +21,8 @@ export type ReaderAnchor = {
 
 export type ReaderUser = {
     id: string,
-    name?: string,
-    pictureUrl?: string,
+    name?: string | null,
+    pictureUrl?: string | null,
 }
 export type ReaderHighlight = {
     id: string,
@@ -30,7 +30,7 @@ export type ReaderHighlight = {
     end: BooqPath,
     group: string,
     text: string,
-    position: number | undefined,
+    position?: number | null,
     author: ReaderUser
 }
 export type ReaderTocItem = {

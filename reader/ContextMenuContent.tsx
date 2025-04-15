@@ -9,6 +9,7 @@ import { BooqSelection } from '@/viewer'
 import { ProfileBadge } from '@/components/ProfilePicture'
 import { colorForGroup, groups } from '@/application/common'
 import { ReaderHighlight, ReaderUser } from './common'
+import { useHighlightMutations } from '@/application/highlights'
 
 type EmptyTarget = {
     kind: 'empty',
@@ -92,7 +93,7 @@ function HighlightTargetMenu({
     setTarget: (target: ContextMenuTarget) => void,
     updateCopilot?: (selection: BooqSelection) => void,
 }) {
-    const isOwnHighlight = self?.id === highlight.author.id
+    const isOwnHighlight = self?.id === highlight.author?.id
     const selection = {
         range: {
             start: highlight.start,
@@ -184,8 +185,7 @@ function AddHighlightItem({
     self: ReaderUser | undefined,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
-    // const { addHighlight } = useHighlightMutations(booqId)
-    function addHighlight(input: any) { }
+    const { addHighlight } = useHighlightMutations(booqId)
     if (!self?.id) {
         return null
     }
@@ -203,7 +203,7 @@ function AddHighlightItem({
                             end: selection.range.end ?? selection.range.start,
                             text: selection.text,
                             author: self,
-                        }) as any // TODO: remove this cast!
+                        })
                         setTarget({
                             kind: 'highlight',
                             highlight,
@@ -235,8 +235,7 @@ function RemoveHighlightItem({
     booqId: string,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
-    // const { removeHighlight } = useHighlightMutations(booqId)
-    function removeHighlight(input: any) { }
+    const { removeHighlight } = useHighlightMutations(booqId)
     return <MenuItem
         text='Remove'
         icon='remove'
@@ -254,8 +253,7 @@ function SelectHighlightGroupItem({
     booqId: string,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
-    // const { updateHighlight } = useHighlightMutations(booqId)
-    function updateHighlight(input: any, second: any) { }
+    const { updateHighlight } = useHighlightMutations(booqId)
     return <div className='container'>
         {
             groups.map(

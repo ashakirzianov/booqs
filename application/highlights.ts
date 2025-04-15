@@ -1,6 +1,6 @@
 import { useQuery, useMutation, gql } from '@apollo/client'
 import { BooqPath, uniqueId } from '@/core'
-import { User } from './auth'
+import { useMemo } from 'react'
 
 const HighlightsQuery = gql`query HighlightsQuery($booqId: ID!) {
     booq(id: $booqId) {
@@ -46,9 +46,10 @@ export function useHighlights(booqId: string) {
         HighlightsQuery,
         { variables: { booqId } },
     )
+    const highlights = useMemo(() => data?.booq.highlights ?? [], [data])
     return {
         loading,
-        highlights: (data?.booq.highlights ?? []),
+        highlights,
     }
 }
 
@@ -93,7 +94,11 @@ export function useHighlightMutations(booqId: string) {
             end: BooqPath,
             group: string,
             text: string,
-            author: User,
+            author: {
+                id: string,
+                name?: string | null,
+                pictureUrl?: string | null,
+            },
         }): Highlight {
             const highlight = {
                 booqId,
