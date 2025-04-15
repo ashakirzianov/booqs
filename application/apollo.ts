@@ -8,14 +8,14 @@ const link = ApolloLink.from([
     onError(({ graphQLErrors, networkError }) => {
         if (graphQLErrors)
             graphQLErrors.forEach(({ message, locations, path }) =>
-                console.log(
+                console.error(
                     `[GraphQL error]: Message: ${message}, Location: ${locations?.join(' ')}, Path: ${path?.join(' ')}`,
                 ),
             )
-        if (networkError) console.log(`[Network error]: ${networkError}`)
+        if (networkError) console.error(`[Network error]: ${networkError}`)
     }),
     new HttpLink({
-        uri: `${process.env.NEXT_PUBLIC_BACKEND}/graphql`,
+        uri: `/api/graphql`,
         credentials: 'include',
     }),
 ])
