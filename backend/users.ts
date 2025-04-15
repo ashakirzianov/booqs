@@ -3,6 +3,8 @@ import { typedModel, TypeFromSchema, taggedObject } from './mongoose'
 import slugify from 'slugify'
 import { afterPrefix } from './utils'
 import { uniq } from 'lodash'
+import { uuSource } from './uu'
+import { removeAllHighlightsForUserId } from './highlights'
 
 const schema = {
     joined: {
@@ -64,6 +66,18 @@ export function userCollection(user: DbUser, name: string): DbCollection {
         default:
             return namedCollection(user, name)
     }
+}
+
+export async function deleteForId(id: string): Promise<boolean> {
+    const deleteUserPromise = (await collection).deleteOne({ _id: id }).exec()
+    const deleteHighlightsPromise = removeAllHighlightsForUserId(id)
+    const deleteBooksPromise = uuSource.deleteAllBooksForUserId
+        ? uuSource.deleteAllBooksForUserId(id) : Promise.resolve(true)
+
+    const [deleteUserResult, deleteHighlightsResult, deleteBooksResult] = await Promise.all([
+        deleteUserPromise, deleteHighlightsPromise, deleteBooksPromise,
+    ])
+    return deleteUserResult.deletedCount > 0 && deleteHighlightsResult && deleteBooksResult
 }
 
 function namedCollection(user: DbUser, name: string): DbCollection {
