@@ -1,4 +1,5 @@
 'use client'
+// TODO: remove provider and use useSWR instead
 import {
     browserSupportsWebAuthn,
     startRegistration, startAuthentication,

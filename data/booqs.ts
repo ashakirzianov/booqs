@@ -4,7 +4,8 @@ import {
     TableOfContentsItem,
 } from '@/core'
 import { booqImageUrl } from '@/backend/images'
-import { booqForId, libraryCardsForIds, LibraryCard, featuredBooqIds } from '@/backend/library'
+import { booqForId, libraryCardsForIds, LibraryCard, featuredBooqIds, booqsForAuthor } from '@/backend/library'
+import { userCollection, userForId } from '@/backend/users'
 
 export type Tag = {
     tag: string,
@@ -38,6 +39,24 @@ export async function featuredBooqCards(coverSize: number = 210): Promise<BooqCa
     const cards = filterUndefined(await libraryCardsForIds(ids))
         .map(card => buildBooqCard(card, coverSize))
     return filterUndefined(cards)
+}
+
+export async function booqCardsForAuthor(author: string): Promise<BooqCard[]> {
+    const cards = await booqsForAuthor(author)
+    return cards.map(card => buildBooqCard(card, 210))
+}
+
+export async function booqCollection(collection: string, userId: string | undefined): Promise<BooqCard[]> {
+    if (!userId) {
+        return []
+    }
+    const user = await userForId(userId)
+    if (!user) {
+        return []
+    }
+    const ids = userCollection(user, collection)
+    const cards = filterUndefined(await libraryCardsForIds(ids))
+    return cards.map(card => buildBooqCard(card, 210))
 }
 
 export async function booqCard(booqId: string) {

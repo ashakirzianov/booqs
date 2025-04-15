@@ -1,12 +1,15 @@
 import { READING_LIST_COLLECTION } from '@/application/collections'
-import { fetchQuery } from '@/application/server'
 import { BooqCollection } from '@/components/BooqCollection'
-import { gql } from '@apollo/client'
-import { cookies } from 'next/headers'
+import { getUserIdInsideRequest } from '@/data/auth'
+import { booqCollection } from '@/data/booqs'
 
 export default async function MyBooqs() {
-    const readingList = await fetchCollection(READING_LIST_COLLECTION)
-    const uploads = await fetchCollection('uploads')
+    const userId = await getUserIdInsideRequest()
+    const [readingList, uploads] = userId
+        ? await Promise.all([
+            booqCollection(READING_LIST_COLLECTION, userId), booqCollection('uploads', userId),
+        ])
+        : [[], []]
     return <>
         <BooqCollection
             title='Uploads'
@@ -18,50 +21,4 @@ export default async function MyBooqs() {
             collection={READING_LIST_COLLECTION}
         />
     </>
-}
-
-async function fetchCollection(collection: string) {
-    const CollectionQuery = gql`query Collection($name: String!) {
-        collection(name: $name) {
-            booqs {
-                id
-                title
-                cover
-                tags {
-                    tag
-                    value
-                }
-            }
-        }
-    }`
-    type CollectionData = {
-        collection: {
-            booqs: {
-                id: string,
-                title: string,
-                cover?: string,
-                tags: Array<{
-                    tag: string,
-                    value?: string,
-                }>,
-            }[],
-        }
-    }
-    type CollectionVars = {
-        name: string,
-    }
-
-    const allCookies = (await cookies()).getAll()
-    const result = await fetchQuery<CollectionData, CollectionVars>({
-        query: CollectionQuery,
-        variables: { name: collection },
-        cookies: allCookies,
-        options: {
-            cache: 'no-store',
-            headers: {
-                'booqs-operation': `collection:${collection}`,
-            },
-        },
-    })
-    return result.success ? result.data.collection.booqs : []
 }

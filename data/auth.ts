@@ -117,12 +117,16 @@ export async function signOutAction() {
     return true
 }
 
-export async function fetchAuthData() {
+export async function getUserIdInsideRequest() {
     const token = await getAuthToken()
     if (!token) {
         return undefined
     }
-    const userId = userIdFromToken(token)
+    return userIdFromToken(token)
+}
+
+export async function fetchAuthData() {
+    const userId = await getUserIdInsideRequest()
     if (!userId) {
         return undefined
     }
