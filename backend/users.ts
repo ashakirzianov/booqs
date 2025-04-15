@@ -26,7 +26,7 @@ const schema = {
 } as const
 const collection = typedModel('users', schema)
 
-type DbUser = TypeFromSchema<typeof schema>
+export type DbUser = TypeFromSchema<typeof schema>
 
 type StringMap<T> = {
     [k: string]: T,
@@ -68,7 +68,7 @@ export function userCollection(user: DbUser, name: string): DbCollection {
     }
 }
 
-export async function deleteForId(id: string): Promise<boolean> {
+export async function deleteUserForId(id: string): Promise<boolean> {
     const deleteUserPromise = (await collection).deleteOne({ _id: id }).exec()
     const deleteHighlightsPromise = removeAllHighlightsForUserId(id)
     const deleteBooksPromise = uuSource.deleteAllBooksForUserId

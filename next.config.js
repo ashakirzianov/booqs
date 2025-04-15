@@ -4,6 +4,7 @@ const nextConfig = {
         serverActions: {
             bodySizeLimit: '10mb',
         },
+        externalImports: true,
     },
     eslint: {
         dirs: [
@@ -11,10 +12,15 @@ const nextConfig = {
             'backend',
             'components', 'core',
             'data',
-            'parser',
-            'reader',
-            'viewer',
+            'graphql', 'parser', 'reader', 'viewer',
         ],
+    },
+    webpack(config) {
+        config.module.rules.push({
+            test: /\.graphql$/,
+            type: 'asset/source', // tells webpack to treat the file as a string
+        })
+        return config
     },
 }
 

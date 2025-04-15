@@ -59,12 +59,12 @@ export function processCard(prefix: string) {
     })
 }
 
-export async function forId(id: string) {
-    const [result] = await forIds([id])
+export async function libraryCardForId(id: string) {
+    const [result] = await libraryCardsForIds([id])
     return result
 }
 
-export async function forIds(ids: string[]): Promise<Array<LibraryCard | undefined>> {
+export async function libraryCardsForIds(ids: string[]): Promise<Array<LibraryCard | undefined>> {
     const parsed = filterUndefined(
         ids.map(idString => {
             const [source, id] = parseId(idString)
@@ -108,6 +108,17 @@ export async function booqForId(booqId: string) {
     }
 }
 
+export async function booqsForAuthor(author: string, limit?: number, offset?: number) {
+    const supported: Array<keyof typeof sources> = ['pg']
+    const results = await Promise.all(
+        supported.map(
+            source => sources[source]!.forAuthor(author, limit, offset)
+                .then(cards => cards.map(processCard(source))),
+        ),
+    )
+    return results.flat()
+}
+
 export async function uploadToSource(sourcePrefix: string, fileBuffer: Buffer, userId: string) {
     const uploadEpub = sources[sourcePrefix]?.uploadEpub
     if (uploadEpub) {
@@ -146,4 +157,57 @@ async function fileForId(booqId: string) {
     return source && id
         ? source.fileForId(id)
         : undefined
+}
+
+export async function searchBooqs(query: string, limit: number, scope: SearchScope[]): Promise<SearchResult[]> {
+    if (!query) {
+        return []
+    }
+    const cards = Object.entries(sources).map(
+        async ([prefix, source]) => {
+            if (source) {
+                const results = await source.search(query, limit, scope)
+                return results.map(processSearchResult(prefix))
+            } else {
+                return []
+            }
+        },
+    )
+
+    const all = await Promise.all(cards)
+    return all.flat()
+}
+
+function processSearchResult(prefix: string) {
+    const cardProcessor = processCard(prefix)
+    return function (result: SearchResult): SearchResult {
+        if (result.kind === 'book') {
+            return {
+                ...result,
+                card: cardProcessor(result.card),
+            }
+        } else {
+            return result
+        }
+    }
+}
+
+export async function featuredBooqIds(_limit?: number) {
+    return [
+        'pg/55201',
+        'pg/1635',
+        'pg/3207',
+        'pg/2680',
+        'pg/11',
+        'pg/1661',
+        'pg/98',
+        'pg/174',
+        'pg/844',
+        'pg/203',
+        'pg/28054',
+        'pg/5740',
+        'pg/135',
+        'pg/1727',
+        'pg/4363',
+    ]
 }

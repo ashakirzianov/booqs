@@ -4,7 +4,7 @@ import {
     TableOfContentsItem,
 } from '@/core'
 import { booqImageUrl } from '@/backend/images'
-import { booqForId, forIds, LibraryCard } from '@/backend/library'
+import { booqForId, libraryCardsForIds, LibraryCard, featuredBooqIds } from '@/backend/library'
 
 export type Tag = {
     tag: string,
@@ -30,34 +30,18 @@ export type BooqPartData = {
 }
 
 export async function featuredIds() {
-    return [
-        'pg/55201',
-        'pg/1635',
-        'pg/3207',
-        'pg/2680',
-        'pg/11',
-        'pg/1661',
-        'pg/98',
-        'pg/174',
-        'pg/844',
-        'pg/203',
-        'pg/28054',
-        'pg/5740',
-        'pg/135',
-        'pg/1727',
-        'pg/4363',
-    ]
+    return featuredBooqIds()
 }
 
 export async function featuredBooqCards(coverSize: number = 210): Promise<BooqCard[]> {
     const ids = await featuredIds()
-    const cards = filterUndefined(await forIds(ids))
+    const cards = filterUndefined(await libraryCardsForIds(ids))
         .map(card => buildBooqCard(card, coverSize))
     return filterUndefined(cards)
 }
 
 export async function booqCard(booqId: string) {
-    const [card] = await forIds([booqId])
+    const [card] = await libraryCardsForIds([booqId])
     return card
 }
 
