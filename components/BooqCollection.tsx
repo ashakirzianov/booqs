@@ -1,8 +1,9 @@
 import { BooqCard, BooqCardData } from '@/components/BooqCard'
 import Link from 'next/link'
 import { booqHref } from './Links'
+import { CollectionButton } from './CollectionButton'
 export function BooqCollection({
-    cards, title,
+    cards, title, collection,
 }: {
     title?: string,
     cards: BooqCardData[],
@@ -27,6 +28,10 @@ export function BooqCollection({
                                 card={card}
                                 actions={<>
                                     <ReadButton booqId={card.id} />
+                                    <CollectionButton
+                                        booqId={card.id}
+                                        collection={collection}
+                                    />
                                 </>}
                             />
                         </li>

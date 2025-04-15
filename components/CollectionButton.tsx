@@ -7,7 +7,8 @@ export function CollectionButton({ booqId, collection }: {
     booqId: string,
     collection?: string,
 }) {
-    const { signed } = useAuth() ?? {}
+    const { auth } = useAuth()
+    const signed = auth.state === 'signed'
     if (!signed || !collection) {
         return null
     } else {
