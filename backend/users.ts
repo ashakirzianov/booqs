@@ -57,6 +57,7 @@ export async function createUser(user: Omit<DbUser, '_id' | 'username' | 'joined
 
 export type DbCollection = string[]
 export function userCollection(user: DbUser, name: string): DbCollection {
+    // TODO: reconsider this madness
     switch (name) {
         case 'my-books':
             return combineCollections([
@@ -126,7 +127,7 @@ export async function removeFromCollection(
 }
 
 export async function addUpload(userId: string, uploadId: string) {
-    return addToCollection(userId, 'uploads', `uu/${uploadId}`)
+    return addToCollection(userId, 'uploads', uploadId)
 }
 
 export type DbBookmark = BookmarkData & { id: string }
