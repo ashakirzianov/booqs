@@ -4,7 +4,6 @@ const nextConfig = {
         serverActions: {
             bodySizeLimit: '10mb',
         },
-        externalImports: true,
     },
     eslint: {
         dirs: [
