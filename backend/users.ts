@@ -4,6 +4,40 @@ import slugify from 'slugify'
 import { afterPrefix } from './utils'
 import { uniq } from 'lodash'
 
+const schema = {
+    joined: {
+        type: Date,
+        required: true,
+    },
+    username: {
+        type: String,
+        required: true,
+    },
+    name: String,
+    facebookId: String,
+    appleId: String,
+    pictureUrl: String,
+    email: String,
+    bookmarks: taggedObject<StringMap<BookmarkData>>(),
+    history: taggedObject<StringMap<StringMap<BooqHistoryData>>>(),
+    collections: [String],
+} as const
+const collection = typedModel('users', schema)
+
+type DbUser = TypeFromSchema<typeof schema>
+
+type StringMap<T> = {
+    [k: string]: T,
+}
+type BookmarkData = {
+    booqId: string,
+    path: BooqPath,
+}
+type BooqHistoryData = {
+    path: BooqPath,
+    date: Date,
+}
+
 export async function userForId(id: string) {
     return (await collection).findById(id).exec()
 }
@@ -81,6 +115,44 @@ export async function addUpload(userId: string, uploadId: string) {
     return addToCollection(userId, 'uploads', `uu/${uploadId}`)
 }
 
+export type DbBookmark = BookmarkData & { id: string }
+
+export function userBookmarks(user: DbUser, booqId: string): DbBookmark[] {
+    return Object.entries(user.bookmarks ?? {}).map(([id, data]) => ({
+        id,
+        ...data,
+    })).filter(bm => bm.booqId === booqId)
+}
+
+export async function addBookmark(
+    userId: string,
+    { id, ...data }: DbBookmark,
+) {
+    const result = await (await collection).findByIdAndUpdate(
+        userId,
+        {
+            [`bookmarks.${id}`]: data,
+        },
+    ).exec()
+
+    return result ? true : false
+}
+
+export async function deleteBookmark(
+    userId: string,
+    { id }: Pick<DbBookmark, 'id'>,
+) {
+    const result = await (await collection).findByIdAndUpdate(
+        userId,
+        {
+            $unset: { [`bookmarks.${id}`]: '' },
+        },
+    ).exec()
+
+    return result ? true : false
+}
+
+
 
 type UserDataForNameGeneration = {
     name?: string,
@@ -111,40 +183,6 @@ function generateUsername({ name, email }: UserDataForNameGeneration) {
         locale: 'en',
     })
     return username
-}
-
-const schema = {
-    joined: {
-        type: Date,
-        required: true,
-    },
-    username: {
-        type: String,
-        required: true,
-    },
-    name: String,
-    facebookId: String,
-    appleId: String,
-    pictureUrl: String,
-    email: String,
-    bookmarks: taggedObject<StringMap<BookmarkData>>(),
-    history: taggedObject<StringMap<StringMap<BooqHistoryData>>>(),
-    collections: [String],
-} as const
-const collection = typedModel('users', schema)
-
-type DbUser = TypeFromSchema<typeof schema>
-
-type StringMap<T> = {
-    [k: string]: T,
-}
-type BookmarkData = {
-    booqId: string,
-    path: BooqPath,
-}
-type BooqHistoryData = {
-    path: BooqPath,
-    date: Date,
 }
 
 export type DbBooqHistory = BooqHistoryData & {
