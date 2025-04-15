@@ -3,7 +3,7 @@ import { typedModel, TypeFromSchema, taggedObject } from './mongoose'
 import slugify from 'slugify'
 import { afterPrefix } from './utils'
 import { uniq } from 'lodash'
-import { uuSource } from './uu'
+import { userUploadsLibrary } from './uu'
 import { removeAllHighlightsForUserId } from './highlights'
 
 const schema = {
@@ -71,8 +71,8 @@ export function userCollection(user: DbUser, name: string): DbCollection {
 export async function deleteUserForId(id: string): Promise<boolean> {
     const deleteUserPromise = (await collection).deleteOne({ _id: id }).exec()
     const deleteHighlightsPromise = removeAllHighlightsForUserId(id)
-    const deleteBooksPromise = uuSource.deleteAllBooksForUserId
-        ? uuSource.deleteAllBooksForUserId(id) : Promise.resolve(true)
+    const deleteBooksPromise = userUploadsLibrary.deleteAllBooksForUserId
+        ? userUploadsLibrary.deleteAllBooksForUserId(id) : Promise.resolve(true)
 
     const [deleteUserResult, deleteHighlightsResult, deleteBooksResult] = await Promise.all([
         deleteUserPromise, deleteHighlightsPromise, deleteBooksPromise,

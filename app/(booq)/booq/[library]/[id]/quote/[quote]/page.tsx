@@ -5,7 +5,7 @@ import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 
 type Params = Promise<{
-    source: string,
+    library: string,
     id: string,
     quote: string,
 }>
@@ -15,8 +15,8 @@ export async function generateMetadata({
 }: {
     params: Params,
 }): Promise<Metadata> {
-    const { source, id, quote } = await params
-    const booqId = `${source}/${id}`
+    const { library, id, quote } = await params
+    const booqId = `${library}/${id}`
     const booqRange = rangeFromString(quote)
     const meta = await booqPreview(booqId, booqRange?.start, booqRange?.end)
     return {
@@ -30,8 +30,8 @@ export default async function BooqPathPage({
 }: {
     params: Params,
 }) {
-    const { source, id, quote } = await params
-    const booqId = `${source}/${id}`
+    const { library, id, quote } = await params
+    const booqId = `${library}/${id}`
     const quoteRange = rangeFromString(quote)
     if (!quoteRange)
         return notFound()

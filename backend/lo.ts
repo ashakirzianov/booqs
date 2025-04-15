@@ -1,10 +1,10 @@
 import { join } from 'path'
 import { promisify } from 'util'
 import { readFile } from 'fs'
-import { LibrarySource } from './library'
+import { Library } from './library'
 
 const epubsRoot = join('public', 'epubs')
-export const loSource: LibrarySource = {
+export const localLibrary: Library = {
     async search() { return [] },
     async forAuthor() { return [] },
     async cards(ids: string[]) {

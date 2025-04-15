@@ -1,9 +1,9 @@
-import type { LibrarySource, LibraryCard, SearchScope, SearchResult } from './library'
+import type { Library, LibraryCard, SearchScope, SearchResult } from './library'
 import { typedModel, TypeFromSchema, taggedObject } from './mongoose'
 import { uniqBy } from 'lodash'
 import { downloadAsset } from './s3'
 
-export const pgSource: LibrarySource = {
+export const pgLibrary: Library = {
     search,
     cards,
     fileForId,

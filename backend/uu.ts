@@ -1,14 +1,14 @@
 import { createHash } from 'crypto'
 import { ReadStream } from 'fs'
 import { inspect } from 'util'
-import type { LibraryCard, LibrarySource, SearchResult } from './library'
+import type { LibraryCard, Library, SearchResult } from './library'
 import { typedModel, TypeFromSchema, taggedObject, DocumentType } from './mongoose'
 import { parseEpub } from '@/parser'
 import { Booq, nodesLength, uniqueId } from '@/core'
 import { deleteAsset, downloadAsset, uploadAsset } from './s3'
 import mongoose from 'mongoose'
 
-export const uuSource: LibrarySource = {
+export const userUploadsLibrary: Library = {
     search, cards, fileForId,
     uploadEpub,
     deleteAllBooksForUserId,
