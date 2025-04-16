@@ -1,71 +1,53 @@
+import { uploadEpubAction } from '@/data/upload'
 import { useState } from 'react'
 
 export type FileData = File
 
 export function useUpload() {
-    const [loading, setLoading] = useState(false)
-    const [result, setResult] = useState<UploadResult | undefined>(undefined)
-    const [error, setError] = useState<string | undefined>(undefined)
+    type UploadState = {
+        state: 'not-started',
+    } | {
+        state: 'loading',
+    } | {
+        state: 'error',
+        error: string,
+    } | {
+        state: 'success',
+        data: {
+            id: string,
+            title?: string,
+            cover?: string,
+        },
+    }
+    const [state, setState] = useState<UploadState>({
+        state: 'not-started',
+    })
     async function uploadFile(file: FileData) {
-        setLoading(true)
-        setResult(undefined)
-        setError(undefined)
-        const result = await fetchUploadFile(file)
+        setState({
+            state: 'loading',
+        })
+        const result = await uploadEpubAction(file)
         if (result.success) {
-            setResult(result.data)
+            setState({
+                state: 'success',
+                data: {
+                    id: result.id,
+                    title: result.title,
+                    cover: result.cover,
+                }
+            })
         } else {
-            setError(result.error)
+            setState({
+                state: 'error',
+                error: result.error ?? 'Unknown error',
+            })
         }
-        setLoading(false)
         return result
     }
     return {
-        uploadFile, loading, result, error,
-    }
-}
-
-type UploadResult = {
-    id: string,
-    title?: string,
-    cover?: string,
-}
-async function fetchUploadFile(file: FileData) {
-    const back = process.env.NEXT_PUBLIC_BACKEND
-    if (back === undefined)
-        throw new Error('NEXT_PUBLIC_BACKEND is undefined')
-    const url = `${back}/upload`
-    try {
-        const formData = new FormData()
-        formData.append('file', file)
-
-        const response = await fetch(url, {
-            method: 'POST',
-            body: formData,
-            credentials: 'include',
-        })
-        if (response.ok) {
-            const result: UploadResult = await response.json()
-            if (!result?.id) {
-                return {
-                    success: false,
-                    error: `Upload failed: no id returned: ${result}`,
-                }
-            }
-            return {
-                success: true,
-                data: result,
-            }
-        } else {
-            return {
-                success: false,
-                error: `Upload failed with ${response.status}: ${response.statusText}`,
-            }
-        }
-    } catch (err) {
-        const message = (err as any)?.message ?? 'Unknown error'
-        return {
-            success: false,
-            error: `An error occurred: ${message}`,
-        }
+        uploadFile,
+        loading: state.state === 'loading',
+        result: state.state === 'success' ? state.data : undefined,
+        error: state.state === 'error' ? state.error : undefined,
     }
 }

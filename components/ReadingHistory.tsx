@@ -10,12 +10,12 @@ import { useIsMounted } from '@/application/utils'
 import { Ellipsis } from './Loading'
 
 export default function ReadingHistory() {
-    const { signed } = useAuth() ?? {}
+    const { auth } = useAuth()
     const { history } = useHistory()
     const mounted = useIsMounted()
     if (!mounted) {
         return <Panel><Ellipsis /></Panel>
-    } else if (!signed) {
+    } else if (auth.state !== 'signed') {
         return <SignInPanel />
     } else if (!history.length) {
         return <Panel>

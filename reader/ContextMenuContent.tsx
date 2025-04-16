@@ -1,3 +1,4 @@
+'use client'
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import * as clipboard from 'clipboard-polyfill'
@@ -6,9 +7,9 @@ import { MenuItem } from '@/components/Menu'
 import { quoteHref } from '@/components/Links'
 import { BooqSelection } from '@/viewer'
 import { ProfileBadge } from '@/components/ProfilePicture'
-import { Highlight, useHighlightMutations } from '@/application/highlights'
-import { User } from '@/application/auth'
 import { colorForGroup, groups } from '@/application/common'
+import { ReaderHighlight, ReaderUser } from './common'
+import { useHighlightMutations } from '@/application/highlights'
 
 type EmptyTarget = {
     kind: 'empty',
@@ -23,7 +24,7 @@ type QuoteTarget = {
 }
 type HighlightTarget = {
     kind: 'highlight',
-    highlight: Highlight,
+    highlight: ReaderHighlight,
 }
 export type ContextMenuTarget =
     | EmptyTarget | SelectionTarget | QuoteTarget | HighlightTarget
@@ -33,7 +34,7 @@ export function ContextMenuContent({
 }: {
     target: ContextMenuTarget,
     booqId: string,
-    self: User | undefined,
+    self: ReaderUser | undefined,
     setTarget: (target: ContextMenuTarget) => void,
     updateCopilot?: (selection: BooqSelection) => void,
 }) {
@@ -54,7 +55,7 @@ function SelectionTargetMenu({
 }: {
     target: SelectionTarget,
     booqId: string,
-    self: User | undefined,
+    self: ReaderUser | undefined,
     setTarget: (target: ContextMenuTarget) => void,
     updateCopilot?: (selection: BooqSelection) => void,
 }) {
@@ -72,7 +73,7 @@ function QuoteTargetMenu({
 }: {
     target: QuoteTarget,
     booqId: string,
-    self: User | undefined,
+    self: ReaderUser | undefined,
     setTarget: (target: ContextMenuTarget) => void,
     updateCopilot?: (selection: BooqSelection) => void,
 }) {
@@ -88,11 +89,11 @@ function HighlightTargetMenu({
 }: {
     target: HighlightTarget,
     booqId: string,
-    self: User | undefined,
+    self: ReaderUser | undefined,
     setTarget: (target: ContextMenuTarget) => void,
     updateCopilot?: (selection: BooqSelection) => void,
 }) {
-    const isOwnHighlight = self?.id === highlight.author.id
+    const isOwnHighlight = self?.id === highlight.author?.id
     const selection = {
         range: {
             start: highlight.start,
@@ -181,7 +182,7 @@ function AddHighlightItem({
 }: {
     selection: BooqSelection,
     booqId: string,
-    self: User | undefined,
+    self: ReaderUser | undefined,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
     const { addHighlight } = useHighlightMutations(booqId)
@@ -230,7 +231,7 @@ function AddHighlightItem({
 function RemoveHighlightItem({
     highlight, booqId, setTarget,
 }: {
-    highlight: Highlight,
+    highlight: ReaderHighlight,
     booqId: string,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
@@ -248,7 +249,7 @@ function RemoveHighlightItem({
 function SelectHighlightGroupItem({
     highlight, booqId, setTarget,
 }: {
-    highlight: Highlight,
+    highlight: ReaderHighlight,
     booqId: string,
     setTarget: (target: ContextMenuTarget) => void,
 }) {

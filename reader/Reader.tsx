@@ -1,51 +1,41 @@
 'use client'
-import React, { useState, useCallback, useMemo } from 'react'
-import { positionForPath, samePath, BooqPath, BooqRange, contextForRange, BooqNode } from '@/core'
+import React, { useCallback, useMemo, useState } from 'react'
+import { BooqPath, BooqRange, contextForRange, positionForPath, samePath } from '@/core'
 import { BorderButton, IconButton } from '@/components/Buttons'
 import { BooqLink, FeedLink, booqHref } from '@/components/Links'
 import { Spinner } from '@/components/Loading'
-import { ThemerButton } from '@/components/Themer'
-import { SignInButton } from '@/components/SignIn'
 import {
     BooqContent, getAugmentationElement, getAugmentationText,
     Augmentation,
-    useOnBooqClick, useOnBooqScroll,
+    useOnBooqClick,
+    useOnBooqScroll,
 } from '@/viewer'
-import { useContextMenu, ContextMenuState } from './ContextMenu'
-import { useNavigationPanel } from './Navigation'
+import { useContextMenu, type ContextMenuState } from './ContextMenu'
 import { ReaderLayout } from './ReaderLayout'
-import { useFontScale } from '@/application/settings'
-import { useFilteredHighlights } from '@/application/navigation'
-import { colorForGroup, pageForPosition, quoteColor } from '@/application/common'
-import { useReportHistory } from '@/application/history'
-import { User, useAuth } from '@/application/auth'
+import { colorForGroup, currentSource, pageForPosition, quoteColor } from '@/application/common'
+import { SignInButton } from '@/components/SignIn'
+import { ReaderAnchor, ReaderBooq, ReaderHighlight, ReaderUser } from './common'
+import { NavigationPanel, useNavigationState } from './NavigationPanel'
+import { reportBooqHistory } from '@/data/user'
+import { ThemerButton } from '@/components/Themer'
+import { useFontScale } from '@/application/theme'
+import { filterHighlights } from './nodes'
+import { useAuth } from '@/application/auth'
 import { Copilot, CopilotState } from '@/components/Copilot'
+import { useHighlights } from '@/application/highlights'
 
-type ReaderBooq = {
-    id: string,
-    title?: string,
-    author?: string,
-    language?: string,
-    length: number,
-    fragment: {
-        nodes: BooqNode[],
-        previous?: ReaderAnchor,
-        current: ReaderAnchor,
-        next?: ReaderAnchor,
-    }
-}
-type ReaderAnchor = {
-    title?: string,
-    path: BooqPath,
-}
+
 export function Reader({
     booq, quote,
 }: {
     booq: ReaderBooq,
     quote?: BooqRange,
 }) {
-    const self = useAuth()
+    const { auth } = useAuth()
+    const self: ReaderUser | undefined = auth.user
     const fontScale = useFontScale()
+    const { highlights } = useHighlights(booq.id)
+
     const {
         onScroll, currentPage, totalPages, leftPages,
     } = useScrollHandler(booq)
@@ -56,7 +46,40 @@ export function Reader({
         start: booq.fragment.current.path,
         end: booq.fragment.next?.path ?? [booq.fragment.nodes.length],
     }), [booq])
-    const { augmentations, menuStateForAugmentation } = useAugmentations(booq.id, quote, self)
+
+    const {
+        navigationOpen, navigationSelection,
+        toggleNavigationOpen, closeNavigation,
+        toggleNavigationSelection,
+    } = useNavigationState()
+    const NavigationContent = <NavigationPanel
+        booqId={booq.id}
+        title={booq.title ?? 'Untitled'}
+        toc={booq.toc}
+        highlights={highlights}
+        selection={navigationSelection}
+        self={self}
+        toggleSelection={toggleNavigationSelection}
+        closeSelf={closeNavigation}
+    />
+    const NavigationButton = <IconButton
+        icon='toc'
+        onClick={toggleNavigationOpen}
+        isSelected={navigationOpen}
+    />
+
+    const filteredHighlights = useMemo(
+        () => filterHighlights({
+            highlights,
+            selection: navigationSelection,
+            self,
+        }), [highlights, navigationSelection, self]
+    )
+
+    const { augmentations, menuStateForAugmentation } = useAugmentations({
+        highlights: filteredHighlights,
+        quote: quote,
+    })
     const { visible, toggle } = useControlsVisibility()
     useOnBooqClick(toggle)
 
@@ -64,9 +87,6 @@ export function Reader({
     const leftLabel = leftPages <= 1 ? 'Last page'
         : `${leftPages} pages left`
 
-    const {
-        navigationOpen, NavigationButton, NavigationContent,
-    } = useNavigationPanel(booq.id, self)
     const [copilotState, setCopilotState] = useState<CopilotState>({
         kind: 'empty',
     })
@@ -96,8 +116,10 @@ export function Reader({
         }
     }, [menuStateForAugmentation, setMenuState])
 
+    const isControlsVisible = !contextMenuVisible && !copilotVisible && visible
+
     return <ReaderLayout
-        isControlsVisible={!contextMenuVisible && !copilotVisible && visible}
+        isControlsVisible={isControlsVisible}
         isNavigationOpen={navigationOpen}
         BooqContent={<div style={{
             fontFamily: 'var(--font-book)',
@@ -192,8 +214,12 @@ function isAnythingSelected() {
         || selection.anchorOffset !== selection.focusOffset
 }
 
-function useAugmentations(booqId: string, quote?: BooqRange, self?: User) {
-    const highlights = useFilteredHighlights(booqId, self)
+function useAugmentations({
+    quote, highlights,
+}: {
+    highlights: ReaderHighlight[],
+    quote?: BooqRange,
+}) {
     const augmentations = useMemo(() => {
         const augmentations = highlights.map<Augmentation>(h => ({
             id: `highlight/${h.id}`,
@@ -255,7 +281,6 @@ function useAugmentations(booqId: string, quote?: BooqRange, self?: User) {
 
 function useScrollHandler({ id, fragment, length }: ReaderBooq) {
     const [currentPath, setCurrentPath] = useState(fragment.current.path)
-    const { reportHistory } = useReportHistory()
 
     const position = positionForPath(fragment.nodes, currentPath)
     const nextChapter = fragment.next
@@ -269,9 +294,10 @@ function useScrollHandler({ id, fragment, length }: ReaderBooq) {
     const onScroll = function (path: BooqPath) {
         if (!samePath(path, currentPath)) {
             setCurrentPath(path)
-            reportHistory({
+            reportBooqHistory({
                 booqId: id,
                 path,
+                source: currentSource(),
             })
         }
     }

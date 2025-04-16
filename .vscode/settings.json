@@ -49,5 +49,6 @@
         "xfbml",
         "xmls",
         "yxxx"
-    ]
+    ],
+    "typescript.tsdk": "node_modules/typescript/lib"
 }

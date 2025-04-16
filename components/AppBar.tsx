@@ -6,21 +6,21 @@ export function AppBar({ left, right }: {
     left?: ReactNode,
     right?: ReactNode,
 }) {
-    return <div className="flex flex-row items-center w-screen h-header py-xl px-4 gap-4">
-        <div className="hidden sm:flex grow-0">
+    return <nav className="flex flex-row items-center w-screen h-header py-xl px-4 gap-4">
+        <section className="hidden sm:flex grow-0">
             <Link href={feedHref()}>
                 <Logo />
             </Link>
-        </div>
-        <div className="flex grow">
+        </section>
+        <section className="flex grow">
             {left}
-        </div>
-        <div className="flex flex-col">
+        </section>
+        <section className="flex flex-col">
             <div className='flex flex-row grow justify-between items-center gap-4'>
                 {right}
             </div>
-        </div>
-    </div>
+        </section>
+    </nav>
 }
 
 function Logo() {

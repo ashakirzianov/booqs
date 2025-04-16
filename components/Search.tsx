@@ -56,7 +56,6 @@ function SearchModal({
                 } else if (e.key === 'Enter' && results.length > 0) {
                     if (selected < authors.length) {
                         const author = authors[selected]
-                        console.log(author)
                         push(authorHref(author.name))
                     } else {
                         const booq = booqs[selected - authors.length]

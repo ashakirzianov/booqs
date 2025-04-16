@@ -4,7 +4,6 @@ import { useRouter } from 'next/navigation'
 import { AppProvider } from '@/application/provider'
 import { useAuth } from '@/application/auth'
 import { useIsMounted } from '@/application/utils'
-import { useDeleteAccount } from '@/application/auth'
 import { Spinner } from '@/components/Loading'
 import { feedHref } from '@/components/Links'
 import { Modal } from '@/components/Modal'
@@ -24,9 +23,9 @@ export default function Account() {
 }
 
 function AccountMounted() {
-    const state = useAuth()
-    return state
-        ? <SignedIn account={state} />
+    const { auth } = useAuth()
+    return auth.state === 'signed'
+        ? <SignedIn account={auth.user} />
         : <NotSigned />
 }
 
@@ -36,7 +35,7 @@ function SignedIn({ account }: {
         joined: string,
     },
 }) {
-    const { deleteAccount } = useDeleteAccount()
+    const { deleteAccount } = useAuth()
     const [modal, setModal] = useState(false)
     const { push } = useRouter()
     function openModal() {

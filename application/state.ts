@@ -1,95 +1,53 @@
-import { ReactNode, createContext, createElement, useContext, useEffect, useState } from 'react'
-import { syncStorageCell } from './storage'
-import type { AuthState } from './auth'
-import { Settings } from './settings'
-import { NavigationState } from './navigation'
+'use client'
+import { ReactNode, createContext, createElement, useEffect, useMemo, useRef, useState } from 'react'
 
-export type SetterOrUpdater<T> = (value: T | ((prev: T) => T)) => void
-export type AppState = {
-    currentUser?: AuthState,
-    settings: Settings,
-    navigationState: NavigationState,
-}
-
-const key = 'user-data'
-const storage = syncStorageCell<AppState>(key, '0.1.0')
-const initialData: AppState = {
-    currentUser: undefined,
-    settings: {
-        fontScale: 120,
-    },
-    navigationState: {
-        showChapters: true,
-        showHighlights: true,
-        showAuthors: [],
-    },
-}
-
-const userContext = createContext({
-    data: initialData,
-    setData: (_: AppState | ((v: AppState) => AppState)) => { },
-})
-
-export function AppStateProvider({ children }: {
-    children: ReactNode,
+type StateConstraint = object | string | number | boolean
+export type SetterOrValue<State> = State | ((state: State) => State)
+export type StateSetter<State> = (setterOrValue: SetterOrValue<State>) => void
+export function makeStateProvider<State extends StateConstraint>({
+    initialData, onMount,
+}: {
+    key: string,
+    initialData: State,
+    onMount?: (data: State, setData: StateSetter<State>) => void,
 }) {
-    const [data, setData] = useState(initialData)
-    // Restore on mount
-    useEffect(() => {
-        if (typeof window !== 'undefined') {
-            const restored = storage.restore()
-            if (restored) {
-                setData(restored)
-            }
-        }
-    }, [])
-    // Handle storage events from this tab
-    useEffect(() => {
-        return storage.subscribe(data => {
-            console.log('storage updated', data)
-            setData(data)
-        })
-    }, [])
-    // Handle storage events from other tabs
-    useEffect(() => {
-        function handleStorage(e: StorageEvent) {
-            if (e.key === key) {
-                const restored = storage.restore()
-                if (restored) {
-                    setData(restored)
-                }
-            }
-        }
-        window.addEventListener('storage', handleStorage)
-        return () => {
-            window.removeEventListener('storage', handleStorage)
-        }
-    }, [])
-    return createElement(
-        userContext.Provider,
-        {
-            value: {
-                data,
-                setData(setter) {
-                    if (typeof setter === 'function') {
-                        const value = setter(data)
-                        // setData(value)
-                        storage.store(value)
-                    } else {
-                        // setData(data)
-                        storage.store(data)
-                    }
-                }
-            }
+
+    type ContextValue = {
+        data: State,
+        setData: StateSetter<State>,
+    }
+    const Context = createContext<ContextValue>({
+        data: initialData,
+        setData: () => {
         },
-        children
-    )
-}
+    })
 
-export function useAppState() {
-    return useContext(userContext).data
-}
+    function StateProvider({ children }: {
+        children: ReactNode,
+    }) {
+        const [data, setData] = useState(initialData)
+        const value = useMemo<ContextValue>(() => ({
+            data,
+            setData,
+        }), [data])
+        const ref = useRef(value)
+        // On mount hook
+        useEffect(() => {
+            if (onMount) {
+                onMount(ref.current.data, ref.current.setData)
+            }
+        }, [ref])
 
-export function useAppStateSetter() {
-    return useContext(userContext).setData
+        return createElement(
+            Context.Provider,
+            {
+                value,
+                children,
+            }
+        )
+    }
+    return {
+        StateProvider,
+        Context,
+    }
 }

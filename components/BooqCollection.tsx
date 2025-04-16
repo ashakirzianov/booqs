@@ -10,7 +10,7 @@ export function BooqCollection({
     collection?: string,
 }) {
     return (
-        <div className='flex flex-row justify-center'>
+        <section className='flex flex-row justify-center'>
             <div className='flex flex-col items-center max-w-[100rem]'>
                 {title
                     ? <h1 className='font-bold p-4 text-2xl self-start'>{title}</h1>
@@ -27,15 +27,18 @@ export function BooqCollection({
                             <BooqCard
                                 card={card}
                                 actions={<>
-                                    <CollectionButton booqId={card.id} collection={collection} />
                                     <ReadButton booqId={card.id} />
+                                    <CollectionButton
+                                        booqId={card.id}
+                                        collection={collection}
+                                    />
                                 </>}
                             />
                         </li>
                     ))}
                 </ul>
             </div>
-        </div>
+        </section>
     )
 }
 

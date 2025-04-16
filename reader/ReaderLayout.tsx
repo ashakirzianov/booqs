@@ -5,14 +5,14 @@ type ControlsProps = {
     isControlsVisible: boolean,
     isNavigationOpen: boolean,
     MainButton: ReactNode,
-    NavigationButton: ReactNode,
-    ThemerButton: ReactNode,
-    AccountButton: ReactNode,
-    CurrentPage: ReactNode,
-    PagesLeft: ReactNode,
-    NavigationContent: ReactNode,
-    ContextMenu: ReactNode,
-    Copilot: ReactNode,
+    NavigationButton?: ReactNode,
+    ThemerButton?: ReactNode,
+    AccountButton?: ReactNode,
+    CurrentPage?: ReactNode,
+    PagesLeft?: ReactNode,
+    NavigationContent?: ReactNode,
+    ContextMenu?: ReactNode,
+    Copilot?: ReactNode,
 }
 
 type LayoutProps = ControlsProps & {

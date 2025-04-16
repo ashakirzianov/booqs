@@ -1,5 +1,5 @@
-import { useQuery, gql } from '@apollo/client'
 import { BooqPath } from '@/core'
+import useSWR from 'swr'
 
 export type CopilotContext = {
     text: string,
@@ -12,57 +12,38 @@ export type CopilotContext = {
     end: BooqPath,
 }
 
-const SuggestQuery = gql`query SuggestQuery($context: CopilotContext!) {
-    copilot(context: $context) {
-        suggestions
-    }
-}`
-type SuggestData = {
-    copilot: {
-        suggestions: string[],
-    }
-}
-type SuggestVars = {
-    context: CopilotContext,
-}
-export function useCopilotSuggestions(context: CopilotContext) {
-    const { loading, data } = useQuery<SuggestData, SuggestVars>(
-        SuggestQuery,
-        {
-            variables: { context },
-            fetchPolicy: 'no-cache',
-            nextFetchPolicy: 'no-cache',
+async function postFetcher(path: string, body: object) {
+    const res = await fetch(path, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
         },
+        body: JSON.stringify(body),
+    })
+    return res.json()
+}
+
+export function useCopilotSuggestions(context: CopilotContext) {
+    const { data, isLoading } = useSWR<string[]>(
+        '/api/copilot/suggestions',
+        (key: string) => postFetcher(key, context),
     )
     return {
-        loading,
-        suggestions: (data?.copilot.suggestions ?? []),
+        loading: isLoading,
+        suggestions: (data ?? []),
     }
 }
 
-const AnswerQuery = gql`query AnswerQuery($context: CopilotContext!, $question: String!) {
-    copilot(context: $context) {
-        answer(question: $question)
-    }
-}`
-type AnswerData = {
-    copilot: {
-        answer: string,
-    }
-}
-type AnserVars = {
-    context: CopilotContext,
-    question: string,
-}
 export function useCopilotAnswer(context: CopilotContext, question: string) {
-    const { loading, data } = useQuery<AnswerData, AnserVars>(
-        AnswerQuery,
-        {
-            variables: { context, question },
-        },
+    const { data, isLoading } = useSWR<string[]>(
+        '/api/copilot/answer',
+        (key: string) => postFetcher(key, {
+            ...context,
+            question,
+        }),
     )
     return {
-        loading,
-        answer: (data?.copilot.answer ?? ''),
+        loading: isLoading,
+        answer: (data ?? []),
     }
 }

@@ -24,6 +24,9 @@ const eslintConfig = [
         },
         rules: {
             '@stylistic/ts/semi': ['error', 'never'],
+            'prefer-const': ['error', {
+                destructuring: 'all'
+            }],
             'no-iterator': 'off',
             'react/no-children-prop': 'off',
             'quotes': [
