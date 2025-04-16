@@ -3,9 +3,9 @@ import { BookmarkParent } from './bookmark'
 import { HighlightParent } from './highlight'
 import { booqForId, LibraryCard } from '@/backend/library'
 import { booqImageUrl } from '@/backend/images'
-import { userBookmarks } from '@/backend/users'
 import { highlightsForBooqId } from '@/backend/highlights'
 import { buildFragment, filterUndefined, previewForPath, textForRange } from '@/core'
+import { getBookmarks } from '@/backend/bookmarks'
 
 export type BooqParent = LibraryCard & {
     kind?: undefined,
@@ -22,7 +22,10 @@ export const booqResolver: IResolvers<BooqParent> = {
         },
         async bookmarks(parent, _, { user }): Promise<BookmarkParent[]> {
             return user
-                ? userBookmarks(user, parent.id)
+                ? getBookmarks({
+                    userId: user.id,
+                    booqId: parent.id,
+                })
                 : []
         },
         async highlights(parent): Promise<HighlightParent[]> {

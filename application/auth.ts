@@ -17,8 +17,8 @@ import { useContext } from 'react'
 export type AuthUser = {
     id: string,
     joined: string,
-    name?: string,
-    pictureUrl?: string,
+    name: string | null,
+    pictureUrl: string | null,
 }
 export type AuthState = {
     state: 'loading',

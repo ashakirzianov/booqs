@@ -1,7 +1,7 @@
 'use server'
 import { BooqPath } from '@/core'
 import { fetchAuthData } from './auth'
-import { addBooqHistory } from '@/backend/users'
+import { addBooqHistory } from '@/backend/history'
 
 export async function reportBooqHistory({
     booqId, path, source,
@@ -19,6 +19,6 @@ export async function reportBooqHistory({
     }
     addBooqHistory(user.id, {
         booqId, path, source,
-        date: new Date(Date.now()),
+        date: Date.now(),
     })
 }

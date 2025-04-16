@@ -78,7 +78,7 @@ function SignedButton({ user }: {
             name={user.name}
         />}
         anchor={<ProfileBadge
-            name={user.name}
+            name={user.name ?? undefined}
             picture={user.pictureUrl ?? undefined}
             size={2}
             border={true}
@@ -100,7 +100,7 @@ function NotSignedButton() {
 }
 
 function AccountMenu({ name }: {
-    name?: string,
+    name: string | null,
 }) {
     const { signOut } = useAuth()
     const router = useRouter()

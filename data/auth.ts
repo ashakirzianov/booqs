@@ -14,11 +14,16 @@ export async function initPasskeyRegistrationAcion() {
         const { id, options } = await initiatePasskeyRegistration({
             requestOrigin: origin ?? undefined,
         })
-        return {
-            success: true,
-            id,
-            options,
-        } as const
+        if (id && options) {
+            return {
+                success: true,
+                id,
+                options,
+            } as const
+        } else {
+            return { success: false } as const
+        }
+
     } catch {
         return {
             success: false,
@@ -37,16 +42,16 @@ export async function verifyPasskeyRegistrationAction({ id, response }: {
             response,
             requestOrigin: origin ?? undefined,
         })
-        if (result.user?._id) {
-            const token = generateToken(result.user._id)
+        if (result.user?.id) {
+            const token = generateToken(result.user.id)
             await setAuthToken(token)
             return {
                 success: true,
                 user: {
-                    id: result.user._id.toString(),
+                    id: result.user.id,
                     name: result.user.name,
-                    pictureUrl: result.user.pictureUrl,
-                    joined: result.user.joined.toString(),
+                    pictureUrl: result.user.profile_picture_url,
+                    joined: result.user.joined_at,
                 },
             } as const
         } else {
@@ -67,11 +72,15 @@ export async function initPasskeySigninAction() {
         const { id, options, } = await initiatePasskeyLogin({
             requestOrigin: origin ?? undefined,
         })
-        return {
-            success: true,
-            id,
-            options,
-        } as const
+        if (id && options) {
+            return {
+                success: true,
+                id,
+                options,
+            } as const
+        } else {
+            return { success: false } as const
+        }
     } catch {
         return {
             success: false,
@@ -90,16 +99,16 @@ export async function verifyPasskeySigninAction({ id, response }: {
             response,
             requestOrigin: origin ?? undefined,
         })
-        if (result.user?._id) {
-            const token = generateToken(result.user._id)
+        if (result.user?.id) {
+            const token = generateToken(result.user.id)
             await setAuthToken(token)
             return {
                 success: true,
                 user: {
-                    id: result.user._id.toString(),
+                    id: result.user.id,
                     name: result.user.name,
-                    pictureUrl: result.user.pictureUrl,
-                    joined: result.user.joined.toString(),
+                    pictureUrl: result.user.profile_picture_url,
+                    joined: result.user.joined_at,
                 },
             } as const
         } else {
@@ -137,10 +146,10 @@ export async function fetchAuthData() {
         return undefined
     }
     return {
-        id: user._id.toString(),
+        id: user.id,
         name: user.name,
-        pictureUrl: user.pictureUrl,
-        joined: user.joined.toString(),
+        pictureUrl: user.profile_picture_url,
+        joined: user.joined_at,
     }
 }
 

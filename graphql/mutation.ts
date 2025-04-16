@@ -1,10 +1,12 @@
 import { IResolvers } from '@graphql-tools/utils'
 import { ResolverContext } from './context'
-import { addBookmark, addBooqHistory, addToCollection, deleteBookmark, deleteBooqHistory, deleteUserForId, removeFromCollection } from '@/backend/users'
-import { uniqueId } from '@/core'
+import { deleteUserForId } from '@/backend/users'
 import { addHighlight, removeHighlight, updateHighlight } from '@/backend/highlights'
 import { initiatePasskeyLogin, initiatePasskeyRegistration, verifyPasskeyLogin, verifyPasskeyRegistration } from '@/backend/passkey'
 import { generateToken } from '@/backend/token'
+import { addToCollection, removeFromCollection } from '@/backend/collections'
+import { addBooqHistory } from '@/backend/history'
+import { addBookmark, deleteBookmark } from '@/backend/bookmarks'
 
 export const mutationResolver: IResolvers<any, ResolverContext> = {
     Mutation: {
@@ -23,23 +25,18 @@ export const mutationResolver: IResolvers<any, ResolverContext> = {
         },
         async addBookmark(_, { bookmark }, { user }) {
             if (user?._id) {
-                return addBookmark(
-                    user._id,
-                    {
-                        id: bookmark.id ?? uniqueId(),
-                        booqId: bookmark.booqId,
-                        path: bookmark.path,
-                    })
+                return addBookmark({
+                    userId: user.id,
+                    booqId: bookmark.booqId,
+                    path: bookmark.path,
+                })
             } else {
                 return false
             }
         },
         async removeBookmark(_, { id }, { user }) {
             if (user?._id) {
-                return deleteBookmark(
-                    user._id,
-                    { id },
-                )
+                return deleteBookmark(id)
             } else {
                 return false
             }
@@ -87,40 +84,28 @@ export const mutationResolver: IResolvers<any, ResolverContext> = {
                         booqId: event.booqId,
                         path: event.path,
                         source: event.source,
-                        date: new Date(Date.now()),
+                        date: Date.now(),
                     })
-            } else {
-                return false
-            }
-        },
-        async removeBooqHistory(_, { booqId }, { user }) {
-            if (user?._id) {
-                return deleteBooqHistory(
-                    user._id,
-                    { booqId },
-                )
             } else {
                 return false
             }
         },
         async addToCollection(_, { booqId, name }, { user }) {
             if (user?._id) {
-                return addToCollection(
-                    user._id,
-                    name,
-                    booqId,
-                )
+                return addToCollection({
+                    userId: user.id,
+                    name, booqId,
+                })
             } else {
                 return false
             }
         },
         async removeFromCollection(_, { booqId, name }, { user }) {
             if (user?._id) {
-                return removeFromCollection(
-                    user._id,
-                    name,
-                    booqId,
-                )
+                return removeFromCollection({
+                    userId: user.id,
+                    name, booqId,
+                })
             } else {
                 return false
             }
@@ -147,7 +132,7 @@ export const mutationResolver: IResolvers<any, ResolverContext> = {
             })
             if (result.success) {
                 const user = result.user
-                const token = generateToken(user._id)
+                const token = generateToken(user.id)
                 setAuthToken(token)
                 return { user }
             }
@@ -173,7 +158,7 @@ export const mutationResolver: IResolvers<any, ResolverContext> = {
                 })
                 if (result.success) {
                     const user = result.user
-                    const token = generateToken(user._id)
+                    const token = generateToken(user.id)
                     setAuthToken(token)
                     return { user }
                 }

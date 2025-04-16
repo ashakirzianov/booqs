@@ -5,9 +5,8 @@ import {
     RegistrationResponseJSON, AuthenticationResponseJSON, WebAuthnCredential,
 } from '@simplewebauthn/server'
 import { config } from './config'
-import { Redis } from '@upstash/redis'
 import { uniqueId } from '@/core'
-import { sql } from './db'
+import { redis, sql } from './db'
 
 export async function initiatePasskeyRegistration({
     requestOrigin,
@@ -86,7 +85,7 @@ export async function verifyPasskeyRegistration({
         const user = await createUser({})
 
         await saveUserCredential({
-            userId: user._id.toString(),
+            userId: user.id,
             credential: registrationInfo.credential,
         })
 
@@ -205,7 +204,7 @@ export async function verifyPasskeyLogin({
         const { newCounter } = authenticationInfo
         if (typeof newCounter === 'number') {
             await saveUserCredential({
-                userId: user._id.toString(),
+                userId: user.id,
                 credential: {
                     ...credential,
                     counter: newCounter,
@@ -227,8 +226,6 @@ export async function verifyPasskeyLogin({
 }
 
 //====== DB ======//
-
-const redis = Redis.fromEnv()
 
 type ChallengeKind = 'registration' | 'login'
 type Challenge = {

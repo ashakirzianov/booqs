@@ -5,7 +5,8 @@ import {
 } from '@/core'
 import { booqImageUrl } from '@/backend/images'
 import { booqForId, libraryCardsForIds, LibraryCard, featuredBooqIds, booqsForAuthor } from '@/backend/library'
-import { userCollection, userForId } from '@/backend/users'
+import { userForId } from '@/backend/users'
+import { booqIdsInCollections } from '@/backend/collections'
 
 export type Tag = {
     tag: string,
@@ -54,7 +55,7 @@ export async function booqCollection(collection: string, userId: string | undefi
     if (!user) {
         return []
     }
-    const ids = userCollection(user, collection)
+    const ids = await booqIdsInCollections(user.id, collection)
     const cards = filterUndefined(await libraryCardsForIds(ids))
     return cards.map(card => buildBooqCard(card, 210))
 }

@@ -16,7 +16,6 @@ type Mutation {
     removeHighlight(id: ID!): Boolean
     updateHighlight(id: ID!, group: String): Boolean
     addBooqHistory(event: BooqHistoryInput!): Boolean
-    removeBooqHistory(booqId: ID!): Boolean
     addToCollection(name: String!, booqId: ID!): Boolean
     removeFromCollection(name: String!, booqId: ID!): Boolean
 
@@ -82,7 +81,6 @@ type User {
 union SearchResult = Booq | Author
 
 input BookmarkInput {
-    id: ID
     booqId: ID!
     path: [Int!]!
 }
