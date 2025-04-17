@@ -12,7 +12,7 @@ export async function initPasskeyRegistrationAcion() {
     try {
         const origin = await getOrigin()
         const { id, options } = await initiatePasskeyRegistration({
-            requestOrigin: origin ?? undefined,
+            origin: origin ?? undefined,
         })
         if (id && options) {
             return {
@@ -40,7 +40,7 @@ export async function verifyPasskeyRegistrationAction({ id, response }: {
         const result = await verifyPasskeyRegistration({
             id,
             response,
-            requestOrigin: origin ?? undefined,
+            origin: origin ?? undefined,
         })
         if (result.user?.id) {
             const token = generateToken(result.user.id)
@@ -70,7 +70,7 @@ export async function initPasskeySigninAction() {
     try {
         const origin = await getOrigin()
         const { id, options, } = await initiatePasskeyLogin({
-            requestOrigin: origin ?? undefined,
+            origin: origin ?? undefined,
         })
         if (id && options) {
             return {
@@ -97,7 +97,7 @@ export async function verifyPasskeySigninAction({ id, response }: {
         const result = await verifyPasskeyLogin({
             id,
             response,
-            requestOrigin: origin ?? undefined,
+            origin: origin ?? undefined,
         })
         if (result.user?.id) {
             const token = generateToken(result.user.id)

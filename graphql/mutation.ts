@@ -117,8 +117,8 @@ export const mutationResolver: IResolvers<any, ResolverContext> = {
                 return false
             }
         },
-        async initPasskeyRegistration(_, __, { requestOrigin }) {
-            const result = await initiatePasskeyRegistration({ requestOrigin })
+        async initPasskeyRegistration(_, __, { origin }) {
+            const result = await initiatePasskeyRegistration({ origin })
             if (result.success) {
                 return {
                     id: result.id,
@@ -128,14 +128,14 @@ export const mutationResolver: IResolvers<any, ResolverContext> = {
                 return undefined
             }
         },
-        async verifyPasskeyRegistration(_, { id, response }, { setAuthToken, requestOrigin }) {
+        async verifyPasskeyRegistration(_, { id, response }, { setAuthToken, origin }) {
             if (!id || !response) {
                 return undefined
             }
             const result = await verifyPasskeyRegistration({
                 id,
                 response,
-                requestOrigin,
+                origin,
             })
             if (result.success) {
                 const user = result.user
@@ -145,9 +145,9 @@ export const mutationResolver: IResolvers<any, ResolverContext> = {
             }
             return undefined
         },
-        async initPasskeyLogin(_, __, { requestOrigin }) {
+        async initPasskeyLogin(_, __, { origin }) {
             const result = await initiatePasskeyLogin({
-                requestOrigin,
+                origin,
             })
             if (result.success) {
                 return {
@@ -158,10 +158,10 @@ export const mutationResolver: IResolvers<any, ResolverContext> = {
                 return undefined
             }
         },
-        async verifyPasskeyLogin(_, { id, response }, { requestOrigin, setAuthToken }) {
+        async verifyPasskeyLogin(_, { id, response }, { origin, setAuthToken }) {
             if (response) {
                 const result = await verifyPasskeyLogin({
-                    id, response, requestOrigin,
+                    id, response, origin,
                 })
                 if (result.success) {
                     const user = result.user

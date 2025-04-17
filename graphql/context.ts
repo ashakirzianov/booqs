@@ -1,10 +1,8 @@
-import { config } from '@/backend/config'
 import { userIdFromToken } from '@/backend/token'
 
-export type RequestOrigin = 'production' | 'localhost'
 export type ResolverContext = {
     userId?: string,
-    requestOrigin?: RequestOrigin,
+    origin?: string,
     setAuthToken(token: string | undefined): void,
 }
 type CookieOptions = {
@@ -21,15 +19,10 @@ type RequestContext = {
 export async function context(ctx: RequestContext): Promise<ResolverContext> {
     const authToken = ctx.getCookie('token') ?? ''
     const userId = userIdFromToken(authToken)
-    const origins = config().origins
-    // TODO: just pass the origin from the request (and rename)
-    const requestOrigin: RequestOrigin = ctx.origin === origins.localhost || ctx.origin === origins.secureLocalhost
-        ? 'localhost'
-        : 'production'
 
     return {
         userId,
-        requestOrigin,
+        origin: ctx.origin,
         setAuthToken(token) {
             if (token) {
                 ctx.setCookie('token', token, {

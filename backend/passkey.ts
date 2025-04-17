@@ -9,12 +9,12 @@ import { uniqueId } from '@/core'
 import { redis, sql } from './db'
 
 export async function initiatePasskeyRegistration({
-    requestOrigin,
+    origin,
 }: {
-    requestOrigin?: string,
+    origin?: string,
 }) {
     try {
-        const { rpID, rpName } = getRPData(requestOrigin)
+        const { rpID, rpName } = getRPData(origin)
 
         const options = await generateRegistrationOptions({
             rpName,
@@ -47,11 +47,11 @@ export async function initiatePasskeyRegistration({
 }
 
 export async function verifyPasskeyRegistration({
-    id, response, requestOrigin,
+    id, response, origin,
 }: {
     id: string,
     response: RegistrationResponseJSON, // The credential JSON received from the client
-    requestOrigin?: string,
+    origin?: string,
 }) {
     try {
         // Retrieve the original challenge we generated for this user
@@ -63,7 +63,7 @@ export async function verifyPasskeyRegistration({
             }
         }
 
-        const { rpID, expectedOrigin } = getRPData(requestOrigin)
+        const { rpID, expectedOrigin } = getRPData(origin)
 
 
         // Verify the registration response
@@ -104,12 +104,12 @@ export async function verifyPasskeyRegistration({
 }
 
 export async function initiatePasskeyLogin({
-    requestOrigin,
+    origin,
 }: {
-    requestOrigin?: string,
+    origin?: string,
 }) {
     try {
-        const { rpID } = getRPData(requestOrigin)
+        const { rpID } = getRPData(origin)
 
         const options = await generateAuthenticationOptions({
             timeout: 60000,
@@ -139,11 +139,11 @@ export async function initiatePasskeyLogin({
 }
 
 export async function verifyPasskeyLogin({
-    id, response, requestOrigin,
+    id, response, origin,
 }: {
     id: string,
     response: AuthenticationResponseJSON, // The credential assertion JSON received from the client
-    requestOrigin?: string,
+    origin?: string,
 }) {
     try {
         const credentialId = response.id
@@ -173,7 +173,7 @@ export async function verifyPasskeyLogin({
             } as const
         }
 
-        const { rpID, expectedOrigin } = getRPData(requestOrigin)
+        const { rpID, expectedOrigin } = getRPData(origin)
 
         const credential: WebAuthnCredential = {
             id: record.id,
@@ -303,17 +303,17 @@ export async function deleteUserCredentials(userId: string) {
     return await sql`DELETE FROM passkey_credentials WHERE user_id = ${userId}`
 }
 
-function getRPData(requestOrigin: string | undefined) {
+function getRPData(origin: string | undefined) {
     const { localhost, secureLocalhost, production } = config().origins
     const domain = config().domain
-    const rpID = requestOrigin === localhost || requestOrigin === secureLocalhost
+    const rpID = origin === localhost || origin === secureLocalhost
         ? 'localhost'
         : domain
 
-    const expectedOrigin = requestOrigin === production
-        || requestOrigin === localhost
-        || requestOrigin === secureLocalhost
-        ? requestOrigin
+    const expectedOrigin = origin === production
+        || origin === localhost
+        || origin === secureLocalhost
+        ? origin
         : production
 
     const rpName = config().appName
