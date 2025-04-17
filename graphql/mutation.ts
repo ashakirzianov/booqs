@@ -3,20 +3,19 @@ import { ResolverContext } from './context'
 import { deleteUserForId } from '@/backend/users'
 import { addHighlight, removeHighlight, updateHighlight } from '@/backend/highlights'
 import { initiatePasskeyLogin, initiatePasskeyRegistration, verifyPasskeyLogin, verifyPasskeyRegistration } from '@/backend/passkey'
-import { generateToken } from '@/backend/token'
 import { addToCollection, removeFromCollection } from '@/backend/collections'
 import { addBooqHistory } from '@/backend/history'
 import { addBookmark, deleteBookmark } from '@/backend/bookmarks'
 
 export const mutationResolver: IResolvers<any, ResolverContext> = {
     Mutation: {
-        signout(_, __, { setAuthToken }) {
-            setAuthToken(undefined)
+        signout(_, __, { clearAuth }) {
+            clearAuth()
             return true
         },
-        async deleteAccount(_, __, { userId, setAuthToken }) {
+        async deleteAccount(_, __, { userId, clearAuth }) {
             if (userId) {
-                setAuthToken(undefined)
+                clearAuth()
                 const result = await deleteUserForId(userId)
                 return result
             } else {
@@ -128,7 +127,7 @@ export const mutationResolver: IResolvers<any, ResolverContext> = {
                 return undefined
             }
         },
-        async verifyPasskeyRegistration(_, { id, response }, { setAuthToken, origin }) {
+        async verifyPasskeyRegistration(_, { id, response }, { setAuthForUserId, origin }) {
             if (!id || !response) {
                 return undefined
             }
@@ -139,8 +138,7 @@ export const mutationResolver: IResolvers<any, ResolverContext> = {
             })
             if (result.success) {
                 const user = result.user
-                const token = generateToken(user.id)
-                setAuthToken(token)
+                setAuthForUserId(user.id)
                 return { user }
             }
             return undefined
@@ -158,15 +156,14 @@ export const mutationResolver: IResolvers<any, ResolverContext> = {
                 return undefined
             }
         },
-        async verifyPasskeyLogin(_, { id, response }, { origin, setAuthToken }) {
+        async verifyPasskeyLogin(_, { id, response }, { origin, setAuthForUserId }) {
             if (response) {
                 const result = await verifyPasskeyLogin({
                     id, response, origin,
                 })
                 if (result.success) {
                     const user = result.user
-                    const token = generateToken(user.id)
-                    setAuthToken(token)
+                    setAuthForUserId(user.id)
                     return { user }
                 }
             }

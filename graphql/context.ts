@@ -1,9 +1,10 @@
-import { userIdFromToken } from '@/backend/token'
+import { generateToken, userIdFromToken } from '@/backend/token'
 
 export type ResolverContext = {
     userId?: string,
     origin?: string,
-    setAuthToken(token: string | undefined): void,
+    setAuthForUserId(userId: string): void,
+    clearAuth(): void,
 }
 type CookieOptions = {
     httpOnly?: boolean,
@@ -23,25 +24,18 @@ export async function context(ctx: RequestContext): Promise<ResolverContext> {
     return {
         userId,
         origin: ctx.origin,
-        setAuthToken(token) {
-            if (token) {
-                ctx.setCookie('token', token, {
-                    httpOnly: true,
-                    secure: true,
-                    maxAge: 60 * 60 * 24 * 30,
-                })
-                ctx.setCookie('signed', 'true', {
-                    httpOnly: false,
-                    maxAge: 60 * 60 * 24 * 30,
-                })
-            } else {
-                ctx.clearCookie('token', {
-                    httpOnly: true,
-                })
-                ctx.clearCookie('signed', {
-                    httpOnly: false,
-                })
-            }
+        setAuthForUserId(userId: string) {
+            const token = generateToken(userId)
+            ctx.setCookie('token', token, {
+                httpOnly: true,
+                secure: true,
+                maxAge: 60 * 60 * 24 * 30,
+            })
+        },
+        clearAuth() {
+            ctx.clearCookie('token', {
+                httpOnly: true,
+            })
         },
     }
 }
