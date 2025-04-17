@@ -15,16 +15,16 @@ export const mutationResolver: IResolvers<any, ResolverContext> = {
             return true
         },
         async deleteAccount(_, __, { user, setAuthToken }) {
-            if (user?._id) {
+            if (user?.id) {
                 setAuthToken(undefined)
-                const result = await deleteUserForId(user._id)
+                const result = await deleteUserForId(user.id)
                 return result
             } else {
                 return false
             }
         },
         async addBookmark(_, { bookmark }, { user }) {
-            if (user?._id) {
+            if (user?.id) {
                 return addBookmark({
                     userId: user.id,
                     booqId: bookmark.booqId,
@@ -35,16 +35,16 @@ export const mutationResolver: IResolvers<any, ResolverContext> = {
             }
         },
         async removeBookmark(_, { id }, { user }) {
-            if (user?._id) {
+            if (user?.id) {
                 return deleteBookmark(id)
             } else {
                 return false
             }
         },
         async addHighlight(_, { highlight }, { user }) {
-            if (user?._id) {
+            if (user?.id) {
                 return addHighlight({
-                    userId: user._id,
+                    userId: user.id,
                     booqId: highlight.booqId,
                     range: {
                         start: highlight.start,
@@ -57,9 +57,9 @@ export const mutationResolver: IResolvers<any, ResolverContext> = {
             }
         },
         async removeHighlight(_, { id }, { user }) {
-            if (user?._id) {
+            if (user?.id) {
                 return removeHighlight({
-                    userId: user._id,
+                    userId: user.id,
                     id: id,
                 })
             } else {
@@ -67,9 +67,9 @@ export const mutationResolver: IResolvers<any, ResolverContext> = {
             }
         },
         async updateHighlight(_, { id, color }, { user }) {
-            if (user?._id) {
+            if (user?.id) {
                 return updateHighlight({
-                    userId: user._id,
+                    userId: user.id,
                     id: id,
                     color,
                 })
@@ -78,8 +78,8 @@ export const mutationResolver: IResolvers<any, ResolverContext> = {
             }
         },
         async addBooqHistory(_, { event }, { user }) {
-            if (user?._id) {
-                return addBooqHistory(user._id, {
+            if (user?.id) {
+                return addBooqHistory(user.id, {
                     booqId: event.booqId,
                     path: event.path,
                     source: event.source,
@@ -90,7 +90,7 @@ export const mutationResolver: IResolvers<any, ResolverContext> = {
             }
         },
         async addToCollection(_, { booqId, name }, { user }) {
-            if (user?._id) {
+            if (user?.id) {
                 return addToCollection({
                     userId: user.id,
                     name, booqId,
@@ -100,7 +100,7 @@ export const mutationResolver: IResolvers<any, ResolverContext> = {
             }
         },
         async removeFromCollection(_, { booqId, name }, { user }) {
-            if (user?._id) {
+            if (user?.id) {
                 return removeFromCollection({
                     userId: user.id,
                     name, booqId,

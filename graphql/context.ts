@@ -4,7 +4,7 @@ import { DbUser, userForId } from '@/backend/users'
 
 export type RequestOrigin = 'production' | 'localhost'
 export type ResolverContext = {
-    user?: DbUser & { _id?: string },
+    user?: DbUser,
     requestOrigin?: RequestOrigin,
     setAuthToken(token: string | undefined): void,
 }
