@@ -3,6 +3,7 @@ CREATE TABLE users (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   username CITEXT UNIQUE NOT NULL,
   email CITEXT UNIQUE,
+  name TEXT,
   profile_picture_url TEXT,
   joined_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
@@ -77,4 +78,14 @@ CREATE TABLE highlights (
   note TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE passkey_credentials (
+    id TEXT PRIMARY KEY,
+    user_id TEXT NOT NULL,
+    public_key TEXT NOT NULL,
+    counter INTEGER NOT NULL DEFAULT 0,
+    transports TEXT[],
+    created_at TIMESTAMP DEFAULT now(),
+    updated_at TIMESTAMP DEFAULT now()
 );
