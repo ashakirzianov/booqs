@@ -9,7 +9,7 @@ CREATE TABLE users (
 );
 
 CREATE TABLE pg_cards (
-  booq_id TEXT PRIMARY KEY,
+  id TEXT PRIMARY KEY,
   asset_id TEXT NOT NULL,
   title TEXT NOT NULL,
   author TEXT,
@@ -22,7 +22,7 @@ CREATE TABLE pg_cards (
 CREATE INDEX pg_cards_search_idx ON pg_cards USING GIN (searchable_tsv);
 
 CREATE TABLE uu_cards (
-  booq_id TEXT PRIMARY KEY,
+  id TEXT PRIMARY KEY,
   asset_id TEXT NOT NULL,
   title TEXT NOT NULL,
   author TEXT,
@@ -37,9 +37,9 @@ CREATE INDEX uu_cards_search_idx ON uu_cards USING GIN (searchable_tsv);
 
 CREATE TABLE uploads (
   user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  booq_id TEXT NOT NULL,
+  id TEXT NOT NULL,
   uploaded_at TIMESTAMPTZ DEFAULT NOW(),
-  PRIMARY KEY (user_id, booq_id)
+  PRIMARY KEY (user_id, id)
 );
 
 CREATE TABLE collections (
