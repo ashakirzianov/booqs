@@ -3,7 +3,7 @@ import { config } from 'dotenv'
 
 // Your script logic
 async function main() {
-    console.log('Running script in Next.js context')
+    console.info('Running script in Next.js context')
     config({ path: '.env' })
     config({ path: '.env.local' })
 }

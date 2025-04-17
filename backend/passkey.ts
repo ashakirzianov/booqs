@@ -154,7 +154,6 @@ export async function verifyPasskeyLogin({
                 success: false,
             } as const
         }
-        console.log('Credential record', record)
         const user = await userForId(record.user_id)
         if (!user) {
             return {

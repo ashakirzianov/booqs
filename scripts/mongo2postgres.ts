@@ -29,15 +29,15 @@ export async function migrateCards() {
     const sql = neon(process.env.DATABASE_URL!)
     const existing = await sql`SELECT id FROM pg_cards`
     const existingIds = new Set(existing.map(r => r.id))
-    console.log(`🟡 Found ${existingIds.size} existing ids`)
+    console.info(`🟡 Found ${existingIds.size} existing ids`)
 
     // 2. Get Mongo documents
     const docs = await collection.find({}).toArray()
-    console.log(`📦 Found ${docs.length} MongoDB documents`)
+    console.info(`📦 Found ${docs.length} MongoDB documents`)
 
     // 3. Filter out existing ids
     const newDocs = docs.filter(doc => !existingIds.has(doc.index))
-    console.log(`✅ ${newDocs.length} new documents to insert`)
+    console.info(`✅ ${newDocs.length} new documents to insert`)
 
     let totalInserted = 0
 
@@ -76,12 +76,12 @@ export async function migrateCards() {
         try {
             await Promise.all(inserts)
             totalInserted += batch.length
-            console.log(`📤 Inserted batch ${i / BATCH_SIZE + 1} (${batch.length} docs)`)
+            console.info(`📤 Inserted batch ${i / BATCH_SIZE + 1} (${batch.length} docs)`)
         } catch (err) {
             console.error(`❌ Failed to insert batch starting at index ${i}`, err)
         }
     }
 
     await mongoClient.close()
-    console.log(`🎉 Migration complete: inserted ${totalInserted} documents`)
+    console.info(`🎉 Migration complete: inserted ${totalInserted} documents`)
 }
