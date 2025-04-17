@@ -4,7 +4,7 @@ import { BooqParent } from './booq'
 import { BooqHistoryParent } from './history'
 import { CopilotInput, CopilotParent } from './copilot'
 import { AuthorParent } from './author'
-import { featuredBooqIds, libraryCardForId, libraryCardsForIds, searchBooqs, SearchScope } from '@/backend/library'
+import { featuredBooqIds, libraryCardForId, libraryCardsForIds, searchBooqs } from '@/backend/library'
 import { booqHistoryForUser } from '@/backend/history'
 import { booqIdsInCollections } from '@/backend/collections'
 
@@ -28,14 +28,11 @@ export const queryResolver: IResolvers<unknown, ResolverContext> = {
         author(_, { name }): AuthorParent {
             return { name, kind: 'author' }
         },
-        async search(_, { query, limit, scope }: {
+        async search(_, { query, limit }: {
             query: string,
             limit?: number,
-            scope?: string[],
         }): Promise<SearchResultParent[]> {
-            const actualScope = (scope ?? ['title', 'author', 'subject'])
-                .filter((s): s is SearchScope => ['title', 'author', 'subject'].includes(s))
-            const results = await searchBooqs(query, limit ?? 100, actualScope)
+            const results = await searchBooqs(query, limit ?? 100)
             return results.map(
                 r => r.kind === 'book'
                     ? r.card

@@ -22,7 +22,6 @@ export type BookFile = {
     kind: 'epub',
     file: Buffer,
 }
-export type SearchScope = 'title' | 'author' | 'subject'
 export type SearchResult = {
     kind: 'author',
     author: {
@@ -33,7 +32,7 @@ export type SearchResult = {
     card: LibraryCard,
 }
 export type Library = {
-    search(query: string, limit: number, scope: SearchScope[]): Promise<SearchResult[]>,
+    search(query: string, limit: number): Promise<SearchResult[]>,
     cards(ids: string[]): Promise<LibraryCard[]>,
     forAuthor(author: string, limit?: number, offset?: number): Promise<LibraryCard[]>,
     fileForId(id: string): Promise<BookFile | undefined>,
@@ -159,14 +158,14 @@ async function fileForId(booqId: string) {
         : undefined
 }
 
-export async function searchBooqs(query: string, limit: number, scope: SearchScope[]): Promise<SearchResult[]> {
+export async function searchBooqs(query: string, limit: number): Promise<SearchResult[]> {
     if (!query) {
         return []
     }
     const cards = Object.entries(libraries).map(
         async ([prefix, library]) => {
             if (library) {
-                const results = await library.search(query, limit, scope)
+                const results = await library.search(query, limit)
                 return results.map(processSearchResult(prefix))
             } else {
                 return []

@@ -1,4 +1,4 @@
-import type { Library, LibraryCard, SearchScope, SearchResult } from './library'
+import type { Library, LibraryCard, SearchResult } from './library'
 import { downloadAsset } from './s3'
 import { sql } from './db'
 
@@ -81,8 +81,36 @@ function convertToLibraryCard({
   }
 }
 
-async function search(_query: string, _limit: number, _scope: SearchScope[]): Promise<SearchResult[]> {
-  return []
+export async function search(query: string, limit = 20, offset = 0): Promise<SearchResult[]> {
+  const rows = await sql`
+    WITH ranked_cards AS (
+      SELECT *,
+        (
+          similarity(title, ${query}) * 5 +
+          greatest_similarity(authors, ${query}) * 4 +
+          greatest_similarity(subjects, ${query}) * 3 +
+          similarity(description, ${query}) * 2 +
+          similarity(jsonb_to_text(metadata), ${query})
+        ) AS score
+      FROM pg_cards
+      WHERE
+        title % ${query} OR
+        exists_similarity(authors, ${query}) OR
+        exists_similarity(subjects, ${query}) OR
+        description % ${query} OR
+        jsonb_to_text(metadata) % ${query}
+    )
+    SELECT * FROM ranked_cards
+    ORDER BY score DESC
+    LIMIT ${limit} OFFSET ${offset}
+  `
+  const cards = rows as DbPgCard[]
+  const libCards = cards.map(convertToLibraryCard)
+  const results = libCards.map(card => ({
+    kind: 'book' as const,
+    card,
+  }))
+  return results
 }
 
 export async function existingAssetIds(): Promise<string[]> {

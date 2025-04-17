@@ -3,7 +3,7 @@ type Query {
     me: User
     booq(id: ID!): Booq
     author(name: String!): Author
-    search(query: String!, scope: [String!], limit: Int): [SearchResult!]
+    search(query: String!, limit: Int): [SearchResult!]
     history: [BooqHistory]
     collection(name: String!): Collection
     featured(limit: Int!): [Booq]
