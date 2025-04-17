@@ -11,10 +11,13 @@ CREATE TABLE users (
 CREATE TABLE pg_cards (
   id TEXT PRIMARY KEY,
   asset_id TEXT NOT NULL,
-  title TEXT NOT NULL,
-  author TEXT,
-  language TEXT,
   length INTEGER,
+  title TEXT NOT NULL,
+  authors TEXT[] NOT NULL,
+  language TEXT,
+  description TEXT,
+  subjects TEXT[],
+  cover TEXT,
   metadata JSONB DEFAULT '{}'::jsonb,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   searchable_tsv TSVECTOR

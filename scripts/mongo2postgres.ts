@@ -1,7 +1,7 @@
+import { MongoClient } from 'mongodb'
 import { neon } from '@neondatabase/serverless'
 
 type MongoDoc = {
-    id: string,
     assetId: string
     index: string
     length: number
@@ -16,22 +16,32 @@ type MongoDoc = {
     meta?: object
 }
 
-const BATCH_SIZE = 1000
+const BATCH_SIZE = 500
 
-export async function migrateCards(docs: MongoDoc[]) {
+export async function migrateCards() {
+    const mongoClient = new MongoClient(process.env.MONGODB_URI!)
+    await mongoClient.connect()
+
+    const db = mongoClient.db('production')
+    const collection = db.collection<MongoDoc>('pg-cards')
+
     // 1. Get existing Postgres ids
     const sql = neon(process.env.DATABASE_URL!)
     const existing = await sql`SELECT id FROM pg_cards`
     const existingIds = new Set(existing.map(r => r.id))
     console.log(`🟡 Found ${existingIds.size} existing ids`)
 
-    // 2. Filter out existing
+    // 2. Get Mongo documents
+    const docs = await collection.find({}).toArray()
+    console.log(`📦 Found ${docs.length} MongoDB documents`)
+
+    // 3. Filter out existing ids
     const newDocs = docs.filter(doc => !existingIds.has(doc.index))
     console.log(`✅ ${newDocs.length} new documents to insert`)
 
-    // 3. Batch insert
     let totalInserted = 0
 
+    // 4. Batch insert
     for (let i = 0; i < newDocs.length; i += BATCH_SIZE) {
         const batch = newDocs.slice(i, i + BATCH_SIZE)
 
@@ -41,17 +51,24 @@ export async function migrateCards(docs: MongoDoc[]) {
                 assetId: asset_id,
                 title = '',
                 author,
+                contributors = [],
                 language,
                 length,
+                description,
+                subjects,
+                cover,
                 meta = {},
             } = doc
 
+            const authors = [author, ...contributors].filter(Boolean)
+
             return sql`
         INSERT INTO pg_cards (
-          id, asset_id, title, author, language, length, metadata
+          id, asset_id, length, title, authors, language, description, subjects, cover, metadata
         )
         VALUES (
-          ${id}, ${asset_id}, ${title}, ${author}, ${language}, ${length}, ${JSON.stringify(meta)}
+          ${id}, ${asset_id}, ${length}, ${title}, ${authors}, ${language}, ${description},
+          ${subjects}, ${cover}, ${JSON.stringify(meta)}
         )
       `
         })
@@ -65,5 +82,6 @@ export async function migrateCards(docs: MongoDoc[]) {
         }
     }
 
+    await mongoClient.close()
     console.log(`🎉 Migration complete: inserted ${totalInserted} documents`)
 }
