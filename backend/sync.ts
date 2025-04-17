@@ -3,7 +3,9 @@ import { typedModel, TypeFromSchema } from './mongoose'
 import { makeBatches } from './utils'
 import { Booq, filterUndefined, nodesLength } from '@/core'
 import { Asset, downloadAsset, listObjects } from './s3'
-import { DbPgCard, pgCards, pgEpubsBucket } from './pg'
+import {
+    existingAssetIds, pgEpubsBucket, insertCard,
+} from './pg'
 import { parseEpub } from '@/parser'
 import { uploadBooqImages } from './images'
 
@@ -85,14 +87,6 @@ async function processAsset(asset: Asset) {
     }
 }
 
-async function existingAssetIds() {
-    const all = await (await pgCards)
-        .find()
-        .select('assetId')
-        .exec()
-    return all.map(d => d.assetId)
-}
-
 async function hasProblems(assetId: string) {
     return logExists({
         kind: 'pg-sync',
@@ -131,7 +125,7 @@ async function downloadAndInsert(assetId: string) {
     const document = await insertRecord(booq, assetId)
     if (document) {
         return {
-            id: document.index,
+            id: document.id,
             booq,
         }
     } else {
@@ -152,23 +146,22 @@ async function insertRecord(booq: Booq, assetId: string) {
         tags,
     } = booq.meta
     const length = nodesLength(booq.nodes)
-    const doc: Omit<DbPgCard, '_id'> = {
-        assetId,
-        index,
+    return insertCard({
+        asset_id: assetId,
+        id: index,
         length,
         subjects,
-        title,
-        author: authors.join(', '),
+        title: title ?? 'Untitled',
+        authors: authors,
         language: languages[0],
         description: descriptions[0],
-        cover: cover?.href,
-        rights,
-        contributors,
-        meta: tags,
-    }
-    const [inserted] = await (await pgCards).insertMany([doc])
-    report('inserted', inserted)
-    return inserted
+        cover: cover?.href ?? null,
+        metadata: {
+            rights,
+            contributors,
+            tags,
+        },
+    })
 }
 
 function indexFromAssetId(assetId: string) {
