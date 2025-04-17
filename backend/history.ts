@@ -15,14 +15,13 @@ type DbReadingHistory = Array<{
 }>
 type RedisHashValue = Omit<DbReadingHistoryEvent, 'booqId' | 'source'>
 export async function booqHistoryForUser(userId: string): Promise<DbReadingHistory> {
-    const record = await redis.hgetall<Record<string, string>>(`user:${userId}:history`) ?? {}
+    const record = await redis.hgetall<Record<string, RedisHashValue>>(`user:${userId}:history`) ?? {}
     const history: DbReadingHistory = Object.entries(record).map(([key, value]) => {
         const [booqId, source] = key.split(':')
-        const data = JSON.parse(value) as RedisHashValue
         return {
             booqId,
             source,
-            ...data,
+            ...value,
         }
     })
     history.sort((a, b) => b.date - a.date)
