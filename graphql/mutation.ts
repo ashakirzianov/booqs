@@ -14,19 +14,19 @@ export const mutationResolver: IResolvers<any, ResolverContext> = {
             setAuthToken(undefined)
             return true
         },
-        async deleteAccount(_, __, { user, setAuthToken }) {
-            if (user?.id) {
+        async deleteAccount(_, __, { userId, setAuthToken }) {
+            if (userId) {
                 setAuthToken(undefined)
-                const result = await deleteUserForId(user.id)
+                const result = await deleteUserForId(userId)
                 return result
             } else {
                 return false
             }
         },
-        async addBookmark(_, { bookmark }, { user }) {
-            if (user?.id) {
+        async addBookmark(_, { bookmark }, { userId }) {
+            if (userId) {
                 await addBookmark({
-                    userId: user.id,
+                    userId,
                     booqId: bookmark.booqId,
                     path: bookmark.path,
                 })
@@ -35,18 +35,18 @@ export const mutationResolver: IResolvers<any, ResolverContext> = {
                 return false
             }
         },
-        async removeBookmark(_, { id }, { user }) {
-            if (user?.id) {
+        async removeBookmark(_, { id }, { userId }) {
+            if (userId) {
                 await deleteBookmark(id)
                 return true
             } else {
                 return false
             }
         },
-        async addHighlight(_, { highlight }, { user }) {
-            if (user?.id) {
+        async addHighlight(_, { highlight }, { userId }) {
+            if (userId) {
                 await addHighlight({
-                    userId: user.id,
+                    userId: userId,
                     booqId: highlight.booqId,
                     range: {
                         start: highlight.start,
@@ -59,10 +59,10 @@ export const mutationResolver: IResolvers<any, ResolverContext> = {
                 return false
             }
         },
-        async removeHighlight(_, { id }, { user }) {
-            if (user?.id) {
+        async removeHighlight(_, { id }, { userId }) {
+            if (userId) {
                 await removeHighlight({
-                    userId: user.id,
+                    userId,
                     id: id,
                 })
                 return true
@@ -70,10 +70,10 @@ export const mutationResolver: IResolvers<any, ResolverContext> = {
                 return false
             }
         },
-        async updateHighlight(_, { id, color }, { user }) {
-            if (user?.id) {
+        async updateHighlight(_, { id, color }, { userId }) {
+            if (userId) {
                 await updateHighlight({
-                    userId: user.id,
+                    userId,
                     id: id,
                     color,
                 })
@@ -82,9 +82,9 @@ export const mutationResolver: IResolvers<any, ResolverContext> = {
                 return false
             }
         },
-        async addBooqHistory(_, { event }, { user }) {
-            if (user?.id) {
-                await addBooqHistory(user.id, {
+        async addBooqHistory(_, { event }, { userId }) {
+            if (userId) {
+                await addBooqHistory(userId, {
                     booqId: event.booqId,
                     path: event.path,
                     source: event.source,
@@ -95,10 +95,10 @@ export const mutationResolver: IResolvers<any, ResolverContext> = {
                 return false
             }
         },
-        async addToCollection(_, { booqId, name }, { user }) {
-            if (user?.id) {
+        async addToCollection(_, { booqId, name }, { userId }) {
+            if (userId) {
                 await addToCollection({
-                    userId: user.id,
+                    userId,
                     name, booqId,
                 })
                 return true
@@ -106,10 +106,10 @@ export const mutationResolver: IResolvers<any, ResolverContext> = {
                 return false
             }
         },
-        async removeFromCollection(_, { booqId, name }, { user }) {
-            if (user?.id) {
+        async removeFromCollection(_, { booqId, name }, { userId }) {
+            if (userId) {
                 await removeFromCollection({
-                    userId: user.id,
+                    userId,
                     name, booqId,
                 })
                 return true

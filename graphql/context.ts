@@ -1,10 +1,9 @@
 import { config } from '@/backend/config'
 import { userIdFromToken } from '@/backend/token'
-import { DbUser, userForId } from '@/backend/users'
 
 export type RequestOrigin = 'production' | 'localhost'
 export type ResolverContext = {
-    user?: DbUser,
+    userId?: string,
     requestOrigin?: RequestOrigin,
     setAuthToken(token: string | undefined): void,
 }
@@ -20,15 +19,16 @@ type RequestContext = {
     clearCookie(name: string, options?: CookieOptions): void,
 }
 export async function context(ctx: RequestContext): Promise<ResolverContext> {
-    const cookie = ctx.getCookie('token') ?? ''
-    const user = await fromCookie(cookie) ?? undefined
+    const authToken = ctx.getCookie('token') ?? ''
+    const userId = userIdFromToken(authToken)
     const origins = config().origins
+    // TODO: just pass the origin from the request (and rename)
     const requestOrigin: RequestOrigin = ctx.origin === origins.localhost || ctx.origin === origins.secureLocalhost
         ? 'localhost'
         : 'production'
 
     return {
-        user,
+        userId,
         requestOrigin,
         setAuthToken(token) {
             if (token) {
@@ -51,12 +51,5 @@ export async function context(ctx: RequestContext): Promise<ResolverContext> {
             }
         },
     }
-}
-
-async function fromCookie(cookie: string) {
-    const userId = userIdFromToken(cookie)
-    return userId
-        ? userForId(userId)
-        : null
 }
 

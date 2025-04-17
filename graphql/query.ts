@@ -7,6 +7,7 @@ import { AuthorParent } from './author'
 import { featuredBooqIds, libraryCardForId, libraryCardsForIds, searchBooqs } from '@/backend/library'
 import { booqHistoryForUser } from '@/backend/history'
 import { booqIdsInCollections } from '@/backend/collections'
+import { userForId } from '@/backend/users'
 
 type SearchResultParent = BooqParent | AuthorParent
 
@@ -39,18 +40,23 @@ export const queryResolver: IResolvers<unknown, ResolverContext> = {
                     : { ...r.author, kind: 'author' },
             )
         },
-        async me(_, __, { user }) {
-            return user
+        async me(_, __, { userId }) {
+            if (userId) {
+                const user = await userForId(userId)
+                return user ?? undefined
+            } else {
+                return undefined
+            }
         },
-        async history(_, __, { user }): Promise<BooqHistoryParent[]> {
-            const result = user
-                ? await booqHistoryForUser(user.id)
+        async history(_, __, { userId }): Promise<BooqHistoryParent[]> {
+            const result = userId
+                ? await booqHistoryForUser(userId)
                 : []
             return result
         },
-        async collection(_, { name }, { user }) {
-            return user
-                ? booqIdsInCollections(user.id, name)
+        async collection(_, { name }, { userId }) {
+            return userId
+                ? booqIdsInCollections(userId, name)
                 : []
         },
         async featured(_, { limit }): Promise<Array<BooqParent | undefined>> {
