@@ -14,7 +14,7 @@ export async function booqIdsInCollections(userId: string, ...names: string[]): 
       FROM user_collections_books ucb
       JOIN collections c ON ucb.collection_id = c.id
       WHERE c.user_id = ${userId}
-        AND c.name IN (${names.join(', ')})
+        AND c.name = ANY(${names})
     `
     return result.map(r => r.booq_id)
 }

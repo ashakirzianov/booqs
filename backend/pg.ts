@@ -3,96 +3,97 @@ import { downloadAsset } from './s3'
 import { sql } from './db'
 
 export const pgLibrary: Library = {
-    search,
-    cards,
-    fileForId,
-    forAuthor,
+  search,
+  cards,
+  fileForId,
+  forAuthor,
 }
 
 export const pgEpubsBucket = 'pg-epubs'
 
 export type DbPgCard = {
-    id: string,
-    asset_id: string,
-    length: number | null,
-    title: string,
-    authors: string[],
-    language: string | null,
-    description: string | null,
-    subjects: string[] | null,
-    cover: string | null,
-    metadata: any,
-    created_at: string,
+  id: string,
+  asset_id: string,
+  length: number | null,
+  title: string,
+  authors: string[],
+  language: string | null,
+  description: string | null,
+  subjects: string[] | null,
+  cover: string | null,
+  metadata: any,
+  created_at: string,
 }
 
 
 export async function cards(ids: string[]): Promise<LibraryCard[]> {
-    if (ids.length === 0) return []
+  if (ids.length === 0) return []
 
-    const result = await sql`
+  const result = await sql`
       SELECT * FROM pg_cards
-      WHERE id IN (${ids.join(',')})
+      WHERE id = ANY(${ids})
     `
-    const cards = result as DbPgCard[]
-    const mapped = cards.map(convertToLibraryCard)
-    return mapped
+
+  const cards = result as DbPgCard[]
+  const mapped = cards.map(convertToLibraryCard)
+  return mapped
 }
 
 async function fileForId(id: string) {
-    const [row] = await sql`
+  const [row] = await sql`
     SELECT asset_id FROM pg_cards
     WHERE id = ${id}
   `
-    if (!row.asset_id) {
-        return undefined
-    } else {
-        const asset = await downloadAsset(pgEpubsBucket, row.asset_id)
-        return Buffer.isBuffer(asset)
-            ? { kind: 'epub', file: asset } as const
-            : undefined
-    }
+  if (!row.asset_id) {
+    return undefined
+  } else {
+    const asset = await downloadAsset(pgEpubsBucket, row.asset_id)
+    return Buffer.isBuffer(asset)
+      ? { kind: 'epub', file: asset } as const
+      : undefined
+  }
 }
 
 export async function forAuthor(name: string, limit?: number, offset?: number): Promise<LibraryCard[]> {
-    const result = await sql`
+  const result = await sql`
       SELECT * FROM pg_cards
       WHERE ${'%' + name + '%'} ILIKE ANY(authors)
       ORDER BY created_at DESC
       ${offset !== undefined ? sql`OFFSET ${offset}` : sql``}
       ${limit !== undefined ? sql`LIMIT ${limit}` : sql``}
     `
-    const cards = result as DbPgCard[]
-    return cards.map(convertToLibraryCard)
+  const cards = result as DbPgCard[]
+  return cards.map(convertToLibraryCard)
 }
 
 function convertToLibraryCard({
-    id, title, authors, language, length,
-    cover, description, subjects,
+  id, title, authors, language, length,
+  cover, description, subjects,
 }: DbPgCard): LibraryCard {
-    return {
-        id, title,
-        language: language ?? undefined,
-        author: authors[0] ?? '',
-        length: length ?? 0,
-        cover: cover ?? undefined,
-        description: description ?? undefined,
-        subjects: subjects ?? [],
-    }
+  return {
+    id, title,
+    language: language ?? undefined,
+    author: authors[0] ?? '',
+    length: length ?? 0,
+    cover: cover ?? undefined,
+    description: description ?? undefined,
+    subjects: subjects ?? [],
+  }
 }
 
 async function search(_query: string, _limit: number, _scope: SearchScope[]): Promise<SearchResult[]> {
-    return []
+  return []
 }
 
 export async function existingAssetIds(): Promise<string[]> {
-    const result = await sql`
+  const result = await sql`
       SELECT asset_id FROM pg_cards
     `
-    return result.map(row => row.asset_id)
+  return result.map(row => row.asset_id)
 }
 
 export async function insertCard(card: Omit<DbPgCard, 'searchable_tsv' | 'created_at'>): Promise<DbPgCard | null> {
-    const [inserted] = await sql`
+  const [inserted] = await sql`
       INSERT INTO pg_cards (
         id,
         asset_id,
@@ -120,5 +121,5 @@ export async function insertCard(card: Omit<DbPgCard, 'searchable_tsv' | 'create
       ON CONFLICT (id) DO NOTHING
       RETURNING *
     `
-    return inserted ? (inserted as DbPgCard) : null
+  return inserted ? (inserted as DbPgCard) : null
 }
