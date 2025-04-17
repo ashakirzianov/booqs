@@ -45,10 +45,11 @@ export const mutationResolver: IResolvers<any, ResolverContext> = {
             if (user?._id) {
                 return addHighlight({
                     userId: user._id,
-                    id: highlight.id,
                     booqId: highlight.booqId,
-                    start: highlight.start,
-                    end: highlight.end,
+                    range: {
+                        start: highlight.start,
+                        end: highlight.end,
+                    },
                     group: highlight.group,
                 })
             } else {
@@ -78,14 +79,12 @@ export const mutationResolver: IResolvers<any, ResolverContext> = {
         },
         async addBooqHistory(_, { event }, { user }) {
             if (user?._id) {
-                return addBooqHistory(
-                    user._id,
-                    {
-                        booqId: event.booqId,
-                        path: event.path,
-                        source: event.source,
-                        date: Date.now(),
-                    })
+                return addBooqHistory(user._id, {
+                    booqId: event.booqId,
+                    path: event.path,
+                    source: event.source,
+                    date: Date.now(),
+                })
             } else {
                 return false
             }

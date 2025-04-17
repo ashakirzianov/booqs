@@ -1,6 +1,5 @@
 import slugify from 'slugify'
 import { userUploadsLibrary } from './uu'
-import { removeAllHighlightsForUserId } from './highlights'
 import { deleteUserCredentials } from './passkey'
 import { estimatedRowCount, sql } from './db'
 
@@ -42,21 +41,20 @@ export async function createUser({
 
 export async function deleteUserForId(id: string): Promise<boolean> {
     const deleteUserPromise = await deleteDbUserForId(id)
-    const deleteHighlightsPromise = removeAllHighlightsForUserId(id)
     const deleteBooksPromise = userUploadsLibrary.deleteAllBooksForUserId
         ? userUploadsLibrary.deleteAllBooksForUserId(id) : Promise.resolve(true)
     const deleteCredentialsPromise = deleteUserCredentials(id)
 
     const [
         deleteUserResult,
-        deleteHighlightsResult, deleteBooksResult,
+        deleteBooksResult,
         _deleteCredentialsResult,
     ] = await Promise.all([
         deleteUserPromise,
-        deleteHighlightsPromise, deleteBooksPromise,
+        deleteBooksPromise,
         deleteCredentialsPromise,
     ])
-    return deleteUserResult && deleteHighlightsResult && deleteBooksResult
+    return deleteUserResult && deleteBooksResult
 }
 
 async function deleteDbUserForId(id: string) {
