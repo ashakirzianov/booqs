@@ -7,7 +7,7 @@ export type DbHighlight = {
   booq_id: string,
   start_path: number[],
   end_path: number[],
-  group: string,
+  color: string,
   note: string | null,
   created_at: string,
   updated_at: string,
@@ -48,21 +48,21 @@ export async function addHighlight({
   userId,
   booqId,
   range,
-  group,
+  color,
   note,
 }: {
   userId: string,
   booqId: string,
   range: BooqRange,
-  group: string,
+  color: string,
   note?: string,
 }): Promise<DbHighlight> {
   const [highlight] = await sql`
       INSERT INTO highlights (
-        user_id, booq_id, start_path, end_path, group, note
+        user_id, booq_id, start_path, end_path, color, note
       )
       VALUES (
-        ${userId}, ${booqId}, ${range.start}, ${range.end}, ${group}, ${note ?? null}
+        ${userId}, ${booqId}, ${range.start}, ${range.end}, ${color}, ${note ?? null}
       )
       RETURNING *
     `
@@ -80,20 +80,20 @@ export async function removeHighlight({ id, userId }: {
 }
 
 export async function updateHighlight({
-  id, userId, group, note,
+  id, userId, color, note,
 }: {
   id: string,
   userId: string,
-  group?: string,
+  color?: string,
   note?: string,
 }): Promise<void> {
-  if (group === undefined && note === undefined) return
+  if (color === undefined && note === undefined) return
 
   await sql`
       UPDATE highlights
       SET
         updated_at = NOW()
-        ${group !== undefined ? sql`, group = ${group}` : sql``}
+        ${color !== undefined ? sql`, color = ${color}` : sql``}
         ${note !== undefined ? sql`, note = ${note}` : sql``}
       WHERE highlight_id = ${id} AND user_id = ${userId}
     `

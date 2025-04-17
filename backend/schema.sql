@@ -73,7 +73,7 @@ CREATE TABLE highlights (
   booq_id TEXT NOT NULL,
   start_path INTEGER[] NOT NULL,
   end_path INTEGER[] NOT NULL,
-  group TEXT NOT NULL,
+  color TEXT NOT NULL,
   note TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()

@@ -50,7 +50,7 @@ export const mutationResolver: IResolvers<any, ResolverContext> = {
                         start: highlight.start,
                         end: highlight.end,
                     },
-                    group: highlight.group,
+                    color: highlight.color,
                 })
             } else {
                 return false
@@ -66,12 +66,12 @@ export const mutationResolver: IResolvers<any, ResolverContext> = {
                 return false
             }
         },
-        async updateHighlight(_, { id, group }, { user }) {
+        async updateHighlight(_, { id, color }, { user }) {
             if (user?._id) {
                 return updateHighlight({
                     userId: user._id,
                     id: id,
-                    group,
+                    color,
                 })
             } else {
                 return false

@@ -12,7 +12,7 @@ import {
 } from '@/viewer'
 import { useContextMenu, type ContextMenuState } from './ContextMenu'
 import { ReaderLayout } from './ReaderLayout'
-import { colorForGroup, currentSource, pageForPosition, quoteColor } from '@/application/common'
+import { resolveHighlightColor, currentSource, pageForPosition, quoteColor } from '@/application/common'
 import { SignInButton } from '@/components/SignIn'
 import { ReaderAnchor, ReaderBooq, ReaderHighlight, ReaderUser } from './common'
 import { NavigationPanel, useNavigationState } from './NavigationPanel'
@@ -224,7 +224,7 @@ function useAugmentations({
         const augmentations = highlights.map<Augmentation>(h => ({
             id: `highlight/${h.id}`,
             range: { start: h.start, end: h.end },
-            color: colorForGroup(h.group),
+            color: resolveHighlightColor(h.color),
         }))
         if (quote) {
             const quoteAugmentation: Augmentation = {

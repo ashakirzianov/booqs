@@ -7,7 +7,7 @@ import { MenuItem } from '@/components/Menu'
 import { quoteHref } from '@/components/Links'
 import { BooqSelection } from '@/viewer'
 import { ProfileBadge } from '@/components/ProfilePicture'
-import { colorForGroup, groups } from '@/application/common'
+import { resolveHighlightColor, highlightColorNames } from '@/application/common'
 import { ReaderHighlight, ReaderUser } from './common'
 import { useHighlightMutations } from '@/application/highlights'
 
@@ -109,7 +109,7 @@ function HighlightTargetMenu({
             />
         }
         {!isOwnHighlight ? null :
-            <SelectHighlightGroupItem  {...rest} highlight={highlight} />
+            <SelectHighlightColorItem  {...rest} highlight={highlight} />
         }
         {!isOwnHighlight ? null :
             <RemoveHighlightItem  {...rest} highlight={highlight} />
@@ -191,14 +191,14 @@ function AddHighlightItem({
     }
     return <div className='container'>
         {
-            groups.map(
-                (group, idx) => <GroupSelectionButton
+            highlightColorNames.map(
+                (color, idx) => <ColorSelectionButton
                     key={idx}
                     selected={false}
-                    color={colorForGroup(group)}
+                    color={resolveHighlightColor(color)}
                     callback={() => {
                         const highlight = addHighlight({
-                            group,
+                            color,
                             start: selection.range.start,
                             end: selection.range.end ?? selection.range.start,
                             text: selection.text,
@@ -246,7 +246,7 @@ function RemoveHighlightItem({
     />
 }
 
-function SelectHighlightGroupItem({
+function SelectHighlightColorItem({
     highlight, booqId, setTarget,
 }: {
     highlight: ReaderHighlight,
@@ -256,19 +256,19 @@ function SelectHighlightGroupItem({
     const { updateHighlight } = useHighlightMutations(booqId)
     return <div className='container'>
         {
-            groups.map(
-                (group, idx) => <GroupSelectionButton
+            highlightColorNames.map(
+                (color, idx) => <ColorSelectionButton
                     key={idx}
-                    selected={group === highlight.group}
-                    color={colorForGroup(group)}
+                    selected={color === highlight.color}
+                    color={resolveHighlightColor(color)}
                     callback={() => {
-                        updateHighlight(highlight.id, group)
+                        updateHighlight(highlight.id, color)
                         // Note: hackie way of updating selection
                         setTarget({
                             kind: 'highlight',
                             highlight: {
                                 ...highlight,
-                                group,
+                                color,
                             },
                         })
                     }}
@@ -290,7 +290,7 @@ function SelectHighlightGroupItem({
     </div>
 }
 
-function GroupSelectionButton({ color, selected, callback }: {
+function ColorSelectionButton({ color, selected, callback }: {
     selected: boolean,
     color: string,
     callback: () => void,

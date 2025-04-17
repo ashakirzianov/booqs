@@ -7,8 +7,8 @@ export function currentSource(): string {
 }
 
 const defaultColor = 'rgba(255, 215, 0, 0.6)'
-const groupColorMapping: {
-    [group in string]: string | undefined;
+const highlightColorMapping: {
+    [color in string]: string | undefined;
 } = {
     first: defaultColor,
     second: 'rgba(135, 206, 235, 0.6)',
@@ -16,8 +16,8 @@ const groupColorMapping: {
     forth: 'rgba(75, 0, 130, 0.6)',
     fifth: 'rgba(34, 139, 34, 0.6)',
 }
-export function colorForGroup(group: string) {
-    return groupColorMapping[group] ?? defaultColor
+export function resolveHighlightColor(color: string) {
+    return highlightColorMapping[color] ?? defaultColor
 }
 export const quoteColor = 'rgba(255, 165, 0, 0.6)'
-export const groups = Object.keys(groupColorMapping)
+export const highlightColorNames = Object.keys(highlightColorMapping)
