@@ -1,9 +1,10 @@
+CREATE EXTENSION IF NOT EXISTS citext;
 CREATE TABLE users (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   username CITEXT UNIQUE NOT NULL,
-  email CITEXT UNIQUE NOT NULL,
+  email CITEXT UNIQUE,
   profile_picture_url TEXT,
-  joined_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  joined_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 CREATE TABLE pg_cards (
@@ -17,6 +18,7 @@ CREATE TABLE pg_cards (
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   searchable_tsv TSVECTOR
 );
+CREATE INDEX pg_cards_search_idx ON pg_cards USING GIN (searchable_tsv);
 
 CREATE TABLE uu_cards (
   booq_id TEXT PRIMARY KEY,
@@ -30,6 +32,7 @@ CREATE TABLE uu_cards (
   file_hash TEXT NOT NULL,
   searchable_tsv TSVECTOR
 );
+CREATE INDEX uu_cards_search_idx ON uu_cards USING GIN (searchable_tsv);
 
 CREATE TABLE uploads (
   user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -46,6 +49,8 @@ CREATE TABLE collections (
   updated_at TIMESTAMPTZ DEFAULT NOW(),
   CONSTRAINT user_collection_name_unique UNIQUE (user_id, name)
 );
+CREATE INDEX collections_user_id_idx ON collections(user_id);
+
 CREATE TABLE user_collections_books (
   collection_id UUID REFERENCES collections(id) ON DELETE CASCADE,
   booq_id TEXT NOT NULL,
@@ -60,6 +65,7 @@ CREATE TABLE bookmarks (
   path SMALLINT[] NOT NULL,
   CONSTRAINT unique_user_booq_path UNIQUE (user_id, booq_id, path)
 );
+CREATE INDEX bookmarks_user_booq_idx ON bookmarks(user_id, booq_id);
 
 CREATE TABLE highlights (
   highlight_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -70,5 +76,5 @@ CREATE TABLE highlights (
   group TEXT NOT NULL,
   note TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
 );
