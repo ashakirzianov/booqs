@@ -25,25 +25,27 @@ export const mutationResolver: IResolvers<any, ResolverContext> = {
         },
         async addBookmark(_, { bookmark }, { user }) {
             if (user?.id) {
-                return addBookmark({
+                await addBookmark({
                     userId: user.id,
                     booqId: bookmark.booqId,
                     path: bookmark.path,
                 })
+                return true
             } else {
                 return false
             }
         },
         async removeBookmark(_, { id }, { user }) {
             if (user?.id) {
-                return deleteBookmark(id)
+                await deleteBookmark(id)
+                return true
             } else {
                 return false
             }
         },
         async addHighlight(_, { highlight }, { user }) {
             if (user?.id) {
-                return addHighlight({
+                await addHighlight({
                     userId: user.id,
                     booqId: highlight.booqId,
                     range: {
@@ -52,59 +54,65 @@ export const mutationResolver: IResolvers<any, ResolverContext> = {
                     },
                     color: highlight.color,
                 })
+                return true
             } else {
                 return false
             }
         },
         async removeHighlight(_, { id }, { user }) {
             if (user?.id) {
-                return removeHighlight({
+                await removeHighlight({
                     userId: user.id,
                     id: id,
                 })
+                return true
             } else {
                 return false
             }
         },
         async updateHighlight(_, { id, color }, { user }) {
             if (user?.id) {
-                return updateHighlight({
+                await updateHighlight({
                     userId: user.id,
                     id: id,
                     color,
                 })
+                return true
             } else {
                 return false
             }
         },
         async addBooqHistory(_, { event }, { user }) {
             if (user?.id) {
-                return addBooqHistory(user.id, {
+                await addBooqHistory(user.id, {
                     booqId: event.booqId,
                     path: event.path,
                     source: event.source,
                     date: Date.now(),
                 })
+                return true
             } else {
                 return false
             }
         },
         async addToCollection(_, { booqId, name }, { user }) {
             if (user?.id) {
-                return addToCollection({
+                await addToCollection({
                     userId: user.id,
                     name, booqId,
                 })
+                return true
             } else {
                 return false
             }
         },
         async removeFromCollection(_, { booqId, name }, { user }) {
             if (user?.id) {
-                return removeFromCollection({
+                await removeFromCollection({
                     userId: user.id,
                     name, booqId,
                 })
+                return true
             } else {
                 return false
             }
