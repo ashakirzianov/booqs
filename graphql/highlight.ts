@@ -33,5 +33,11 @@ export const highlightResolver: IResolvers<HighlightParent> = {
             const position = positionForPath(booq.nodes, parent.start_path)
             return position
         },
+        start(parent) {
+            return parent.start_path
+        },
+        end(parent) {
+            return parent.end_path
+        },
     },
 }
