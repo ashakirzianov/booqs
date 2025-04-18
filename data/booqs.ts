@@ -10,13 +10,13 @@ import { booqIdsInCollections } from '@/backend/collections'
 
 export type Tag = {
     tag: string,
-    value?: string,
+    value?: string | null,
 }
 export type BooqCard = {
     id: string,
-    title?: string,
-    author?: string,
-    cover?: string,
+    title: string | null,
+    author: string | null,
+    cover: string | null,
     tags: Tag[],
 }
 export type BooqPreview = {
@@ -116,10 +116,10 @@ function buildBooqCard(card: LibraryCard, coverSize: number) {
     return {
         id: card.id,
         title: card.title,
-        author: card.author,
+        author: card.authors[0] ?? null,
         cover: card.cover
             ? booqImageUrl(card.id, card.cover, coverSize)
-            : undefined,
+            : null,
         tags: buildTags(card),
     }
 }

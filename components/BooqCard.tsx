@@ -6,12 +6,12 @@ import { ReactNode } from 'react'
 
 export type BooqCardData = {
     id: string,
-    title?: string,
-    author?: string,
-    cover?: string,
+    title: string | null,
+    author: string | null,
+    cover: string | null,
     tags: Array<{
         tag: string,
-        value?: string,
+        value?: string | null,
     }>,
 }
 export function BooqCard({
@@ -42,8 +42,8 @@ export function BooqCard({
 }
 
 function Header({ title, author }: {
-    title?: string,
-    author?: string,
+    title: string | null,
+    author: string | null,
 }) {
     return <div className='flex flex-col items-baseline'>
         <span className="text-xl font-bold">{title}</span>

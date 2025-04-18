@@ -3,9 +3,9 @@ import React from 'react'
 const defaultSize = 70
 
 export function BooqCover({ cover, title, author, size }: {
-    cover?: string,
-    title?: string,
-    author?: string,
+    cover: string | null,
+    title: string | null,
+    author: string | null,
     size?: number,
 }) {
     size = size ?? defaultSize
@@ -23,20 +23,20 @@ export function BooqCover({ cover, title, author, size }: {
 
 function BooqImageCover({ cover, title }: {
     cover: string,
-    title?: string,
+    title: string | null,
 }) {
-    return <div title={title} className='flex w-full h-full bg-cover bg-no-repeat' style={{
+    return <div title={title ?? undefined} className='flex w-full h-full bg-cover bg-no-repeat' style={{
         backgroundImage: `url(${cover})`,
     }} />
 }
 
 function BooqDefaultCover({ title, author, size }: {
-    title?: string,
-    author?: string,
+    title: string | null,
+    author: string | null,
     size: number,
 }) {
     const { back, text } = colorForString(title ?? 'no-title' + author)
-    return <div title={title} className='flex flex-row grow items-stretch'>
+    return <div title={title ?? undefined} className='flex flex-row grow items-stretch'>
         <div className='flex flex-col grow items-center justify-center overflow-hidden text-ellipsis text-center p-[10%]' style={{
             fontSize: calcFontSize(title ?? 'no-title', size),
             background: back,

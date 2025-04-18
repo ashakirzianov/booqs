@@ -155,7 +155,7 @@ function BooqSearchResultContent({ result, query }: {
         <BooqCover
             cover={result.cover}
             title={result.title}
-            author={result.author}
+            author={result.authors[0] ?? null}
             size={20}
         />
         <div className='flex flex-col my-0 mx-lg'>
@@ -163,7 +163,7 @@ function BooqSearchResultContent({ result, query }: {
                 text={result.title ?? ''}
                 emphasis={query}
             />
-            <span>{result.author}</span>
+            <span>{result.authors[0]}</span>
         </div>
     </Link>
 }

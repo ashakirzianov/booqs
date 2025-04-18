@@ -324,10 +324,10 @@ function convertToLibraryCard(doc: DbUuCard): LibraryCard {
         id: doc.id,
         length: doc.length ?? 0,
         title: doc.title,
-        author: doc.authors[0] ?? undefined,
-        language: doc.language ?? undefined,
-        description: doc.description ?? undefined,
+        authors: doc.authors,
+        language: doc.language,
+        description: doc.description,
         subjects: doc.subjects ?? [],
-        cover: doc.cover ?? undefined,
+        cover: doc.cover,
     }
 }

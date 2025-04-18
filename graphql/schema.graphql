@@ -52,7 +52,7 @@ scalar WebAuthnAuthenticationResponseJSON
 type Booq {
     id: ID!
     title: String
-    author: String
+    authors: [String]
     language: String,
     length: Int
     cover(size: Int): String

@@ -11,12 +11,12 @@ import { localLibrary } from './lo'
 export type LibraryCard = {
     id: string,
     length: number,
-    title?: string,
-    author?: string,
-    language?: string,
-    description?: string,
-    subjects?: string[],
-    cover?: string,
+    title: string | null,
+    authors: string[],
+    language: string | null,
+    description: string | null,
+    subjects: string[],
+    cover: string | null,
 }
 export type BookFile = {
     kind: 'epub',

@@ -2,7 +2,7 @@ import React from 'react'
 
 export type BooqTag = {
     tag: string,
-    value?: string,
+    value?: string | null,
 }
 export function BooqTags({ tags }: {
     tags: BooqTag[],
@@ -39,7 +39,7 @@ function BooqTagPill({ tag }: {
             return <Pill
                 color="pink"
                 label="Project Gutenberg"
-                title={tag.value}
+                title={tag.value ?? undefined}
             />
         case 'pages':
             return <Pill

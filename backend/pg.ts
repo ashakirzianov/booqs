@@ -72,11 +72,11 @@ function convertToLibraryCard({
 }: DbPgCard): LibraryCard {
   return {
     id, title,
-    language: language ?? undefined,
-    author: authors[0] ?? '',
+    language,
+    authors,
     length: length ?? 0,
-    cover: cover ?? undefined,
-    description: description ?? undefined,
+    cover,
+    description,
     subjects: subjects ?? [],
   }
 }
