@@ -3,7 +3,7 @@ import { Popover } from '@/components/Popover'
 import { Icon } from '@/components/Icon'
 import { ContextMenuContent } from '@/reader/ContextMenuContent'
 import { ProfileBadge } from '@/components/ProfilePicture'
-import { colorForGroup } from '@/application/common'
+import { resolveHighlightColor } from '@/application/common'
 import { ReaderHighlight, ReaderUser } from './common'
 
 export function HighlightNodeComp({ booqId, highlight, self }: {
@@ -14,7 +14,7 @@ export function HighlightNodeComp({ booqId, highlight, self }: {
     const badgeClass = self?.id === highlight.author.id
         ? 'hidden' : 'flex'
     return <div className='container flex flex-1 justify-between pl-base' style={{
-        borderLeft: `3px solid ${colorForGroup(highlight.group)}`,
+        borderLeft: `3px solid ${resolveHighlightColor(highlight.color)}`,
     }}>
         <div className='w-full text-primary text-justify'>
             <BooqLink booqId={booqId} path={highlight.start}>

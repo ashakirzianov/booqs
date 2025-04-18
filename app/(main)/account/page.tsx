@@ -31,7 +31,7 @@ function AccountMounted() {
 
 function SignedIn({ account }: {
     account: {
-        name?: string,
+        name: string | null,
         joined: string,
     },
 }) {

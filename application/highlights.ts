@@ -9,7 +9,7 @@ const HighlightsQuery = gql`query HighlightsQuery($booqId: ID!) {
             id
             start
             end
-            group
+            color
             text
             position
             author {
@@ -28,7 +28,7 @@ type HighlightsData = {
             id: string,
             start: BooqPath,
             end: BooqPath,
-            group: string,
+            color: string,
             text: string,
             position: number | null,
             author: {
@@ -61,7 +61,7 @@ type AddHighlightVars = {
     highlight: {
         id: string,
         booqId: string,
-        group: string,
+        color: string,
         start: BooqPath,
         end: BooqPath,
     },
@@ -72,11 +72,11 @@ const RemoveHighlightMutation = gql`mutation RemoveHighlight($id: ID!) {
 type RemoveHighlightData = { removeHighlight: boolean }
 type RemoveHighlightVars = { id: string }
 
-const UpdateHighlightMutation = gql`mutation UpdateHighlight($id: ID!, $group: String) {
-    updateHighlight(id: $id, group: $group)
+const UpdateHighlightMutation = gql`mutation UpdateHighlight($id: ID!, $color: String) {
+    updateHighlight(id: $id, color: $color)
 }`
 type UpdateHighlightData = { updateHighlight: boolean }
-type UpdateHighlightVars = { id: string, group?: string }
+type UpdateHighlightVars = { id: string, color?: string }
 
 export function useHighlightMutations(booqId: string) {
     const [add] = useMutation<AddHighlightData, AddHighlightVars>(
@@ -92,7 +92,7 @@ export function useHighlightMutations(booqId: string) {
         addHighlight(input: {
             start: BooqPath,
             end: BooqPath,
-            group: string,
+            color: string,
             text: string,
             author: {
                 id: string,
@@ -105,7 +105,7 @@ export function useHighlightMutations(booqId: string) {
                 id: uniqueId(),
                 start: input.start,
                 end: input.end,
-                group: input.group,
+                color: input.color,
             }
             const created: Highlight = {
                 ...input,
@@ -177,9 +177,9 @@ export function useHighlightMutations(booqId: string) {
                 }
             })
         },
-        updateHighlight(id: string, group: string) {
+        updateHighlight(id: string, color: string) {
             update({
-                variables: { id, group },
+                variables: { id, color },
                 optimisticResponse: { updateHighlight: true },
                 update(cache, { data }) {
                     if (data?.updateHighlight) {
@@ -197,7 +197,7 @@ export function useHighlightMutations(booqId: string) {
                                     booq: {
                                         ...cached.booq,
                                         highlights: cached.booq.highlights.map(
-                                            h => h.id === id ? { ...h, group } : h,
+                                            h => h.id === id ? { ...h, color } : h,
                                         ),
                                     },
                                 }

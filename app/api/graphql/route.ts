@@ -1,7 +1,7 @@
 import typeDefs from '@/graphql/schema.graphql' assert { type: 'text' }
 import { createYoga, createSchema } from 'graphql-yoga'
-import { context, resolvers } from '@/graphql'
-import { ResolverContext } from '@/graphql/context'
+import { resolvers } from '@/graphql/resolvers'
+import { ResolverContext, context } from '@/graphql/context'
 import { cookies, headers } from 'next/headers'
 import { NextRequest } from 'next/server'
 

@@ -94,6 +94,7 @@ function UploadModalContent({ closeModal }: {
             <div className='p-4'>
                 <BooqCover
                     title={result.title}
+                    author={null}
                     cover={result.cover}
                 />
             </div>

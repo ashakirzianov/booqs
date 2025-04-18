@@ -28,7 +28,7 @@ export type ReaderHighlight = {
     id: string,
     start: BooqPath,
     end: BooqPath,
-    group: string,
+    color: string,
     text: string,
     position?: number | null,
     author: ReaderUser
