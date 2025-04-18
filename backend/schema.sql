@@ -33,13 +33,16 @@ CREATE INDEX IF NOT EXISTS pg_cards_search_idx ON pg_cards USING GIN (searchable
 CREATE TABLE IF NOT EXISTS uu_cards (
   id TEXT PRIMARY KEY,
   asset_id TEXT NOT NULL,
-  title TEXT NOT NULL,
-  author TEXT,
-  language TEXT,
   length INTEGER,
+  title TEXT NOT NULL,
+  authors TEXT[] NOT NULL,
+  language TEXT,
+  description TEXT,
+  subjects TEXT[],
+  cover TEXT,
   metadata JSONB DEFAULT '{}'::jsonb,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   file_hash TEXT NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   searchable_tsv TSVECTOR
 );
 CREATE INDEX IF NOT EXISTS uu_cards_search_idx ON uu_cards USING GIN (searchable_tsv);
@@ -47,9 +50,9 @@ CREATE INDEX IF NOT EXISTS uu_cards_search_idx ON uu_cards USING GIN (searchable
 -- Uploads
 CREATE TABLE IF NOT EXISTS uploads (
   user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  id TEXT NOT NULL,
+  upload_id TEXT NOT NULL REFERENCES uu_cards(id) ON DELETE CASCADE,
   uploaded_at TIMESTAMPTZ DEFAULT NOW(),
-  PRIMARY KEY (user_id, id)
+  PRIMARY KEY (user_id, upload_id)
 );
 
 -- Collections
