@@ -1,5 +1,4 @@
 import { inspect } from 'util'
-import { typedModel, TypeFromSchema } from './mongoose'
 import { makeBatches } from './utils'
 import { Booq, filterUndefined, nodesLength } from '@/core'
 import { Asset, downloadAsset, listObjects } from './s3'
@@ -8,32 +7,25 @@ import {
 } from './pg'
 import { parseEpub } from '@/parser'
 import { uploadBooqImages } from './images'
+import { redis } from './db'
 
-const schema = {
-    id: {
-        type: String,
-        required: true,
-    },
-    kind: {
-        type: String,
-        required: true,
-    },
-    message: String,
-    data: Object,
-} as const
-
-type DbLog = TypeFromSchema<typeof schema>
-const logModel = typedModel('log', schema)
-
-async function logItem(item: Omit<DbLog, '_id'>) {
-    return (await logModel).insertMany([item])
+type Log = {
+    kind: string,
+    message: string,
+    id: string,
+    data?: object,
+}
+async function logItem(item: Log) {
+    return redis.hset('logs', {
+        [`${item.kind}:${item.id}`]: JSON.stringify(item),
+    })
 }
 
 async function logExists({ kind, id }: {
     kind: string,
     id: string,
 }) {
-    return (await logModel).exists({ kind, id })
+    return redis.hexists('logs', `${kind}:${id}`)
 }
 
 export async function pgSyncWorker() {
