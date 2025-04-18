@@ -177,7 +177,7 @@ async function insertRecord({ booq, assetId, fileHash }: {
     const id = uniqueId()
     const length = nodesLength(booq.nodes)
     // TODO: support multiple languages
-    const [inserted] = await sql`
+    const query = sql`
       INSERT INTO uu_cards (
         id,
         asset_id,
@@ -201,12 +201,13 @@ async function insertRecord({ booq, assetId, fileHash }: {
         ${descriptions?.join('\n') ?? null},
         ${subjects ?? []},
         ${cover?.href ?? null},
-        ${tags ?? {}},
+        ${{ tags }},
         ${fileHash}
       )
       ON CONFLICT (id) DO NOTHING
       RETURNING *
     `
+    const [inserted] = await query
     return inserted ? (inserted as DbUuCard) : null
 }
 
