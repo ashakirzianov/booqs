@@ -176,6 +176,7 @@ async function insertRecord({ booq, assetId, fileHash }: {
     }
     const id = uniqueId()
     const length = nodesLength(booq.nodes)
+    // TODO: support multiple languages
     const [inserted] = await sql`
       INSERT INTO uu_cards (
         id,
@@ -196,8 +197,8 @@ async function insertRecord({ booq, assetId, fileHash }: {
         ${length},
         ${title},
         ${authors},
-        ${languages?.[0] ?? null},
-        ${descriptions?.[0] ?? null},
+        ${languages?.join(', ') ?? null},
+        ${descriptions?.join('\n') ?? null},
         ${subjects ?? []},
         ${cover?.href ?? null},
         ${tags ?? {}},
