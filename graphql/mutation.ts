@@ -3,9 +3,13 @@ import { ResolverContext } from './context'
 import { deleteUserForId } from '@/backend/users'
 import { addHighlight, removeHighlight, updateHighlight } from '@/backend/highlights'
 import { initiatePasskeyLogin, initiatePasskeyRegistration, verifyPasskeyLogin, verifyPasskeyRegistration } from '@/backend/passkey'
-import { addToCollection, removeFromCollection } from '@/backend/collections'
+import { addToCollection, booqIdsInCollections, removeFromCollection } from '@/backend/collections'
 import { addBooqHistory } from '@/backend/history'
 import { addBookmark, deleteBookmark } from '@/backend/bookmarks'
+import { BookmarkParent } from './bookmark'
+import { HighlightParent } from './highlight'
+import { BooqHistoryParent } from './history'
+import { CollectionParent } from './collection'
 
 export const mutationResolver: IResolvers<any, ResolverContext> = {
     Mutation: {
@@ -22,29 +26,27 @@ export const mutationResolver: IResolvers<any, ResolverContext> = {
                 return false
             }
         },
-        async addBookmark(_, { bookmark }, { userId }) {
+        async addBookmark(_, { bookmark }, { userId }): Promise<BookmarkParent | null> {
             if (userId) {
-                await addBookmark({
+                return addBookmark({
                     userId,
                     booqId: bookmark.booqId,
                     path: bookmark.path,
                 })
-                return true
             } else {
-                return false
+                return null
             }
         },
         async removeBookmark(_, { id }, { userId }) {
             if (userId) {
-                await deleteBookmark(id)
-                return true
+                return deleteBookmark(id)
             } else {
                 return false
             }
         },
-        async addHighlight(_, { highlight }, { userId }) {
+        async addHighlight(_, { highlight }, { userId }): Promise<HighlightParent | null> {
             if (userId) {
-                await addHighlight({
+                return addHighlight({
                     userId: userId,
                     booqId: highlight.booqId,
                     range: {
@@ -53,67 +55,63 @@ export const mutationResolver: IResolvers<any, ResolverContext> = {
                     },
                     color: highlight.color,
                 })
-                return true
             } else {
-                return false
+                return null
             }
         },
         async removeHighlight(_, { id }, { userId }) {
             if (userId) {
-                await removeHighlight({
+                return removeHighlight({
                     userId,
                     id: id,
                 })
-                return true
             } else {
                 return false
             }
         },
-        async updateHighlight(_, { id, color }, { userId }) {
+        async updateHighlight(_, { id, color }, { userId }): Promise<HighlightParent | null> {
             if (userId) {
-                await updateHighlight({
+                return updateHighlight({
                     userId,
                     id: id,
                     color,
                 })
-                return true
             } else {
-                return false
+                return null
             }
         },
-        async addBooqHistory(_, { event }, { userId }) {
+        async addBooqHistory(_, { event }, { userId }): Promise<BooqHistoryParent | null> {
             if (userId) {
-                await addBooqHistory(userId, {
+                return addBooqHistory(userId, {
                     booqId: event.booqId,
                     path: event.path,
                     source: event.source,
                     date: Date.now(),
                 })
-                return true
             } else {
-                return false
+                return null
             }
         },
-        async addToCollection(_, { booqId, name }, { userId }) {
+        async addToCollection(_, { booqId, name }, { userId }): Promise<CollectionParent | null> {
             if (userId) {
                 await addToCollection({
                     userId,
                     name, booqId,
                 })
-                return true
+                return booqIdsInCollections(userId, name)
             } else {
-                return false
+                return null
             }
         },
-        async removeFromCollection(_, { booqId, name }, { userId }) {
+        async removeFromCollection(_, { booqId, name }, { userId }): Promise<CollectionParent | null> {
             if (userId) {
                 await removeFromCollection({
                     userId,
                     name, booqId,
                 })
-                return true
+                return booqIdsInCollections(userId, name)
             } else {
-                return false
+                return null
             }
         },
         async initPasskeyRegistration(_, __, { origin }) {

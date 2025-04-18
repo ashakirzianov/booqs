@@ -27,7 +27,7 @@ export async function addToCollection({
     userId: string,
     booqId: string,
     name: string,
-}): Promise<void> {
+}): Promise<boolean> {
     const [collection] = await sql`
       INSERT INTO collections (user_id, name)
       VALUES (${userId}, ${name})
@@ -35,11 +35,12 @@ export async function addToCollection({
       RETURNING id
     `
 
-    await sql`
-      INSERT INTO user_collections_books (collection_id, booq_id)
-      VALUES (${collection.id}, ${booqId})
-      ON CONFLICT DO NOTHING
-    `
+    const result = await sql`
+    INSERT INTO user_collections_books (collection_id, booq_id)
+    VALUES (${collection.id}, ${booqId})
+    ON CONFLICT DO NOTHING
+  `
+    return result.length > 0
 }
 
 export async function removeFromCollection({
@@ -50,17 +51,18 @@ export async function removeFromCollection({
     userId: string,
     booqId: string,
     name: string,
-}): Promise<void> {
+}): Promise<boolean> {
     const [collection] = await sql`
       SELECT id FROM collections
       WHERE user_id = ${userId} AND name = ${name}
     `
-    if (!collection) return
+    if (!collection) return false
 
-    await sql`
-      DELETE FROM user_collections_books
-      WHERE collection_id = ${collection.id} AND booq_id = ${booqId}
-    `
+    const result = await sql`
+    DELETE FROM user_collections_books
+    WHERE collection_id = ${collection.id} AND booq_id = ${booqId}
+  `
+    return result.length > 0
 }
 
 export async function addUpload(userId: string, uploadId: string) {

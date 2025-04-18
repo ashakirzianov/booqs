@@ -31,17 +31,19 @@ export async function addBookmark({
     userId: string,
     booqId: string,
     path: BooqPath,
-}): Promise<void> {
-    await sql`
+}): Promise<DbBookmark> {
+    const [row] = await sql`
       INSERT INTO bookmarks (user_id, booq_id, path)
       VALUES (${userId}, ${booqId}, ${path})
       ON CONFLICT DO NOTHING
     `
+    return row as DbBookmark
 }
 
-export async function deleteBookmark(id: string): Promise<void> {
-    await sql`
+export async function deleteBookmark(id: string): Promise<boolean> {
+    const rows = await sql`
       DELETE FROM bookmarks
       WHERE id = ${id}
     `
+    return rows.length > 0
 }

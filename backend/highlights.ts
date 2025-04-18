@@ -72,11 +72,12 @@ export async function addHighlight({
 export async function removeHighlight({ id, userId }: {
   id: string,
   userId: string,
-}): Promise<void> {
-  await sql`
+}): Promise<boolean> {
+  const rows = await sql`
       DELETE FROM highlights
       WHERE highlight_id = ${id} AND user_id = ${userId}
     `
+  return rows.length > 0
 }
 
 export async function updateHighlight({
@@ -86,15 +87,17 @@ export async function updateHighlight({
   userId: string,
   color?: string,
   note?: string,
-}): Promise<void> {
-  if (color === undefined && note === undefined) return
+}): Promise<DbHighlight | null> {
+  if (color === undefined && note === undefined) return null
 
-  await sql`
+  const [row] = await sql`
       UPDATE highlights
       SET
         updated_at = NOW()
         ${color !== undefined ? sql`, color = ${color}` : sql``}
         ${note !== undefined ? sql`, note = ${note}` : sql``}
       WHERE highlight_id = ${id} AND user_id = ${userId}
+      RETURNING *
     `
+  return (row as DbHighlight) ?? null
 }

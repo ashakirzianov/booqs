@@ -10,14 +10,14 @@ type Query {
     copilot(context: CopilotContext!): Copilot
 }
 type Mutation {
-    addBookmark(bookmark: BookmarkInput!): Boolean
+    addBookmark(bookmark: BookmarkInput!): Bookmark
     removeBookmark(id: ID!): Boolean
-    addHighlight(highlight: HighlightInput!): Boolean
+    addHighlight(highlight: HighlightInput!): Highlight
     removeHighlight(id: ID!): Boolean
-    updateHighlight(id: ID!, color: String): Boolean
-    addBooqHistory(event: BooqHistoryInput!): Boolean
-    addToCollection(name: String!, booqId: ID!): Boolean
-    removeFromCollection(name: String!, booqId: ID!): Boolean
+    updateHighlight(id: ID!, color: String): Highlight
+    addBooqHistory(event: BooqHistoryInput!): BooqHistory
+    addToCollection(name: String!, booqId: ID!): Collection
+    removeFromCollection(name: String!, booqId: ID!): Collection
 
     initPasskeyRegistration: InitPasskeyRegistrationResponse
     verifyPasskeyRegistration(
