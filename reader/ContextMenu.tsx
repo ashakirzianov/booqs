@@ -38,7 +38,7 @@ export function useContextMenu({
             booqId={booqId}
             self={self}
             target={menuState.target}
-            setTarget={target => setMenuState({
+            setTarget={target => updateMenuState({
                 ...menuState,
                 target,
             })}

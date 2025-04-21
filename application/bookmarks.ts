@@ -1,5 +1,6 @@
 import { useQuery, useMutation, gql } from '@apollo/client'
-import { BooqPath, uniqueId } from '@/core'
+import { BooqPath } from '@/core'
+import { v4 as uuidv4 } from 'uuid'
 
 const BookmarksQuery = gql`query BookmarksQuery($booqId: ID!) {
     booq(id: $booqId) {
@@ -53,7 +54,7 @@ export function useBookmarkMutations(booqId: string) {
     )
     return {
         addBookmark(path: BooqPath) {
-            const id = uniqueId()
+            const id = uuidv4()
             add({
                 variables: { bookmark: { path, booqId, id } },
                 optimisticResponse: { addBookmark: true },

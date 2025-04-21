@@ -1,6 +1,7 @@
 import { useQuery, useMutation, gql } from '@apollo/client'
-import { BooqPath, uniqueId } from '@/core'
+import { BooqPath } from '@/core'
 import { useMemo } from 'react'
+import { v4 as uuidv4 } from 'uuid'
 
 const HighlightsQuery = gql`query HighlightsQuery($booqId: ID!) {
     booq(id: $booqId) {
@@ -102,7 +103,7 @@ export function useHighlightMutations(booqId: string) {
         }): Highlight {
             const highlight = {
                 booqId,
-                id: uniqueId(),
+                id: uuidv4(),
                 start: input.start,
                 end: input.end,
                 color: input.color,
