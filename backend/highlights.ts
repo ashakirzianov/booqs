@@ -2,7 +2,7 @@ import { BooqRange } from '@/core'
 import { sql } from './db'
 
 export type DbHighlight = {
-  highlight_id: string,
+  id: string,
   user_id: string,
   booq_id: string,
   start_path: number[],
@@ -15,8 +15,8 @@ export type DbHighlight = {
 
 export async function highlightForId(id: string): Promise<DbHighlight | null> {
   const [highlight] = await sql`
-      SELECT * FROM highlights
-      WHERE highlight_id = ${id}
+      SELECT * FROM hi
+      WHERE id = ${id}
     `
   return highlight ? (highlight as DbHighlight) : null
 }
@@ -77,7 +77,7 @@ export async function removeHighlight({ id, userId }: {
 }): Promise<boolean> {
   const rows = await sql`
       DELETE FROM highlights
-      WHERE highlight_id = ${id} AND user_id = ${userId}
+      WHERE id = ${id} AND user_id = ${userId}
     `
   return rows.length > 0
 }
@@ -98,7 +98,7 @@ export async function updateHighlight({
         updated_at = NOW()
         ${color !== undefined ? sql`, color = ${color}` : sql``}
         ${note !== undefined ? sql`, note = ${note}` : sql``}
-      WHERE highlight_id = ${id} AND user_id = ${userId}
+      WHERE id = ${id} AND user_id = ${userId}
       RETURNING *
     `
   return (row as DbHighlight) ?? null
