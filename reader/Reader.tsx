@@ -13,7 +13,6 @@ import {
 import { useContextMenu, type ContextMenuState } from './ContextMenu'
 import { ReaderLayout } from './ReaderLayout'
 import { resolveHighlightColor, currentSource, pageForPosition, quoteColor } from '@/application/common'
-import { SignInButton } from '@/components/SignInModal'
 import { ReaderAnchor, ReaderBooq, ReaderHighlight, ReaderUser } from './common'
 import { NavigationPanel, useNavigationState } from './NavigationPanel'
 import { reportBooqHistory } from '@/data/user'
@@ -23,6 +22,7 @@ import { filterHighlights } from './nodes'
 import { useAuth } from '@/application/auth'
 import { Copilot, CopilotState } from '@/components/Copilot'
 import { useHighlights } from '@/application/highlights'
+import { AccountButton } from '@/components/AccountButton'
 
 
 export function Reader({
@@ -155,7 +155,7 @@ export function Reader({
         </FeedLink>}
         NavigationButton={NavigationButton}
         ThemerButton={<ThemerButton />}
-        AccountButton={<SignInButton />}
+        AccountButton={<AccountButton user={auth.user} />}
         CurrentPage={<PageLabel text={pagesLabel} />}
         PagesLeft={<PageLabel text={leftLabel} />}
         NavigationContent={NavigationContent}
@@ -186,7 +186,7 @@ export function LoadingBooqScreen() {
         </FeedLink>}
         NavigationButton={null}
         ThemerButton={<ThemerButton />}
-        AccountButton={<SignInButton />}
+        AccountButton={<AccountButton />}
         CurrentPage={null}
         PagesLeft={null}
         NavigationContent={null}
