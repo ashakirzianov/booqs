@@ -38,6 +38,10 @@ export function feedHref() {
     return '/'
 }
 
+export function signInHref() {
+    return '/signin'
+}
+
 export function accountHref() {
     return '/account'
 }
