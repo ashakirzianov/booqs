@@ -7,7 +7,7 @@ import { useIsMounted } from '@/application/utils'
 import { Spinner } from '@/components/Loading'
 import { feedHref } from '@/components/Links'
 import { Modal } from '@/components/Modal'
-import { SignInModal } from '@/components/SignIn'
+import { SignInModal } from '@/components/SignInModal'
 
 export default function Account() {
     const mounted = useIsMounted()

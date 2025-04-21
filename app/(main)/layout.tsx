@@ -1,6 +1,6 @@
 import { AppBar } from '@/components/AppBar'
 import { Search } from '@/components/Search'
-import { SignInButton } from '@/components/SignIn'
+import { SignInButton } from '@/components/SignInModal'
 import { UploadButton } from '@/components/Upload'
 
 export default function MainLayout({

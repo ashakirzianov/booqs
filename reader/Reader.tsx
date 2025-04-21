@@ -13,7 +13,7 @@ import {
 import { useContextMenu, type ContextMenuState } from './ContextMenu'
 import { ReaderLayout } from './ReaderLayout'
 import { resolveHighlightColor, currentSource, pageForPosition, quoteColor } from '@/application/common'
-import { SignInButton } from '@/components/SignIn'
+import { SignInButton } from '@/components/SignInModal'
 import { ReaderAnchor, ReaderBooq, ReaderHighlight, ReaderUser } from './common'
 import { NavigationPanel, useNavigationState } from './NavigationPanel'
 import { reportBooqHistory } from '@/data/user'

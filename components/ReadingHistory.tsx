@@ -2,7 +2,7 @@
 import React, { ReactNode, useState } from 'react'
 import { BooqPreview } from '@/components/BooqPreview'
 import { BooqLink } from '@/components/Links'
-import { SignInModal } from './SignIn'
+import { SignInModal } from './SignInModal'
 import { useAuth } from '@/application/auth'
 import { useHistory } from '@/application/history'
 import { pageForPosition } from '@/application/common'
