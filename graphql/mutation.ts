@@ -6,9 +6,6 @@ import { initiatePasskeyLogin, initiatePasskeyRegistration, verifyPasskeyLogin, 
 import { addToCollection, removeFromCollection } from '@/backend/collections'
 import { addBooqHistory } from '@/backend/history'
 import { addBookmark, deleteBookmark } from '@/backend/bookmarks'
-import { BookmarkParent } from './bookmark'
-import { HighlightParent } from './highlight'
-import { BooqHistoryParent } from './history'
 
 export const mutationResolver: IResolvers<any, ResolverContext> = {
     Mutation: {
@@ -25,15 +22,17 @@ export const mutationResolver: IResolvers<any, ResolverContext> = {
                 return false
             }
         },
-        async addBookmark(_, { bookmark }, { userId }): Promise<BookmarkParent | null> {
+        async addBookmark(_, { bookmark }, { userId }): Promise<boolean> {
             if (userId) {
-                return addBookmark({
+                await addBookmark({
                     userId,
+                    id: bookmark.id,
                     booqId: bookmark.booqId,
                     path: bookmark.path,
                 })
+                return true
             } else {
-                return null
+                return false
             }
         },
         async removeBookmark(_, { id }, { userId }) {
@@ -43,9 +42,10 @@ export const mutationResolver: IResolvers<any, ResolverContext> = {
                 return false
             }
         },
-        async addHighlight(_, { highlight }, { userId }): Promise<HighlightParent | null> {
+        async addHighlight(_, { highlight }, { userId }): Promise<boolean> {
             if (userId) {
-                return addHighlight({
+                await addHighlight({
+                    id: highlight.id,
                     userId: userId,
                     booqId: highlight.booqId,
                     range: {
@@ -54,8 +54,9 @@ export const mutationResolver: IResolvers<any, ResolverContext> = {
                     },
                     color: highlight.color,
                 })
+                return true
             } else {
-                return null
+                return false
             }
         },
         async removeHighlight(_, { id }, { userId }) {
@@ -68,27 +69,29 @@ export const mutationResolver: IResolvers<any, ResolverContext> = {
                 return false
             }
         },
-        async updateHighlight(_, { id, color }, { userId }): Promise<HighlightParent | null> {
+        async updateHighlight(_, { id, color }, { userId }): Promise<boolean> {
             if (userId) {
-                return updateHighlight({
+                await updateHighlight({
                     userId,
                     id: id,
                     color,
                 })
+                return true
             } else {
-                return null
+                return false
             }
         },
-        async addBooqHistory(_, { event }, { userId }): Promise<BooqHistoryParent | null> {
+        async addBooqHistory(_, { event }, { userId }): Promise<boolean> {
             if (userId) {
-                return addBooqHistory(userId, {
+                await addBooqHistory(userId, {
                     booqId: event.booqId,
                     path: event.path,
                     source: event.source,
                     date: Date.now(),
                 })
+                return true
             } else {
-                return null
+                return false
             }
         },
         async addToCollection(_, { booqId, name }, { userId }): Promise<boolean> {

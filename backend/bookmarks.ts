@@ -24,17 +24,19 @@ export async function getBookmarks({
 }
 
 export async function addBookmark({
+    id,
     userId,
     booqId,
     path,
 }: {
+    id: string,
     userId: string,
     booqId: string,
     path: BooqPath,
 }): Promise<DbBookmark> {
     const [row] = await sql`
-      INSERT INTO bookmarks (user_id, booq_id, path)
-      VALUES (${userId}, ${booqId}, ${path})
+      INSERT INTO bookmarks (id, user_id, booq_id, path)
+      VALUES (${id}, ${userId}, ${booqId}, ${path})
       ON CONFLICT DO NOTHING
     `
     return row as DbBookmark

@@ -45,12 +45,14 @@ export async function highlightsFor({
 }
 
 export async function addHighlight({
+  id,
   userId,
   booqId,
   range,
   color,
   note,
 }: {
+  id: string,
   userId: string,
   booqId: string,
   range: BooqRange,
@@ -59,10 +61,10 @@ export async function addHighlight({
 }): Promise<DbHighlight> {
   const [highlight] = await sql`
       INSERT INTO highlights (
-        user_id, booq_id, start_path, end_path, color, note
+        id, user_id, booq_id, start_path, end_path, color, note
       )
       VALUES (
-        ${userId}, ${booqId}, ${range.start}, ${range.end}, ${color}, ${note ?? null}
+        ${id}, ${userId}, ${booqId}, ${range.start}, ${range.end}, ${color}, ${note ?? null}
       )
       RETURNING *
     `
