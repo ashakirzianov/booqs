@@ -10,15 +10,18 @@ export default async function MyBooqs() {
             booqCollection(READING_LIST_COLLECTION, userId), booqCollection('uploads', userId),
         ])
         : [[], []]
+    const signed = userId ? true : false
     return <>
         <BooqCollection
             title='Uploads'
             cards={uploads}
+            signed={signed}
         />
         <BooqCollection
             title='My Booqs'
             cards={readingList}
             collection={READING_LIST_COLLECTION}
+            signed={signed}
         />
     </>
 }
