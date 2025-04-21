@@ -69,93 +69,6 @@ export { AuthProvider }
 export function useAuth() {
     const { data, setData } = useContext(Context)
 
-    async function registerWithPasskey() {
-        try {
-            if (!browserSupportsWebAuthn()) {
-                setData({
-                    state: 'error',
-                    error: 'Your browser does not support WebAuthn',
-                })
-                return
-            }
-            setData({ state: 'loading' })
-            const initResult = await initPasskeyRegistrationAcion()
-            if (!initResult.success) {
-                setData({
-                    state: 'error',
-                    error: 'Failed to init passkey registration'
-                })
-                return
-            }
-            const response = await startRegistration({
-                optionsJSON: initResult.options,
-            })
-            const verificationResult = await verifyPasskeyRegistrationAction({
-                id: initResult.id,
-                response,
-            })
-            if (!verificationResult.success) {
-                setData({
-                    state: 'error',
-                    error: 'Failed to verify passkey registration'
-                })
-                return
-            }
-            setData({
-                state: 'signed',
-                user: verificationResult.user,
-            })
-        } catch (err: any) {
-            setData({
-                state: 'error',
-                error: err.toString(),
-            })
-        }
-    }
-
-    async function signInWithPasskey() {
-        try {
-            if (!browserSupportsWebAuthn()) {
-                setData({
-                    state: 'error',
-                    error: 'Your browser does not support WebAuthn',
-                })
-                return
-            }
-            setData({ state: 'loading' })
-            const initResult = await initPasskeySigninAction()
-            if (!initResult.success) {
-                setData({
-                    state: 'error',
-                    error: 'Failed to init passkey registration'
-                })
-                return
-            }
-            const response = await startAuthentication({
-                optionsJSON: initResult.options,
-            })
-            const verificationResult = await verifyPasskeySigninAction({
-                id: initResult.id,
-                response,
-            })
-            if (!verificationResult.success) {
-                setData({
-                    state: 'error',
-                    error: 'Failed to verify passkey registration'
-                })
-                return
-            }
-            setData({
-                state: 'signed',
-                user: verificationResult.user,
-            })
-        } catch (err: any) {
-            setData({
-                state: 'error',
-                error: err.toString(),
-            })
-        }
-    }
     async function signOut() {
         const current = data
         setData({ state: 'loading' })
@@ -181,8 +94,131 @@ export function useAuth() {
 
     return {
         auth: data,
-        registerWithPasskey, signInWithPasskey,
+        registerWithPasskey() {
+            setData({ state: 'loading' })
+            registerWithPasskey().then(result => {
+                if (result.success) {
+                    setData({
+                        state: 'signed',
+                        user: result.user,
+                    })
+                } else {
+                    setData({
+                        state: 'error',
+                        error: result.error,
+                    })
+                }
+            }
+            ).catch(err => {
+                setData({
+                    state: 'error',
+                    error: err.toString(),
+                })
+            })
+        },
+        signInWithPasskey() {
+            setData({ state: 'loading' })
+            signInWithPasskey().then(result => {
+                if (result.success) {
+                    setData({
+                        state: 'signed',
+                        user: result.user,
+                    })
+                } else {
+                    setData({
+                        state: 'error',
+                        error: result.error,
+                    })
+                }
+            }
+            ).catch(err => {
+                setData({
+                    state: 'error',
+                    error: err.toString(),
+                })
+            })
+        },
         deleteAccount,
         signOut,
+    }
+}
+
+export async function registerWithPasskey() {
+    try {
+        if (!browserSupportsWebAuthn()) {
+            return {
+                success: false as const,
+                error: 'Your browser does not support WebAuthn',
+            }
+        }
+        const initResult = await initPasskeyRegistrationAcion()
+        if (!initResult.success) {
+            return {
+                success: false as const,
+                error: 'Failed to init passkey registration'
+            }
+        }
+        const response = await startRegistration({
+            optionsJSON: initResult.options,
+        })
+        const verificationResult = await verifyPasskeyRegistrationAction({
+            id: initResult.id,
+            response,
+        })
+        if (!verificationResult.success) {
+            return {
+                success: false as const,
+                error: 'Failed to verify passkey registration'
+            }
+        }
+        return {
+            success: true as const,
+            user: verificationResult.user,
+        }
+    } catch (err: any) {
+        return {
+            success: false as const,
+            error: err.toString(),
+        }
+    }
+}
+
+export async function signInWithPasskey() {
+    try {
+        if (!browserSupportsWebAuthn()) {
+            return {
+                success: false as const,
+                error: 'Your browser does not support WebAuthn',
+            }
+        }
+        const initResult = await initPasskeySigninAction()
+        if (!initResult.success) {
+            return {
+                success: false as const,
+                error: 'Failed to init passkey registration'
+            }
+        }
+        const response = await startAuthentication({
+            optionsJSON: initResult.options,
+        })
+        const verificationResult = await verifyPasskeySigninAction({
+            id: initResult.id,
+            response,
+        })
+        if (!verificationResult.success) {
+            return {
+                success: false as const,
+                error: 'Failed to verify passkey registration'
+            }
+        }
+        return {
+            success: true as const,
+            user: verificationResult.user,
+        }
+    } catch (err: any) {
+        return {
+            success: false as const,
+            error: err.toString(),
+        }
     }
 }
