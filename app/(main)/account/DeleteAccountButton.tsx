@@ -6,7 +6,7 @@ import { deleteAccountAction } from '@/data/auth'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
-export function AccountPage({ account }: {
+export function DeleteAccountButton({ account }: {
     account: {
         name: string | null,
         joined: string,
