@@ -16,8 +16,8 @@ type Mutation {
     removeHighlight(id: ID!): Boolean
     updateHighlight(id: ID!, color: String): Highlight
     addBooqHistory(event: BooqHistoryInput!): BooqHistory
-    addToCollection(name: String!, booqId: ID!): Collection
-    removeFromCollection(name: String!, booqId: ID!): Collection
+    addToCollection(name: String!, booqId: ID!): Boolean
+    removeFromCollection(name: String!, booqId: ID!): Boolean
 
     initPasskeyRegistration: InitPasskeyRegistrationResponse
     verifyPasskeyRegistration(
@@ -149,6 +149,7 @@ type BooqHistory {
     position: Int!
 }
 type Collection {
+    name: String!
     booqs: [Booq!]
 }
 

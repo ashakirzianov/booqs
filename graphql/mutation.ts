@@ -3,13 +3,12 @@ import { ResolverContext } from './context'
 import { deleteUserForId } from '@/backend/users'
 import { addHighlight, removeHighlight, updateHighlight } from '@/backend/highlights'
 import { initiatePasskeyLogin, initiatePasskeyRegistration, verifyPasskeyLogin, verifyPasskeyRegistration } from '@/backend/passkey'
-import { addToCollection, booqIdsInCollections, removeFromCollection } from '@/backend/collections'
+import { addToCollection, removeFromCollection } from '@/backend/collections'
 import { addBooqHistory } from '@/backend/history'
 import { addBookmark, deleteBookmark } from '@/backend/bookmarks'
 import { BookmarkParent } from './bookmark'
 import { HighlightParent } from './highlight'
 import { BooqHistoryParent } from './history'
-import { CollectionParent } from './collection'
 
 export const mutationResolver: IResolvers<any, ResolverContext> = {
     Mutation: {
@@ -92,26 +91,24 @@ export const mutationResolver: IResolvers<any, ResolverContext> = {
                 return null
             }
         },
-        async addToCollection(_, { booqId, name }, { userId }): Promise<CollectionParent | null> {
+        async addToCollection(_, { booqId, name }, { userId }): Promise<boolean> {
             if (userId) {
-                await addToCollection({
+                return addToCollection({
                     userId,
                     name, booqId,
                 })
-                return booqIdsInCollections(userId, name)
             } else {
-                return null
+                return false
             }
         },
-        async removeFromCollection(_, { booqId, name }, { userId }): Promise<CollectionParent | null> {
+        async removeFromCollection(_, { booqId, name }, { userId }): Promise<boolean> {
             if (userId) {
-                await removeFromCollection({
+                return removeFromCollection({
                     userId,
                     name, booqId,
                 })
-                return booqIdsInCollections(userId, name)
             } else {
-                return null
+                return false
             }
         },
         async initPasskeyRegistration(_, __, { origin }) {

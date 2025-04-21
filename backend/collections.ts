@@ -34,12 +34,14 @@ export async function addToCollection({
       ON CONFLICT (user_id, name) DO UPDATE SET updated_at = NOW()
       RETURNING id
     `
+    if (!collection) return false
 
     const result = await sql`
     INSERT INTO user_collections_books (collection_id, booq_id)
     VALUES (${collection.id}, ${booqId})
     ON CONFLICT DO NOTHING
-  `
+    RETURNING booq_id
+    `
     return result.length > 0
 }
 
@@ -61,7 +63,8 @@ export async function removeFromCollection({
     const result = await sql`
     DELETE FROM user_collections_books
     WHERE collection_id = ${collection.id} AND booq_id = ${booqId}
-  `
+    RETURNING booq_id
+    `
     return result.length > 0
 }
 
