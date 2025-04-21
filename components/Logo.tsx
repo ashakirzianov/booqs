@@ -1,4 +1,6 @@
-export function Logo() {
+export function Logo({ style }: {
+    style?: React.CSSProperties,
+}) {
     return <div className='font-normal' style={{
         color: 'rgba(253,163,2,1)',
         fontFamily: 'var(--font-main)',
@@ -7,6 +9,7 @@ export function Logo() {
         WebkitBackgroundClip: 'text',
         WebkitTextFillColor: 'transparent',
         userSelect: 'none',
+        ...style,
     }}>
         BOOQS
     </div>
