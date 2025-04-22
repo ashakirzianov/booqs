@@ -5,6 +5,7 @@ import { DeleteAccountButton } from './DeleteAccountButton'
 import { booqCollection } from '@/data/booqs'
 import { READING_LIST_COLLECTION } from '@/application/collections'
 import { BooqCollection } from '@/components/BooqCollection'
+import { SignoutButton } from './SignoutButton'
 
 export default async function Page() {
     const user = await fetchAuthData()
@@ -30,5 +31,6 @@ export default async function Page() {
             name: user.name,
             joined: user.joined,
         }} />
+        <SignoutButton />
     </>
 }
