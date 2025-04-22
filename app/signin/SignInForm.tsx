@@ -2,13 +2,12 @@
 import { registerWithPasskey, signInWithPasskey } from '@/application/auth'
 import { Icon } from '@/components/Icon'
 import { Spinner } from '@/components/Loading'
-import { useRouter } from 'next/navigation'
+import { redirect } from 'next/navigation'
 import { useState } from 'react'
 
 export function SignInForm({ returnTo }: {
     returnTo: string,
 }) {
-    const router = useRouter()
     const [state, setState] = useState<{
         state: 'idle',
     } | {
@@ -26,11 +25,7 @@ export function SignInForm({ returnTo }: {
             setState({ state: 'loading' })
             const result = await registerWithPasskey()
             if (result.success) {
-                setState({
-                    state: 'signed',
-                    user: result.user,
-                })
-                router.push(returnTo)
+                redirect(returnTo)
             } else {
                 setState({
                     state: 'error',
@@ -45,11 +40,7 @@ export function SignInForm({ returnTo }: {
             setState({ state: 'loading' })
             const result = await signInWithPasskey()
             if (result.success) {
-                setState({
-                    state: 'signed',
-                    user: result.user,
-                })
-                router.push(returnTo)
+                redirect(returnTo)
             } else {
                 setState({
                     state: 'error',
