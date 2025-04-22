@@ -7,6 +7,7 @@ import { parseEpub } from '@/parser'
 import { uploadBooqImages } from './images'
 import { userUploadsLibrary } from './uu'
 import { localLibrary } from './lo'
+import { redis } from './db'
 
 export type LibraryCard = {
     id: string,
@@ -92,18 +93,18 @@ export async function libraryCardsForIds(ids: string[]): Promise<Array<LibraryCa
     )
 }
 
-const cache: {
-    [booqId: string]: Promise<Booq | undefined>,
-} = {}
-
 export async function booqForId(booqId: string) {
-    const cached = cache[booqId]
+    const cached = await redis.get<Booq>(`cache:booq:${booqId}`)
     if (cached) {
         return cached
     } else {
-        const promise = parseBooqForId(booqId)
-        cache[booqId] = promise
-        return promise
+        const booq = await parseBooqForId(booqId)
+        if (booq) {
+            await redis.set(`cache:booq:${booqId}`, booq, {
+                ex: 60 * 60 * 24,
+            })
+        }
+        return booq
     }
 }
 
