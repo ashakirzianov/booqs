@@ -10,7 +10,7 @@ import { SignoutButton } from './SignoutButton'
 export default async function Page() {
     const user = await fetchAuthData()
     if (!user) {
-        redirect(signInHref())
+        redirect(signInHref({}))
     }
     const [readingList, uploads] = await Promise.all([
         booqCollection(READING_LIST_COLLECTION, user.id), booqCollection('uploads', user.id),
