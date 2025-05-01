@@ -3,11 +3,12 @@ import Link from 'next/link'
 import { booqHref } from './Links'
 import { CollectionButton } from './CollectionButton'
 export function BooqCollection({
-    cards, title, collection,
+    cards, title, collection, signed,
 }: {
     title?: string,
     cards: BooqCardData[],
     collection?: string,
+    signed: boolean,
 }) {
     return (
         <section className='flex flex-row justify-center'>
@@ -28,10 +29,12 @@ export function BooqCollection({
                                 card={card}
                                 actions={<>
                                     <ReadButton booqId={card.id} />
-                                    <CollectionButton
-                                        booqId={card.id}
-                                        collection={collection}
-                                    />
+                                    {signed && collection ?
+                                        <CollectionButton
+                                            booqId={card.id}
+                                            collection={collection}
+                                        />
+                                        : null}
                                 </>}
                             />
                         </li>
