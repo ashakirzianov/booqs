@@ -3,14 +3,15 @@ import { IconButton } from './Buttons'
 import { accountHref, signInHref } from './Links'
 import { ProfileBadge } from './ProfilePicture'
 
-export function AccountButton({ user }: {
+export function AccountButton({ user, from }: {
     user?: {
         name: string | null,
         pictureUrl: string | null,
     } | null,
+    from?: string,
 }) {
     if (!user) {
-        return <NotSignedAccountButtion />
+        return <NotSignedAccountButtion from={from} />
     }
     return <SignedAccountButton
         name={user.name}
@@ -32,8 +33,10 @@ export function SignedAccountButton({ name, pictureUrl }: {
     </Link>
 }
 
-export function NotSignedAccountButtion() {
-    return <Link href={signInHref()}>
+export function NotSignedAccountButtion({ from }: {
+    from?: string,
+}) {
+    return <Link href={signInHref({ returnTo: from })}>
         <IconButton
             icon='sign-in' />
     </Link>

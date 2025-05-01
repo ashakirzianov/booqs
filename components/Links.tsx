@@ -38,8 +38,10 @@ export function feedHref() {
     return '/'
 }
 
-export function signInHref() {
-    return '/signin'
+export function signInHref({ returnTo }: {
+    returnTo?: string,
+}) {
+    return `/signin${returnTo ? `?return_to=${encodeURIComponent(returnTo)}` : ''}`
 }
 
 export function accountHref() {

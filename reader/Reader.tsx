@@ -23,6 +23,7 @@ import { useAuth } from '@/application/auth'
 import { Copilot, CopilotState } from '@/components/Copilot'
 import { useHighlights } from '@/application/highlights'
 import { AccountButton } from '@/components/AccountButton'
+import { usePathname } from 'next/navigation'
 
 
 export function Reader({
@@ -31,6 +32,7 @@ export function Reader({
     booq: ReaderBooq,
     quote?: BooqRange,
 }) {
+    const pathname = usePathname()
     const { auth } = useAuth()
     const self: ReaderUser | undefined = auth.user
     const fontScale = useFontScale()
@@ -155,7 +157,10 @@ export function Reader({
         </FeedLink>}
         NavigationButton={NavigationButton}
         ThemerButton={<ThemerButton />}
-        AccountButton={<AccountButton user={auth.user} />}
+        AccountButton={<AccountButton
+            user={auth.user}
+            from={pathname}
+        />}
         CurrentPage={<PageLabel text={pagesLabel} />}
         PagesLeft={<PageLabel text={leftLabel} />}
         NavigationContent={NavigationContent}

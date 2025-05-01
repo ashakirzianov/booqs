@@ -6,12 +6,12 @@ export default async function Page({ searchParams }: {
         [key: string]: string | undefined
     }>,
 }) {
-    let { returnTo } = await searchParams
-    returnTo = returnTo ?? '/'
+    let { return_to } = await searchParams
+    return_to = return_to ?? '/'
     return <main className='flex flex-col items-center justify-start h-screen gap-4 p-16'>
         <Logo style={{
             fontSize: 'xxx-large',
         }} />
-        <SignInForm returnTo={returnTo} />
+        <SignInForm returnTo={return_to} />
     </main>
 }
