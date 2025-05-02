@@ -15,7 +15,7 @@ export function Button({ children, onClick, selected }: {
     selected?: boolean,
 }) {
     return <button
-        className={clsx('button flex text-dimmed text-2xl cursor-pointer transition bg-transparent hover:text-highlight focus:outline-hidden w-8 h-8 justify-center items-center', {
+        className={clsx('button flex text-dimmed text-2xl cursor-pointer transition duration-150 bg-transparent hover:text-highlight focus:outline-hidden w-8 h-8 justify-center items-center', {
             'text-highlight': selected,
             'text-dimmed': !selected,
         })}
