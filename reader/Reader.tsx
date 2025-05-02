@@ -23,8 +23,7 @@ import { Copilot, CopilotState } from '@/components/Copilot'
 import { useHighlights } from '@/application/highlights'
 import { AccountButton } from '@/components/AccountButton'
 import { usePathname } from 'next/navigation'
-import { Spinner } from '@/components/Loading'
-import { BackIcon, TocIcon } from '@/components/Icons'
+import { BackIcon, Spinner, TocIcon } from '@/components/Icons'
 
 
 export function Reader({

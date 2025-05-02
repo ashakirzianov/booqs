@@ -1,11 +1,6 @@
 import '@/app/globals.css'
 import { Metadata, Viewport } from 'next'
 
-// FontAwesome support
-import { config } from '@fortawesome/fontawesome-svg-core'
-import '@fortawesome/fontawesome-svg-core/styles.css'
-config.autoAddCss = false
-
 import { Lato, Lora } from 'next/font/google'
 import { AppProvider } from '@/application/provider'
 

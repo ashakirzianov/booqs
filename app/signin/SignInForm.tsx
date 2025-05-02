@@ -1,7 +1,6 @@
 'use client'
 import { registerWithPasskey, signInWithPasskey } from '@/application/auth'
-import { PasskeyIcon, NewItemIcon } from '@/components/Icons'
-import { Spinner } from '@/components/Loading'
+import { PasskeyIcon, NewItemIcon, Spinner } from '@/components/Icons'
 import { redirect } from 'next/navigation'
 import { useState } from 'react'
 
