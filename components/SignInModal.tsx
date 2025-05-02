@@ -5,10 +5,10 @@ import { IconButton } from '@/components/Buttons'
 import { ProfileBadge } from '@/components/ProfilePicture'
 import { ModalButton, ModalDivider, ModalLabel, Modal } from '@/components/Modal'
 import { Popover } from '@/components/Popover'
-import { Spinner } from '@/components/Loading'
 import { accountHref, myBooqsHref } from '@/components/Links'
 import { useRouter } from 'next/navigation'
 import { AuthUser, useAuth } from '@/application/auth'
+import { Spinner } from './Icons'
 
 export function SignInModal({ isOpen, closeModal }: {
     isOpen: boolean,

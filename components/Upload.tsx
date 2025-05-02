@@ -1,13 +1,13 @@
 'use client'
 import { IconButton } from '@/components/Buttons'
 import { useSelectFileDialog } from '@/components/SelectFileDialog'
-import { Spinner } from '@/components/Loading'
 import { Popover } from '@/components/Popover'
 import { Modal, ModalButton, ModalDivider, ModalLabel } from '@/components/Modal'
 import { BooqCover } from '@/components/BooqCover'
 import { booqHref } from '@/components/Links'
 import { useUpload } from '@/application/upload'
 import { useCallback, useState } from 'react'
+import { Spinner } from './Icons'
 
 export function UploadButton() {
     const [isOpen, setIsOpen] = useState(false)

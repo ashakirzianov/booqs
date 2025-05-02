@@ -2,6 +2,14 @@ import React from 'react'
 import { Icon, IconName } from './Icon'
 import { Spinner } from './Loading'
 
+export function ActionButtonWrapper({ children }: {
+    children: React.ReactNode,
+}) {
+    return <div className='text-dimmed hover:text-highlight'>
+        {children}
+    </div>
+}
+
 export function IconButton({ icon, onClick, isSelected }: {
     icon: IconName,
     onClick?: () => void,

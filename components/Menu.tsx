@@ -1,7 +1,7 @@
 import React, { ReactNode } from 'react'
 import { IconName, Icon } from './Icon'
-import { Spinner } from './Loading'
 import Link from 'next/link'
+import { Spinner } from './Icons'
 
 export function Menu({ callback, children }: {
     children: ReactNode,

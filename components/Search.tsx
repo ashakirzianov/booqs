@@ -1,6 +1,5 @@
 'use client'
 import { BooqCover } from '@/components/BooqCover'
-import { Spinner } from '@/components/Loading'
 import { authorHref, booqHref } from '@/components/Links'
 import { Modal, useModalState } from './Modal'
 import {
@@ -10,6 +9,7 @@ import {
 import Link from 'next/link'
 import { ReactNode, useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { Spinner } from './Icons'
 
 export function Search() {
     const { isOpen, openModal, closeModal } = useModalState()

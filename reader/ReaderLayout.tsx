@@ -25,7 +25,7 @@ export function ReaderLayout({
     BooqContent, PrevButton, NextButton,
     ...controls
 }: LayoutProps) {
-    return <div className={`${styles.layout}`}>
+    return <div className={`${styles.layout} text-red`}>
         {PrevButton}
         <div className={`${styles.booq}`}>
             {BooqContent}

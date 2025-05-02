@@ -3,7 +3,6 @@ import React, { useCallback, useMemo, useState } from 'react'
 import { BooqPath, BooqRange, contextForRange, positionForPath, samePath } from '@/core'
 import { BorderButton, IconButton } from '@/components/Buttons'
 import { BooqLink, FeedLink, booqHref } from '@/components/Links'
-import { Spinner } from '@/components/Loading'
 import {
     BooqContent, getAugmentationElement, getAugmentationText,
     Augmentation,
@@ -24,6 +23,7 @@ import { Copilot, CopilotState } from '@/components/Copilot'
 import { useHighlights } from '@/application/highlights'
 import { AccountButton } from '@/components/AccountButton'
 import { usePathname } from 'next/navigation'
+import { Spinner } from '@/components/Loading'
 
 
 export function Reader({
