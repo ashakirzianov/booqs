@@ -2,14 +2,19 @@ import Link from 'next/link'
 import { IconButton } from './Buttons'
 import { accountHref, signInHref } from './Links'
 import { ProfileBadge } from './ProfilePicture'
+import { Spinner } from './Loading'
 
-export function AccountButton({ user, from }: {
+export function AccountButton({ user, loading, from }: {
     user?: {
         name: string | null,
         pictureUrl: string | null,
     } | null,
+    loading?: boolean,
     from?: string,
 }) {
+    if (loading) {
+        return <LoadingAccountButton />
+    }
     if (!user) {
         return <NotSignedAccountButtion from={from} />
     }
@@ -17,6 +22,10 @@ export function AccountButton({ user, from }: {
         name={user.name}
         pictureUrl={user.pictureUrl}
     />
+}
+
+export function LoadingAccountButton() {
+    return <Spinner />
 }
 
 export function SignedAccountButton({ name, pictureUrl }: {

@@ -160,6 +160,7 @@ export function Reader({
         AccountButton={<AccountButton
             user={auth.user}
             from={pathname}
+            loading={auth.state === 'loading'}
         />}
         CurrentPage={<PageLabel text={pagesLabel} />}
         PagesLeft={<PageLabel text={leftLabel} />}
