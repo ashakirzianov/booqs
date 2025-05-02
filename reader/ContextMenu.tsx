@@ -6,6 +6,7 @@ import {
 import { ContextMenuContent, ContextMenuTarget } from './ContextMenuContent'
 import { useFloater } from '@/components/Floater'
 import { ReaderUser } from './common'
+import clsx from 'clsx'
 
 export type ContextMenuState = {
     target: ContextMenuTarget,
@@ -147,11 +148,11 @@ function ContextMenuPanel({ content, anchor }: {
     content: ReactNode,
     anchor?: VirtualElement,
 }) {
-    // const visibility = anchor ? '' : 'hidden'
-    const visibilityClass = anchor ? '' : 'translate-y-full opacity-0'
     return <div id='ctxmenu' className='flex flex-1 flex-col h-full justify-end items-stretch self-stretch pointer-events-none select-none' style={{
         padding: 'env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)',
     }}>
-        <div className={`${visibilityClass} rounded-sm m-base pointer-events-auto bg-background border border-border transition-all`}>{content}</div>
+        <div className={clsx('rounded-sm m-base pointer-events-auto bg-background border border-border transition-all', {
+            'translate-y-full opacity-0': !anchor,
+        })}>{content}</div>
     </div>
 }

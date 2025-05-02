@@ -1,3 +1,4 @@
+import clsx from 'clsx'
 import React from 'react'
 
 export function ActionButtonWrapper({ children }: {
@@ -13,10 +14,11 @@ export function Button({ children, onClick, selected }: {
     onClick?: () => void,
     selected?: boolean,
 }) {
-    const selectedClass = selected
-        ? 'text-highlight' : 'text-dimmed'
     return <button
-        className={`button flex text-dimmed text-2xl cursor-pointer transition bg-transparent hover:text-highlight focus:outline-hidden ${selectedClass} w-8 h-8 justify-center items-center`}
+        className={clsx('button flex text-dimmed text-2xl cursor-pointer transition bg-transparent hover:text-highlight focus:outline-hidden w-8 h-8 justify-center items-center', {
+            'text-highlight': selected,
+            'text-dimmed': !selected,
+        })}
         onClick={onClick}
     >
         {children}

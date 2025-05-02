@@ -2,6 +2,7 @@ import { Popover } from '@/components/Popover'
 import { Button } from '@/components/Buttons'
 import { useSetFontScale } from '@/application/theme'
 import { ThemerIcon } from '@/components/Icons'
+import clsx from 'clsx'
 
 export function ThemerButton() {
     return <Popover
@@ -32,10 +33,10 @@ function FontScaleButton({ scale, onClick }: {
     scale: 'up' | 'down',
     onClick: () => void,
 }) {
-    const fontSizeClass = scale === 'up'
-        ? 'text-2xl'
-        : 'text-lg'
     return <div className='cursor-pointer' onClick={onClick}>
-        <span className={`${fontSizeClass} font-book transition text-action hover:text-highlight drop-shadow-md`}>Abc</span>
+        <span className={clsx('font-book transition text-action hover:text-highlight drop-shadow-md', {
+            'text-2xl': scale === 'up',
+            'text-lg': scale === 'down',
+        })}>Abc</span>
     </div>
 }

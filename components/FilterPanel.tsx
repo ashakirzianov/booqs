@@ -1,3 +1,4 @@
+import clsx from 'clsx'
 import React, { useState } from 'react'
 
 type FilterItem = {
@@ -31,7 +32,9 @@ export function FilterPanel({
             items.map(
                 (item, idx) => <div
                     key={idx}
-                    className={`item cursor-pointer my-sm mx-base border-2 border-transparent ${item.value === selected ? 'border-highlight' : ''} hover:border-highlight`}
+                    className={clsx('item cursor-pointer my-sm mx-base border-2 border-transparent hover:border-highlight', {
+                        'border-highlight': item.value === selected,
+                    })}
                     onClick={() => select(item.value)}
                 >
                     {item.text}

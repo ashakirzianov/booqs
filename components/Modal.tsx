@@ -2,6 +2,7 @@
 import { ReactNode, useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { CloseIcon } from './Icons'
+import clsx from 'clsx'
 
 export function useModalState() {
     const [isOpen, setIsOpen] = useState(false)
@@ -70,9 +71,10 @@ export function ModalFullScreen({
     isOpen: boolean,
     children: ReactNode,
 }) {
-    const containerClosedClass = isOpen ? '' : 'invisible opacity-0 translate-y-1/4'
     return <div
-        className={`fixed top-0 right-0 bottom-0 left-0 flex flex-col pointer-events-auto transition duration-300 bg-background h-screen w-screen max-h-screen ${containerClosedClass}`}
+        className={clsx('fixed top-0 right-0 bottom-0 left-0 flex flex-col pointer-events-auto transition duration-300 bg-background h-screen w-screen max-h-screen', {
+            'invisible opacity-0 translate-y-1/4': !isOpen,
+        })}
     >
         {children}
     </div>
@@ -86,11 +88,13 @@ export function ModalAsDiv({
     closeModal: () => void,
     children: ReactNode,
 }) {
-    const screenClosedClass = isOpen ? '' : 'invisible bg-transparent'
-    const containerClosedClass = isOpen ? '' : 'opacity-0 translate-y-1/4'
-    return <div className={`flex flex-col fixed justify-center items-center bg-black/25 z-10 transition-all top-0 right-0 bottom-0 left-0 ${screenClosedClass}`} onClick={closeModal}>
+    return <div className={clsx('flex flex-col fixed justify-center items-center bg-black/25 z-10 transition-all top-0 right-0 bottom-0 left-0', {
+        'invisible bg-transparent': !isOpen,
+    })} onClick={closeModal}>
         <div
-            className={`relative pointer-events-auto transition duration-300 shadow rounded-sm bg-background ${containerClosedClass}`}
+            className={clsx('relative pointer-events-auto transition duration-300 shadow rounded-sm bg-background', {
+                'opacity-0 translate-y-1/4': !isOpen,
+            })}
             onClick={e => e.stopPropagation()}
         >
             {children}
