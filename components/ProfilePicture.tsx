@@ -1,3 +1,5 @@
+import { ProfileIcon } from '@/components/Icons'
+
 export function ProfileBadge({
     picture, name, size, border,
 }: {
@@ -42,21 +44,23 @@ function ProfilePicture({ picture, size, border }: {
     </div>
 }
 
-function ProfilePicturePlaceholder({ initials, size, border }: {
+function ProfilePicturePlaceholder({ }: {
     initials: string,
     size: number,
     border: boolean,
 }) {
-    return <div className='container font-bold text-xl flex items-center justify-center p-0 shrink-0 overflow-hidden bg-background text-dimmed hover:border-highlight' style={{
-        borderRadius: '50%',
-        border: border ? `1.5px solid var(--theme-dimmed)` : 'none',
-        width: `${size}rem`,
-        height: `${size}rem`,
-        transition: '250ms color, 250ms border',
-        fontSize: `${size / 2}rem`,
-    }}>
-        {initials}
-    </div>
+
+    // return <div className='container font-bold text-xl flex items-center justify-center p-0 shrink-0 overflow-hidden bg-background text-dimmed hover:border-highlight' style={{
+    //     borderRadius: '50%',
+    //     border: border ? `1.5px solid var(--theme-dimmed)` : 'none',
+    //     width: `${size}rem`,
+    //     height: `${size}rem`,
+    //     transition: '250ms color, 250ms border',
+    //     fontSize: `${size / 2}rem`,
+    // }}>
+    //     {initials}
+    // </div>
+    return <ProfileIcon />
 }
 
 function getInitials(name: string) {

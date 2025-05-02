@@ -1,14 +1,16 @@
 'use client'
 import React, { useState } from 'react'
 import { Menu, MenuItem } from '@/components/Menu'
-import { IconButton } from '@/components/Buttons'
+import { PanelButton } from '@/components/Buttons'
 import { ProfileBadge } from '@/components/ProfilePicture'
 import { ModalButton, ModalDivider, ModalLabel, Modal } from '@/components/Modal'
 import { Popover } from '@/components/Popover'
-import { Spinner } from '@/components/Loading'
 import { accountHref, myBooqsHref } from '@/components/Links'
 import { useRouter } from 'next/navigation'
 import { AuthUser, useAuth } from '@/application/auth'
+import {
+    BookIcon, NewItemIcon, PasskeyIcon, SettingsIcon, SignInIcon, SignOutIcon, Spinner,
+} from '@/components/Icons'
 
 export function SignInModal({ isOpen, closeModal }: {
     isOpen: boolean,
@@ -26,7 +28,7 @@ export function SignInModal({ isOpen, closeModal }: {
             <ModalDivider />
             <ModalButton
                 text='Register with Passkey'
-                icon='new-passkey'
+                icon={<NewItemIcon />}
                 onClick={() => {
                     registerWithPasskey()
                     closeModal()
@@ -36,7 +38,7 @@ export function SignInModal({ isOpen, closeModal }: {
             <ModalDivider />
             <ModalButton
                 text='Sign in with Passkey'
-                icon='signin-passkey'
+                icon={<PasskeyIcon />}
                 onClick={() => {
                     signInWithPasskey()
                     closeModal()
@@ -89,9 +91,10 @@ function SignedButton({ user }: {
 function NotSignedButton() {
     const [isOpen, setIsOpen] = useState(false)
     return <>
-        <IconButton
-            icon='sign-in'
-            onClick={() => setIsOpen(true)} />
+        <PanelButton
+            onClick={() => setIsOpen(true)} >
+            <SignInIcon />
+        </PanelButton>
         <SignInModal
             isOpen={isOpen}
             closeModal={() => setIsOpen(false)}
@@ -109,16 +112,16 @@ function AccountMenu({ name }: {
         <Menu>
             <MenuItem
                 text='My Booqs'
-                icon='books'
+                icon={<BookIcon />}
                 href={myBooqsHref()}
             />
             <MenuItem
                 text='Settings'
-                icon='settings'
+                icon={<SettingsIcon />}
                 href={accountHref()}
             />
             <MenuItem
-                icon='sign-out'
+                icon={<SignOutIcon />}
                 text='Sing Out'
                 callback={() => {
                     signOut()

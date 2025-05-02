@@ -1,9 +1,8 @@
 'use client'
 import React, { useCallback, useMemo, useState } from 'react'
 import { BooqPath, BooqRange, contextForRange, positionForPath, samePath } from '@/core'
-import { BorderButton, IconButton } from '@/components/Buttons'
+import { BorderButton, PanelButton } from '@/components/Buttons'
 import { BooqLink, FeedLink, booqHref } from '@/components/Links'
-import { Spinner } from '@/components/Loading'
 import {
     BooqContent, getAugmentationElement, getAugmentationText,
     Augmentation,
@@ -24,6 +23,7 @@ import { Copilot, CopilotState } from '@/components/Copilot'
 import { useHighlights } from '@/application/highlights'
 import { AccountButton } from '@/components/AccountButton'
 import { usePathname } from 'next/navigation'
+import { BackIcon, Spinner, TocIcon } from '@/components/Icons'
 
 
 export function Reader({
@@ -64,11 +64,12 @@ export function Reader({
         toggleSelection={toggleNavigationSelection}
         closeSelf={closeNavigation}
     />
-    const NavigationButton = <IconButton
-        icon='toc'
+    const NavigationButton = <PanelButton
         onClick={toggleNavigationOpen}
-        isSelected={navigationOpen}
-    />
+        selected={navigationOpen}
+    >
+        <TocIcon />
+    </PanelButton>
 
     const filteredHighlights = useMemo(
         () => filterHighlights({
@@ -153,13 +154,16 @@ export function Reader({
             booq={booq}
         />}
         MainButton={<FeedLink>
-            <IconButton icon='back' />
+            <PanelButton>
+                <BackIcon />
+            </PanelButton>
         </FeedLink>}
         NavigationButton={NavigationButton}
         ThemerButton={<ThemerButton />}
         AccountButton={<AccountButton
             user={auth.user}
             from={pathname}
+            loading={auth.state === 'loading'}
         />}
         CurrentPage={<PageLabel text={pagesLabel} />}
         PagesLeft={<PageLabel text={leftLabel} />}
@@ -187,7 +191,9 @@ export function LoadingBooqScreen() {
         ContextMenu={null}
         Copilot={null}
         MainButton={<FeedLink>
-            <IconButton icon='back' />
+            <PanelButton>
+                <BackIcon />
+            </PanelButton>
         </FeedLink>}
         NavigationButton={null}
         ThemerButton={<ThemerButton />}

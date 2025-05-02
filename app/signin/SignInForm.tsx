@@ -1,7 +1,6 @@
 'use client'
 import { registerWithPasskey, signInWithPasskey } from '@/application/auth'
-import { Icon } from '@/components/Icon'
-import { Spinner } from '@/components/Loading'
+import { PasskeyIcon, NewItemIcon, Spinner } from '@/components/Icons'
 import { redirect } from 'next/navigation'
 import { useState } from 'react'
 
@@ -33,7 +32,7 @@ export function SignInForm({ returnTo }: {
                 })
             }
         }}>
-            <Icon name='new-passkey' />
+            <NewItemIcon />
             <span>Register with Passkey</span>
         </Button>
         <Button onClick={async function () {
@@ -48,7 +47,7 @@ export function SignInForm({ returnTo }: {
                 })
             }
         }}>
-            <Icon name='signin-passkey' />
+            <PasskeyIcon />
             <span>Sign in with Passkey</span>
         </Button>
         {state.state === 'loading' ? <Spinner /> : null}

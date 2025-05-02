@@ -1,22 +1,31 @@
 import Link from 'next/link'
-import { IconButton } from './Buttons'
+import { PanelButton } from './Buttons'
 import { accountHref, signInHref } from './Links'
 import { ProfileBadge } from './ProfilePicture'
+import { SignInIcon, Spinner } from './Icons'
 
-export function AccountButton({ user, from }: {
+export function AccountButton({ user, loading, from }: {
     user?: {
         name: string | null,
         pictureUrl: string | null,
     } | null,
+    loading?: boolean,
     from?: string,
 }) {
-    if (!user) {
-        return <NotSignedAccountButtion from={from} />
-    }
-    return <SignedAccountButton
-        name={user.name}
-        pictureUrl={user.pictureUrl}
-    />
+    return <PanelButton>
+        {
+            loading ? <LoadingAccountButton />
+                : user ? <SignedAccountButton
+                    name={user.name}
+                    pictureUrl={user.pictureUrl}
+                />
+                    : <NotSignedAccountButton from={from} />
+        }
+    </PanelButton>
+}
+
+export function LoadingAccountButton() {
+    return <Spinner />
 }
 
 export function SignedAccountButton({ name, pictureUrl }: {
@@ -33,11 +42,10 @@ export function SignedAccountButton({ name, pictureUrl }: {
     </Link>
 }
 
-export function NotSignedAccountButtion({ from }: {
+export function NotSignedAccountButton({ from }: {
     from?: string,
 }) {
     return <Link href={signInHref({ returnTo: from })}>
-        <IconButton
-            icon='sign-in' />
+        <SignInIcon />
     </Link>
 }

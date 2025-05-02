@@ -2,9 +2,9 @@ import { BooqSelection, VirtualElement } from '@/viewer'
 import { useCallback, useEffect, useState } from 'react'
 import { useFloater } from './Floater'
 import { CopilotContext, useCopilotAnswer, useCopilotSuggestions } from '@/application/copilot'
-import { Spinner } from './Loading'
 import { ModalDivider, ModalHeader, ModalFullScreen } from './Modal'
 import { useIsSmallScreen } from '@/application/utils'
+import { Spinner } from './Icons'
 
 type CopilotEmpty = {
     kind: 'empty',

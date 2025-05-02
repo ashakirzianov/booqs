@@ -1,18 +1,16 @@
 import { BooqLink } from '@/components/Links'
 import { Popover } from '@/components/Popover'
-import { Icon } from '@/components/Icon'
 import { ContextMenuContent } from '@/reader/ContextMenuContent'
-import { ProfileBadge } from '@/components/ProfilePicture'
 import { resolveHighlightColor } from '@/application/common'
 import { ReaderHighlight, ReaderUser } from './common'
+import { MoreIcon } from '@/components/Icons'
+import clsx from 'clsx'
 
 export function HighlightNodeComp({ booqId, highlight, self }: {
     booqId: string,
     self: ReaderUser | undefined,
     highlight: ReaderHighlight,
 }) {
-    const badgeClass = self?.id === highlight.author.id
-        ? 'hidden' : 'flex'
     return <div className='container flex flex-1 justify-between pl-base' style={{
         borderLeft: `3px solid ${resolveHighlightColor(highlight.color)}`,
     }}>
@@ -26,7 +24,7 @@ export function HighlightNodeComp({ booqId, highlight, self }: {
                 placement='right-start'
                 hasAction={true}
                 anchor={<div className='flex justify-center cursor-pointer text-xl text-dimmed xl:text-background hover:text-highlight w-lg'>
-                    <Icon name='more' />
+                    <MoreIcon />
                 </div>}
                 content={<div className='w-48 pointer-events-auto text-primary'>
                     <ContextMenuContent
@@ -40,13 +38,10 @@ export function HighlightNodeComp({ booqId, highlight, self }: {
                     />
                 </div>}
             />
-            <div className={`${badgeClass} mt-base`} title={highlight.author.name ?? undefined}>
-                <ProfileBadge
-                    size={1}
-                    name={highlight.author.name ?? undefined}
-                    picture={undefined}
-                    border={false}
-                />
+            <div className={clsx('mt-base', {
+                'hidden': self?.id === highlight.author.id,
+                'flex': self?.id !== highlight.author.id,
+            })} title={highlight.author.name ?? undefined}>
             </div>
         </div>
     </div>

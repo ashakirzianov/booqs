@@ -1,9 +1,10 @@
 'use client'
 import React from 'react'
 import { BooqPath, samePath } from '@/core'
-import { IconButton } from '@/components/Buttons'
 import { useAuth } from '@/application/auth'
 import { useBookmarkMutations, useBookmarks } from '@/application/bookmarks'
+import { BookmarkIcon } from './Icons'
+import { PanelButton } from './Buttons'
 
 export function BookmarkButton({ booqId, path }: {
     booqId: string,
@@ -16,8 +17,7 @@ export function BookmarkButton({ booqId, path }: {
         return null
     }
     const current = bookmarks.find(b => samePath(b.path, path))
-    return <IconButton
-        icon={current ? 'bookmark-solid' : 'bookmark-empty'}
+    return <PanelButton
         onClick={() => {
             if (current) {
                 removeBookmark(current.id)
@@ -25,5 +25,7 @@ export function BookmarkButton({ booqId, path }: {
                 addBookmark(path)
             }
         }}
-    />
+    >
+        <BookmarkIcon filled={!!current} />
+    </PanelButton>
 }

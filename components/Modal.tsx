@@ -1,7 +1,8 @@
 'use client'
 import { ReactNode, useEffect, useRef, useState } from 'react'
-import { Icon, IconName } from './Icon'
 import Link from 'next/link'
+import { CloseIcon } from './Icons'
+import clsx from 'clsx'
 
 export function useModalState() {
     const [isOpen, setIsOpen] = useState(false)
@@ -70,9 +71,10 @@ export function ModalFullScreen({
     isOpen: boolean,
     children: ReactNode,
 }) {
-    const containerClosedClass = isOpen ? '' : 'invisible opacity-0 translate-y-1/4'
     return <div
-        className={`fixed top-0 right-0 bottom-0 left-0 flex flex-col pointer-events-auto transition duration-300 bg-background h-screen w-screen max-h-screen ${containerClosedClass}`}
+        className={clsx('fixed top-0 right-0 bottom-0 left-0 flex flex-col pointer-events-auto transition duration-300 bg-background h-screen w-screen max-h-screen', {
+            'invisible opacity-0 translate-y-1/4': !isOpen,
+        })}
     >
         {children}
     </div>
@@ -86,11 +88,13 @@ export function ModalAsDiv({
     closeModal: () => void,
     children: ReactNode,
 }) {
-    const screenClosedClass = isOpen ? '' : 'invisible bg-transparent'
-    const containerClosedClass = isOpen ? '' : 'opacity-0 translate-y-1/4'
-    return <div className={`flex flex-col fixed justify-center items-center bg-black/25 z-10 transition-all top-0 right-0 bottom-0 left-0 ${screenClosedClass}`} onClick={closeModal}>
+    return <div className={clsx('flex flex-col fixed justify-center items-center bg-black/25 z-10 transition-all top-0 right-0 bottom-0 left-0', {
+        'invisible bg-transparent': !isOpen,
+    })} onClick={closeModal}>
         <div
-            className={`relative pointer-events-auto transition duration-300 shadow rounded-sm bg-background ${containerClosedClass}`}
+            className={clsx('relative pointer-events-auto transition duration-300 shadow rounded-sm bg-background', {
+                'opacity-0 translate-y-1/4': !isOpen,
+            })}
             onClick={e => e.stopPropagation()}
         >
             {children}
@@ -109,16 +113,12 @@ export function ModalDivider() {
 
 export function ModalButton({ text, icon, href, onClick }: {
     text: string,
-    icon?: IconName,
+    icon?: ReactNode,
     href?: string,
     onClick?: () => void,
 }) {
     const content = <div className='flex flex-row items-center'>
-        {
-            icon
-                ? <div><Icon name={icon} /></div>
-                : null
-        }
+        {icon ?? null}
         <span className='m-lg no-underline'>{text}</span>
     </div>
     return <div className='flex grow flex-col items-center cursor-pointer text-action hover:text-highlight' onClick={onClick}>
@@ -142,7 +142,7 @@ export function ModalHeader({ text, onClose }: {
         </div>
         <div className='col-start-3 col-end-4 flex justify-end w-full items-center' >
             <div onClick={onClose} className='hover:text-highlight cursor-pointer'>
-                <Icon name='close' />
+                <CloseIcon />
             </div>
         </div>
     </div>
