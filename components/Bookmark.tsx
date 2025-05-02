@@ -4,7 +4,7 @@ import { BooqPath, samePath } from '@/core'
 import { useAuth } from '@/application/auth'
 import { useBookmarkMutations, useBookmarks } from '@/application/bookmarks'
 import { BookmarkIcon } from './Icons'
-import { Button } from './Buttons'
+import { PanelButton } from './Buttons'
 
 export function BookmarkButton({ booqId, path }: {
     booqId: string,
@@ -17,7 +17,7 @@ export function BookmarkButton({ booqId, path }: {
         return null
     }
     const current = bookmarks.find(b => samePath(b.path, path))
-    return <Button
+    return <PanelButton
         onClick={() => {
             if (current) {
                 removeBookmark(current.id)
@@ -27,5 +27,5 @@ export function BookmarkButton({ booqId, path }: {
         }}
     >
         <BookmarkIcon filled={!!current} />
-    </Button>
+    </PanelButton>
 }

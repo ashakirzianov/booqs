@@ -1,5 +1,4 @@
 import { ReactNode } from 'react'
-import { ProfileBadge } from '@/components/ProfilePicture'
 import { NavigationSelection } from './common'
 
 export type HighlightAuthor = {
@@ -38,12 +37,6 @@ export function NavigationFilter({
                         text={first ?? 'Incognito'}
                         selected={selection[`author:${author.id}`] ?? false}
                         toggle={() => toggle(`author:${author.id}`)}
-                        Badge={<ProfileBadge
-                            size={1}
-                            border={false}
-                            name={author.name ?? undefined}
-                            picture={author.pictureUrl ?? undefined}
-                        />}
                     />
                 </div>
             })

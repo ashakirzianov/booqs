@@ -1,14 +1,14 @@
 import { Popover } from '@/components/Popover'
-import { Button } from '@/components/Buttons'
+import { PanelButton } from '@/components/Buttons'
 import { useSetFontScale } from '@/application/theme'
 import { ThemerIcon } from '@/components/Icons'
 import clsx from 'clsx'
 
 export function ThemerButton() {
     return <Popover
-        anchor={<Button>
+        anchor={<PanelButton>
             <ThemerIcon />
-        </Button>}
+        </PanelButton>}
         content={<ThemerPanel />}
     />
 }

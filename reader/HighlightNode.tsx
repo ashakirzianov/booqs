@@ -1,7 +1,6 @@
 import { BooqLink } from '@/components/Links'
 import { Popover } from '@/components/Popover'
 import { ContextMenuContent } from '@/reader/ContextMenuContent'
-import { ProfileBadge } from '@/components/ProfilePicture'
 import { resolveHighlightColor } from '@/application/common'
 import { ReaderHighlight, ReaderUser } from './common'
 import { MoreIcon } from '@/components/Icons'
@@ -43,12 +42,6 @@ export function HighlightNodeComp({ booqId, highlight, self }: {
                 'hidden': self?.id === highlight.author.id,
                 'flex': self?.id !== highlight.author.id,
             })} title={highlight.author.name ?? undefined}>
-                <ProfileBadge
-                    size={1}
-                    name={highlight.author.name ?? undefined}
-                    picture={undefined}
-                    border={false}
-                />
             </div>
         </div>
     </div>

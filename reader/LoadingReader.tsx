@@ -1,5 +1,5 @@
 import { BooqPath, BooqRange, BooqNode } from '@/core'
-import { BorderButton, Button } from '@/components/Buttons'
+import { BorderButton, PanelButton } from '@/components/Buttons'
 import { BooqLink, FeedLink } from '@/components/Links'
 import { ReaderLayout } from './ReaderLayout'
 import { Augmentation, BooqContent } from '@/viewer'
@@ -68,9 +68,9 @@ export function LoadingReader({
         ContextMenu={null}
         Copilot={null}
         MainButton={<FeedLink>
-            <Button>
+            <PanelButton>
                 <BackIcon />
-            </Button>
+            </PanelButton>
         </FeedLink>}
         // TODO: provide some loading indication?
         NavigationButton={null}

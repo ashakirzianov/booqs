@@ -1,5 +1,5 @@
 'use client'
-import { Button } from '@/components/Buttons'
+import { PanelButton } from '@/components/Buttons'
 import { useSelectFileDialog } from '@/components/SelectFileDialog'
 import { Popover } from '@/components/Popover'
 import { Modal, ModalButton, ModalDivider, ModalLabel } from '@/components/Modal'
@@ -20,9 +20,9 @@ export function UploadButton() {
 
     return <>
         <Popover
-            anchor={<Button onClick={openModal}>
+            anchor={<PanelButton onClick={openModal}>
                 <UploadIcon />
-            </Button>}
+            </PanelButton>}
             content={<div className='m-lg w-full text-center font-bold'>
                 Click to select epub
             </div>}

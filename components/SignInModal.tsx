@@ -1,7 +1,7 @@
 'use client'
 import React, { useState } from 'react'
 import { Menu, MenuItem } from '@/components/Menu'
-import { Button } from '@/components/Buttons'
+import { PanelButton } from '@/components/Buttons'
 import { ProfileBadge } from '@/components/ProfilePicture'
 import { ModalButton, ModalDivider, ModalLabel, Modal } from '@/components/Modal'
 import { Popover } from '@/components/Popover'
@@ -91,10 +91,10 @@ function SignedButton({ user }: {
 function NotSignedButton() {
     const [isOpen, setIsOpen] = useState(false)
     return <>
-        <Button
+        <PanelButton
             onClick={() => setIsOpen(true)} >
             <SignInIcon />
-        </Button>
+        </PanelButton>
         <SignInModal
             isOpen={isOpen}
             closeModal={() => setIsOpen(false)}

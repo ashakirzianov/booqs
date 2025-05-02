@@ -1,7 +1,7 @@
 'use client'
 import React, { useCallback, useMemo, useState } from 'react'
 import { BooqPath, BooqRange, contextForRange, positionForPath, samePath } from '@/core'
-import { BorderButton, Button } from '@/components/Buttons'
+import { BorderButton, PanelButton } from '@/components/Buttons'
 import { BooqLink, FeedLink, booqHref } from '@/components/Links'
 import {
     BooqContent, getAugmentationElement, getAugmentationText,
@@ -64,12 +64,12 @@ export function Reader({
         toggleSelection={toggleNavigationSelection}
         closeSelf={closeNavigation}
     />
-    const NavigationButton = <Button
+    const NavigationButton = <PanelButton
         onClick={toggleNavigationOpen}
         selected={navigationOpen}
     >
         <TocIcon />
-    </Button>
+    </PanelButton>
 
     const filteredHighlights = useMemo(
         () => filterHighlights({
@@ -154,9 +154,9 @@ export function Reader({
             booq={booq}
         />}
         MainButton={<FeedLink>
-            <Button>
+            <PanelButton>
                 <BackIcon />
-            </Button>
+            </PanelButton>
         </FeedLink>}
         NavigationButton={NavigationButton}
         ThemerButton={<ThemerButton />}
@@ -191,9 +191,9 @@ export function LoadingBooqScreen() {
         ContextMenu={null}
         Copilot={null}
         MainButton={<FeedLink>
-            <Button>
+            <PanelButton>
                 <BackIcon />
-            </Button>
+            </PanelButton>
         </FeedLink>}
         NavigationButton={null}
         ThemerButton={<ThemerButton />}

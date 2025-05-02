@@ -130,7 +130,7 @@ function CopilotItem({ selection, updateCopilot }: {
     }
     return <MenuItem
         text='Ask copilot'
-        icon={<CopilotIcon />}
+        icon={<ContextMenuIcon><CopilotIcon /></ContextMenuIcon>}
         callback={() => {
             updateCopilot(selection)
         }}
@@ -239,7 +239,7 @@ function RemoveHighlightItem({
     const { removeHighlight } = useHighlightMutations(booqId)
     return <MenuItem
         text='Remove'
-        icon={<RemoveIcon />}
+        icon={<ContextMenuIcon><RemoveIcon /></ContextMenuIcon>}
         callback={() => {
             removeHighlight(highlight.id)
             setTarget({ kind: 'empty' })
@@ -316,7 +316,7 @@ function CopyQuoteItem({
     const { prefetch } = useRouter()
     return <MenuItem
         text='Copy quote'
-        icon={<ShareIcon />}
+        icon={<ContextMenuIcon><ShareIcon /></ContextMenuIcon>}
         callback={() => {
             const quote = generateQuote(booqId, selection.text, selection.range)
             clipboard.writeText(quote)
@@ -336,7 +336,7 @@ function CopyTextItem({
 }) {
     return <MenuItem
         text='Copy text'
-        icon={<CopyIcon />}
+        icon={<ContextMenuIcon><CopyIcon /></ContextMenuIcon>}
         callback={() => {
             const text = selection.text
             clipboard.writeText(text)
@@ -356,7 +356,7 @@ function CopyLinkItem({
     const { prefetch } = useRouter()
     return <MenuItem
         text='Copy link'
-        icon={<LinkIcon />}
+        icon={<ContextMenuIcon><LinkIcon /></ContextMenuIcon>}
         callback={() => {
             const link = generateLink(booqId, selection.range)
             clipboard.writeText(link)
@@ -401,4 +401,10 @@ function generateLink(booqId: string, range: BooqRange) {
 function baseUrl() {
     const current = window.location
     return `${current.protocol}//${current.host}`
+}
+
+function ContextMenuIcon({ children }: {
+    children: React.ReactNode,
+}) {
+    return <div className='w-6 h-6'>{children}</div>
 }

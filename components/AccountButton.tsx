@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { ActionButtonWrapper } from './Buttons'
+import { PanelButton } from './Buttons'
 import { accountHref, signInHref } from './Links'
 import { ProfileBadge } from './ProfilePicture'
 import { SignInIcon, Spinner } from './Icons'
@@ -12,16 +12,16 @@ export function AccountButton({ user, loading, from }: {
     loading?: boolean,
     from?: string,
 }) {
-    return <ActionButtonWrapper>
+    return <PanelButton>
         {
             loading ? <LoadingAccountButton />
                 : user ? <SignedAccountButton
                     name={user.name}
                     pictureUrl={user.pictureUrl}
                 />
-                    : <NotSignedAccountButtion from={from} />
+                    : <NotSignedAccountButton from={from} />
         }
-    </ActionButtonWrapper>
+    </PanelButton>
 }
 
 export function LoadingAccountButton() {
@@ -42,7 +42,7 @@ export function SignedAccountButton({ name, pictureUrl }: {
     </Link>
 }
 
-export function NotSignedAccountButtion({ from }: {
+export function NotSignedAccountButton({ from }: {
     from?: string,
 }) {
     return <Link href={signInHref({ returnTo: from })}>

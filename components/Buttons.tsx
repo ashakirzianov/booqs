@@ -1,19 +1,14 @@
 import clsx from 'clsx'
 import React from 'react'
 
-export function ActionButtonWrapper({ children }: {
-    children: React.ReactNode,
-}) {
-    return <div className='text-dimmed hover:text-highlight'>
-        {children}
-    </div>
-}
-
-export function Button({ children, onClick, selected }: {
+type ButtonProps = {
     children?: React.ReactNode,
     onClick?: () => void,
     selected?: boolean,
-}) {
+}
+export function PanelButton({
+    children, onClick, selected,
+}: ButtonProps) {
     return <button
         className={clsx('button flex text-dimmed text-2xl cursor-pointer transition duration-150 bg-transparent hover:text-highlight focus:outline-hidden w-8 h-8 justify-center items-center', {
             'text-highlight': selected,
