@@ -34,7 +34,7 @@ function FontScaleButton({ scale, onClick }: {
     onClick: () => void,
 }) {
     return <div className='cursor-pointer' onClick={onClick}>
-        <span className={clsx('font-book transition text-action hover:text-highlight drop-shadow-md', {
+        <span className={clsx('font-book transition text-action hover:text-highlight', {
             'text-2xl': scale === 'up',
             'text-lg': scale === 'down',
         })}>Abc</span>
