@@ -1,5 +1,4 @@
 import React from 'react'
-import { Icon, IconName } from './Icon'
 
 export function ActionButtonWrapper({ children }: {
     children: React.ReactNode,
@@ -24,16 +23,11 @@ export function Button({ children, onClick, selected }: {
     </button>
 }
 
-export function BorderButton({ text, icon, onClick }: {
+export function BorderButton({ text, onClick }: {
     text: string,
-    icon?: IconName,
     onClick?: () => void,
 }) {
     return <div className='flex text-center text-dimmed border-2 border-dimmed no-underline cursor-pointer transition-all duration-300 hover:text-highlight hover:border-highlight rounded-sm font-bold py-sm px-base' onClick={onClick}>
-        {
-            !icon ? null :
-                <div className='mr-base'><Icon name={icon} /></div>
-        }
         {text}
     </div>
 }
