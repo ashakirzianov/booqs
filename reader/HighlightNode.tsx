@@ -1,10 +1,10 @@
 import { BooqLink } from '@/components/Links'
 import { Popover } from '@/components/Popover'
-import { Icon } from '@/components/Icon'
 import { ContextMenuContent } from '@/reader/ContextMenuContent'
 import { ProfileBadge } from '@/components/ProfilePicture'
 import { resolveHighlightColor } from '@/application/common'
 import { ReaderHighlight, ReaderUser } from './common'
+import { MoreIcon } from '@/components/Icons'
 
 export function HighlightNodeComp({ booqId, highlight, self }: {
     booqId: string,
@@ -26,7 +26,7 @@ export function HighlightNodeComp({ booqId, highlight, self }: {
                 placement='right-start'
                 hasAction={true}
                 anchor={<div className='flex justify-center cursor-pointer text-xl text-dimmed xl:text-background hover:text-highlight w-lg'>
-                    <Icon name='more' />
+                    <MoreIcon />
                 </div>}
                 content={<div className='w-48 pointer-events-auto text-primary'>
                     <ContextMenuContent
