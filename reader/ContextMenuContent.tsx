@@ -10,6 +10,7 @@ import { ProfileBadge } from '@/components/ProfilePicture'
 import { resolveHighlightColor, highlightColorNames } from '@/application/common'
 import { ReaderHighlight, ReaderUser } from './common'
 import { useHighlightMutations } from '@/application/highlights'
+import { CopilotIcon, CopyIcon, LinkIcon, RemoveIcon, ShareIcon } from '@/components/Icons'
 
 type EmptyTarget = {
     kind: 'empty',
@@ -129,7 +130,7 @@ function CopilotItem({ selection, updateCopilot }: {
     }
     return <MenuItem
         text='Ask copilot'
-        icon='question'
+        icon={<CopilotIcon />}
         callback={() => {
             updateCopilot(selection)
         }}
@@ -238,7 +239,7 @@ function RemoveHighlightItem({
     const { removeHighlight } = useHighlightMutations(booqId)
     return <MenuItem
         text='Remove'
-        icon='remove'
+        icon={<RemoveIcon />}
         callback={() => {
             removeHighlight(highlight.id)
             setTarget({ kind: 'empty' })
@@ -315,7 +316,7 @@ function CopyQuoteItem({
     const { prefetch } = useRouter()
     return <MenuItem
         text='Copy quote'
-        icon='quote'
+        icon={<ShareIcon />}
         callback={() => {
             const quote = generateQuote(booqId, selection.text, selection.range)
             clipboard.writeText(quote)
@@ -335,7 +336,7 @@ function CopyTextItem({
 }) {
     return <MenuItem
         text='Copy text'
-        icon='copy'
+        icon={<CopyIcon />}
         callback={() => {
             const text = selection.text
             clipboard.writeText(text)
@@ -355,7 +356,7 @@ function CopyLinkItem({
     const { prefetch } = useRouter()
     return <MenuItem
         text='Copy link'
-        icon='link'
+        icon={<LinkIcon />}
         callback={() => {
             const link = generateLink(booqId, selection.range)
             clipboard.writeText(link)

@@ -1,5 +1,4 @@
 import React, { ReactNode } from 'react'
-import { IconName, Icon } from './Icon'
 import Link from 'next/link'
 import { Spinner } from './Icons'
 
@@ -16,7 +15,7 @@ export function MenuItem({
     icon, text, callback, spinner, href,
 }: {
     text: string,
-    icon?: IconName,
+    icon?: ReactNode,
     callback?: () => void,
     spinner?: boolean,
     href?: string,
@@ -29,7 +28,7 @@ export function MenuItem({
     >
         {
             icon
-                ? <div className="flex justify-center items-center mr-lg"><Icon name={icon} /></div>
+                ? <div className="flex justify-center items-center mr-lg">{icon}</div>
                 : null
         }
         <span className='flex grow'>{text}</span>

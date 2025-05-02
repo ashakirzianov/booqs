@@ -8,7 +8,9 @@ import { Popover } from '@/components/Popover'
 import { accountHref, myBooqsHref } from '@/components/Links'
 import { useRouter } from 'next/navigation'
 import { AuthUser, useAuth } from '@/application/auth'
-import { NewItemIcon, PasskeyIcon, Spinner } from './Icons'
+import {
+    BookIcon, NewItemIcon, PasskeyIcon, SettingsIcon, SignOutIcon, Spinner,
+} from '@/components/Icons'
 
 export function SignInModal({ isOpen, closeModal }: {
     isOpen: boolean,
@@ -109,16 +111,16 @@ function AccountMenu({ name }: {
         <Menu>
             <MenuItem
                 text='My Booqs'
-                icon='books'
+                icon={<BookIcon />}
                 href={myBooqsHref()}
             />
             <MenuItem
                 text='Settings'
-                icon='settings'
+                icon={<SettingsIcon />}
                 href={accountHref()}
             />
             <MenuItem
-                icon='sign-out'
+                icon={<SignOutIcon />}
                 text='Sing Out'
                 callback={() => {
                     signOut()
