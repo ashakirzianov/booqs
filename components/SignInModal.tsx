@@ -1,7 +1,7 @@
 'use client'
 import React, { useState } from 'react'
 import { Menu, MenuItem } from '@/components/Menu'
-import { IconButton } from '@/components/Buttons'
+import { Button } from '@/components/Buttons'
 import { ProfileBadge } from '@/components/ProfilePicture'
 import { ModalButton, ModalDivider, ModalLabel, Modal } from '@/components/Modal'
 import { Popover } from '@/components/Popover'
@@ -9,7 +9,7 @@ import { accountHref, myBooqsHref } from '@/components/Links'
 import { useRouter } from 'next/navigation'
 import { AuthUser, useAuth } from '@/application/auth'
 import {
-    BookIcon, NewItemIcon, PasskeyIcon, SettingsIcon, SignOutIcon, Spinner,
+    BookIcon, NewItemIcon, PasskeyIcon, SettingsIcon, SignInIcon, SignOutIcon, Spinner,
 } from '@/components/Icons'
 
 export function SignInModal({ isOpen, closeModal }: {
@@ -91,9 +91,10 @@ function SignedButton({ user }: {
 function NotSignedButton() {
     const [isOpen, setIsOpen] = useState(false)
     return <>
-        <IconButton
-            icon='sign-in'
-            onClick={() => setIsOpen(true)} />
+        <Button
+            onClick={() => setIsOpen(true)} >
+            <SignInIcon />
+        </Button>
         <SignInModal
             isOpen={isOpen}
             closeModal={() => setIsOpen(false)}

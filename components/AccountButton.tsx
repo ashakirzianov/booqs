@@ -1,8 +1,8 @@
 import Link from 'next/link'
-import { ActionButtonWrapper, IconButton } from './Buttons'
+import { ActionButtonWrapper } from './Buttons'
 import { accountHref, signInHref } from './Links'
 import { ProfileBadge } from './ProfilePicture'
-import { Spinner } from './Icons'
+import { SignInIcon, Spinner } from './Icons'
 
 export function AccountButton({ user, loading, from }: {
     user?: {
@@ -46,7 +46,6 @@ export function NotSignedAccountButtion({ from }: {
     from?: string,
 }) {
     return <Link href={signInHref({ returnTo: from })}>
-        <IconButton
-            icon='sign-in' />
+        <SignInIcon />
     </Link>
 }

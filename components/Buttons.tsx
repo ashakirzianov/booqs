@@ -1,6 +1,5 @@
 import React from 'react'
 import { Icon, IconName } from './Icon'
-import { Spinner } from './Loading'
 
 export function ActionButtonWrapper({ children }: {
     children: React.ReactNode,
@@ -10,47 +9,19 @@ export function ActionButtonWrapper({ children }: {
     </div>
 }
 
-export function IconButton({ icon, onClick, isSelected }: {
-    icon: IconName,
+export function Button({ children, onClick, selected }: {
+    children?: React.ReactNode,
     onClick?: () => void,
-    isSelected?: boolean,
+    selected?: boolean,
 }) {
-    const selectedClass = isSelected
+    const selectedClass = selected
         ? 'text-highlight' : 'text-dimmed'
     return <button
         className={`button flex text-dimmed text-2xl cursor-pointer transition bg-transparent hover:text-highlight focus:outline-hidden ${selectedClass} w-8 h-8 justify-center items-center`}
         onClick={onClick}
     >
-        <Icon name={icon} />
+        {children}
     </button>
-}
-
-export function ActionButton({ text, onClick }: {
-    text: string,
-    onClick?: () => void,
-}) {
-    return <>
-        <button onClick={onClick} className='shadow-button rounded-sm p-base border-none bg-action text-lg cursor-pointer font-light transition duration-300 hover:bg-highlight'>
-            <span>{text}</span>
-        </button>
-    </>
-}
-
-export function TextButton({ text, onClick, loading }: {
-    text: string,
-    onClick?: () => void,
-    loading?: boolean,
-}) {
-    return <>
-        <span className='text-action underline text-lg cursor-pointer transition duration-300 hover:text-highlight' onClick={onClick}>
-            {text}
-            {
-                loading
-                    ? <Spinner />
-                    : null
-            }
-        </span>
-    </>
 }
 
 export function BorderButton({ text, icon, onClick }: {

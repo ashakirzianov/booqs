@@ -1,10 +1,13 @@
 import { Popover } from '@/components/Popover'
-import { IconButton } from '@/components/Buttons'
+import { Button } from '@/components/Buttons'
 import { useSetFontScale } from '@/application/theme'
+import { ThemerIcon } from '@/components/Icons'
 
 export function ThemerButton() {
     return <Popover
-        anchor={<IconButton icon='appearance' />}
+        anchor={<Button>
+            <ThemerIcon />
+        </Button>}
         content={<ThemerPanel />}
     />
 }

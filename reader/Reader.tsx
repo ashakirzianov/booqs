@@ -1,7 +1,7 @@
 'use client'
 import React, { useCallback, useMemo, useState } from 'react'
 import { BooqPath, BooqRange, contextForRange, positionForPath, samePath } from '@/core'
-import { BorderButton, IconButton } from '@/components/Buttons'
+import { BorderButton, Button } from '@/components/Buttons'
 import { BooqLink, FeedLink, booqHref } from '@/components/Links'
 import {
     BooqContent, getAugmentationElement, getAugmentationText,
@@ -24,6 +24,7 @@ import { useHighlights } from '@/application/highlights'
 import { AccountButton } from '@/components/AccountButton'
 import { usePathname } from 'next/navigation'
 import { Spinner } from '@/components/Loading'
+import { BackIcon, TocIcon } from '@/components/Icons'
 
 
 export function Reader({
@@ -64,11 +65,12 @@ export function Reader({
         toggleSelection={toggleNavigationSelection}
         closeSelf={closeNavigation}
     />
-    const NavigationButton = <IconButton
-        icon='toc'
+    const NavigationButton = <Button
         onClick={toggleNavigationOpen}
-        isSelected={navigationOpen}
-    />
+        selected={navigationOpen}
+    >
+        <TocIcon />
+    </Button>
 
     const filteredHighlights = useMemo(
         () => filterHighlights({
@@ -153,7 +155,9 @@ export function Reader({
             booq={booq}
         />}
         MainButton={<FeedLink>
-            <IconButton icon='back' />
+            <Button>
+                <BackIcon />
+            </Button>
         </FeedLink>}
         NavigationButton={NavigationButton}
         ThemerButton={<ThemerButton />}
@@ -188,7 +192,9 @@ export function LoadingBooqScreen() {
         ContextMenu={null}
         Copilot={null}
         MainButton={<FeedLink>
-            <IconButton icon='back' />
+            <Button>
+                <BackIcon />
+            </Button>
         </FeedLink>}
         NavigationButton={null}
         ThemerButton={<ThemerButton />}

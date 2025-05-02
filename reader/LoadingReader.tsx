@@ -1,9 +1,10 @@
 import { BooqPath, BooqRange, BooqNode } from '@/core'
-import { BorderButton, IconButton } from '@/components/Buttons'
+import { BorderButton, Button } from '@/components/Buttons'
 import { BooqLink, FeedLink } from '@/components/Links'
 import { ReaderLayout } from './ReaderLayout'
 import { Augmentation, BooqContent } from '@/viewer'
 import { quoteColor } from '@/application/common'
+import { BackIcon } from '@/components/Icons'
 
 type BooqAnchor = {
     title?: string,
@@ -67,7 +68,9 @@ export function LoadingReader({
         ContextMenu={null}
         Copilot={null}
         MainButton={<FeedLink>
-            <IconButton icon='back' />
+            <Button>
+                <BackIcon />
+            </Button>
         </FeedLink>}
         // TODO: provide some loading indication?
         NavigationButton={null}
