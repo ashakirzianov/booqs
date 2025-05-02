@@ -8,7 +8,7 @@ import { Popover } from '@/components/Popover'
 import { accountHref, myBooqsHref } from '@/components/Links'
 import { useRouter } from 'next/navigation'
 import { AuthUser, useAuth } from '@/application/auth'
-import { Spinner } from './Icons'
+import { NewItemIcon, PasskeyIcon, Spinner } from './Icons'
 
 export function SignInModal({ isOpen, closeModal }: {
     isOpen: boolean,
@@ -26,7 +26,7 @@ export function SignInModal({ isOpen, closeModal }: {
             <ModalDivider />
             <ModalButton
                 text='Register with Passkey'
-                icon='new-passkey'
+                icon={<NewItemIcon />}
                 onClick={() => {
                     registerWithPasskey()
                     closeModal()
@@ -36,7 +36,7 @@ export function SignInModal({ isOpen, closeModal }: {
             <ModalDivider />
             <ModalButton
                 text='Sign in with Passkey'
-                icon='signin-passkey'
+                icon={<PasskeyIcon />}
                 onClick={() => {
                     signInWithPasskey()
                     closeModal()

@@ -1,7 +1,7 @@
 'use client'
 import { ReactNode, useEffect, useRef, useState } from 'react'
-import { Icon, IconName } from './Icon'
 import Link from 'next/link'
+import { CloseIcon } from './Icons'
 
 export function useModalState() {
     const [isOpen, setIsOpen] = useState(false)
@@ -109,16 +109,12 @@ export function ModalDivider() {
 
 export function ModalButton({ text, icon, href, onClick }: {
     text: string,
-    icon?: IconName,
+    icon?: ReactNode,
     href?: string,
     onClick?: () => void,
 }) {
     const content = <div className='flex flex-row items-center'>
-        {
-            icon
-                ? <div><Icon name={icon} /></div>
-                : null
-        }
+        {icon ?? null}
         <span className='m-lg no-underline'>{text}</span>
     </div>
     return <div className='flex grow flex-col items-center cursor-pointer text-action hover:text-highlight' onClick={onClick}>
@@ -142,7 +138,7 @@ export function ModalHeader({ text, onClose }: {
         </div>
         <div className='col-start-3 col-end-4 flex justify-end w-full items-center' >
             <div onClick={onClose} className='hover:text-highlight cursor-pointer'>
-                <Icon name='close' />
+                <CloseIcon />
             </div>
         </div>
     </div>
