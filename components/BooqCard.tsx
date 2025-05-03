@@ -49,7 +49,7 @@ function Header({ title, author }: {
         <span className="text-xl font-bold">{title}</span>
         {
             author &&
-            <span className="text-lg">by <Link href={authorHref(author)}
+            <span className="text-lg">by <Link href={authorHref({ name: author })}
                 className='hover:underline'
             >
                 {author}

@@ -1,10 +1,11 @@
 import { BooqPath, BooqRange, BooqNode } from '@/core'
 import { BorderButton, PanelButton } from '@/components/Buttons'
-import { BooqLink, FeedLink } from '@/components/Links'
 import { ReaderLayout } from './ReaderLayout'
 import { Augmentation, BooqContent } from '@/viewer'
 import { quoteColor } from '@/application/common'
 import { BackIcon } from '@/components/Icons'
+import Link from 'next/link'
+import { booqHref, feedHref } from '@/components/Links'
 
 type BooqAnchor = {
     title?: string,
@@ -67,11 +68,11 @@ export function LoadingReader({
         />}
         ContextMenu={null}
         Copilot={null}
-        MainButton={<FeedLink>
+        MainButton={<Link href={feedHref()}>
             <PanelButton>
                 <BackIcon />
             </PanelButton>
-        </FeedLink>}
+        </Link>}
         // TODO: provide some loading indication?
         NavigationButton={null}
         ThemerButton={null}
@@ -90,9 +91,9 @@ function AnchorButton({ booqId, anchor, title }: {
     if (!anchor) {
         return null
     }
-    return <BooqLink booqId={booqId} path={anchor.path}>
+    return <Link href={booqHref({ id: booqId, path: anchor.path })}>
         <div className='flex items-center h-header'>
             <BorderButton text={anchor.title ?? title} />
         </div>
-    </BooqLink>
+    </Link>
 }

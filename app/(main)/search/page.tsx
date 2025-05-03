@@ -5,9 +5,9 @@ import Link from 'next/link'
 export async function generateMetadata({
     searchParams,
 }: {
-    searchParams: { query: string }
+    searchParams: Promise<{ query: string }>
 }) {
-    const { query } = searchParams
+    const { query } = await searchParams
     return {
         title: `Search results for "${query}"`,
         description: `Search results for "${query}"`,

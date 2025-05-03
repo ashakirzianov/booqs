@@ -1,10 +1,11 @@
-import { BooqLink } from '@/components/Links'
 import { Popover } from '@/components/Popover'
 import { ContextMenuContent } from '@/reader/ContextMenuContent'
 import { resolveHighlightColor } from '@/application/common'
 import { ReaderHighlight, ReaderUser } from './common'
 import { MoreIcon } from '@/components/Icons'
 import clsx from 'clsx'
+import { booqHref } from '@/components/Links'
+import Link from 'next/link'
 
 export function HighlightNodeComp({ booqId, highlight, self }: {
     booqId: string,
@@ -15,9 +16,9 @@ export function HighlightNodeComp({ booqId, highlight, self }: {
         borderLeft: `3px solid ${resolveHighlightColor(highlight.color)}`,
     }}>
         <div className='w-full text-primary text-justify'>
-            <BooqLink booqId={booqId} path={highlight.start}>
+            <Link href={booqHref({ id: booqId, path: highlight.start })} className='text-primary hover:text-highlight'>
                 {highlight.text}
-            </BooqLink>
+            </Link>
         </div>
         <div className='flex flex-col justify-between items-stretch ml-lg'>
             <Popover

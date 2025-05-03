@@ -1,6 +1,7 @@
 import { pageForPosition } from '@/application/common'
-import { BooqLink } from '@/components/Links'
 import { TocNode } from './nodes'
+import Link from 'next/link'
+import { booqHref } from '@/components/Links'
 
 
 export function TocNodeComp({
@@ -10,11 +11,11 @@ export function TocNodeComp({
     node: TocNode,
 }) {
     return <>
-        <BooqLink booqId={booqId} path={path}>
+        <Link href={booqHref({ id: booqId, path })}>
             <div className='flex flex-nowrap flex-1 justify-between font-bold hover:text-highlight'>
                 <span className='title'>{title ?? 'no-title'}</span>
                 <span className='ml-base'>{pageForPosition(position)}</span>
             </div>
-        </BooqLink>
+        </Link>
     </>
 }

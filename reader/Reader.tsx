@@ -2,7 +2,7 @@
 import React, { useCallback, useMemo, useState } from 'react'
 import { BooqPath, BooqRange, contextForRange, positionForPath, samePath } from '@/core'
 import { BorderButton, PanelButton } from '@/components/Buttons'
-import { BooqLink, FeedLink, booqHref } from '@/components/Links'
+import { booqHref, feedHref } from '@/components/Links'
 import {
     BooqContent, getAugmentationElement, getAugmentationText,
     Augmentation,
@@ -24,6 +24,7 @@ import { useHighlights } from '@/application/highlights'
 import { AccountButton } from '@/components/AccountButton'
 import { usePathname } from 'next/navigation'
 import { BackIcon, Spinner, TocIcon } from '@/components/Icons'
+import Link from 'next/link'
 
 
 export function Reader({
@@ -153,11 +154,11 @@ export function Reader({
             setState={setCopilotState}
             booq={booq}
         />}
-        MainButton={<FeedLink>
+        MainButton={<Link href={feedHref()}>
             <PanelButton>
                 <BackIcon />
             </PanelButton>
-        </FeedLink>}
+        </Link>}
         NavigationButton={NavigationButton}
         ThemerButton={<ThemerButton />}
         AccountButton={<AccountButton
@@ -190,11 +191,11 @@ export function LoadingBooqScreen() {
         NextButton={null}
         ContextMenu={null}
         Copilot={null}
-        MainButton={<FeedLink>
+        MainButton={<Link href={feedHref()}>
             <PanelButton>
                 <BackIcon />
             </PanelButton>
-        </FeedLink>}
+        </Link>}
         NavigationButton={null}
         ThemerButton={<ThemerButton />}
         AccountButton={<AccountButton />}
@@ -327,11 +328,11 @@ function AnchorButton({ booqId, anchor, title }: {
     if (!anchor) {
         return null
     }
-    return <BooqLink booqId={booqId} path={anchor.path}>
+    return <Link href={booqHref({ id: booqId, path: anchor.path })} className='flex items-center h-header'>
         <div className='flex items-center h-header'>
             <BorderButton text={anchor.title ?? title} />
         </div>
-    </BooqLink>
+    </Link>
 }
 
 function PageLabel({ text }: {
