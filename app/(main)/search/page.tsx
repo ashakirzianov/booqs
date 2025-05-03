@@ -1,4 +1,6 @@
+import { booqHref } from '@/components/Links'
 import { fetchSearchQuery, LibrarySearchResult, LibraryBooqSearchResult, LibraryAuthorSearchResult } from '@/data/search'
+import Link from 'next/link'
 
 export async function generateMetadata({
     searchParams,
@@ -51,7 +53,11 @@ function BooqSearchResult({
 }) {
     return (
         <div>
-            <h2>{result.title}</h2>
+            <h2>
+                <Link href={booqHref(result.id)}>
+                    {result.title}
+                </Link>
+            </h2>
             <p>by {result.authors[0]}</p>
         </div>
     )

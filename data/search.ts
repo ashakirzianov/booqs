@@ -3,6 +3,7 @@ import { searchBooqs } from '@/backend/library'
 export type LibrarySearchResult = LibraryBooqSearchResult | LibraryAuthorSearchResult
 export type LibraryBooqSearchResult = {
     kind: 'book',
+    id: string,
     title: string | null,
     authors: string[],
     cover: string | null,
@@ -17,6 +18,7 @@ export async function fetchSearchQuery(query: string, limit: number = 20): Promi
         if (result.kind === 'book') {
             return {
                 kind: 'book' as const,
+                id: result.card.id,
                 title: result.card.title,
                 authors: result.card.authors,
                 cover: result.card.cover,

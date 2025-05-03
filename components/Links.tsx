@@ -24,6 +24,7 @@ export function FeedLink({ children }: {
     </Link>
 }
 
+// TODO: refactor to use consistent params passing
 export function booqHref(booqId: string, path?: BooqPath) {
     return path?.length
         ? `/booq/${booqId}/path/${pathToString(path)}#${pathToId(path)}`
