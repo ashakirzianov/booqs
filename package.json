@@ -10,6 +10,9 @@
     "https": "next dev --experimental-https",
     "workers": "tsx scripts/index.ts"
   },
+  "overrides": {
+    "css-tree": "3.0.0"
+  },
   "dependencies": {
     "@apollo/client": "^3.13.8",
     "@apollo/server": "^4.12.0",
@@ -31,7 +34,6 @@
     "cors": "^2.8.5",
     "css": "^3.0.0",
     "css-select": "^5.1.0",
-    "css-tree": "^3.0.0",
     "domutils": "^3.2.2",
     "eslint": "9.26.0",
     "eslint-config-next": "^15.3.1",
