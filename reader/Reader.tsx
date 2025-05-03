@@ -1,6 +1,6 @@
 'use client'
-import React, { useCallback, useMemo, useState } from 'react'
-import { BooqPath, BooqRange, contextForRange, positionForPath, samePath } from '@/core'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { BooqPath, BooqRange, contextForRange, pathToId, positionForPath, samePath } from '@/core'
 import { BorderButton, PanelButton } from '@/components/Buttons'
 import { booqHref, feedHref } from '@/application/href'
 import {
@@ -38,6 +38,19 @@ export function Reader({
     const self: ReaderUser | undefined = auth.user
     const fontScale = useFontScale()
     const { highlights } = useHighlights(booq.id)
+
+    const quoteRef = useRef(quote)
+    useEffect(() => {
+        if (quoteRef.current) {
+            const id = pathToId(quoteRef.current.start)
+            const element = document.getElementById(id)
+            if (element) {
+                element.scrollIntoView({
+                    behavior: 'instant',
+                })
+            }
+        }
+    }, [quoteRef])
 
     const {
         onScroll, currentPage, totalPages, leftPages,
