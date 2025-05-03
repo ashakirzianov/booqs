@@ -38,6 +38,12 @@ export function feedHref() {
     return '/'
 }
 
+export function searchHref({ query }: {
+    query: string,
+}) {
+    return `/search?query=${encodeURIComponent(query)}`
+}
+
 export function signInHref({ returnTo }: {
     returnTo?: string,
 }) {
