@@ -1,10 +1,11 @@
 diff --git a/node_modules/css-tree/lib/data-patch.js b/node_modules/css-tree/lib/data-patch.js
-index cd49cbe..b590747 100644
+index cd49cbe..b5d727e 100644
 --- a/node_modules/css-tree/lib/data-patch.js
 +++ b/node_modules/css-tree/lib/data-patch.js
-@@ -1,6 +1,999 @@
+@@ -1,6 +1,1000 @@
  import { createRequire } from 'module';
  
++console.log('✔ Patched css-tree loaded!');
  const require = createRequire(import.meta.url);
 -const patch = require('../data/patch.json');
 +const patch = {
