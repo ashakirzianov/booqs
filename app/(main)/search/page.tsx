@@ -1,4 +1,4 @@
-import { booqHref } from '@/application/href'
+import { authorHref, booqHref } from '@/application/href'
 import { fetchSearchQuery, LibrarySearchResult, LibraryBooqSearchResult, LibraryAuthorSearchResult } from '@/data/search'
 import Link from 'next/link'
 
@@ -70,7 +70,9 @@ function AuthorSearchResult({
 }) {
     return (
         <div>
-            <h2>{result.name}</h2>
+            <h2><Link href={authorHref({ name: result.name })}>
+                {result.name}
+            </Link></h2>
         </div>
     )
 }
