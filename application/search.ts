@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useQuery, gql } from '@apollo/client'
 
 const SearchQuery = gql`query Search($query: String!) {
@@ -32,12 +32,21 @@ type SearchData = {
 }
 export function useSearch() {
     const [query, setQuery] = useState('')
+    const [debouncedQuery, setDebouncedQuery] = useState(query)
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            setDebouncedQuery(query)
+        }, 300)
+        return () => {
+            clearTimeout(handler)
+        }
+    }, [query])
     const { loading, data } = useQuery<SearchData>(
         SearchQuery,
         {
-            variables: { query },
-            // nextFetchPolicy: 'network-only',
-            // fetchPolicy: 'network-only',
+            variables: { query: debouncedQuery },
+            nextFetchPolicy: 'network-only',
+            fetchPolicy: 'network-only',
         },
     )
 
