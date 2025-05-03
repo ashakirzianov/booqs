@@ -134,7 +134,7 @@ export function Reader({
                 range={range}
                 augmentations={augmentations}
                 onAugmentationClick={onAugmentationClick}
-                hrefForPath={booqHref}
+                hrefForPath={(id, path) => booqHref({ id, path })}
             />
         </div>}
         PrevButton={<AnchorButton

@@ -8,7 +8,7 @@ export function BooqLink({ booqId, path, children }: {
     path?: BooqPath,
     children: ReactNode,
 }) {
-    return <Link href={booqHref(booqId, path)} style={{
+    return <Link href={booqHref({ id: booqId, path })} style={{
         textDecoration: 'none',
         color: 'inherit',
     }}>
@@ -24,15 +24,20 @@ export function FeedLink({ children }: {
     </Link>
 }
 
-// TODO: refactor to use consistent params passing
-export function booqHref(booqId: string, path?: BooqPath) {
+export function booqHref({ id, path }: {
+    id: string,
+    path?: BooqPath,
+}) {
     return path?.length
-        ? `/booq/${booqId}/path/${pathToString(path)}#${pathToId(path)}`
-        : `/booq/${booqId}`
+        ? `/booq/${id}/path/${pathToString(path)}#${pathToId(path)}`
+        : `/booq/${id}`
 }
 
-export function quoteHref(booqId: string, range: BooqRange) {
-    return `/booq/${booqId}/quote/${rangeToString(range)}#${pathToId(range.start)}`
+export function quoteHref({ id, range }: {
+    id: string,
+    range: BooqRange,
+}) {
+    return `/booq/${id}/quote/${rangeToString(range)}#${pathToId(range.start)}`
 }
 
 export function feedHref() {
@@ -59,6 +64,6 @@ export function myBooqsHref() {
     return `/account/collection`
 }
 
-export function authorHref(name: string) {
+export function authorHref({ name }: { name: string }) {
     return `/author/${encodeURIComponent(name)}`
 }

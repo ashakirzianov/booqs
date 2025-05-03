@@ -58,10 +58,10 @@ function SearchModal({
                     if (selected !== null && results.length > 0) {
                         if (selected < authors.length) {
                             const author = authors[selected]
-                            push(authorHref(author.name))
+                            push(authorHref({ name: author.name }))
                         } else {
                             const booq = booqs[selected - authors.length]
-                            push(booqHref(booq.id, [0]))
+                            push(booqHref({ id: booq.id, path: [0] }))
                         }
                         closeModal()
                     } else {
@@ -157,7 +157,7 @@ function BooqSearchResultContent({ result, query }: {
     result: BooqSearchResult,
     query: string,
 }) {
-    return <Link href={booqHref(result.id, [0])} className='flex flex-row'>
+    return <Link href={booqHref({ id: result.id, path: [0] })} className='flex flex-row'>
         <BooqCover
             cover={result.cover}
             title={result.title}
@@ -179,7 +179,7 @@ function AuthorSearchResultContent({ result, query }: {
     query: string,
     selected?: boolean,
 }) {
-    return <Link href={authorHref(result.name)}>
+    return <Link href={authorHref({ name: result.name })}>
         <EmphasizedSpan
             text={result.name}
             emphasis={query}
