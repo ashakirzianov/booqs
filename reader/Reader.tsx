@@ -2,7 +2,7 @@
 import React, { useCallback, useMemo, useState } from 'react'
 import { BooqPath, BooqRange, contextForRange, positionForPath, samePath } from '@/core'
 import { BorderButton, PanelButton } from '@/components/Buttons'
-import { booqHref, feedHref } from '@/components/Links'
+import { booqHref, feedHref } from '@/application/href'
 import {
     BooqContent, getAugmentationElement, getAugmentationText,
     Augmentation,

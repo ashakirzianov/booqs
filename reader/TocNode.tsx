@@ -1,7 +1,7 @@
 import { pageForPosition } from '@/application/common'
 import { TocNode } from './nodes'
 import Link from 'next/link'
-import { booqHref } from '@/components/Links'
+import { booqHref } from '@/application/href'
 
 
 export function TocNodeComp({

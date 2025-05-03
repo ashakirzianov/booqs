@@ -1,7 +1,7 @@
 'use client'
 import { useRouter } from 'next/navigation'
 import { signOutAction } from '@/data/auth'
-import { feedHref } from '@/components/Links'
+import { feedHref } from '@/application/href'
 export function SignoutButton() {
     const router = useRouter()
     async function signout() {

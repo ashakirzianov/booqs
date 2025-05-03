@@ -1,4 +1,4 @@
-import { booqHref } from '@/components/Links'
+import { booqHref } from '@/application/href'
 import { fetchSearchQuery, LibrarySearchResult, LibraryBooqSearchResult, LibraryAuthorSearchResult } from '@/data/search'
 import Link from 'next/link'
 

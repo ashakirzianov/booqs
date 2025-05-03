@@ -5,7 +5,7 @@ import { Augmentation, BooqContent } from '@/viewer'
 import { quoteColor } from '@/application/common'
 import { BackIcon } from '@/components/Icons'
 import Link from 'next/link'
-import { booqHref, feedHref } from '@/components/Links'
+import { booqHref, feedHref } from '@/application/href'
 
 type BooqAnchor = {
     title?: string,

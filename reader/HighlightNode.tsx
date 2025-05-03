@@ -4,7 +4,7 @@ import { resolveHighlightColor } from '@/application/common'
 import { ReaderHighlight, ReaderUser } from './common'
 import { MoreIcon } from '@/components/Icons'
 import clsx from 'clsx'
-import { booqHref } from '@/components/Links'
+import { booqHref } from '@/application/href'
 import Link from 'next/link'
 
 export function HighlightNodeComp({ booqId, highlight, self }: {

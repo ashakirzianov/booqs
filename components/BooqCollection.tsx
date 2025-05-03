@@ -1,6 +1,6 @@
 import { BooqCard, BooqCardData } from '@/components/BooqCard'
 import Link from 'next/link'
-import { booqHref } from './Links'
+import { booqHref } from '../application/href'
 import { CollectionButton } from './CollectionButton'
 export function BooqCollection({
     cards, title, collection, signed,

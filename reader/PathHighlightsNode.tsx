@@ -2,7 +2,7 @@ import { Fragment } from 'react'
 import { HighlightNodeComp } from './HighlightNode'
 import { ReaderTocItem, ReaderUser } from './common'
 import { PathHighlightsNode } from './nodes'
-import { booqHref } from '@/components/Links'
+import { booqHref } from '@/application/href'
 import Link from 'next/link'
 
 export function PathHighlightsNodeComp({

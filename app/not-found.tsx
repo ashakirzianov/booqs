@@ -1,4 +1,4 @@
-import { feedHref } from '@/components/Links'
+import { feedHref } from '@/application/href'
 import Link from 'next/link'
 
 

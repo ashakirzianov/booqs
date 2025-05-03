@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { PanelButton } from './Buttons'
-import { accountHref, signInHref } from './Links'
+import { accountHref, signInHref } from '../application/href'
 import { ProfileBadge } from './ProfilePicture'
 import { SignInIcon, Spinner } from './Icons'
 
