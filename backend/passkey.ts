@@ -19,7 +19,7 @@ export async function initiatePasskeyRegistration({
         const options = await generateRegistrationOptions({
             rpName,
             rpID,
-            userName: 'placeholder', // This will be replaced with the actual user ID
+            userName: 'booqs-passkey',
             timeout: 60000,
             attestationType: 'none',
             authenticatorSelection: {
