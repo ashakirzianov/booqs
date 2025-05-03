@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { BooqCover } from '@/components/BooqCover'
 import { BooqTags } from '@/components/BooqTags'
-import { authorHref } from '@/components/Links'
+import { authorHref } from '@/application/href'
 import { ReactNode } from 'react'
 
 export type BooqCardData = {
@@ -49,7 +49,7 @@ function Header({ title, author }: {
         <span className="text-xl font-bold">{title}</span>
         {
             author &&
-            <span className="text-lg">by <Link href={authorHref(author)}
+            <span className="text-lg">by <Link href={authorHref({ name: author })}
                 className='hover:underline'
             >
                 {author}

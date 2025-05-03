@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation'
-import { signInHref } from '@/components/Links'
+import { signInHref } from '@/application/href'
 import { fetchAuthData } from '@/data/auth'
 import { DeleteAccountButton } from './DeleteAccountButton'
 import { booqCollection } from '@/data/booqs'

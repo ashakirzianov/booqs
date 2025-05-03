@@ -1,8 +1,9 @@
 import { Fragment } from 'react'
-import { BooqLink } from '@/components/Links'
 import { HighlightNodeComp } from './HighlightNode'
 import { ReaderTocItem, ReaderUser } from './common'
 import { PathHighlightsNode } from './nodes'
+import { booqHref } from '@/application/href'
+import Link from 'next/link'
 
 export function PathHighlightsNodeComp({
     booqId, self,
@@ -39,9 +40,9 @@ function Path({ items, booqId }: {
                 : <Fragment key={idx}>
                     {idx === 0 ? null : <div className='mr-base'>/</div>}
                     <div className='font-bold mr-base hover:underline'>
-                        <BooqLink booqId={booqId} path={item.path}>
+                        <Link href={booqHref({ id: booqId, path: item.path })}>
                             {item.title}
-                        </BooqLink>
+                        </Link>
                     </div>
                 </Fragment>
             )

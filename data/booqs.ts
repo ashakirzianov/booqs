@@ -60,9 +60,13 @@ export async function booqCollection(collection: string, userId: string | undefi
     return cards.map(card => buildBooqCard(card, 210))
 }
 
-export async function booqCard(booqId: string) {
+export async function booqCard(booqId: string): Promise<BooqCard | undefined> {
     const [card] = await libraryCardsForIds([booqId])
-    return card
+    if (undefined === card) {
+        return undefined
+    }
+
+    return buildBooqCard(card, 210)
 }
 
 export async function booqPreview(booqId: string, path?: BooqPath, end?: BooqPath, length: number = 500) {
@@ -82,7 +86,7 @@ export async function booqPreview(booqId: string, path?: BooqPath, end?: BooqPat
 }
 
 export async function booqPart(booqId: string, path?: BooqPath) {
-    const card = await booqCard(booqId)
+    const [card] = await libraryCardsForIds([booqId])
     if (card === undefined) {
         return undefined
     }

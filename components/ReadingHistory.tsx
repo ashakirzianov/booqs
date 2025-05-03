@@ -1,8 +1,9 @@
 import React from 'react'
 import { BooqPreview } from '@/components/BooqPreview'
-import { BooqLink } from '@/components/Links'
 import { pageForPosition } from '@/application/common'
 import { BooqPath } from '@/core'
+import Link from 'next/link'
+import { booqHref } from '../application/href'
 
 
 export type ReadingHistoryEntry = {
@@ -23,7 +24,7 @@ export function ReadingHistory({ history }: {
             history.map(
                 (entry, idx) =>
                     <div key={idx} className='flex snap-center'>
-                        <BooqLink booqId={entry.booqId} path={entry.path}>
+                        <Link href={booqHref({ id: entry.booqId, path: entry.path })}>
                             <BooqPreview
                                 path={entry.path}
                                 text={entry.preview}
@@ -31,7 +32,7 @@ export function ReadingHistory({ history }: {
                                 page={pageForPosition(entry.position)}
                                 total={pageForPosition(entry.length)}
                             />
-                        </BooqLink>
+                        </Link>
                     </div>
             )
         }

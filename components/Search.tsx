@@ -1,6 +1,6 @@
 'use client'
 import { BooqCover } from '@/components/BooqCover'
-import { authorHref, booqHref } from '@/components/Links'
+import { authorHref, booqHref, searchHref } from '@/application/href'
 import { Modal, useModalState } from './Modal'
 import {
     AuthorSearchResult, BooqSearchResult,
@@ -38,9 +38,10 @@ function SearchModal({
 }) {
     const { push } = useRouter()
     const { query, doQuery, results, loading } = useSearch()
-    const [selected, setSelected] = useState(0)
+    const [selected, setSelected] = useState<number | null>(null)
     const booqs = results.filter(isBooqSearchResult)
     const authors = results.filter(isAuthorSearchResult)
+    const router = useRouter()
     return <Modal
         isOpen={isOpen}
         closeModal={closeModal}
@@ -50,18 +51,23 @@ function SearchModal({
                 if (e.key === 'Escape') {
                     closeModal()
                 } else if (e.key === 'ArrowUp') {
-                    setSelected(Math.max(0, selected - 1))
+                    setSelected(Math.max(0, (selected ?? 0) - 1))
                 } else if (e.key === 'ArrowDown') {
-                    setSelected(Math.min(results.length - 1, selected + 1))
-                } else if (e.key === 'Enter' && results.length > 0) {
-                    if (selected < authors.length) {
-                        const author = authors[selected]
-                        push(authorHref(author.name))
+                    setSelected(Math.min(results.length - 1, (selected ?? 0) + 1))
+                } else if (e.key === 'Enter') {
+                    if (selected !== null && results.length > 0) {
+                        if (selected < authors.length) {
+                            const author = authors[selected]
+                            push(authorHref({ name: author.name }))
+                        } else {
+                            const booq = booqs[selected - authors.length]
+                            push(booqHref({ id: booq.id, path: [0] }))
+                        }
+                        closeModal()
                     } else {
-                        const booq = booqs[selected - authors.length]
-                        push(booqHref(booq.id, [0]))
+                        router.push(searchHref({ query }))
+                        closeModal()
                     }
-                    closeModal()
                 }
             }}
         >
@@ -113,7 +119,7 @@ function SearchModal({
                     : null}
                 {
                     loading
-                        ? <div key='spinner' className='self-center m-lg'><Spinner /></div>
+                        ? <div key='spinner' className='self-center m-lg w-8 h-8'><Spinner /></div>
                         : results.length === 0
                             ? <div className='text-center text-dimmed p-base'>
                                 No results
@@ -151,7 +157,7 @@ function BooqSearchResultContent({ result, query }: {
     result: BooqSearchResult,
     query: string,
 }) {
-    return <Link href={booqHref(result.id, [0])} className='flex flex-row'>
+    return <Link href={booqHref({ id: result.id, path: [0] })} className='flex flex-row'>
         <BooqCover
             cover={result.cover}
             title={result.title}
@@ -173,7 +179,7 @@ function AuthorSearchResultContent({ result, query }: {
     query: string,
     selected?: boolean,
 }) {
-    return <Link href={authorHref(result.name)}>
+    return <Link href={authorHref({ name: result.name })}>
         <EmphasizedSpan
             text={result.name}
             emphasis={query}

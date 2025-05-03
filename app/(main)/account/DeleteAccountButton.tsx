@@ -1,6 +1,6 @@
 'use client'
 
-import { feedHref } from '@/components/Links'
+import { feedHref } from '@/application/href'
 import { Modal } from '@/components/Modal'
 import { deleteAccountAction } from '@/data/auth'
 import { useRouter } from 'next/navigation'

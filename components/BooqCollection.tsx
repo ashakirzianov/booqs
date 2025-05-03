@@ -1,6 +1,6 @@
 import { BooqCard, BooqCardData } from '@/components/BooqCard'
 import Link from 'next/link'
-import { booqHref } from './Links'
+import { booqHref } from '../application/href'
 import { CollectionButton } from './CollectionButton'
 export function BooqCollection({
     cards, title, collection, signed,
@@ -48,7 +48,7 @@ export function BooqCollection({
 function ReadButton({ booqId }: {
     booqId: string,
 }) {
-    return <Link href={booqHref(booqId, [0])}>
+    return <Link href={booqHref({ id: booqId, path: [0] })}>
         <span className='text-action underline text-lg cursor-pointer transition duration-300 hover:text-highlight'>
             Read
         </span>

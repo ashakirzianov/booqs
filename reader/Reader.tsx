@@ -1,8 +1,8 @@
 'use client'
-import React, { useCallback, useMemo, useState } from 'react'
-import { BooqPath, BooqRange, contextForRange, positionForPath, samePath } from '@/core'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { BooqPath, BooqRange, contextForRange, pathToId, positionForPath, samePath } from '@/core'
 import { BorderButton, PanelButton } from '@/components/Buttons'
-import { BooqLink, FeedLink, booqHref } from '@/components/Links'
+import { booqHref, feedHref } from '@/application/href'
 import {
     BooqContent, getAugmentationElement, getAugmentationText,
     Augmentation,
@@ -24,6 +24,7 @@ import { useHighlights } from '@/application/highlights'
 import { AccountButton } from '@/components/AccountButton'
 import { usePathname } from 'next/navigation'
 import { BackIcon, Spinner, TocIcon } from '@/components/Icons'
+import Link from 'next/link'
 
 
 export function Reader({
@@ -37,6 +38,19 @@ export function Reader({
     const self: ReaderUser | undefined = auth.user
     const fontScale = useFontScale()
     const { highlights } = useHighlights(booq.id)
+
+    const quoteRef = useRef(quote)
+    useEffect(() => {
+        if (quoteRef.current) {
+            const id = pathToId(quoteRef.current.start)
+            const element = document.getElementById(id)
+            if (element) {
+                element.scrollIntoView({
+                    behavior: 'instant',
+                })
+            }
+        }
+    }, [quoteRef])
 
     const {
         onScroll, currentPage, totalPages, leftPages,
@@ -134,7 +148,7 @@ export function Reader({
                 range={range}
                 augmentations={augmentations}
                 onAugmentationClick={onAugmentationClick}
-                hrefForPath={booqHref}
+                hrefForPath={(id, path) => booqHref({ id, path })}
             />
         </div>}
         PrevButton={<AnchorButton
@@ -153,11 +167,11 @@ export function Reader({
             setState={setCopilotState}
             booq={booq}
         />}
-        MainButton={<FeedLink>
+        MainButton={<Link href={feedHref()}>
             <PanelButton>
                 <BackIcon />
             </PanelButton>
-        </FeedLink>}
+        </Link>}
         NavigationButton={NavigationButton}
         ThemerButton={<ThemerButton />}
         AccountButton={<AccountButton
@@ -190,11 +204,11 @@ export function LoadingBooqScreen() {
         NextButton={null}
         ContextMenu={null}
         Copilot={null}
-        MainButton={<FeedLink>
+        MainButton={<Link href={feedHref()}>
             <PanelButton>
                 <BackIcon />
             </PanelButton>
-        </FeedLink>}
+        </Link>}
         NavigationButton={null}
         ThemerButton={<ThemerButton />}
         AccountButton={<AccountButton />}
@@ -327,11 +341,11 @@ function AnchorButton({ booqId, anchor, title }: {
     if (!anchor) {
         return null
     }
-    return <BooqLink booqId={booqId} path={anchor.path}>
+    return <Link href={booqHref({ id: booqId, path: anchor.path })} className='flex items-center h-header'>
         <div className='flex items-center h-header'>
             <BorderButton text={anchor.title ?? title} />
         </div>
-    </BooqLink>
+    </Link>
 }
 
 function PageLabel({ text }: {

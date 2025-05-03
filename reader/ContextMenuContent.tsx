@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation'
 import * as clipboard from 'clipboard-polyfill'
 import { BooqRange } from '@/core'
 import { MenuItem } from '@/components/Menu'
-import { quoteHref } from '@/components/Links'
+import { quoteHref } from '@/application/href'
 import { BooqSelection } from '@/viewer'
 import { ProfileBadge } from '@/components/ProfilePicture'
 import { resolveHighlightColor, highlightColorNames } from '@/application/common'
@@ -321,7 +321,9 @@ function CopyQuoteItem({
             const quote = generateQuote(booqId, selection.text, selection.range)
             clipboard.writeText(quote)
             removeSelection()
-            prefetch(quoteHref(booqId, selection.range))
+            prefetch(quoteHref({
+                id: booqId, range: selection.range,
+            }))
             setTarget({ kind: 'empty' })
         }}
     />
@@ -361,7 +363,9 @@ function CopyLinkItem({
             const link = generateLink(booqId, selection.range)
             clipboard.writeText(link)
             removeSelection()
-            prefetch(quoteHref(booqId, selection.range))
+            prefetch(quoteHref({
+                id: booqId, range: selection.range,
+            }))
             setTarget({ kind: 'empty' })
         }}
     />
@@ -375,7 +379,9 @@ function useCopyQuote(booqId: string, selection?: BooqSelection) {
                 e.preventDefault()
                 const selectionText = generateQuote(booqId, selection.text, selection.range)
                 e.clipboardData.setData('text/plain', selectionText)
-                prefetch(quoteHref(booqId, selection.range))
+                prefetch(quoteHref({
+                    id: booqId, range: selection.range,
+                }))
             }
         }
         window.addEventListener('copy', handleCopy)
@@ -395,7 +401,7 @@ function generateQuote(booqId: string, text: string, range: BooqRange) {
 }
 
 function generateLink(booqId: string, range: BooqRange) {
-    return `${baseUrl()}${quoteHref(booqId, range)}`
+    return `${baseUrl()}${quoteHref({ id: booqId, range })}`
 }
 
 function baseUrl() {
