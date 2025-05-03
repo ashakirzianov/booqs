@@ -1,8 +1,8 @@
 diff --git a/node_modules/css-tree/data/patch.json b/node_modules/css-tree/data/patch.json
-index 08c59a1..1becba2 100644
+index 08c59a1..2806a5d 100644
 --- a/node_modules/css-tree/data/patch.json
 +++ b/node_modules/css-tree/data/patch.json
-@@ -1,982 +1 @@
+@@ -1,982 +1,14 @@
 -{
 -    "atrules": {
 -        "charset": {
@@ -66,7 +66,13 @@ index 08c59a1..1becba2 100644
 -                "justify-self": "<'justify-self'> | anchor-center"
 -            }
 -        }
--    },
++[
++    {
++        "type": "Atrule",
++        "name": "keyframes",
++        "prelude": "AtrulePrelude",
++        "block": "Block"
+     },
 -    "properties": {
 -        "-moz-background-clip": {
 -            "comment": "deprecated syntax in old Firefox, https://developer.mozilla.org/en/docs/Web/CSS/background-clip",
@@ -983,7 +989,12 @@ index 08c59a1..1becba2 100644
 -            "syntax": "caption | icon | menu | message-box | small-caption | status-bar",
 -            "comment": "new definition on font-4, https://drafts.csswg.org/css-fonts-4/#system-family-name-value"
 -        }
--    }
++    {
++        "type": "Atrule",
++        "name": "font-feature-values",
++        "prelude": "AtrulePrelude",
++        "block": "Block"
+     }
 -}
-+404: Not Found
++]
 \ No newline at end of file
