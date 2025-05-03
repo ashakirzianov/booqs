@@ -2,14 +2,14 @@ import {
     parse, Rule, Declaration, Charset, Media, AtRule, Comment,
 } from 'css'
 import { compile, is } from 'css-select'
-import { calculate, compare } from 'specificity'
+import { selectorSpecificity, compare } from '@csstools/selector-specificity'
 import { flatten } from 'lodash'
 import { filterUndefined } from '../core'
 import { XmlElement, attributesOf } from './xmlTree'
 import { Diagnoser } from 'booqs-epub'
 
 type CompiledQuery = ReturnType<typeof compile>
-type Specificity = ReturnType<typeof calculate>
+type Specificity = ReturnType<typeof selectorSpecificity>
 export type Selector = {
     selector: string,
     compiled: CompiledQuery,
@@ -197,7 +197,7 @@ function isSelect(xml: XmlElement, selector: Selector) {
 function parseSelector(selector: string, diags: Diagnoser): Selector | undefined {
     try {
         const compiled = compile(selector)
-        const specificity = calculate(selector)
+        const specificity = selectorSpecificity(selector as any)
         return {
             selector,
             compiled,
