@@ -113,7 +113,7 @@ function SearchModal({
                     : null}
                 {
                     loading
-                        ? <div key='spinner' className='self-center m-lg'><Spinner /></div>
+                        ? <div key='spinner' className='self-center m-lg w-8 h-8'><Spinner /></div>
                         : results.length === 0
                             ? <div className='text-center text-dimmed p-base'>
                                 No results
