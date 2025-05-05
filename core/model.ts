@@ -1,7 +1,6 @@
-export type BooqId = {
-    id: string,
-    library: string,
-}
+export type LibraryId = string
+export type InLibraryId = string
+export type BooqId = `${LibraryId}/${InLibraryId}`
 
 export type BooqPath = number[]
 export type BooqRange = {
@@ -73,4 +72,7 @@ export type Booq = {
     meta: BooqMeta,
     toc: TableOfContents,
     images: BooqImages,
+}
+export type BooqWithId = Booq & {
+    id: BooqId,
 }
