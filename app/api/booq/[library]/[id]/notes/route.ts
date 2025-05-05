@@ -1,7 +1,7 @@
 import {
-    addHighlight,
-    highligtsWithAuthorForBooqId,
-} from '@/backend/highlights'
+    addNote,
+    notesWithAuthorForBooqId,
+} from '@/backend/notes'
 import { userForId } from '@/backend/users'
 import { makeId } from '@/core'
 import { getUserIdInsideRequest } from '@/data/auth'
@@ -11,8 +11,8 @@ type Params = {
     library: string,
     id: string,
 }
-// TODO: use DbHighlight
-type HighlightJson = {
+// TODO: use DbNote
+type NotesJson = {
     id: string,
     booqId: string,
     author: {
@@ -23,40 +23,40 @@ type HighlightJson = {
     start: number[],
     end: number[],
     color: string,
-    note: string | null,
+    content: string | null,
     createdAt: string,
     updatedAt: string,
 }
 export type GetResponse = {
-    highlights: HighlightJson[],
+    notes: NotesJson[],
 }
 export async function GET(request: NextRequest, { params }: { params: Promise<Params> }) {
     const { library, id } = await params
     const booqId = makeId(library, id)
-    const hls = await highligtsWithAuthorForBooqId(booqId)
+    const notes = await notesWithAuthorForBooqId(booqId)
     const result: GetResponse = {
-        highlights: hls.map(h => ({
-            id: h.id,
-            booqId: h.booq_id,
-            authorId: h.user_id,
-            start: h.start_path,
-            end: h.end_path,
-            color: h.color,
-            note: h.note,
-            createdAt: h.created_at,
-            updatedAt: h.updated_at,
+        notes: notes.map(note => ({
+            id: note.id,
+            booqId: note.booq_id,
+            authorId: note.author_id,
+            start: note.start_path,
+            end: note.end_path,
+            color: note.color,
+            content: note.content,
+            createdAt: note.created_at,
+            updatedAt: note.updated_at,
             author: {
-                id: h.author_id,
-                name: h.author_name,
-                profilePictureURL: h.author_profile_picture_url,
+                id: note.author_id,
+                name: note.author_name,
+                profilePictureURL: note.author_profile_picture_url,
             },
         })),
     }
     return Response.json(result)
 }
 
-export type PostBody = Pick<HighlightJson, 'id' | 'start' | 'end' | 'color' | 'note'>
-export type PostResponse = HighlightJson
+export type PostBody = Pick<NotesJson, 'id' | 'start' | 'end' | 'color' | 'content'>
+export type PostResponse = NotesJson
 export async function POST(request: NextRequest, { params }: { params: Promise<Params> }) {
     const { library, id: paramsId } = await params
     const booqId = makeId(library, paramsId)
@@ -68,17 +68,17 @@ export async function POST(request: NextRequest, { params }: { params: Promise<P
     if (!author) {
         return Response.json({ error: 'User does not exist' }, { status: 401 })
     }
-    const { id, start, end, color, note }: PostBody = await request.json()
+    const { id, start, end, color, content }: PostBody = await request.json()
     if (!id || !booqId || !start || !end || !color) {
         return Response.json({ error: 'Missing required fields' }, { status: 400 })
     }
-    const hl = await addHighlight({
+    const hl = await addNote({
         id,
-        userId,
+        authorId: userId,
         booqId,
         range: { start, end },
         color: color,
-        note: note ?? undefined,
+        content: content ?? undefined,
     })
     const result: PostResponse = {
         id: hl.id,
@@ -86,7 +86,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<P
         start: hl.start_path,
         end: hl.end_path,
         color: hl.color,
-        note: hl.note,
+        content: hl.content,
         createdAt: hl.created_at,
         updatedAt: hl.updated_at,
         author: {

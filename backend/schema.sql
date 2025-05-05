@@ -85,20 +85,20 @@ CREATE TABLE IF NOT EXISTS bookmarks (
 CREATE INDEX IF NOT EXISTS bookmarks_user_booq_idx ON bookmarks(user_id, booq_id);
 CREATE INDEX IF NOT EXISTS bookmarks_user_id_idx ON bookmarks(user_id);
 
--- Highlights
-CREATE TABLE IF NOT EXISTS highlights (
+-- Notes
+CREATE TABLE IF NOT EXISTS notes (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  author_id UUID REFERENCES users(id) ON DELETE CASCADE,
   booq_id TEXT NOT NULL,
   start_path INTEGER[] NOT NULL,
   end_path INTEGER[] NOT NULL,
   color TEXT NOT NULL,
-  note TEXT,
+  content TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
-CREATE INDEX IF NOT EXISTS highlights_user_id_idx ON highlights(user_id);
-CREATE INDEX IF NOT EXISTS highlights_booq_id_idx ON highlights(booq_id);
+CREATE INDEX IF NOT EXISTS notes_user_id_idx ON notes(author_id);
+CREATE INDEX IF NOT EXISTS notes_booq_id_idx ON notes(booq_id);
 
 -- Passkey credentials
 CREATE TABLE IF NOT EXISTS passkey_credentials (

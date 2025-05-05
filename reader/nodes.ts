@@ -6,40 +6,40 @@ export type TocNode = {
     kind: 'toc',
     item: TableOfContentsItem,
 }
-export type HighlightNode = {
-    kind: 'highlight',
-    highlight: BooqNote,
+export type NoteNode = {
+    kind: 'note',
+    note: BooqNote,
 }
-export type PathHighlightsNode = {
-    kind: 'highlights',
+export type PathNotesNode = {
+    kind: 'notes',
     items: Array<TableOfContentsItem | undefined>,
-    highlights: BooqNote[],
+    notes: BooqNote[],
 }
-export type NavigationNode = TocNode | HighlightNode | PathHighlightsNode
+export type NavigationNode = TocNode | NoteNode | PathNotesNode
 
 export function buildNavigationNodes({
-    title, toc, selection, highlights, self,
+    title, toc, selection, notes, self,
 }: {
     title: string
     toc: TableOfContentsItem[],
-    highlights: BooqNote[],
+    notes: BooqNote[],
     selection: NavigationSelection,
     self?: AccountDisplayData,
 }) {
-    const authors = highlightsAuthors(highlights)
+    const authors = notesAuthors(notes)
 
     const showChapters = selection.chapters
-    const showHighlights = selection.highlights
-    const filteredHighlights = filterHighlights({
-        highlights, selection, self,
+    const showNotes = selection.notes
+    const filteredNotes = filterNotes({
+        notes, selection, self,
     })
 
     const filter = showChapters
-        ? (showHighlights ? 'all' : 'contents')
-        : (showHighlights ? 'highlights' : 'none')
+        ? (showNotes ? 'all' : 'contents')
+        : (showNotes ? 'notes' : 'none')
     const nodes = buildNodes({
         filter, title, toc,
-        highlights: filteredHighlights,
+        notes: filteredNotes,
     })
 
     return {
@@ -48,31 +48,31 @@ export function buildNavigationNodes({
     }
 }
 
-export function filterHighlights({
-    highlights, selection, self,
+export function filterNotes({
+    notes, selection, self,
 }: {
-    highlights: BooqNote[],
+    notes: BooqNote[],
     selection: NavigationSelection,
     self: AccountDisplayData | undefined,
 }) {
-    const showHighlights = selection.highlights
+    const showNotes = selection.notes
     const showAuthors = Object.entries(selection)
         .filter(([key]) => key.startsWith('author:'))
         .map(([key]) => key.split(':')[1])
-    const allAuthors = showHighlights && self?.id
+    const allAuthors = showNotes && self?.id
         ? [self.id, ...showAuthors]
         : showAuthors
-    const filteredHighlights = highlights.filter(
-        h => allAuthors.some(authorId => h.author.id === authorId)
+    const filteredNotes = notes.filter(
+        note => allAuthors.some(authorId => note.author.id === authorId)
     )
-    return filteredHighlights
+    return filteredNotes
 }
 
-function buildNodes({ toc, filter, highlights, title }: {
+function buildNodes({ toc, filter, notes, title }: {
     title?: string,
     filter: string,
     toc: TableOfContentsItem[],
-    highlights: BooqNote[],
+    notes: BooqNote[],
 }): NavigationNode[] {
     const nodes: NavigationNode[] = []
     let prev: TableOfContentsItem = {
@@ -85,16 +85,16 @@ function buildNodes({ toc, filter, highlights, title }: {
     for (const next of toc) {
         prevPath = prevPath.slice(0, prev.level)
         prevPath[prev.level] = prev
-        const inside = highlights.filter(
+        const inside = notes.filter(
             hl => pathInRange(hl.range.start, {
                 start: prev?.path ?? [0],
                 end: next.path,
             }),
         )
         if (filter === 'all') {
-            nodes.push(...inside.map(h => ({
-                kind: 'highlight' as const,
-                highlight: h,
+            nodes.push(...inside.map(note => ({
+                kind: 'note' as const,
+                note,
             })))
             nodes.push({
                 kind: 'toc',
@@ -105,12 +105,12 @@ function buildNodes({ toc, filter, highlights, title }: {
                 kind: 'toc',
                 item: next,
             })
-        } else if (filter === 'highlights') {
+        } else if (filter === 'notes') {
             if (inside.length !== 0) {
                 nodes.push({
-                    kind: 'highlights',
+                    kind: 'notes',
                     items: prevPath,
-                    highlights: inside,
+                    notes: inside,
                 })
             }
         }
@@ -119,8 +119,8 @@ function buildNodes({ toc, filter, highlights, title }: {
     return nodes
 }
 
-function highlightsAuthors(highlights: BooqNote[]): AccountDisplayData[] {
-    const grouped = groupBy(highlights, h => h.author.id)
+function notesAuthors(notes: BooqNote[]): AccountDisplayData[] {
+    const grouped = groupBy(notes, n => n.author.id)
     return Object.entries(grouped).map(
         ([_, [{ author }]]) => author
     )

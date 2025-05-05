@@ -11,15 +11,15 @@ import {
 } from '@/viewer'
 import { useContextMenu, type ContextMenuState } from './ContextMenu'
 import { ReaderLayout } from './ReaderLayout'
-import { resolveHighlightColor, currentSource, pageForPosition, quoteColor } from '@/application/common'
+import { resolveNoteColor, currentSource, pageForPosition, quoteColor } from '@/application/common'
 import { NavigationPanel, useNavigationState } from './NavigationPanel'
 import { reportBooqHistory } from '@/data/user'
 import { ThemerButton } from '@/components/Themer'
 import { useFontScale } from '@/application/theme'
-import { filterHighlights } from './nodes'
+import { filterNotes } from './nodes'
 import { useAuth } from '@/application/auth'
 import { Copilot, CopilotState } from '@/components/Copilot'
-import { useBooqHighlights } from '@/application/highlights'
+import { useBooqNotes } from '@/application/notes'
 import { AccountButton } from '@/components/AccountButton'
 import { usePathname } from 'next/navigation'
 import { BackIcon, Spinner, TocIcon } from '@/components/Icons'
@@ -36,15 +36,15 @@ export function Reader({
     const { auth } = useAuth()
     const self: AccountDisplayData | undefined = auth.user
     const fontScale = useFontScale()
-    const { highlights } = useBooqHighlights({ booqId: booq.id })
-    const resolvedHighlights = useMemo(() => {
-        return highlights.map<BooqNote>(h => ({
-            ...h,
-            start: h.range.start,
-            end: h.range.end,
-            text: textForRange(booq.fragment.nodes, h.range) ?? '',
+    const { notes } = useBooqNotes({ booqId: booq.id })
+    const resolvedNotes = useMemo(() => {
+        return notes.map<BooqNote>(note => ({
+            ...note,
+            start: note.range.start,
+            end: note.range.end,
+            text: textForRange(booq.fragment.nodes, note.range) ?? '',
         }))
-    }, [highlights, booq.fragment.nodes])
+    }, [notes, booq.fragment.nodes])
 
     const quoteRef = useRef(quote)
     useEffect(() => {
@@ -79,7 +79,7 @@ export function Reader({
         booqId={booq.id}
         title={booq.meta.title ?? 'Untitled'}
         toc={booq.toc.items}
-        highlights={resolvedHighlights}
+        notes={resolvedNotes}
         selection={navigationSelection}
         self={self}
         toggleSelection={toggleNavigationSelection}
@@ -92,16 +92,16 @@ export function Reader({
         <TocIcon />
     </PanelButton>
 
-    const filteredHighlights = useMemo(
-        () => filterHighlights({
-            highlights: resolvedHighlights,
+    const filteredNotes = useMemo(
+        () => filterNotes({
+            notes: resolvedNotes,
             selection: navigationSelection,
             self,
-        }), [resolvedHighlights, navigationSelection, self]
+        }), [resolvedNotes, navigationSelection, self]
     )
 
     const { augmentations, menuStateForAugmentation } = useAugmentations({
-        highlights: filteredHighlights,
+        notes: filteredNotes,
         quote: quote,
     })
     const { visible, toggle } = useControlsVisibility()
@@ -250,16 +250,16 @@ function isAnythingSelected() {
 }
 
 function useAugmentations({
-    quote, highlights,
+    quote, notes,
 }: {
-    highlights: BooqNote[],
+    notes: BooqNote[],
     quote?: BooqRange,
 }) {
     const augmentations = useMemo(() => {
-        const augmentations = highlights.map<Augmentation>(h => ({
-            id: `highlight/${h.id}`,
-            range: h.range,
-            color: resolveHighlightColor(h.color),
+        const augmentations = notes.map<Augmentation>(note => ({
+            id: `note/${note.id}`,
+            range: note.range,
+            color: resolveNoteColor(note.color),
         }))
         if (quote) {
             const quoteAugmentation: Augmentation = {
@@ -271,7 +271,7 @@ function useAugmentations({
         } else {
             return augmentations
         }
-    }, [quote, highlights])
+    }, [quote, notes])
     const menuStateForAugmentation = useCallback(function (augmentationId: string): ContextMenuState | undefined {
         const anchor = getAugmentationElement(augmentationId)
         if (!anchor) {
@@ -292,14 +292,14 @@ function useAugmentations({
                         },
                     }
                     : undefined
-            case 'highlight': {
-                const highlight = highlights.find(hl => hl.id === id)
-                return highlight
+            case 'note': {
+                const note = notes.find(hl => hl.id === id)
+                return note
                     ? {
                         anchor,
                         target: {
-                            kind: 'highlight',
-                            highlight,
+                            kind: 'note',
+                            note,
                         }
                     }
                     : undefined
@@ -307,7 +307,7 @@ function useAugmentations({
             default:
                 return undefined
         }
-    }, [quote, highlights])
+    }, [quote, notes])
     return {
         augmentations,
         menuStateForAugmentation,

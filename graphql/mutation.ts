@@ -1,7 +1,7 @@
 import { IResolvers } from '@graphql-tools/utils'
 import { ResolverContext } from './context'
 import { deleteUserForId } from '@/backend/users'
-import { addHighlight, removeHighlight, updateHighlight } from '@/backend/highlights'
+import { addNote, removeNote, updateNote } from '@/backend/notes'
 import { initiatePasskeyLogin, initiatePasskeyRegistration, verifyPasskeyLogin, verifyPasskeyRegistration } from '@/backend/passkey'
 import { addToCollection, removeFromCollection } from '@/backend/collections'
 import { addBooqHistory } from '@/backend/history'
@@ -42,37 +42,37 @@ export const mutationResolver: IResolvers<any, ResolverContext> = {
                 return false
             }
         },
-        async addHighlight(_, { highlight }, { userId }): Promise<boolean> {
+        async addNote(_, { note }, { userId }): Promise<boolean> {
             if (userId) {
-                await addHighlight({
-                    id: highlight.id,
-                    userId: userId,
-                    booqId: highlight.booqId,
+                await addNote({
+                    id: note.id,
+                    authorId: userId,
+                    booqId: note.booqId,
                     range: {
-                        start: highlight.start,
-                        end: highlight.end,
+                        start: note.start,
+                        end: note.end,
                     },
-                    color: highlight.color,
+                    color: note.color,
                 })
                 return true
             } else {
                 return false
             }
         },
-        async removeHighlight(_, { id }, { userId }) {
+        async removeNote(_, { id }, { userId }) {
             if (userId) {
-                return removeHighlight({
-                    userId,
+                return removeNote({
+                    authorId: userId,
                     id: id,
                 })
             } else {
                 return false
             }
         },
-        async updateHighlight(_, { id, color }, { userId }): Promise<boolean> {
+        async updateNote(_, { id, color }, { userId }): Promise<boolean> {
             if (userId) {
-                await updateHighlight({
-                    userId,
+                await updateNote({
+                    authorId: userId,
                     id: id,
                     color,
                 })

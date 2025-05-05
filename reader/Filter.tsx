@@ -1,15 +1,11 @@
 import { ReactNode } from 'react'
 import { NavigationSelection } from './nodes'
+import { AccountDisplayData } from '@/core'
 
-export type HighlightAuthor = {
-    id: string,
-    name?: string | null,
-    pictureUrl?: string | null,
-}
 export function NavigationFilter({
     authors, selection, toggle,
 }: {
-    authors: HighlightAuthor[],
+    authors: AccountDisplayData[],
     selection: NavigationSelection,
     toggle: (id: string) => void,
 }) {
@@ -24,9 +20,9 @@ export function NavigationFilter({
         </div>
         <div className={itemClass}>
             <FilterButton
-                text='Highlights'
-                selected={selection.highlights}
-                toggle={() => toggle('highlights')}
+                text='Notes'
+                selected={selection.notes}
+                toggle={() => toggle('notes')}
             />
         </div>
         {

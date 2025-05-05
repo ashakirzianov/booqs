@@ -1,28 +1,28 @@
 import { Fragment } from 'react'
-import { HighlightNodeComp } from './HighlightNode'
-import { PathHighlightsNode } from './nodes'
+import { NoteNodeComp } from './NoteNode'
+import { PathNotesNode } from './nodes'
 import { booqHref } from '@/application/href'
 import Link from 'next/link'
 import { AccountDisplayData, TableOfContentsItem } from '@/core'
 
-export function PathHighlightsNodeComp({
+export function PathNotesNodeComp({
     booqId, self,
-    node: { items, highlights },
+    node: { items, notes },
 }: {
     booqId: string,
     self: AccountDisplayData | undefined,
-    node: PathHighlightsNode,
+    node: PathNotesNode,
 }) {
     return <div>
         <Path booqId={booqId} items={items} />
         {
-            highlights.map(
+            notes.map(
                 (hl) =>
                     <div key={hl.id} className='my-base'>
-                        <HighlightNodeComp
+                        <NoteNodeComp
                             booqId={booqId}
                             self={self}
-                            highlight={hl}
+                            note={hl}
                         />
                     </div>
             )

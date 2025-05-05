@@ -1,19 +1,19 @@
 'use client'
 
-import type { GetResponse, PostBody, PostResponse } from '@/app/api/booq/[library]/[id]/highlights/route'
+import type { GetResponse, PostBody, PostResponse } from '@/app/api/booq/[library]/[id]/notes/route'
 import { AccountDisplayData, BooqRange, NoteData } from '@/core'
 import useSWR from 'swr'
 import useSWRMutation from 'swr/mutation'
 import { v4 as uuidv4 } from 'uuid'
 
-export function useBooqHighlights({
+export function useBooqNotes({
     booqId, self,
 }: {
     booqId: string,
     self?: AccountDisplayData,
 }) {
     const { data, isLoading } = useSWR(
-        `/api/booq/${booqId}/highlights`,
+        `/api/booq/${booqId}/notes`,
         async (url: string) => {
             const res = await fetch(url, {
                 method: 'GET',
@@ -22,15 +22,15 @@ export function useBooqHighlights({
                 },
             })
             if (!res.ok) {
-                throw new Error('Failed to fetch highlights')
+                throw new Error('Failed to fetch notes')
             }
             const result: GetResponse = await res.json()
             return result
         }
     )
 
-    const { trigger: postHighlightTrigger } = useSWRMutation(
-        `/api/booq/${booqId}/highlights`,
+    const { trigger: postNoteTrigger } = useSWRMutation(
+        `/api/booq/${booqId}/notes`,
         async (url, { arg }: { arg: PostBody }) => {
             const res = await fetch(url, {
                 method: 'POST',
@@ -40,7 +40,7 @@ export function useBooqHighlights({
                 body: JSON.stringify(arg),
             })
             if (!res.ok) {
-                throw new Error('Failed to add highlight')
+                throw new Error('Failed to add note')
             }
             const result: PostResponse = await res.json()
             return result
@@ -48,12 +48,12 @@ export function useBooqHighlights({
         populateCache: (postResponse: PostResponse, currentData: GetResponse | undefined): GetResponse => {
             if (!currentData) {
                 return {
-                    highlights: [postResponse],
+                    notes: [postResponse],
                 }
             }
             return {
-                highlights: [
-                    ...currentData.highlights,
+                notes: [
+                    ...currentData.notes,
                     postResponse,
                 ],
             }
@@ -61,14 +61,14 @@ export function useBooqHighlights({
         rollbackOnError: true,
         revalidate: false,
     })
-    function addHighlight({
+    function addNote({
         range: { start, end },
         color,
-        note,
+        content,
     }: {
         range: BooqRange,
         color: string,
-        note?: string
+        content?: string
     }) {
         if (!self) {
             return undefined
@@ -76,50 +76,50 @@ export function useBooqHighlights({
         const postBody: PostBody = {
             id: uuidv4(),
             start, end, color,
-            note: note ?? null,
+            content: content ?? null,
         }
-        postHighlightTrigger(postBody, {
+        postNoteTrigger(postBody, {
             optimisticData: postBody,
         })
-        const newHighlight: NoteData = {
+        const newNote: NoteData = {
             id: postBody.id,
             booqId,
             range: postBody,
             color: postBody.color,
-            content: postBody.note ?? undefined,
+            content: postBody.content ?? undefined,
             author: self,
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
         }
-        return newHighlight
+        return newNote
     }
 
-    const highlights: NoteData[] = data?.highlights.map(h => ({
-        id: h.id,
-        booqId: h.booqId,
+    const notes: NoteData[] = data?.notes.map(note => ({
+        id: note.id,
+        booqId: note.booqId,
         range: {
-            start: h.start,
-            end: h.end,
+            start: note.start,
+            end: note.end,
         },
-        color: h.color,
-        note: h.note,
+        color: note.color,
+        content: note.content ?? undefined,
         author: {
-            id: h.author.id,
-            name: h.author.name ?? undefined,
-            profilePictureURL: h.author.profilePictureURL ?? undefined,
+            id: note.author.id,
+            name: note.author.name ?? undefined,
+            profilePictureURL: note.author.profilePictureURL ?? undefined,
         },
-        createdAt: h.createdAt,
-        updatedAt: h.updatedAt,
+        createdAt: note.createdAt,
+        updatedAt: note.updatedAt,
     })) ?? []
 
     return {
-        highlights,
+        notes,
         isLoading,
-        addHighlight,
-        removeHighlight: async (_id: string) => {
+        addNote,
+        removeNote: async (_id: string) => {
             // TODO: implement
         },
-        updateHighlight: async (_id: string, _color: string, _note?: string) => {
+        updateNote: async (_id: string, _color: string, _note?: string) => {
             // TODO: implement
         },
     }

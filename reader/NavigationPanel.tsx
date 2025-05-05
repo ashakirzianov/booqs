@@ -1,8 +1,8 @@
 'use client'
 import React, { useMemo, useState } from 'react'
 import { TocNodeComp } from './TocNode'
-import { HighlightNodeComp } from './HighlightNode'
-import { PathHighlightsNodeComp } from './PathHighlightsNode'
+import { NoteNodeComp } from './NoteNode'
+import { PathNotesNodeComp } from './PathNotesNode'
 import { NavigationFilter } from './Filter'
 import { buildNavigationNodes, NavigationNode, NavigationSelection } from './nodes'
 import { AccountDisplayData, BooqNote, TableOfContentsItem } from '@/core'
@@ -11,7 +11,7 @@ export function useNavigationState() {
     const [navigationOpen, setNavigationOpen] = useState(false)
     const [navigationSelection, setNavigationSelection] = useState<NavigationSelection>({
         chapters: true,
-        highlights: true,
+        notes: true,
     })
     return {
         navigationOpen,
@@ -32,14 +32,14 @@ export function useNavigationState() {
 }
 
 export function NavigationPanel({
-    booqId, self, title, toc, highlights,
+    booqId, self, title, toc, notes,
     selection,
     toggleSelection, closeSelf,
 }: {
     booqId: string,
     title: string
     toc: TableOfContentsItem[],
-    highlights: BooqNote[],
+    notes: BooqNote[],
     selection: NavigationSelection,
     self?: AccountDisplayData,
     toggleSelection: (item: string) => void,
@@ -47,11 +47,11 @@ export function NavigationPanel({
 }) {
     const { nodes, authors } = useMemo(() => {
         return buildNavigationNodes({
-            title, toc, highlights,
+            title, toc, notes,
             selection,
             self,
         })
-    }, [title, toc, highlights, selection, self])
+    }, [title, toc, notes, selection, self])
     const exceptSelf = authors.filter(a => a.id !== self?.id)
     return useMemo(() => {
         return <div className='flex flex-1' style={{
@@ -103,14 +103,14 @@ function NavigationNodeComp({ booqId, self, node }: {
                 booqId={booqId}
                 node={node}
             />
-        case 'highlight':
-            return <HighlightNodeComp
+        case 'note':
+            return <NoteNodeComp
                 booqId={booqId}
                 self={self}
-                highlight={node.highlight}
+                note={node.note}
             />
-        case 'highlights':
-            return <PathHighlightsNodeComp
+        case 'notes':
+            return <PathNotesNodeComp
                 booqId={booqId}
                 self={self}
                 node={node}

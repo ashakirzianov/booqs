@@ -1,15 +1,15 @@
 import { IResolvers } from '@graphql-tools/utils'
 import { BooqParent } from './booq'
-import { DbHighlight } from '@/backend/highlights'
+import { DbNote } from '@/backend/notes'
 import { DbUser, userForId } from '@/backend/users'
 import { booqForId, libraryCardForId } from '@/backend/library'
 import { positionForPath, textForRange } from '@/core'
 
-export type HighlightParent = DbHighlight
-export const highlightResolver: IResolvers<HighlightParent> = {
-    Highlight: {
+export type NoteParent = DbNote
+export const noteResolver: IResolvers<NoteParent> = {
+    Note: {
         async author(parent): Promise<DbUser | null> {
-            return userForId(parent.user_id)
+            return userForId(parent.author_id)
         },
         async booq(parent): Promise<BooqParent | undefined> {
             return libraryCardForId(parent.booq_id)

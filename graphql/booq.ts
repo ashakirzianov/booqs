@@ -1,11 +1,11 @@
 import { IResolvers } from '@graphql-tools/utils'
 import { BookmarkParent } from './bookmark'
-import { HighlightParent } from './highlight'
+import { NoteParent } from './note'
 import { booqForId } from '@/backend/library'
 import { booqImageUrl } from '@/backend/images'
 import { BooqLibraryCard, buildFragment, filterUndefined, previewForPath, textForRange } from '@/core'
 import { getBookmarks } from '@/backend/bookmarks'
-import { highlightsFor } from '@/backend/highlights'
+import { notesFor } from '@/backend/notes'
 
 export type BooqParent = BooqLibraryCard & {
     kind?: undefined,
@@ -28,8 +28,8 @@ export const booqResolver: IResolvers<BooqParent> = {
                 })
                 : []
         },
-        async highlights(parent): Promise<HighlightParent[]> {
-            return highlightsFor({
+        async notes(parent): Promise<NoteParent[]> {
+            return notesFor({
                 booqId: parent.id,
             })
         },
