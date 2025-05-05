@@ -10,7 +10,7 @@ import { booqForId, libraryCardsForIds, featuredBooqIds, booqsForAuthor } from '
 import { userForId } from '@/backend/users'
 import { booqIdsInCollections } from '@/backend/collections'
 
-export type BooqPreview = {
+type BooqPreview = {
     id: string,
     title: string,
     preview: string,
