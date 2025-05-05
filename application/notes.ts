@@ -75,7 +75,9 @@ export function useBooqNotes({
         }
         const postBody: PostBody = {
             id: uuidv4(),
-            start, end, color,
+            color,
+            start_path: start,
+            end_path: end,
             content: content ?? null,
         }
         postNoteTrigger(postBody, {
@@ -84,7 +86,10 @@ export function useBooqNotes({
         const newNote: NoteData = {
             id: postBody.id,
             booqId,
-            range: postBody,
+            range: {
+                start: postBody.start_path,
+                end: postBody.end_path,
+            },
             color: postBody.color,
             content: postBody.content ?? undefined,
             author: self,
@@ -96,20 +101,20 @@ export function useBooqNotes({
 
     const notes: NoteData[] = data?.notes.map(note => ({
         id: note.id,
-        booqId: note.booqId,
+        booqId: note.booq_id,
         range: {
-            start: note.start,
-            end: note.end,
+            start: note.start_path,
+            end: note.end_path,
         },
         color: note.color,
         content: note.content ?? undefined,
         author: {
-            id: note.author.id,
-            name: note.author.name ?? undefined,
-            profilePictureURL: note.author.profilePictureURL ?? undefined,
+            id: note.author_id,
+            name: note.author_name ?? undefined,
+            profilePictureURL: note.author_profile_picture_url ?? undefined,
         },
-        createdAt: note.createdAt,
-        updatedAt: note.updatedAt,
+        createdAt: note.created_at,
+        updatedAt: note.updated_at,
     })) ?? []
 
     return {

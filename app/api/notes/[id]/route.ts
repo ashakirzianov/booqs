@@ -1,5 +1,6 @@
 import {
     updateNote, removeNote,
+    DbNote,
 } from '@/backend/notes'
 import { getUserIdInsideRequest } from '@/data/auth'
 import { NextRequest } from 'next/server'
@@ -7,19 +8,9 @@ import { NextRequest } from 'next/server'
 type Params = {
     id: string,
 }
-type NoteJson = {
-    id: string,
-    booqId: string,
-    authorId: string,
-    start: number[],
-    end: number[],
-    color: string,
-    content: string | null,
-    createdAt: string,
-    updatedAt: string,
-}
-export type PatchBody = Partial<Pick<NoteJson, 'color' | 'content'>>
-export type PatchResponse = NoteJson
+
+export type PatchBody = Partial<Pick<DbNote, 'color' | 'content'>>
+export type PatchResponse = Pick<DbNote, 'id' | 'color' | 'content' | 'created_at' | 'updated_at'>
 export async function PATCH(request: NextRequest, { params }: { params: Promise<Params> }) {
     const userId = await getUserIdInsideRequest()
     if (!userId) {
@@ -36,17 +27,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     if (!note) {
         return Response.json({ error: 'Note not found' }, { status: 404 })
     }
-    const result: PatchResponse = {
-        id: note.id,
-        booqId: note.booq_id,
-        authorId: note.author_id,
-        start: note.start_path,
-        end: note.end_path,
-        color: note.color,
-        content: note.content,
-        createdAt: note.created_at,
-        updatedAt: note.updated_at,
-    }
+    const result: PatchResponse = note
     return Response.json(result)
 }
 
