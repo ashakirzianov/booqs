@@ -99,7 +99,7 @@ export function useBooqNotes({
         return newNote
     }
 
-    const notes: NoteData[] = data?.notes.map(note => ({
+    const notes: NoteData[] = data?.notes?.map(note => ({
         id: note.id,
         booqId: note.booq_id,
         range: {

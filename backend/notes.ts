@@ -49,17 +49,17 @@ export async function notesFor({
     `
   return result as DbNote[]
 }
-
 export async function notesWithAuthorForBooqId(booqId: string) {
   const notes = await sql`
       SELECT n.*, u.name AS author_name, u.profile_picture_url AS author_profile_picture_url
-      FROM n notes
-      WHERE booq_id = ${booqId}
+      FROM notes n
       JOIN users u ON u.id = n.author_id
+      WHERE booq_id = ${booqId}
       `
 
   return notes as DbNoteWithAuthor[]
 }
+
 
 export async function addNote({
   id,
