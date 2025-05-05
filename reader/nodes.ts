@@ -124,8 +124,8 @@ function highlightsAuthors(highlights: ReaderHighlight[]): ReaderUser[] {
     return Object.entries(grouped).map(
         ([_, [{ author }]]) => ({
             id: author.id,
-            name: author.name ?? undefined,
-            pictureUrl: author.pictureUrl ?? undefined,
+            name: author.name,
+            pictureUrl: author.pictureUrl,
         })
     )
 }

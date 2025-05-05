@@ -1,217 +1,131 @@
-import { useQuery, useMutation, gql } from '@apollo/client'
-import { BooqPath } from '@/core'
-import { useMemo } from 'react'
+'use client'
+
+import type { GetResponse, PostBody, PostResponse } from '@/app/api/booq/[library]/[id]/highlights/route'
+import { BooqRange } from '@/core'
+import useSWR from 'swr'
+import useSWRMutation from 'swr/mutation'
 import { v4 as uuidv4 } from 'uuid'
+import { AuthUser } from './auth'
 
-const HighlightsQuery = gql`query HighlightsQuery($booqId: ID!) {
-    booq(id: $booqId) {
-        id
-        highlights {
-            id
-            start
-            end
-            color
-            text
-            position
-            author {
-                id
-                name
-                pictureUrl
+export type Highlight = {
+    id: string,
+    booqId: string,
+    range: BooqRange,
+    color: string,
+    note?: string | null,
+    author: AuthUser,
+}
+export function useBooqHighlights({
+    booqId, self,
+}: {
+    booqId: string,
+    self?: AuthUser,
+}) {
+    const { data, isLoading } = useSWR(
+        `/api/booq/${booqId}/highlights`,
+        async (url: string) => {
+            const res = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
+            if (!res.ok) {
+                throw new Error('Failed to fetch highlights')
             }
+            const result: GetResponse = await res.json()
+            return result
         }
-    }
-}`
-type HighlightsData = {
-    booq: {
-        id: string,
-        highlights: {
-            __typename: 'BooqHighlight',
-            id: string,
-            start: BooqPath,
-            end: BooqPath,
-            color: string,
-            text: string,
-            position: number | null,
-            author: {
-                __typename: 'User',
-                id: string,
-                name: string | null,
-                pictureUrl: string | null,
-            },
-        }[],
-    },
-}
-export type Highlight = HighlightsData['booq']['highlights'][number]
-export function useHighlights(booqId: string) {
-    const { loading, data } = useQuery<HighlightsData>(
-        HighlightsQuery,
-        { variables: { booqId } },
     )
-    const highlights = useMemo(() => data?.booq.highlights ?? [], [data])
-    return {
-        loading,
-        highlights,
-    }
-}
 
-const AddHighlightMutation = gql`mutation AddHighlight($highlight: HighlightInput!) {
-    addHighlight(highlight: $highlight)
-}`
-type AddHighlightData = { addHighlight: boolean }
-type AddHighlightVars = {
-    highlight: {
-        id: string,
-        booqId: string,
-        color: string,
-        start: BooqPath,
-        end: BooqPath,
-    },
-}
-const RemoveHighlightMutation = gql`mutation RemoveHighlight($id: ID!) {
-    removeHighlight(id: $id)
-}`
-type RemoveHighlightData = { removeHighlight: boolean }
-type RemoveHighlightVars = { id: string }
-
-const UpdateHighlightMutation = gql`mutation UpdateHighlight($id: ID!, $color: String) {
-    updateHighlight(id: $id, color: $color)
-}`
-type UpdateHighlightData = { updateHighlight: boolean }
-type UpdateHighlightVars = { id: string, color?: string }
-
-export function useHighlightMutations(booqId: string) {
-    const [add] = useMutation<AddHighlightData, AddHighlightVars>(
-        AddHighlightMutation,
-    )
-    const [remove] = useMutation<RemoveHighlightData, RemoveHighlightVars>(
-        RemoveHighlightMutation,
-    )
-    const [update] = useMutation<UpdateHighlightData, UpdateHighlightVars>(
-        UpdateHighlightMutation,
-    )
-    return {
-        addHighlight(input: {
-            start: BooqPath,
-            end: BooqPath,
-            color: string,
-            text: string,
-            author: {
-                id: string,
-                name?: string | null,
-                pictureUrl?: string | null,
-            },
-        }): Highlight {
-            const highlight = {
-                booqId,
-                id: uuidv4(),
-                start: input.start,
-                end: input.end,
-                color: input.color,
+    const { trigger: postHighlightTrigger } = useSWRMutation(
+        `/api/booq/${booqId}/highlights`,
+        async (url, { arg }: { arg: PostBody }) => {
+            const res = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(arg),
+            })
+            if (!res.ok) {
+                throw new Error('Failed to add highlight')
             }
-            const created: Highlight = {
-                ...input,
-                __typename: 'BooqHighlight',
-                id: highlight.id,
-                position: null,
-                author: {
-                    __typename: 'User',
-                    id: input.author.id,
-                    name: input.author.name ?? null,
-                    pictureUrl: input.author.pictureUrl ?? null,
-                },
-            } as const
-            add({
-                variables: { highlight },
-                optimisticResponse: { addHighlight: true },
-                update(cache, { data }) {
-                    if (data?.addHighlight) {
-                        let cached = cache.readQuery<HighlightsData>({
-                            query: HighlightsQuery,
-                            variables: { booqId },
-                        })
-                        if (cached) {
-                            cached = {
-                                ...cached,
-                                booq: {
-                                    ...cached.booq,
-                                    highlights: [created, ...cached.booq.highlights],
-                                },
-                            }
-                            cache.writeQuery({
-                                query: HighlightsQuery,
-                                variables: { booqId },
-                                data: cached,
-                            })
-                        }
-                    }
-                },
-            })
-            return created
-        },
-        removeHighlight(id: string) {
-            remove({
-                variables: { id },
-                optimisticResponse: { removeHighlight: true },
-                update(cache, { data }) {
-                    if (data?.removeHighlight) {
-                        let cached = cache.readQuery<HighlightsData>({
-                            query: HighlightsQuery,
-                            variables: { booqId },
-                        })
-                        if (cached) {
-                            cached = {
-                                ...cached,
-                                booq: {
-                                    ...cached.booq,
-                                    highlights: cached.booq.highlights.filter(
-                                        h => h.id !== id,
-                                    ),
-                                },
-                            }
-                            cache.writeQuery<HighlightsData>({
-                                query: HighlightsQuery,
-                                variables: { booqId },
-                                data: cached,
-                            })
-                        }
-                    }
+            const result: PostResponse = await res.json()
+            return result
+        }, {
+        populateCache: (postResponse: PostResponse, currentData: GetResponse | undefined): GetResponse => {
+            if (!currentData) {
+                return {
+                    highlights: [postResponse],
                 }
-            })
+            }
+            return {
+                highlights: [
+                    ...currentData.highlights,
+                    postResponse,
+                ],
+            }
         },
-        updateHighlight(id: string, color: string) {
-            update({
-                variables: { id, color },
-                optimisticResponse: { updateHighlight: true },
-                update(cache, { data }) {
-                    if (data?.updateHighlight) {
-                        let cached = cache.readQuery<HighlightsData>({
-                            query: HighlightsQuery,
-                            variables: { booqId },
-                        })
-                        if (cached) {
-                            const target = cached.booq.highlights.find(
-                                h => h.id === id,
-                            )
-                            if (target) {
-                                cached = {
-                                    ...cached,
-                                    booq: {
-                                        ...cached.booq,
-                                        highlights: cached.booq.highlights.map(
-                                            h => h.id === id ? { ...h, color } : h,
-                                        ),
-                                    },
-                                }
-                                cache.writeQuery<HighlightsData>({
-                                    query: HighlightsQuery,
-                                    variables: { booqId },
-                                    data: cached,
-                                })
-                            }
-                        }
-                    }
-                },
-            })
+        rollbackOnError: true,
+        revalidate: false,
+    })
+    function addHighlight({
+        range: { start, end },
+        color,
+        note,
+    }: {
+        range: BooqRange,
+        color: string,
+        note?: string
+    }) {
+        if (!self) {
+            return undefined
+        }
+        const postBody: PostBody = {
+            id: uuidv4(),
+            start, end, color,
+            note: note ?? null,
+        }
+        postHighlightTrigger(postBody, {
+            optimisticData: postBody,
+        })
+        const newHighlight: Highlight = {
+            id: postBody.id,
+            booqId,
+            range: postBody,
+            color: postBody.color,
+            note: postBody.note,
+            author: self,
+        }
+        return newHighlight
+    }
+
+    const highlights: Highlight[] = data?.highlights.map(h => ({
+        id: h.id,
+        booqId: h.booqId,
+        range: {
+            start: h.start,
+            end: h.end,
+        },
+        color: h.color,
+        note: h.note,
+        author: {
+            id: h.author.id,
+            name: h.author.name,
+            pictureUrl: h.author.profilePictureURL,
+        },
+    })) ?? []
+
+    return {
+        highlights,
+        isLoading,
+        addHighlight,
+        removeHighlight: async (_id: string) => {
+            // TODO: implement
+        },
+        updateHighlight: async (_id: string, _color: string, _note?: string) => {
+            // TODO: implement
         },
     }
 }

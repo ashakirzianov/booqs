@@ -13,6 +13,12 @@ export type DbHighlight = {
   updated_at: string,
 }
 
+export type DbHighlightWithAuthor = DbHighlight & {
+  author_id: string,
+  author_name: string | null,
+  author_profile_picture_url: string | null,
+}
+
 export async function highlightForId(id: string): Promise<DbHighlight | null> {
   const [highlight] = await sql`
       SELECT * FROM hi
@@ -42,6 +48,17 @@ export async function highlightsFor({
       ${limit !== undefined ? sql`LIMIT ${limit}` : sql``}
     `
   return result as DbHighlight[]
+}
+
+export async function highligtsWithAuthorForBooqId(booqId: string) {
+  const hls = await sql`
+      SELECT h.*, u.id AS author_id, u.name AS author_name, u.profile_picture_url AS author_profile_picture_url
+      FROM h highlights
+      WHERE booq_id = ${booqId}
+      JOIN users u ON u.id = h.user_id
+      `
+
+  return hls as DbHighlightWithAuthor[]
 }
 
 export async function addHighlight({

@@ -1,6 +1,6 @@
 'use client'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { BooqPath, BooqRange, contextForRange, pathToId, positionForPath, samePath } from '@/core'
+import { BooqPath, BooqRange, contextForRange, pathToId, positionForPath, samePath, textForRange } from '@/core'
 import { BorderButton, PanelButton } from '@/components/Buttons'
 import { booqHref, feedHref } from '@/application/href'
 import {
@@ -20,7 +20,7 @@ import { useFontScale } from '@/application/theme'
 import { filterHighlights } from './nodes'
 import { useAuth } from '@/application/auth'
 import { Copilot, CopilotState } from '@/components/Copilot'
-import { useHighlights } from '@/application/highlights'
+import { useBooqHighlights } from '@/application/highlights'
 import { AccountButton } from '@/components/AccountButton'
 import { usePathname } from 'next/navigation'
 import { BackIcon, Spinner, TocIcon } from '@/components/Icons'
@@ -37,7 +37,15 @@ export function Reader({
     const { auth } = useAuth()
     const self: ReaderUser | undefined = auth.user
     const fontScale = useFontScale()
-    const { highlights } = useHighlights(booq.id)
+    const { highlights } = useBooqHighlights({ booqId: booq.id })
+    const resolvedHighlights = useMemo(() => {
+        return highlights.map<ReaderHighlight>(h => ({
+            ...h,
+            start: h.range.start,
+            end: h.range.end,
+            text: textForRange(booq.fragment.nodes, h.range) ?? '',
+        }))
+    }, [highlights, booq.fragment.nodes])
 
     const quoteRef = useRef(quote)
     useEffect(() => {
@@ -72,7 +80,7 @@ export function Reader({
         booqId={booq.id}
         title={booq.title ?? 'Untitled'}
         toc={booq.toc}
-        highlights={highlights}
+        highlights={resolvedHighlights}
         selection={navigationSelection}
         self={self}
         toggleSelection={toggleNavigationSelection}
@@ -87,10 +95,10 @@ export function Reader({
 
     const filteredHighlights = useMemo(
         () => filterHighlights({
-            highlights,
+            highlights: resolvedHighlights,
             selection: navigationSelection,
             self,
-        }), [highlights, navigationSelection, self]
+        }), [resolvedHighlights, navigationSelection, self]
     )
 
     const { augmentations, menuStateForAugmentation } = useAugmentations({

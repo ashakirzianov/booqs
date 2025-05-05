@@ -14,10 +14,11 @@ import {
 import { makeStateProvider } from './state'
 import { useContext } from 'react'
 
+// TODO: rename to AccountInfo
 export type AuthUser = {
     id: string,
-    joined: string,
     name: string | null,
+    // TODO: rename to profilePictureURL
     pictureUrl: string | null,
 }
 export type AuthState = {

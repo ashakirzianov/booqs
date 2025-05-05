@@ -8,8 +8,8 @@ import { quoteHref } from '@/application/href'
 import { BooqSelection } from '@/viewer'
 import { ProfileBadge } from '@/components/ProfilePicture'
 import { resolveHighlightColor, highlightColorNames } from '@/application/common'
-import { ReaderHighlight, ReaderUser } from './common'
-import { useHighlightMutations } from '@/application/highlights'
+import { ReaderUser, ReaderHighlight } from './common'
+import { useBooqHighlights } from '@/application/highlights'
 import { CopilotIcon, CopyIcon, LinkIcon, RemoveIcon, ShareIcon } from '@/components/Icons'
 
 type EmptyTarget = {
@@ -186,7 +186,7 @@ function AddHighlightItem({
     self: ReaderUser | undefined,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
-    const { addHighlight } = useHighlightMutations(booqId)
+    const { addHighlight } = useBooqHighlights({ booqId, self })
     if (!self?.id) {
         return null
     }
@@ -200,16 +200,21 @@ function AddHighlightItem({
                     callback={() => {
                         const highlight = addHighlight({
                             color,
-                            start: selection.range.start,
-                            end: selection.range.end ?? selection.range.start,
-                            text: selection.text,
-                            author: self,
+                            range: selection.range,
+                            note: selection.text,
                         })
-                        setTarget({
-                            kind: 'highlight',
-                            highlight,
-                        })
-                        removeSelection()
+                        if (highlight) {
+                            setTarget({
+                                kind: 'highlight',
+                                highlight: {
+                                    ...highlight,
+                                    text: selection.text,
+                                    start: selection.range.start,
+                                    end: selection.range.end,
+                                },
+                            })
+                            removeSelection()
+                        }
                     }}
                 />,
             )
@@ -236,7 +241,7 @@ function RemoveHighlightItem({
     booqId: string,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
-    const { removeHighlight } = useHighlightMutations(booqId)
+    const { removeHighlight } = useBooqHighlights({ booqId })
     return <MenuItem
         text='Remove'
         icon={<ContextMenuIcon><RemoveIcon /></ContextMenuIcon>}
@@ -254,7 +259,7 @@ function SelectHighlightColorItem({
     booqId: string,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
-    const { updateHighlight } = useHighlightMutations(booqId)
+    const { updateHighlight } = useBooqHighlights({ booqId })
     return <div className='container'>
         {
             highlightColorNames.map(

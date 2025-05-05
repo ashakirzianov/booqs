@@ -1,3 +1,4 @@
+import { AuthUser } from '@/application/auth'
 import { BooqNode, BooqPath } from '@/core'
 
 export type ReaderBooq = {
@@ -19,11 +20,7 @@ export type ReaderAnchor = {
     path: BooqPath,
 }
 
-export type ReaderUser = {
-    id: string,
-    name?: string | null,
-    pictureUrl?: string | null,
-}
+export type ReaderUser = AuthUser
 export type ReaderHighlight = {
     id: string,
     start: BooqPath,
