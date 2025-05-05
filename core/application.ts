@@ -40,3 +40,8 @@ export type BooqLibraryCard = {
     coverUrl?: string,
     tags: BooqMetaTag[],
 }
+
+export type BooqCollection = {
+    name: string,
+    booqIds: BooqId[],
+}
