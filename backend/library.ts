@@ -16,12 +16,14 @@ export type BookFile = {
     kind: 'epub',
     file: Buffer,
 }
-export type SearchResult<CardType = BooqLibraryCard> = {
+export type SearchResult<CardType = BooqLibraryCard> = AuthorSearchResult | BooqSearchResult<CardType>
+export type AuthorSearchResult = {
     kind: 'author',
     author: {
         name: string,
     },
-} | {
+}
+export type BooqSearchResult<CardType = BooqLibraryCard> = {
     kind: 'book',
     card: CardType,
 }
