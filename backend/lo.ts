@@ -1,23 +1,24 @@
 import { join } from 'path'
 import { promisify } from 'util'
 import { readFile } from 'fs'
-import { Library, LibraryCard } from './library'
+import { InLibraryCard, Library } from './library'
 
 const epubsRoot = join('public', 'epubs')
 export const localLibrary: Library = {
     async search() { return [] },
     async forAuthor() { return [] },
     async cards(ids: string[]) {
-        return ids.map(function (id): LibraryCard {
+        return ids.map(function (id): InLibraryCard {
             return {
                 id,
                 authors: [],
                 length: 0,
-                title: null,
-                language: null,
-                description: null,
+                title: undefined,
+                languages: [],
+                description: undefined,
                 subjects: [],
-                cover: null,
+                coverUrl: undefined,
+                tags: [],
             }
         })
     },

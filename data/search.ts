@@ -4,9 +4,9 @@ export type LibrarySearchResult = LibraryBooqSearchResult | LibraryAuthorSearchR
 export type LibraryBooqSearchResult = {
     kind: 'book',
     id: string,
-    title: string | null,
+    title: string | undefined,
     authors: string[],
-    cover: string | null,
+    coverUrl: string | undefined,
 }
 export type LibraryAuthorSearchResult = {
     kind: 'author',
@@ -21,7 +21,7 @@ export async function fetchSearchQuery(query: string, limit: number = 20): Promi
                 id: result.card.id,
                 title: result.card.title,
                 authors: result.card.authors,
-                cover: result.card.cover,
+                coverUrl: result.card.coverUrl,
             }
         } else if (result.kind === 'author') {
             return {

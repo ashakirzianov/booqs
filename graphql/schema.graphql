@@ -53,9 +53,11 @@ type Booq {
     id: ID!
     title: String
     authors: [String]
-    language: String,
+    languages: [String],
+    subjects: [String]
+    description: String
     length: Int
-    cover(size: Int): String
+    coverUrl(size: Int): String
     tags: [Tag]!
     bookmarks: [Bookmark]
     highlights: [Highlight]

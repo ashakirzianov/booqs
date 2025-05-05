@@ -19,7 +19,7 @@ export async function uploadEpubAction(file: File) {
             success: true,
             id: result.id,
             title: result.title ?? undefined,
-            coverUrl: result.cover ?? undefined,
+            coverUrl: result.coverUrl ?? undefined,
         } as const
     } else {
         return {

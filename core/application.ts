@@ -29,10 +29,14 @@ export type PartialBooqData = {
     meta: BooqMeta,
     toc: TableOfContents,
 }
-export type BooqCardData = {
-    id: string,
+export type BooqLibraryCard = {
+    id: BooqId,
+    length: number,
     title?: string,
     authors: string[],
+    languages: string[],
+    subjects: string[],
+    description?: string,
     coverUrl?: string,
     tags: BooqMetaTag[],
 }

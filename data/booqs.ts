@@ -3,11 +3,10 @@ import {
     buildFragment,
     PartialBooqData,
     BooqId,
-    BooqMetaTag,
-    BooqCardData,
+    BooqLibraryCard,
 } from '@/core'
 import { booqImageUrl } from '@/backend/images'
-import { booqForId, libraryCardsForIds, LibraryCard, featuredBooqIds, booqsForAuthor } from '@/backend/library'
+import { booqForId, libraryCardsForIds, featuredBooqIds, booqsForAuthor } from '@/backend/library'
 import { userForId } from '@/backend/users'
 import { booqIdsInCollections } from '@/backend/collections'
 
@@ -21,19 +20,19 @@ export async function featuredIds() {
     return featuredBooqIds()
 }
 
-export async function featuredBooqCards(coverSize: number = 210): Promise<BooqCardData[]> {
+export async function featuredBooqCards(coverSize: number = 210): Promise<BooqLibraryCard[]> {
     const ids = await featuredIds()
     const cards = filterUndefined(await libraryCardsForIds(ids))
         .map(card => buildBooqCard(card, coverSize))
     return filterUndefined(cards)
 }
 
-export async function booqCardsForAuthor(author: string): Promise<BooqCardData[]> {
+export async function booqCardsForAuthor(author: string): Promise<BooqLibraryCard[]> {
     const cards = await booqsForAuthor(author)
     return cards.map(card => buildBooqCard(card, 210))
 }
 
-export async function booqCollection(collection: string, userId: string | undefined): Promise<BooqCardData[]> {
+export async function booqCollection(collection: string, userId: string | undefined): Promise<BooqLibraryCard[]> {
     if (!userId) {
         return []
     }
@@ -46,7 +45,7 @@ export async function booqCollection(collection: string, userId: string | undefi
     return cards.map(card => buildBooqCard(card, 210))
 }
 
-export async function booqCard(booqId: string): Promise<BooqCardData | undefined> {
+export async function booqCard(booqId: string): Promise<BooqLibraryCard | undefined> {
     const [card] = await libraryCardsForIds([booqId])
     if (undefined === card) {
         return undefined
@@ -102,37 +101,11 @@ function previewForBooq(booq: Booq, path?: BooqPath, end?: BooqPath, length: num
     }
 }
 
-function buildBooqCard(card: LibraryCard, coverSize: number): BooqCardData {
+function buildBooqCard(card: BooqLibraryCard, coverSize: number): BooqLibraryCard {
     return {
-        id: card.id,
-        title: card.title ?? undefined,
-        authors: card.authors,
-        coverUrl: card.cover
-            ? booqImageUrl(card.id, card.cover, coverSize)
+        ...card,
+        coverUrl: card.coverUrl
+            ? booqImageUrl(card.id, card.coverUrl, coverSize)
             : undefined,
-        tags: buildTags(card),
     }
-}
-
-function buildTags(card: LibraryCard): BooqMetaTag[] {
-    return filterUndefined([
-        {
-            name: 'pages',
-            value: Math.floor(card.length / 1500).toString(),
-        },
-        ...(card.subjects ?? []).map(s => ({
-            name: 'subject',
-            value: s ?? undefined,
-        })),
-        card.language === undefined ? undefined :
-            {
-                name: 'language',
-                value: card.language ?? undefined,
-            },
-        !card.id.startsWith('pg/') ? undefined :
-            {
-                name: 'pg-index',
-                value: card.id.substring('pg/'.length),
-            },
-    ])
 }

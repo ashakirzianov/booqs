@@ -1,7 +1,7 @@
 import { createHash } from 'crypto'
 import { ReadStream } from 'fs'
 import { inspect } from 'util'
-import type { LibraryCard, Library, SearchResult } from './library'
+import type { InLibraryCard, Library, InLibrarySearchResult } from './library'
 import { parseEpub } from '@/parser'
 import { Booq, nodesLength, uniqueId } from '@/core'
 import { deleteAsset, downloadAsset, uploadAsset } from './s3'
@@ -43,7 +43,7 @@ export async function uploadsForUserId(userId: string): Promise<DbUuCard[]> {
     return result as DbUuCard[]
 }
 
-async function cards(ids: string[]): Promise<LibraryCard[]> {
+async function cards(ids: string[]): Promise<InLibraryCard[]> {
     if (ids.length === 0) return []
 
     const result = await sql`
@@ -71,7 +71,7 @@ async function fileForId(id: string) {
     }
 }
 
-export async function search(query: string, limit = 20, offset = 0): Promise<SearchResult[]> {
+export async function search(query: string, limit = 20, offset = 0): Promise<InLibrarySearchResult[]> {
     const rows = await sql`
     WITH ranked_cards AS (
       SELECT *,
@@ -319,15 +319,16 @@ async function getAllBooksWithoutUploadUsers(): Promise<DbUuCard[]> {
     return rows as DbUuCard[]
 }
 
-function convertToLibraryCard(doc: DbUuCard): LibraryCard {
+function convertToLibraryCard(doc: DbUuCard): InLibraryCard {
     return {
         id: doc.id,
         length: doc.length ?? 0,
         title: doc.title,
         authors: doc.authors,
-        language: doc.language,
-        description: doc.description,
+        languages: doc.language ? [doc.language] : [],
+        description: doc.description ?? undefined,
         subjects: doc.subjects ?? [],
-        cover: doc.cover,
+        coverUrl: doc.cover ?? undefined,
+        tags: [],
     }
 }
