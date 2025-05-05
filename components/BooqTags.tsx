@@ -1,11 +1,8 @@
+import { BooqMetaTag } from '@/core'
 import React from 'react'
 
-export type BooqTag = {
-    tag: string,
-    value?: string | null,
-}
 export function BooqTags({ tags }: {
-    tags: BooqTag[],
+    tags: BooqMetaTag[],
 }) {
     return <div style={{
         display: 'flex',
@@ -20,9 +17,9 @@ export function BooqTags({ tags }: {
 }
 
 function BooqTagPill({ tag }: {
-    tag: BooqTag,
+    tag: BooqMetaTag,
 }) {
-    switch (tag.tag.toLowerCase()) {
+    switch (tag.name.toLowerCase()) {
         case 'language':
             return tag.value
                 ? <Pill

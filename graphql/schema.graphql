@@ -73,7 +73,7 @@ type Author {
 type User {
     id: ID!
     username: ID!
-    joined: String!
+    joinedAt: String!
     name: String
     pictureUrl: String
 }

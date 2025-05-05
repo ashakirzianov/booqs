@@ -2,10 +2,10 @@ import React from 'react'
 
 const defaultSize = 70
 
-export function BooqCover({ cover, title, author, size }: {
-    cover: string | null,
-    title: string | null,
-    author: string | null,
+export function BooqCover({ coverUrl, title, author, size }: {
+    coverUrl: string | undefined,
+    title: string | undefined,
+    author: string | undefined,
     size?: number,
 }) {
     size = size ?? defaultSize
@@ -14,8 +14,8 @@ export function BooqCover({ cover, title, author, size }: {
         height: size * 3,
     }}>
         {
-            cover
-                ? <BooqImageCover cover={cover} title={title} />
+            coverUrl
+                ? <BooqImageCover cover={coverUrl} title={title} />
                 : <BooqDefaultCover title={title} author={author} size={size} />
         }
     </div>
@@ -23,7 +23,7 @@ export function BooqCover({ cover, title, author, size }: {
 
 function BooqImageCover({ cover, title }: {
     cover: string,
-    title: string | null,
+    title: string | undefined,
 }) {
     return <div title={title ?? undefined} className='flex w-full h-full bg-cover bg-no-repeat' style={{
         backgroundImage: `url(${cover})`,
@@ -31,8 +31,8 @@ function BooqImageCover({ cover, title }: {
 }
 
 function BooqDefaultCover({ title, author, size }: {
-    title: string | null,
-    author: string | null,
+    title: string | undefined,
+    author: string | undefined,
     size: number,
 }) {
     const { back, text } = colorForString(title ?? 'no-title' + author)

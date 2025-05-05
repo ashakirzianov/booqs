@@ -1,16 +1,16 @@
 import { Fragment } from 'react'
 import { HighlightNodeComp } from './HighlightNode'
-import { ReaderTocItem, ReaderUser } from './common'
 import { PathHighlightsNode } from './nodes'
 import { booqHref } from '@/application/href'
 import Link from 'next/link'
+import { AccountDisplayData, TableOfContentsItem } from '@/core'
 
 export function PathHighlightsNodeComp({
     booqId, self,
     node: { items, highlights },
 }: {
     booqId: string,
-    self: ReaderUser | undefined,
+    self: AccountDisplayData | undefined,
     node: PathHighlightsNode,
 }) {
     return <div>
@@ -32,7 +32,7 @@ export function PathHighlightsNodeComp({
 
 function Path({ items, booqId }: {
     booqId: string,
-    items: Array<ReaderTocItem | undefined>,
+    items: Array<TableOfContentsItem | undefined>,
 }) {
     return <div className='flex flex-wrap'>
         {

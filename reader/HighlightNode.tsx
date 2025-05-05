@@ -1,22 +1,22 @@
 import { Popover } from '@/components/Popover'
 import { ContextMenuContent } from '@/reader/ContextMenuContent'
 import { resolveHighlightColor } from '@/application/common'
-import { ReaderHighlight, ReaderUser } from './common'
 import { MoreIcon } from '@/components/Icons'
 import clsx from 'clsx'
 import { booqHref } from '@/application/href'
 import Link from 'next/link'
+import { AccountDisplayData, BooqNote } from '@/core'
 
 export function HighlightNodeComp({ booqId, highlight, self }: {
     booqId: string,
-    self: ReaderUser | undefined,
-    highlight: ReaderHighlight,
+    self: AccountDisplayData | undefined,
+    highlight: BooqNote,
 }) {
     return <div className='container flex flex-1 justify-between pl-base' style={{
         borderLeft: `3px solid ${resolveHighlightColor(highlight.color)}`,
     }}>
         <div className='w-full text-primary text-justify'>
-            <Link href={booqHref({ id: booqId, path: highlight.start })} className='text-primary hover:text-highlight'>
+            <Link href={booqHref({ id: booqId, path: highlight.range.start })} className='text-primary hover:text-highlight'>
                 {highlight.text}
             </Link>
         </div>

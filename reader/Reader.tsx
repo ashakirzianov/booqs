@@ -1,6 +1,6 @@
 'use client'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { BooqPath, BooqRange, contextForRange, pathToId, positionForPath, samePath, textForRange } from '@/core'
+import { AccountDisplayData, BooqAnchor, BooqNote, BooqPath, BooqRange, contextForRange, PartialBooqData, pathToId, positionForPath, samePath, textForRange } from '@/core'
 import { BorderButton, PanelButton } from '@/components/Buttons'
 import { booqHref, feedHref } from '@/application/href'
 import {
@@ -12,7 +12,6 @@ import {
 import { useContextMenu, type ContextMenuState } from './ContextMenu'
 import { ReaderLayout } from './ReaderLayout'
 import { resolveHighlightColor, currentSource, pageForPosition, quoteColor } from '@/application/common'
-import { ReaderAnchor, ReaderBooq, ReaderHighlight, ReaderUser } from './common'
 import { NavigationPanel, useNavigationState } from './NavigationPanel'
 import { reportBooqHistory } from '@/data/user'
 import { ThemerButton } from '@/components/Themer'
@@ -30,16 +29,16 @@ import Link from 'next/link'
 export function Reader({
     booq, quote,
 }: {
-    booq: ReaderBooq,
+    booq: PartialBooqData,
     quote?: BooqRange,
 }) {
     const pathname = usePathname()
     const { auth } = useAuth()
-    const self: ReaderUser | undefined = auth.user
+    const self: AccountDisplayData | undefined = auth.user
     const fontScale = useFontScale()
     const { highlights } = useBooqHighlights({ booqId: booq.id })
     const resolvedHighlights = useMemo(() => {
-        return highlights.map<ReaderHighlight>(h => ({
+        return highlights.map<BooqNote>(h => ({
             ...h,
             start: h.range.start,
             end: h.range.end,
@@ -78,8 +77,8 @@ export function Reader({
     } = useNavigationState()
     const NavigationContent = <NavigationPanel
         booqId={booq.id}
-        title={booq.title ?? 'Untitled'}
-        toc={booq.toc}
+        title={booq.meta.title ?? 'Untitled'}
+        toc={booq.toc.items}
         highlights={resolvedHighlights}
         selection={navigationSelection}
         self={self}
@@ -173,7 +172,10 @@ export function Reader({
         Copilot={<Copilot
             state={copilotState}
             setState={setCopilotState}
-            booq={booq}
+            data={{
+                id: booq.id,
+                meta: booq.meta,
+            }}
         />}
         MainButton={<Link href={feedHref()}>
             <PanelButton>
@@ -250,13 +252,13 @@ function isAnythingSelected() {
 function useAugmentations({
     quote, highlights,
 }: {
-    highlights: ReaderHighlight[],
+    highlights: BooqNote[],
     quote?: BooqRange,
 }) {
     const augmentations = useMemo(() => {
         const augmentations = highlights.map<Augmentation>(h => ({
             id: `highlight/${h.id}`,
-            range: { start: h.start, end: h.end },
+            range: h.range,
             color: resolveHighlightColor(h.color),
         }))
         if (quote) {
@@ -312,7 +314,8 @@ function useAugmentations({
     }
 }
 
-function useScrollHandler({ id, fragment, length }: ReaderBooq) {
+function useScrollHandler({ id, fragment, toc }: PartialBooqData) {
+    const length = toc.length
     const [currentPath, setCurrentPath] = useState(fragment.current.path)
 
     const position = positionForPath(fragment.nodes, currentPath)
@@ -343,7 +346,7 @@ function useScrollHandler({ id, fragment, length }: ReaderBooq) {
 
 function AnchorButton({ booqId, anchor, title }: {
     booqId: string,
-    anchor?: ReaderAnchor,
+    anchor?: BooqAnchor,
     title: string,
 }) {
     if (!anchor) {

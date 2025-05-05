@@ -7,10 +7,11 @@ import { ModalButton, ModalDivider, ModalLabel, Modal } from '@/components/Modal
 import { Popover } from '@/components/Popover'
 import { accountHref, myBooqsHref } from '@/application/href'
 import { useRouter } from 'next/navigation'
-import { AuthUser, useAuth } from '@/application/auth'
+import { useAuth } from '@/application/auth'
 import {
     BookIcon, NewItemIcon, PasskeyIcon, SettingsIcon, SignInIcon, SignOutIcon, Spinner,
 } from '@/components/Icons'
+import { AccountData } from '@/core'
 
 export function SignInModal({ isOpen, closeModal }: {
     isOpen: boolean,
@@ -73,7 +74,7 @@ export function SignInButton() {
 }
 
 function SignedButton({ user }: {
-    user: AuthUser,
+    user: AccountData,
 }) {
     return <Popover
         content={<AccountMenu
@@ -81,7 +82,7 @@ function SignedButton({ user }: {
         />}
         anchor={<ProfileBadge
             name={user.name ?? undefined}
-            picture={user.pictureUrl ?? undefined}
+            picture={user.profilePictureURL ?? undefined}
             size={2}
             border={true}
         />}
@@ -103,7 +104,7 @@ function NotSignedButton() {
 }
 
 function AccountMenu({ name }: {
-    name: string | null,
+    name: string | undefined,
 }) {
     const { signOut } = useAuth()
     const router = useRouter()

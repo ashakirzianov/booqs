@@ -1,5 +1,5 @@
 import { ReactNode } from 'react'
-import { NavigationSelection } from './common'
+import { NavigationSelection } from './nodes'
 
 export type HighlightAuthor = {
     id: string,

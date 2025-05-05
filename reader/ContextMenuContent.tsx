@@ -2,13 +2,12 @@
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import * as clipboard from 'clipboard-polyfill'
-import { BooqRange } from '@/core'
+import { AccountDisplayData, BooqNote, BooqRange } from '@/core'
 import { MenuItem } from '@/components/Menu'
 import { quoteHref } from '@/application/href'
 import { BooqSelection } from '@/viewer'
 import { ProfileBadge } from '@/components/ProfilePicture'
 import { resolveHighlightColor, highlightColorNames } from '@/application/common'
-import { ReaderUser, ReaderHighlight } from './common'
 import { useBooqHighlights } from '@/application/highlights'
 import { CopilotIcon, CopyIcon, LinkIcon, RemoveIcon, ShareIcon } from '@/components/Icons'
 
@@ -25,7 +24,7 @@ type QuoteTarget = {
 }
 type HighlightTarget = {
     kind: 'highlight',
-    highlight: ReaderHighlight,
+    highlight: BooqNote,
 }
 export type ContextMenuTarget =
     | EmptyTarget | SelectionTarget | QuoteTarget | HighlightTarget
@@ -35,7 +34,7 @@ export function ContextMenuContent({
 }: {
     target: ContextMenuTarget,
     booqId: string,
-    self: ReaderUser | undefined,
+    self: AccountDisplayData | undefined,
     setTarget: (target: ContextMenuTarget) => void,
     updateCopilot?: (selection: BooqSelection) => void,
 }) {
@@ -56,7 +55,7 @@ function SelectionTargetMenu({
 }: {
     target: SelectionTarget,
     booqId: string,
-    self: ReaderUser | undefined,
+    self: AccountDisplayData | undefined,
     setTarget: (target: ContextMenuTarget) => void,
     updateCopilot?: (selection: BooqSelection) => void,
 }) {
@@ -74,7 +73,7 @@ function QuoteTargetMenu({
 }: {
     target: QuoteTarget,
     booqId: string,
-    self: ReaderUser | undefined,
+    self: AccountDisplayData | undefined,
     setTarget: (target: ContextMenuTarget) => void,
     updateCopilot?: (selection: BooqSelection) => void,
 }) {
@@ -90,23 +89,20 @@ function HighlightTargetMenu({
 }: {
     target: HighlightTarget,
     booqId: string,
-    self: ReaderUser | undefined,
+    self: AccountDisplayData | undefined,
     setTarget: (target: ContextMenuTarget) => void,
     updateCopilot?: (selection: BooqSelection) => void,
 }) {
     const isOwnHighlight = self?.id === highlight.author?.id
     const selection = {
-        range: {
-            start: highlight.start,
-            end: highlight.end,
-        },
+        range: highlight.range,
         text: highlight.text,
     }
     return <>
         {isOwnHighlight ? null :
             <AuthorItem
                 name={highlight.author.name ?? undefined}
-                pictureUrl={highlight.author.pictureUrl ?? undefined}
+                pictureUrl={highlight.author.profilePictureURL ?? undefined}
             />
         }
         {!isOwnHighlight ? null :
@@ -183,7 +179,7 @@ function AddHighlightItem({
 }: {
     selection: BooqSelection,
     booqId: string,
-    self: ReaderUser | undefined,
+    self: AccountDisplayData | undefined,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
     const { addHighlight } = useBooqHighlights({ booqId, self })
@@ -209,8 +205,7 @@ function AddHighlightItem({
                                 highlight: {
                                     ...highlight,
                                     text: selection.text,
-                                    start: selection.range.start,
-                                    end: selection.range.end,
+                                    range: selection.range,
                                 },
                             })
                             removeSelection()
@@ -237,7 +232,7 @@ function AddHighlightItem({
 function RemoveHighlightItem({
     highlight, booqId, setTarget,
 }: {
-    highlight: ReaderHighlight,
+    highlight: BooqNote,
     booqId: string,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
@@ -255,7 +250,7 @@ function RemoveHighlightItem({
 function SelectHighlightColorItem({
     highlight, booqId, setTarget,
 }: {
-    highlight: ReaderHighlight,
+    highlight: BooqNote,
     booqId: string,
     setTarget: (target: ContextMenuTarget) => void,
 }) {

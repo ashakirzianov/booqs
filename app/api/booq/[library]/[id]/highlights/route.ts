@@ -11,6 +11,7 @@ type Params = {
     library: string,
     id: string,
 }
+// TODO: use DbHighlight
 type HighlightJson = {
     id: string,
     booqId: string,

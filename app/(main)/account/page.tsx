@@ -29,7 +29,7 @@ export default async function Page() {
         />
         <DeleteAccountButton account={{
             name: user.name,
-            joined: user.joined,
+            joinedAt: user.joinedAt,
         }} />
         <SignoutButton />
     </>

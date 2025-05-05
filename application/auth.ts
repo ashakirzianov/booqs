@@ -13,14 +13,8 @@ import {
 } from '@/data/auth'
 import { makeStateProvider } from './state'
 import { useContext } from 'react'
+import { AccountData } from '@/core'
 
-// TODO: rename to AccountInfo
-export type AuthUser = {
-    id: string,
-    name: string | null,
-    // TODO: rename to profilePictureURL
-    pictureUrl: string | null,
-}
 export type AuthState = {
     state: 'loading',
     user?: undefined,
@@ -33,7 +27,7 @@ export type AuthState = {
     user?: undefined,
 } | {
     state: 'signed',
-    user: AuthUser,
+    user: AccountData,
 }
 
 const {

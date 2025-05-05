@@ -9,6 +9,7 @@ import { userUploadsLibrary } from './uu'
 import { localLibrary } from './lo'
 import { redis } from './db'
 
+// TODO: combine with BooqCardData
 export type LibraryCard = {
     id: string,
     length: number,

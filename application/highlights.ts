@@ -1,25 +1,16 @@
 'use client'
 
 import type { GetResponse, PostBody, PostResponse } from '@/app/api/booq/[library]/[id]/highlights/route'
-import { BooqRange } from '@/core'
+import { AccountDisplayData, BooqRange, NoteData } from '@/core'
 import useSWR from 'swr'
 import useSWRMutation from 'swr/mutation'
 import { v4 as uuidv4 } from 'uuid'
-import { AuthUser } from './auth'
 
-export type Highlight = {
-    id: string,
-    booqId: string,
-    range: BooqRange,
-    color: string,
-    note?: string | null,
-    author: AuthUser,
-}
 export function useBooqHighlights({
     booqId, self,
 }: {
     booqId: string,
-    self?: AuthUser,
+    self?: AccountDisplayData,
 }) {
     const { data, isLoading } = useSWR(
         `/api/booq/${booqId}/highlights`,
@@ -90,18 +81,20 @@ export function useBooqHighlights({
         postHighlightTrigger(postBody, {
             optimisticData: postBody,
         })
-        const newHighlight: Highlight = {
+        const newHighlight: NoteData = {
             id: postBody.id,
             booqId,
             range: postBody,
             color: postBody.color,
-            note: postBody.note,
+            content: postBody.note ?? undefined,
             author: self,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
         }
         return newHighlight
     }
 
-    const highlights: Highlight[] = data?.highlights.map(h => ({
+    const highlights: NoteData[] = data?.highlights.map(h => ({
         id: h.id,
         booqId: h.booqId,
         range: {
@@ -112,9 +105,11 @@ export function useBooqHighlights({
         note: h.note,
         author: {
             id: h.author.id,
-            name: h.author.name,
-            pictureUrl: h.author.profilePictureURL,
+            name: h.author.name ?? undefined,
+            profilePictureURL: h.author.profilePictureURL ?? undefined,
         },
+        createdAt: h.createdAt,
+        updatedAt: h.updatedAt,
     })) ?? []
 
     return {

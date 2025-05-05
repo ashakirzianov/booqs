@@ -5,6 +5,7 @@ import {
 } from '@/backend/passkey'
 import { generateToken, userIdFromToken } from '@/backend/token'
 import { deleteUserForId, userForId } from '@/backend/users'
+import { AccountData } from '@/core'
 import { RegistrationResponseJSON, AuthenticationResponseJSON } from '@simplewebauthn/browser'
 import { cookies, headers } from 'next/headers'
 
@@ -49,10 +50,10 @@ export async function verifyPasskeyRegistrationAction({ id, response }: {
                 success: true,
                 user: {
                     id: result.user.id,
-                    name: result.user.name,
-                    pictureUrl: result.user.profile_picture_url,
-                    joined: result.user.joined_at,
-                },
+                    name: result.user.name ?? undefined,
+                    profilePictureURL: result.user.profile_picture_url ?? undefined,
+                    joinedAt: result.user.joined_at,
+                } satisfies AccountData,
             } as const
         } else {
             return {
@@ -106,10 +107,10 @@ export async function verifyPasskeySigninAction({ id, response }: {
                 success: true,
                 user: {
                     id: result.user.id,
-                    name: result.user.name,
-                    pictureUrl: result.user.profile_picture_url,
-                    joined: result.user.joined_at,
-                },
+                    name: result.user.name ?? undefined,
+                    profilePictureURL: result.user.profile_picture_url ?? undefined,
+                    joinedAt: result.user.joined_at,
+                } satisfies AccountData,
             } as const
         } else {
             return {
@@ -136,7 +137,7 @@ export async function getUserIdInsideRequest() {
     return userIdFromToken(token)
 }
 
-export async function fetchAuthData() {
+export async function fetchAuthData(): Promise<AccountData | undefined> {
     const userId = await getUserIdInsideRequest()
     if (!userId) {
         return undefined
@@ -147,9 +148,9 @@ export async function fetchAuthData() {
     }
     return {
         id: user.id,
-        name: user.name,
-        pictureUrl: user.profile_picture_url,
-        joined: user.joined_at,
+        joinedAt: user.joined_at,
+        name: user.name ?? undefined,
+        profilePictureURL: user.profile_picture_url ?? undefined,
     }
 }
 

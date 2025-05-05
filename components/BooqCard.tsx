@@ -3,29 +3,21 @@ import { BooqCover } from '@/components/BooqCover'
 import { BooqTags } from '@/components/BooqTags'
 import { authorHref } from '@/application/href'
 import { ReactNode } from 'react'
+import type { BooqCardData } from '@/core'
 
-export type BooqCardData = {
-    id: string,
-    title: string | null,
-    author: string | null,
-    cover: string | null,
-    tags: Array<{
-        tag: string,
-        value?: string | null,
-    }>,
-}
 export function BooqCard({
-    card: { title, author, cover, tags },
+    card: { title, authors, coverUrl, tags },
     actions,
 }: {
     card: BooqCardData,
     actions?: ReactNode,
 }) {
+    const author = authors.join(', ')
     return <div className="flex flex-col grow gap-4 items-center sm:flex-row sm:flex-wrap sm:items-stretch h-full">
         <BooqCover
-            title={title}
+            title={title ?? undefined}
             author={author}
-            cover={cover}
+            coverUrl={coverUrl}
         />
         <div className="flex flex-col flex-1 justify-between">
             <div className='header'>
@@ -42,8 +34,8 @@ export function BooqCard({
 }
 
 function Header({ title, author }: {
-    title: string | null,
-    author: string | null,
+    title: string | undefined,
+    author: string | undefined,
 }) {
     return <div className='flex flex-col items-baseline'>
         <span className="text-xl font-bold">{title}</span>

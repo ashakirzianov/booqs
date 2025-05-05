@@ -49,7 +49,7 @@ export type TableOfContents = {
 
 export type BooqMetaTag = {
     name: string,
-    value: string,
+    value?: string,
 }
 export type BooqMeta = {
     title: string | undefined,
@@ -72,7 +72,4 @@ export type Booq = {
     meta: BooqMeta,
     toc: TableOfContents,
     images: BooqImages,
-}
-export type BooqWithId = Booq & {
-    id: BooqId,
 }

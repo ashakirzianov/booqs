@@ -4,8 +4,8 @@ import { TocNodeComp } from './TocNode'
 import { HighlightNodeComp } from './HighlightNode'
 import { PathHighlightsNodeComp } from './PathHighlightsNode'
 import { NavigationFilter } from './Filter'
-import { buildNavigationNodes, NavigationNode } from './nodes'
-import { NavigationSelection, ReaderHighlight, ReaderTocItem, ReaderUser } from './common'
+import { buildNavigationNodes, NavigationNode, NavigationSelection } from './nodes'
+import { AccountDisplayData, BooqNote, TableOfContentsItem } from '@/core'
 
 export function useNavigationState() {
     const [navigationOpen, setNavigationOpen] = useState(false)
@@ -38,10 +38,10 @@ export function NavigationPanel({
 }: {
     booqId: string,
     title: string
-    toc: ReaderTocItem[],
-    highlights: ReaderHighlight[],
+    toc: TableOfContentsItem[],
+    highlights: BooqNote[],
     selection: NavigationSelection,
-    self?: ReaderUser,
+    self?: AccountDisplayData,
     toggleSelection: (item: string) => void,
     closeSelf: () => void,
 }) {
@@ -94,7 +94,7 @@ export function NavigationPanel({
 
 function NavigationNodeComp({ booqId, self, node }: {
     booqId: string,
-    self: ReaderUser | undefined,
+    self: AccountDisplayData | undefined,
     node: NavigationNode,
 }) {
     switch (node.kind) {

@@ -1,19 +1,19 @@
 import { groupBy } from 'lodash'
-import { pathInRange } from '@/core'
-import { NavigationSelection, ReaderHighlight, ReaderTocItem, ReaderUser } from './common'
+import { AccountDisplayData, BooqNote, pathInRange, TableOfContentsItem } from '@/core'
 
+export type NavigationSelection = Record<string, boolean>
 export type TocNode = {
     kind: 'toc',
-    item: ReaderTocItem,
+    item: TableOfContentsItem,
 }
 export type HighlightNode = {
     kind: 'highlight',
-    highlight: ReaderHighlight,
+    highlight: BooqNote,
 }
 export type PathHighlightsNode = {
     kind: 'highlights',
-    items: Array<ReaderTocItem | undefined>,
-    highlights: ReaderHighlight[],
+    items: Array<TableOfContentsItem | undefined>,
+    highlights: BooqNote[],
 }
 export type NavigationNode = TocNode | HighlightNode | PathHighlightsNode
 
@@ -21,10 +21,10 @@ export function buildNavigationNodes({
     title, toc, selection, highlights, self,
 }: {
     title: string
-    toc: ReaderTocItem[],
-    highlights: ReaderHighlight[],
+    toc: TableOfContentsItem[],
+    highlights: BooqNote[],
     selection: NavigationSelection,
-    self?: ReaderUser,
+    self?: AccountDisplayData,
 }) {
     const authors = highlightsAuthors(highlights)
 
@@ -51,9 +51,9 @@ export function buildNavigationNodes({
 export function filterHighlights({
     highlights, selection, self,
 }: {
-    highlights: ReaderHighlight[],
+    highlights: BooqNote[],
     selection: NavigationSelection,
-    self: ReaderUser | undefined,
+    self: AccountDisplayData | undefined,
 }) {
     const showHighlights = selection.highlights
     const showAuthors = Object.entries(selection)
@@ -71,22 +71,22 @@ export function filterHighlights({
 function buildNodes({ toc, filter, highlights, title }: {
     title?: string,
     filter: string,
-    toc: ReaderTocItem[],
-    highlights: ReaderHighlight[],
+    toc: TableOfContentsItem[],
+    highlights: BooqNote[],
 }): NavigationNode[] {
     const nodes: NavigationNode[] = []
-    let prev: ReaderTocItem = {
+    let prev: TableOfContentsItem = {
         title: title ?? 'Untitled',
         position: 0,
         level: 0,
         path: [0],
     }
-    let prevPath: Array<ReaderTocItem | undefined> = []
+    let prevPath: Array<TableOfContentsItem | undefined> = []
     for (const next of toc) {
         prevPath = prevPath.slice(0, prev.level)
         prevPath[prev.level] = prev
         const inside = highlights.filter(
-            hl => pathInRange(hl.start, {
+            hl => pathInRange(hl.range.start, {
                 start: prev?.path ?? [0],
                 end: next.path,
             }),
@@ -119,13 +119,9 @@ function buildNodes({ toc, filter, highlights, title }: {
     return nodes
 }
 
-function highlightsAuthors(highlights: ReaderHighlight[]): ReaderUser[] {
+function highlightsAuthors(highlights: BooqNote[]): AccountDisplayData[] {
     const grouped = groupBy(highlights, h => h.author.id)
     return Object.entries(grouped).map(
-        ([_, [{ author }]]) => ({
-            id: author.id,
-            name: author.name,
-            pictureUrl: author.pictureUrl,
-        })
+        ([_, [{ author }]]) => author
     )
 }
