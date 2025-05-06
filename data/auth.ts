@@ -48,12 +48,7 @@ export async function verifyPasskeyRegistrationAction({ id, response }: {
             await setAuthToken(token)
             return {
                 success: true,
-                user: {
-                    id: result.user.id,
-                    name: result.user.name ?? undefined,
-                    profilePictureURL: result.user.profile_picture_url ?? undefined,
-                    joinedAt: result.user.joined_at,
-                } satisfies AccountData,
+                user: result.user,
             } as const
         } else {
             return {
@@ -105,12 +100,7 @@ export async function verifyPasskeySigninAction({ id, response }: {
             await setAuthToken(token)
             return {
                 success: true,
-                user: {
-                    id: result.user.id,
-                    name: result.user.name ?? undefined,
-                    profilePictureURL: result.user.profile_picture_url ?? undefined,
-                    joinedAt: result.user.joined_at,
-                } satisfies AccountData,
+                user: result.user,
             } as const
         } else {
             return {

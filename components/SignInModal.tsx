@@ -56,17 +56,17 @@ export function SignInModal({ isOpen, closeModal }: {
 }
 
 export function SignInButton() {
-    const { auth } = useAuth()
+    const { user, isLoading } = useAuth()
 
-    if (auth.state === 'loading') {
+    if (isLoading) {
         return <Spinner />
     }
 
     return <div className='cursor-pointer'>
         {
-            auth.state === 'signed'
+            user
                 ? <SignedButton
-                    user={auth.user}
+                    user={user}
                 />
                 : <NotSignedButton />
         }

@@ -5,8 +5,10 @@ import { feedHref } from '@/application/href'
 export function SignoutButton() {
     const router = useRouter()
     async function signout() {
-        await signOutAction()
-        router.push(feedHref())
+        const result = await signOutAction()
+        if (result) {
+            router.push(feedHref())
+        }
     }
     return <button className='text-action hover:text-highlight' onClick={signout}>
         Sign out

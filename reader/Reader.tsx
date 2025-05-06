@@ -1,6 +1,6 @@
 'use client'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { AccountDisplayData, BooqAnchor, BooqNote, BooqPath, BooqRange, contextForRange, PartialBooqData, pathToId, positionForPath, samePath, textForRange } from '@/core'
+import { BooqAnchor, BooqNote, BooqPath, BooqRange, contextForRange, PartialBooqData, pathToId, positionForPath, samePath, textForRange } from '@/core'
 import { BorderButton, PanelButton } from '@/components/Buttons'
 import { booqHref, feedHref } from '@/application/href'
 import {
@@ -33,10 +33,9 @@ export function Reader({
     quote?: BooqRange,
 }) {
     const pathname = usePathname()
-    const { auth } = useAuth()
-    const self: AccountDisplayData | undefined = auth.user
+    const { user, isLoading: isAuthLoading } = useAuth()
     const fontScale = useFontScale()
-    const { notes } = useBooqNotes({ booqId: booq.id, self })
+    const { notes } = useBooqNotes({ booqId: booq.id, self: user })
     const resolvedNotes = useMemo(() => {
         return notes.map<BooqNote>(note => ({
             ...note,
@@ -81,7 +80,7 @@ export function Reader({
         toc={booq.toc.items}
         notes={resolvedNotes}
         selection={navigationSelection}
-        self={self}
+        self={user}
         toggleSelection={toggleNavigationSelection}
         closeSelf={closeNavigation}
     />
@@ -96,8 +95,8 @@ export function Reader({
         () => filterNotes({
             notes: resolvedNotes,
             selection: navigationSelection,
-            self,
-        }), [resolvedNotes, navigationSelection, self]
+            self: user,
+        }), [resolvedNotes, navigationSelection, user]
     )
 
     const { augmentations, menuStateForAugmentation } = useAugmentations({
@@ -120,7 +119,7 @@ export function Reader({
         updateMenuState: setMenuState,
     } = useContextMenu({
         booqId: booq.id,
-        self,
+        self: user,
         closed: copilotState.kind !== 'empty',
         updateCopilot(selection, anchor) {
             setCopilotState({
@@ -185,9 +184,9 @@ export function Reader({
         NavigationButton={NavigationButton}
         ThemerButton={<ThemerButton />}
         AccountButton={<AccountButton
-            user={auth.user}
+            user={user}
             from={pathname}
-            loading={auth.state === 'loading'}
+            loading={isAuthLoading}
         />}
         CurrentPage={<PageLabel text={pagesLabel} />}
         PagesLeft={<PageLabel text={leftLabel} />}
