@@ -1,4 +1,4 @@
-import type { Library, LibraryCard, SearchResult } from './library'
+import type { InLibraryCard, Library, InLibrarySearchResult } from './library'
 import { downloadAsset } from './s3'
 import { sql } from './db'
 
@@ -26,7 +26,7 @@ export type DbPgCard = {
 }
 
 
-export async function cards(ids: string[]): Promise<LibraryCard[]> {
+export async function cards(ids: string[]): Promise<InLibraryCard[]> {
   if (ids.length === 0) return []
 
   const result = await sql`
@@ -54,7 +54,7 @@ async function fileForId(id: string) {
   }
 }
 
-export async function forAuthor(name: string, limit?: number, offset?: number): Promise<LibraryCard[]> {
+export async function forAuthor(name: string, limit?: number, offset?: number): Promise<InLibraryCard[]> {
   const result = await sql`
       SELECT * FROM pg_cards
       WHERE ${'%' + name + '%'} ILIKE ANY(authors)
@@ -69,19 +69,20 @@ export async function forAuthor(name: string, limit?: number, offset?: number): 
 function convertToLibraryCard({
   id, title, authors, language, length,
   cover, description, subjects,
-}: DbPgCard): LibraryCard {
+}: DbPgCard): InLibraryCard {
   return {
     id, title,
-    language,
+    languages: language ? [language] : [],
     authors,
     length: length ?? 0,
-    cover,
-    description,
+    coverUrl: cover ?? undefined,
+    description: description ?? undefined,
     subjects: subjects ?? [],
+    tags: [],
   }
 }
 
-export async function search(query: string, limit = 20, offset = 0): Promise<SearchResult[]> {
+export async function search(query: string, limit = 20, offset = 0): Promise<InLibrarySearchResult[]> {
   const rows = await sql`
     WITH ranked_cards AS (
       SELECT *,

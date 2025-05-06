@@ -1,5 +1,7 @@
-export function makeId(...ids: string[]): string {
-    return ids.join('/')
+import { BooqId, InLibraryId, LibraryId } from './model'
+
+export function makeId(libraryId: LibraryId, inLibraryId: InLibraryId): BooqId {
+    return `${libraryId}/${inLibraryId}`
 }
 
 export function parseId(id: string): string[] {

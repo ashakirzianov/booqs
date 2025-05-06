@@ -5,8 +5,8 @@ import {
 } from '@/viewer'
 import { ContextMenuContent, ContextMenuTarget } from './ContextMenuContent'
 import { useFloater } from '@/components/Floater'
-import { ReaderUser } from './common'
 import clsx from 'clsx'
+import { AccountDisplayData } from '@/core'
 
 export type ContextMenuState = {
     target: ContextMenuTarget,
@@ -14,10 +14,10 @@ export type ContextMenuState = {
 }
 
 export function useContextMenu({
-    booqId, self, updateCopilot, closed,
+    booqId, user, updateCopilot, closed,
 }: {
     booqId: string,
-    self: ReaderUser | undefined,
+    user: AccountDisplayData | undefined,
     closed: boolean,
     updateCopilot: (selection: BooqSelection, anchor: VirtualElement) => void,
 }) {
@@ -37,7 +37,7 @@ export function useContextMenu({
         setIsOpen,
         Content: <div className='w-40'><ContextMenuContent
             booqId={booqId}
-            self={self}
+            user={user}
             target={menuState.target}
             setTarget={target => updateMenuState({
                 ...menuState,

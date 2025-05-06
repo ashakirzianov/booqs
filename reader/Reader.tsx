@@ -1,6 +1,6 @@
 'use client'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { BooqPath, BooqRange, contextForRange, pathToId, positionForPath, samePath } from '@/core'
+import { BooqAnchor, BooqNote, BooqPath, BooqRange, contextForRange, PartialBooqData, pathToId, positionForPath, samePath, textForRange } from '@/core'
 import { BorderButton, PanelButton } from '@/components/Buttons'
 import { booqHref, feedHref } from '@/application/href'
 import {
@@ -11,16 +11,15 @@ import {
 } from '@/viewer'
 import { useContextMenu, type ContextMenuState } from './ContextMenu'
 import { ReaderLayout } from './ReaderLayout'
-import { resolveHighlightColor, currentSource, pageForPosition, quoteColor } from '@/application/common'
-import { ReaderAnchor, ReaderBooq, ReaderHighlight, ReaderUser } from './common'
+import { resolveNoteColor, currentSource, pageForPosition, quoteColor } from '@/application/common'
 import { NavigationPanel, useNavigationState } from './NavigationPanel'
 import { reportBooqHistory } from '@/data/user'
 import { ThemerButton } from '@/components/Themer'
 import { useFontScale } from '@/application/theme'
-import { filterHighlights } from './nodes'
+import { filterNotes } from './nodes'
 import { useAuth } from '@/application/auth'
 import { Copilot, CopilotState } from '@/components/Copilot'
-import { useHighlights } from '@/application/highlights'
+import { useBooqNotes } from '@/application/notes'
 import { AccountButton } from '@/components/AccountButton'
 import { usePathname } from 'next/navigation'
 import { BackIcon, Spinner, TocIcon } from '@/components/Icons'
@@ -30,14 +29,21 @@ import Link from 'next/link'
 export function Reader({
     booq, quote,
 }: {
-    booq: ReaderBooq,
+    booq: PartialBooqData,
     quote?: BooqRange,
 }) {
     const pathname = usePathname()
-    const { auth } = useAuth()
-    const self: ReaderUser | undefined = auth.user
+    const { user, isLoading: isAuthLoading } = useAuth()
     const fontScale = useFontScale()
-    const { highlights } = useHighlights(booq.id)
+    const { notes } = useBooqNotes({ booqId: booq.id, user })
+    const resolvedNotes = useMemo(() => {
+        return notes.map<BooqNote>(note => ({
+            ...note,
+            start: note.range.start,
+            end: note.range.end,
+            text: textForRange(booq.fragment.nodes, note.range) ?? '',
+        }))
+    }, [notes, booq.fragment.nodes])
 
     const quoteRef = useRef(quote)
     useEffect(() => {
@@ -70,11 +76,11 @@ export function Reader({
     } = useNavigationState()
     const NavigationContent = <NavigationPanel
         booqId={booq.id}
-        title={booq.title ?? 'Untitled'}
-        toc={booq.toc}
-        highlights={highlights}
+        title={booq.meta.title ?? 'Untitled'}
+        toc={booq.toc.items}
+        notes={resolvedNotes}
         selection={navigationSelection}
-        self={self}
+        user={user}
         toggleSelection={toggleNavigationSelection}
         closeSelf={closeNavigation}
     />
@@ -85,16 +91,16 @@ export function Reader({
         <TocIcon />
     </PanelButton>
 
-    const filteredHighlights = useMemo(
-        () => filterHighlights({
-            highlights,
+    const filteredNotes = useMemo(
+        () => filterNotes({
+            notes: resolvedNotes,
             selection: navigationSelection,
-            self,
-        }), [highlights, navigationSelection, self]
+            user,
+        }), [resolvedNotes, navigationSelection, user]
     )
 
     const { augmentations, menuStateForAugmentation } = useAugmentations({
-        highlights: filteredHighlights,
+        notes: filteredNotes,
         quote: quote,
     })
     const { visible, toggle } = useControlsVisibility()
@@ -113,7 +119,7 @@ export function Reader({
         updateMenuState: setMenuState,
     } = useContextMenu({
         booqId: booq.id,
-        self,
+        user,
         closed: copilotState.kind !== 'empty',
         updateCopilot(selection, anchor) {
             setCopilotState({
@@ -165,7 +171,10 @@ export function Reader({
         Copilot={<Copilot
             state={copilotState}
             setState={setCopilotState}
-            booq={booq}
+            data={{
+                id: booq.id,
+                meta: booq.meta,
+            }}
         />}
         MainButton={<Link href={feedHref()}>
             <PanelButton>
@@ -175,9 +184,9 @@ export function Reader({
         NavigationButton={NavigationButton}
         ThemerButton={<ThemerButton />}
         AccountButton={<AccountButton
-            user={auth.user}
+            user={user}
             from={pathname}
-            loading={auth.state === 'loading'}
+            loading={isAuthLoading}
         />}
         CurrentPage={<PageLabel text={pagesLabel} />}
         PagesLeft={<PageLabel text={leftLabel} />}
@@ -240,16 +249,16 @@ function isAnythingSelected() {
 }
 
 function useAugmentations({
-    quote, highlights,
+    quote, notes,
 }: {
-    highlights: ReaderHighlight[],
+    notes: BooqNote[],
     quote?: BooqRange,
 }) {
     const augmentations = useMemo(() => {
-        const augmentations = highlights.map<Augmentation>(h => ({
-            id: `highlight/${h.id}`,
-            range: { start: h.start, end: h.end },
-            color: resolveHighlightColor(h.color),
+        const augmentations = notes.map<Augmentation>(note => ({
+            id: `note/${note.id}`,
+            range: note.range,
+            color: resolveNoteColor(note.color),
         }))
         if (quote) {
             const quoteAugmentation: Augmentation = {
@@ -261,7 +270,7 @@ function useAugmentations({
         } else {
             return augmentations
         }
-    }, [quote, highlights])
+    }, [quote, notes])
     const menuStateForAugmentation = useCallback(function (augmentationId: string): ContextMenuState | undefined {
         const anchor = getAugmentationElement(augmentationId)
         if (!anchor) {
@@ -282,14 +291,14 @@ function useAugmentations({
                         },
                     }
                     : undefined
-            case 'highlight': {
-                const highlight = highlights.find(hl => hl.id === id)
-                return highlight
+            case 'note': {
+                const note = notes.find(hl => hl.id === id)
+                return note
                     ? {
                         anchor,
                         target: {
-                            kind: 'highlight',
-                            highlight,
+                            kind: 'note',
+                            note,
                         }
                     }
                     : undefined
@@ -297,14 +306,15 @@ function useAugmentations({
             default:
                 return undefined
         }
-    }, [quote, highlights])
+    }, [quote, notes])
     return {
         augmentations,
         menuStateForAugmentation,
     }
 }
 
-function useScrollHandler({ id, fragment, length }: ReaderBooq) {
+function useScrollHandler({ id, fragment, toc }: PartialBooqData) {
+    const length = toc.length
     const [currentPath, setCurrentPath] = useState(fragment.current.path)
 
     const position = positionForPath(fragment.nodes, currentPath)
@@ -335,7 +345,7 @@ function useScrollHandler({ id, fragment, length }: ReaderBooq) {
 
 function AnchorButton({ booqId, anchor, title }: {
     booqId: string,
-    anchor?: ReaderAnchor,
+    anchor?: BooqAnchor,
     title: string,
 }) {
     if (!anchor) {

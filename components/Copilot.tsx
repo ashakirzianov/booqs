@@ -5,6 +5,7 @@ import { CopilotContext, useCopilotAnswer, useCopilotSuggestions } from '@/appli
 import { ModalDivider, ModalHeader, ModalFullScreen } from './Modal'
 import { useIsSmallScreen } from '@/application/utils'
 import { Spinner } from './Icons'
+import { BooqId, BooqMeta } from '@/core'
 
 type CopilotEmpty = {
     kind: 'empty',
@@ -16,17 +17,14 @@ type CopilotSelected = {
     anchor: VirtualElement,
 }
 type BooqData = {
-    id: string,
-    title?: string,
-    author?: string,
-    language?: string,
-    length: number,
+    id: BooqId,
+    meta: BooqMeta,
 }
 export type CopilotState = CopilotEmpty | CopilotSelected
 type CopilotProps = {
     state: CopilotState,
     setState: (state: CopilotState) => void,
-    booq: BooqData,
+    data: BooqData,
 }
 export function Copilot(props: CopilotProps) {
     const small = useIsSmallScreen()
@@ -37,7 +35,7 @@ export function Copilot(props: CopilotProps) {
     }
 }
 
-function CopilotFloating({ state, setState, booq }: CopilotProps) {
+function CopilotFloating({ state, setState, data }: CopilotProps) {
     const { FloaterNode, setReference } = useFloater({
         isOpen: state.kind !== 'empty',
         setIsOpen: open => {
@@ -48,7 +46,7 @@ function CopilotFloating({ state, setState, booq }: CopilotProps) {
         Content: <div
             className='container flex flex-col grow items-center font-main select-none transition font-bold max-w-[var(--content-width)]'
         >
-            <CopilotStateContent state={state} booq={booq} />
+            <CopilotStateContent state={state} data={data} />
         </div>,
     })
     useEffect(() => {
@@ -59,7 +57,7 @@ function CopilotFloating({ state, setState, booq }: CopilotProps) {
     return FloaterNode
 }
 
-function CopilotModal({ state, setState, booq }: CopilotProps) {
+function CopilotModal({ state, setState, data }: CopilotProps) {
     const isOpen = state.kind !== 'empty'
     const closeModal = useCallback(() => {
         setState({ kind: 'empty' })
@@ -68,20 +66,20 @@ function CopilotModal({ state, setState, booq }: CopilotProps) {
         <ModalHeader text='Ask Copilot' onClose={closeModal} />
         <ModalDivider />
         <div className='flex flex-col grow items-center justify-start font-main select-none transition font-bold overflow-y-auto'>
-            <CopilotStateContent state={state} booq={booq} />
+            <CopilotStateContent state={state} data={data} />
         </div>
     </ModalFullScreen>
 }
 
-function CopilotStateContent({ state, booq }: {
+function CopilotStateContent({ state, data }: {
     state: CopilotState,
-    booq: BooqData,
+    data: BooqData,
 }) {
     switch (state.kind) {
         case 'empty':
             return <CopilotEmptyContent state={state} />
         case 'selected':
-            return <CopilotSelectedContent state={state} booq={booq} />
+            return <CopilotSelectedContent state={state} data={data} />
     }
 }
 
@@ -91,17 +89,17 @@ function CopilotEmptyContent({ }: {
     return 'Empty'
 }
 
-function CopilotSelectedContent({ state, booq }: {
+function CopilotSelectedContent({ state, data }: {
     state: CopilotSelected,
-    booq: BooqData,
+    data: BooqData,
 }) {
     const context = {
         text: state.selection.text,
         context: state.context,
-        booqId: booq.id,
-        title: booq.title ?? 'Unknown',
-        author: booq.author ?? 'Unknown author',
-        language: booq.language ?? 'en-US',
+        booqId: data.id,
+        title: data.meta.title ?? 'Unknown',
+        author: data.meta.authors[0] ?? 'Unknown author',
+        language: data.meta.languages[0] ?? 'en-US',
         start: state.selection.range.start,
         end: state.selection.range.end,
     }

@@ -1,23 +1,23 @@
 import { Popover } from '@/components/Popover'
 import { ContextMenuContent } from '@/reader/ContextMenuContent'
-import { resolveHighlightColor } from '@/application/common'
-import { ReaderHighlight, ReaderUser } from './common'
+import { resolveNoteColor } from '@/application/common'
 import { MoreIcon } from '@/components/Icons'
 import clsx from 'clsx'
 import { booqHref } from '@/application/href'
 import Link from 'next/link'
+import { AccountDisplayData, BooqNote } from '@/core'
 
-export function HighlightNodeComp({ booqId, highlight, self }: {
+export function NoteNodeComp({ booqId, note, user }: {
     booqId: string,
-    self: ReaderUser | undefined,
-    highlight: ReaderHighlight,
+    user: AccountDisplayData | undefined,
+    note: BooqNote,
 }) {
     return <div className='container flex flex-1 justify-between pl-base' style={{
-        borderLeft: `3px solid ${resolveHighlightColor(highlight.color)}`,
+        borderLeft: `3px solid ${resolveNoteColor(note.color)}`,
     }}>
         <div className='w-full text-primary text-justify'>
-            <Link href={booqHref({ id: booqId, path: highlight.start })} className='text-primary hover:text-highlight'>
-                {highlight.text}
+            <Link href={booqHref({ id: booqId, path: note.range.start })} className='text-primary hover:text-highlight'>
+                {note.text}
             </Link>
         </div>
         <div className='flex flex-col justify-between items-stretch ml-lg'>
@@ -30,19 +30,19 @@ export function HighlightNodeComp({ booqId, highlight, self }: {
                 content={<div className='w-48 pointer-events-auto text-primary'>
                     <ContextMenuContent
                         booqId={booqId}
-                        self={self}
+                        user={user}
                         setTarget={() => undefined}
                         target={{
-                            kind: 'highlight',
-                            highlight,
+                            kind: 'note',
+                            note,
                         }}
                     />
                 </div>}
             />
             <div className={clsx('mt-base', {
-                'hidden': self?.id === highlight.author.id,
-                'flex': self?.id !== highlight.author.id,
-            })} title={highlight.author.name ?? undefined}>
+                'hidden': user?.id === note.author.id,
+                'flex': user?.id !== note.author.id,
+            })} title={note.author.name ?? undefined}>
             </div>
         </div>
     </div>

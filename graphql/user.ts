@@ -4,7 +4,7 @@ import { IResolvers } from '@graphql-tools/utils'
 export type UserParent = DbUser
 export const userResolver: IResolvers<UserParent> = {
     User: {
-        joined(parent) {
+        joinedAt(parent) {
             return parent.joined_at
         },
         pictureUrl(parent) {

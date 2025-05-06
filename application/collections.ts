@@ -1,122 +1,66 @@
-import { useQuery, useMutation, gql } from '@apollo/client'
+'use client'
+import { DeleteBody, DeleteResponse, GetResponse, PostBody, PostResponse } from '@/app/api/collections/[name]/route'
+import { BooqId } from '@/core'
+import useSWR from 'swr'
+import useSWRMutation from 'swr/mutation'
 
 export const READING_LIST_COLLECTION = 'reading-list'
 export const UPLOADS_COLLECTION = 'uploads'
 
-const CollectionIdsQuery = gql`query CollectionIds($name: String!) {
-    collection(name: $name) {
-        booqs {
-            id
-        }
-    }
-}`
-type CollectionIdsData = {
-    collection: {
-        booqs: {
-            id: string,
-        }[],
-    },
-}
-type CollectionIdsVars = {
-    name: string,
-}
-export function useCollectionIds(name: string) {
-    const { loading, data } = useQuery<CollectionIdsData, CollectionIdsVars>(
-        CollectionIdsQuery,
-        { variables: { name } }
-    )
-    const ids = data?.collection?.booqs.map(b => b.id) ?? []
-    return {
-        loading,
-        ids,
-    }
-}
+const fetcher = (url: string) => fetch(url).then(res => res.json())
 
-const AddToCollectionMutation = gql`
-mutation AddToCollection($name: String!, $booqId: ID!) {
-    addToCollection(name: $name, booqId: $booqId)
-}`
-type AddToCollectionData = {
-    addToCollection: boolean,
-}
-export function useAddToCollection(name: string) {
-    const [doAdd, { loading }] = useMutation<AddToCollectionData>(
-        AddToCollectionMutation,
+export function useCollection(name: string) {
+    const key = `/api/collections/${name}`
+    const { data, error, isLoading } = useSWR<GetResponse>(key, fetcher)
+
+    const addMutation = useSWRMutation(
+        key,
+        async (url, { arg }: { arg: PostBody }) => {
+            const res = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(arg),
+            })
+            if (!res.ok) throw new Error('Failed to add to collection')
+            return res.json() as Promise<PostResponse>
+        }
     )
+
+    const removeMutation = useSWRMutation(
+        key,
+        async (url, { arg }: { arg: DeleteBody }) => {
+            const res = await fetch(url, {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(arg),
+            })
+            if (!res.ok) throw new Error('Failed to remove from collection')
+            return res.json() as Promise<DeleteResponse>
+        }
+    )
+
     return {
-        loading,
+        ids: data?.booqIds ?? [] as BooqId[],
+        isLoading,
+        error,
         addToCollection(booqId: string) {
-            doAdd({
-                variables: { name, booqId },
-                optimisticResponse: { addToCollection: true },
-                update(cache, { data }) {
-                    if (data?.addToCollection) {
-                        let cached = cache.readQuery<CollectionIdsData, CollectionIdsVars>({
-                            query: CollectionIdsQuery,
-                            variables: { name },
-                        })
-                        if (cached) {
-                            const item = {
-                                __typename: 'Booq',
-                                id: booqId,
-                            } as const
-                            cached = {
-                                ...cached,
-                                collection: {
-                                    ...cached.collection,
-                                    booqs: [item, ...cached.collection.booqs],
-                                },
-                            }
-                            cache.writeQuery({
-                                query: CollectionIdsQuery,
-                                variables: { name },
-                                data: cached,
-                            })
-                        }
-                    }
-                }
+            addMutation.trigger({ booqId }, {
+                optimisticData: currentData =>
+                    currentData
+                        ? { booqIds: [...new Set([...currentData.booqIds, booqId])] }
+                        : { booqIds: [booqId] },
+                rollbackOnError: true,
+                populateCache: true,
             })
         },
-    }
-}
-
-const RemoveFromCollectionMutation = gql`
-mutation RemoveFromCollection($name: String!, $booqId: ID!) {
-    removeFromCollection(name: $name, booqId: $booqId)
-}`
-type RemoveFromCollectionData = {
-    removeFromCollection: boolean,
-}
-export function useRemoveFromCollection(name: string) {
-    const [doRemove, { loading }] = useMutation<RemoveFromCollectionData>(
-        RemoveFromCollectionMutation,
-    )
-    return {
-        loading,
         removeFromCollection(booqId: string) {
-            doRemove({
-                variables: { name, booqId },
-                optimisticResponse: { removeFromCollection: true },
-                update(cache, { data }) {
-                    if (data?.removeFromCollection) {
-                        const stored = cache.readQuery<CollectionIdsData, CollectionIdsVars>({
-                            query: CollectionIdsQuery,
-                            variables: { name },
-                        })
-                        const booqs = (stored?.collection?.booqs ?? []).filter(b => b.id !== booqId)
-                        cache.writeQuery<CollectionIdsData, CollectionIdsVars>({
-                            query: CollectionIdsQuery,
-                            variables: { name },
-                            data: {
-                                ...stored,
-                                collection: {
-                                    ...stored?.collection,
-                                    booqs,
-                                },
-                            },
-                        })
-                    }
-                },
+            removeMutation.trigger({ booqId }, {
+                optimisticData: (currentData) =>
+                ({
+                    booqIds: (currentData?.booqIds ?? []).filter((id) => id !== booqId)
+                }),
+                rollbackOnError: true,
+                populateCache: true,
             })
         },
     }

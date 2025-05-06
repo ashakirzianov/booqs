@@ -1,28 +1,28 @@
 import { Fragment } from 'react'
-import { HighlightNodeComp } from './HighlightNode'
-import { ReaderTocItem, ReaderUser } from './common'
-import { PathHighlightsNode } from './nodes'
+import { NoteNodeComp } from './NoteNode'
+import { PathNotesNode } from './nodes'
 import { booqHref } from '@/application/href'
 import Link from 'next/link'
+import { AccountDisplayData, TableOfContentsItem } from '@/core'
 
-export function PathHighlightsNodeComp({
-    booqId, self,
-    node: { items, highlights },
+export function PathNotesNodeComp({
+    booqId, user,
+    node: { items, notes },
 }: {
     booqId: string,
-    self: ReaderUser | undefined,
-    node: PathHighlightsNode,
+    user: AccountDisplayData | undefined,
+    node: PathNotesNode,
 }) {
     return <div>
         <Path booqId={booqId} items={items} />
         {
-            highlights.map(
+            notes.map(
                 (hl) =>
                     <div key={hl.id} className='my-base'>
-                        <HighlightNodeComp
+                        <NoteNodeComp
                             booqId={booqId}
-                            self={self}
-                            highlight={hl}
+                            user={user}
+                            note={hl}
                         />
                     </div>
             )
@@ -32,7 +32,7 @@ export function PathHighlightsNodeComp({
 
 function Path({ items, booqId }: {
     booqId: string,
-    items: Array<ReaderTocItem | undefined>,
+    items: Array<TableOfContentsItem | undefined>,
 }) {
     return <div className='flex flex-wrap'>
         {

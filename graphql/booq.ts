@@ -1,20 +1,20 @@
 import { IResolvers } from '@graphql-tools/utils'
 import { BookmarkParent } from './bookmark'
-import { HighlightParent } from './highlight'
-import { booqForId, LibraryCard } from '@/backend/library'
+import { NoteParent } from './note'
+import { booqForId } from '@/backend/library'
 import { booqImageUrl } from '@/backend/images'
-import { buildFragment, filterUndefined, previewForPath, textForRange } from '@/core'
+import { BooqLibraryCard, buildFragment, filterUndefined, previewForPath, textForRange } from '@/core'
 import { getBookmarks } from '@/backend/bookmarks'
-import { highlightsFor } from '@/backend/highlights'
+import { notesFor } from '@/backend/notes'
 
-export type BooqParent = LibraryCard & {
+export type BooqParent = BooqLibraryCard & {
     kind?: undefined,
 }
 export const booqResolver: IResolvers<BooqParent> = {
     Booq: {
-        cover(parent, { size }) {
-            return parent.cover
-                ? booqImageUrl(parent.id, parent.cover, size)
+        coverUrl(parent, { size }) {
+            return parent.coverUrl
+                ? booqImageUrl(parent.id, parent.coverUrl, size)
                 : undefined
         },
         tags(parent) {
@@ -28,8 +28,8 @@ export const booqResolver: IResolvers<BooqParent> = {
                 })
                 : []
         },
-        async highlights(parent): Promise<HighlightParent[]> {
-            return highlightsFor({
+        async notes(parent): Promise<NoteParent[]> {
+            return notesFor({
                 booqId: parent.id,
             })
         },
@@ -83,15 +83,6 @@ function buildTags(card: BooqParent): Tag[] {
             tag: 'pages',
             value: Math.floor(card.length / 1500).toString(),
         },
-        ...(card.subjects ?? []).map(s => ({
-            tag: 'subject',
-            value: s,
-        })),
-        card.language === undefined ? undefined :
-            {
-                tag: 'language',
-                value: card.language,
-            },
         !card.id.startsWith('pg/') ? undefined :
             {
                 tag: 'pg-index',

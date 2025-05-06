@@ -6,7 +6,7 @@ import { collectionResolver } from './collection'
 import { booqResolver } from './booq'
 import { booqHistoryResolver } from './history'
 import { bookmarkResolver } from './bookmark'
-import { highlightResolver } from './highlight'
+import { noteResolver } from './note'
 import { userResolver } from './user'
 import { copilotResolver } from './copilot'
 import { authorResolver } from './author'
@@ -20,7 +20,7 @@ export const resolvers: IResolvers = {
     ...authorResolver,
     ...booqHistoryResolver,
     ...bookmarkResolver,
-    ...highlightResolver,
+    ...noteResolver,
     ...userResolver,
     ...copilotResolver,
     BooqNode: namedJsonScalar('BooqNode'),

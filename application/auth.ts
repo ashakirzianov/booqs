@@ -1,5 +1,4 @@
 'use client'
-// TODO: remove provider and use useSWR instead
 import {
     browserSupportsWebAuthn,
     startRegistration, startAuthentication,
@@ -8,138 +7,102 @@ import {
     initPasskeyRegistrationAcion, verifyPasskeyRegistrationAction,
     initPasskeySigninAction, verifyPasskeySigninAction,
     signOutAction,
-    fetchAuthData,
     deleteAccountAction,
 } from '@/data/auth'
-import { makeStateProvider } from './state'
-import { useContext } from 'react'
-
-export type AuthUser = {
-    id: string,
-    joined: string,
-    name: string | null,
-    pictureUrl: string | null,
-}
-export type AuthState = {
-    state: 'loading',
-    user?: undefined,
-} | {
-    state: 'not-signed',
-    user?: undefined,
-} | {
-    state: 'error',
-    error: string,
-    user?: undefined,
-} | {
-    state: 'signed',
-    user: AuthUser,
-}
-
-const {
-    StateProvider: AuthProvider,
-    Context,
-} = makeStateProvider<AuthState>({
-    key: 'auth',
-    initialData: {
-        state: 'loading',
-    },
-    onMount(_, setData) {
-        fetchAuthData().then(user => {
-            if (user) {
-                setData({
-                    state: 'signed',
-                    user,
-                })
-            } else {
-                setData({
-                    state: 'not-signed',
-                })
-            }
-        }).catch(_ => {
-            setData({
-                state: 'error',
-                error: 'Error fetching auth data',
-            })
-        })
-    }
-})
-
-export { AuthProvider }
+import useSWR from 'swr'
+import { GetResponse } from '@/app/api/me/route'
+import { AccountData } from '@/core'
 
 export function useAuth() {
-    const { data, setData } = useContext(Context)
+    const { data, isLoading, error, mutate } = useSWR(
+        '/api/me',
+        async function (url: string) {
+            const res = await fetch(url)
+            if (res.status !== 200) {
+                throw new Error('Failed to fetch user')
+            }
+            const data: GetResponse = await res.json()
+            return data
+        }
+    )
 
     async function signOut() {
-        const current = data
-        setData({ state: 'loading' })
-        const result = await signOutAction()
-        if (result) {
-            setData({ state: 'not-signed' })
-        } else {
-            setData(current)
-        }
-    }
-    async function deleteAccount() {
-        setData({ state: 'loading' })
-        const result = await deleteAccountAction()
-        if (result) {
-            setData({ state: 'not-signed' })
-        } else {
-            setData({
-                state: 'error',
-                error: 'Failed to delete account',
-            })
-        }
-    }
-
-    return {
-        auth: data,
-        registerWithPasskey() {
-            setData({ state: 'loading' })
-            registerWithPasskey().then(result => {
-                if (result.success) {
-                    setData({
-                        state: 'signed',
-                        user: result.user,
-                    })
-                } else {
-                    setData({
-                        state: 'error',
-                        error: result.error,
-                    })
+        const result = await mutate(async function () {
+            const result = await signOutAction()
+            if (result) {
+                return {
+                    user: null,
                 }
             }
-            ).catch(err => {
-                setData({
-                    state: 'error',
-                    error: err.toString(),
-                })
+            throw new Error('Failed to sign out')
+        }, {
+            optimisticData: {
+                user: null,
+            },
+        })
+        return result?.user === null
+    }
+    async function deleteAccount() {
+        mutate(async function () {
+            const result = await deleteAccountAction()
+            if (result) {
+                return {
+                    user: null,
+                }
+            }
+            throw new Error('Failed to delete account')
+        }, {
+            optimisticData: {
+                user: null,
+            },
+        })
+    }
+
+    const user: AccountData | undefined = data?.user
+        ? {
+            id: data.user.id,
+            name: data.user.name ?? undefined,
+            profilePictureURL: data.user.profile_picture_url ?? undefined,
+            joinedAt: data.user.joined_at,
+        }
+        : undefined
+
+    return {
+        user,
+        registerWithPasskey() {
+            mutate(async function () {
+                const result = await registerWithPasskey()
+                if (result.success) {
+                    return {
+                        user: result.user,
+                    }
+                } else {
+                    throw new Error(result.error)
+                }
+            }, {
+                populateCache: true,
+                rollbackOnError: true,
             })
         },
         signInWithPasskey() {
-            setData({ state: 'loading' })
-            signInWithPasskey().then(result => {
+            mutate(async function () {
+                const result = await signInWithPasskey()
                 if (result.success) {
-                    setData({
-                        state: 'signed',
+                    return {
                         user: result.user,
-                    })
+                    }
                 } else {
-                    setData({
-                        state: 'error',
-                        error: result.error,
-                    })
+                    throw new Error(result.error)
                 }
-            }
-            ).catch(err => {
-                setData({
-                    state: 'error',
-                    error: err.toString(),
-                })
+            }, {
+                populateCache: true,
+                rollbackOnError: true,
             })
         },
         deleteAccount,
         signOut,
+        isLoading,
+        error,
     }
 }
 

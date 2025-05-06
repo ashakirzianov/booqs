@@ -15,8 +15,8 @@ export function useUpload() {
         state: 'success',
         data: {
             id: string,
-            title: string | null,
-            cover: string | null,
+            title: string | undefined,
+            coverUrl: string | undefined,
         },
     }
     const [state, setState] = useState<UploadState>({
@@ -33,7 +33,7 @@ export function useUpload() {
                 data: {
                     id: result.id,
                     title: result.title,
-                    cover: result.cover,
+                    coverUrl: result.coverUrl,
                 }
             })
         } else {

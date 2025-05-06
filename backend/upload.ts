@@ -3,18 +3,18 @@ import { booqImageUrl } from './images'
 import { uploadToLibrary } from './library'
 
 export async function uploadEpubBook(fileBuffer: Buffer, userId: string) {
-    let { id, title, cover } = await uploadToLibrary('uu', fileBuffer, userId) ?? { title: null, cover: null }
+    let { id, title, coverUrl } = await uploadToLibrary('uu', fileBuffer, userId) ?? { title: undefined, coverUrl: undefined }
     if (id) {
         const added = addUpload(userId, id)
         if (!added) {
             console.error('Failed to add upload to collection')
         }
-        if (cover) {
-            cover = booqImageUrl(id, cover)
+        if (coverUrl) {
+            coverUrl = booqImageUrl(id, coverUrl)
         }
         return {
             success: true,
-            id, title, cover,
+            id, title, coverUrl,
         } as const
     } else {
         return {

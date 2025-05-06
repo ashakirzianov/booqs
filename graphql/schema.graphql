@@ -12,9 +12,9 @@ type Query {
 type Mutation {
     addBookmark(bookmark: BookmarkInput!): Boolean
     removeBookmark(id: ID!): Boolean
-    addHighlight(highlight: HighlightInput!): Boolean
-    removeHighlight(id: ID!): Boolean
-    updateHighlight(id: ID!, color: String): Boolean
+    addNote(note: NoteInput!): Boolean
+    removeNote(id: ID!): Boolean
+    updateNote(id: ID!, color: String): Boolean
     addBooqHistory(event: BooqHistoryInput!): Boolean
     addToCollection(name: String!, booqId: ID!): Boolean
     removeFromCollection(name: String!, booqId: ID!): Boolean
@@ -53,12 +53,14 @@ type Booq {
     id: ID!
     title: String
     authors: [String]
-    language: String,
+    languages: [String],
+    subjects: [String]
+    description: String
     length: Int
-    cover(size: Int): String
+    coverUrl(size: Int): String
     tags: [Tag]!
     bookmarks: [Bookmark]
-    highlights: [Highlight]
+    notes: [Note]
     preview(path: [Int!], end: [Int!], length: Int = 500): String
     fragment(path: [Int!]): BooqFragment
     nodes: [BooqNode]
@@ -73,7 +75,7 @@ type Author {
 type User {
     id: ID!
     username: ID!
-    joined: String!
+    joinedAt: String!
     name: String
     pictureUrl: String
 }
@@ -85,7 +87,7 @@ input BookmarkInput {
     booqId: ID!
     path: [Int!]!
 }
-input HighlightInput {
+input NoteInput {
     id: ID
     booqId: ID!
     color: String!
@@ -132,7 +134,7 @@ type Bookmark {
     id: ID
     path: [Int!]
 }
-type Highlight {
+type Note {
     author: User
     booq: Booq
     id: ID

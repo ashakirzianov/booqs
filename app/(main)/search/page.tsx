@@ -1,5 +1,6 @@
 import { authorHref, booqHref } from '@/application/href'
-import { fetchSearchQuery, LibrarySearchResult, LibraryBooqSearchResult, LibraryAuthorSearchResult } from '@/data/search'
+import { AuthorSearchResult, BooqSearchResult, SearchResult } from '@/core'
+import { fetchSearchQuery } from '@/data/search'
 import Link from 'next/link'
 
 export async function generateMetadata({
@@ -26,7 +27,7 @@ export default async function SearchPage({
             <ul>
                 {results.map((result, index) => (
                     <li key={index}>
-                        <SearchResult result={result} />
+                        <SearchResultItem result={result} />
                     </li>
                 ))}
             </ul>
@@ -34,44 +35,44 @@ export default async function SearchPage({
     )
 }
 
-function SearchResult({ result }: {
-    result: LibrarySearchResult,
+function SearchResultItem({ result }: {
+    result: SearchResult,
 }) {
     if (result.kind === 'book') {
-        return <BooqSearchResult result={result} />
+        return <BooqSearchResultItem result={result} />
     } else if (result.kind === 'author') {
-        return <AuthorSearchResult result={result} />
+        return <AuthorSearchResultItem result={result} />
     } else {
         return null
     }
 }
 
-function BooqSearchResult({
+function BooqSearchResultItem({
     result,
 }: {
-    result: LibraryBooqSearchResult,
+    result: BooqSearchResult,
 }) {
     return (
         <div>
             <h2>
-                <Link href={booqHref({ id: result.id })}>
-                    {result.title}
+                <Link href={booqHref({ id: result.card.id })}>
+                    {result.card.title}
                 </Link>
             </h2>
-            <p>by {result.authors[0]}</p>
+            <p>by {result.card.authors[0]}</p>
         </div>
     )
 }
 
-function AuthorSearchResult({
+function AuthorSearchResultItem({
     result,
 }: {
-    result: LibraryAuthorSearchResult,
+    result: AuthorSearchResult,
 }) {
     return (
         <div>
-            <h2><Link href={authorHref({ name: result.name })}>
-                {result.name}
+            <h2><Link href={authorHref({ name: result.author.name })}>
+                {result.author.name}
             </Link></h2>
         </div>
     )

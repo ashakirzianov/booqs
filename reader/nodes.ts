@@ -1,45 +1,45 @@
 import { groupBy } from 'lodash'
-import { pathInRange } from '@/core'
-import { NavigationSelection, ReaderHighlight, ReaderTocItem, ReaderUser } from './common'
+import { AccountDisplayData, BooqNote, pathInRange, TableOfContentsItem } from '@/core'
 
+export type NavigationSelection = Record<string, boolean>
 export type TocNode = {
     kind: 'toc',
-    item: ReaderTocItem,
+    item: TableOfContentsItem,
 }
-export type HighlightNode = {
-    kind: 'highlight',
-    highlight: ReaderHighlight,
+export type NoteNode = {
+    kind: 'note',
+    note: BooqNote,
 }
-export type PathHighlightsNode = {
-    kind: 'highlights',
-    items: Array<ReaderTocItem | undefined>,
-    highlights: ReaderHighlight[],
+export type PathNotesNode = {
+    kind: 'notes',
+    items: Array<TableOfContentsItem | undefined>,
+    notes: BooqNote[],
 }
-export type NavigationNode = TocNode | HighlightNode | PathHighlightsNode
+export type NavigationNode = TocNode | NoteNode | PathNotesNode
 
 export function buildNavigationNodes({
-    title, toc, selection, highlights, self,
+    title, toc, selection, notes, user,
 }: {
     title: string
-    toc: ReaderTocItem[],
-    highlights: ReaderHighlight[],
+    toc: TableOfContentsItem[],
+    notes: BooqNote[],
     selection: NavigationSelection,
-    self?: ReaderUser,
+    user?: AccountDisplayData,
 }) {
-    const authors = highlightsAuthors(highlights)
+    const authors = notesAuthors(notes)
 
     const showChapters = selection.chapters
-    const showHighlights = selection.highlights
-    const filteredHighlights = filterHighlights({
-        highlights, selection, self,
+    const showNotes = selection.notes
+    const filteredNotes = filterNotes({
+        notes, selection, user,
     })
 
     const filter = showChapters
-        ? (showHighlights ? 'all' : 'contents')
-        : (showHighlights ? 'highlights' : 'none')
+        ? (showNotes ? 'all' : 'contents')
+        : (showNotes ? 'notes' : 'none')
     const nodes = buildNodes({
         filter, title, toc,
-        highlights: filteredHighlights,
+        notes: filteredNotes,
     })
 
     return {
@@ -48,53 +48,53 @@ export function buildNavigationNodes({
     }
 }
 
-export function filterHighlights({
-    highlights, selection, self,
+export function filterNotes({
+    notes, selection, user,
 }: {
-    highlights: ReaderHighlight[],
+    notes: BooqNote[],
     selection: NavigationSelection,
-    self: ReaderUser | undefined,
+    user: AccountDisplayData | undefined,
 }) {
-    const showHighlights = selection.highlights
+    const showNotes = selection.notes
     const showAuthors = Object.entries(selection)
         .filter(([key]) => key.startsWith('author:'))
         .map(([key]) => key.split(':')[1])
-    const allAuthors = showHighlights && self?.id
-        ? [self.id, ...showAuthors]
+    const allAuthors = showNotes && user?.id
+        ? [user.id, ...showAuthors]
         : showAuthors
-    const filteredHighlights = highlights.filter(
-        h => allAuthors.some(authorId => h.author.id === authorId)
+    const filteredNotes = notes.filter(
+        note => allAuthors.some(authorId => note.author.id === authorId)
     )
-    return filteredHighlights
+    return filteredNotes
 }
 
-function buildNodes({ toc, filter, highlights, title }: {
+function buildNodes({ toc, filter, notes, title }: {
     title?: string,
     filter: string,
-    toc: ReaderTocItem[],
-    highlights: ReaderHighlight[],
+    toc: TableOfContentsItem[],
+    notes: BooqNote[],
 }): NavigationNode[] {
     const nodes: NavigationNode[] = []
-    let prev: ReaderTocItem = {
+    let prev: TableOfContentsItem = {
         title: title ?? 'Untitled',
         position: 0,
         level: 0,
         path: [0],
     }
-    let prevPath: Array<ReaderTocItem | undefined> = []
+    let prevPath: Array<TableOfContentsItem | undefined> = []
     for (const next of toc) {
         prevPath = prevPath.slice(0, prev.level)
         prevPath[prev.level] = prev
-        const inside = highlights.filter(
-            hl => pathInRange(hl.start, {
+        const inside = notes.filter(
+            hl => pathInRange(hl.range.start, {
                 start: prev?.path ?? [0],
                 end: next.path,
             }),
         )
         if (filter === 'all') {
-            nodes.push(...inside.map(h => ({
-                kind: 'highlight' as const,
-                highlight: h,
+            nodes.push(...inside.map(note => ({
+                kind: 'note' as const,
+                note,
             })))
             nodes.push({
                 kind: 'toc',
@@ -105,12 +105,12 @@ function buildNodes({ toc, filter, highlights, title }: {
                 kind: 'toc',
                 item: next,
             })
-        } else if (filter === 'highlights') {
+        } else if (filter === 'notes') {
             if (inside.length !== 0) {
                 nodes.push({
-                    kind: 'highlights',
+                    kind: 'notes',
                     items: prevPath,
-                    highlights: inside,
+                    notes: inside,
                 })
             }
         }
@@ -119,13 +119,9 @@ function buildNodes({ toc, filter, highlights, title }: {
     return nodes
 }
 
-function highlightsAuthors(highlights: ReaderHighlight[]): ReaderUser[] {
-    const grouped = groupBy(highlights, h => h.author.id)
+function notesAuthors(notes: BooqNote[]): AccountDisplayData[] {
+    const grouped = groupBy(notes, n => n.author.id)
     return Object.entries(grouped).map(
-        ([_, [{ author }]]) => ({
-            id: author.id,
-            name: author.name ?? undefined,
-            pictureUrl: author.pictureUrl ?? undefined,
-        })
+        ([_, [{ author }]]) => author
     )
 }

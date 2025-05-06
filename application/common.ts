@@ -7,7 +7,7 @@ export function currentSource(): string {
 }
 
 const defaultColor = 'rgba(255, 215, 0, 0.6)'
-const highlightColorMapping: {
+const noteColorMapping: {
     [color in string]: string | undefined;
 } = {
     first: defaultColor,
@@ -16,8 +16,8 @@ const highlightColorMapping: {
     forth: 'rgba(75, 0, 130, 0.6)',
     fifth: 'rgba(34, 139, 34, 0.6)',
 }
-export function resolveHighlightColor(color: string) {
-    return highlightColorMapping[color] ?? defaultColor
+export function resolveNoteColor(color: string) {
+    return noteColorMapping[color] ?? defaultColor
 }
 export const quoteColor = 'rgba(255, 165, 0, 0.6)'
-export const highlightColorNames = Object.keys(highlightColorMapping)
+export const noteColorNames = Object.keys(noteColorMapping)

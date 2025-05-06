@@ -8,8 +8,8 @@ import { useState } from 'react'
 
 export function DeleteAccountButton({ account }: {
     account: {
-        name: string | null,
-        joined: string,
+        name: string | undefined,
+        joinedAt: string,
     },
 }) {
     const [modal, setModal] = useState(false)
@@ -28,7 +28,7 @@ export function DeleteAccountButton({ account }: {
         <div className='flex w-full justify-center'>
             <div className='flex flex-col w-panel max-w-full gap-2'>
                 <h1 className='font-bold'>{account.name}</h1>
-                <p>Joined {formatDate(account.joined)}</p>
+                <p>Joined {formatDate(account.joinedAt)}</p>
                 <button className='text-alert font-bold max-w-fit p-2 rounded-sm border-2 border-alert hover:bg-alert hover:text-background' onClick={openModal}>Delete Account</button>
             </div>
             <Modal isOpen={modal} closeModal={closeModal}>

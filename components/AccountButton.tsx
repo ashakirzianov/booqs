@@ -3,12 +3,10 @@ import { PanelButton } from './Buttons'
 import { accountHref, signInHref } from '../application/href'
 import { ProfileBadge } from './ProfilePicture'
 import { SignInIcon, Spinner } from './Icons'
+import { AccountData } from '@/core'
 
 export function AccountButton({ user, loading, from }: {
-    user?: {
-        name: string | null,
-        pictureUrl: string | null,
-    } | null,
+    user?: AccountData,
     loading?: boolean,
     from?: string,
 }) {
@@ -17,7 +15,7 @@ export function AccountButton({ user, loading, from }: {
             loading ? <LoadingAccountButton />
                 : user ? <SignedAccountButton
                     name={user.name}
-                    pictureUrl={user.pictureUrl}
+                    profilePictureURL={user.profilePictureURL}
                 />
                     : <NotSignedAccountButton from={from} />
         }
@@ -28,14 +26,11 @@ export function LoadingAccountButton() {
     return <Spinner />
 }
 
-export function SignedAccountButton({ name, pictureUrl }: {
-    name: string | null,
-    pictureUrl: string | null,
-}) {
+export function SignedAccountButton({ name, profilePictureURL }: Pick<AccountData, 'name' | 'profilePictureURL'>) {
     return <Link href={accountHref()}>
         <ProfileBadge
             name={name ?? undefined}
-            picture={pictureUrl ?? undefined}
+            picture={profilePictureURL ?? undefined}
             size={2}
             border={true}
         />

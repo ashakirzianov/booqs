@@ -2,14 +2,13 @@
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import * as clipboard from 'clipboard-polyfill'
-import { BooqRange } from '@/core'
+import { AccountDisplayData, BooqNote, BooqRange } from '@/core'
 import { MenuItem } from '@/components/Menu'
 import { quoteHref } from '@/application/href'
 import { BooqSelection } from '@/viewer'
 import { ProfileBadge } from '@/components/ProfilePicture'
-import { resolveHighlightColor, highlightColorNames } from '@/application/common'
-import { ReaderHighlight, ReaderUser } from './common'
-import { useHighlightMutations } from '@/application/highlights'
+import { resolveNoteColor, noteColorNames } from '@/application/common'
+import { useBooqNotes } from '@/application/notes'
 import { CopilotIcon, CopyIcon, LinkIcon, RemoveIcon, ShareIcon } from '@/components/Icons'
 
 type EmptyTarget = {
@@ -23,19 +22,19 @@ type QuoteTarget = {
     kind: 'quote',
     selection: BooqSelection,
 }
-type HighlightTarget = {
-    kind: 'highlight',
-    highlight: ReaderHighlight,
+type NoteTarget = {
+    kind: 'note',
+    note: BooqNote,
 }
 export type ContextMenuTarget =
-    | EmptyTarget | SelectionTarget | QuoteTarget | HighlightTarget
+    | EmptyTarget | SelectionTarget | QuoteTarget | NoteTarget
 
 export function ContextMenuContent({
     target, ...rest
 }: {
     target: ContextMenuTarget,
     booqId: string,
-    self: ReaderUser | undefined,
+    user: AccountDisplayData | undefined,
     setTarget: (target: ContextMenuTarget) => void,
     updateCopilot?: (selection: BooqSelection) => void,
 }) {
@@ -44,8 +43,8 @@ export function ContextMenuContent({
             return <SelectionTargetMenu target={target} {...rest} />
         case 'quote':
             return <QuoteTargetMenu target={target} {...rest} />
-        case 'highlight':
-            return <HighlightTargetMenu target={target} {...rest} />
+        case 'note':
+            return <NoteTargetMenu target={target} {...rest} />
         default:
             return null
     }
@@ -56,13 +55,13 @@ function SelectionTargetMenu({
 }: {
     target: SelectionTarget,
     booqId: string,
-    self: ReaderUser | undefined,
+    user: AccountDisplayData | undefined,
     setTarget: (target: ContextMenuTarget) => void,
     updateCopilot?: (selection: BooqSelection) => void,
 }) {
     useCopyQuote(rest.booqId, selection)
     return <>
-        <AddHighlightItem {...rest} selection={selection} />
+        <AddNoteItem {...rest} selection={selection} />
         <CopilotItem {...rest} selection={selection} />
         <CopyQuoteItem {...rest} selection={selection} />
         <CopyLinkItem {...rest} selection={selection} />
@@ -74,46 +73,43 @@ function QuoteTargetMenu({
 }: {
     target: QuoteTarget,
     booqId: string,
-    self: ReaderUser | undefined,
+    user: AccountDisplayData | undefined,
     setTarget: (target: ContextMenuTarget) => void,
     updateCopilot?: (selection: BooqSelection) => void,
 }) {
     return <>
-        <AddHighlightItem {...rest} selection={selection} />
+        <AddNoteItem {...rest} selection={selection} />
         <CopilotItem {...rest} selection={selection} />
         <CopyTextItem {...rest} selection={selection} />
     </>
 }
 
-function HighlightTargetMenu({
-    target: { highlight }, self, ...rest
+function NoteTargetMenu({
+    target: { note }, user, ...rest
 }: {
-    target: HighlightTarget,
+    target: NoteTarget,
     booqId: string,
-    self: ReaderUser | undefined,
+    user: AccountDisplayData | undefined,
     setTarget: (target: ContextMenuTarget) => void,
     updateCopilot?: (selection: BooqSelection) => void,
 }) {
-    const isOwnHighlight = self?.id === highlight.author?.id
+    const isOwnNote = user?.id === note.author?.id
     const selection = {
-        range: {
-            start: highlight.start,
-            end: highlight.end,
-        },
-        text: highlight.text,
+        range: note.range,
+        text: note.text,
     }
     return <>
-        {isOwnHighlight ? null :
+        {isOwnNote ? null :
             <AuthorItem
-                name={highlight.author.name ?? undefined}
-                pictureUrl={highlight.author.pictureUrl ?? undefined}
+                name={note.author.name ?? undefined}
+                pictureUrl={note.author.profilePictureURL ?? undefined}
             />
         }
-        {!isOwnHighlight ? null :
-            <SelectHighlightColorItem  {...rest} highlight={highlight} />
+        {!isOwnNote ? null :
+            <SelectNoteColorItem  {...rest} user={user} note={note} />
         }
-        {!isOwnHighlight ? null :
-            <RemoveHighlightItem  {...rest} highlight={highlight} />
+        {!isOwnNote ? null :
+            <RemoveNoteItem  {...rest} user={user} note={note} />
         }
         <CopilotItem {...rest} selection={selection} />
         <CopyQuoteItem {...rest} selection={selection} />
@@ -178,38 +174,41 @@ function AuthorItem({ name, pictureUrl }: {
     </div>
 }
 
-function AddHighlightItem({
-    selection, booqId, self, setTarget,
+function AddNoteItem({
+    selection, booqId, user, setTarget,
 }: {
     selection: BooqSelection,
     booqId: string,
-    self: ReaderUser | undefined,
+    user: AccountDisplayData | undefined,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
-    const { addHighlight } = useHighlightMutations(booqId)
-    if (!self?.id) {
+    const { addNote } = useBooqNotes({ booqId, user })
+    if (!user?.id) {
         return null
     }
     return <div className='container'>
         {
-            highlightColorNames.map(
+            noteColorNames.map(
                 (color, idx) => <ColorSelectionButton
                     key={idx}
                     selected={false}
-                    color={resolveHighlightColor(color)}
+                    color={resolveNoteColor(color)}
                     callback={() => {
-                        const highlight = addHighlight({
+                        const note = addNote({
                             color,
-                            start: selection.range.start,
-                            end: selection.range.end ?? selection.range.start,
-                            text: selection.text,
-                            author: self,
+                            range: selection.range,
                         })
-                        setTarget({
-                            kind: 'highlight',
-                            highlight,
-                        })
-                        removeSelection()
+                        if (note) {
+                            setTarget({
+                                kind: 'note',
+                                note: {
+                                    ...note,
+                                    text: selection.text,
+                                    range: selection.range,
+                                },
+                            })
+                            removeSelection()
+                        }
                     }}
                 />,
             )
@@ -229,46 +228,48 @@ function AddHighlightItem({
     </div>
 }
 
-function RemoveHighlightItem({
-    highlight, booqId, setTarget,
+function RemoveNoteItem({
+    note, booqId, setTarget, user,
 }: {
-    highlight: ReaderHighlight,
+    note: BooqNote,
     booqId: string,
+    user: AccountDisplayData,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
-    const { removeHighlight } = useHighlightMutations(booqId)
+    const { removeNote } = useBooqNotes({ booqId, user })
     return <MenuItem
         text='Remove'
         icon={<ContextMenuIcon><RemoveIcon /></ContextMenuIcon>}
         callback={() => {
-            removeHighlight(highlight.id)
+            removeNote({ noteId: note.id })
             setTarget({ kind: 'empty' })
         }}
     />
 }
 
-function SelectHighlightColorItem({
-    highlight, booqId, setTarget,
+function SelectNoteColorItem({
+    note, booqId, setTarget, user,
 }: {
-    highlight: ReaderHighlight,
+    note: BooqNote,
     booqId: string,
+    user: AccountDisplayData,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
-    const { updateHighlight } = useHighlightMutations(booqId)
+    const { updateNote } = useBooqNotes({ booqId, user })
     return <div className='container'>
         {
-            highlightColorNames.map(
+            noteColorNames.map(
                 (color, idx) => <ColorSelectionButton
                     key={idx}
-                    selected={color === highlight.color}
-                    color={resolveHighlightColor(color)}
+                    selected={color === note.color}
+                    color={resolveNoteColor(color)}
                     callback={() => {
-                        updateHighlight(highlight.id, color)
+                        updateNote({ noteId: note.id, color })
                         // Note: hackie way of updating selection
                         setTarget({
-                            kind: 'highlight',
-                            highlight: {
-                                ...highlight,
+                            kind: 'note',
+                            note: {
+                                ...note,
                                 color,
                             },
                         })

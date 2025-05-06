@@ -1,67 +1,26 @@
-import { useEffect, useState } from 'react'
-import { useQuery, gql } from '@apollo/client'
+import { GetResponse } from '@/app/api/search/route'
+import useSWR from 'swr'
 
-const SearchQuery = gql`query Search($query: String!) {
-    search(query: $query, limit: 10) {
-        __typename
-        ... on Booq {
-            id
-            title
-            authors
-            cover(size: 60)
-        }
-        ... on Author {
-            name
-        }
-    }
-}`
-export type BooqSearchResult = {
-    __typename: 'Booq',
-    id: string,
-    title: string | null,
-    authors: string[],
-    cover: string | null,
-}
-export type AuthorSearchResult = {
-    __typename: 'Author',
-    name: string,
-}
-export type SearchResult = BooqSearchResult | AuthorSearchResult
-type SearchData = {
-    search: SearchResult[],
-}
-export function useSearch() {
-    const [query, setQuery] = useState('')
-    const [debouncedQuery, setDebouncedQuery] = useState(query)
-    useEffect(() => {
-        const handler = setTimeout(() => {
-            setDebouncedQuery(query)
-        }, 300)
-        return () => {
-            clearTimeout(handler)
-        }
-    }, [query])
-    const { loading, data } = useQuery<SearchData>(
-        SearchQuery,
-        {
-            variables: { query: debouncedQuery },
-            nextFetchPolicy: 'network-only',
-            fetchPolicy: 'network-only',
+
+export function useSearch({ query }: {
+    query: string,
+}) {
+    const shouldFetch = query.trim().length > 0
+    const { data, error, isLoading } = useSWR(
+        shouldFetch ? `/api/search?query=${query}` : null,
+        async function (url: string) {
+            const res = await fetch(url)
+            if (!res.ok) {
+                throw new Error('Failed to fetch')
+            }
+            const result: GetResponse = await res.json()
+            return result
         },
     )
-
     return {
-        query,
-        doQuery: setQuery,
-        results: data?.search ?? [],
-        loading,
+        query: data?.query ?? '',
+        results: data?.results ?? [],
+        isLoading,
+        error,
     }
-}
-
-export function isBooqSearchResult(result: SearchResult): result is BooqSearchResult {
-    return result.__typename === 'Booq'
-}
-
-export function isAuthorSearchResult(result: SearchResult): result is AuthorSearchResult {
-    return result.__typename === 'Author'
 }

@@ -1,17 +1,17 @@
 'use client'
 import React, { useMemo, useState } from 'react'
 import { TocNodeComp } from './TocNode'
-import { HighlightNodeComp } from './HighlightNode'
-import { PathHighlightsNodeComp } from './PathHighlightsNode'
+import { NoteNodeComp } from './NoteNode'
+import { PathNotesNodeComp } from './PathNotesNode'
 import { NavigationFilter } from './Filter'
-import { buildNavigationNodes, NavigationNode } from './nodes'
-import { NavigationSelection, ReaderHighlight, ReaderTocItem, ReaderUser } from './common'
+import { buildNavigationNodes, NavigationNode, NavigationSelection } from './nodes'
+import { AccountDisplayData, BooqNote, TableOfContentsItem } from '@/core'
 
 export function useNavigationState() {
     const [navigationOpen, setNavigationOpen] = useState(false)
     const [navigationSelection, setNavigationSelection] = useState<NavigationSelection>({
         chapters: true,
-        highlights: true,
+        notes: true,
     })
     return {
         navigationOpen,
@@ -32,27 +32,27 @@ export function useNavigationState() {
 }
 
 export function NavigationPanel({
-    booqId, self, title, toc, highlights,
+    booqId, user, title, toc, notes,
     selection,
     toggleSelection, closeSelf,
 }: {
     booqId: string,
     title: string
-    toc: ReaderTocItem[],
-    highlights: ReaderHighlight[],
+    toc: TableOfContentsItem[],
+    notes: BooqNote[],
     selection: NavigationSelection,
-    self?: ReaderUser,
+    user?: AccountDisplayData,
     toggleSelection: (item: string) => void,
     closeSelf: () => void,
 }) {
     const { nodes, authors } = useMemo(() => {
         return buildNavigationNodes({
-            title, toc, highlights,
+            title, toc, notes,
             selection,
-            self,
+            user,
         })
-    }, [title, toc, highlights, selection, self])
-    const exceptSelf = authors.filter(a => a.id !== self?.id)
+    }, [title, toc, notes, selection, user])
+    const exceptSelf = authors.filter(a => a.id !== user?.id)
     return useMemo(() => {
         return <div className='flex flex-1' style={{
             padding: '0 env(safe-area-inset-right) 0 env(safe-area-inset-left)',
@@ -76,7 +76,7 @@ export function NavigationPanel({
                                     <div className='py-base' onClick={closeSelf}>
                                         <NavigationNodeComp
                                             booqId={booqId}
-                                            self={self}
+                                            user={user}
                                             node={node}
                                         />
                                     </div>
@@ -92,9 +92,9 @@ export function NavigationPanel({
     }, [nodes])
 }
 
-function NavigationNodeComp({ booqId, self, node }: {
+function NavigationNodeComp({ booqId, user, node }: {
     booqId: string,
-    self: ReaderUser | undefined,
+    user: AccountDisplayData | undefined,
     node: NavigationNode,
 }) {
     switch (node.kind) {
@@ -103,16 +103,16 @@ function NavigationNodeComp({ booqId, self, node }: {
                 booqId={booqId}
                 node={node}
             />
-        case 'highlight':
-            return <HighlightNodeComp
+        case 'note':
+            return <NoteNodeComp
                 booqId={booqId}
-                self={self}
-                highlight={node.highlight}
+                user={user}
+                note={node.note}
             />
-        case 'highlights':
-            return <PathHighlightsNodeComp
+        case 'notes':
+            return <PathNotesNodeComp
                 booqId={booqId}
-                self={self}
+                user={user}
                 node={node}
             />
         default:

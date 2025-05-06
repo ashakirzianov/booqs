@@ -11,7 +11,6 @@
     "workers": "tsx scripts/index.ts"
   },
   "dependencies": {
-    "@apollo/client": "^3.13.5",
     "@apollo/server": "^4.11.3",
     "@as-integrations/next": "^3.2.0",
     "@aws-sdk/client-s3": "^3.772.0",
@@ -60,7 +59,6 @@
   },
   "devDependencies": {
     "@stylistic/eslint-plugin-ts": "^4.2.0",
-    "@types/apollo-upload-client": "^18.0.0",
     "@types/apple-signin-api": "^1.5.3",
     "@types/cors": "^2.8.17",
     "@types/css": "0.0.38",
