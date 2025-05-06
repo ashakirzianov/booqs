@@ -2,7 +2,7 @@ import { AuthorSearchResult, BooqLibraryCard, BooqSearchResult, filterUndefined,
 import { groupBy } from 'lodash'
 import { Booq } from '../core'
 import { pgLibrary } from './pg'
-import { logTime } from './utils'
+import { logTimeAsync } from './utils'
 import { parseEpub } from '@/parser'
 import { uploadBooqImages } from './images'
 import { userUploadsLibrary } from './uu'
@@ -131,10 +131,10 @@ async function parseBooqForId(booqId: string) {
     if (!file) {
         return undefined
     }
-    const { value: booq, diags } = await logTime(() => parseEpub({
+    const { value: booq, diags } = await logTimeAsync('parse epub', () => parseEpub({
         fileData: file.file,
         title: booqId,
-    }), 'Parser')
+    }))
     diags.forEach(console.info)
     return booq
 }
