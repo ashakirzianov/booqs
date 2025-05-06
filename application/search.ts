@@ -8,7 +8,7 @@ const SearchQuery = gql`query Search($query: String!) {
             id
             title
             authors
-            cover(size: 60)
+            coverUrl(size: 60)
         }
         ... on Author {
             name
@@ -20,7 +20,7 @@ export type BooqSearchResult = {
     id: string,
     title: string | null,
     authors: string[],
-    cover: string | null,
+    coverUrl: string | null,
 }
 export type AuthorSearchResult = {
     __typename: 'Author',
