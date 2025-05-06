@@ -143,6 +143,11 @@ function sameState(a: ContextMenuState, b: ContextMenuState) {
     if (a.target.kind === 'empty' && b.target.kind === 'empty' && a.anchor === b.anchor) {
         return true
     }
+    if (a.target.kind === 'selection' && b.target.kind === 'selection') {
+        if (a.target.selection.text === b.target.selection.text) {
+            return true
+        }
+    }
     return false
 }
 
