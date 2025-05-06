@@ -106,10 +106,10 @@ function NoteTargetMenu({
             />
         }
         {!isOwnNote ? null :
-            <SelectNoteColorItem  {...rest} note={note} />
+            <SelectNoteColorItem  {...rest} self={self} note={note} />
         }
         {!isOwnNote ? null :
-            <RemoveNoteItem  {...rest} note={note} />
+            <RemoveNoteItem  {...rest} self={self} note={note} />
         }
         <CopilotItem {...rest} selection={selection} />
         <CopyQuoteItem {...rest} selection={selection} />
@@ -229,31 +229,33 @@ function AddNoteItem({
 }
 
 function RemoveNoteItem({
-    note, booqId, setTarget,
+    note, booqId, setTarget, self,
 }: {
     note: BooqNote,
     booqId: string,
+    self: AccountDisplayData,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
-    const { removeNote } = useBooqNotes({ booqId })
+    const { removeNote } = useBooqNotes({ booqId, self })
     return <MenuItem
         text='Remove'
         icon={<ContextMenuIcon><RemoveIcon /></ContextMenuIcon>}
         callback={() => {
-            removeNote(note.id)
+            removeNote({ noteId: note.id })
             setTarget({ kind: 'empty' })
         }}
     />
 }
 
 function SelectNoteColorItem({
-    note, booqId, setTarget,
+    note, booqId, setTarget, self,
 }: {
     note: BooqNote,
     booqId: string,
+    self: AccountDisplayData,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
-    const { updateNote } = useBooqNotes({ booqId })
+    const { updateNote } = useBooqNotes({ booqId, self })
     return <div className='container'>
         {
             noteColorNames.map(
@@ -262,7 +264,7 @@ function SelectNoteColorItem({
                     selected={color === note.color}
                     color={resolveNoteColor(color)}
                     callback={() => {
-                        updateNote(note.id, color)
+                        updateNote({ noteId: note.id, color })
                         // Note: hackie way of updating selection
                         setTarget({
                             kind: 'note',

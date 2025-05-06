@@ -1,6 +1,7 @@
 'use client'
 
 import type { GetResponse, PostBody, PostResponse } from '@/app/api/booq/[library]/[id]/notes/route'
+import type { PatchBody, PatchResponse } from '@/app/api/notes/[id]/route'
 import { AccountDisplayData, BooqRange, NoteData } from '@/core'
 import { useMemo } from 'react'
 import useSWR from 'swr'
@@ -11,10 +12,12 @@ export function useBooqNotes({
     booqId, self,
 }: {
     booqId: string,
-    self?: AccountDisplayData,
+    self: AccountDisplayData | undefined,
 }) {
+    const notesKey = `/api/booq/${booqId}/notes`
+
     const { data, isLoading } = useSWR(
-        `/api/booq/${booqId}/notes`,
+        notesKey,
         async (url: string) => {
             const res = await fetch(url, {
                 method: 'GET',
@@ -29,40 +32,42 @@ export function useBooqNotes({
             return result
         }
     )
+
     const notes = useMemo(() =>
         data?.notes.map(noteFromJson) ?? [],
         [data?.notes]
     )
 
     const { trigger: postNoteTrigger } = useSWRMutation(
-        `/api/booq/${booqId}/notes`,
-        async (url, { arg }: { arg: PostBody }) => {
+        notesKey,
+        async (url, { arg: body }: { arg: PostBody }) => {
             const res = await fetch(url, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(arg),
+                body: JSON.stringify(body),
             })
             if (!res.ok) {
                 throw new Error('Failed to add note')
             }
             const result: PostResponse = await res.json()
             return result
-        }, {
-        populateCache: (postResponse: PostResponse, currentData: GetResponse | undefined): GetResponse => {
-            if (!currentData) {
-                return {
-                    notes: [postResponse],
-                }
-            }
-            return {
-                notes: [...currentData.notes, postResponse],
-            }
         },
-        rollbackOnError: true,
-        revalidate: false,
-    })
+        {
+            populateCache: (postResponse: PostResponse, currentData: GetResponse | undefined) => {
+                if (!currentData) {
+                    return { notes: [postResponse] }
+                }
+                return {
+                    notes: [...currentData.notes, postResponse],
+                }
+            },
+            rollbackOnError: true,
+            revalidate: false,
+        }
+    )
+
     function addNote({
         range: { start, end },
         color,
@@ -72,9 +77,8 @@ export function useBooqNotes({
         color: string,
         content?: string
     }) {
-        if (!self) {
-            return undefined
-        }
+        if (!self) return undefined
+
         const postBody: PostBody = {
             id: uuidv4(),
             color,
@@ -82,34 +86,138 @@ export function useBooqNotes({
             end_path: end,
             content: content ?? null,
         }
+
+        const now = new Date().toISOString()
         const optimisticResponse: PostResponse = {
             ...postBody,
             author_id: self.id,
             author_name: self.name ?? null,
             author_profile_picture_url: self.profilePictureURL ?? null,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
+            created_at: now,
+            updated_at: now,
             booq_id: booqId,
         }
+
         postNoteTrigger(postBody, {
             optimisticData: (currentData: GetResponse | undefined): GetResponse =>
                 currentData
                     ? { notes: [...currentData.notes, optimisticResponse] }
                     : { notes: [optimisticResponse] },
         })
+
         return noteFromJson(optimisticResponse)
+    }
+
+    const { trigger: deleteNoteTrigger } = useSWRMutation(
+        notesKey,
+        async (_key: string, { arg: noteId }: { arg: string }) => {
+            const res = await fetch(`/api/notes/${noteId}`, {
+                method: 'DELETE',
+            })
+            if (!res.ok) {
+                throw new Error('Failed to delete note')
+            }
+            return noteId
+        },
+        {
+            populateCache: (deleteResponse: string, currentData: GetResponse | undefined) => {
+                if (!currentData) {
+                    return { notes: [] }
+                }
+                return {
+                    notes: currentData.notes.filter(n => n.id !== deleteResponse),
+                }
+            },
+            rollbackOnError: true,
+            revalidate: false,
+        }
+    )
+
+    function removeNote({ noteId }: { noteId: string }) {
+        if (!self || !data) return false
+        deleteNoteTrigger(noteId, {
+            optimisticData: (currentData: GetResponse | undefined): GetResponse =>
+                currentData
+                    ? { notes: currentData.notes.filter(n => n.id !== noteId) }
+                    : { notes: [] },
+        })
+        return true
+    }
+
+    const { trigger: updateNoteTrigger } = useSWRMutation(
+        notesKey,
+        async (_key: string, { arg: { noteId, body } }: {
+            arg: {
+                noteId: string,
+                body: PatchBody,
+            }
+        }) => {
+            const res = await fetch(`/api/notes/${noteId}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(body),
+            })
+            if (!res.ok) {
+                throw new Error('Failed to update note')
+            }
+            const result: PatchResponse = await res.json()
+            return result
+        },
+        {
+            populateCache: (patchResponse: PatchResponse, currentData: GetResponse | undefined) => {
+                if (!currentData) {
+                    return { notes: [] }
+                }
+                return {
+                    notes: currentData.notes.map(n =>
+                        n.id === patchResponse.id
+                            ? { ...n, ...patchResponse }
+                            : n
+                    ),
+                }
+            },
+            rollbackOnError: true,
+            revalidate: false,
+        }
+    )
+
+    function updateNote({ noteId, color, content }: {
+        noteId: string,
+        color?: string,
+        content?: string,
+    }) {
+        if (!self || !data) return
+
+        const body: PatchBody = {
+            color,
+            content,
+        }
+
+        updateNoteTrigger({ noteId, body }, {
+            optimisticData: (currentData: GetResponse | undefined): GetResponse => {
+                if (!currentData) {
+                    return { notes: [] }
+                }
+                const now = new Date().toISOString()
+                return {
+                    notes: currentData.notes.map(n =>
+                        n.id === noteId
+                            ? { ...n, ...body, updated_at: now }
+                            : n
+                    ),
+                }
+            },
+        })
     }
 
     return {
         notes,
         isLoading,
         addNote,
-        removeNote: async (_id: string) => {
-            // TODO: implement
-        },
-        updateNote: async (_id: string, _color: string, _note?: string) => {
-            // TODO: implement
-        },
+        removeNote,
+        updateNote,
     }
 }
 

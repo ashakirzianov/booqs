@@ -95,6 +95,7 @@ export async function removeNote({ id, authorId }: {
   const rows = await sql`
       DELETE FROM notes
       WHERE id = ${id} AND author_id = ${authorId}
+      RETURNING *
     `
   return rows.length > 0
 }

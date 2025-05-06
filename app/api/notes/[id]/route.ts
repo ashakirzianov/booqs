@@ -41,7 +41,7 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
         id, authorId: userId,
     })
     if (success) {
-        return Response.json(null, { status: 204 })
+        return new Response(undefined, { status: 204 })
     } else {
         return Response.json({ error: 'Note not found' }, { status: 404 })
     }

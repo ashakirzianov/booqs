@@ -36,7 +36,7 @@ export function Reader({
     const { auth } = useAuth()
     const self: AccountDisplayData | undefined = auth.user
     const fontScale = useFontScale()
-    const { notes } = useBooqNotes({ booqId: booq.id })
+    const { notes } = useBooqNotes({ booqId: booq.id, self })
     const resolvedNotes = useMemo(() => {
         return notes.map<BooqNote>(note => ({
             ...note,
