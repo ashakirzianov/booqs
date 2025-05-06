@@ -58,21 +58,17 @@ export function useContextMenu({
 
     type ContextMenuStateSetter = (prev: ContextMenuState) => ContextMenuState
     const updateMenuState = useCallback(function (setterOrValue: ContextMenuStateSetter | ContextMenuState) {
-        function setAnchor(anchor?: VirtualElement) {
-            if (anchor) {
-                setReference(anchor)
+        setMenuState(prev => {
+            const next =
+                typeof setterOrValue === 'function' ? setterOrValue(prev) : setterOrValue
+            if (sameState(prev, next)) {
+                return prev
             }
-        }
-        if (typeof setterOrValue === 'function') {
-            setMenuState(prev => {
-                const next = setterOrValue(prev)
-                setAnchor(next.anchor)
-                return next
-            })
-        } else {
-            setAnchor(setterOrValue.anchor)
-            setMenuState(setterOrValue)
-        }
+            if (next.anchor) {
+                setReference(next.anchor)
+            }
+            return next
+        })
     }, [setMenuState, setReference])
 
     useEffect(() => {
@@ -141,6 +137,13 @@ function getSelectionState(): ContextMenuState {
     return {
         target: { kind: 'empty' },
     }
+}
+
+function sameState(a: ContextMenuState, b: ContextMenuState) {
+    if (a.target.kind === 'empty' && b.target.kind === 'empty' && a.anchor === b.anchor) {
+        return true
+    }
+    return false
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
