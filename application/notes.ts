@@ -2,6 +2,7 @@
 
 import type { GetResponse, PostBody, PostResponse } from '@/app/api/booq/[library]/[id]/notes/route'
 import { AccountDisplayData, BooqRange, NoteData } from '@/core'
+import { useMemo } from 'react'
 import useSWR from 'swr'
 import useSWRMutation from 'swr/mutation'
 import { v4 as uuidv4 } from 'uuid'
@@ -28,6 +29,10 @@ export function useBooqNotes({
             return result
         }
     )
+    const notes = useMemo(() =>
+        data?.notes.map(noteFromJson) ?? [],
+        [data?.notes]
+    )
 
     const { trigger: postNoteTrigger } = useSWRMutation(
         `/api/booq/${booqId}/notes`,
@@ -52,10 +57,7 @@ export function useBooqNotes({
                 }
             }
             return {
-                notes: [
-                    ...currentData.notes,
-                    postResponse,
-                ],
+                notes: [...currentData.notes, postResponse],
             }
         },
         rollbackOnError: true,
@@ -80,26 +82,40 @@ export function useBooqNotes({
             end_path: end,
             content: content ?? null,
         }
-        postNoteTrigger(postBody, {
-            optimisticData: postBody,
-        })
-        const newNote: NoteData = {
-            id: postBody.id,
-            booqId,
-            range: {
-                start: postBody.start_path,
-                end: postBody.end_path,
-            },
-            color: postBody.color,
-            content: postBody.content ?? undefined,
-            author: self,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
+        const optimisticResponse: PostResponse = {
+            ...postBody,
+            author_id: self.id,
+            author_name: self.name ?? null,
+            author_profile_picture_url: self.profilePictureURL ?? null,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+            booq_id: booqId,
         }
-        return newNote
+        postNoteTrigger(postBody, {
+            optimisticData: (currentData: GetResponse | undefined): GetResponse =>
+                currentData
+                    ? { notes: [...currentData.notes, optimisticResponse] }
+                    : { notes: [optimisticResponse] },
+        })
+        return noteFromJson(optimisticResponse)
     }
 
-    const notes: NoteData[] = data?.notes?.map(note => ({
+    return {
+        notes,
+        isLoading,
+        addNote,
+        removeNote: async (_id: string) => {
+            // TODO: implement
+        },
+        updateNote: async (_id: string, _color: string, _note?: string) => {
+            // TODO: implement
+        },
+    }
+}
+
+type NoteJson = GetResponse['notes'][number]
+function noteFromJson(note: NoteJson): NoteData {
+    return {
         id: note.id,
         booqId: note.booq_id,
         range: {
@@ -115,17 +131,5 @@ export function useBooqNotes({
         },
         createdAt: note.created_at,
         updatedAt: note.updated_at,
-    })) ?? []
-
-    return {
-        notes,
-        isLoading,
-        addNote,
-        removeNote: async (_id: string) => {
-            // TODO: implement
-        },
-        updateNote: async (_id: string, _color: string, _note?: string) => {
-            // TODO: implement
-        },
     }
 }
