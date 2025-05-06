@@ -1,4 +1,4 @@
-import { BooqLibraryCard, filterUndefined, InLibraryId, LibraryId, makeId, parseId } from '@/core'
+import { AuthorSearchResult, BooqLibraryCard, BooqSearchResult, filterUndefined, InLibraryId, LibraryId, makeId, parseId, SearchResult } from '@/core'
 import { groupBy } from 'lodash'
 import { Booq } from '../core'
 import { pgLibrary } from './pg'
@@ -16,18 +16,10 @@ export type BookFile = {
     kind: 'epub',
     file: Buffer,
 }
-export type SearchResult<CardType = BooqLibraryCard> = AuthorSearchResult | BooqSearchResult<CardType>
-export type AuthorSearchResult = {
-    kind: 'author',
-    author: {
-        name: string,
-    },
-}
-export type BooqSearchResult<CardType = BooqLibraryCard> = {
-    kind: 'book',
-    card: CardType,
-}
-export type InLibrarySearchResult = SearchResult<InLibraryCard>
+export type InLibrarySearchResult = AuthorSearchResult
+    | Omit<BooqSearchResult, 'card'> & {
+        card: InLibraryCard,
+    }
 export type Library = {
     search(query: string, limit: number): Promise<InLibrarySearchResult[]>,
     cards(ids: InLibraryId[]): Promise<InLibraryCard[]>,

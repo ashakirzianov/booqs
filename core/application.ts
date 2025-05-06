@@ -40,8 +40,18 @@ export type BooqLibraryCard = {
     coverUrl?: string,
     tags: BooqMetaTag[],
 }
-
 export type BooqCollection = {
     name: string,
     booqIds: BooqId[],
+}
+export type SearchResult = AuthorSearchResult | BooqSearchResult
+export type AuthorSearchResult = {
+    kind: 'author',
+    author: {
+        name: string,
+    },
+}
+export type BooqSearchResult = {
+    kind: 'book',
+    card: BooqLibraryCard,
 }

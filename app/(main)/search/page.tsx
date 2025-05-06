@@ -1,5 +1,5 @@
 import { authorHref, booqHref } from '@/application/href'
-import { AuthorSearchResult, BooqSearchResult, SearchResult } from '@/backend/library'
+import { AuthorSearchResult, BooqSearchResult, SearchResult } from '@/core'
 import { fetchSearchQuery } from '@/data/search'
 import Link from 'next/link'
 
