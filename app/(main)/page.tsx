@@ -13,7 +13,7 @@ export default async function Home() {
     const featured = await featuredBooqCards()
     const history = await logTimeAsync(
         'history',
-        () => fetchReadingHistory(500),
+        () => fetchReadingHistory(),
     )
     const userId = await getUserIdInsideRequest()
     return <>

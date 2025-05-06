@@ -1,20 +1,15 @@
 import {
-    Booq, BooqPath, filterUndefined, previewForPath, textForRange,
+    BooqPath, filterUndefined,
     buildFragment,
     PartialBooqData,
     BooqId,
     BooqLibraryCard,
 } from '@/core'
 import { booqImageUrl } from '@/backend/images'
-import { booqForId, libraryCardsForIds, featuredBooqIds, booqsForAuthor } from '@/backend/library'
+import { libraryCardsForIds, featuredBooqIds, booqsForAuthor } from '@/backend/library'
 import { userForId } from '@/backend/users'
 import { booqIdsInCollections } from '@/backend/collections'
-
-type BooqPreview = {
-    id: string,
-    title: string,
-    preview: string,
-}
+import { booqForId, booqPreview } from '@/backend/booq'
 
 export async function featuredIds() {
     return featuredBooqIds()
@@ -54,20 +49,8 @@ export async function booqCard(booqId: string): Promise<BooqLibraryCard | undefi
     return buildBooqCard(card, 210)
 }
 
-export async function booqPreview(booqId: BooqId, path?: BooqPath, end?: BooqPath, length: number = 500) {
-    const booq = await booqForId(booqId)
-    if (booq?.meta.title === undefined) {
-        return undefined
-    }
-    const preview = previewForBooq(booq, path, end, length)
-    if (preview === undefined) {
-        return undefined
-    }
-    return {
-        id: booqId,
-        title: booq.meta.title,
-        preview: preview,
-    } satisfies BooqPreview
+export async function fetchBooqPreview(booqId: BooqId, path: BooqPath, end?: BooqPath) {
+    return booqPreview(booqId, path, end)
 }
 
 export async function booqPart(booqId: BooqId, path?: BooqPath) {
@@ -87,18 +70,6 @@ export async function booqPart(booqId: BooqId, path?: BooqPath) {
         toc: booq.toc,
         meta: booq.meta,
     } satisfies PartialBooqData
-}
-
-function previewForBooq(booq: Booq, path?: BooqPath, end?: BooqPath, length: number = 500): string | undefined {
-    if (end) {
-        const preview = textForRange(booq.nodes, { start: path ?? [], end })?.trim()
-        return length
-            ? preview?.substring(0, length)
-            : preview
-    } else {
-        const preview = previewForPath(booq.nodes, path ?? [], length)
-        return preview?.trim()?.substring(0, length)
-    }
 }
 
 function buildBooqCard(card: BooqLibraryCard, coverSize: number): BooqLibraryCard {

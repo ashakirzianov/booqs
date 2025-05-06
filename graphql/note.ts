@@ -2,8 +2,9 @@ import { IResolvers } from '@graphql-tools/utils'
 import { BooqParent } from './booq'
 import { DbNote } from '@/backend/notes'
 import { DbUser, userForId } from '@/backend/users'
-import { booqForId, libraryCardForId } from '@/backend/library'
+import { libraryCardForId } from '@/backend/library'
 import { positionForPath, textForRange } from '@/core'
+import { booqForId } from '@/backend/booq'
 
 export type NoteParent = DbNote
 export const noteResolver: IResolvers<NoteParent> = {

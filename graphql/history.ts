@@ -1,8 +1,9 @@
 import { IResolvers } from '@graphql-tools/utils'
 import { BooqParent } from './booq'
-import { booqForId, libraryCardForId } from '@/backend/library'
+import { libraryCardForId } from '@/backend/library'
 import { positionForPath, previewForPath } from '@/core'
 import { DbReadingHistoryEvent } from '@/backend/history'
+import { booqForId } from '@/backend/booq'
 
 export type BooqHistoryParent = DbReadingHistoryEvent
 export const booqHistoryResolver: IResolvers<BooqHistoryParent> = {

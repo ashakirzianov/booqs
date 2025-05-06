@@ -1,5 +1,5 @@
 import { pathFromString } from '@/core'
-import { booqPart, booqPreview } from '@/data/booqs'
+import { booqPart, fetchBooqPreview } from '@/data/booqs'
 import { Reader } from '@/reader/Reader'
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
@@ -26,12 +26,12 @@ export async function generateMetadata({
     const endPath = end && pathFromString(end)
     const booqPath = pathFromString(path)
     const meta = startPath && endPath
-        ? await booqPreview(`${library}/${id}`, startPath, endPath)
-        : await booqPreview(`${library}/${id}`, booqPath)
+        ? await fetchBooqPreview(`${library}/${id}`, startPath, endPath)
+        : await fetchBooqPreview(`${library}/${id}`, booqPath ?? [])
 
     return {
         title: meta?.title ?? 'Booq',
-        description: meta?.preview,
+        description: meta?.text,
     }
 }
 
