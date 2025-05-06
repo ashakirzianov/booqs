@@ -34,7 +34,7 @@ export function ContextMenuContent({
 }: {
     target: ContextMenuTarget,
     booqId: string,
-    self: AccountDisplayData | undefined,
+    user: AccountDisplayData | undefined,
     setTarget: (target: ContextMenuTarget) => void,
     updateCopilot?: (selection: BooqSelection) => void,
 }) {
@@ -55,7 +55,7 @@ function SelectionTargetMenu({
 }: {
     target: SelectionTarget,
     booqId: string,
-    self: AccountDisplayData | undefined,
+    user: AccountDisplayData | undefined,
     setTarget: (target: ContextMenuTarget) => void,
     updateCopilot?: (selection: BooqSelection) => void,
 }) {
@@ -73,7 +73,7 @@ function QuoteTargetMenu({
 }: {
     target: QuoteTarget,
     booqId: string,
-    self: AccountDisplayData | undefined,
+    user: AccountDisplayData | undefined,
     setTarget: (target: ContextMenuTarget) => void,
     updateCopilot?: (selection: BooqSelection) => void,
 }) {
@@ -85,15 +85,15 @@ function QuoteTargetMenu({
 }
 
 function NoteTargetMenu({
-    target: { note }, self, ...rest
+    target: { note }, user, ...rest
 }: {
     target: NoteTarget,
     booqId: string,
-    self: AccountDisplayData | undefined,
+    user: AccountDisplayData | undefined,
     setTarget: (target: ContextMenuTarget) => void,
     updateCopilot?: (selection: BooqSelection) => void,
 }) {
-    const isOwnNote = self?.id === note.author?.id
+    const isOwnNote = user?.id === note.author?.id
     const selection = {
         range: note.range,
         text: note.text,
@@ -106,10 +106,10 @@ function NoteTargetMenu({
             />
         }
         {!isOwnNote ? null :
-            <SelectNoteColorItem  {...rest} self={self} note={note} />
+            <SelectNoteColorItem  {...rest} user={user} note={note} />
         }
         {!isOwnNote ? null :
-            <RemoveNoteItem  {...rest} self={self} note={note} />
+            <RemoveNoteItem  {...rest} user={user} note={note} />
         }
         <CopilotItem {...rest} selection={selection} />
         <CopyQuoteItem {...rest} selection={selection} />
@@ -175,15 +175,15 @@ function AuthorItem({ name, pictureUrl }: {
 }
 
 function AddNoteItem({
-    selection, booqId, self, setTarget,
+    selection, booqId, user, setTarget,
 }: {
     selection: BooqSelection,
     booqId: string,
-    self: AccountDisplayData | undefined,
+    user: AccountDisplayData | undefined,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
-    const { addNote } = useBooqNotes({ booqId, self })
-    if (!self?.id) {
+    const { addNote } = useBooqNotes({ booqId, user })
+    if (!user?.id) {
         return null
     }
     return <div className='container'>
@@ -229,14 +229,14 @@ function AddNoteItem({
 }
 
 function RemoveNoteItem({
-    note, booqId, setTarget, self,
+    note, booqId, setTarget, user,
 }: {
     note: BooqNote,
     booqId: string,
-    self: AccountDisplayData,
+    user: AccountDisplayData,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
-    const { removeNote } = useBooqNotes({ booqId, self })
+    const { removeNote } = useBooqNotes({ booqId, user })
     return <MenuItem
         text='Remove'
         icon={<ContextMenuIcon><RemoveIcon /></ContextMenuIcon>}
@@ -248,14 +248,14 @@ function RemoveNoteItem({
 }
 
 function SelectNoteColorItem({
-    note, booqId, setTarget, self,
+    note, booqId, setTarget, user,
 }: {
     note: BooqNote,
     booqId: string,
-    self: AccountDisplayData,
+    user: AccountDisplayData,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
-    const { updateNote } = useBooqNotes({ booqId, self })
+    const { updateNote } = useBooqNotes({ booqId, user })
     return <div className='container'>
         {
             noteColorNames.map(

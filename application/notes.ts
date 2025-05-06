@@ -9,10 +9,10 @@ import useSWRMutation from 'swr/mutation'
 import { v4 as uuidv4 } from 'uuid'
 
 export function useBooqNotes({
-    booqId, self,
+    booqId, user,
 }: {
     booqId: string,
-    self: AccountDisplayData | undefined,
+    user: AccountDisplayData | undefined,
 }) {
     const notesKey = `/api/booq/${booqId}/notes`
 
@@ -77,7 +77,7 @@ export function useBooqNotes({
         color: string,
         content?: string
     }) {
-        if (!self) return undefined
+        if (!user) return undefined
 
         const postBody: PostBody = {
             id: uuidv4(),
@@ -90,9 +90,9 @@ export function useBooqNotes({
         const now = new Date().toISOString()
         const optimisticResponse: PostResponse = {
             ...postBody,
-            author_id: self.id,
-            author_name: self.name ?? null,
-            author_profile_picture_url: self.profilePictureURL ?? null,
+            author_id: user.id,
+            author_name: user.name ?? null,
+            author_profile_picture_url: user.profilePictureURL ?? null,
             created_at: now,
             updated_at: now,
             booq_id: booqId,
@@ -134,7 +134,7 @@ export function useBooqNotes({
     )
 
     function removeNote({ noteId }: { noteId: string }) {
-        if (!self || !data) return false
+        if (!user || !data) return false
         deleteNoteTrigger(noteId, {
             optimisticData: (currentData: GetResponse | undefined): GetResponse =>
                 currentData
@@ -188,7 +188,7 @@ export function useBooqNotes({
         color?: string,
         content?: string,
     }) {
-        if (!self || !data) return
+        if (!user || !data) return
 
         const body: PatchBody = {
             color,

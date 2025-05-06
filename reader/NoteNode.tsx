@@ -7,9 +7,9 @@ import { booqHref } from '@/application/href'
 import Link from 'next/link'
 import { AccountDisplayData, BooqNote } from '@/core'
 
-export function NoteNodeComp({ booqId, note, self }: {
+export function NoteNodeComp({ booqId, note, user }: {
     booqId: string,
-    self: AccountDisplayData | undefined,
+    user: AccountDisplayData | undefined,
     note: BooqNote,
 }) {
     return <div className='container flex flex-1 justify-between pl-base' style={{
@@ -30,7 +30,7 @@ export function NoteNodeComp({ booqId, note, self }: {
                 content={<div className='w-48 pointer-events-auto text-primary'>
                     <ContextMenuContent
                         booqId={booqId}
-                        self={self}
+                        user={user}
                         setTarget={() => undefined}
                         target={{
                             kind: 'note',
@@ -40,8 +40,8 @@ export function NoteNodeComp({ booqId, note, self }: {
                 </div>}
             />
             <div className={clsx('mt-base', {
-                'hidden': self?.id === note.author.id,
-                'flex': self?.id !== note.author.id,
+                'hidden': user?.id === note.author.id,
+                'flex': user?.id !== note.author.id,
             })} title={note.author.name ?? undefined}>
             </div>
         </div>

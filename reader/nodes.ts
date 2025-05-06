@@ -18,20 +18,20 @@ export type PathNotesNode = {
 export type NavigationNode = TocNode | NoteNode | PathNotesNode
 
 export function buildNavigationNodes({
-    title, toc, selection, notes, self,
+    title, toc, selection, notes, user,
 }: {
     title: string
     toc: TableOfContentsItem[],
     notes: BooqNote[],
     selection: NavigationSelection,
-    self?: AccountDisplayData,
+    user?: AccountDisplayData,
 }) {
     const authors = notesAuthors(notes)
 
     const showChapters = selection.chapters
     const showNotes = selection.notes
     const filteredNotes = filterNotes({
-        notes, selection, self,
+        notes, selection, user,
     })
 
     const filter = showChapters
@@ -49,18 +49,18 @@ export function buildNavigationNodes({
 }
 
 export function filterNotes({
-    notes, selection, self,
+    notes, selection, user,
 }: {
     notes: BooqNote[],
     selection: NavigationSelection,
-    self: AccountDisplayData | undefined,
+    user: AccountDisplayData | undefined,
 }) {
     const showNotes = selection.notes
     const showAuthors = Object.entries(selection)
         .filter(([key]) => key.startsWith('author:'))
         .map(([key]) => key.split(':')[1])
-    const allAuthors = showNotes && self?.id
-        ? [self.id, ...showAuthors]
+    const allAuthors = showNotes && user?.id
+        ? [user.id, ...showAuthors]
         : showAuthors
     const filteredNotes = notes.filter(
         note => allAuthors.some(authorId => note.author.id === authorId)

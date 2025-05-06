@@ -32,7 +32,7 @@ export function useNavigationState() {
 }
 
 export function NavigationPanel({
-    booqId, self, title, toc, notes,
+    booqId, user, title, toc, notes,
     selection,
     toggleSelection, closeSelf,
 }: {
@@ -41,7 +41,7 @@ export function NavigationPanel({
     toc: TableOfContentsItem[],
     notes: BooqNote[],
     selection: NavigationSelection,
-    self?: AccountDisplayData,
+    user?: AccountDisplayData,
     toggleSelection: (item: string) => void,
     closeSelf: () => void,
 }) {
@@ -49,10 +49,10 @@ export function NavigationPanel({
         return buildNavigationNodes({
             title, toc, notes,
             selection,
-            self,
+            user,
         })
-    }, [title, toc, notes, selection, self])
-    const exceptSelf = authors.filter(a => a.id !== self?.id)
+    }, [title, toc, notes, selection, user])
+    const exceptSelf = authors.filter(a => a.id !== user?.id)
     return useMemo(() => {
         return <div className='flex flex-1' style={{
             padding: '0 env(safe-area-inset-right) 0 env(safe-area-inset-left)',
@@ -76,7 +76,7 @@ export function NavigationPanel({
                                     <div className='py-base' onClick={closeSelf}>
                                         <NavigationNodeComp
                                             booqId={booqId}
-                                            self={self}
+                                            user={user}
                                             node={node}
                                         />
                                     </div>
@@ -92,9 +92,9 @@ export function NavigationPanel({
     }, [nodes])
 }
 
-function NavigationNodeComp({ booqId, self, node }: {
+function NavigationNodeComp({ booqId, user, node }: {
     booqId: string,
-    self: AccountDisplayData | undefined,
+    user: AccountDisplayData | undefined,
     node: NavigationNode,
 }) {
     switch (node.kind) {
@@ -106,13 +106,13 @@ function NavigationNodeComp({ booqId, self, node }: {
         case 'note':
             return <NoteNodeComp
                 booqId={booqId}
-                self={self}
+                user={user}
                 note={node.note}
             />
         case 'notes':
             return <PathNotesNodeComp
                 booqId={booqId}
-                self={self}
+                user={user}
                 node={node}
             />
         default:

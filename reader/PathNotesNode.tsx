@@ -6,11 +6,11 @@ import Link from 'next/link'
 import { AccountDisplayData, TableOfContentsItem } from '@/core'
 
 export function PathNotesNodeComp({
-    booqId, self,
+    booqId, user,
     node: { items, notes },
 }: {
     booqId: string,
-    self: AccountDisplayData | undefined,
+    user: AccountDisplayData | undefined,
     node: PathNotesNode,
 }) {
     return <div>
@@ -21,7 +21,7 @@ export function PathNotesNodeComp({
                     <div key={hl.id} className='my-base'>
                         <NoteNodeComp
                             booqId={booqId}
-                            self={self}
+                            user={user}
                             note={hl}
                         />
                     </div>

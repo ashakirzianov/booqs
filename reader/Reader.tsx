@@ -35,7 +35,7 @@ export function Reader({
     const pathname = usePathname()
     const { user, isLoading: isAuthLoading } = useAuth()
     const fontScale = useFontScale()
-    const { notes } = useBooqNotes({ booqId: booq.id, self: user })
+    const { notes } = useBooqNotes({ booqId: booq.id, user })
     const resolvedNotes = useMemo(() => {
         return notes.map<BooqNote>(note => ({
             ...note,
@@ -80,7 +80,7 @@ export function Reader({
         toc={booq.toc.items}
         notes={resolvedNotes}
         selection={navigationSelection}
-        self={user}
+        user={user}
         toggleSelection={toggleNavigationSelection}
         closeSelf={closeNavigation}
     />
@@ -95,7 +95,7 @@ export function Reader({
         () => filterNotes({
             notes: resolvedNotes,
             selection: navigationSelection,
-            self: user,
+            user,
         }), [resolvedNotes, navigationSelection, user]
     )
 
@@ -119,7 +119,7 @@ export function Reader({
         updateMenuState: setMenuState,
     } = useContextMenu({
         booqId: booq.id,
-        self: user,
+        user,
         closed: copilotState.kind !== 'empty',
         updateCopilot(selection, anchor) {
             setCopilotState({
