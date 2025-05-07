@@ -12,23 +12,6 @@ CREATE TABLE IF NOT EXISTS users (
   joined_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- pg_cards
-CREATE TABLE IF NOT EXISTS pg_cards (
-  id TEXT PRIMARY KEY,
-  asset_id TEXT NOT NULL,
-  length INTEGER,
-  title TEXT NOT NULL,
-  authors TEXT[] NOT NULL,
-  language TEXT,
-  description TEXT,
-  subjects TEXT[],
-  cover TEXT,
-  metadata JSONB DEFAULT '{}'::jsonb,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  searchable_tsv TSVECTOR
-);
-CREATE INDEX IF NOT EXISTS pg_cards_search_idx ON pg_cards USING GIN (searchable_tsv);
-
 -- uu_cards
 CREATE TABLE IF NOT EXISTS uu_cards (
   id TEXT PRIMARY KEY,
