@@ -1,9 +1,9 @@
 import { inspect } from 'util'
 import { makeBatches } from './utils'
-import { Booq, filterUndefined, nodesLength } from '@/core'
+import { filterUndefined } from '@/core'
 import { Asset, downloadAsset, listObjects } from './s3'
 import {
-    existingAssetIds, pgEpubsBucket, insertCard,
+    existingAssetIds, pgEpubsBucket, insertAssetRecord,
 } from './pg'
 import { parseEpub } from '@/parser'
 import { uploadBooqImages } from './images'
@@ -91,54 +91,12 @@ async function downloadAndInsert(assetId: string) {
         await reportProblem(assetId, 'Parsing errors', diags)
         return
     }
-    const document = await insertRecord(booq, assetId)
+    const document = await insertAssetRecord({ booq, assetId })
     if (document) {
         return {
             id: document.id,
             booq,
         }
-    } else {
-        return undefined
-    }
-}
-
-async function insertRecord(booq: Booq, assetId: string) {
-    const index = indexFromAssetId(assetId)
-    if (index === undefined) {
-        report(`Invalid asset id: ${assetId}`)
-        await reportProblem(assetId, 'Bad asset id', assetId)
-        return undefined
-    }
-    const {
-        title, authors, subjects, languages, descriptions, cover,
-        rights, contributors,
-        tags,
-    } = booq.meta
-    const length = nodesLength(booq.nodes)
-    return insertCard({
-        asset_id: assetId,
-        id: index,
-        length,
-        subjects,
-        title: title ?? 'Untitled',
-        authors: authors,
-        language: languages[0],
-        description: descriptions[0],
-        cover: cover?.href ?? null,
-        metadata: {
-            rights,
-            contributors,
-            tags,
-        },
-    })
-}
-
-function indexFromAssetId(assetId: string) {
-    const match = assetId.match(/^pg(\d+)/)
-    if (match) {
-        const indexString = match[1]
-        const index = parseInt(indexString, 10)
-        return isNaN(index) ? undefined : indexString
     } else {
         return undefined
     }

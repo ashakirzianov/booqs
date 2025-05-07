@@ -1,6 +1,7 @@
 import type { InLibraryCard, Library, InLibrarySearchResult } from './library'
 import { downloadAsset } from './s3'
 import { sql } from './db'
+import { Booq } from '@/core'
 
 export const pgLibrary: Library = {
   search,
@@ -121,7 +122,50 @@ export async function existingAssetIds(): Promise<string[]> {
   return result.map(row => row.asset_id)
 }
 
-export async function insertCard(card: Omit<DbPgCard, 'searchable_tsv' | 'created_at'>): Promise<DbPgCard | null> {
+export async function insertAssetRecord({ booq, assetId }: {
+  booq: Booq,
+  assetId: string,
+}) {
+  const index = indexFromAssetId(assetId)
+  if (index === undefined) {
+    return undefined
+  }
+  const {
+    title, authors, subjects, languages, descriptions, cover,
+    rights, contributors,
+    tags,
+  } = booq.meta
+  const length = booq.toc.length
+  return insertCard({
+    asset_id: assetId,
+    id: index,
+    length,
+    subjects,
+    title: title ?? 'Untitled',
+    authors: authors,
+    language: languages[0],
+    description: descriptions[0],
+    cover: cover?.href ?? null,
+    metadata: {
+      rights,
+      contributors,
+      tags,
+    },
+  })
+}
+
+function indexFromAssetId(assetId: string) {
+  const match = assetId.match(/^pg(\d+)/)
+  if (match) {
+    const indexString = match[1]
+    const index = parseInt(indexString, 10)
+    return isNaN(index) ? undefined : indexString
+  } else {
+    return undefined
+  }
+}
+
+async function insertCard(card: Omit<DbPgCard, 'searchable_tsv' | 'created_at'>): Promise<DbPgCard | null> {
   const [inserted] = await sql`
       INSERT INTO pg_cards (
         id,
