@@ -1,7 +1,6 @@
 import { GetResponse } from '@/app/api/search/route'
 import useSWR from 'swr'
 
-
 export function useSearch({ query }: {
     query: string,
 }) {

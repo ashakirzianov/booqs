@@ -3,9 +3,10 @@ import { uploadAsset } from './s3'
 import { Booq, BooqId } from '@/core'
 
 const bucket = 'booqs-images'
-const coverSizes = [60, 120, 210]
+const coverSizes = [60, 120, 210] as const
+export type CoverSize = typeof coverSizes[number]
 
-export function booqImageUrl(booqId: BooqId, src: string, size?: number) {
+export function booqImageUrl(booqId: BooqId, src: string, size?: CoverSize) {
     const base = `https://${bucket}.s3.amazonaws.com/${booqId}/${src}`
     return size ? `${base}@${size}` : base
 }
@@ -14,8 +15,8 @@ export async function uploadBooqImages(booqId: BooqId, booq: Booq) {
     const allImages = Object.entries(booq.images).map(
         ([src, base64]) => uploadImage(base64, booqId, src),
     )
-    if (typeof booq.meta.cover === 'string') {
-        const coverSrc = booq.meta.cover
+    if (typeof booq.meta.coverSrc === 'string') {
+        const coverSrc = booq.meta.coverSrc
         const coverBuffer = booq.images[coverSrc]
         if (coverBuffer) {
             const covers = coverSizes.map(

@@ -1,4 +1,4 @@
-import { BooqNode, Booq } from '../core'
+import { BooqNode, Booq, nodesLength } from '../core'
 import { EpubPackage } from './epub'
 import { parseSection } from './section'
 import { buildImages } from './images'
@@ -23,13 +23,14 @@ export async function processEpub(epub: EpubPackage, diags: Diagnoser): Promise<
 
     const prepocessed = preprocess(nodes)
 
+    const length = nodesLength(nodes)
     return {
         nodes: prepocessed,
         meta,
+        length,
         toc: toc ?? {
             title: undefined,
             items: [],
-            length: 0,
         },
         images: images ?? {},
     }

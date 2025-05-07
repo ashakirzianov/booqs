@@ -98,8 +98,8 @@ function CopilotSelectedContent({ state, data }: {
         context: state.context,
         booqId: data.id,
         title: data.meta.title ?? 'Unknown',
-        author: data.meta.authors[0] ?? 'Unknown author',
-        language: data.meta.languages[0] ?? 'en-US',
+        author: data.meta.authors?.join(', ') ?? 'Unknown author',
+        language: data.meta.languages?.[0] ?? 'en-US',
         start: state.selection.range.start,
         end: state.selection.range.end,
     }

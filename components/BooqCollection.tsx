@@ -2,12 +2,13 @@ import { BooqCard } from '@/components/BooqCard'
 import Link from 'next/link'
 import { booqHref } from '../application/href'
 import { CollectionButton } from './CollectionButton'
-import type { BooqId, BooqLibraryCard } from '@/core'
+import type { BooqId } from '@/core'
+import { BooqCardData } from '@/data/booqs'
 export function BooqCollection({
     cards, title, collection, signed,
 }: {
     title?: string,
-    cards: BooqLibraryCard[],
+    cards: BooqCardData[],
     collection?: string,
     signed: boolean,
 }) {

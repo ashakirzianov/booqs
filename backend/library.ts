@@ -14,8 +14,9 @@ export type BookFile = {
     file: Buffer,
 }
 export type InLibrarySearchResult = AuthorSearchResult
-    | Omit<BooqSearchResult, 'card'> & {
-        card: InLibraryCard,
+    | Omit<BooqSearchResult, 'id' | 'coverUrl'> & {
+        id: InLibraryId,
+        coverSrc: string | undefined,
     }
 export type Library = {
     search(query: string, limit: number): Promise<InLibrarySearchResult[]>,
@@ -137,12 +138,13 @@ export async function fileForId(booqId: BooqId) {
 }
 
 function processSearchResult(prefix: string) {
-    const cardProcessor = processCard(prefix)
     return function (result: InLibrarySearchResult): SearchResult {
-        if (result.kind === 'book') {
+        if (result.kind === 'booq') {
+            const { id, ...rest } = result
+            const booqId = makeId(prefix, result.id)
             return {
-                ...result,
-                card: cardProcessor(result.card),
+                ...rest,
+                id: booqId,
             }
         } else {
             return result

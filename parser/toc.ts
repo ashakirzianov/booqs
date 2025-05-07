@@ -1,6 +1,6 @@
 import { Diagnoser } from 'booqs-epub'
 import {
-    BooqNode, TableOfContentsItem, TableOfContents, findPathForId, nodesLength, positionForPath,
+    BooqNode, TableOfContentsItem, TableOfContents, findPathForId, positionForPath,
 } from '../core'
 import { EpubPackage } from './epub'
 import { transformHref } from './parserUtils'
@@ -32,7 +32,6 @@ export async function buildToc(nodes: BooqNode[], file: EpubPackage, diags: Diag
     return {
         title,
         items,
-        length: nodesLength(nodes), // TODO: implement
     }
 }
 

@@ -1,24 +1,23 @@
 import { EpubPackage } from './epub'
-import { BooqMeta } from '../core'
+import { BooqMeta, BooqMetaTag } from '../core'
 import { Diagnoser } from 'booqs-epub'
 
 export function buildMeta(epub: EpubPackage, diags?: Diagnoser): BooqMeta {
     const pkgMeta = epub.metadata
     const result: BooqMeta = {
         title: undefined,
-        authors: [],
-        languages: [],
-        contributors: [],
-        descriptions: [],
-        subjects: [],
+        authors: undefined,
+        languages: undefined,
+        contributors: undefined,
+        description: undefined,
+        subjects: undefined,
         rights: undefined,
-        tags: [],
+        tags: undefined,
+        coverSrc: undefined,
     }
     const cover = pkgMeta.items.find(i => i.name === 'cover')
     if (cover) {
-        result.cover = {
-            href: cover.href,
-        }
+        result.coverSrc = cover.href
     }
     const titles: string[] = []
     for (let [key, value] of Object.entries(pkgMeta.fields)) {
@@ -46,18 +45,34 @@ export function buildMeta(epub: EpubPackage, diags?: Diagnoser): BooqMeta {
                 titles.push(...texts)
                 break
             case 'creator':
+                if (!result.authors) {
+                    result.authors = []
+                }
                 result.authors.push(...texts)
                 break
             case 'contributor':
+                if (!result.contributors) {
+                    result.contributors = []
+                }
                 result.contributors.push(...texts)
                 break
             case 'language':
+                if (!result.languages) {
+                    result.languages = []
+                }
                 result.languages.push(...texts)
                 break
             case 'description':
-                result.descriptions.push(...texts)
+                if (!result.description) {
+                    result.description = texts.join(' ,')
+                } else {
+                    result.description += ', ' + texts.join(', ')
+                }
                 break
             case 'subject':
+                if (!result.subjects) {
+                    result.subjects = []
+                }
                 result.subjects.push(...texts.map(v => v.split(' -- ')).flat())
                 break
             case 'rights':
@@ -73,28 +88,25 @@ export function buildMeta(epub: EpubPackage, diags?: Diagnoser): BooqMeta {
                 break
             case 'date': {
                 const vals = value
-                    .map(v => {
+                    .map((v): BooqMetaTag => {
                         const event = v['@opf:event']
                         if (event) {
-                            return {
-                                name: event,
-                                value: v['#text'] ?? '',
-                            }
+                            return [event, v['#text'] ?? '']
                         } else {
-                            return {
-                                name: 'date',
-                                value: v['#text'] ?? '',
-                            }
+                            return ['date', v['#text'] ?? '']
                         }
                     })
+                if (!result.tags) {
+                    result.tags = []
+                }
                 result.tags.push(...vals)
             }
                 break
             default:
-                result.tags.push({
-                    name: key,
-                    value: texts.join(' '),
-                })
+                if (!result.tags) {
+                    result.tags = []
+                }
+                result.tags.push([key, texts.join(', ')])
 
         }
     }

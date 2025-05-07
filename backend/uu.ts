@@ -3,7 +3,7 @@ import { ReadStream } from 'fs'
 import { inspect } from 'util'
 import type { InLibraryCard, Library, InLibrarySearchResult } from './library'
 import { parseEpub } from '@/parser'
-import { Booq, nodesLength } from '@/core'
+import { Booq, BooqMetaTag, nodesLength } from '@/core'
 import { nanoid } from 'nanoid'
 import { deleteAsset, downloadAsset, uploadAsset } from './s3'
 import { sql } from './db'
@@ -21,16 +21,19 @@ export const userUploadedEpubsBucket = 'uu-epubs'
 export type DbUuCard = {
     id: string,
     asset_id: string,
-    length: number | null,
-    title: string,
-    authors: string[],
-    language: string | null,
+    length: number,
+    title: string | null,
+    authors: string[] | null,
+    languages: string[] | null,
     description: string | null,
     subjects: string[] | null,
-    cover: string | null,
-    metadata: any,
+    cover_src: string | null,
+    contributors: string[] | null,
+    rights: string | null,
+    tags: string[] | null,
     file_hash: string,
-    created_at: string,
+    created_at: `${string}T${string}`,
+    searchable_tsv?: string | null,
 }
 
 export async function uploadsForUserId(userId: string): Promise<DbUuCard[]> {
@@ -80,16 +83,14 @@ export async function search(query: string, limit = 20, offset = 0): Promise<InL
           similarity(title, ${query}) * 5 +
           greatest_similarity(authors, ${query}) * 4 +
           greatest_similarity(subjects, ${query}) * 3 +
-          similarity(description, ${query}) * 2 +
-          similarity(jsonb_to_text(metadata), ${query})
+          similarity(description, ${query}) * 2
         ) AS score
       FROM uu_cards
       WHERE
         title % ${query} OR
         exists_similarity(authors, ${query}) OR
         exists_similarity(subjects, ${query}) OR
-        description % ${query} OR
-        jsonb_to_text(metadata) % ${query}
+        description % ${query}
     )
     SELECT * FROM ranked_cards
     ORDER BY score DESC
@@ -98,8 +99,11 @@ export async function search(query: string, limit = 20, offset = 0): Promise<InL
     const cards = rows as DbUuCard[]
     const libCards = cards.map(convertToLibraryCard)
     const results = libCards.map(card => ({
-        kind: 'book' as const,
-        card,
+        kind: 'booq' as const,
+        id: card.id,
+        title: card.title,
+        authors: card.authors,
+        coverSrc: card.coverSrc,
     }))
     return results
 }
@@ -114,6 +118,7 @@ export async function uploadEpub(fileBuffer: Buffer, userId: string) {
         })
         return {
             card: convertToLibraryCard(existing),
+            booq: undefined,
         }
     }
 
@@ -165,19 +170,15 @@ async function insertRecord({ booq, assetId, fileHash }: {
     fileHash: string,
 }): Promise<DbUuCard | null> {
     const {
-        title, authors, subjects, languages, descriptions, cover,
+        title, authors, subjects, languages, description, coverSrc,
         rights, contributors,
         tags,
     } = booq.meta
-    if (rights) {
-        tags.push({ name: 'rights', value: rights })
-    }
-    if (contributors) {
-        tags.push({ name: 'contributors', value: contributors.join(', ') })
-    }
     const id = nanoid(10)
     const length = nodesLength(booq.nodes)
-    // TODO: support multiple languages
+    const tagArray = tags
+        ? tags.map(serializeTag)
+        : undefined
     const query = sql`
       INSERT INTO uu_cards (
         id,
@@ -185,24 +186,28 @@ async function insertRecord({ booq, assetId, fileHash }: {
         length,
         title,
         authors,
-        language,
+        languages,
         description,
         subjects,
-        cover,
-        metadata,
+        rights,
+        contributors,
+        cover_src,
+        tags,
         file_hash
       )
       VALUES (
         ${id},
         ${assetId},
         ${length},
-        ${title},
-        ${authors},
-        ${languages?.join(', ') ?? null},
-        ${descriptions?.join('\n') ?? null},
-        ${subjects ?? []},
-        ${cover?.href ?? null},
-        ${{ tags }},
+        ${title ?? null},
+        ${authors ?? null},
+        ${languages ?? null},
+        ${description ?? null},
+        ${subjects ?? null},
+        ${rights ?? null},
+        ${contributors ?? null},
+        ${coverSrc ?? null},
+        ${tagArray ?? null},
         ${fileHash}
       )
       ON CONFLICT (id) DO NOTHING
@@ -303,11 +308,11 @@ async function deleteAllUploadRecordsForUserId(userId: string): Promise<boolean>
 async function deleteCards(ids: string[]): Promise<boolean> {
     if (ids.length === 0) return false
 
-    const rows = await sql`
+    await sql`
       DELETE FROM uu_cards
       WHERE id = ANY(${ids})
     `
-    return rows.length > 0
+    return true
 }
 
 async function getAllBooksWithoutUploadUsers(): Promise<DbUuCard[]> {
@@ -324,12 +329,29 @@ function convertToLibraryCard(doc: DbUuCard): InLibraryCard {
     return {
         id: doc.id,
         length: doc.length ?? 0,
-        title: doc.title,
-        authors: doc.authors,
-        languages: doc.language ? [doc.language] : [],
+        title: doc.title ?? undefined,
+        authors: doc.authors ?? undefined,
+        languages: doc.languages ?? undefined,
         description: doc.description ?? undefined,
-        subjects: doc.subjects ?? [],
-        coverUrl: doc.cover ?? undefined,
-        tags: [],
+        subjects: doc.subjects ?? undefined,
+        contributors: doc.contributors ?? undefined,
+        rights: doc.rights ?? undefined,
+        coverSrc: doc.cover_src ?? undefined,
+        tags: doc.tags
+            ? doc.tags.map(deserializeTag)
+            : undefined,
+    }
+}
+
+function serializeTag(tag: BooqMetaTag): string {
+    return JSON.stringify(tag)
+}
+
+function deserializeTag(tagString: string): BooqMetaTag {
+    try {
+        return JSON.parse(tagString) as BooqMetaTag
+    } catch (e) {
+        console.error('Failed to deserialize tag:', e)
+        return [tagString]
     }
 }

@@ -13,16 +13,17 @@ export const pgLibrary: Library = {
 export const pgEpubsBucket = 'pg-epubs'
 
 type DbPgCard = {
-  asset_id: string,
+  assetId: string,
   length: number,
-  title: string | null,
-  authors: string[],
-  languages: string[],
-  subjects: string[],
-  description: string | null,
-  cover_url: string | null,
-  rights: string | null,
-  tags: Array<[key: string, value?: string]>,
+  title: string | undefined,
+  authors: string[] | undefined,
+  languages: string[] | undefined,
+  subjects: string[] | undefined,
+  description: string | undefined,
+  contributors: string[] | undefined,
+  coverSrc: string | undefined,
+  rights: string | undefined,
+  tags: Array<[key: string, value?: string]> | undefined,
 }
 
 export async function cards(ids: string[]): Promise<InLibraryCard[]> {
@@ -41,11 +42,11 @@ export async function search(query: string, _limit = 20, _offset = 0): Promise<I
 }
 
 export async function fileForId(id: string) {
-  const asset_id = await redis.hget<DbPgCard['asset_id']>(`library:pg:cards:${id}`, 'asset_id')
-  if (!asset_id) {
+  const assetId = await redis.hget<DbPgCard['assetId']>(`library:pg:cards:${id}`, 'assetId')
+  if (!assetId) {
     return undefined
   } else {
-    const asset = await downloadAsset(pgEpubsBucket, asset_id)
+    const asset = await downloadAsset(pgEpubsBucket, assetId)
     return Buffer.isBuffer(asset)
       ? { kind: 'epub', file: asset } as const
       : undefined
@@ -65,23 +66,24 @@ export async function insertAssetRecord({ booq, assetId }: {
     return undefined
   }
   const {
-    title, authors, subjects, languages, descriptions, cover,
-    rights,
-    // contributors, tags,
+    title, authors, subjects, languages, description, coverSrc,
+    rights, contributors, tags,
   } = booq.meta
-  const length = booq.toc.length
   const success = await insertDbCard(`${index}`, {
-    asset_id: assetId,
-    length,
+    assetId,
+    length: booq.length,
     subjects,
-    title: title ?? null,
-    authors: authors,
-    languages: languages,
-    description: descriptions.join('\n'),
-    cover_url: cover?.href ?? null,
-    rights: rights ?? null,
-    // TODO: support tags, rights and contributors
-    tags: [],
+    title: title,
+    authors,
+    languages,
+    description,
+    coverSrc: coverSrc,
+    rights,
+    contributors,
+    tags: [
+      ...(tags ?? []),
+      ['pg-index', `${index}`],
+    ],
   })
   if (success) {
     await redis.sadd('library:pg:asset_ids', assetId)
@@ -98,17 +100,16 @@ async function cardForId(id: string): Promise<InLibraryCard | undefined> {
   }
   return {
     id,
+    length: row.length,
     title: row.title ?? undefined,
     authors: row.authors,
     subjects: row.subjects,
     languages: row.languages,
-    description: row.description ?? undefined,
-    coverUrl: row.cover_url ?? undefined,
-    tags: row.tags.map(([key, value]) => ({
-      name: key,
-      value: value ?? undefined,
-    })),
-    length: row.length,
+    description: row.description,
+    contributors: row.contributors,
+    coverSrc: row.coverSrc,
+    rights: row.rights,
+    tags: row.tags,
   }
 }
 

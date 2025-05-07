@@ -1,3 +1,21 @@
+-- DROP TABLE IF EXISTS
+--   passkey_credentials,
+--   notes,
+--   bookmarks,
+--   user_collections_booqs,
+--   collections,
+--   uploads,
+--   uu_cards,
+--   users
+-- CASCADE;
+
+-- DROP FUNCTION IF EXISTS
+--   update_uu_cards_search_tsv,
+--   jsonb_to_text(jsonb),
+--   greatest_similarity(text[], text),
+--   exists_similarity(text[], text)
+-- CASCADE;
+
 CREATE EXTENSION IF NOT EXISTS citext;
 CREATE EXTENSION IF NOT EXISTS pg_trgm;
 CREATE EXTENSION IF NOT EXISTS unaccent;
@@ -17,19 +35,23 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE TABLE IF NOT EXISTS uu_cards (
   id TEXT PRIMARY KEY DEFAULT uuid_generate_v4()::TEXT,
   asset_id TEXT NOT NULL,
-  length INTEGER,
-  title TEXT NOT NULL,
-  authors TEXT[] NOT NULL,
-  language TEXT,
+  length INTEGER NOT NULL,
+  title TEXT,
+  authors TEXT[],
+  languages TEXT[],
   description TEXT,
   subjects TEXT[],
-  cover TEXT,
-  metadata JSONB DEFAULT '{}'::jsonb,
+  contributors TEXT[],
+  rights TEXT,
+  cover_src TEXT,
+  tags TEXT[],
   file_hash TEXT NOT NULL,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   searchable_tsv TSVECTOR
 );
 CREATE INDEX IF NOT EXISTS uu_cards_search_idx ON uu_cards USING GIN (searchable_tsv);
+CREATE INDEX IF NOT EXISTS uu_cards_file_hash_idx ON uu_cards(file_hash);
+CREATE INDEX IF NOT EXISTS uu_cards_asset_id_idx ON uu_cards(asset_id);
 
 -- Uploads
 CREATE TABLE IF NOT EXISTS uploads (
@@ -39,6 +61,8 @@ CREATE TABLE IF NOT EXISTS uploads (
   PRIMARY KEY (user_id, upload_id)
 );
 CREATE INDEX IF NOT EXISTS uploads_upload_id_idx ON uploads(upload_id);
+CREATE INDEX IF NOT EXISTS uploads_user_id_idx ON uploads(user_id);
+CREATE INDEX IF NOT EXISTS uploads_uploaded_at_idx ON uploads(uploaded_at);
 
 -- Collections
 CREATE TABLE IF NOT EXISTS collections (
@@ -85,6 +109,8 @@ CREATE TABLE IF NOT EXISTS notes (
 );
 CREATE INDEX IF NOT EXISTS notes_author_id_idx ON notes(author_id);
 CREATE INDEX IF NOT EXISTS notes_booq_id_idx ON notes(booq_id);
+CREATE INDEX IF NOT EXISTS notes_user_id_booq_id_idx ON notes(author_id, booq_id);
+CREATE INDEX IF NOT EXISTS notes_created_at_idx ON notes(created_at);
 
 -- Passkey credentials
 CREATE TABLE IF NOT EXISTS passkey_credentials (
@@ -93,8 +119,8 @@ CREATE TABLE IF NOT EXISTS passkey_credentials (
   public_key TEXT NOT NULL,
   counter INTEGER NOT NULL DEFAULT 0,
   transports TEXT[],
-  created_at TIMESTAMP DEFAULT now(),
-  updated_at TIMESTAMP DEFAULT now()
+  created_at TIMESTAMPTZ DEFAULT now(),
+  updated_at TIMESTAMPTZ DEFAULT now()
 );
 
 -- Full-text search helper functions
@@ -117,8 +143,7 @@ BEGIN
     setweight(to_tsvector('english', coalesce(NEW.title, '')), 'A') ||
     setweight(to_tsvector('english', array_to_string(NEW.authors, ' ')), 'B') ||
     setweight(to_tsvector('english', coalesce(NEW.description, '')), 'C') ||
-    setweight(to_tsvector('english', array_to_string(NEW.subjects, ' ')), 'D') ||
-    setweight(to_tsvector('english', coalesce(jsonb_to_text(NEW.metadata), '')), 'D');
+    setweight(to_tsvector('english', array_to_string(NEW.subjects, ' ')), 'D');
   RETURN NEW;
 END
 $$ LANGUAGE plpgsql;

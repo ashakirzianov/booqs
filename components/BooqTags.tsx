@@ -16,32 +16,32 @@ export function BooqTags({ tags }: {
     </div>
 }
 
-function BooqTagPill({ tag }: {
+function BooqTagPill({ tag: [name, value] }: {
     tag: BooqMetaTag,
 }) {
-    switch (tag.name.toLowerCase()) {
+    switch (name.toLowerCase()) {
         case 'language':
-            return tag.value
+            return value
                 ? <Pill
                     color="#4CAF50"
-                    label={tag.value.toUpperCase()}
+                    label={value.toUpperCase()}
                 />
                 : null
         case 'subject':
             return <Pill
                 color="#673AB7"
-                label={tag.value ?? 'subject'}
+                label={value ?? 'subject'}
             />
         case 'pg-index':
             return <Pill
                 color="pink"
                 label="Project Gutenberg"
-                title={tag.value ?? undefined}
+                title={value ?? undefined}
             />
         case 'pages':
             return <Pill
                 color='var(--theme-primary)'
-                label={`${tag.value} pages`}
+                label={`${value} pages`}
             />
         default:
             return null

@@ -3,8 +3,8 @@ import { BooqParent } from './booq'
 import { booqsForAuthor } from '@/backend/library'
 
 export type AuthorParent = {
-    name: string,
     kind: 'author',
+    name: string,
 }
 export const authorResolver: IResolvers<AuthorParent> = {
     Author: {

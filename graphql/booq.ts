@@ -3,24 +3,33 @@ import { BookmarkParent } from './bookmark'
 import { NoteParent } from './note'
 import { booqImageUrl } from '@/backend/images'
 import {
-    BooqLibraryCard, buildFragment, previewForPath, textForRange,
+    BooqId,
+    BooqLibraryCard,
+    buildFragment, previewForPath, textForRange,
 } from '@/core'
 import { getBookmarks } from '@/backend/bookmarks'
 import { notesFor } from '@/backend/notes'
 import { booqForId } from '@/backend/booq'
+import { libraryCardForId } from '@/backend/library'
 
-export type BooqParent = BooqLibraryCard & {
-    kind?: undefined,
+export type BooqParent = {
+    kind?: 'booq' | undefined,
+    id: BooqId,
+    coverSrc?: string | undefined,
 }
 export const booqResolver: IResolvers<BooqParent> = {
     Booq: {
         coverUrl(parent, { size }) {
-            return parent.coverUrl
-                ? booqImageUrl(parent.id, parent.coverUrl, size)
+            return parent.coverSrc
+                ? booqImageUrl(parent.id, parent.coverSrc, size)
                 : undefined
         },
-        tags(parent) {
-            return buildTags(parent)
+        async tags(parent) {
+            const card = await libraryCardForId(parent.id)
+            if (!card) {
+                return undefined
+            }
+            return buildTags(card)
         },
         async bookmarks(parent, _, { user }): Promise<BookmarkParent[]> {
             return user
@@ -79,16 +88,14 @@ type Tag = {
     tag: string,
     value?: string | null,
 }
-function buildTags(card: BooqParent): Tag[] {
+function buildTags(card: BooqLibraryCard): Tag[] {
     return [
         {
             tag: 'pages',
             value: Math.floor(card.length / 1500).toString(),
         },
-        !card.id.startsWith('pg/') ? undefined :
-            {
-                tag: 'pg-index',
-                value: card.id.substring('pg/'.length),
-            },
+        ...(card.tags ?? []).map(([tag, value]) => ({
+            tag, value,
+        }))
     ].filter(tag => tag !== undefined)
 }

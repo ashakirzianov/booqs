@@ -44,31 +44,26 @@ export type TableOfContentsItem = {
 export type TableOfContents = {
     title: string | undefined,
     items: TableOfContentsItem[],
-    length: number,
 }
 
-export type BooqMetaTag = {
-    name: string,
-    value?: string,
-}
+export type BooqMetaTag = [name: string, value?: string]
 export type BooqMeta = {
     title: string | undefined,
-    authors: string[],
-    languages: string[],
-    contributors: string[],
-    descriptions: string[],
-    subjects: string[],
+    authors: string[] | undefined,
+    languages: string[] | undefined,
+    contributors: string[] | undefined,
+    description: string | undefined,
+    subjects: string[] | undefined,
     rights: string | undefined,
-    cover?: {
-        href: string,
-    },
-    tags: BooqMetaTag[],
+    coverSrc: string | undefined,
+    tags: BooqMetaTag[] | undefined,
 }
 export type BooqImages = {
     [src: string]: string,
 }
 export type Booq = {
     nodes: BooqNode[],
+    length: number,
     meta: BooqMeta,
     toc: TableOfContents,
     images: BooqImages,

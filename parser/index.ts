@@ -46,7 +46,7 @@ export async function extractMetadata({ fileData, extractCover }: {
     }
     const metadata = buildMeta(epub, diags)
     if (extractCover) {
-        const coverHref = metadata.cover?.href
+        const coverHref = metadata.coverSrc
         if (typeof coverHref === 'string') {
             const coverBuffer = await epub.bufferResolver(coverHref)
             if (!coverBuffer) {

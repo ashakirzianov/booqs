@@ -1,5 +1,5 @@
 import { BooqFragment } from './fragment'
-import { BooqId, BooqMeta, BooqMetaTag, BooqRange, TableOfContents } from './model'
+import { BooqId, BooqMeta, BooqRange, TableOfContents } from './model'
 
 export type AccountData = {
     id: string,
@@ -28,17 +28,11 @@ export type PartialBooqData = {
     fragment: BooqFragment,
     meta: BooqMeta,
     toc: TableOfContents,
+    length: number,
 }
-export type BooqLibraryCard = {
+export type BooqLibraryCard = BooqMeta & {
     id: BooqId,
     length: number,
-    title?: string,
-    authors: string[],
-    languages: string[],
-    subjects: string[],
-    description?: string,
-    coverUrl?: string,
-    tags: BooqMetaTag[],
 }
 export type BooqCollection = {
     name: string,
@@ -47,11 +41,12 @@ export type BooqCollection = {
 export type SearchResult = AuthorSearchResult | BooqSearchResult
 export type AuthorSearchResult = {
     kind: 'author',
-    author: {
-        name: string,
-    },
+    name: string,
 }
 export type BooqSearchResult = {
-    kind: 'book',
-    card: BooqLibraryCard,
+    kind: 'booq',
+    id: BooqId,
+    title: string | undefined,
+    authors: string[] | undefined,
+    coverSrc: string | undefined,
 }

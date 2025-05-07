@@ -314,8 +314,7 @@ function useAugmentations({
     }
 }
 
-function useScrollHandler({ id, fragment, toc }: PartialBooqData) {
-    const length = toc.length
+function useScrollHandler({ id, fragment, length }: PartialBooqData) {
     const [currentPath, setCurrentPath] = useState(fragment.current.path)
 
     const position = positionForPath(fragment.nodes, currentPath)
