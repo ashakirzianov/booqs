@@ -1,4 +1,4 @@
-import { uniq } from 'lodash'
+import uniq from 'lodash-es/uniq'
 import { BooqNode, BooqImages, BooqMeta } from '../core'
 import { EpubPackage } from './epub'
 import { resolveRelativePath } from './path'

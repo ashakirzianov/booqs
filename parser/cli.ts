@@ -3,10 +3,8 @@
 import { existsSync, lstat, readdir, writeFile, readFile } from 'fs'
 import { extname, join } from 'path'
 import { promisify, inspect } from 'util'
-import { flatten } from 'lodash'
 import { Booq } from '../core'
 import { parseEpub } from './index'
-import { diagnoser } from 'booqs-epub'
 
 exec()
 
@@ -65,11 +63,10 @@ async function listFiles(path: string): Promise<string[]> {
     const isDirectory = (await promisify(lstat)(path)).isDirectory()
     if (isDirectory) {
         const files = await promisify(readdir)(path)
-        return flatten(
-            await Promise.all(
-                files.map(f => listFiles(join(path, f))),
-            ),
+        const all = await Promise.all(
+            files.map(f => listFiles(join(path, f))),
         )
+        return all.flat()
     } else {
         return [path]
     }

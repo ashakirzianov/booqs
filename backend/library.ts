@@ -1,5 +1,5 @@
 import { AuthorSearchResult, BooqLibraryCard, BooqSearchResult, filterUndefined, InLibraryId, LibraryId, makeId, parseId, SearchResult } from '@/core'
-import { groupBy } from 'lodash'
+import groupBy from 'lodash-es/groupBy'
 import { Booq } from '../core'
 import { pgLibrary } from './pg'
 import { uploadBooqImages } from './images'
