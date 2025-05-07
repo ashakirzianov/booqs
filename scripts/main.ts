@@ -1,13 +1,11 @@
-import { pgSyncWorker } from '@/backend/sync'
+import { syncWithGutenberg } from '@/backend/sync'
 
 
 async function main() {
     console.info('Running script in Next.js context')
     console.info('Running pg sync: S3 to Store...')
-    const total = await pgSyncWorker({
-        batchSize: 100,
-    })
-    console.info(`Finished running pg sync: ${total}`)
+    await syncWithGutenberg()
+    console.info(`Finished running pg sync`)
 }
 
 main().catch((err) => {

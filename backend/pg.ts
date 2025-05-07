@@ -53,23 +53,20 @@ export async function fileForId(id: string) {
   }
 }
 
-export async function existingAssetIds(): Promise<string[]> {
-  return redis.smembers('library:pg:asset_ids')
+export async function existingIds(): Promise<number[]> {
+  return redis.smembers('library:pg:ids')
 }
 
-export async function insertAssetRecord({ booq, assetId }: {
+export async function insertPgRecord({ booq, assetId, id }: {
   booq: Booq,
   assetId: string,
+  id: string,
 }) {
-  const index = indexFromAssetId(assetId)
-  if (index === undefined) {
-    return undefined
-  }
   const {
     title, authors, subjects, languages, description, coverSrc,
     rights, contributors, tags,
   } = booq.meta
-  const success = await insertDbCard(`${index}`, {
+  const success = await insertDbCard(id, {
     assetId,
     length: booq.length,
     subjects,
@@ -82,12 +79,12 @@ export async function insertAssetRecord({ booq, assetId }: {
     contributors,
     tags: [
       ...(tags ?? []),
-      ['pg-index', `${index}`],
+      ['pg-index', `${id}`],
     ],
   })
   if (success) {
-    await redis.sadd('library:pg:asset_ids', assetId)
-    return { id: `${index}` }
+    await redis.sadd('library:pg:ids', id)
+    return { id }
   } else {
     console.error('Could not insert record: ', assetId)
     return undefined
@@ -117,15 +114,4 @@ async function cardForId(id: string): Promise<InLibraryCard | undefined> {
 async function insertDbCard(id: string, card: DbPgCard): Promise<boolean> {
   await redis.hset(`library:pg:cards:${id}`, sanitizeForRedisHash(card))
   return true
-}
-
-function indexFromAssetId(assetId: string): number | undefined {
-  const match = assetId.match(/^pg(\d+)/)
-  if (match) {
-    const indexString = match[1]
-    const index = parseInt(indexString, 10)
-    return isNaN(index) ? undefined : index
-  } else {
-    return undefined
-  }
 }
