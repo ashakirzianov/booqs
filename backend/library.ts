@@ -1,4 +1,4 @@
-import { AuthorSearchResult, BooqLibraryCard, BooqSearchResult, InLibraryId, LibraryId, makeId, parseId, SearchResult } from '@/core'
+import { AuthorSearchResult, BooqId, BooqLibraryCard, BooqSearchResult, InLibraryId, LibraryId, makeId, parseId, SearchResult } from '@/core'
 import groupBy from 'lodash-es/groupBy'
 import { Booq } from '../core'
 import { pgLibrary } from './pg'
@@ -128,7 +128,7 @@ export async function searchBooqs(query: string, limit: number): Promise<SearchR
     return all.flat()
 }
 
-export async function fileForId(booqId: string) {
+export async function fileForId(booqId: BooqId) {
     const [prefix, id] = parseId(booqId)
     const library = libraries[prefix]
     return library && id

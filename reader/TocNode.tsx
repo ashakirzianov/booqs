@@ -2,12 +2,13 @@ import { pageForPosition } from '@/application/common'
 import { TocNode } from './nodes'
 import Link from 'next/link'
 import { booqHref } from '@/application/href'
+import { BooqId } from '@/core'
 
 
 export function TocNodeComp({
     booqId, node: { item: { path, title, position } },
 }: {
-    booqId: string,
+    booqId: BooqId,
     node: TocNode,
 }) {
     return <>

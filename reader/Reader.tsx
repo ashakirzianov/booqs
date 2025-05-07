@@ -2,7 +2,7 @@
 import '@/app/wdyr'
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { BooqAnchor, BooqNote, BooqPath, BooqRange, contextForRange, PartialBooqData, pathToId, positionForPath, samePath, textForRange } from '@/core'
+import { BooqAnchor, BooqId, BooqNote, BooqPath, BooqRange, contextForRange, PartialBooqData, pathToId, positionForPath, samePath, textForRange } from '@/core'
 import { BorderButton, PanelButton } from '@/components/Buttons'
 import { booqHref, feedHref } from '@/application/href'
 import {
@@ -345,7 +345,7 @@ function useScrollHandler({ id, fragment, toc }: PartialBooqData) {
 }
 
 function AnchorButton({ booqId, anchor, title }: {
-    booqId: string,
+    booqId: BooqId,
     anchor?: BooqAnchor,
     title: string,
 }) {

@@ -2,7 +2,7 @@ import { BooqCard } from '@/components/BooqCard'
 import Link from 'next/link'
 import { booqHref } from '../application/href'
 import { CollectionButton } from './CollectionButton'
-import type { BooqLibraryCard } from '@/core'
+import type { BooqId, BooqLibraryCard } from '@/core'
 export function BooqCollection({
     cards, title, collection, signed,
 }: {
@@ -47,7 +47,7 @@ export function BooqCollection({
 }
 
 function ReadButton({ booqId }: {
-    booqId: string,
+    booqId: BooqId,
 }) {
     return <Link href={booqHref({ id: booqId, path: [0] })}>
         <span className='text-action underline text-lg cursor-pointer transition duration-300 hover:text-highlight'>

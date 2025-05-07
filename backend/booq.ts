@@ -1,10 +1,10 @@
-import { Booq, BooqPath, pathToString, positionForPath, previewForPath, textForRange } from '@/core'
+import { Booq, BooqId, BooqPath, pathToString, positionForPath, previewForPath, textForRange } from '@/core'
 import { redis } from './db'
 import { logTime, logTimeAsync } from './utils'
 import { parseEpub } from '@/parser'
 import { fileForId } from './library'
 
-export async function booqForId(booqId: string) {
+export async function booqForId(booqId: BooqId) {
     const cached = await redis.get<Booq>(`cache:booq:${booqId}`)
     if (cached) {
         return cached
@@ -20,7 +20,7 @@ export async function booqForId(booqId: string) {
 }
 
 export type BooqPreview = {
-    booqId: string,
+    booqId: BooqId,
     path: BooqPath,
     title?: string,
     text: string,
@@ -28,7 +28,7 @@ export type BooqPreview = {
     position: number,
 }
 const PREVIEW_LENGTH = 500
-export async function booqPreview(booqId: string, path: BooqPath, end?: BooqPath): Promise<BooqPreview | undefined> {
+export async function booqPreview(booqId: BooqId, path: BooqPath, end?: BooqPath): Promise<BooqPreview | undefined> {
     const key = `cache:booq:${booqId}:preview:${pathToString(path)}${end ? `:${pathToString(end)}` : ''}`
     const cached = await redis.get<BooqPreview>(key)
     if (cached) {
@@ -62,7 +62,7 @@ export async function booqPreview(booqId: string, path: BooqPath, end?: BooqPath
     return preview
 }
 
-async function parseBooqForId(booqId: string) {
+async function parseBooqForId(booqId: BooqId) {
     const file = await fileForId(booqId)
     if (!file) {
         return undefined

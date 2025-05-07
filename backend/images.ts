@@ -1,16 +1,16 @@
 import sharp from 'sharp'
 import { uploadAsset } from './s3'
-import { Booq } from '@/core'
+import { Booq, BooqId } from '@/core'
 
 const bucket = 'booqs-images'
 const coverSizes = [60, 120, 210]
 
-export function booqImageUrl(booqId: string, src: string, size?: number) {
+export function booqImageUrl(booqId: BooqId, src: string, size?: number) {
     const base = `https://${bucket}.s3.amazonaws.com/${booqId}/${src}`
     return size ? `${base}@${size}` : base
 }
 
-export async function uploadBooqImages(booqId: string, booq: Booq) {
+export async function uploadBooqImages(booqId: BooqId, booq: Booq) {
     const allImages = Object.entries(booq.images).map(
         ([src, base64]) => uploadImage(base64, booqId, src),
     )
@@ -27,7 +27,7 @@ export async function uploadBooqImages(booqId: string, booq: Booq) {
     return Promise.all(allImages)
 }
 
-async function uploadImage(base64: string, booqId: string, src: string, size?: number) {
+async function uploadImage(base64: string, booqId: BooqId, src: string, size?: number) {
     const id = size
         ? `${booqId}/${src}@${size}`
         : `${booqId}/${src}`

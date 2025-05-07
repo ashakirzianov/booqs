@@ -1,4 +1,4 @@
-import { BooqPath, BooqRange, BooqNode } from '@/core'
+import { BooqPath, BooqRange, BooqNode, BooqId } from '@/core'
 import { BorderButton, PanelButton } from '@/components/Buttons'
 import { ReaderLayout } from './ReaderLayout'
 import { Augmentation, BooqContent } from '@/viewer'
@@ -12,7 +12,7 @@ type BooqAnchor = {
     path: BooqPath,
 }
 type BooqData = {
-    id: string,
+    id: BooqId,
     title?: string,
     length: number,
     fragment: {
@@ -84,7 +84,7 @@ export function LoadingReader({
 }
 
 function AnchorButton({ booqId, anchor, title }: {
-    booqId: string,
+    booqId: BooqId,
     anchor?: BooqAnchor,
     title: string,
 }) {

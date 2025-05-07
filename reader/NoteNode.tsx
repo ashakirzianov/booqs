@@ -5,10 +5,10 @@ import { MoreIcon } from '@/components/Icons'
 import clsx from 'clsx'
 import { booqHref } from '@/application/href'
 import Link from 'next/link'
-import { AccountDisplayData, BooqNote } from '@/core'
+import { AccountDisplayData, BooqId, BooqNote } from '@/core'
 
 export function NoteNodeComp({ booqId, note, user }: {
-    booqId: string,
+    booqId: BooqId,
     user: AccountDisplayData | undefined,
     note: BooqNote,
 }) {

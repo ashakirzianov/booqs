@@ -1,3 +1,4 @@
+import { BooqId } from '@/core'
 import { sql } from './db'
 
 export type DbCollection = {
@@ -25,7 +26,7 @@ export async function addToCollection({
     name,
 }: {
     userId: string,
-    booqId: string,
+    booqId: BooqId,
     name: string,
 }): Promise<boolean> {
     const [collection] = await sql`
@@ -51,7 +52,7 @@ export async function removeFromCollection({
     name,
 }: {
     userId: string,
-    booqId: string,
+    booqId: BooqId,
     name: string,
 }): Promise<boolean> {
     const [collection] = await sql`
@@ -68,7 +69,7 @@ export async function removeFromCollection({
     return result.length > 0
 }
 
-export async function addUpload(userId: string, uploadId: string) {
+export async function addUpload(userId: string, uploadId: BooqId) {
     return addToCollection({
         userId,
         name: 'uploads',

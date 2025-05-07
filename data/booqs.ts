@@ -42,7 +42,7 @@ export async function booqCollection(collection: string, userId: string | undefi
     return cards
 }
 
-export async function booqCard(booqId: string): Promise<BooqLibraryCard | undefined> {
+export async function booqCard(booqId: BooqId): Promise<BooqLibraryCard | undefined> {
     const [card] = await libraryCardsForIds([booqId])
     if (undefined === card) {
         return undefined

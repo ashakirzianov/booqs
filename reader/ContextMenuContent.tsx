@@ -2,7 +2,7 @@
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import * as clipboard from 'clipboard-polyfill'
-import { AccountDisplayData, BooqNote, BooqRange } from '@/core'
+import { AccountDisplayData, BooqId, BooqNote, BooqRange } from '@/core'
 import { MenuItem } from '@/components/Menu'
 import { quoteHref } from '@/application/href'
 import { BooqSelection } from '@/viewer'
@@ -33,7 +33,7 @@ export function ContextMenuContent({
     target, ...rest
 }: {
     target: ContextMenuTarget,
-    booqId: string,
+    booqId: BooqId,
     user: AccountDisplayData | undefined,
     setTarget: (target: ContextMenuTarget) => void,
     updateCopilot?: (selection: BooqSelection) => void,
@@ -54,7 +54,7 @@ function SelectionTargetMenu({
     target: { selection }, ...rest
 }: {
     target: SelectionTarget,
-    booqId: string,
+    booqId: BooqId,
     user: AccountDisplayData | undefined,
     setTarget: (target: ContextMenuTarget) => void,
     updateCopilot?: (selection: BooqSelection) => void,
@@ -72,7 +72,7 @@ function QuoteTargetMenu({
     target: { selection }, ...rest
 }: {
     target: QuoteTarget,
-    booqId: string,
+    booqId: BooqId,
     user: AccountDisplayData | undefined,
     setTarget: (target: ContextMenuTarget) => void,
     updateCopilot?: (selection: BooqSelection) => void,
@@ -88,7 +88,7 @@ function NoteTargetMenu({
     target: { note }, user, ...rest
 }: {
     target: NoteTarget,
-    booqId: string,
+    booqId: BooqId,
     user: AccountDisplayData | undefined,
     setTarget: (target: ContextMenuTarget) => void,
     updateCopilot?: (selection: BooqSelection) => void,
@@ -178,7 +178,7 @@ function AddNoteItem({
     selection, booqId, user, setTarget,
 }: {
     selection: BooqSelection,
-    booqId: string,
+    booqId: BooqId,
     user: AccountDisplayData | undefined,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
@@ -232,7 +232,7 @@ function RemoveNoteItem({
     note, booqId, setTarget, user,
 }: {
     note: BooqNote,
-    booqId: string,
+    booqId: BooqId,
     user: AccountDisplayData,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
@@ -251,7 +251,7 @@ function SelectNoteColorItem({
     note, booqId, setTarget, user,
 }: {
     note: BooqNote,
-    booqId: string,
+    booqId: BooqId,
     user: AccountDisplayData,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
@@ -311,7 +311,7 @@ function CopyQuoteItem({
     selection, booqId, setTarget,
 }: {
     selection: BooqSelection,
-    booqId: string,
+    booqId: BooqId,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
     const { prefetch } = useRouter()
@@ -334,7 +334,7 @@ function CopyTextItem({
     selection, setTarget,
 }: {
     selection: BooqSelection,
-    booqId: string,
+    booqId: BooqId,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
     return <MenuItem
@@ -353,7 +353,7 @@ function CopyLinkItem({
     selection, booqId, setTarget,
 }: {
     selection: BooqSelection,
-    booqId: string,
+    booqId: BooqId,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
     const { prefetch } = useRouter()
@@ -372,7 +372,7 @@ function CopyLinkItem({
     />
 }
 
-function useCopyQuote(booqId: string, selection?: BooqSelection) {
+function useCopyQuote(booqId: BooqId, selection?: BooqSelection) {
     const { prefetch } = useRouter()
     useEffect(() => {
         function handleCopy(e: ClipboardEvent) {
@@ -396,12 +396,12 @@ function removeSelection() {
     window.getSelection()?.empty()
 }
 
-function generateQuote(booqId: string, text: string, range: BooqRange) {
+function generateQuote(booqId: BooqId, text: string, range: BooqRange) {
     const link = generateLink(booqId, range)
     return `"${text}"\n${link}`
 }
 
-function generateLink(booqId: string, range: BooqRange) {
+function generateLink(booqId: BooqId, range: BooqRange) {
     return `${baseUrl()}${quoteHref({ id: booqId, range })}`
 }
 

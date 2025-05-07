@@ -11,7 +11,7 @@ export type AccountDisplayData = Pick<AccountData, 'id' | 'name' | 'profilePictu
 export type NoteColor = string // TODO: rename?
 export type NoteData = {
     id: string,
-    booqId: string,
+    booqId: BooqId,
     author: AccountDisplayData,
     range: BooqRange,
     color: string,

@@ -3,7 +3,7 @@ import { BooqParent } from './booq'
 import { DbNote } from '@/backend/notes'
 import { DbUser, userForId } from '@/backend/users'
 import { libraryCardForId } from '@/backend/library'
-import { positionForPath, textForRange } from '@/core'
+import { BooqId, positionForPath, textForRange } from '@/core'
 import { booqForId } from '@/backend/booq'
 
 export type NoteParent = DbNote
@@ -16,7 +16,7 @@ export const noteResolver: IResolvers<NoteParent> = {
             return libraryCardForId(parent.booq_id)
         },
         async text(parent) {
-            const booq = await booqForId(parent.booq_id)
+            const booq = await booqForId(parent.booq_id as BooqId)
             if (booq) {
                 const text = textForRange(booq.nodes, {
                     start: parent.start_path,
@@ -27,7 +27,7 @@ export const noteResolver: IResolvers<NoteParent> = {
             return '<no-booq>'
         },
         async position(parent) {
-            const booq = await booqForId(parent.booq_id)
+            const booq = await booqForId(parent.booq_id as BooqId)
             if (!booq) {
                 return undefined
             }

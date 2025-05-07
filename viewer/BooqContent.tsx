@@ -1,18 +1,18 @@
 import { useMemo } from 'react'
 import { Augmentation, renderNodes } from './render'
-import { BooqNode, BooqPath, BooqRange } from '@/core'
+import { BooqId, BooqNode, BooqPath, BooqRange } from '@/core'
 
 export const BooqContentID = 'booq-root'
 export function BooqContent({
     booqId, nodes, range, augmentations,
     onAugmentationClick, hrefForPath,
 }: {
-    booqId: string,
+    booqId: BooqId,
     nodes: BooqNode[],
     range: BooqRange,
     augmentations: Augmentation[],
     onAugmentationClick?: (id: string) => void,
-    hrefForPath?: (booqId: string, path: BooqPath) => string,
+    hrefForPath?: (booqId: BooqId, path: BooqPath) => string,
 }) {
     return useMemo(function () {
         return <div id={BooqContentID} className='container'>

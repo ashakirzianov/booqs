@@ -6,7 +6,7 @@ import {
 import { ContextMenuContent, ContextMenuTarget } from './ContextMenuContent'
 import { useFloater } from '@/components/Floater'
 import clsx from 'clsx'
-import { AccountDisplayData } from '@/core'
+import { AccountDisplayData, BooqId } from '@/core'
 
 export type ContextMenuState = {
     target: ContextMenuTarget,
@@ -16,7 +16,7 @@ export type ContextMenuState = {
 export function useContextMenu({
     booqId, user, updateCopilot, closed,
 }: {
-    booqId: string,
+    booqId: BooqId,
     user: AccountDisplayData | undefined,
     closed: boolean,
     updateCopilot: (selection: BooqSelection, anchor: VirtualElement) => void,

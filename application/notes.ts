@@ -2,7 +2,7 @@
 
 import type { GetResponse, PostBody, PostResponse } from '@/app/api/booq/[library]/[id]/notes/route'
 import type { PatchBody, PatchResponse } from '@/app/api/notes/[id]/route'
-import { AccountDisplayData, BooqRange, NoteData } from '@/core'
+import { AccountDisplayData, BooqId, BooqRange, NoteData } from '@/core'
 import { useMemo } from 'react'
 import useSWR from 'swr'
 import useSWRMutation from 'swr/mutation'
@@ -11,7 +11,7 @@ import { v4 } from 'uuid'
 export function useBooqNotes({
     booqId, user,
 }: {
-    booqId: string,
+    booqId: BooqId,
     user: AccountDisplayData | undefined,
 }) {
     const notesKey = `/api/booq/${booqId}/notes`
@@ -225,7 +225,7 @@ type NoteJson = GetResponse['notes'][number]
 function noteFromJson(note: NoteJson): NoteData {
     return {
         id: note.id,
-        booqId: note.booq_id,
+        booqId: note.booq_id as BooqId,
         range: {
             start: note.start_path,
             end: note.end_path,

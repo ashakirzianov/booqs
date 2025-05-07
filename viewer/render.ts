@@ -2,6 +2,7 @@ import { ReactNode, createElement } from 'react'
 import {
     BooqElementNode, BooqNode, pathToString,
     pathInRange, samePath, pathLessThan, BooqPath, BooqRange, pathToId,
+    BooqId,
 } from '@/core'
 
 export type Augmentation = {
@@ -11,14 +12,14 @@ export type Augmentation = {
 }
 
 type RenderContext = {
-    booqId: string,
+    booqId: BooqId,
     path: BooqPath,
     range: BooqRange,
     parent?: BooqElementNode,
     withinAnchor?: boolean,
     augmentations: Augmentation[],
     onAugmentationClick?: (id: string) => void,
-    hrefForPath?: (booqId: string, path: BooqPath) => string,
+    hrefForPath?: (booqId: BooqId, path: BooqPath) => string,
 }
 export function renderNodes(nodes: BooqNode[], ctx: RenderContext): ReactNode {
     const result = nodes.map(
@@ -122,7 +123,7 @@ function isExternalSrc(src: string) {
     return src.startsWith('http://') || src.startsWith('https://') || src.startsWith('www.')
 }
 
-function imageFullSrc(booqId: string, src: string) {
+function imageFullSrc(booqId: BooqId, src: string) {
     // TODO: investigate why we need this hack for certain epubs
     if (src.startsWith('../')) {
         src = src.substring('../'.length)

@@ -5,7 +5,7 @@ import { NoteNodeComp } from './NoteNode'
 import { PathNotesNodeComp } from './PathNotesNode'
 import { NavigationFilter } from './Filter'
 import { buildNavigationNodes, NavigationNode, NavigationSelection } from './nodes'
-import { AccountDisplayData, BooqNote, TableOfContentsItem } from '@/core'
+import { AccountDisplayData, BooqId, BooqNote, TableOfContentsItem } from '@/core'
 
 export function useNavigationState() {
     const [navigationOpen, setNavigationOpen] = useState(false)
@@ -36,7 +36,7 @@ export function NavigationPanel({
     selection,
     toggleSelection, closeSelf,
 }: {
-    booqId: string,
+    booqId: BooqId,
     title: string
     toc: TableOfContentsItem[],
     notes: BooqNote[],
@@ -93,7 +93,7 @@ export function NavigationPanel({
 }
 
 function NavigationNodeComp({ booqId, user, node }: {
-    booqId: string,
+    booqId: BooqId,
     user: AccountDisplayData | undefined,
     node: NavigationNode,
 }) {

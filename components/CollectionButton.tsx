@@ -1,8 +1,9 @@
 'use client'
 import { useCollection } from '@/application/collections'
+import { BooqId } from '@/core'
 
 export function CollectionButton({ booqId, collection }: {
-    booqId: string,
+    booqId: BooqId,
     collection: string,
 }) {
     const {

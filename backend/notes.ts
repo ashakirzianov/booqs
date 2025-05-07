@@ -1,4 +1,4 @@
-import { BooqRange } from '@/core'
+import { BooqId, BooqRange } from '@/core'
 import { sql } from './db'
 
 export type DbNote = {
@@ -49,7 +49,7 @@ export async function notesFor({
     `
   return result as DbNote[]
 }
-export async function notesWithAuthorForBooqId(booqId: string) {
+export async function notesWithAuthorForBooqId(booqId: BooqId) {
   const notes = await sql`
       SELECT n.*, u.name AS author_name, u.profile_picture_url AS author_profile_picture_url
       FROM notes n
@@ -71,7 +71,7 @@ export async function addNote({
 }: {
   id: string,
   authorId: string,
-  booqId: string,
+  booqId: BooqId,
   range: BooqRange,
   color: string,
   content?: string,
