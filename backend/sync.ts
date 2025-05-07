@@ -9,32 +9,13 @@ import { parseEpub } from '@/parser'
 import { uploadBooqImages } from './images'
 import { redis } from './db'
 
-type Log = {
-    kind: string,
-    message: string,
-    id: string,
-    data?: object,
-}
-async function logItem(item: Log) {
-    return redis.hset('logs', {
-        [`${item.kind}:${item.id}`]: JSON.stringify(item),
-    })
-}
-
-async function logExists({ kind, id }: {
-    kind: string,
-    id: string,
-}) {
-    return redis.hexists('logs', `${kind}:${id}`)
-}
-
 export async function pgSyncWorker() {
-    for await (const { id, booq } of syncWithS3()) {
+    for await (const { id, booq } of syncS3ToCards()) {
         uploadBooqImages(`pg/${id}`, booq)
     }
 }
 
-async function* syncWithS3() {
+async function* syncS3ToCards() {
     report('Syncing with S3')
 
     const batches = makeBatches(assetsToProcess(), 1)
@@ -74,24 +55,20 @@ async function processAsset(asset: Asset) {
         return result
     } catch (e) {
         report(`Promise rejection ${asset.Key}: ${e}`)
-        logProblem(asset.Key, 'Unhandled exception', e)
+        reportProblem(asset.Key, 'Unhandled exception', e)
         return
     }
 }
 
 async function hasProblems(assetId: string) {
-    return logExists({
-        kind: 'pg-sync',
-        id: assetId,
-    })
+    return redis.hexists('pg:problems', assetId)
 }
 
-async function logProblem(assetId: string, message: string, err: any) {
-    return logItem({
-        kind: 'pg-sync',
-        message,
-        id: assetId,
-        data: err,
+async function reportProblem(assetId: string, message: string, err: any) {
+    return redis.hset('pg:problems', {
+        [assetId]: {
+            message, err,
+        },
     })
 }
 
@@ -111,7 +88,7 @@ async function downloadAndInsert(assetId: string) {
     })
     if (!booq) {
         report(`Couldn't parse epub: ${assetId}`)
-        await logProblem(assetId, 'Parsing errors', diags)
+        await reportProblem(assetId, 'Parsing errors', diags)
         return
     }
     const document = await insertRecord(booq, assetId)
@@ -129,7 +106,7 @@ async function insertRecord(booq: Booq, assetId: string) {
     const index = indexFromAssetId(assetId)
     if (index === undefined) {
         report(`Invalid asset id: ${assetId}`)
-        await logProblem(assetId, 'Bad asset id', assetId)
+        await reportProblem(assetId, 'Bad asset id', assetId)
         return undefined
     }
     const {
@@ -168,8 +145,8 @@ function indexFromAssetId(assetId: string) {
 }
 
 function report(label: string, data?: any) {
-    console.warn('PG: \x1b[32m%s\x1b[0m', label)
+    console.info('PG: \x1b[32m%s\x1b[0m', label)
     if (data) {
-        console.warn(inspect(data, false, 3, true))
+        console.info(inspect(data, false, 3, true))
     }
 }
