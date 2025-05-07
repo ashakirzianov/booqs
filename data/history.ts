@@ -1,6 +1,5 @@
 import { booqHistoryForUser } from '@/backend/history'
 import { getUserIdInsideRequest } from './auth'
-import { filterUndefined } from '@/core'
 import { booqPreview } from '@/backend/booq'
 
 export async function fetchReadingHistory() {
@@ -13,5 +12,5 @@ export async function fetchReadingHistory() {
         return booqPreview(entry.booqId, entry.path)
     })
     const resolved = await Promise.all(promises)
-    return filterUndefined(resolved)
+    return resolved.filter(entry => entry !== undefined)
 }

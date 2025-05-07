@@ -4,7 +4,6 @@ import {
 import { compile, is } from 'css-select'
 import { selectorSpecificity, compare } from '@csstools/selector-specificity'
 import { flatten } from 'lodash'
-import { filterUndefined } from '../core'
 import { XmlElement, attributesOf } from './xmlTree'
 import { Diagnoser } from 'booqs-epub'
 
@@ -128,7 +127,7 @@ function parseInlineStyle(style: string, fileName: string, diags: Diagnoser) {
 function buildRule(rule: Rule, diags: Diagnoser): StyleRule | undefined {
     const supported = rule.selectors?.filter(supportedSelector) ?? []
     const value = supported.map(s => parseSelector(s, diags))
-    const selectors = filterUndefined(value ?? [])
+    const selectors = (value ?? []).filter(s => s !== undefined)
     if (selectors.length === 0) {
         return undefined
     }

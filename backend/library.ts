@@ -1,4 +1,4 @@
-import { AuthorSearchResult, BooqLibraryCard, BooqSearchResult, filterUndefined, InLibraryId, LibraryId, makeId, parseId, SearchResult } from '@/core'
+import { AuthorSearchResult, BooqLibraryCard, BooqSearchResult, InLibraryId, LibraryId, makeId, parseId, SearchResult } from '@/core'
 import groupBy from 'lodash-es/groupBy'
 import { Booq } from '../core'
 import { pgLibrary } from './pg'
@@ -50,14 +50,14 @@ export async function libraryCardForId(id: string) {
 }
 
 export async function libraryCardsForIds(ids: string[]): Promise<Array<BooqLibraryCard | undefined>> {
-    const parsed = filterUndefined(
-        ids.map(idString => {
+    const parsed = ids
+        .map(idString => {
             const [library, id] = parseId(idString)
             return library && id
                 ? { library, id }
                 : undefined
-        }),
-    )
+        })
+        .filter(p => p !== undefined)
     const grouped = groupBy(
         parsed,
         id => id.library,
@@ -71,8 +71,9 @@ export async function libraryCardsForIds(ids: string[]): Promise<Array<BooqLibra
             return undefined
         }
     })
-    const results = filterUndefined(await Promise.all(groupedResults))
+    const results = (await Promise.all(groupedResults))
         .flat()
+        .filter(r => r !== undefined)
     return ids.map(
         id => results.find(r => r.id === id),
     )

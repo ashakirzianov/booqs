@@ -1,6 +1,5 @@
 import { inspect } from 'util'
 import { makeBatches } from './utils'
-import { filterUndefined } from '@/core'
 import { Asset, downloadAsset, listObjects } from './s3'
 import {
     existingAssetIds, pgEpubsBucket, insertAssetRecord,
@@ -23,7 +22,7 @@ async function* syncS3ToCards() {
         const added = await Promise.all(
             batch.map(processAsset),
         )
-        yield* filterUndefined(added)
+        yield* added.filter(result => result !== undefined)
     }
 
     report('done syncing with S3')

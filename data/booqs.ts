@@ -1,6 +1,5 @@
 import {
-    BooqPath, filterUndefined,
-    buildFragment,
+    BooqPath, buildFragment,
     PartialBooqData,
     BooqId,
     BooqLibraryCard,
@@ -17,9 +16,10 @@ export async function featuredIds() {
 
 export async function featuredBooqCards(coverSize: number = 210): Promise<BooqLibraryCard[]> {
     const ids = await featuredIds()
-    const cards = filterUndefined(await libraryCardsForIds(ids))
+    const cards = (await libraryCardsForIds(ids))
+        .filter(card => card !== undefined)
         .map(card => buildBooqCard(card, coverSize))
-    return filterUndefined(cards)
+    return cards
 }
 
 export async function booqCardsForAuthor(author: string): Promise<BooqLibraryCard[]> {
@@ -36,8 +36,10 @@ export async function booqCollection(collection: string, userId: string | undefi
         return []
     }
     const ids = await booqIdsInCollections(user.id, collection)
-    const cards = filterUndefined(await libraryCardsForIds(ids))
-    return cards.map(card => buildBooqCard(card, 210))
+    const cards = (await libraryCardsForIds(ids))
+        .filter(card => card !== undefined)
+        .map(card => buildBooqCard(card, 210))
+    return cards
 }
 
 export async function booqCard(booqId: string): Promise<BooqLibraryCard | undefined> {

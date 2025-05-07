@@ -2,7 +2,9 @@ import { IResolvers } from '@graphql-tools/utils'
 import { BookmarkParent } from './bookmark'
 import { NoteParent } from './note'
 import { booqImageUrl } from '@/backend/images'
-import { BooqLibraryCard, buildFragment, filterUndefined, previewForPath, textForRange } from '@/core'
+import {
+    BooqLibraryCard, buildFragment, previewForPath, textForRange,
+} from '@/core'
 import { getBookmarks } from '@/backend/bookmarks'
 import { notesFor } from '@/backend/notes'
 import { booqForId } from '@/backend/booq'
@@ -78,7 +80,7 @@ type Tag = {
     value?: string | null,
 }
 function buildTags(card: BooqParent): Tag[] {
-    return filterUndefined([
+    return [
         {
             tag: 'pages',
             value: Math.floor(card.length / 1500).toString(),
@@ -88,5 +90,5 @@ function buildTags(card: BooqParent): Tag[] {
                 tag: 'pg-index',
                 value: card.id.substring('pg/'.length),
             },
-    ])
+    ].filter(tag => tag !== undefined)
 }
