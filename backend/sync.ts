@@ -91,10 +91,10 @@ async function downloadAndInsert(assetId: string) {
         await reportProblem(assetId, 'Parsing errors', diags)
         return
     }
-    const document = await insertAssetRecord({ booq, assetId })
+    const { id } = await insertAssetRecord({ booq, assetId }) ?? {}
     if (document) {
         return {
-            id: document.id,
+            id,
             booq,
         }
     } else {

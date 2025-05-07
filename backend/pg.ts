@@ -70,7 +70,7 @@ export async function insertAssetRecord({ booq, assetId }: {
     // contributors, tags,
   } = booq.meta
   const length = booq.toc.length
-  return insertDbCard(`${index}`, {
+  const success = await insertDbCard(`${index}`, {
     asset_id: assetId,
     length,
     subjects,
@@ -83,6 +83,12 @@ export async function insertAssetRecord({ booq, assetId }: {
     // TODO: support tags, rights and contributors
     tags: [],
   })
+  if (success) {
+    await redis.sadd('library:pg:asset_ids', assetId)
+    return { id: `${index}` }
+  } else {
+    return undefined
+  }
 }
 
 async function cardForId(id: string): Promise<InLibraryCard | undefined> {
