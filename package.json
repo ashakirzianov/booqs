@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "https": "next dev --experimental-https",
+    "analyze": "ANALYZE=true next build",
     "workers": "tsx scripts/index.ts"
   },
   "dependencies": {
@@ -59,6 +60,7 @@
     "uuid": "^11.1.0"
   },
   "devDependencies": {
+    "@next/bundle-analyzer": "^15.3.2",
     "@stylistic/eslint-plugin-ts": "^4.2.0",
     "@types/apple-signin-api": "^1.5.3",
     "@types/cors": "^2.8.17",
