@@ -1,10 +1,11 @@
 CREATE EXTENSION IF NOT EXISTS citext;
 CREATE EXTENSION IF NOT EXISTS pg_trgm;
 CREATE EXTENSION IF NOT EXISTS unaccent;
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- Users
 CREATE TABLE IF NOT EXISTS users (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  id TEXT PRIMARY KEY DEFAULT uuid_generate_v4()::TEXT,
   username CITEXT UNIQUE NOT NULL,
   email CITEXT UNIQUE,
   name TEXT,
@@ -14,7 +15,7 @@ CREATE TABLE IF NOT EXISTS users (
 
 -- uu_cards
 CREATE TABLE IF NOT EXISTS uu_cards (
-  id TEXT PRIMARY KEY,
+  id TEXT PRIMARY KEY DEFAULT uuid_generate_v4()::TEXT,
   asset_id TEXT NOT NULL,
   length INTEGER,
   title TEXT NOT NULL,
@@ -32,16 +33,17 @@ CREATE INDEX IF NOT EXISTS uu_cards_search_idx ON uu_cards USING GIN (searchable
 
 -- Uploads
 CREATE TABLE IF NOT EXISTS uploads (
-  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   upload_id TEXT NOT NULL REFERENCES uu_cards(id) ON DELETE CASCADE,
   uploaded_at TIMESTAMPTZ DEFAULT NOW(),
   PRIMARY KEY (user_id, upload_id)
 );
+CREATE INDEX IF NOT EXISTS uploads_upload_id_idx ON uploads(upload_id);
 
 -- Collections
 CREATE TABLE IF NOT EXISTS collections (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  id TEXT PRIMARY KEY DEFAULT uuid_generate_v4()::TEXT,
+  user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   name TEXT NOT NULL,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW(),
@@ -49,18 +51,19 @@ CREATE TABLE IF NOT EXISTS collections (
 );
 CREATE INDEX IF NOT EXISTS collections_user_id_idx ON collections(user_id);
 
--- Books in collections
-CREATE TABLE IF NOT EXISTS user_collections_books (
-  collection_id UUID REFERENCES collections(id) ON DELETE CASCADE,
+-- Booqs in collections
+CREATE TABLE IF NOT EXISTS user_collections_booqs (
+  collection_id TEXT REFERENCES collections(id) ON DELETE CASCADE,
   booq_id TEXT NOT NULL,
   added_at TIMESTAMPTZ DEFAULT NOW(),
   PRIMARY KEY (collection_id, booq_id)
 );
+CREATE INDEX IF NOT EXISTS user_collections_booqs_booq_id_idx ON user_collections_booqs(booq_id);
 
 -- Bookmarks
 CREATE TABLE IF NOT EXISTS bookmarks (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  id TEXT PRIMARY KEY DEFAULT uuid_generate_v4()::TEXT,
+  user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   booq_id TEXT NOT NULL,
   path SMALLINT[] NOT NULL,
   CONSTRAINT unique_user_booq_path UNIQUE (user_id, booq_id, path)
@@ -70,8 +73,8 @@ CREATE INDEX IF NOT EXISTS bookmarks_user_id_idx ON bookmarks(user_id);
 
 -- Notes
 CREATE TABLE IF NOT EXISTS notes (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  author_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  id TEXT PRIMARY KEY DEFAULT uuid_generate_v4()::TEXT,
+  author_id TEXT REFERENCES users(id) ON DELETE CASCADE,
   booq_id TEXT NOT NULL,
   start_path INTEGER[] NOT NULL,
   end_path INTEGER[] NOT NULL,
@@ -80,13 +83,13 @@ CREATE TABLE IF NOT EXISTS notes (
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
-CREATE INDEX IF NOT EXISTS notes_user_id_idx ON notes(author_id);
+CREATE INDEX IF NOT EXISTS notes_author_id_idx ON notes(author_id);
 CREATE INDEX IF NOT EXISTS notes_booq_id_idx ON notes(booq_id);
 
 -- Passkey credentials
 CREATE TABLE IF NOT EXISTS passkey_credentials (
-  id TEXT PRIMARY KEY,
-  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  id TEXT PRIMARY KEY DEFAULT uuid_generate_v4()::TEXT,
+  user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   public_key TEXT NOT NULL,
   counter INTEGER NOT NULL DEFAULT 0,
   transports TEXT[],
@@ -108,7 +111,7 @@ CREATE OR REPLACE FUNCTION exists_similarity(arr TEXT[], query TEXT) RETURNS BOO
 $$ LANGUAGE SQL IMMUTABLE;
 
 -- FTS triggers for pg_cards (with 'english' config)
-CREATE OR REPLACE FUNCTION update_pg_cards_search_tsv() RETURNS trigger AS $$
+CREATE OR REPLACE FUNCTION update_uu_cards_search_tsv() RETURNS trigger AS $$
 BEGIN
   NEW.searchable_tsv :=
     setweight(to_tsvector('english', coalesce(NEW.title, '')), 'A') ||
@@ -120,6 +123,6 @@ BEGIN
 END
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER pg_cards_search_trigger
-  BEFORE INSERT OR UPDATE ON pg_cards
-  FOR EACH ROW EXECUTE FUNCTION update_pg_cards_search_tsv();
+CREATE TRIGGER uu_cards_search_trigger
+  BEFORE INSERT OR UPDATE ON uu_cards
+  FOR EACH ROW EXECUTE FUNCTION update_uu_cards_search_tsv();

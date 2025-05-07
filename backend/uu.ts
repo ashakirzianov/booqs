@@ -4,7 +4,7 @@ import { inspect } from 'util'
 import type { InLibraryCard, Library, InLibrarySearchResult } from './library'
 import { parseEpub } from '@/parser'
 import { Booq, nodesLength } from '@/core'
-import { v4 } from 'uuid'
+import { nanoid } from 'nanoid'
 import { deleteAsset, downloadAsset, uploadAsset } from './s3'
 import { sql } from './db'
 
@@ -129,7 +129,7 @@ async function uploadNewEpub({ buffer, hash }: File, userId: string) {
         report('Can\'t parse upload')
         return undefined
     }
-    const assetId = v4()
+    const assetId = nanoid(10)
     const uploadResult = await uploadAsset(userUploadedEpubsBucket, assetId, buffer)
     if (!uploadResult.$metadata) {
         report('Can\'t upload file to S3')
@@ -175,7 +175,7 @@ async function insertRecord({ booq, assetId, fileHash }: {
     if (contributors) {
         tags.push({ name: 'contributors', value: contributors.join(', ') })
     }
-    const id = v4()
+    const id = nanoid(10)
     const length = nodesLength(booq.nodes)
     // TODO: support multiple languages
     const query = sql`

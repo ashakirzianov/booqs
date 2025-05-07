@@ -3,10 +3,10 @@
 import type { GetResponse, PostBody, PostResponse } from '@/app/api/booq/[library]/[id]/notes/route'
 import type { PatchBody, PatchResponse } from '@/app/api/notes/[id]/route'
 import { AccountDisplayData, BooqId, BooqRange, NoteData } from '@/core'
+import { nanoid } from 'nanoid'
 import { useMemo } from 'react'
 import useSWR from 'swr'
 import useSWRMutation from 'swr/mutation'
-import { v4 } from 'uuid'
 
 export function useBooqNotes({
     booqId, user,
@@ -80,7 +80,7 @@ export function useBooqNotes({
         if (!user) return undefined
 
         const postBody: PostBody = {
-            id: v4(),
+            id: nanoid(10),
             color,
             start_path: start,
             end_path: end,

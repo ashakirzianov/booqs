@@ -12,7 +12,7 @@ export type DbCollection = {
 export async function booqIdsInCollections(userId: string, ...names: string[]): Promise<string[]> {
     const result = await sql`
       SELECT ucb.booq_id
-      FROM user_collections_books ucb
+      FROM user_collections_booqs ucb
       JOIN collections c ON ucb.collection_id = c.id
       WHERE c.user_id = ${userId}
         AND c.name = ANY(${names})
@@ -38,7 +38,7 @@ export async function addToCollection({
     if (!collection) return false
 
     const result = await sql`
-    INSERT INTO user_collections_books (collection_id, booq_id)
+    INSERT INTO user_collections_booqs (collection_id, booq_id)
     VALUES (${collection.id}, ${booqId})
     ON CONFLICT DO NOTHING
     RETURNING booq_id
@@ -62,7 +62,7 @@ export async function removeFromCollection({
     if (!collection) return false
 
     const result = await sql`
-    DELETE FROM user_collections_books
+    DELETE FROM user_collections_booqs
     WHERE collection_id = ${collection.id} AND booq_id = ${booqId}
     RETURNING booq_id
     `
