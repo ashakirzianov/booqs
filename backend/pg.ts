@@ -1,6 +1,6 @@
 import type { InLibraryCard, Library, InLibrarySearchResult } from './library'
 import { downloadAsset } from './s3'
-import { redis } from './db'
+import { redis, sanitizeForRedisHash } from './db'
 import { Booq } from '@/core'
 
 export const pgLibrary: Library = {
@@ -89,6 +89,7 @@ export async function insertAssetRecord({ booq, assetId }: {
     await redis.sadd('library:pg:asset_ids', assetId)
     return { id: `${index}` }
   } else {
+    console.error('Could not insert record: ', assetId)
     return undefined
   }
 }
@@ -114,7 +115,7 @@ async function cardForId(id: string): Promise<InLibraryCard | undefined> {
 }
 
 async function insertDbCard(id: string, card: DbPgCard): Promise<boolean> {
-  await redis.hset(`library:pg:cards:${id}`, card)
+  await redis.hset(`library:pg:cards:${id}`, sanitizeForRedisHash(card))
   return true
 }
 

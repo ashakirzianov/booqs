@@ -8,16 +8,22 @@ import { parseEpub } from '@/parser'
 import { uploadBooqImages } from './images'
 import { redis } from './db'
 
-export async function pgSyncWorker() {
-    for await (const { id, booq } of syncS3ToCards()) {
+export type SyncWorkerProps = {
+    batchSize: number
+}
+export async function pgSyncWorker(props: SyncWorkerProps) {
+    let count = 0
+    for await (const { id, booq } of syncS3ToCards(props)) {
+        count++
         uploadBooqImages(`pg/${id}`, booq)
     }
+    return count
 }
 
-async function* syncS3ToCards() {
+async function* syncS3ToCards({ batchSize }: SyncWorkerProps) {
     report('Syncing with S3')
 
-    const batches = makeBatches(assetsToProcess(), 1)
+    const batches = makeBatches(assetsToProcess(), batchSize)
     for await (const batch of batches) {
         const added = await Promise.all(
             batch.map(processAsset),
@@ -91,7 +97,7 @@ async function downloadAndInsert(assetId: string) {
         return
     }
     const { id } = await insertAssetRecord({ booq, assetId }) ?? {}
-    if (document) {
+    if (id) {
         return {
             id,
             booq,
