@@ -3,7 +3,8 @@ import { ReadStream } from 'fs'
 import { inspect } from 'util'
 import type { InLibraryCard, Library, InLibrarySearchResult } from './library'
 import { parseEpub } from '@/parser'
-import { Booq, nodesLength, uniqueId } from '@/core'
+import { Booq, nodesLength } from '@/core'
+import { v4 } from 'uuid'
 import { deleteAsset, downloadAsset, uploadAsset } from './s3'
 import { sql } from './db'
 
@@ -128,7 +129,7 @@ async function uploadNewEpub({ buffer, hash }: File, userId: string) {
         report('Can\'t parse upload')
         return undefined
     }
-    const assetId = uniqueId()
+    const assetId = v4()
     const uploadResult = await uploadAsset(userUploadedEpubsBucket, assetId, buffer)
     if (!uploadResult.$metadata) {
         report('Can\'t upload file to S3')
@@ -174,7 +175,7 @@ async function insertRecord({ booq, assetId, fileHash }: {
     if (contributors) {
         tags.push({ name: 'contributors', value: contributors.join(', ') })
     }
-    const id = uniqueId()
+    const id = v4()
     const length = nodesLength(booq.nodes)
     // TODO: support multiple languages
     const query = sql`

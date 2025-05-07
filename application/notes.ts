@@ -6,7 +6,7 @@ import { AccountDisplayData, BooqRange, NoteData } from '@/core'
 import { useMemo } from 'react'
 import useSWR from 'swr'
 import useSWRMutation from 'swr/mutation'
-import { v4 as uuidv4 } from 'uuid'
+import { v4 } from 'uuid'
 
 export function useBooqNotes({
     booqId, user,
@@ -80,7 +80,7 @@ export function useBooqNotes({
         if (!user) return undefined
 
         const postBody: PostBody = {
-            id: uuidv4(),
+            id: v4(),
             color,
             start_path: start,
             end_path: end,
