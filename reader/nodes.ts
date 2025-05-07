@@ -1,4 +1,4 @@
-import { groupBy } from 'lodash'
+import groupBy from 'lodash-es/groupBy'
 import { AccountDisplayData, BooqNote, pathInRange, TableOfContentsItem } from '@/core'
 
 export type NavigationSelection = Record<string, boolean>

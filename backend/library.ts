@@ -1,13 +1,10 @@
 import { AuthorSearchResult, BooqLibraryCard, BooqSearchResult, filterUndefined, InLibraryId, LibraryId, makeId, parseId, SearchResult } from '@/core'
-import { groupBy } from 'lodash'
+import groupBy from 'lodash-es/groupBy'
 import { Booq } from '../core'
 import { pgLibrary } from './pg'
-import { logTime } from './utils'
-import { parseEpub } from '@/parser'
 import { uploadBooqImages } from './images'
 import { userUploadsLibrary } from './uu'
 import { localLibrary } from './lo'
-import { redis } from './db'
 
 export type InLibraryCard = Omit<BooqLibraryCard, 'id'> & {
     id: InLibraryId,
@@ -81,21 +78,6 @@ export async function libraryCardsForIds(ids: string[]): Promise<Array<BooqLibra
     )
 }
 
-export async function booqForId(booqId: string) {
-    const cached = await redis.get<Booq>(`cache:booq:${booqId}`)
-    if (cached) {
-        return cached
-    } else {
-        const booq = await parseBooqForId(booqId)
-        if (booq) {
-            await redis.set(`cache:booq:${booqId}`, booq, {
-                ex: 60 * 60 * 24,
-            })
-        }
-        return booq
-    }
-}
-
 export async function booqsForAuthor(author: string, limit?: number, offset?: number) {
     const supported: Array<keyof typeof libraries> = ['pg']
     const results = await Promise.all(
@@ -126,27 +108,6 @@ export async function uploadToLibrary(libraryPrefix: string, fileBuffer: Buffer,
     return undefined
 }
 
-async function parseBooqForId(booqId: string) {
-    const file = await fileForId(booqId)
-    if (!file) {
-        return undefined
-    }
-    const { value: booq, diags } = await logTime(() => parseEpub({
-        fileData: file.file,
-        title: booqId,
-    }), 'Parser')
-    diags.forEach(console.info)
-    return booq
-}
-
-async function fileForId(booqId: string) {
-    const [prefix, id] = parseId(booqId)
-    const library = libraries[prefix]
-    return library && id
-        ? library.fileForId(id)
-        : undefined
-}
-
 export async function searchBooqs(query: string, limit: number): Promise<SearchResult[]> {
     if (!query) {
         return []
@@ -164,6 +125,14 @@ export async function searchBooqs(query: string, limit: number): Promise<SearchR
 
     const all = await Promise.all(cards)
     return all.flat()
+}
+
+export async function fileForId(booqId: string) {
+    const [prefix, id] = parseId(booqId)
+    const library = libraries[prefix]
+    return library && id
+        ? library.fileForId(id)
+        : undefined
 }
 
 function processSearchResult(prefix: string) {

@@ -1,11 +1,11 @@
 import { IResolvers } from '@graphql-tools/utils'
 import { BookmarkParent } from './bookmark'
 import { NoteParent } from './note'
-import { booqForId } from '@/backend/library'
 import { booqImageUrl } from '@/backend/images'
 import { BooqLibraryCard, buildFragment, filterUndefined, previewForPath, textForRange } from '@/core'
 import { getBookmarks } from '@/backend/bookmarks'
 import { notesFor } from '@/backend/notes'
+import { booqForId } from '@/backend/booq'
 
 export type BooqParent = BooqLibraryCard & {
     kind?: undefined,

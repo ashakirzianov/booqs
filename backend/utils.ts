@@ -1,9 +1,14 @@
-export async function logTime<T>(f: () => Promise<T>, label?: string) {
-    console.info(`Start: ${label}`)
-    const start = Date.now()
+export async function logTimeAsync<T>(label: string, f: () => Promise<T>) {
+    console.time(label)
     const result = await f()
-    const end = Date.now()
-    console.info(`End: ${label}, time: ${end - start}`)
+    console.timeEnd(label)
+    return result
+}
+
+export function logTime<T>(label: string, f: () => T) {
+    console.time(label)
+    const result = f()
+    console.timeEnd(label)
     return result
 }
 

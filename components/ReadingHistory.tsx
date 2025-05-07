@@ -8,9 +8,9 @@ import { booqHref } from '../application/href'
 
 export type ReadingHistoryEntry = {
     booqId: string,
-    title: string | undefined,
+    title?: string,
     path: BooqPath,
-    preview: string,
+    text: string,
     position: number,
     length: number,
 }
@@ -27,7 +27,7 @@ export function ReadingHistory({ history }: {
                         <Link href={booqHref({ id: entry.booqId, path: entry.path })}>
                             <BooqPreview
                                 path={entry.path}
-                                text={entry.preview}
+                                text={entry.text}
                                 title={entry.title ?? ''}
                                 page={pageForPosition(entry.position)}
                                 total={pageForPosition(entry.length)}

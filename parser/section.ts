@@ -5,7 +5,7 @@ import {
 import { EpubSection, EpubPackage } from './epub'
 import { parseCss, Stylesheet, StyleRule, applyRules } from './css'
 import { transformHref } from './parserUtils'
-import { capitalize } from 'lodash'
+import capitalize from 'lodash-es/capitalize'
 import { resolveRelativePath } from './path'
 import { isComment } from 'domutils'
 import { Diagnoser } from 'booqs-epub'

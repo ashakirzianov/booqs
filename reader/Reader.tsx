@@ -1,4 +1,6 @@
 'use client'
+import '@/app/wdyr'
+
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { BooqAnchor, BooqNote, BooqPath, BooqRange, contextForRange, PartialBooqData, pathToId, positionForPath, samePath, textForRange } from '@/core'
 import { BorderButton, PanelButton } from '@/components/Buttons'
@@ -24,7 +26,6 @@ import { AccountButton } from '@/components/AccountButton'
 import { usePathname } from 'next/navigation'
 import { BackIcon, Spinner, TocIcon } from '@/components/Icons'
 import Link from 'next/link'
-
 
 export function Reader({
     booq, quote,

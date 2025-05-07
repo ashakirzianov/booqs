@@ -4,14 +4,17 @@ import { fetchReadingHistory } from '@/data/history'
 import { READING_LIST_COLLECTION } from '@/application/collections'
 import { getUserIdInsideRequest } from '@/data/auth'
 import { BooqCollection } from '@/components/BooqCollection'
+import { logTimeAsync } from '@/backend/utils'
 
 export const dynamic = 'force-dynamic'
-
-export const fetchCache = 'force-no-store' // optional, for data fetching
+export const fetchCache = 'force-no-store'
 
 export default async function Home() {
     const featured = await featuredBooqCards()
-    const history = await fetchReadingHistory(500)
+    const history = await logTimeAsync(
+        'history',
+        () => fetchReadingHistory(),
+    )
     const userId = await getUserIdInsideRequest()
     return <>
         {history && history.length > 0
