@@ -18,42 +18,55 @@ export async function syncWithGutenberg() {
     const ids = await getAllGutenbergIds()
     info(`Found ${ids.length} ids`)
     for (const id of ids) {
-        info(`Processing ${id}`)
         if (existingSet.has(id)) {
             info(`Skipping ${id} because it already exists`)
             continue
         }
-        if (await hasProblems(id)) {
-            info(`Skipping ${id} because it has problems`)
-            continue
+        try {
+            await processId(id)
+        } catch (err) {
+            console.error(`Error processing ${id}`, err)
+            await reportProblem(id, 'Processing error', err)
         }
-        let needToUploadImages = false
-        let assetRecord: AssetRecord | undefined = await existingAssetForId(id)
-        if (!assetRecord) {
-            info(`Downloading gutenberg epub for id: ${id}`)
-            assetRecord = await downloadGutenbergEpub(id)
-            needToUploadImages = true
-        } else {
-            info(`Found existing asset for ${id}: ${assetRecord.assetId}`)
-        }
-        if (!assetRecord) {
-            reportProblem(id, `Couldn't download asset for id: ${id}`, new Error('No asset'))
-            continue
-        }
-        const parseResult = await parseAndInsert({
-            id,
-            record: assetRecord,
-        })
-        if (!parseResult) {
-            reportProblem(id, 'Failed to parse and insert', new Error('Parse error'))
-            continue
-        }
-        if (needToUploadImages) {
-            info(`Uploading images for ${assetRecord.assetId}`)
-            await uploadBooqImages(`pg/${assetRecord.assetId}`, parseResult.booq)
-        }
-        info(`Successfully processed ${id}`)
     }
+}
+
+async function processId(id: string) {
+    info(`Processing ${id}`)
+    if (await hasProblems(id)) {
+        info(`Skipping ${id} because it has problems`)
+        return false
+    }
+    let needToUploadImages = false
+    let assetRecord: AssetRecord | undefined = await existingAssetForId(id)
+    if (!assetRecord) {
+        info(`Downloading gutenberg epub for id: ${id}`)
+        assetRecord = await downloadGutenbergEpub(id)
+        if (assetRecord) {
+            info(`Downloaded gutenberg epub file: ${assetRecord.assetId}`)
+        }
+        needToUploadImages = true
+    } else {
+        info(`Found existing asset for ${id}: ${assetRecord.assetId}`)
+    }
+    if (!assetRecord) {
+        reportProblem(id, `Couldn't download asset for id: ${id}`, new Error('No asset'))
+        return false
+    }
+    const parseResult = await parseAndInsert({
+        id,
+        record: assetRecord,
+    })
+    if (!parseResult) {
+        reportProblem(id, 'Failed to parse and insert', new Error('Parse error'))
+        return false
+    }
+    if (needToUploadImages) {
+        info(`Uploading images for ${assetRecord.assetId}`)
+        await uploadBooqImages(`pg/${assetRecord.assetId}`, parseResult.booq)
+    }
+    info(`Successfully processed ${id}`)
+    return true
 }
 
 async function parseAndInsert({
@@ -111,7 +124,7 @@ async function existingAssetForId(id: string): Promise<AssetRecord | undefined> 
 }
 
 function info(label: string, data?: any) {
-    console.info('PG: \x1b[32m%s\x1b[0m', label)
+    console.info('\x1b[32m%s\x1b[0m', label)
     if (data) {
         console.info(inspect(data, false, 3, true))
     }
