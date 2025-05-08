@@ -6,7 +6,6 @@ import {
 import { parseEpub } from '@/parser'
 import { uploadBooqImages } from './images'
 import { redis } from './db'
-import e from 'cors'
 
 type AssetRecord = {
     assetId: string,
