@@ -4,8 +4,8 @@ import { processEpub } from './book'
 import { openEpubFile } from './epub'
 import { buildMeta } from './metadata'
 
-export async function parseEpub({ fileData: fileBuffer }: {
-    fileData: Buffer,
+export async function parseEpub({ fileBuffer }: {
+    fileBuffer: Buffer,
     title?: string,
 }): Promise<{
     value: Booq | undefined,
@@ -32,8 +32,8 @@ export type ExtractedMetadata = {
     metadata: BooqMeta,
     cover?: string,
 }
-export async function extractMetadata({ fileData: fileBuffer, extractCover }: {
-    fileData: Buffer,
+export async function extractMetadata({ fileBuffer, extractCover }: {
+    fileBuffer: Buffer,
     extractCover?: boolean,
 }): Promise<{
     value: ExtractedMetadata | undefined,

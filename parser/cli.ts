@@ -32,9 +32,9 @@ async function exec() {
 }
 
 async function processEpubFile(filePath: string, verbosity: number = 0) {
-    const fileData = await promisify(readFile)(filePath)
+    const fileBuffer = await promisify(readFile)(filePath)
     const { value: booq, diags } = await parseEpub({
-        fileData: fileData,
+        fileBuffer,
     })
     if (verbosity > -1) {
         console.info('Diagnostics:')

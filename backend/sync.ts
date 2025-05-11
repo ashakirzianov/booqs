@@ -97,7 +97,7 @@ async function parseAndInsert({
 }) {
     info(`Processing ${assetId}`)
     const { value: booq, diags } = await parseEpub({
-        fileData: asset as any,
+        fileBuffer: asset as any,
     })
     if (!booq) {
         info(`Couldn't parse epub: ${assetId}`)

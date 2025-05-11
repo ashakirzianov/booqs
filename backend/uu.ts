@@ -127,7 +127,7 @@ export async function uploadEpub(fileBuffer: Buffer, userId: string) {
 
 async function uploadNewEpub({ buffer, hash }: File, userId: string) {
     const { value: booq, diags } = await parseEpub({
-        fileData: buffer,
+        fileBuffer: buffer,
     })
     diags.forEach(d => report(JSON.stringify(d)))
     if (!booq) {
