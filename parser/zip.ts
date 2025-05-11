@@ -1,7 +1,8 @@
 import JSZip from 'jszip'
 import { FileProvider } from 'booqs-epub'
 
-export function createZipFileProvider(fileContent: Buffer): FileProvider {
+type NodeBuffer = globalThis.Buffer<ArrayBufferLike>
+export function createZipFileProvider(fileContent: Buffer): FileProvider<NodeBuffer> {
     let _zip: Promise<JSZip> | undefined
     async function zip() {
         if (!_zip) {
@@ -18,7 +19,7 @@ export function createZipFileProvider(fileContent: Buffer): FileProvider {
                 }
                 return file.async('text')
             } catch (e) {
-                diags.push({
+                diags?.push({
                     message: `Error reading text ${path}: ${e}`,
                 })
                 return undefined
@@ -32,7 +33,7 @@ export function createZipFileProvider(fileContent: Buffer): FileProvider {
                 }
                 return file.async('nodebuffer')
             } catch (e) {
-                diags.push({
+                diags?.push({
                     message: `Error reading binary ${path}: ${e}`,
                 })
                 return undefined

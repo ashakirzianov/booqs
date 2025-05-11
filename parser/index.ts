@@ -1,30 +1,30 @@
-import { Diagnostic, diagnoser } from 'booqs-epub'
+import { Diagnoser, Diagnostic } from 'booqs-epub'
 import { Booq, BooqMeta } from '../core'
 import { processEpub } from './book'
-import { openFirstEpubPackage } from './epub'
+import { openEpubPackage } from './epub'
 import { buildMeta } from './metadata'
 
-export async function parseEpub({ fileData, title }: {
+export async function parseEpub({ fileData }: {
     fileData: Buffer,
     title?: string,
 }): Promise<{
     value: Booq | undefined,
     diags: Diagnostic[],
 }> {
-    const diags = diagnoser(title ?? 'parseEpub')
+    const diags: Diagnoser = []
     try {
-        const file = await openFirstEpubPackage({ fileData, diagnoser: diags })
+        const file = await openEpubPackage({ fileData, diagnoser: diags })
         if (!file) {
-            return { value: undefined, diags: diags.all() }
+            return { value: undefined, diags: diags }
         }
         const book = await processEpub(file, diags)
-        return { value: book, diags: diags.all() }
+        return { value: book, diags: diags }
     } catch (err) {
         diags?.push({
             message: 'Unhandled exception on parsing',
             data: err as object,
         })
-        return { value: undefined, diags: diags.all() }
+        return { value: undefined, diags: diags }
     }
 }
 
@@ -39,10 +39,10 @@ export async function extractMetadata({ fileData, extractCover }: {
     value: ExtractedMetadata | undefined,
     diags: Diagnostic[],
 }> {
-    const diags = diagnoser('extract metadata')
-    const epub = await openFirstEpubPackage({ fileData, diagnoser: diags })
+    const diags: Diagnoser = []
+    const epub = await openEpubPackage({ fileData, diagnoser: diags })
     if (!epub) {
-        return { value: undefined, diags: diags.all() }
+        return { value: undefined, diags: diags }
     }
     const metadata = buildMeta(epub, diags)
     if (extractCover) {
@@ -53,15 +53,15 @@ export async function extractMetadata({ fileData, extractCover }: {
                 diags.push({
                     message: `couldn't load cover image: ${coverHref}`,
                 })
-                return { value: { metadata }, diags: diags.all() }
+                return { value: { metadata }, diags: diags }
             } else {
                 const cover = Buffer.from(coverBuffer).toString('base64')
-                return { value: { cover, metadata }, diags: diags.all() }
+                return { value: { cover, metadata }, diags: diags }
             }
         } else {
-            return { value: { metadata }, diags: diags.all() }
+            return { value: { metadata }, diags: diags }
         }
     } else {
-        return { value: { metadata }, diags: diags.all() }
+        return { value: { metadata }, diags: diags }
     }
 }

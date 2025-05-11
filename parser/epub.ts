@@ -6,6 +6,7 @@ export type EpubSection = {
     id: string,
     content: string,
 }
+// TODO: remove
 export type EpubMetadata = {
     fields: Record<string, Array<Record<string, string | undefined>> | undefined>,
     items: Array<{
@@ -27,82 +28,80 @@ export type EpubPackage = {
     toc(): Generator<EpubTocItem>,
 }
 
-export async function openFirstEpubPackage({ fileData, diagnoser }: {
+export async function openEpubPackage({ fileData, diagnoser }: {
     fileData: Buffer,
     diagnoser?: Diagnoser,
 }): Promise<EpubPackage | undefined> {
     const epub = open(createZipFileProvider(fileData), diagnoser)
-    for await (const pkg of epub.packages()) {
-        const toc = await pkg.toc()
-        try {
-
-            const book: EpubPackage = {
-                metadata: getMetadata(pkg.document, diagnoser),
-                bufferResolver: async href => {
-                    const item = await pkg.loadHref(href)
-                    if (!item || !item.content) {
-                        return undefined
-                    } else if (typeof item.content === 'string') {
-                        return undefined
-                    } else {
-                        return item.content as Buffer
-                    }
-                },
-                textResolver: async href => {
-                    const item = await pkg.loadHref(href)
-                    if (!item || !item.content) {
-                        return undefined
-                    } else if (typeof item.content === 'string') {
-                        return item.content
-                    } else {
-                        return undefined
-                    }
-                },
-                sections: async function* () {
-                    for (const el of pkg.spine()) {
-                        const id = el.manifestItem['@id']
-                        const href = el.manifestItem['@href']
-                        if (!id || !href) {
-                            continue
-                        }
-                        const loaded = await el.load()
-                        if (!loaded || typeof loaded.content !== 'string') {
-                            continue
-                        }
-                        const section: EpubSection = {
-                            id,
-                            fileName: href,
-                            content: loaded.content,
-                        }
-                        yield section
-                    }
-                },
-                toc: function* () {
-                    if (!toc) {
-                        return
-                    }
-                    for (const el of toc.items) {
-                        yield {
-                            level: el.level,
-                            label: el.label,
-                            href: el.href,
-                        }
-                    }
-                },
-            }
-
-            return book
-        } catch (e) {
-            diagnoser?.push({
-                message: 'exception on epub open',
-                data: e as object,
-            })
-        }
+    const { content: pkg } = await epub.documents().package() ?? {}
+    if (!pkg) {
+        return undefined
     }
-    diagnoser?.push({
-        message: 'no packages found',
-    })
-    return undefined
+    const spine = await epub.spine() ?? []
+    const toc = await epub.toc()
+
+    return {
+        metadata: getMetadata(pkg, diagnoser),
+        bufferResolver: async href => {
+            const manifestItem = await epub.itemForHref(href)
+            if (!manifestItem) {
+                return undefined
+            }
+            const item = await epub.loadItem(manifestItem)
+            if (!item || !item.content) {
+                return undefined
+            } else if (typeof item.content === 'string') {
+                return undefined
+            } else {
+                return item.content as Buffer
+            }
+        },
+        textResolver: async href => {
+            const manifestItem = await epub.itemForHref(href)
+            if (!manifestItem) {
+                return undefined
+            }
+            const item = await epub.loadItem(manifestItem)
+            if (!item || !item.content) {
+                return undefined
+            } else if (typeof item.content === 'string') {
+                return item.content
+            } else {
+                return undefined
+            }
+        },
+        sections: async function* () {
+            for (const { manifestItem } of spine) {
+                const id = manifestItem['@id']
+                const href = manifestItem['@href']
+                if (!id || !href) {
+                    continue
+                }
+                const loaded = await epub.loadItem(manifestItem)
+                if (!loaded || typeof loaded.content !== 'string') {
+                    continue
+                }
+                const section: EpubSection = {
+                    id,
+                    fileName: href,
+                    content: loaded.content,
+                }
+                yield section
+            }
+        },
+        toc: function* () {
+            if (!toc) {
+                return
+            }
+            for (const el of toc.items) {
+                yield {
+                    level: el.level,
+                    label: el.label,
+                    href: el.href,
+                }
+            }
+        },
+    }
 }
 
 function getMetadata(document: Unvalidated<PackageDocument>, diagnoser?: Diagnoser): EpubMetadata {
