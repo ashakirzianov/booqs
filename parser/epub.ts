@@ -1,156 +1,54 @@
-import { Diagnoser, PackageDocument, Unvalidated, openEpub as open } from 'booqs-epub'
-import { createZipFileProvider } from './zip'
+import { Diagnoser, openEpub, FileProvider } from 'booqs-epub'
+import JSZip from 'jszip'
 
-export type EpubSection = {
-    fileName: string,
-    id: string,
-    content: string,
-}
-// TODO: remove
-export type EpubMetadata = {
-    fields: Record<string, Array<Record<string, string | undefined>> | undefined>,
-    items: Array<{
-        name: string,
-        href: string,
-        id: string,
-    }>,
-}
-export type EpubTocItem = {
-    level: number,
-    label: string,
-    href: string,
-}
-export type EpubPackage = {
-    metadata: EpubMetadata,
-    bufferResolver(href: string): Promise<Buffer | undefined>,
-    textResolver(href: string): Promise<string | undefined>,
-    sections(): AsyncGenerator<EpubSection>,
-    toc(): Generator<EpubTocItem>,
-}
+// TODO: use export from 'booqs-epub' instead of this
+export type EpubFile = NonNullable<Awaited<ReturnType<typeof openEpubFile>>>
 
-export async function openEpubPackage({ fileData, diagnoser }: {
-    fileData: Buffer,
+export async function openEpubFile({ fileBuffer, diagnoser }: {
+    fileBuffer: Buffer,
     diagnoser?: Diagnoser,
-}): Promise<EpubPackage | undefined> {
-    const epub = open(createZipFileProvider(fileData), diagnoser)
-    const { content: pkg } = await epub.documents().package() ?? {}
-    if (!pkg) {
-        return undefined
-    }
-    const spine = await epub.spine() ?? []
-    const toc = await epub.toc()
-
-    return {
-        metadata: getMetadata(pkg, diagnoser),
-        bufferResolver: async href => {
-            const manifestItem = await epub.itemForHref(href)
-            if (!manifestItem) {
-                return undefined
-            }
-            const item = await epub.loadItem(manifestItem)
-            if (!item || !item.content) {
-                return undefined
-            } else if (typeof item.content === 'string') {
-                return undefined
-            } else {
-                return item.content as Buffer
-            }
-        },
-        textResolver: async href => {
-            const manifestItem = await epub.itemForHref(href)
-            if (!manifestItem) {
-                return undefined
-            }
-            const item = await epub.loadItem(manifestItem)
-            if (!item || !item.content) {
-                return undefined
-            } else if (typeof item.content === 'string') {
-                return item.content
-            } else {
-                return undefined
-            }
-        },
-        sections: async function* () {
-            for (const { manifestItem } of spine) {
-                const id = manifestItem['@id']
-                const href = manifestItem['@href']
-                if (!id || !href) {
-                    continue
-                }
-                const loaded = await epub.loadItem(manifestItem)
-                if (!loaded || typeof loaded.content !== 'string') {
-                    continue
-                }
-                const section: EpubSection = {
-                    id,
-                    fileName: href,
-                    content: loaded.content,
-                }
-                yield section
-            }
-        },
-        toc: function* () {
-            if (!toc) {
-                return
-            }
-            for (const el of toc.items) {
-                yield {
-                    level: el.level,
-                    label: el.label,
-                    href: el.href,
-                }
-            }
-        },
-    }
+}) {
+    const epub = openEpub(createZipFileProvider(fileBuffer), diagnoser)
+    return epub
 }
 
-function getMetadata(document: Unvalidated<PackageDocument>, diagnoser?: Diagnoser): EpubMetadata {
-    const metadata = document.package?.[0]?.metadata?.[0]
-    const manifest = document.package?.[0]?.manifest?.[0]?.item
-    if (!metadata || !manifest) {
-        diagnoser?.push({
-            message: 'bad package: no metadata or manifest',
-        })
-        return {
-            fields: {},
-            items: [],
+type NodeBuffer = globalThis.Buffer<ArrayBufferLike>
+export function createZipFileProvider(fileContent: Buffer): FileProvider<NodeBuffer> {
+    let _zip: Promise<JSZip> | undefined
+    async function zip() {
+        if (!_zip) {
+            _zip = JSZip.loadAsync(fileContent)
         }
-    }
-    const { meta, ...rest } = metadata
-    const fields: EpubMetadata['fields'] = rest
-    const items: EpubMetadata['items'] = []
-    for (const m of meta ?? []) {
-        const record = m as Record<string, string>
-        const name = record['@name']
-        if (name) {
-            const contentId = record['@content']
-            if (!contentId) {
-                diagnoser?.push({
-                    message: 'bad package: meta without content',
-                })
-                continue
-            }
-            const manifestItem = manifest.find(i => i['@id'] === contentId)
-            if (!manifestItem) {
-                fields[name] = [{ '#text': contentId }]
-                continue
-            }
-            const { '@id': id, '@href': href } = manifestItem
-            if (!id || !href) {
-                diagnoser?.push({
-                    message: 'bad package: meta with bad content',
-                })
-                continue
-            }
-            items.push({
-                name,
-                href,
-                id,
-            })
-        }
+        return _zip
     }
     return {
-        fields,
-        items,
+        async readText(path, diags) {
+            try {
+                const file = (await zip()).file(path)
+                if (!file) {
+                    return undefined
+                }
+                return file.async('text')
+            } catch (e) {
+                diags?.push({
+                    message: `Error reading text ${path}: ${e}`,
+                })
+                return undefined
+            }
+        },
+        async readBinary(path, diags) {
+            try {
+                const file = (await zip()).file(path)
+                if (!file) {
+                    return undefined
+                }
+                return file.async('nodebuffer')
+            } catch (e) {
+                diags?.push({
+                    message: `Error reading binary ${path}: ${e}`,
+                })
+                return undefined
+            }
+        },
     }
 }

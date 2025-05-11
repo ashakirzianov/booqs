@@ -2,12 +2,16 @@ import { Diagnoser } from 'booqs-epub'
 import {
     BooqNode, TableOfContentsItem, TableOfContents, findPathForId, positionForPath,
 } from '../core'
-import { EpubPackage } from './epub'
+import { EpubFile } from './epub'
 import { transformHref } from './parserUtils'
 
-export async function buildToc(nodes: BooqNode[], file: EpubPackage, diags: Diagnoser): Promise<TableOfContents> {
+export async function buildToc(nodes: BooqNode[], file: EpubFile, diags: Diagnoser): Promise<TableOfContents> {
     const items: TableOfContentsItem[] = []
-    for (const epubTocItem of file.toc()) {
+    const { items: toc, title } = await file.toc() ?? {
+        title: undefined,
+        items: [],
+    }
+    for (const epubTocItem of toc) {
         if (epubTocItem.href) {
             const targetId = transformHref(epubTocItem.href).substring(1)
             const path = findPathForId(nodes, targetId)
@@ -26,8 +30,6 @@ export async function buildToc(nodes: BooqNode[], file: EpubPackage, diags: Diag
             }
         }
     }
-    const titles = file.metadata.fields['title'] ?? file.metadata.fields['dc:title'] ?? []
-    const title = titles.map(t => t['#text']).join(', ')
 
     return {
         title,

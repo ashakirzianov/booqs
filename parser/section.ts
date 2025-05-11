@@ -2,7 +2,7 @@ import { BooqNode, BooqNodeStyle, BooqElementNode } from '../core'
 import {
     xmlStringParser, XmlElement, findByName, xml2string, childrenOf, nameOf, attributesOf, textOf, asObject, XmlAttributes,
 } from './xmlTree'
-import { EpubSection, EpubPackage } from './epub'
+import { EpubFile } from './epub'
 import { parseCss, Stylesheet, StyleRule, applyRules } from './css'
 import { transformHref } from './parserUtils'
 import capitalize from 'lodash-es/capitalize'
@@ -10,14 +10,19 @@ import { resolveRelativePath } from './path'
 import { isComment } from 'domutils'
 import { Diagnoser } from 'booqs-epub'
 
-export async function parseSection(section: EpubSection, file: EpubPackage, diags: Diagnoser): Promise<BooqNode | undefined> {
+export type EpubSection = {
+    fileName: string,
+    id: string,
+    content: string,
+}
+export async function parseSection(section: EpubSection, file: EpubFile, diags: Diagnoser): Promise<BooqNode | undefined> {
     const node = await processSectionContent(section.content, {
         fileName: section.fileName,
         stylesheet: { rules: [] },
         diags,
         resolveTextFile: async href => {
             const resolved = resolveRelativePath(href, section.fileName)
-            return file.textResolver(resolved)
+            return file.loadTextFile(resolved)
         },
     })
     return node

@@ -1,15 +1,31 @@
 import { BooqNode, Booq, nodesLength } from '../core'
-import { EpubPackage } from './epub'
-import { parseSection } from './section'
+import { EpubFile } from './epub'
+import { EpubSection, parseSection } from './section'
 import { buildImages } from './images'
 import { buildToc } from './toc'
 import { preprocess } from './preprocess'
 import { buildMeta } from './metadata'
 import { Diagnoser } from 'booqs-epub'
 
-export async function processEpub(epub: EpubPackage, diags: Diagnoser): Promise<Booq | undefined> {
+// TODO: make sync again
+export async function processEpub(epub: EpubFile, diags: Diagnoser): Promise<Booq | undefined> {
     const nodes: BooqNode[] = []
-    for await (const section of epub.sections()) {
+    const spine = await epub.spine() ?? []
+    for (const { manifestItem } of spine) {
+        const id = manifestItem['@id']
+        const href = manifestItem['@href']
+        if (!id || !href) {
+            continue
+        }
+        const loaded = await epub.loadItem(manifestItem)
+        if (!loaded || typeof loaded.content !== 'string') {
+            continue
+        }
+        const section: EpubSection = {
+            id,
+            fileName: href,
+            content: loaded.content,
+        }
         const value = await parseSection(section, epub, diags)
         if (!value) {
             return undefined
@@ -17,7 +33,7 @@ export async function processEpub(epub: EpubPackage, diags: Diagnoser): Promise<
         nodes.push(value)
     }
 
-    const meta = buildMeta(epub, diags)
+    const meta = await buildMeta(epub, diags)
     const images = await buildImages(nodes, meta, epub, diags)
     const toc = await buildToc(nodes, epub, diags)
 
