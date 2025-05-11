@@ -1,5 +1,5 @@
 import { inspect } from 'util'
-import { downloadAsset } from './s3'
+import { assetExists, downloadAsset, uploadAsset } from './s3'
 import {
     existingIds, pgEpubsBucket, insertPgRecord,
 } from './pg'
@@ -11,7 +11,11 @@ type AssetRecord = {
     assetId: string,
     asset: Buffer,
 }
-export async function syncWithGutenberg() {
+
+export type SyncOptions = {
+    skipExistingS3: boolean,
+}
+export async function syncWithGutenberg(options?: SyncOptions) {
     const existing = await existingIds()
     const existingSet = new Set(existing.map(id => id.toString()))
     info(`Found ${existingSet.size} existing ids`)
@@ -23,7 +27,7 @@ export async function syncWithGutenberg() {
             continue
         }
         try {
-            await processId(id)
+            await processId(id, options)
         } catch (err) {
             console.error(`Error processing ${id}`, err)
             await reportProblem(id, 'Processing error', err)
@@ -31,23 +35,39 @@ export async function syncWithGutenberg() {
     }
 }
 
-async function processId(id: string) {
+async function processId(id: string, options?: SyncOptions) {
     info(`Processing ${id}`)
     if (await hasProblems(id)) {
         info(`Skipping ${id} because it has problems`)
         return false
     }
-    let needToUploadImages = false
-    let assetRecord: AssetRecord | undefined = await existingAssetForId(id)
-    if (!assetRecord) {
-        info(`Downloading gutenberg epub for id: ${id}`)
+    let needToUploadImages = true
+    if (options?.skipExistingS3) {
+        const existingAssetId = await assetExistForId(id)
+        if (existingAssetId) {
+            info(`Skipping ${id} because it already exists in S3: ${existingAssetId}`)
+            return false
+        }
+    }
+    let assetRecord: AssetRecord | undefined
+    if (!options?.skipExistingS3) {
+        assetRecord = await existingAssetForId(id)
+        if (assetRecord) {
+            info(`Found existing asset for ${id}: ${assetRecord.assetId}`)
+            needToUploadImages = false
+        }
+    } else {
         assetRecord = await downloadGutenbergEpub(id)
         if (assetRecord) {
             info(`Downloaded gutenberg epub file: ${assetRecord.assetId}`)
+            const result = await uploadAsset(pgEpubsBucket, assetRecord.assetId, assetRecord.asset)
+            if (result.$metadata.httpStatusCode !== 200) {
+                info(`Failed to upload asset for id: ${id}`)
+                return false
+            } else {
+                info(`Uploaded asset to S3: ${assetRecord.assetId}`)
+            }
         }
-        needToUploadImages = true
-    } else {
-        info(`Found existing asset for ${id}: ${assetRecord.assetId}`)
     }
     if (!assetRecord) {
         reportProblem(id, `Couldn't download asset for id: ${id}`, new Error('No asset'))
@@ -103,6 +123,20 @@ async function reportProblem(id: string, message: string, err: any) {
     })
 }
 
+async function assetExistForId(id: string): Promise<string | undefined> {
+    const nameWithImages = `pg${id}-images.epub`
+    const assetWithImages = await assetExists(pgEpubsBucket, nameWithImages)
+    if (assetWithImages) {
+        return nameWithImages
+    }
+    const nameWithoutImages = `pg${id}.epub`
+    const assetWithoutImages = await assetExists(pgEpubsBucket, nameWithoutImages)
+    if (assetWithoutImages) {
+        return nameWithImages
+    }
+    return undefined
+}
+
 async function existingAssetForId(id: string): Promise<AssetRecord | undefined> {
     const nameWithImages = `pg${id}-images.epub`
     const assetWithImages = await downloadAsset(pgEpubsBucket, nameWithImages)
@@ -137,16 +171,20 @@ async function getAllGutenbergIds(): Promise<string[]> {
     const text = await res.text()
 
     const ids: string[] = []
+    const set = new Set<string>()
 
     const lines = text.split('\n')
     for (const line of lines) {
         const match = line.trim().match(/\d+$/)
         if (match) {
-            ids.push(match[0])
+            if (!set.has(match[0])) {
+                set.add(match[0])
+                ids.push(match[0])
+            }
         }
     }
 
-    return [...new Set(ids)]
+    return ids
 }
 
 async function downloadGutenbergEpub(id: string): Promise<AssetRecord | undefined> {
