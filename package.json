@@ -9,7 +9,7 @@
     "lint": "next lint",
     "https": "next dev --experimental-https",
     "analyze": "ANALYZE=true next build",
-    "workers": "tsx scripts/index.ts"
+    "cli": "tsx cli/index.ts"
   },
   "dependencies": {
     "@apollo/server": "^4.11.3",

@@ -9,7 +9,7 @@ const nextConfig = {
         dirs: [
             'app', 'application',
             'backend',
-            'components', 'core',
+            'components', 'core', 'cli',
             'data',
             'graphql', 'parser', 'reader', 'viewer',
         ],
