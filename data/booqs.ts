@@ -59,12 +59,18 @@ export async function fetchBooqPreview(booqId: BooqId, path: BooqPath, end?: Boo
     return booqPreview(booqId, path, end)
 }
 
-export async function booqPart(booqId: BooqId, path?: BooqPath): Promise<PartialBooqData | undefined> {
+export async function booqPart({
+    booqId, path, bypassCache,
+}: {
+    booqId: BooqId,
+    path?: BooqPath,
+    bypassCache?: boolean,
+}): Promise<PartialBooqData | undefined> {
     const [card] = await libraryCardsForIds([booqId])
     if (card === undefined) {
         return undefined
     }
-    const booq = await booqForId(booqId)
+    const booq = await booqForId(booqId, bypassCache)
     if (booq === undefined) {
         return undefined
     }

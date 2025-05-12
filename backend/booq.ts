@@ -4,7 +4,10 @@ import { logTime, logTimeAsync } from './utils'
 import { parseEpubFile } from '@/parser'
 import { fileForId } from './library'
 
-export async function booqForId(booqId: BooqId) {
+export async function booqForId(booqId: BooqId, bypassCache = false): Promise<Booq | undefined> {
+    if (bypassCache) {
+        return parseBooqForId(booqId)
+    }
     const cached = await redis.get<Booq>(`cache:booq:${booqId}`)
     if (cached) {
         return cached
