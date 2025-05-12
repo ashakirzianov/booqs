@@ -158,15 +158,18 @@ function extractRights(records: Records, diags?: Diagnoser): string | undefined 
 function extractTags(epubMetadata: EpubMetadata, diags?: Diagnoser): BooqMetaTag[] {
     const {
         date,
+        cover, // Ignoring this
+        ...rest
+    } = epubMetadata
+    const {
         source, publisher,
-        cover,
         'calibre:timestamp': calibreTimestamp,
         'calibre:title_sort': calibreSeries,
         'calibre:series': calibreTitleSort,
         'calibre:series_index': calibreSeriesIndex,
-        ...rest
-    } = epubMetadata
-    for (const key of Object.keys(rest)) {
+        ...unexpected
+    } = rest
+    for (const key of Object.keys(unexpected)) {
         diags?.push({
             message: `Unexpected attribute ${key} in metadata`,
             severity: 'warning',
@@ -174,8 +177,6 @@ function extractTags(epubMetadata: EpubMetadata, diags?: Diagnoser): BooqMetaTag
     }
     const tags = [
         ...extractDates(date, diags),
-        ...extractTextTags(source, 'source', diags),
-        ...extractTextTags(publisher, 'publisher', diags),
         ...extractRest(rest, diags),
     ]
 
@@ -196,24 +197,21 @@ function extractDates(records: Records, diags?: Diagnoser): BooqMetaTag[] {
         ?? []
 }
 
-function extractTextTags(records: Records, key: string, diags?: Diagnoser): BooqMetaTag[] {
-    return records
-        ?.filter(r => validateMetadataRecord(r, {
-            expectedAttributes: ['#text'],
-            diags,
-        }))
-        ?.map(r => ([
-            key,
-            r['#text'],
-        ]))
-        ?? []
-}
-
 function extractRest(epubMetadata: EpubMetadata, _diags?: Diagnoser): BooqMetaTag[] {
-    return Object.entries(epubMetadata)
+    const result = Object.entries(epubMetadata)
         .map(([key, value]) => {
-            return [key, JSON.stringify(value)]
-        })
+            return (value ?? []).map(value => {
+                return Object.entries(value ?? {})
+                    .map<BooqMetaTag>(([subKey, subValue]) => {
+                        if (subKey === '#text') {
+                            return [key, subValue]
+                        } else {
+                            return [`${key}:${subKey}`, subValue]
+                        }
+                    })
+            })
+        }).flat(2)
+    return result
 }
 
 type ExtractedMetadata<Keys extends string, OptKeys extends string> = Record<Keys, string> & Record<OptKeys, string | undefined>
