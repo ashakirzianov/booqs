@@ -15,12 +15,20 @@ export async function parseEpubs(options: CliOptions) {
         path: string,
         diags: Diagnostic[],
     }> = []
+    const CHUNK_SIZE = 1000
     let count = 0
+    let chunk = 0
+    const optionsString = Object.entries(options.switches).map(([key, value]) => `${key}=${value}`).join(' ')
+    const timeKey = `parse: ${optionsString}`
+    console.time(timeKey)
+    console.time(`chunk ${chunk}`)
     for await (const path of allEpubFiles(paths)) {
         try {
             const { booq, epub, diags } = await processEpubFile(path, options)
-            if ((++count) % 1000 === 0) {
+            if ((++count) % CHUNK_SIZE === 0) {
                 console.info(`Processed ${count} files`)
+                console.timeEnd(`chunk ${chunk++}`)
+                console.time(`chunk ${chunk}`)
             }
             if (options.switches['metadata'] === 'true') {
                 console.info(`Metadata for ${path}: ${pretty(booq?.meta)}`)
@@ -65,6 +73,8 @@ export async function parseEpubs(options: CliOptions) {
     } else {
         console.info(`No problems found in ${count} files`)
     }
+    console.timeEnd(`chunk ${chunk}`)
+    console.timeEnd(timeKey)
 }
 
 async function processEpubFile(filePath: string, options: CliOptions) {
