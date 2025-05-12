@@ -4,6 +4,22 @@ import { Diagnoser, EpubMetadata, EpubMetadataItem, scoped } from 'booqs-epub'
 
 export async function buildMeta(epub: EpubFile, diags?: Diagnoser): Promise<BooqMeta> {
     const epubMetadata = await epub.metadata()
+    if (!epubMetadata) {
+        diags?.push({
+            message: 'Missing metadata in epub',
+        })
+        return {
+            title: undefined,
+            authors: undefined,
+            languages: undefined,
+            contributors: undefined,
+            description: undefined,
+            subjects: undefined,
+            rights: undefined,
+            tags: [],
+            coverSrc: undefined,
+        }
+    }
     const coverItem = await epub.coverItem()
 
     const {
@@ -58,6 +74,7 @@ function extractTitle(records: Records, diags?: Diagnoser): string | undefined {
         diags?.push({
             message: 'Multiple titles found in metadata',
             data: { records },
+            severity: 'warning',
         })
     }
     return records

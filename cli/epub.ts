@@ -23,7 +23,7 @@ export async function processEpubs(options: CliOptions) {
                 console.info(`Processed ${count} files`)
             }
             if (result.length > 0) {
-                console.info(`Problems found in ${path}`)
+                console.info(`Problems found in ${path}: ${pretty(result)}`)
                 problems.push({
                     path,
                     diags: result,
@@ -81,7 +81,9 @@ async function processEpubFile(filePath: string, options: CliOptions): Promise<D
                     if (options.switches['raw'] === 'true') {
                         console.info(`Raw metadata for ${filePath}: ${pretty(epubMeta)}`)
                     }
-                    console.info(`Metadata for ${filePath}: ${pretty(metadata)}`)
+                    if (options.switches['metadata'] === 'true') {
+                        console.info(`Booqs metadata for ${filePath}: ${pretty(metadata)}`)
+                    }
                 }
                 return filtered
             }
