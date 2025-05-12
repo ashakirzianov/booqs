@@ -2,10 +2,10 @@ import { Diagnoser } from 'booqs-epub'
 import {
     BooqNode, TableOfContentsItem, TableOfContents, findPathForId, positionForPath,
 } from '../core'
-import { EpubFile } from './epub'
+import { Epub } from './epub'
 import { transformHref } from './parserUtils'
 
-export async function buildToc(nodes: BooqNode[], file: EpubFile, diags: Diagnoser): Promise<TableOfContents> {
+export async function buildToc(nodes: BooqNode[], file: Epub, diags: Diagnoser): Promise<TableOfContents> {
     const items: TableOfContentsItem[] = []
     const { items: toc, title } = await file.toc() ?? {
         title: undefined,

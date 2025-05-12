@@ -3,7 +3,7 @@ import fs from 'fs'
 import path from 'path'
 import type { CliOptions } from './main'
 import { Diagnostic, openEpub } from 'booqs-epub'
-import { validateEpubFile } from '@/parser/validator'
+import { validateEpub } from '@/parser/validate'
 import { inspect } from 'util'
 import { extractMetadataFromEpub } from '@/parser'
 import { createZipFileProvider } from '@/parser/zip'
@@ -64,7 +64,7 @@ async function processEpubFile(filePath: string, options: CliOptions): Promise<D
     const diagnoser: Diagnostic[] = []
     const epub = openEpub(createZipFileProvider(fileBuffer), diagnoser)
     if (options.switches['validate'] === 'true') {
-        const result = await validateEpubFile({
+        const result = await validateEpub({
             epub, diags: diagnoser,
         })
         return filterDiags(result.diags)

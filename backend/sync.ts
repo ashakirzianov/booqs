@@ -3,7 +3,7 @@ import { assetExists, downloadAsset, uploadAsset } from './s3'
 import {
     existingIds, pgEpubsBucket, insertPgRecord,
 } from './pg'
-import { parseEpub } from '@/parser'
+import { parseEpubFile } from '@/parser'
 import { uploadBooqImages } from './images'
 import { redis } from './db'
 
@@ -96,7 +96,7 @@ async function parseAndInsert({
     record: AssetRecord,
 }) {
     info(`Processing ${assetId}`)
-    const { value: booq, diags } = await parseEpub({
+    const { value: booq, diags } = await parseEpubFile({
         fileBuffer: asset as any,
     })
     if (!booq) {

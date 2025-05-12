@@ -1,7 +1,7 @@
 import { Booq, BooqId, BooqPath, pathToString, positionForPath, previewForPath, textForRange } from '@/core'
 import { redis } from './db'
 import { logTime, logTimeAsync } from './utils'
-import { parseEpub } from '@/parser'
+import { parseEpubFile } from '@/parser'
 import { fileForId } from './library'
 
 export async function booqForId(booqId: BooqId) {
@@ -67,9 +67,8 @@ async function parseBooqForId(booqId: BooqId) {
     if (!file) {
         return undefined
     }
-    const { value: booq, diags } = await logTimeAsync('parse epub', () => parseEpub({
+    const { value: booq, diags } = await logTimeAsync('parse epub', () => parseEpubFile({
         fileBuffer: file.file,
-        title: booqId,
     }))
     diags.forEach(console.info)
     return booq

@@ -1,14 +1,14 @@
 import { BooqNode, Booq, nodesLength } from '../core'
-import { EpubFile } from './epub'
+import { Epub } from './epub'
 import { EpubSection, parseSection } from './section'
 import { buildImages } from './images'
 import { buildToc } from './toc'
 import { preprocess } from './preprocess'
-import { buildMeta } from './metadata'
+import { extactBooqMeta } from './metadata'
 import { Diagnoser } from 'booqs-epub'
 
 // TODO: make sync again
-export async function processEpub(epub: EpubFile, diags: Diagnoser): Promise<Booq | undefined> {
+export async function processEpub(epub: Epub, diags: Diagnoser): Promise<Booq | undefined> {
     const nodes: BooqNode[] = []
     const spine = await epub.spine() ?? []
     for (const { manifestItem } of spine) {
@@ -33,7 +33,7 @@ export async function processEpub(epub: EpubFile, diags: Diagnoser): Promise<Boo
         nodes.push(value)
     }
 
-    const meta = await buildMeta(epub, diags)
+    const meta = await extactBooqMeta(epub, diags)
     const images = await buildImages(nodes, meta, epub, diags)
     const toc = await buildToc(nodes, epub, diags)
 

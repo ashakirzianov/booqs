@@ -4,7 +4,7 @@ import { existsSync, lstat, readdir, writeFile, readFile } from 'fs'
 import { extname, join } from 'path'
 import { promisify, inspect } from 'util'
 import { Booq } from '../core'
-import { parseEpub } from './index'
+import { parseEpubFile } from './index'
 
 exec()
 
@@ -33,7 +33,7 @@ async function exec() {
 
 async function processEpubFile(filePath: string, verbosity: number = 0) {
     const fileBuffer = await promisify(readFile)(filePath)
-    const { value: booq, diags } = await parseEpub({
+    const { value: booq, diags } = await parseEpubFile({
         fileBuffer,
     })
     if (verbosity > -1) {

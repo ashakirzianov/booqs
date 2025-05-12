@@ -2,7 +2,7 @@ import { createHash } from 'crypto'
 import { ReadStream } from 'fs'
 import { inspect } from 'util'
 import type { InLibraryCard, Library, InLibrarySearchResult } from './library'
-import { parseEpub } from '@/parser'
+import { parseEpubFile } from '@/parser'
 import { Booq, BooqMetaTag, nodesLength } from '@/core'
 import { nanoid } from 'nanoid'
 import { deleteAsset, downloadAsset, uploadAsset } from './s3'
@@ -126,7 +126,7 @@ export async function uploadEpub(fileBuffer: Buffer, userId: string) {
 }
 
 async function uploadNewEpub({ buffer, hash }: File, userId: string) {
-    const { value: booq, diags } = await parseEpub({
+    const { value: booq, diags } = await parseEpubFile({
         fileBuffer: buffer,
     })
     diags.forEach(d => report(JSON.stringify(d)))
