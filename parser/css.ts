@@ -3,6 +3,7 @@ import {
 } from 'css'
 import { compile, is } from 'css-select'
 import { selectorSpecificity, compare } from '@csstools/selector-specificity'
+import selectorParser from 'postcss-selector-parser'
 import { flatten } from 'lodash'
 import { XmlElement, attributesOf } from './xmlTree'
 import { Diagnoser } from 'booqs-epub'
@@ -196,7 +197,8 @@ function isSelect(xml: XmlElement, selector: Selector) {
 function parseSelector(selector: string, diags: Diagnoser): Selector | undefined {
     try {
         const compiled = compile(selector)
-        const specificity = selectorSpecificity(selector as any)
+        const parsed = selectorParser().astSync(selector)
+        const specificity = selectorSpecificity(parsed)
         return {
             selector,
             compiled,
