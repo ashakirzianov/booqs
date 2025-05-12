@@ -16,8 +16,6 @@ async function main() {
     } else {
         await processEpubs(options)
     }
-
-    console.info(`Finished running pg sync`)
 }
 
 export type CliOptions = {

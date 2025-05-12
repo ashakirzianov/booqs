@@ -1,7 +1,7 @@
 import { Diagnoser, Diagnostic } from 'booqs-epub'
 import { Booq, BooqMeta } from '../core'
 import { processEpub } from './book'
-import { openEpubFile } from './epub'
+import { EpubFile, openEpubFile } from './epub'
 import { buildMeta } from './metadata'
 
 export async function parseEpub({ fileBuffer }: {
@@ -41,6 +41,40 @@ export async function extractMetadata({ fileBuffer, extractCover }: {
 }> {
     const diags: Diagnoser = []
     const epub = await openEpubFile({ fileBuffer: fileBuffer, diagnoser: diags })
+    if (!epub) {
+        return { value: undefined, diags: diags }
+    }
+    const metadata = await buildMeta(epub, diags)
+    if (extractCover) {
+        const coverHref = metadata.coverSrc
+        if (typeof coverHref === 'string') {
+            const coverBuffer = await epub.loadBinaryFile(coverHref)
+            if (!coverBuffer) {
+                diags.push({
+                    message: `couldn't load cover image: ${coverHref}`,
+                })
+                return { value: { metadata }, diags: diags }
+            } else {
+                const cover = Buffer.from(coverBuffer).toString('base64')
+                return { value: { cover, metadata }, diags: diags }
+            }
+        } else {
+            return { value: { metadata }, diags: diags }
+        }
+    } else {
+        return { value: { metadata }, diags: diags }
+    }
+}
+
+export async function extractMetadataFromEpub({ epub, extractCover, diags }: {
+    epub: EpubFile,
+    diags?: Diagnoser,
+    extractCover?: boolean,
+}): Promise<{
+    value: ExtractedMetadata | undefined,
+    diags: Diagnostic[],
+}> {
+    diags = diags ?? []
     if (!epub) {
         return { value: undefined, diags: diags }
     }

@@ -1,7 +1,8 @@
-import { Diagnoser, Diagnostic, epubDocumentLoader } from 'booqs-epub'
+import { Diagnoser, Diagnostic, openEpub } from 'booqs-epub'
 import { createZipFileProvider } from './zip'
 import { z } from 'zod'
 import { containerDocument, navDocument, ncxDocument, packageDocument } from './schema'
+import { EpubFile } from './epub'
 
 export async function validateEpub({ fileBuffer, diags }: {
     fileBuffer: Buffer,
@@ -10,8 +11,18 @@ export async function validateEpub({ fileBuffer, diags }: {
     diags: Diagnostic[],
 }> {
     diags = diags ?? []
+    const epub = openEpub(createZipFileProvider(fileBuffer), diags)
+    return validateEpubFile({ epub, diags })
+}
+
+export async function validateEpubFile({
+    epub, diags,
+}: { epub: EpubFile, diags?: Diagnoser }): Promise<{
+    diags: Diagnostic[],
+}> {
+    diags = diags ?? []
     try {
-        const docs = epubDocumentLoader(createZipFileProvider(fileBuffer), diags)
+        const docs = epub.documents()
         const map = {
             container: containerDocument,
             package: packageDocument,
