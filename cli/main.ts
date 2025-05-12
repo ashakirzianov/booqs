@@ -1,5 +1,5 @@
 import { syncWithGutenberg } from '@/backend/sync'
-import { processEpubs } from './epub'
+import { parseEpubs } from './parse'
 
 main().catch((err) => {
     console.error(err)
@@ -8,13 +8,22 @@ main().catch((err) => {
 
 async function main() {
     const options = parseCliOptions()
+    const [command, ...subCommands] = options.commands
+    switch (command) {
+        case 'parse':
+            await parseEpubs({
+                ...options,
+                commands: subCommands,
+            })
+            return
+        default:
+            console.info('Unknown command')
+    }
     if (options.switches.worker === 'pgsync') {
         console.info('Running pg sync: S3 to Store...')
         await syncWithGutenberg({
             skipExistingS3: options.switches['skip-s3'] === 'true',
         })
-    } else {
-        await processEpubs(options)
     }
 }
 

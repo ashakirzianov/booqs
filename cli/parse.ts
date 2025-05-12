@@ -5,10 +5,10 @@ import type { CliOptions } from './main'
 import { Diagnostic, openEpub } from 'booqs-epub'
 import { validateEpub } from '@/parser/validate'
 import { inspect } from 'util'
-import { extractMetadataFromEpub } from '@/parser'
+import { parseEpub } from '@/parser'
 import { createZipFileProvider } from '@/parser/zip'
 
-export async function processEpubs(options: CliOptions) {
+export async function parseEpubs(options: CliOptions) {
     console.info('Processing epub files...')
     const paths = options.commands
     const problems: Array<{
@@ -18,15 +18,23 @@ export async function processEpubs(options: CliOptions) {
     let count = 0
     for await (const path of allEpubFiles(paths)) {
         try {
-            const result = await processEpubFile(path, options)
+            const { booq, epub, diags } = await processEpubFile(path, options)
             if ((++count) % 1000 === 0) {
                 console.info(`Processed ${count} files`)
             }
-            if (result.length > 0) {
-                console.info(`Problems found in ${path}: ${pretty(result)}`)
+            if (options.switches['metadata'] === 'true') {
+                console.info(`Metadata for ${path}: ${pretty(booq?.meta)}`)
+                if (options.switches['raw'] === 'true') {
+                    const rawMetadata = await epub.metadata()
+                    console.info(`Raw metadata for ${path}: ${pretty(rawMetadata)}`)
+                }
+            }
+            const filtered = filterDiags(diags, options)
+            if (filtered.length > 0) {
+                console.info(`Problems found in ${path}: ${pretty(filtered)}`)
                 problems.push({
                     path,
-                    diags: result,
+                    diags: filtered,
                 })
                 if (options.switches['quick-fail'] === 'true') {
                     break
@@ -59,41 +67,30 @@ export async function processEpubs(options: CliOptions) {
     }
 }
 
-async function processEpubFile(filePath: string, options: CliOptions): Promise<Diagnostic[]> {
+async function processEpubFile(filePath: string, options: CliOptions) {
+    const diags: Diagnostic[] = []
     const fileBuffer = await fs.promises.readFile(filePath)
-    const diagnoser: Diagnostic[] = []
-    const epub = openEpub(createZipFileProvider(fileBuffer), diagnoser)
-    if (options.switches['validate'] === 'true') {
-        const result = await validateEpub({
-            epub, diags: diagnoser,
+    const epub = openEpub(createZipFileProvider(fileBuffer), diags)
+    const { value: booq } = await parseEpub({
+        epub, diags,
+    })
+    if (!booq) {
+        diags?.push({
+            message: `Can't parse file`,
+            severity: 'critical',
         })
-        return filterDiags(result.diags)
-    } else {
-        const epubMeta = await epub.metadata()
-        if (epubMeta) {
-            const { value, diags } = await extractMetadataFromEpub({
-                epub, diags: diagnoser,
-            })
-            if (value) {
-                const { metadata } = value
-                const filtered = filterDiags(diags)
-                if (filtered.length > 0 || options.switches['show-each'] === 'true') {
-                    if (options.switches['raw'] === 'true') {
-                        console.info(`Raw metadata for ${filePath}: ${pretty(epubMeta)}`)
-                    }
-                    if (options.switches['metadata'] === 'true') {
-                        console.info(`Booqs metadata for ${filePath}: ${pretty(metadata)}`)
-                    }
-                }
-                return filtered
-            }
-        }
-        diagnoser.push(`Can't get metadata for ${filePath}`)
-        return filterDiags(diagnoser)
+    }
+    if (options.switches['validate'] === 'true') {
+        await validateEpub({
+            epub, diags,
+        })
+    }
+    return {
+        booq, epub, diags,
     }
 }
 
-function filterDiags(diags: Diagnostic[]): Diagnostic[] {
+function filterDiags(diags: Diagnostic[], options: CliOptions): Diagnostic[] {
     return diags.filter(diag => {
         return diag.severity !== 'info'
         // && !diag.message?.startsWith('Missing attribute #text')
