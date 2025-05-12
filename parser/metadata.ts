@@ -159,7 +159,12 @@ function extractTags(epubMetadata: EpubMetadata, diags?: Diagnoser): BooqMetaTag
     const {
         date,
         source, publisher,
-        cover, ...rest
+        cover,
+        'calibre:timestamp': calibreTimestamp,
+        'calibre:title_sort': calibreSeries,
+        'calibre:series': calibreTitleSort,
+        'calibre:series_index': calibreSeriesIndex,
+        ...rest
     } = epubMetadata
     for (const key of Object.keys(rest)) {
         diags?.push({

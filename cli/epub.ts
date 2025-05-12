@@ -55,7 +55,7 @@ export async function processEpubs(options: CliOptions) {
             console.info(`Problems in ${path}: ${pretty(diags)}`)
         }
     } else {
-        console.info('No problems found')
+        console.info(`No problems found in ${count} files`)
     }
 }
 
@@ -77,7 +77,7 @@ async function processEpubFile(filePath: string, options: CliOptions): Promise<D
             if (value) {
                 const { metadata } = value
                 const filtered = filterDiags(diags)
-                if (filtered.length > 0) {
+                if (filtered.length > 0 || options.switches['show-each'] === 'true') {
                     if (options.switches['raw'] === 'true') {
                         console.info(`Raw metadata for ${filePath}: ${pretty(epubMeta)}`)
                     }
@@ -96,6 +96,8 @@ async function processEpubFile(filePath: string, options: CliOptions): Promise<D
 function filterDiags(diags: Diagnostic[]): Diagnostic[] {
     return flattenDiags(diags).filter(diag => {
         return diag.severity !== 'info'
+        // && !diag.message?.startsWith('Missing attribute #text')
+        // && !diag.message?.startsWith('Multiple titles found in metadata')
     })
 }
 
