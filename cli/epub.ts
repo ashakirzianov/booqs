@@ -2,10 +2,10 @@
 import fs from 'fs'
 import path from 'path'
 import type { CliOptions } from './main'
-import { Diagnostic, flattenDiags, openEpub } from 'booqs-epub'
-import { validateEpub, validateEpubFile } from '@/parser/validator'
+import { Diagnostic, openEpub } from 'booqs-epub'
+import { validateEpubFile } from '@/parser/validator'
 import { inspect } from 'util'
-import { extractMetadata, extractMetadataFromEpub } from '@/parser'
+import { extractMetadataFromEpub } from '@/parser'
 import { createZipFileProvider } from '@/parser/zip'
 
 export async function processEpubs(options: CliOptions) {
@@ -94,7 +94,7 @@ async function processEpubFile(filePath: string, options: CliOptions): Promise<D
 }
 
 function filterDiags(diags: Diagnostic[]): Diagnostic[] {
-    return flattenDiags(diags).filter(diag => {
+    return diags.filter(diag => {
         return diag.severity !== 'info'
         // && !diag.message?.startsWith('Missing attribute #text')
         // && !diag.message?.startsWith('Multiple titles found in metadata')

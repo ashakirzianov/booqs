@@ -1,6 +1,6 @@
 import { EpubFile } from './epub'
 import { BooqMeta, BooqMetaTag } from '../core'
-import { Diagnoser, EpubMetadata, EpubMetadataItem, scoped } from 'booqs-epub'
+import { Diagnoser, EpubMetadata, EpubMetadataItem } from 'booqs-epub'
 
 export async function buildMeta(epub: EpubFile, diags?: Diagnoser): Promise<BooqMeta> {
     const epubMetadata = await epub.metadata()
@@ -31,17 +31,17 @@ export async function buildMeta(epub: EpubFile, diags?: Diagnoser): Promise<Booq
 
     diags = diags ?? []
 
-    const _identifiers = extractIdentifiers(identifier, scoped(diags, 'identifier'))
+    const _identifiers = extractIdentifiers(identifier, diags)
 
     return {
-        title: extractTitle(title, scoped(diags, 'title')),
-        authors: extractAuthors(creator, scoped(diags, 'creator')),
-        languages: extractLanguages(language, scoped(diags, 'language')),
-        contributors: extractContributors(contributor, scoped(diags, 'contributor')),
-        description: extractDescription(description, scoped(diags, 'description')),
-        subjects: extractSubjects(subject, scoped(diags, 'subject')),
-        rights: extractRights(rights, scoped(diags, 'rights')),
-        tags: extractTags(rest, scoped(diags, 'rest')),
+        title: extractTitle(title, diags),
+        authors: extractAuthors(creator, diags),
+        languages: extractLanguages(language, diags),
+        contributors: extractContributors(contributor, diags),
+        description: extractDescription(description, diags),
+        subjects: extractSubjects(subject, diags),
+        rights: extractRights(rights, diags),
+        tags: extractTags(rest, diags),
         coverSrc: coverItem?.['@href'],
     }
 }
