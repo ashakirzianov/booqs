@@ -66,7 +66,7 @@ export async function parseEpubs(options: CliOptions) {
         }
     }
     if (problems.length > 0) {
-        console.info(`Found ${problems.length} problems`)
+        console.info(`Found ${problems.length} problems in ${count} files`)
         for (const { path, diags } of problems) {
             console.info(`Problems in ${path}: ${pretty(diags)}`)
         }
