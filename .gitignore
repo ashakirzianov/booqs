@@ -37,4 +37,4 @@ next-env.d.ts
 certificates
 
 # local epub files
-local
+public/epubs
