@@ -1,5 +1,5 @@
 import type { InLibraryCard, Library, InLibrarySearchResult } from './library'
-import { downloadAsset } from './s3'
+import { downloadAsset } from './blob'
 import { redis, sanitizeForRedisHash } from './db'
 import { Booq } from '@/core'
 

@@ -1,5 +1,5 @@
 import sharp from 'sharp'
-import { uploadAsset } from './s3'
+import { uploadAsset } from './blob'
 import { Booq, BooqId } from '@/core'
 
 const bucket = 'booqs-images'

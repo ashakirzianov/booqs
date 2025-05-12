@@ -5,7 +5,7 @@ import type { InLibraryCard, Library, InLibrarySearchResult } from './library'
 import { parseEpubFile } from '@/parser'
 import { Booq, BooqMetaTag, nodesLength } from '@/core'
 import { nanoid } from 'nanoid'
-import { deleteAsset, downloadAsset, uploadAsset } from './s3'
+import { deleteAsset, downloadAsset, uploadAsset } from './blob'
 import { sql } from './db'
 
 export const userUploadsLibrary: Library = {
@@ -137,7 +137,7 @@ async function uploadNewEpub({ buffer, hash }: File, userId: string) {
     const assetId = nanoid(10)
     const uploadResult = await uploadAsset(userUploadedEpubsBucket, assetId, buffer)
     if (!uploadResult.$metadata) {
-        report('Can\'t upload file to S3')
+        report('Can\'t upload file to blob storage')
         return undefined
     }
     const insertResult = await insertRecord({ booq, assetId, fileHash: hash })
@@ -291,10 +291,10 @@ async function deleteBook({ id, assetId }: {
     id: string,
     assetId: string,
 }) {
-    const s3promies = deleteAsset(userUploadedEpubsBucket, assetId)
+    const blobPromies = deleteAsset(userUploadedEpubsBucket, assetId)
     const dbPromise = deleteCards([id])
-    const [s3Result, dbResult] = await Promise.all([s3promies, dbPromise])
-    return s3Result && dbResult
+    const [blobResult, dbResult] = await Promise.all([blobPromies, dbPromise])
+    return blobResult && dbResult
 }
 
 async function deleteAllUploadRecordsForUserId(userId: string): Promise<boolean> {

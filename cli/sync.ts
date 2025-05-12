@@ -1,5 +1,5 @@
 import { inspect } from 'util'
-import { downloadAsset, listObjects, uploadAsset } from '@/backend/s3'
+import { downloadAsset, listObjects, uploadAsset } from '@/backend/blob'
 import {
     existingIds, pgEpubsBucket, insertPgRecord,
 } from '@/backend/pg'
@@ -17,10 +17,10 @@ export async function sync(options: CliOptions) {
     const [command] = options.commands
     switch (command) {
         case 'web2blob':
-            await syncWebToS3(options)
+            await syncWebToBlob(options)
             return
         case 'blob2db':
-            await syncS3ToDB(options)
+            await syncBlobToDB(options)
             return
         default:
             console.info('Unknown command: ', command)
@@ -28,17 +28,17 @@ export async function sync(options: CliOptions) {
     }
 }
 
-async function syncWebToS3(_options: CliOptions) {
-    info('Syncing web to S3...')
+async function syncWebToBlob(_options: CliOptions) {
+    info('Syncing web to blob storage...')
     const webIdsPromise = getAllGutenbergIds()
-    const s3AssetIdsPromise = existingS3Ids()
-    const [webIds, s3Ids] = await Promise.all([webIdsPromise, s3AssetIdsPromise])
+    const blobAssetIdsPromise = existingBlobIds()
+    const [webIds, blobIds] = await Promise.all([webIdsPromise, blobAssetIdsPromise])
     info(`Found ${webIds.length} ids in Gutenberg Collection`)
-    info(`Found ${s3Ids.length} ids in S3`)
-    const existingSet = new Set(s3Ids)
+    info(`Found ${blobIds.length} ids in blob storage`)
+    const existingSet = new Set(blobIds)
     for (const id of webIds) {
         if (existingSet.has(id)) {
-            info(`Skipping ${id} because it already exists in S3`)
+            info(`Skipping ${id} because it already exists in blob storage`)
             continue
         }
         try {
@@ -61,17 +61,17 @@ async function syncWebToS3(_options: CliOptions) {
     }
 }
 
-async function syncS3ToDB(options: CliOptions) {
-    info('Syncing S3 to DB...')
-    const s3AssetIdsPromise = existingS3Ids()
+async function syncBlobToDB(options: CliOptions) {
+    info('Syncing Blob to DB...')
+    const blobAssetIdsPromise = existingBlobIds()
     const existingIdsPromise = existingIds()
-    const [s3AssetIds, existing] = await Promise.all([
-        s3AssetIdsPromise, existingIdsPromise,
+    const [blobAssetIds, existing] = await Promise.all([
+        blobAssetIdsPromise, existingIdsPromise,
     ])
-    info(`Found ${s3AssetIds.length} ids in S3`)
+    info(`Found ${blobAssetIds.length} ids in blob storage`)
     info(`Found ${existing.length} ids in DB`)
     const existingIdsSet = new Set(existing.map(id => id.toString()))
-    for (const assetId of s3AssetIds) {
+    for (const assetId of blobAssetIds) {
         if (existingIdsSet.has(assetId)) {
             info(`Skipping ${assetId} because it already exists in DB`)
             continue
@@ -112,7 +112,7 @@ async function syncS3ToDB(options: CliOptions) {
     }
 }
 
-async function existingS3Ids() {
+async function existingBlobIds() {
     const existing = []
     for await (const object of listObjects(pgEpubsBucket)) {
         const id = idFromAssetId(object.Key ?? '')
