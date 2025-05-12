@@ -29,7 +29,7 @@ export function positionForPath(nodes: BooqNode[], path: BooqPath): number {
         position += nodeLength(nodes[idx])
     }
     const last = nodes[head]
-    if (last.kind === 'element' && last?.children) {
+    if (last?.kind === 'element' && last?.children) {
         const after = positionForPath(last.children, tail)
         return after + position
     } else {
