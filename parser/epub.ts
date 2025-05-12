@@ -1,8 +1,9 @@
-import { Diagnoser, openEpub } from 'booqs-epub'
-import { createZipFileProvider } from './zip'
+import { Diagnoser, openEpub, EpubLoader, LoadedEpub } from 'booqs-epub'
+import { createZipFileProvider, BinaryType } from './zip'
 
-// TODO: use export from 'booqs-epub' instead of this
-export type Epub = NonNullable<Awaited<ReturnType<typeof openEpubFile>>>
+export type Epub = AsyncEpub
+export type AsyncEpub = EpubLoader<BinaryType>
+export type SyncEpub = LoadedEpub<BinaryType>
 
 export async function openEpubFile({ fileBuffer, diags }: {
     fileBuffer: Buffer,

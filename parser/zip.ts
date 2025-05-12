@@ -1,8 +1,8 @@
 import { FileProvider } from 'booqs-epub'
 import JSZip from 'jszip'
 
-type NodeBuffer = globalThis.Buffer<ArrayBufferLike>
-export function createZipFileProvider(fileContent: Buffer): FileProvider<NodeBuffer> {
+export type BinaryType = globalThis.Buffer<ArrayBufferLike>
+export function createZipFileProvider(fileContent: Buffer): FileProvider<BinaryType> {
     let _zip: Promise<JSZip> | undefined
     async function zip() {
         if (!_zip) {
