@@ -21,7 +21,7 @@ type RenderContext = {
     onAugmentationClick?: (id: string) => void,
     hrefForPath?: (booqId: BooqId, path: BooqPath) => string,
 }
-export function renderNodes(nodes: BooqNode[], ctx: RenderContext): ReactNode {
+export function renderNodes(nodes: BooqNode[], ctx: RenderContext): ReactNode[] {
     const result = nodes.map(
         (n, idx) => renderNode(n, {
             ...ctx,
@@ -36,6 +36,8 @@ function renderNode(node: BooqNode, ctx: RenderContext): ReactNode {
             switch (ctx.parent?.name) {
                 case 'table': case 'tbody': case 'tr':
                     return null
+                case 'style':
+                    return node.content
                 default:
                     return renderTextNode(node.content, ctx)
             }
@@ -97,8 +99,8 @@ function getProps(node: BooqElementNode, { path, booqId, range, hrefForPath }: R
         ...node.attrs,
         id: pathToId(path),
         className: node.pph
-            ? 'booq-pph' : undefined,
-        style: node.style,
+            ? (node.attrs?.className ? `booq-pph ${node.attrs.className}` : 'booq-pph')
+            : node.attrs?.className,
         key: pathToString(path),
         href: node.ref
             ? (
@@ -132,12 +134,25 @@ function imageFullSrc(booqId: BooqId, src: string) {
 }
 
 function getChildren(node: BooqElementNode, ctx: RenderContext) {
-    return node.children?.length
-        ? renderNodes(node.children, {
-            ...ctx,
-            parent: node,
-            withinAnchor: ctx.withinAnchor || node.name === 'a',
-        })
+    const children = node.children && renderNodes(node.children, {
+        ...ctx,
+        parent: node,
+        withinAnchor: ctx.withinAnchor || node.name === 'a',
+    })
+    if (node.css) {
+        const styleNode = createElement(
+            'style',
+            {
+                key: `${pathToString(ctx.path)}-style`,
+            },
+            node.css,
+        )
+        return children
+            ? [styleNode, ...children]
+            : styleNode
+    }
+    return (children?.length ?? 0) > 0
+        ? children
         : null
 }
 

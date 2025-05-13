@@ -25,7 +25,10 @@ export async function buildToc(nodes: BooqNode[], file: Epub, diags: Diagnoser):
             } else {
                 diags.push({
                     message: 'Unresolved toc item',
-                    data: epubTocItem,
+                    data: {
+                        tocItem: epubTocItem,
+                        targetId,
+                    },
                 })
             }
         }

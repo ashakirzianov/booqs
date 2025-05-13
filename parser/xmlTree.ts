@@ -6,11 +6,11 @@ export type XmlAttributes = {
     [attr: string]: string,
 }
 export type XmlElement = ReturnType<typeof parseDocument>['childNodes'][number]
-export function xmlStringParser(input: string): XmlElement[] {
+export function xmlStringParser(input: string) {
     return parseDocument(input, {
         xmlMode: true,
         recognizeSelfClosing: true,
-    }).childNodes
+    })
 }
 
 export function asObject(element: XmlElement): {

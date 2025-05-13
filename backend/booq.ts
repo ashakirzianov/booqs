@@ -3,6 +3,7 @@ import { redis } from './db'
 import { logTime, logTimeAsync } from './utils'
 import { parseEpubFile } from '@/parser'
 import { fileForId } from './library'
+import { inspect } from 'util'
 
 export async function booqForId(booqId: BooqId, bypassCache = false): Promise<Booq | undefined> {
     if (bypassCache) {
@@ -73,6 +74,8 @@ async function parseBooqForId(booqId: BooqId) {
     const { value: booq, diags } = await logTimeAsync('parse epub', () => parseEpubFile({
         fileBuffer: file.file,
     }))
-    diags.forEach(console.info)
+    diags.forEach(diag => {
+        console.info(inspect(diag, { depth: 5, colors: true }))
+    })
     return booq
 }

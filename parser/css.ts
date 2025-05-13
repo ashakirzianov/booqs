@@ -2,11 +2,19 @@ import {
     parse, Rule, Declaration, Charset, Media, AtRule, Comment,
 } from 'css'
 import { compile, is } from 'css-select'
+import postcss from 'postcss'
+import prefixer from 'postcss-prefix-selector'
 import { selectorSpecificity, compare } from '@csstools/selector-specificity'
 import selectorParser from 'postcss-selector-parser'
 import { flatten } from 'lodash'
 import { XmlElement, attributesOf } from './xmlTree'
 import { Diagnoser } from 'booqs-epub'
+
+export function prefixAllSeclectors(cssString: string, prefix: string) {
+    return postcss().use(prefixer({
+        prefix: `.${prefix}`,
+    })).process(cssString).css
+}
 
 type CompiledQuery = ReturnType<typeof compile>
 type Specificity = ReturnType<typeof selectorSpecificity>
