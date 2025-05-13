@@ -30,6 +30,13 @@ export async function parseEpubs(options: CliOptions) {
                 console.timeEnd(`chunk ${chunk++}`)
                 console.time(`chunk ${chunk}`)
             }
+            if (options.switches['max']) {
+                const max = parseInt(options.switches['max'])
+                if (count >= max) {
+                    console.info(`Reached max count of ${max} files`)
+                    break
+                }
+            }
             if (options.switches['metadata'] === 'true') {
                 console.info(`Metadata for ${path}: ${pretty(booq?.meta)}`)
                 if (options.switches['raw'] === 'true') {
