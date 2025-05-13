@@ -205,10 +205,15 @@ async function getAllGutenbergIds(): Promise<string[]> {
 }
 
 async function downloadGutenbergEpub(id: string): Promise<AssetRecord | undefined> {
-    const withImagesUrl = `https://www.gutenberg.org/ebooks/${id}.epub.images`
+    const withImagesUrl = `https://www.gutenberg.org/ebooks/${id}.epub3.images`
     const withImagesResult = await downloadGutenbergFile(withImagesUrl)
     if (withImagesResult) {
         return withImagesResult
+    }
+    const withImagesOldUrl = `https://www.gutenberg.org/ebooks/${id}.epub.images`
+    const withImagesOldResult = await downloadGutenbergFile(withImagesOldUrl)
+    if (withImagesOldResult) {
+        return withImagesOldResult
     }
     const withoutImagesUrl = `https://www.gutenberg.org/ebooks/${id}.epub.noimages`
     const withoutImagesResult = await downloadGutenbergFile(withoutImagesUrl)
