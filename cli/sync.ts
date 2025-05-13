@@ -126,7 +126,7 @@ async function existingBlobIds() {
 }
 
 function idFromAssetId(assetId: string) {
-    const match = assetId.match(/pg(\d+)(?:-images)?\.epub/)
+    const match = assetId.match(/^pg(\d+)[^.]*\.epub$/i)
     if (match) {
         return match[1]
     }
