@@ -8,7 +8,7 @@ import { transformHref } from './parserUtils'
 import { resolveRelativePath } from './path'
 import { isComment } from 'domutils'
 import { Diagnoser } from 'booqs-epub'
-import { prefixAllSeclectors } from './css'
+import { preprocessCss } from './css'
 
 export type EpubSection = {
     fileName: string,
@@ -86,15 +86,18 @@ async function processSectionContent(content: string, env: Env): Promise<BooqNod
         }
         children.push(child)
     }
+    const prefix = generateSelectorPrefix(env.id)
     const css = env.css.length > 0
-        ? prefixAllSeclectors(env.css, generateSelectorPrefix(env.id))
+        ? preprocessCss(env.css, {
+            prefix,
+        })
         : undefined
     return {
         kind: 'element',
         name: 'section',
         css,
         attrs: {
-            className: generateSelectorPrefix(env.id),
+            className: prefix,
         },
         id: env.fileName,
         fileName: env.fileName,
