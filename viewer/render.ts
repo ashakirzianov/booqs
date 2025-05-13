@@ -102,6 +102,7 @@ function getProps(node: BooqElementNode, { path, booqId, range, hrefForPath }: R
             ? (node.attrs?.className ? `booq-pph ${node.attrs.className}` : 'booq-pph')
             : node.attrs?.className,
         key: pathToString(path),
+        style: node.style,
         href: node.ref
             ? (
                 pathInRange(node.ref, range)
