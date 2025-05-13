@@ -76,7 +76,7 @@ async function processSectionContent(content: string, env: Env): Promise<BooqNod
                 }
                 break
             default:
-                if (!isEmptyText(element) && isComment(element)) {
+                if (!isEmptyText(element) && !isComment(element)) {
                     env.diags.push({
                         message: `unexpected node: ${name}`,
                         data: { xml: xml2string(element) },
