@@ -24,13 +24,13 @@ export type BooqNote = NoteData & {
     position?: number,
 }
 export type PartialBooqData = {
-    id: BooqId,
+    booqId: BooqId,
     fragment: BooqFragment,
     meta: BooqMeta,
     toc: TableOfContents,
 }
 export type BooqLibraryCard = BooqMeta & {
-    id: BooqId,
+    booqId: BooqId,
 }
 export type BooqCollection = {
     name: string,
@@ -43,7 +43,7 @@ export type AuthorSearchResult = {
 }
 export type BooqSearchResult = {
     kind: 'booq',
-    id: BooqId,
+    booqId: BooqId,
     title: string | undefined,
     authors: string[] | undefined,
     coverSrc: string | undefined,

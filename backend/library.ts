@@ -1,4 +1,4 @@
-import { AuthorSearchResult, BooqId, BooqLibraryCard, BooqSearchResult, InLibraryId, LibraryId, makeId, parseId, SearchResult } from '@/core'
+import { AuthorSearchResult, BooqId, BooqLibraryCard, BooqMeta, BooqSearchResult, InLibraryId, LibraryId, makeId, parseId, SearchResult } from '@/core'
 import groupBy from 'lodash-es/groupBy'
 import { Booq } from '../core'
 import { pgLibrary } from './pg'
@@ -6,7 +6,7 @@ import { uploadBooqImages } from './images'
 import { userUploadsLibrary } from './uu'
 import { localLibrary } from './lo'
 
-export type InLibraryCard = Omit<BooqLibraryCard, 'id'> & {
+export type InLibraryCard = BooqMeta & {
     id: InLibraryId,
 }
 export type BookFile = {
@@ -14,7 +14,7 @@ export type BookFile = {
     file: Buffer,
 }
 export type InLibrarySearchResult = AuthorSearchResult
-    | Omit<BooqSearchResult, 'id' | 'coverUrl'> & {
+    | Omit<BooqSearchResult, 'booqId' | 'coverUrl'> & {
         id: InLibraryId,
         coverSrc: string | undefined,
     }
@@ -38,10 +38,10 @@ const libraries: {
     lo: localLibrary,
 }
 
-export function processCard(prefix: string) {
-    return (card: InLibraryCard) => ({
-        ...card,
-        id: makeId(prefix, card.id),
+export function processCard(prefix: string): (card: InLibraryCard) => BooqLibraryCard {
+    return ({ id, ...meta }: InLibraryCard) => ({
+        booqId: makeId(prefix, id),
+        ...meta,
     })
 }
 
@@ -76,7 +76,7 @@ export async function libraryCardsForIds(ids: string[]): Promise<Array<BooqLibra
         .flat()
         .filter(r => r !== undefined)
     return ids.map(
-        id => results.find(r => r.id === id),
+        id => results.find(r => r.booqId === id),
     )
 }
 
@@ -144,7 +144,7 @@ function processSearchResult(prefix: string) {
             const booqId = makeId(prefix, result.id)
             return {
                 ...rest,
-                id: booqId,
+                booqId: booqId,
             }
         } else {
             return result

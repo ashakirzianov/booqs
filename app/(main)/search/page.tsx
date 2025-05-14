@@ -54,7 +54,7 @@ function BooqSearchResultItem({
     return (
         <div>
             <h2>
-                <Link href={booqHref({ id: result.id })}>
+                <Link href={booqHref({ id: result.booqId })}>
                     {result.title}
                 </Link>
             </h2>

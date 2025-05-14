@@ -77,7 +77,7 @@ export async function booqPart({
     const fragment = buildFragment({ booq, path })
 
     return {
-        id: booqId,
+        booqId,
         fragment,
         toc: booq.toc,
         meta: booq.meta,
@@ -88,7 +88,7 @@ function buildBooqCard(card: BooqLibraryCard, coverSize: CoverSize): BooqCardDat
     return {
         ...card,
         coverUrl: card.coverSrc
-            ? booqImageUrl(card.id, card.coverSrc, coverSize)
+            ? booqImageUrl(card.booqId, card.coverSrc, coverSize)
             : undefined,
     }
 }

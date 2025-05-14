@@ -1,7 +1,7 @@
-import { BooqPath, pathToString, BooqRange, pathToId } from '@/core'
+import { BooqPath, pathToString, BooqRange, pathToId, BooqId } from '@/core'
 
 export function booqHref({ id, path }: {
-    id: string,
+    id: BooqId,
     path?: BooqPath,
 }) {
     return path?.length

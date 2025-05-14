@@ -26,14 +26,14 @@ export function BooqCollection({
                             : null
                     }
                     {cards.map(card => (
-                        <li key={card.id} className='w-[30rem] max-w-[90vw] rounded-sm shadow py-2 px-4'>
+                        <li key={card.booqId} className='w-[30rem] max-w-[90vw] rounded-sm shadow py-2 px-4'>
                             <BooqCard
                                 card={card}
                                 actions={<>
-                                    <ReadButton booqId={card.id} />
+                                    <ReadButton booqId={card.booqId} />
                                     {signed && collection ?
                                         <CollectionButton
-                                            booqId={card.id}
+                                            booqId={card.booqId}
                                             collection={collection}
                                         />
                                         : null}

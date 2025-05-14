@@ -18,7 +18,7 @@ export function toClientSearchResult(result: SearchResult): SearchResultClient {
         return {
             ...rest,
             coverUrl: coverSrc
-                ? booqImageUrl(rest.id, coverSrc)
+                ? booqImageUrl(rest.booqId, coverSrc)
                 : undefined,
         }
     } else {

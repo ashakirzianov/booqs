@@ -14,18 +14,18 @@ import { libraryCardForId } from '@/backend/library'
 
 export type BooqParent = {
     kind?: 'booq' | undefined,
-    id: BooqId,
+    booqId: BooqId,
     coverSrc?: string | undefined,
 }
 export const booqResolver: IResolvers<BooqParent> = {
     Booq: {
         coverUrl(parent, { size }) {
             return parent.coverSrc
-                ? booqImageUrl(parent.id, parent.coverSrc, size)
+                ? booqImageUrl(parent.booqId, parent.coverSrc, size)
                 : undefined
         },
         async tags(parent) {
-            const card = await libraryCardForId(parent.id)
+            const card = await libraryCardForId(parent.booqId)
             if (!card) {
                 return undefined
             }
@@ -35,17 +35,17 @@ export const booqResolver: IResolvers<BooqParent> = {
             return user
                 ? getBookmarks({
                     userId: user.id,
-                    booqId: parent.id,
+                    booqId: parent.booqId,
                 })
                 : []
         },
         async notes(parent): Promise<NoteParent[]> {
             return notesFor({
-                booqId: parent.id,
+                booqId: parent.booqId,
             })
         },
         async preview(parent, { path, end, length }) {
-            const booq = await booqForId(parent.id)
+            const booq = await booqForId(parent.booqId)
             if (!booq) {
                 return undefined
             }
@@ -60,13 +60,13 @@ export const booqResolver: IResolvers<BooqParent> = {
             }
         },
         async nodes(parent) {
-            const booq = await booqForId(parent.id)
+            const booq = await booqForId(parent.booqId)
             return booq
                 ? booq.nodes
                 : undefined
         },
         async fragment(parent, { path }) {
-            const booq = await booqForId(parent.id)
+            const booq = await booqForId(parent.booqId)
             if (!booq) {
                 return undefined
             }
@@ -76,7 +76,7 @@ export const booqResolver: IResolvers<BooqParent> = {
             })
         },
         async tableOfContents(parent) {
-            const booq = await booqForId(parent.id)
+            const booq = await booqForId(parent.booqId)
             return booq
                 ? booq.toc.items
                 : undefined

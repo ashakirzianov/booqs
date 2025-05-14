@@ -14,10 +14,10 @@ export async function uploadEpubAction(file: File) {
     const bytes = await file.arrayBuffer()
     const buffer = Buffer.from(bytes)
     const result = await uploadEpubBook(buffer, auth.id)
-    if (result.success && result.id) {
+    if (result.success && result.booqId) {
         return {
             success: true,
-            id: result.id,
+            booqId: result.booqId,
             title: result.title ?? undefined,
             coverUrl: result.coverUrl ?? undefined,
         } as const

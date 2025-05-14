@@ -36,7 +36,7 @@ export function Reader({
     const pathname = usePathname()
     const { user, isLoading: isAuthLoading } = useAuth()
     const fontScale = useFontScale()
-    const { notes } = useBooqNotes({ booqId: booq.id, user })
+    const { notes } = useBooqNotes({ booqId: booq.booqId, user })
     const resolvedNotes = useMemo(() => {
         return notes.map<BooqNote>(note => ({
             ...note,
@@ -76,7 +76,7 @@ export function Reader({
         toggleNavigationSelection,
     } = useNavigationState()
     const NavigationContent = <NavigationPanel
-        booqId={booq.id}
+        booqId={booq.booqId}
         title={booq.meta.title ?? 'Untitled'}
         toc={booq.toc.items}
         notes={resolvedNotes}
@@ -119,7 +119,7 @@ export function Reader({
         ContextMenuNode, isOpen: contextMenuVisible,
         updateMenuState: setMenuState,
     } = useContextMenu({
-        booqId: booq.id,
+        booqId: booq.booqId,
         user,
         closed: copilotState.kind !== 'empty',
         updateCopilot(selection, anchor) {
@@ -150,7 +150,7 @@ export function Reader({
             fontSize: `${fontScale}%`,
         }}>
             <BooqContent
-                booqId={booq.id}
+                booqId={booq.booqId}
                 nodes={booq.fragment.nodes}
                 range={range}
                 augmentations={augmentations}
@@ -159,12 +159,12 @@ export function Reader({
             />
         </div>}
         PrevButton={<AnchorButton
-            booqId={booq.id}
+            booqId={booq.booqId}
             anchor={booq.fragment.previous}
             title='Previous'
         />}
         NextButton={<AnchorButton
-            booqId={booq.id}
+            booqId={booq.booqId}
             anchor={booq.fragment.next}
             title='Next'
         />}
@@ -173,7 +173,7 @@ export function Reader({
             state={copilotState}
             setState={setCopilotState}
             data={{
-                id: booq.id,
+                id: booq.booqId,
                 meta: booq.meta,
             }}
         />}
@@ -314,7 +314,7 @@ function useAugmentations({
     }
 }
 
-function useScrollHandler({ id, fragment, meta: { length } }: PartialBooqData) {
+function useScrollHandler({ booqId, fragment, meta: { length } }: PartialBooqData) {
     const [currentPath, setCurrentPath] = useState(fragment.current.path)
 
     const position = positionForPath(fragment.nodes, currentPath)
@@ -330,7 +330,7 @@ function useScrollHandler({ id, fragment, meta: { length } }: PartialBooqData) {
         if (!samePath(path, currentPath)) {
             setCurrentPath(path)
             reportBooqHistory({
-                booqId: id,
+                booqId,
                 path,
                 source: currentSource(),
             })
