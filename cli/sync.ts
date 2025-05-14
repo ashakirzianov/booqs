@@ -31,7 +31,7 @@ export async function sync(options: CliOptions) {
 async function syncWebToBlob(_options: CliOptions) {
     info('Syncing web to blob storage...')
     const webIdsPromise = getAllGutenbergIds()
-    const blobAssetIdsPromise = existingBlobIds()
+    const blobAssetIdsPromise = Array.fromAsync(existingBlobIds())
     const [webIds, blobIds] = await Promise.all([webIdsPromise, blobAssetIdsPromise])
     info(`Found ${webIds.length} ids in Gutenberg Collection`)
     info(`Found ${blobIds.length} ids in blob storage`)
@@ -63,66 +63,108 @@ async function syncWebToBlob(_options: CliOptions) {
 
 async function syncBlobToDB(options: CliOptions) {
     info('Syncing Blob to DB...')
-    const blobAssetIdsPromise = existingBlobIds()
-    const existingIdsPromise = existingIds()
-    const [blobAssetIds, existing] = await Promise.all([
-        blobAssetIdsPromise, existingIdsPromise,
-    ])
-    info(`Found ${blobAssetIds.length} ids in blob storage`)
+    const batchSize = parseInt(options.switches['batch'] || '1')
+    const retryProblems = options.switches['retry-problems'] === 'true'
+    const needToUploadImages = options.switches['upload-images'] === 'true'
+    const existing = await existingIds()
     info(`Found ${existing.length} ids in DB`)
     const existingIdsSet = new Set(existing.map(id => id.toString()))
-    for (const assetId of blobAssetIds) {
-        if (existingIdsSet.has(assetId)) {
-            info(`Skipping ${assetId} because it already exists in DB`)
-            continue
+    const filteredGenerator = filter(existingBlobAssetIds(), (id) => {
+        if (existingIdsSet.has(id)) {
+            info(`Skipping ${id} because it already exists in DB`)
+            return false
         }
-        if (options.switches['retry-problems'] !== 'true' && await hasProblems(assetId)) {
-            info(`Skipping ${assetId} because it has problems`)
-            continue
-        }
-        try {
-            const id = idFromAssetId(assetId)
-            if (!id) {
-                warn(`Couldn't get id from assetId: ${assetId}`)
-                continue
+        return true
+    })
+    let count = 0
+    for await (const batch of makeBatches(filteredGenerator, batchSize)) {
+        info(`Processing batch ${count++} with ${batch.length} assets...`)
+        const promises = batch.map(async (assetId) => {
+            try {
+                if (retryProblems && await hasProblems(assetId)) {
+                    info(`Skipping ${assetId} because it has problems`)
+                    return false
+                }
+                const id = idFromAssetId(assetId)
+                if (!id) {
+                    warn(`Couldn't get id from assetId: ${assetId}`)
+                    return false
+                }
+                const asset = await downloadAsset(pgEpubsBucket, assetId)
+                if (!asset) {
+                    warn(`Couldn't download asset for id: ${id}`)
+                    return false
+                }
+                const parseResult = await parseAndInsert({
+                    id,
+                    record: {
+                        asset, assetId,
+                    },
+                })
+                if (!parseResult) {
+                    reportProblem(id, 'Failed to parse and insert', new Error('Parse error'))
+                    return false
+                }
+                info(`Parsed and inserted ${assetId}`)
+                if (needToUploadImages) {
+                    info(`Uploading images for ${assetId}`)
+                    await uploadBooqImages(`pg/${assetId}`, parseResult.booq)
+                }
+                info(`Successfully processed ${assetId}`)
+                return true
+            } catch (err) {
+                console.error(`Error processing ${assetId}`, err)
+                await reportProblem(assetId, 'Processing error', err)
             }
-            const asset = await downloadAsset(pgEpubsBucket, assetId)
-            if (!asset) {
-                warn(`Couldn't download asset for id: ${id}`)
-                continue
-            }
-            const parseResult = await parseAndInsert({
-                id,
-                record: {
-                    asset, assetId,
-                },
-            })
-            if (!parseResult) {
-                reportProblem(id, 'Failed to parse and insert', new Error('Parse error'))
-                continue
-            }
-            info(`Parsed and inserted ${assetId}`)
-            info(`Uploading images for ${assetId}`)
-            await uploadBooqImages(`pg/${assetId}`, parseResult.booq)
-            info(`Uploaded images for ${assetId}`)
-        } catch (err) {
-            console.error(`Error processing ${assetId}`, err)
-            await reportProblem(assetId, 'Processing error', err)
+        })
+        await Promise.all(promises)
+    }
+}
+
+async function* existingBlobIds() {
+    for await (const assetId of existingBlobAssetIds()) {
+        const id = idFromAssetId(assetId)
+        if (id) {
+            yield id
+        } else {
+            warn('Skipping non-pg-epub asset:', assetId)
         }
     }
 }
 
-async function existingBlobIds() {
-    const existing = []
+async function* existingBlobAssetIds() {
     for await (const object of listObjects(pgEpubsBucket)) {
-        const id = idFromAssetId(object.Key ?? '')
-        if (id) {
-            existing.push(id)
+        if (object.Key) {
+            yield object.Key
         } else {
-            warn('Skipping non-pg-epub asset:', object)
+            warn(`Invalid object in blob: ${object}`)
         }
     }
-    return existing
+}
+
+async function* makeBatches<T>(generator: AsyncGenerator<T>, batchSize: number) {
+    let batch: T[] = []
+    for await (const item of generator) {
+        batch.push(item)
+        if (batch.length >= batchSize) {
+            yield batch
+            batch = []
+        }
+    }
+    if (batch.length > 0) {
+        yield batch
+    }
+}
+
+async function* filter<T>(
+    generator: AsyncGenerator<T>,
+    predicate: (item: T) => boolean,
+) {
+    for await (const item of generator) {
+        if (predicate(item)) {
+            yield item
+        }
+    }
 }
 
 function idFromAssetId(assetId: string) {
