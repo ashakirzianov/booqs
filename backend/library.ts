@@ -144,7 +144,7 @@ function processSearchResult(prefix: string) {
             const booqId = makeId(prefix, result.id)
             return {
                 ...rest,
-                booqId: booqId,
+                booqId,
             }
         } else {
             return result

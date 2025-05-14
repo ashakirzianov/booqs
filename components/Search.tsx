@@ -64,7 +64,7 @@ function SearchModal({
                             push(authorHref({ name: author.name }))
                         } else {
                             const booq = booqs[selected - authors.length]
-                            push(booqHref({ id: booq.booqId, path: [0] }))
+                            push(booqHref({ booqId: booq.booqId, path: [0] }))
                         }
                         closeModal()
                     } else {
@@ -160,7 +160,7 @@ function BooqSearchResultContent({ result, query }: {
     result: BooqSearchResultClient,
     query: string,
 }) {
-    return <Link href={booqHref({ id: result.booqId, path: [0] })} className='flex flex-row'>
+    return <Link href={booqHref({ booqId: result.booqId, path: [0] })} className='flex flex-row'>
         <BooqCover
             coverUrl={result.coverUrl}
             title={result.title}

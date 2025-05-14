@@ -12,7 +12,7 @@ export function TocNodeComp({
     node: TocNode,
 }) {
     return <>
-        <Link href={booqHref({ id: booqId, path })}>
+        <Link href={booqHref({ booqId, path })}>
             <div className='flex flex-nowrap flex-1 justify-between font-bold hover:text-highlight'>
                 <span className='title'>{title ?? 'no-title'}</span>
                 <span className='ml-base'>{pageForPosition(position)}</span>

@@ -50,7 +50,7 @@ export function BooqCollection({
 function ReadButton({ booqId }: {
     booqId: BooqId,
 }) {
-    return <Link href={booqHref({ id: booqId, path: [0] })}>
+    return <Link href={booqHref({ booqId, path: [0] })}>
         <span className='text-action underline text-lg cursor-pointer transition duration-300 hover:text-highlight'>
             Read
         </span>

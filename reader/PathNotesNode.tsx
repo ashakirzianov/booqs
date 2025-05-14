@@ -40,7 +40,7 @@ function Path({ items, booqId }: {
                 : <Fragment key={idx}>
                     {idx === 0 ? null : <div className='mr-base'>/</div>}
                     <div className='font-bold mr-base hover:underline'>
-                        <Link href={booqHref({ id: booqId, path: item.path })}>
+                        <Link href={booqHref({ booqId, path: item.path })}>
                             {item.title}
                         </Link>
                     </div>

@@ -155,7 +155,7 @@ export function Reader({
                 range={range}
                 augmentations={augmentations}
                 onAugmentationClick={onAugmentationClick}
-                hrefForPath={(id, path) => booqHref({ id, path })}
+                hrefForPath={(id, path) => booqHref({ booqId: id, path })}
             />
         </div>}
         PrevButton={<AnchorButton
@@ -351,7 +351,7 @@ function AnchorButton({ booqId, anchor, title }: {
     if (!anchor) {
         return null
     }
-    return <Link href={booqHref({ id: booqId, path: anchor.path })} className='flex items-center h-header'>
+    return <Link href={booqHref({ booqId, path: anchor.path })} className='flex items-center h-header'>
         <div className='flex items-center h-header'>
             <BorderButton text={anchor.title ?? title} />
         </div>

@@ -24,7 +24,7 @@ export function ReadingHistory({ history }: {
             history.map(
                 (entry, idx) =>
                     <div key={idx} className='flex snap-center'>
-                        <Link href={booqHref({ id: entry.booqId, path: entry.path })}>
+                        <Link href={booqHref({ booqId: entry.booqId, path: entry.path })}>
                             <BooqPreview
                                 path={entry.path}
                                 text={entry.text}

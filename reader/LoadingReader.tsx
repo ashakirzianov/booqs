@@ -91,7 +91,7 @@ function AnchorButton({ booqId, anchor, title }: {
     if (!anchor) {
         return null
     }
-    return <Link href={booqHref({ id: booqId, path: anchor.path })}>
+    return <Link href={booqHref({ booqId, path: anchor.path })}>
         <div className='flex items-center h-header'>
             <BorderButton text={anchor.title ?? title} />
         </div>
