@@ -11,14 +11,13 @@ export const localLibrary: Library = {
         return ids.map(function (id): InLibraryCard {
             return {
                 id,
-                authors: undefined,
-                length: 0,
-                title: undefined,
-                languages: undefined,
-                description: undefined,
-                subjects: undefined,
+                uniqueIdentifier: undefined,
+                title: 'Unknown',
+                authors: [],
                 contributors: undefined,
-                rights: undefined,
+                languages: [],
+                description: undefined,
+                length: 0,
                 coverSrc: undefined,
                 tags: undefined,
             }

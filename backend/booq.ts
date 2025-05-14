@@ -53,7 +53,7 @@ export async function booqPreview(booqId: BooqId, path: BooqPath, end?: BooqPath
         `position for path ${pathToString(path)}`,
         () => positionForPath(booq.nodes, path),
     )
-    const length = booq.length
+    const length = booq.meta.length
     const preview = {
         booqId,
         path,

@@ -4,7 +4,7 @@ import { Epub, openEpubFile } from './epub'
 import { extactBooqMeta } from './metadata'
 
 export type ExtractedMetadata = {
-    metadata: BooqMeta,
+    metadata: Omit<BooqMeta, 'length'>,
     cover?: string,
 }
 export async function extractEpubMetadataFromFile({ fileBuffer, extractCover, diags }: {

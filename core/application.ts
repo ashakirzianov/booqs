@@ -28,11 +28,9 @@ export type PartialBooqData = {
     fragment: BooqFragment,
     meta: BooqMeta,
     toc: TableOfContents,
-    length: number,
 }
 export type BooqLibraryCard = BooqMeta & {
     id: BooqId,
-    length: number,
 }
 export type BooqCollection = {
     name: string,

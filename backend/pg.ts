@@ -1,7 +1,8 @@
 import type { InLibraryCard, Library, InLibrarySearchResult } from './library'
 import { downloadAsset } from './blob'
 import { redis, sanitizeForRedisHash } from './db'
-import { Booq } from '@/core'
+import { Booq, BooqMeta } from '@/core'
+import { getValuesForTag } from '@/core/meta'
 
 export const pgLibrary: Library = {
   search,
@@ -14,16 +15,15 @@ export const pgEpubsBucket = 'pg-epubs'
 
 type DbPgCard = {
   assetId: string,
-  length: number,
-  title: string | undefined,
-  authors: string[] | undefined,
-  languages: string[] | undefined,
-  subjects: string[] | undefined,
+  meta: BooqMeta,
+  // Flat metadata for search
+  title: string,
+  primaryFileAs: string,
+  fileAs: string[],
+  languages: string[],
   description: string | undefined,
-  contributors: string[] | undefined,
-  coverSrc: string | undefined,
+  subjects: string[] | undefined,
   rights: string | undefined,
-  tags: Array<[key: string, value?: string]> | undefined,
 }
 
 export async function cards(ids: string[]): Promise<InLibraryCard[]> {
@@ -62,25 +62,12 @@ export async function insertPgRecord({ booq, assetId, id }: {
   assetId: string,
   id: string,
 }) {
-  const {
-    title, authors, subjects, languages, description, coverSrc,
-    rights, contributors, tags,
-  } = booq.meta
   const success = await insertDbCard(id, {
     assetId,
-    length: booq.length,
-    subjects,
-    title: title,
-    authors,
-    languages,
-    description,
-    coverSrc: coverSrc,
-    rights,
-    contributors,
-    tags: [
-      ...(tags ?? []),
-      ['pg-index', `${id}`],
-    ],
+    ...dbFromCard({
+      id,
+      ...booq.meta,
+    }),
   })
   if (success) {
     await redis.sadd('library:pg:ids', id)
@@ -98,20 +85,36 @@ async function cardForId(id: string): Promise<InLibraryCard | undefined> {
   }
   return {
     id,
-    length: row.length,
-    title: row.title ?? undefined,
-    authors: row.authors,
-    subjects: row.subjects,
-    languages: row.languages,
-    description: row.description,
-    contributors: row.contributors,
-    coverSrc: row.coverSrc,
-    rights: row.rights,
-    tags: row.tags,
+    ...cardFromDb(row),
   }
 }
 
 async function insertDbCard(id: string, card: DbPgCard): Promise<boolean> {
   await redis.hset(`library:pg:cards:${id}`, sanitizeForRedisHash(card))
   return true
+}
+
+function cardFromDb(row: DbPgCard): Omit<InLibraryCard, 'id'> {
+  return row.meta
+}
+
+function dbFromCard(card: InLibraryCard): Omit<DbPgCard, 'assetId'> {
+  const { id, ...meta } = card
+  const {
+    authors, tags, title, languages, description,
+  } = meta
+  const fileAs = authors.map((a) => a.fileAs ?? a.name)
+  const primaryFileAs = fileAs[0] ?? 'Unknown'
+  const subjects = getValuesForTag('subject', tags ?? [])
+  const rights = getValuesForTag('rights', tags ?? []).join(' | ')
+  return {
+    title,
+    languages,
+    description,
+    rights,
+    fileAs,
+    primaryFileAs,
+    subjects,
+    meta: card,
+  }
 }

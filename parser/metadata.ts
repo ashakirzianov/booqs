@@ -1,68 +1,47 @@
 import { Epub } from './epub'
-import { BooqMeta, BooqMetaTag } from '../core'
+import { BooqAuthor, BooqMeta, BooqMetaTag } from '../core'
 import { Diagnoser, EpubMetadata, EpubMetadataItem } from 'booqs-epub'
 
-export async function extactBooqMeta(epub: Epub, diags?: Diagnoser): Promise<BooqMeta> {
+export async function extactBooqMeta(epub: Epub, diags?: Diagnoser): Promise<Omit<BooqMeta, 'length'>> {
     const epubMetadata = await epub.metadata()
     if (!epubMetadata) {
         diags?.push({
             message: 'Missing metadata in epub',
         })
         return {
-            title: undefined,
-            authors: undefined,
-            languages: undefined,
+            uniqueIdentifier: undefined,
+            title: 'Untitled',
+            authors: [],
             contributors: undefined,
+            languages: [],
             description: undefined,
-            subjects: undefined,
-            rights: undefined,
-            tags: [],
             coverSrc: undefined,
+            tags: [],
         }
     }
     const coverItem = await epub.coverItem()
+    const uniqueIdentifier = await epub.uniqueIdentifier()
 
     const {
-        title, creator, language, contributor,
-        description, subject, rights,
-        identifier,
+        title, creator, language, description, contributor,
         ...rest
     } = epubMetadata
 
     diags = diags ?? []
 
-    const _identifiers = extractIdentifiers(identifier, diags)
-
     return {
-        title: extractTitle(title, diags),
-        authors: extractAuthors(creator, diags),
-        languages: extractLanguages(language, diags),
+        uniqueIdentifier,
+        title: extractTitle(title, diags) ?? 'Untitled',
+        authors: extractAuthors(creator, diags) ?? [],
         contributors: extractContributors(contributor, diags),
+        languages: extractLanguages(language, diags) ?? [],
         description: extractDescription(description, diags),
-        subjects: extractSubjects(subject, diags),
-        rights: extractRights(rights, diags),
-        tags: extractTags(rest, diags),
         coverSrc: coverItem?.['@href'],
+        tags: extractTags(rest, diags),
     }
 }
 
 type Records = EpubMetadataItem[] | undefined
-
-function extractIdentifiers(records: Records, diags?: Diagnoser): string[] | undefined {
-    if (!records || records.length === 0) {
-        diags?.push({
-            message: 'Missing identifier in metadata',
-        })
-        return undefined
-    }
-    return records
-        ?.filter(r => validateMetadataRecord(r, {
-            expectedAttributes: ['#text'],
-            ignoreAttributes: ['@scheme', '@id'],
-            diags,
-        }))
-        ?.map(r => r['#text'])
-}
 
 function extractTitle(records: Records, diags?: Diagnoser): string | undefined {
     if (!records || records.length === 0) {
@@ -85,6 +64,20 @@ function extractTitle(records: Records, diags?: Diagnoser): string | undefined {
         ?.map(r => r['#text']).join(' ')
 }
 
+function extractAuthors(records: Records, diags?: Diagnoser): BooqAuthor[] | undefined {
+    return records
+        ?.filter(r => validateMetadataRecord(r, {
+            expectedAttributes: ['#text'],
+            optionalAttributes: ['@file-as', '@role'],
+            diags,
+        }))
+        ?.map(r => ({
+            name: r['#text'],
+            fileAs: r['@file-as'],
+            role: r['@role'],
+        }))
+}
+
 function extractLanguages(records: Records, diags?: Diagnoser): string[] | undefined {
     if (!records || records.length === 0) {
         diags?.push({
@@ -101,26 +94,6 @@ function extractLanguages(records: Records, diags?: Diagnoser): string[] | undef
         ?.map(r => r['#text'])
 }
 
-function extractAuthors(records: Records, diags?: Diagnoser): string[] | undefined {
-    return records
-        ?.filter(r => validateMetadataRecord(r, {
-            expectedAttributes: ['#text'],
-            optionalAttributes: ['@file-as', '@role'],
-            diags,
-        }))
-        ?.map(r => r['#text'])
-}
-
-function extractContributors(records: Records, diags?: Diagnoser): string[] | undefined {
-    return records
-        ?.filter(r => validateMetadataRecord(r, {
-            expectedAttributes: ['#text'],
-            optionalAttributes: ['@file-as', '@role'],
-            diags,
-        }))
-        ?.map(r => r['#text'])
-}
-
 function extractDescription(records: Records, diags?: Diagnoser): string | undefined {
     return records
         ?.filter(r => validateMetadataRecord(r, {
@@ -131,38 +104,28 @@ function extractDescription(records: Records, diags?: Diagnoser): string | undef
         ?.join('\n')
 }
 
-function extractSubjects(records: Records, diags?: Diagnoser): string[] | undefined {
+function extractContributors(records: Records, diags?: Diagnoser): BooqAuthor[] | undefined {
     return records
         ?.filter(r => validateMetadataRecord(r, {
             expectedAttributes: ['#text'],
+            optionalAttributes: ['@file-as', '@role'],
             diags,
         }))
-        ?.map(r => r['#text'])
-}
-
-function extractRights(records: Records, diags?: Diagnoser): string | undefined {
-    if ((records?.length ?? 0) > 1) {
-        diags?.push({
-            message: 'Multiple rights found in metadata',
-            data: { records },
-        })
-    }
-    return records
-        ?.filter(r => validateMetadataRecord(r, {
-            expectedAttributes: ['#text'],
-            diags,
+        ?.map(r => ({
+            name: r['#text'],
+            fileAs: r['@file-as'],
+            role: r['@role'],
         }))
-        ?.map(r => r['#text']).join(' ')
 }
 
 function extractTags(epubMetadata: EpubMetadata, diags?: Diagnoser): BooqMetaTag[] {
     const {
-        date,
+        identifier, contributor, date,
         cover, // Ignoring this
         ...rest
     } = epubMetadata
     const {
-        source, publisher,
+        source, publisher, subjects, rights,
         'calibre:timestamp': calibreTimestamp,
         'calibre:title_sort': calibreSeries,
         'calibre:series': calibreTitleSort,
@@ -176,14 +139,34 @@ function extractTags(epubMetadata: EpubMetadata, diags?: Diagnoser): BooqMetaTag
         })
     }
     const tags = [
-        ...extractDates(date, diags),
-        ...extractRest(rest, diags),
+        ...extractIdentifierTags(identifier, diags),
+        ...extractDateTags(date, diags),
+        ...extractRestTags(rest, diags),
     ]
 
     return tags
 }
 
-function extractDates(records: Records, diags?: Diagnoser): BooqMetaTag[] {
+function extractIdentifierTags(records: Records, diags?: Diagnoser): BooqMetaTag[] {
+    if (!records || records.length === 0) {
+        diags?.push({
+            message: 'Missing identifier in metadata',
+        })
+        return []
+    }
+    const identifiers = records
+        ?.filter(r => validateMetadataRecord(r, {
+            expectedAttributes: ['#text'],
+            ignoreAttributes: ['@scheme', '@id'],
+            diags,
+        }))
+        ?.map(r => r['#text'])
+        ?? []
+
+    return identifiers.map(identifier => ['identifier', identifier])
+}
+
+function extractDateTags(records: Records, diags?: Diagnoser): BooqMetaTag[] {
     return records
         ?.filter(r => validateMetadataRecord(r, {
             expectedAttributes: ['#text'],
@@ -197,7 +180,7 @@ function extractDates(records: Records, diags?: Diagnoser): BooqMetaTag[] {
         ?? []
 }
 
-function extractRest(epubMetadata: EpubMetadata, _diags?: Diagnoser): BooqMetaTag[] {
+function extractRestTags(epubMetadata: EpubMetadata, _diags?: Diagnoser): BooqMetaTag[] {
     const result = Object.entries(epubMetadata)
         .map(([key, value]) => {
             return (value ?? []).map(value => {

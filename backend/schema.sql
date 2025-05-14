@@ -35,23 +35,30 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE TABLE IF NOT EXISTS uu_cards (
   id TEXT PRIMARY KEY DEFAULT uuid_generate_v4()::TEXT,
   asset_id TEXT NOT NULL,
-  length INTEGER NOT NULL,
-  title TEXT,
-  authors TEXT[],
-  languages TEXT[],
-  description TEXT,
-  subjects TEXT[],
-  contributors TEXT[],
-  rights TEXT,
-  cover_src TEXT,
-  tags TEXT[],
   file_hash TEXT NOT NULL,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  searchable_tsv TSVECTOR
+  meta JSONB NOT NULL
 );
 CREATE INDEX IF NOT EXISTS uu_cards_search_idx ON uu_cards USING GIN (searchable_tsv);
 CREATE INDEX IF NOT EXISTS uu_cards_file_hash_idx ON uu_cards(file_hash);
 CREATE INDEX IF NOT EXISTS uu_cards_asset_id_idx ON uu_cards(asset_id);
+-- Enable pg_trgm if not already
+CREATE EXTENSION IF NOT EXISTS pg_trgm;
+
+-- Index on title
+CREATE INDEX IF NOT EXISTS uu_cards_title_trgm_idx
+ON uu_cards
+USING gin ((meta->>'title') gin_trgm_ops);
+
+-- Index on authors' names (flatten JSON array into string)
+CREATE INDEX IF NOT EXISTS uu_cards_authors_trgm_idx
+ON uu_cards
+USING gin (
+  (
+    string_agg(DISTINCT a->>'name', ' ')
+    FROM jsonb_array_elements_text(meta->'authors') AS a
+  ) gin_trgm_ops
+);
 
 -- Uploads
 CREATE TABLE IF NOT EXISTS uploads (
@@ -122,32 +129,3 @@ CREATE TABLE IF NOT EXISTS passkey_credentials (
   created_at TIMESTAMPTZ DEFAULT now(),
   updated_at TIMESTAMPTZ DEFAULT now()
 );
-
--- Full-text search helper functions
-CREATE OR REPLACE FUNCTION jsonb_to_text(jsonb) RETURNS TEXT AS $$
-  SELECT string_agg(value::text, ' ') FROM jsonb_each_text($1)
-$$ LANGUAGE SQL IMMUTABLE;
-
-CREATE OR REPLACE FUNCTION greatest_similarity(arr TEXT[], query TEXT) RETURNS FLOAT AS $$
-  SELECT MAX(similarity(el, query)) FROM unnest(arr) el
-$$ LANGUAGE SQL IMMUTABLE;
-
-CREATE OR REPLACE FUNCTION exists_similarity(arr TEXT[], query TEXT) RETURNS BOOLEAN AS $$
-  SELECT EXISTS (SELECT 1 FROM unnest(arr) el WHERE el % query)
-$$ LANGUAGE SQL IMMUTABLE;
-
--- FTS triggers for pg_cards (with 'english' config)
-CREATE OR REPLACE FUNCTION update_uu_cards_search_tsv() RETURNS trigger AS $$
-BEGIN
-  NEW.searchable_tsv :=
-    setweight(to_tsvector('english', coalesce(NEW.title, '')), 'A') ||
-    setweight(to_tsvector('english', array_to_string(NEW.authors, ' ')), 'B') ||
-    setweight(to_tsvector('english', coalesce(NEW.description, '')), 'C') ||
-    setweight(to_tsvector('english', array_to_string(NEW.subjects, ' ')), 'D');
-  RETURN NEW;
-END
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER uu_cards_search_trigger
-  BEFORE INSERT OR UPDATE ON uu_cards
-  FOR EACH ROW EXECUTE FUNCTION update_uu_cards_search_tsv();

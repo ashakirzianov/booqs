@@ -33,17 +33,20 @@ export async function processEpub(epub: Epub, diags: Diagnoser): Promise<Booq | 
         nodes.push(value)
     }
 
-    const meta = await extactBooqMeta(epub, diags)
+    const length = nodesLength(nodes)
+    const metaFromMetadata = await extactBooqMeta(epub, diags)
+    const meta = {
+        ...metaFromMetadata,
+        length,
+    }
     const images = await buildImages(nodes, meta, epub, diags)
     const toc = await buildToc(nodes, epub, diags)
 
     const prepocessed = preprocess(nodes)
 
-    const length = nodesLength(nodes)
     return {
         nodes: prepocessed,
         meta,
-        length,
         toc: toc ?? {
             title: undefined,
             items: [],

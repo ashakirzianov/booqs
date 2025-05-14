@@ -47,24 +47,31 @@ export type TableOfContents = {
     items: TableOfContentsItem[],
 }
 
-export type BooqMetaTag = [name: string, value?: string]
+export type BooqMetaTagValue = string
+export type BooqMetaTag = [name: string, value?: BooqMetaTagValue]
+export type BooqTitle = string
+export type BooqAuthor = {
+    name: string,
+    fileAs?: string,
+    role?: string,
+}
+export type BooqLanguage = string
 export type BooqMeta = {
-    title: string | undefined,
-    authors: string[] | undefined,
-    languages: string[] | undefined,
-    contributors: string[] | undefined,
+    uniqueIdentifier: string | undefined,
+    title: BooqTitle,
+    authors: BooqAuthor[],
+    contributors: BooqAuthor[] | undefined,
+    languages: BooqLanguage[],
     description: string | undefined,
-    subjects: string[] | undefined,
-    rights: string | undefined,
     coverSrc: string | undefined,
     tags: BooqMetaTag[] | undefined,
+    length: number,
 }
 export type BooqImages = {
     [src: string]: string,
 }
 export type Booq = {
     nodes: BooqNode[],
-    length: number,
     meta: BooqMeta,
     toc: TableOfContents,
     images: BooqImages,

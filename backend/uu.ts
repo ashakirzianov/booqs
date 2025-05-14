@@ -3,7 +3,7 @@ import { ReadStream } from 'fs'
 import { inspect } from 'util'
 import type { InLibraryCard, Library, InLibrarySearchResult } from './library'
 import { parseEpubFile } from '@/parser'
-import { Booq, BooqMetaTag, nodesLength } from '@/core'
+import { Booq, BooqMeta } from '@/core'
 import { nanoid } from 'nanoid'
 import { deleteAsset, downloadAsset, uploadAsset } from './blob'
 import { sql } from './db'
@@ -21,19 +21,9 @@ export const userUploadedEpubsBucket = 'uu-epubs'
 export type DbUuCard = {
     id: string,
     asset_id: string,
-    length: number,
-    title: string | null,
-    authors: string[] | null,
-    languages: string[] | null,
-    description: string | null,
-    subjects: string[] | null,
-    cover_src: string | null,
-    contributors: string[] | null,
-    rights: string | null,
-    tags: string[] | null,
     file_hash: string,
     created_at: `${string}T${string}`,
-    searchable_tsv?: string | null,
+    meta: BooqMeta,
 }
 
 export async function uploadsForUserId(userId: string): Promise<DbUuCard[]> {
@@ -77,33 +67,24 @@ async function fileForId(id: string) {
 
 export async function search(query: string, limit = 20, offset = 0): Promise<InLibrarySearchResult[]> {
     const rows = await sql`
-    WITH ranked_cards AS (
-      SELECT *,
-        (
-          similarity(title, ${query}) * 5 +
-          greatest_similarity(authors, ${query}) * 4 +
-          greatest_similarity(subjects, ${query}) * 3 +
-          similarity(description, ${query}) * 2
-        ) AS score
-      FROM uu_cards
-      WHERE
-        title % ${query} OR
-        exists_similarity(authors, ${query}) OR
-        exists_similarity(subjects, ${query}) OR
-        description % ${query}
-    )
-    SELECT * FROM ranked_cards
-    ORDER BY score DESC
-    LIMIT ${limit} OFFSET ${offset}
-  `
+    SELECT *
+    FROM uu_cards
+    WHERE
+      (meta->>'title') % ${query}
+      OR EXISTS (
+        SELECT 1
+        FROM jsonb_array_elements(meta->'authors') AS author
+        WHERE author->>'name' % ${query}
+      )
+    ORDER BY similarity(meta->>'title', ${query}) DESC
+    LIMIT ${limit} OFFSET ${offset}`
     const cards = rows as DbUuCard[]
-    const libCards = cards.map(convertToLibraryCard)
-    const results = libCards.map(card => ({
+    const results = cards.map<InLibrarySearchResult>(row => ({
         kind: 'booq' as const,
-        id: card.id,
-        title: card.title,
-        authors: card.authors,
-        coverSrc: card.coverSrc,
+        id: row.id,
+        title: row.meta.title,
+        authors: row.meta.authors.map(a => a.name),
+        coverSrc: row.meta.coverSrc,
     }))
     return results
 }
@@ -169,46 +150,20 @@ async function insertRecord({ booq, assetId, fileHash }: {
     assetId: string,
     fileHash: string,
 }): Promise<DbUuCard | null> {
-    const {
-        title, authors, subjects, languages, description, coverSrc,
-        rights, contributors,
-        tags,
-    } = booq.meta
     const id = nanoid(10)
-    const length = nodesLength(booq.nodes)
-    const tagArray = tags
-        ? tags.map(serializeTag)
-        : undefined
+    const meta = booq.meta
     const query = sql`
       INSERT INTO uu_cards (
         id,
         asset_id,
-        length,
-        title,
-        authors,
-        languages,
-        description,
-        subjects,
-        rights,
-        contributors,
-        cover_src,
-        tags,
-        file_hash
+        file_hash,
+        meta
       )
       VALUES (
         ${id},
         ${assetId},
-        ${length},
-        ${title ?? null},
-        ${authors ?? null},
-        ${languages ?? null},
-        ${description ?? null},
-        ${subjects ?? null},
-        ${rights ?? null},
-        ${contributors ?? null},
-        ${coverSrc ?? null},
-        ${tagArray ?? null},
-        ${fileHash}
+        ${fileHash},
+        ${meta}
       )
       ON CONFLICT (id) DO NOTHING
       RETURNING *
@@ -328,30 +283,6 @@ async function getAllBooksWithoutUploadUsers(): Promise<DbUuCard[]> {
 function convertToLibraryCard(doc: DbUuCard): InLibraryCard {
     return {
         id: doc.id,
-        length: doc.length ?? 0,
-        title: doc.title ?? undefined,
-        authors: doc.authors ?? undefined,
-        languages: doc.languages ?? undefined,
-        description: doc.description ?? undefined,
-        subjects: doc.subjects ?? undefined,
-        contributors: doc.contributors ?? undefined,
-        rights: doc.rights ?? undefined,
-        coverSrc: doc.cover_src ?? undefined,
-        tags: doc.tags
-            ? doc.tags.map(deserializeTag)
-            : undefined,
-    }
-}
-
-function serializeTag(tag: BooqMetaTag): string {
-    return JSON.stringify(tag)
-}
-
-function deserializeTag(tagString: string): BooqMetaTag {
-    try {
-        return JSON.parse(tagString) as BooqMetaTag
-    } catch (e) {
-        console.error('Failed to deserialize tag:', e)
-        return [tagString]
+        ...doc.meta,
     }
 }
