@@ -11,7 +11,6 @@ export const localLibrary: Library = {
         return ids.map(function (id): InLibraryCard {
             return {
                 id,
-                uniqueIdentifier: undefined,
                 title: 'Unknown',
                 authors: [],
                 length: 0,

@@ -9,7 +9,6 @@ export async function extactBooqMeta(epub: Epub, diags?: Diagnoser): Promise<Omi
             message: 'Missing metadata in epub',
         })
         return {
-            uniqueIdentifier: undefined,
             title: 'Untitled',
             authors: [],
             coverSrc: undefined,
@@ -17,7 +16,6 @@ export async function extactBooqMeta(epub: Epub, diags?: Diagnoser): Promise<Omi
         }
     }
     const coverItem = await epub.coverItem()
-    const uniqueIdentifier = await epub.uniqueIdentifier()
 
     const {
         title, creator,
@@ -27,7 +25,6 @@ export async function extactBooqMeta(epub: Epub, diags?: Diagnoser): Promise<Omi
     diags = diags ?? []
 
     return {
-        uniqueIdentifier,
         title: extractTitle(title, diags) ?? 'Untitled',
         authors: extractAuthors(creator, diags) ?? [],
         extra: extractExtra(rest, diags),

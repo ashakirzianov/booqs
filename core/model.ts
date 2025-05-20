@@ -60,7 +60,6 @@ export type BooqExtraMetadata = {
     attributes?: Record<string, string | undefined>,
 }
 export type BooqMetadata = {
-    uniqueIdentifier: string | undefined,
     title: BooqTitle,
     authors: BooqAuthor[],
     extra: BooqExtraMetadata[],
