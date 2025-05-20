@@ -46,7 +46,7 @@ export async function processEpub(epub: Epub, diags: Diagnoser): Promise<Booq | 
 
     return {
         nodes: prepocessed,
-        meta,
+        metadata: meta,
         toc: toc ?? {
             title: undefined,
             items: [],

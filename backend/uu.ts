@@ -3,7 +3,7 @@ import { ReadStream } from 'fs'
 import { inspect } from 'util'
 import type { InLibraryCard, Library, InLibrarySearchResult } from './library'
 import { parseEpubFile } from '@/parser'
-import { Booq, BooqMeta } from '@/core'
+import { Booq, BooqMetadata } from '@/core'
 import { nanoid } from 'nanoid'
 import { deleteAsset, downloadAsset, uploadAsset } from './blob'
 import { sql } from './db'
@@ -23,7 +23,7 @@ export type DbUuCard = {
     asset_id: string,
     file_hash: string,
     created_at: `${string}T${string}`,
-    meta: BooqMeta,
+    meta: BooqMetadata,
 }
 
 export async function uploadsForUserId(userId: string): Promise<DbUuCard[]> {
@@ -151,7 +151,7 @@ async function insertRecord({ booq, assetId, fileHash }: {
     fileHash: string,
 }): Promise<DbUuCard | null> {
     const id = nanoid(10)
-    const meta = booq.meta
+    const meta = booq.metadata
     const query = sql`
       INSERT INTO uu_cards (
         id,

@@ -1,5 +1,5 @@
 import { BooqFragment } from './fragment'
-import { BooqId, BooqMeta, BooqRange, TableOfContents } from './model'
+import { BooqId, BooqMetadata, BooqRange, TableOfContents } from './model'
 
 export type AccountData = {
     id: string,
@@ -26,10 +26,10 @@ export type BooqNote = NoteData & {
 export type PartialBooqData = {
     booqId: BooqId,
     fragment: BooqFragment,
-    meta: BooqMeta,
+    meta: BooqMetadata,
     toc: TableOfContents,
 }
-export type BooqLibraryCard = BooqMeta & {
+export type BooqLibraryCard = BooqMetadata & {
     booqId: BooqId,
 }
 export type BooqCollection = {

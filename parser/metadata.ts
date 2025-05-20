@@ -1,8 +1,8 @@
 import { Epub } from './epub'
-import { BooqAuthor, BooqExtraMetadata, BooqMeta } from '../core'
+import { BooqAuthor, BooqExtraMetadata, BooqMetadata } from '../core'
 import { Diagnoser, EpubMetadata, EpubMetadataItem } from 'booqs-epub'
 
-export async function extactBooqMeta(epub: Epub, diags?: Diagnoser): Promise<Omit<BooqMeta, 'length'>> {
+export async function extactBooqMeta(epub: Epub, diags?: Diagnoser): Promise<Omit<BooqMetadata, 'length'>> {
     const epubMetadata = await epub.metadata()
     if (!epubMetadata) {
         diags?.push({

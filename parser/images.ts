@@ -1,10 +1,10 @@
 import uniq from 'lodash-es/uniq'
-import { BooqNode, BooqImages, BooqMeta } from '../core'
+import { BooqNode, BooqImages, BooqMetadata } from '../core'
 import { Epub } from './epub'
 import { resolveRelativePath } from './path'
 import { Diagnoser } from 'booqs-epub'
 
-export async function buildImages(nodes: BooqNode[], meta: BooqMeta, file: Epub, diags: Diagnoser) {
+export async function buildImages(nodes: BooqNode[], meta: BooqMetadata, file: Epub, diags: Diagnoser) {
     const srcs = collectImgSrcs(nodes)
     const cover = meta.coverSrc
     const allSrcs = cover !== undefined

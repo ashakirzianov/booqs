@@ -1,10 +1,10 @@
 import { Diagnoser, Diagnostic } from 'booqs-epub'
-import { BooqMeta } from '../core'
+import { BooqMetadata } from '../core'
 import { Epub, openEpubFile } from './epub'
 import { extactBooqMeta } from './metadata'
 
 export type ExtractedMetadata = {
-    metadata: Omit<BooqMeta, 'length'>,
+    metadata: Omit<BooqMetadata, 'length'>,
     cover?: string,
 }
 export async function extractEpubMetadataFromFile({ fileBuffer, extractCover, diags }: {

@@ -38,7 +38,7 @@ export async function parseEpubs(options: CliOptions) {
                 }
             }
             if (options.switches['metadata'] === 'true') {
-                console.info(`Metadata for ${path}: ${pretty(booq?.meta)}`)
+                console.info(`Metadata for ${path}: ${pretty(booq?.metadata)}`)
                 if (options.switches['raw'] === 'true') {
                     const rawMetadata = await epub.metadata()
                     console.info(`Raw metadata for ${path}: ${pretty(rawMetadata)}`)

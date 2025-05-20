@@ -1,7 +1,7 @@
 import type { InLibraryCard, Library, InLibrarySearchResult } from './library'
 import { downloadAsset } from './blob'
 import { redis, sanitizeForRedisHash } from './db'
-import { Booq, BooqMeta } from '@/core'
+import { Booq, BooqMetadata } from '@/core'
 import { getExtraMetadataValues } from '@/core/meta'
 
 export const pgLibrary: Library = {
@@ -15,7 +15,7 @@ export const pgEpubsBucket = 'pg-epubs'
 
 type DbPgCard = {
   assetId: string,
-  meta: BooqMeta,
+  meta: BooqMetadata,
   // Flat metadata for search
   title: string,
   primaryFileAs: string,
@@ -66,7 +66,7 @@ export async function insertPgRecord({ booq, assetId, id }: {
     assetId,
     ...dbFromCard({
       id,
-      ...booq.meta,
+      ...booq.metadata,
     }),
   })
   if (success) {

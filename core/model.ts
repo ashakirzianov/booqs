@@ -59,7 +59,7 @@ export type BooqExtraMetadata = {
     value?: string,
     attributes?: Record<string, string | undefined>,
 }
-export type BooqMeta = {
+export type BooqMetadata = {
     uniqueIdentifier: string | undefined,
     title: BooqTitle,
     authors: BooqAuthor[],
@@ -72,7 +72,7 @@ export type BooqImages = {
 }
 export type Booq = {
     nodes: BooqNode[],
-    meta: BooqMeta,
+    metadata: BooqMetadata,
     toc: TableOfContents,
     images: BooqImages,
 }

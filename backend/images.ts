@@ -15,8 +15,8 @@ export async function uploadBooqImages(booqId: BooqId, booq: Booq) {
     const allImages = Object.entries(booq.images).map(
         ([src, base64]) => uploadImage(base64, booqId, src),
     )
-    if (typeof booq.meta.coverSrc === 'string') {
-        const coverSrc = booq.meta.coverSrc
+    if (typeof booq.metadata.coverSrc === 'string') {
+        const coverSrc = booq.metadata.coverSrc
         const coverBuffer = booq.images[coverSrc]
         if (coverBuffer) {
             const covers = coverSizes.map(

@@ -1,4 +1,4 @@
-import { AuthorSearchResult, BooqId, BooqLibraryCard, BooqMeta, BooqSearchResult, InLibraryId, LibraryId, makeId, parseId, SearchResult } from '@/core'
+import { AuthorSearchResult, BooqId, BooqLibraryCard, BooqMetadata, BooqSearchResult, InLibraryId, LibraryId, makeId, parseId, SearchResult } from '@/core'
 import groupBy from 'lodash-es/groupBy'
 import { Booq } from '../core'
 import { pgLibrary } from './pg'
@@ -6,7 +6,7 @@ import { uploadBooqImages } from './images'
 import { userUploadsLibrary } from './uu'
 import { localLibrary } from './lo'
 
-export type InLibraryCard = BooqMeta & {
+export type InLibraryCard = BooqMetadata & {
     id: InLibraryId,
 }
 export type BookFile = {

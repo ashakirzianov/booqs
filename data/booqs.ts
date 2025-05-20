@@ -80,7 +80,7 @@ export async function booqPart({
         booqId,
         fragment,
         toc: booq.toc,
-        meta: booq.meta,
+        meta: booq.metadata,
     } satisfies PartialBooqData
 }
 

@@ -5,7 +5,7 @@ import { CopilotContext, useCopilotAnswer, useCopilotSuggestions } from '@/appli
 import { ModalDivider, ModalHeader, ModalFullScreen } from './Modal'
 import { useIsSmallScreen } from '@/application/utils'
 import { Spinner } from './Icons'
-import { BooqId, BooqMeta } from '@/core'
+import { BooqId, BooqMetadata } from '@/core'
 import { getExtraMetadataValues } from '@/core/meta'
 
 type CopilotEmpty = {
@@ -19,7 +19,7 @@ type CopilotSelected = {
 }
 type BooqData = {
     id: BooqId,
-    meta: BooqMeta,
+    meta: BooqMetadata,
 }
 export type CopilotState = CopilotEmpty | CopilotSelected
 type CopilotProps = {
