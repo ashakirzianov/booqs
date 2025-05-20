@@ -1,6 +1,6 @@
-import { BooqMetaTag } from '@/core'
 import React from 'react'
 
+type BooqMetaTag = readonly [tag: string, value?: string]
 export function BooqTags({ tags }: {
     tags: BooqMetaTag[],
 }) {

@@ -94,8 +94,9 @@ function buildTags(card: BooqLibraryCard): Tag[] {
             tag: 'pages',
             value: Math.floor(card.length / 1500).toString(),
         },
-        ...(card.tags ?? []).map(([tag, value]) => ({
-            tag, value,
+        ...(card.extra ?? []).map((extra) => ({
+            tag: extra.name,
+            value: extra.value ?? null,
         }))
     ].filter(tag => tag !== undefined)
 }

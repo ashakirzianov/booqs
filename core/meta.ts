@@ -1,10 +1,10 @@
-import { BooqMetaTag, BooqMetaTagValue } from './model'
+import { BooqExtraMetadata } from './model'
 
-export function getValuesForTag(
-    tag: string,
-    tags: BooqMetaTag[],
-): BooqMetaTagValue[] {
-    return tags
-        .map(([name, value]) => name === tag ? value : undefined)
+export function getExtraMetadataValues(
+    name: string,
+    extra: BooqExtraMetadata[],
+): string[] {
+    return extra
+        .map((extra) => extra.name === name ? extra.value : undefined)
         .filter((v) => v !== undefined)
 }

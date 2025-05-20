@@ -1,5 +1,5 @@
 import { Epub } from './epub'
-import { BooqAuthor, BooqMeta, BooqMetaTag } from '../core'
+import { BooqAuthor, BooqExtraMetadata, BooqMeta } from '../core'
 import { Diagnoser, EpubMetadata, EpubMetadataItem } from 'booqs-epub'
 
 export async function extactBooqMeta(epub: Epub, diags?: Diagnoser): Promise<Omit<BooqMeta, 'length'>> {
@@ -12,18 +12,15 @@ export async function extactBooqMeta(epub: Epub, diags?: Diagnoser): Promise<Omi
             uniqueIdentifier: undefined,
             title: 'Untitled',
             authors: [],
-            contributors: undefined,
-            languages: [],
-            description: undefined,
             coverSrc: undefined,
-            tags: [],
+            extra: [],
         }
     }
     const coverItem = await epub.coverItem()
     const uniqueIdentifier = await epub.uniqueIdentifier()
 
     const {
-        title, creator, language, description, contributor,
+        title, creator,
         ...rest
     } = epubMetadata
 
@@ -33,11 +30,8 @@ export async function extactBooqMeta(epub: Epub, diags?: Diagnoser): Promise<Omi
         uniqueIdentifier,
         title: extractTitle(title, diags) ?? 'Untitled',
         authors: extractAuthors(creator, diags) ?? [],
-        contributors: extractContributors(contributor, diags),
-        languages: extractLanguages(language, diags) ?? [],
-        description: extractDescription(description, diags),
+        extra: extractExtra(rest, diags),
         coverSrc: coverItem?.['@href'],
-        tags: extractTags(rest, diags),
     }
 }
 
@@ -78,123 +72,17 @@ function extractAuthors(records: Records, diags?: Diagnoser): BooqAuthor[] | und
         }))
 }
 
-function extractLanguages(records: Records, diags?: Diagnoser): string[] | undefined {
-    if (!records || records.length === 0) {
-        diags?.push({
-            message: 'Missing language in metadata',
-        })
-        return undefined
-    }
-    return records
-        ?.filter(r => validateMetadataRecord(r, {
-            expectedAttributes: ['#text'],
-            ignoreAttributes: ['@type'],
-            diags,
-        }))
-        ?.map(r => r['#text'])
-}
-
-function extractDescription(records: Records, diags?: Diagnoser): string | undefined {
-    return records
-        ?.filter(r => validateMetadataRecord(r, {
-            expectedAttributes: ['#text'],
-            diags,
-        }))
-        ?.map(r => r['#text'])
-        ?.join('\n')
-}
-
-function extractContributors(records: Records, diags?: Diagnoser): BooqAuthor[] | undefined {
-    return records
-        ?.filter(r => validateMetadataRecord(r, {
-            expectedAttributes: ['#text'],
-            optionalAttributes: ['@file-as', '@role'],
-            diags,
-        }))
-        ?.map(r => ({
-            name: r['#text'],
-            fileAs: r['@file-as'],
-            role: r['@role'],
-        }))
-}
-
-function extractTags(epubMetadata: EpubMetadata, diags?: Diagnoser): BooqMetaTag[] {
-    const {
-        identifier, contributor, date,
-        cover, // Ignoring this
-        ...rest
-    } = epubMetadata
-    const {
-        source, publisher, subjects, rights,
-        'calibre:timestamp': calibreTimestamp,
-        'calibre:title_sort': calibreSeries,
-        'calibre:series': calibreTitleSort,
-        'calibre:series_index': calibreSeriesIndex,
-        ...unexpected
-    } = rest
-    for (const key of Object.keys(unexpected)) {
-        diags?.push({
-            message: `Unexpected attribute ${key} in metadata`,
-            severity: 'warning',
-        })
-    }
-    const tags = [
-        ...extractIdentifierTags(identifier, diags),
-        ...extractDateTags(date, diags),
-        ...extractRestTags(rest, diags),
-    ]
-
-    return tags
-}
-
-function extractIdentifierTags(records: Records, diags?: Diagnoser): BooqMetaTag[] {
-    if (!records || records.length === 0) {
-        diags?.push({
-            message: 'Missing identifier in metadata',
-        })
-        return []
-    }
-    const identifiers = records
-        ?.filter(r => validateMetadataRecord(r, {
-            expectedAttributes: ['#text'],
-            ignoreAttributes: ['@scheme', '@id'],
-            diags,
-        }))
-        ?.map(r => r['#text'])
-        ?? []
-
-    return identifiers.map(identifier => ['identifier', identifier])
-}
-
-function extractDateTags(records: Records, diags?: Diagnoser): BooqMetaTag[] {
-    return records
-        ?.filter(r => validateMetadataRecord(r, {
-            expectedAttributes: ['#text'],
-            optionalAttributes: ['@event'],
-            diags,
-        }))
-        ?.map(r => r['@event']
-            ? [r['@event'], r['#text']]
-            : ['date', r['#text']]
-        )
-        ?? []
-}
-
-function extractRestTags(epubMetadata: EpubMetadata, _diags?: Diagnoser): BooqMetaTag[] {
-    const result = Object.entries(epubMetadata)
-        .map(([key, value]) => {
-            return (value ?? []).map(value => {
-                return Object.entries(value ?? {})
-                    .map<BooqMetaTag>(([subKey, subValue]) => {
-                        if (subKey === '#text') {
-                            return [key, subValue]
-                        } else {
-                            return [`${key}:${subKey}`, subValue]
-                        }
-                    })
+function extractExtra(epubMetadata: EpubMetadata, _diags?: Diagnoser) {
+    const extra: BooqExtraMetadata[] = []
+    for (const [name, items] of Object.entries(epubMetadata)) {
+        for (const item of items ?? []) {
+            const { '#text': value, ...attributes } = item
+            extra.push({
+                name, value, attributes
             })
-        }).flat(2)
-    return result
+        }
+    }
+    return extra
 }
 
 type ExtractedMetadata<Keys extends string, OptKeys extends string> = Record<Keys, string> & Record<OptKeys, string | undefined>

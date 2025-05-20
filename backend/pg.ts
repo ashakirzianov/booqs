@@ -2,7 +2,7 @@ import type { InLibraryCard, Library, InLibrarySearchResult } from './library'
 import { downloadAsset } from './blob'
 import { redis, sanitizeForRedisHash } from './db'
 import { Booq, BooqMeta } from '@/core'
-import { getValuesForTag } from '@/core/meta'
+import { getExtraMetadataValues } from '@/core/meta'
 
 export const pgLibrary: Library = {
   search,
@@ -101,12 +101,14 @@ function cardFromDb(row: DbPgCard): Omit<InLibraryCard, 'id'> {
 function dbFromCard(card: InLibraryCard): Omit<DbPgCard, 'assetId'> {
   const { id, ...meta } = card
   const {
-    authors, tags, title, languages, description,
+    authors, title, extra,
   } = meta
   const fileAs = authors.map((a) => a.fileAs ?? a.name)
   const primaryFileAs = fileAs[0] ?? 'Unknown'
-  const subjects = getValuesForTag('subject', tags ?? [])
-  const rights = getValuesForTag('rights', tags ?? []).join(' | ')
+  const languages = getExtraMetadataValues('language', extra ?? [])
+  const description = getExtraMetadataValues('description', extra ?? []).join('\n')
+  const subjects = getExtraMetadataValues('subject', extra ?? [])
+  const rights = getExtraMetadataValues('rights', extra ?? []).join(' | ')
   return {
     title,
     languages,

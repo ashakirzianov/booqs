@@ -14,12 +14,9 @@ export const localLibrary: Library = {
                 uniqueIdentifier: undefined,
                 title: 'Unknown',
                 authors: [],
-                contributors: undefined,
-                languages: [],
-                description: undefined,
                 length: 0,
                 coverSrc: undefined,
-                tags: undefined,
+                extra: [],
             }
         })
     },

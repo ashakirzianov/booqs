@@ -6,6 +6,7 @@ import { ModalDivider, ModalHeader, ModalFullScreen } from './Modal'
 import { useIsSmallScreen } from '@/application/utils'
 import { Spinner } from './Icons'
 import { BooqId, BooqMeta } from '@/core'
+import { getExtraMetadataValues } from '@/core/meta'
 
 type CopilotEmpty = {
     kind: 'empty',
@@ -99,7 +100,7 @@ function CopilotSelectedContent({ state, data }: {
         booqId: data.id,
         title: data.meta.title ?? 'Unknown',
         author: data.meta.authors?.join(', ') ?? 'Unknown author',
-        language: data.meta.languages?.[0] ?? 'en-US',
+        language: getExtraMetadataValues('language', data.meta.extra)[0] ?? 'en-US',
         start: state.selection.range.start,
         end: state.selection.range.end,
     }
