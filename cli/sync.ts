@@ -68,7 +68,7 @@ async function syncBlobToDB(options: CliOptions) {
     const needToUploadImages = options.switches['upload-images'] === 'true'
     const existing = await existingIds()
     info(`Found ${existing.length} ids in DB`)
-    const existingIdsSet = new Set(existing.map(id => id.toString()))
+    const existingIdsSet = new Set(existing)
     const filteredGenerator = filter(existingBlobAssetIds(), (id) => {
         if (existingIdsSet.has(id)) {
             info(`Skipping ${id} because it already exists in DB`)

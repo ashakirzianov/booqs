@@ -1,21 +1,3 @@
--- DROP TABLE IF EXISTS
---   passkey_credentials,
---   notes,
---   bookmarks,
---   user_collections_booqs,
---   collections,
---   uploads,
---   uu_cards,
---   users
--- CASCADE;
-
--- DROP FUNCTION IF EXISTS
---   update_uu_cards_search_tsv,
---   jsonb_to_text(jsonb),
---   greatest_similarity(text[], text),
---   exists_similarity(text[], text)
--- CASCADE;
-
 CREATE EXTENSION IF NOT EXISTS citext;
 CREATE EXTENSION IF NOT EXISTS pg_trgm;
 CREATE EXTENSION IF NOT EXISTS unaccent;
@@ -31,45 +13,165 @@ CREATE TABLE IF NOT EXISTS users (
   joined_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- uu_cards
-CREATE TABLE IF NOT EXISTS uu_cards (
+-- Library
+CREATE TABLE IF NOT EXISTS booq_library (
+  id TEXT PRIMARY KEY,
+  source TEXT NOT NULL, -- 'pg', 'uu'
+  source_id TEXT NOT NULL, -- original ID in the source table
+  asset_id TEXT NOT NULL,
+  visibility TEXT NOT NULL DEFAULT 'public', -- 'public', 'uploads'
+
+  title TEXT,
+  authors TEXT,
+  languages TEXT[],
+  subjects TEXT,
+
+  searchable_tsv TSVECTOR
+);
+
+-- Fuzzy search (substring)
+CREATE INDEX idx_library_title_trgm ON booq_library USING GIN (title gin_trgm_ops);
+CREATE INDEX idx_library_authors_trgm ON booq_library USING GIN (authors gin_trgm_ops);
+CREATE INDEX idx_library_subjects_trgm ON booq_library USING GIN (subjects gin_trgm_ops);
+
+-- Exact match for language
+CREATE INDEX idx_library_languages ON booq_library USING GIN (languages);
+
+-- Full-text search
+CREATE INDEX idx_library_searchable_tsv ON booq_library USING GIN (searchable_tsv);
+
+-- Optional: for filtering by visibility
+CREATE INDEX idx_library_visibility ON booq_library (visibility);
+
+CREATE OR REPLACE FUNCTION sync_library()
+RETURNS TRIGGER AS $$
+DECLARE
+  source_arg TEXT := TG_ARGV[0];         -- 'pg' or 'uu'
+  visibility_arg TEXT := TG_ARGV[1]; -- 'public', 'uploads', etc.
+  authors TEXT;
+  languages TEXT[];
+  subjects TEXT;
+  description TEXT;
+BEGIN
+  -- extract authors string
+  SELECT string_agg(author->>'name', ' ')
+    INTO authors
+  FROM jsonb_array_elements(NEW.meta->'authors') author;
+
+  -- extract languages from extra
+  SELECT ARRAY_AGG(entry->>'value')
+    INTO languages
+  FROM jsonb_array_elements(NEW.meta->'extra') entry
+  WHERE lower(entry->>'name') = 'language';
+
+  -- extract subjects from extra
+  SELECT string_agg(entry->>'value', ' ')
+    INTO subjects
+  FROM jsonb_array_elements(NEW.meta->'extra') entry
+  WHERE lower(entry->>'name') = 'subject';
+
+  -- optional: extract description
+  SELECT string_agg(entry->>'value', E'\n')
+    INTO description
+  FROM jsonb_array_elements(NEW.meta->'extra') entry
+  WHERE lower(entry->>'name') = 'description';
+
+  INSERT INTO booq_library (
+    id,
+    source,
+    source_id,
+    asset_id,
+    visibility,
+    title,
+    authors,
+    languages,
+    subjects,
+    searchable_tsv
+  )
+  VALUES (
+    source_arg || '/' || NEW.id,
+    source_arg,
+    NEW.id,
+    NEW.asset_id,
+    visibility_arg,
+    NEW.meta->>'title',
+    authors,
+    languages,
+    subjects,
+    to_tsvector('english',
+      unaccent(
+        coalesce(NEW.meta->>'title', '') || ' ' ||
+        coalesce(description, '') || ' ' ||
+        coalesce(authors, '') || ' ' ||
+        coalesce(subjects, '')
+      )
+    )
+  )
+  ON CONFLICT (id) DO UPDATE SET
+    title = EXCLUDED.title,
+    authors = EXCLUDED.authors,
+    languages = EXCLUDED.languages,
+    subjects = EXCLUDED.subjects,
+    searchable_tsv = EXCLUDED.searchable_tsv;
+    
+  RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION delete_from_library()
+RETURNS TRIGGER AS $$
+BEGIN
+  DELETE FROM booq_library WHERE id = TG_ARGV[0] || '/' || OLD.id;
+  RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Uploads
+-- uu_assets
+CREATE TABLE IF NOT EXISTS uu_assets (
   id TEXT PRIMARY KEY DEFAULT uuid_generate_v4()::TEXT,
   asset_id TEXT NOT NULL,
   file_hash TEXT NOT NULL,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   meta JSONB NOT NULL
 );
-CREATE INDEX IF NOT EXISTS uu_cards_search_idx ON uu_cards USING GIN (searchable_tsv);
-CREATE INDEX IF NOT EXISTS uu_cards_file_hash_idx ON uu_cards(file_hash);
-CREATE INDEX IF NOT EXISTS uu_cards_asset_id_idx ON uu_cards(asset_id);
--- Enable pg_trgm if not already
-CREATE EXTENSION IF NOT EXISTS pg_trgm;
 
--- Index on title
-CREATE INDEX IF NOT EXISTS uu_cards_title_trgm_idx
-ON uu_cards
-USING gin ((meta->>'title') gin_trgm_ops);
+CREATE TRIGGER trg_delete_library_uu
+  AFTER DELETE ON uu_assets
+  FOR EACH ROW
+  EXECUTE FUNCTION delete_from_library('uu');
 
--- Index on authors' names (flatten JSON array into string)
-CREATE INDEX IF NOT EXISTS uu_cards_authors_trgm_idx
-ON uu_cards
-USING gin (
-  (
-    string_agg(DISTINCT a->>'name', ' ')
-    FROM jsonb_array_elements_text(meta->'authors') AS a
-  ) gin_trgm_ops
-);
+CREATE TRIGGER trg_sync_library_uu
+  AFTER INSERT OR UPDATE ON uu_assets
+  FOR EACH ROW
+  EXECUTE FUNCTION sync_library('uu', 'uploads');
 
--- Uploads
+-- uploads
 CREATE TABLE IF NOT EXISTS uploads (
   user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  upload_id TEXT NOT NULL REFERENCES uu_cards(id) ON DELETE CASCADE,
+  upload_id TEXT NOT NULL REFERENCES uu_assets(id) ON DELETE CASCADE,
   uploaded_at TIMESTAMPTZ DEFAULT NOW(),
   PRIMARY KEY (user_id, upload_id)
 );
 CREATE INDEX IF NOT EXISTS uploads_upload_id_idx ON uploads(upload_id);
 CREATE INDEX IF NOT EXISTS uploads_user_id_idx ON uploads(user_id);
 CREATE INDEX IF NOT EXISTS uploads_uploaded_at_idx ON uploads(uploaded_at);
+
+-- Progect Gutenberg
+-- pg_assets
+CREATE TABLE IF NOT EXISTS pg_assets (
+  id TEXT PRIMARY KEY,
+  asset_id TEXT NOT NULL,
+  meta JSONB NOT NULL
+);
+CREATE TRIGGER trg_sync_library_pg
+  AFTER INSERT OR UPDATE ON pg_assets
+  FOR EACH ROW
+  EXECUTE FUNCTION sync_library('pg', 'public');
+CREATE TRIGGER trg_delete_library_pg
+  AFTER DELETE ON pg_assets
+  FOR EACH ROW
+  EXECUTE FUNCTION delete_from_library('pg');
 
 -- Collections
 CREATE TABLE IF NOT EXISTS collections (
@@ -90,17 +192,6 @@ CREATE TABLE IF NOT EXISTS user_collections_booqs (
   PRIMARY KEY (collection_id, booq_id)
 );
 CREATE INDEX IF NOT EXISTS user_collections_booqs_booq_id_idx ON user_collections_booqs(booq_id);
-
--- Bookmarks
-CREATE TABLE IF NOT EXISTS bookmarks (
-  id TEXT PRIMARY KEY DEFAULT uuid_generate_v4()::TEXT,
-  user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  booq_id TEXT NOT NULL,
-  path SMALLINT[] NOT NULL,
-  CONSTRAINT unique_user_booq_path UNIQUE (user_id, booq_id, path)
-);
-CREATE INDEX IF NOT EXISTS bookmarks_user_booq_idx ON bookmarks(user_id, booq_id);
-CREATE INDEX IF NOT EXISTS bookmarks_user_id_idx ON bookmarks(user_id);
 
 -- Notes
 CREATE TABLE IF NOT EXISTS notes (
