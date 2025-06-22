@@ -13,118 +13,80 @@ CREATE TABLE IF NOT EXISTS users (
   joined_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- Library
-CREATE TABLE IF NOT EXISTS booq_library (
-  id TEXT PRIMARY KEY,
-  source TEXT NOT NULL, -- 'pg', 'uu'
-  source_id TEXT NOT NULL, -- original ID in the source table
-  asset_id TEXT NOT NULL,
-  visibility TEXT NOT NULL DEFAULT 'public', -- 'public', 'uploads'
-
-  title TEXT,
-  authors TEXT,
-  languages TEXT[],
-  subjects TEXT,
-
-  searchable_tsv TSVECTOR
-);
-
--- Fuzzy search (substring)
-CREATE INDEX idx_library_title_trgm ON booq_library USING GIN (title gin_trgm_ops);
-CREATE INDEX idx_library_authors_trgm ON booq_library USING GIN (authors gin_trgm_ops);
-CREATE INDEX idx_library_subjects_trgm ON booq_library USING GIN (subjects gin_trgm_ops);
-
--- Exact match for language
-CREATE INDEX idx_library_languages ON booq_library USING GIN (languages);
-
--- Full-text search
-CREATE INDEX idx_library_searchable_tsv ON booq_library USING GIN (searchable_tsv);
-
--- Optional: for filtering by visibility
-CREATE INDEX idx_library_visibility ON booq_library (visibility);
-
-CREATE OR REPLACE FUNCTION sync_library()
-RETURNS TRIGGER AS $$
-DECLARE
-  source_arg TEXT := TG_ARGV[0];         -- 'pg' or 'uu'
-  visibility_arg TEXT := TG_ARGV[1]; -- 'public', 'uploads', etc.
-  authors TEXT;
-  languages TEXT[];
-  subjects TEXT;
-  description TEXT;
-BEGIN
-  -- extract authors string
-  SELECT string_agg(author->>'name', ' ')
-    INTO authors
-  FROM jsonb_array_elements(NEW.meta->'authors') author;
-
-  -- extract languages from extra
-  SELECT ARRAY_AGG(entry->>'value')
-    INTO languages
-  FROM jsonb_array_elements(NEW.meta->'extra') entry
-  WHERE lower(entry->>'name') = 'language';
-
-  -- extract subjects from extra
-  SELECT string_agg(entry->>'value', ' ')
-    INTO subjects
-  FROM jsonb_array_elements(NEW.meta->'extra') entry
-  WHERE lower(entry->>'name') = 'subject';
-
-  -- optional: extract description
-  SELECT string_agg(entry->>'value', E'\n')
-    INTO description
-  FROM jsonb_array_elements(NEW.meta->'extra') entry
-  WHERE lower(entry->>'name') = 'description';
-
-  INSERT INTO booq_library (
-    id,
-    source,
-    source_id,
-    asset_id,
-    visibility,
-    title,
-    authors,
-    languages,
-    subjects,
-    searchable_tsv
+-- Library metadata view
+DROP MATERIALIZED VIEW IF EXISTS library_metadata CASCADE;
+CREATE MATERIALIZED VIEW library_metadata AS
+SELECT
+  'uu' AS source,
+  id,
+  asset_id,
+  meta->>'title' AS title,
+  (
+    SELECT string_agg(a->>'name', ', ')
+    FROM jsonb_array_elements(meta->'authors') AS a
+  ) AS author_names,
+  (
+    SELECT array_agg(a->>'fileAs')
+    FROM jsonb_array_elements(meta->'authors') AS a
+    WHERE a ? 'fileAs'
+  ) AS file_as_list,
+  (
+    SELECT array_agg(e->>'value')
+    FROM jsonb_array_elements(meta->'extra') AS e
+    WHERE e->>'name' = 'subject'
+  ) AS subjects,
+  (
+    SELECT array_agg(e->>'value')
+    FROM jsonb_array_elements(meta->'extra') AS e
+    WHERE e->>'name' = 'language'
+  ) AS languages
+FROM uu_assets
+UNION ALL
+SELECT
+  'pg' AS source,
+  id,
+  asset_id,
+  meta->>'title',
+  (
+    SELECT string_agg(a->>'name', ', ')
+    FROM jsonb_array_elements(meta->'authors') AS a
+  ),
+  (
+    SELECT array_agg(a->>'fileAs')
+    FROM jsonb_array_elements(meta->'authors') AS a
+    WHERE a ? 'fileAs'
+  ),
+  (
+    SELECT array_agg(e->>'value')
+    FROM jsonb_array_elements(meta->'extra') AS e
+    WHERE e->>'name' = 'subject'
+  ),
+  (
+    SELECT array_agg(e->>'value')
+    FROM jsonb_array_elements(meta->'extra') AS e
+    WHERE e->>'name' = 'language'
   )
-  VALUES (
-    source_arg || '/' || NEW.id,
-    source_arg,
-    NEW.id,
-    NEW.asset_id,
-    visibility_arg,
-    NEW.meta->>'title',
-    authors,
-    languages,
-    subjects,
-    to_tsvector('english',
-      unaccent(
-        coalesce(NEW.meta->>'title', '') || ' ' ||
-        coalesce(description, '') || ' ' ||
-        coalesce(authors, '') || ' ' ||
-        coalesce(subjects, '')
-      )
-    )
-  )
-  ON CONFLICT (id) DO UPDATE SET
-    title = EXCLUDED.title,
-    authors = EXCLUDED.authors,
-    languages = EXCLUDED.languages,
-    subjects = EXCLUDED.subjects,
-    searchable_tsv = EXCLUDED.searchable_tsv;
-    
-  RETURN NULL;
-END;
-$$ LANGUAGE plpgsql;
+FROM pg_assets;
 
-CREATE OR REPLACE FUNCTION delete_from_library()
-RETURNS TRIGGER AS $$
-BEGIN
-  DELETE FROM booq_library WHERE id = TG_ARGV[0] || '/' || OLD.id;
-  RETURN NULL;
-END;
-$$ LANGUAGE plpgsql;
+-- Add a unique index for concurrent refresh
+CREATE UNIQUE INDEX library_metadata_id_source_idx
+  ON library_metadata (id, source);
+
+-- Add additional indexes for search
+CREATE INDEX library_metadata_title_trgm
+  ON library_metadata USING GIN (title gin_trgm_ops);
+
+CREATE INDEX library_metadata_author_names_trgm
+  ON library_metadata USING GIN (author_names gin_trgm_ops);
+
+CREATE INDEX library_metadata_subjects
+  ON library_metadata USING GIN (subjects);
+
+CREATE INDEX library_metadata_languages
+  ON library_metadata USING GIN (languages);
+
+CREATE INDEX library_metadata_file_as_list
+  ON library_metadata USING GIN (file_as_list);
 
 -- Uploads
 -- uu_assets
@@ -135,16 +97,6 @@ CREATE TABLE IF NOT EXISTS uu_assets (
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   meta JSONB NOT NULL
 );
-
-CREATE TRIGGER trg_delete_library_uu
-  AFTER DELETE ON uu_assets
-  FOR EACH ROW
-  EXECUTE FUNCTION delete_from_library('uu');
-
-CREATE TRIGGER trg_sync_library_uu
-  AFTER INSERT OR UPDATE ON uu_assets
-  FOR EACH ROW
-  EXECUTE FUNCTION sync_library('uu', 'uploads');
 
 -- uploads
 CREATE TABLE IF NOT EXISTS uploads (
@@ -164,14 +116,6 @@ CREATE TABLE IF NOT EXISTS pg_assets (
   asset_id TEXT NOT NULL,
   meta JSONB NOT NULL
 );
-CREATE TRIGGER trg_sync_library_pg
-  AFTER INSERT OR UPDATE ON pg_assets
-  FOR EACH ROW
-  EXECUTE FUNCTION sync_library('pg', 'public');
-CREATE TRIGGER trg_delete_library_pg
-  AFTER DELETE ON pg_assets
-  FOR EACH ROW
-  EXECUTE FUNCTION delete_from_library('pg');
 
 -- Collections
 CREATE TABLE IF NOT EXISTS collections (
