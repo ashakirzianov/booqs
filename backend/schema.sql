@@ -13,81 +13,6 @@ CREATE TABLE IF NOT EXISTS users (
   joined_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- Library metadata view
-DROP MATERIALIZED VIEW IF EXISTS library_metadata CASCADE;
-CREATE MATERIALIZED VIEW library_metadata AS
-SELECT
-  'uu' AS source,
-  id,
-  asset_id,
-  meta->>'title' AS title,
-  (
-    SELECT string_agg(a->>'name', ', ')
-    FROM jsonb_array_elements(meta->'authors') AS a
-  ) AS author_names,
-  (
-    SELECT array_agg(a->>'fileAs')
-    FROM jsonb_array_elements(meta->'authors') AS a
-    WHERE a ? 'fileAs'
-  ) AS file_as_list,
-  (
-    SELECT array_agg(e->>'value')
-    FROM jsonb_array_elements(meta->'extra') AS e
-    WHERE e->>'name' = 'subject'
-  ) AS subjects,
-  (
-    SELECT array_agg(e->>'value')
-    FROM jsonb_array_elements(meta->'extra') AS e
-    WHERE e->>'name' = 'language'
-  ) AS languages
-FROM uu_assets
-UNION ALL
-SELECT
-  'pg' AS source,
-  id,
-  asset_id,
-  meta->>'title',
-  (
-    SELECT string_agg(a->>'name', ', ')
-    FROM jsonb_array_elements(meta->'authors') AS a
-  ),
-  (
-    SELECT array_agg(a->>'fileAs')
-    FROM jsonb_array_elements(meta->'authors') AS a
-    WHERE a ? 'fileAs'
-  ),
-  (
-    SELECT array_agg(e->>'value')
-    FROM jsonb_array_elements(meta->'extra') AS e
-    WHERE e->>'name' = 'subject'
-  ),
-  (
-    SELECT array_agg(e->>'value')
-    FROM jsonb_array_elements(meta->'extra') AS e
-    WHERE e->>'name' = 'language'
-  )
-FROM pg_assets;
-
--- Add a unique index for concurrent refresh
-CREATE UNIQUE INDEX library_metadata_id_source_idx
-  ON library_metadata (id, source);
-
--- Add additional indexes for search
-CREATE INDEX library_metadata_title_trgm
-  ON library_metadata USING GIN (title gin_trgm_ops);
-
-CREATE INDEX library_metadata_author_names_trgm
-  ON library_metadata USING GIN (author_names gin_trgm_ops);
-
-CREATE INDEX library_metadata_subjects
-  ON library_metadata USING GIN (subjects);
-
-CREATE INDEX library_metadata_languages
-  ON library_metadata USING GIN (languages);
-
-CREATE INDEX library_metadata_file_as_list
-  ON library_metadata USING GIN (file_as_list);
-
 -- Uploads
 -- uu_assets
 CREATE TABLE IF NOT EXISTS uu_assets (
@@ -116,6 +41,34 @@ CREATE TABLE IF NOT EXISTS pg_assets (
   asset_id TEXT NOT NULL,
   meta JSONB NOT NULL
 );
+
+-- Library metadata (for searching)
+CREATE TABLE IF NOT EXISTS library_metadata (
+  source TEXT NOT NULL, -- 'uu' for uu_assets, 'pg' for pg_assets
+  id TEXT PRIMARY KEY DEFAULT uuid_generate_v4()::TEXT,
+  asset_id TEXT NOT NULL,
+  title TEXT NOT NULL,
+  authors CITEXT[],
+  file_as CITEXT[],
+  languages CITEXT[],
+  subjects CITEXT[],
+  meta JSONB NOT NULL,
+  PRIMARY KEY (source, id),
+);
+
+-- For efficient search in title and authors
+CREATE INDEX idx_library_metadata_source_title ON library_metadata (source, title);
+CREATE INDEX idx_library_metadata_source_authors ON library_metadata (source, unnest(authors));
+
+-- For filtering by language
+CREATE INDEX idx_library_metadata_languages ON library_metadata USING GIN (languages);
+
+-- For filtering by subject
+CREATE INDEX idx_library_metadata_subjects ON library_metadata USING GIN (subjects);
+
+-- For prefix search on authors (optional optimization)
+CREATE INDEX idx_library_metadata_authors_prefix ON library_metadata
+USING GIN (authors gin_trgm_ops); -- Requires pg_trgm extension
 
 -- Collections
 CREATE TABLE IF NOT EXISTS collections (

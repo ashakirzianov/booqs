@@ -7,6 +7,7 @@ import { parseEpubFile } from '@/parser'
 import { uploadBooqImages } from '@/backend/images'
 import { redis } from '@/backend/db'
 import { CliOptions } from './main'
+import { addToSearchIndex } from '@/backend/search'
 
 type AssetRecord = {
     assetId: string,
@@ -190,8 +191,17 @@ async function parseAndInsert({
         await reportProblem(assetId, 'Parsing errors', diags)
         return
     }
-    const result = await insertPgRecord({ booq, assetId, id })
-    return result !== undefined
+    const insertResult = await insertPgRecord({ booq, assetId, id })
+    if (!insertResult) {
+        return undefined
+    }
+    const indexResult = await addToSearchIndex({
+        id,
+        source: 'pg',
+        assetId,
+        metadata: booq.metadata,
+    })
+    return indexResult !== undefined
         ? { booq }
         : undefined
 }
