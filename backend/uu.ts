@@ -11,7 +11,6 @@ import { uploadBooqImages } from './images'
 
 export const userUploadsLibrary: Library = {
     search, cards, fileForId,
-    deleteAllBooksForUserId,
     // TODO: implement
     async forAuthor() { return [] },
 }

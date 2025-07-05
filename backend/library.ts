@@ -21,7 +21,6 @@ export type Library = {
     cards(ids: InLibraryId[]): Promise<InLibraryCard[]>,
     forAuthor(author: string, limit?: number, offset?: number): Promise<InLibraryCard[]>,
     fileForId(id: string): Promise<BookFile | undefined>,
-    deleteAllBooksForUserId?(userId: string): Promise<boolean>,
 }
 
 const libraries: {
