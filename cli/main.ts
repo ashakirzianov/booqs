@@ -22,7 +22,7 @@ async function main() {
 }
 
 export type CliOptions = {
-    switches: Record<string, string>,
+    switches: Record<string, string | undefined>,
     commands: string[],
 }
 function parseCliOptions(): CliOptions {

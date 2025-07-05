@@ -29,11 +29,14 @@ export async function sync(options: CliOptions) {
     }
 }
 
-async function syncWebToBlob(_options: CliOptions) {
+async function syncWebToBlob(options: CliOptions) {
     info('Syncing web to blob storage...')
-    const webIdsPromise = getAllGutenbergIds()
-    const blobAssetIdsPromise = Array.fromAsync(existingBlobIds())
-    const [webIds, blobIds] = await Promise.all([webIdsPromise, blobAssetIdsPromise])
+    const retryProblems = options.switches['retry-problems'] === 'true'
+    const limitSwitch = options.switches['limit']
+    const webIds = limitSwitch
+        ? allGutenbergIdsUpTo(parseInt(limitSwitch))
+        : await getAllGutenbergIds()
+    const blobIds = await Array.fromAsync(existingBlobIds())
     info(`Found ${webIds.length} ids in Gutenberg Collection`)
     info(`Found ${blobIds.length} ids in blob storage`)
     const existingSet = new Set(blobIds)
@@ -42,10 +45,14 @@ async function syncWebToBlob(_options: CliOptions) {
             info(`Skipping ${id} because it already exists in blob storage`)
             continue
         }
+        if (!retryProblems && await hasProblems(id)) {
+            info(`Skipping ${id} because it has problems`)
+            continue
+        }
         try {
             const assetRecord = await downloadGutenbergEpub(id)
             if (!assetRecord) {
-                warn(`Couldn't download asset for ${id}`)
+                await reportProblem(id, `Couldn't download asset for ${id}`)
                 continue
             }
             info(`Downloaded gutenberg epub file: ${assetRecord.assetId}`)
@@ -82,7 +89,7 @@ async function syncBlobToDB(options: CliOptions) {
         info(`Processing batch ${count++} with ${batch.length} assets...`)
         const promises = batch.map(async (assetId) => {
             try {
-                if (retryProblems && await hasProblems(assetId)) {
+                if (!retryProblems && await hasProblems(assetId)) {
                     info(`Skipping ${assetId} because it has problems`)
                     return false
                 }
@@ -210,7 +217,7 @@ async function hasProblems(id: string) {
     return redis.hexists('pg:problems', id)
 }
 
-async function reportProblem(id: string, message: string, err: any) {
+async function reportProblem(id: string, message: string, err?: any) {
     console.error(`PG: Problem with ${id}: ${message}`, err)
     return redis.hset('pg:problems', {
         [id]: {
@@ -231,6 +238,14 @@ function warn(label: string, data?: any) {
     if (data) {
         console.warn(inspect(data, false, 3, true))
     }
+}
+
+function allGutenbergIdsUpTo(limit: number): string[] {
+    const ids: string[] = []
+    for (let i = 1; i <= limit; i++) {
+        ids.push(i.toString())
+    }
+    return ids
 }
 
 async function getAllGutenbergIds(): Promise<string[]> {
