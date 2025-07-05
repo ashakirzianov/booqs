@@ -1,8 +1,6 @@
 import { AuthorSearchResult, BooqId, BooqLibraryCard, BooqMetadata, BooqSearchResult, InLibraryId, LibraryId, makeId, parseId, SearchResult } from '@/core'
 import groupBy from 'lodash-es/groupBy'
-import { Booq } from '../core'
 import { pgLibrary } from './pg'
-import { uploadBooqImages } from './images'
 import { userUploadsLibrary } from './uu'
 import { localLibrary } from './lo'
 
@@ -23,10 +21,6 @@ export type Library = {
     cards(ids: InLibraryId[]): Promise<InLibraryCard[]>,
     forAuthor(author: string, limit?: number, offset?: number): Promise<InLibraryCard[]>,
     fileForId(id: string): Promise<BookFile | undefined>,
-    uploadEpub?(fileBuffer: Buffer, userId: string): Promise<{
-        card: InLibraryCard,
-        booq?: Booq,
-    } | undefined>,
     deleteAllBooksForUserId?(userId: string): Promise<boolean>,
 }
 
@@ -89,25 +83,6 @@ export async function booqsForAuthor(author: string, limit?: number, offset?: nu
         ),
     )
     return results.flat()
-}
-
-export async function uploadToLibrary(libraryPrefix: string, fileBuffer: Buffer, userId: string) {
-    const uploadEpub = libraries[libraryPrefix]?.uploadEpub
-    if (uploadEpub) {
-        const result = await uploadEpub(fileBuffer, userId)
-        if (result) {
-            if (result.booq) {
-                const imageResults = await uploadBooqImages(`${libraryPrefix}/${result.card.id}`, result.booq)
-                for (const imageResult of imageResults) {
-                    if (!imageResult.success) {
-                        console.warn(`Failed to upload image ${imageResult.id} for ${libraryPrefix}/${result.card.id}`)
-                    }
-                }
-            }
-            return processCard(libraryPrefix)(result.card)
-        }
-    }
-    return undefined
 }
 
 export async function searchBooqs(query: string, limit: number): Promise<SearchResult[]> {

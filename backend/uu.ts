@@ -7,11 +7,10 @@ import { Booq, BooqMetadata } from '@/core'
 import { nanoid } from 'nanoid'
 import { deleteAsset, downloadAsset, uploadAsset } from './blob'
 import { sql } from './db'
-import { addToSearchIndex } from './search'
+import { uploadBooqImages } from './images'
 
 export const userUploadsLibrary: Library = {
     search, cards, fileForId,
-    uploadEpub,
     deleteAllBooksForUserId,
     // TODO: implement
     async forAuthor() { return [] },
@@ -90,7 +89,7 @@ export async function search(query: string, limit = 20, offset = 0): Promise<InL
     return results
 }
 
-export async function uploadEpub(fileBuffer: Buffer, userId: string) {
+export async function uploadEpubForUser(fileBuffer: Buffer, userId: string) {
     const { buffer, hash } = await buildFileFromBuffer(fileBuffer)
     const existing = await cardForHash(hash)
     if (existing) {
@@ -98,10 +97,7 @@ export async function uploadEpub(fileBuffer: Buffer, userId: string) {
             uploadId: existing.id,
             userId,
         })
-        return {
-            card: convertToLibraryCard(existing),
-            booq: undefined,
-        }
+        return convertToLibraryCard(existing)
     }
 
     return uploadNewEpub({ buffer, hash }, userId)
@@ -128,16 +124,8 @@ async function uploadNewEpub({ buffer, hash }: File, userId: string) {
         return undefined
     }
     await addToRegistry({ uploadId: insertResult.id, userId })
-    await addToSearchIndex({
-        id: insertResult.id,
-        source: 'uu',
-        assetId,
-        metadata: booq.metadata,
-    })
-    return {
-        card: convertToLibraryCard(insertResult),
-        booq,
-    }
+    await uploadBooqImages(`uu/${insertResult.id}`, booq)
+    return convertToLibraryCard(insertResult)
 }
 
 async function cardForHash(hash: string) {
