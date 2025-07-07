@@ -3,13 +3,13 @@ import { BooqCover } from '@/components/BooqCover'
 import { BooqTags } from '@/components/BooqTags'
 import { authorHref } from '@/application/href'
 import { ReactNode } from 'react'
-import { BooqCardData } from '@/data/booqs'
+import { BooqDetails } from '@/data/booqs'
 
 export function BooqCard({
     card: { title, authors, coverUrl, tags },
     actions,
 }: {
-    card: BooqCardData,
+    card: BooqDetails,
     actions?: ReactNode,
 }) {
     const author = authors?.join(', ')

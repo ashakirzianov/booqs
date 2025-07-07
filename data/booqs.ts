@@ -10,7 +10,7 @@ import { userForId } from '@/backend/users'
 import { booqIdsInCollections } from '@/backend/collections'
 import { booqForId, booqPreview } from '@/backend/booq'
 
-export type BooqCardData = {
+export type BooqDetails = {
     booqId: BooqId,
     title: string,
     authors: string[],
@@ -22,7 +22,7 @@ export async function featuredIds() {
     return featuredBooqIds()
 }
 
-export async function featuredBooqCards(coverSize: CoverSize = 210): Promise<BooqCardData[]> {
+export async function featuredBooqCards(coverSize: CoverSize = 210): Promise<BooqDetails[]> {
     const ids = await featuredIds()
     const cards = (await libraryCardsForIds(ids))
         .filter(card => card !== undefined)
@@ -30,12 +30,12 @@ export async function featuredBooqCards(coverSize: CoverSize = 210): Promise<Boo
     return cards
 }
 
-export async function booqCardsForAuthor(author: string): Promise<BooqCardData[]> {
+export async function booqCardsForAuthor(author: string): Promise<BooqDetails[]> {
     const cards = await booqsForAuthor(author)
     return cards.map(card => buildBooqCardData(card.booqId, card.meta, 210))
 }
 
-export async function booqCollection(collection: string, userId: string | undefined): Promise<BooqCardData[]> {
+export async function booqCollection(collection: string, userId: string | undefined): Promise<BooqDetails[]> {
     if (!userId) {
         return []
     }
@@ -50,7 +50,7 @@ export async function booqCollection(collection: string, userId: string | undefi
     return cards
 }
 
-export async function booqCard(booqId: BooqId): Promise<BooqCardData | undefined> {
+export async function booqCard(booqId: BooqId): Promise<BooqDetails | undefined> {
     const [card] = await libraryCardsForIds([booqId])
     if (undefined === card) {
         return undefined
@@ -88,7 +88,7 @@ export async function booqPart({
     } satisfies PartialBooqData
 }
 
-function buildBooqCardData(booqId: BooqId, meta: BooqMetadata, coverSize: CoverSize): BooqCardData {
+function buildBooqCardData(booqId: BooqId, meta: BooqMetadata, coverSize: CoverSize): BooqDetails {
     return {
         booqId,
         title: meta.title,
