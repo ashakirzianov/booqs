@@ -2,6 +2,7 @@ import type { InLibraryCard, Library, InLibrarySearchResult } from './library'
 import { downloadAsset } from './blob'
 import { sql } from './db'
 import { Booq, BooqMetadata } from '@/core'
+import { addToSearchIndex } from './search'
 
 export const pgLibrary: Library = {
   search,
@@ -71,16 +72,23 @@ export async function insertPgRecord({ booq, assetId, id }: {
   assetId: string,
   id: string,
 }) {
-  const success = await insertDbCard({
+  const insertSuccess = await insertDbCard({
     id,
     asset_id: assetId,
     meta: booq.metadata,
   })
-  if (success) {
-    return { id }
-  } else {
-    return undefined
+  if (insertSuccess) {
+    const indexSuccess = await addToSearchIndex({
+      id,
+      source: 'pg',
+      assetId,
+      metadata: booq.metadata,
+    })
+    if (indexSuccess) {
+      return { id }
+    }
   }
+  return undefined
 }
 
 export async function existingIds(): Promise<string[]> {
