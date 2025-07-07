@@ -1,7 +1,7 @@
 import { createHash } from 'crypto'
 import { ReadStream } from 'fs'
 import { inspect } from 'util'
-import type { InLibraryCard, Library, InLibrarySearchResult } from './library'
+import type { InLibraryCard, Library } from './library'
 import { parseEpubFile } from '@/parser'
 import { Booq, BooqMetadata } from '@/core'
 import { nanoid } from 'nanoid'
@@ -10,8 +10,9 @@ import { sql } from './db'
 import { uploadBooqImages } from './images'
 
 export const userUploadsLibrary: Library = {
-    search, cards, fileForId,
+    cards, fileForId,
     // TODO: implement
+    async search() { return [] },
     async forAuthor() { return [] },
 }
 
@@ -28,7 +29,7 @@ export type DbUuCard = {
 export async function uploadsForUserId(userId: string): Promise<DbUuCard[]> {
     const result = await sql`
       SELECT uc.*
-      FROM uu_cards uc
+      FROM uu_assets uc
       JOIN uploads u ON uc.id = u.upload_id
       WHERE u.user_id = ${userId}
       ORDER BY u.uploaded_at DESC
@@ -40,7 +41,7 @@ async function cards(ids: string[]): Promise<InLibraryCard[]> {
     if (ids.length === 0) return []
 
     const result = await sql`
-          SELECT * FROM uu_cards
+          SELECT * FROM uu_assets
           WHERE id = ANY(${ids})
         `
 
@@ -51,7 +52,7 @@ async function cards(ids: string[]): Promise<InLibraryCard[]> {
 
 async function fileForId(id: string) {
     const [row] = await sql`
-        SELECT asset_id FROM uu_cards
+        SELECT asset_id FROM uu_assets
         WHERE id = ${id}
       `
     if (!row.asset_id) {
@@ -62,30 +63,6 @@ async function fileForId(id: string) {
             ? { kind: 'epub', file: asset } as const
             : undefined
     }
-}
-
-export async function search(query: string, limit = 20, offset = 0): Promise<InLibrarySearchResult[]> {
-    const rows = await sql`
-    SELECT *
-    FROM uu_cards
-    WHERE
-      (meta->>'title') % ${query}
-      OR EXISTS (
-        SELECT 1
-        FROM jsonb_array_elements(meta->'authors') AS author
-        WHERE author->>'name' % ${query}
-      )
-    ORDER BY similarity(meta->>'title', ${query}) DESC
-    LIMIT ${limit} OFFSET ${offset}`
-    const cards = rows as DbUuCard[]
-    const results = cards.map<InLibrarySearchResult>(row => ({
-        kind: 'booq' as const,
-        id: row.id,
-        title: row.meta.title,
-        authors: row.meta.authors.map(a => a.name),
-        coverSrc: row.meta.coverSrc,
-    }))
-    return results
 }
 
 export async function uploadEpubForUser(fileBuffer: Buffer, userId: string) {
@@ -129,7 +106,7 @@ async function uploadNewEpub({ buffer, hash }: File, userId: string) {
 
 async function cardForHash(hash: string) {
     const [row] = await sql`
-        SELECT * FROM uu_cards
+        SELECT * FROM uu_assets
         WHERE file_hash = ${hash}
       `
     if (!row) {
@@ -147,7 +124,7 @@ async function insertRecord({ booq, assetId, fileHash }: {
     const id = nanoid(10)
     const meta = booq.metadata
     const query = sql`
-      INSERT INTO uu_cards (
+      INSERT INTO uu_assets (
         id,
         asset_id,
         file_hash,
@@ -258,7 +235,7 @@ async function deleteCards(ids: string[]): Promise<boolean> {
     if (ids.length === 0) return false
 
     await sql`
-      DELETE FROM uu_cards
+      DELETE FROM uu_assets
       WHERE id = ANY(${ids})
     `
     return true
@@ -266,7 +243,7 @@ async function deleteCards(ids: string[]): Promise<boolean> {
 
 async function getAllBooksWithoutUploadUsers(): Promise<DbUuCard[]> {
     const rows = await sql`
-      SELECT * FROM uu_cards
+      SELECT * FROM uu_assets
       WHERE id NOT IN (
         SELECT upload_id FROM uploads
       )
