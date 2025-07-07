@@ -30,7 +30,7 @@ export async function cards(ids: string[]): Promise<InLibraryCard[]> {
   return rows.map(row => {
     return {
       id: row.id,
-      ...row.meta,
+      meta: row.meta,
     }
   })
 }

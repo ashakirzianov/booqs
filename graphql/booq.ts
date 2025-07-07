@@ -4,7 +4,7 @@ import { NoteParent } from './note'
 import { booqImageUrl } from '@/backend/images'
 import {
     BooqId,
-    BooqLibraryCard,
+    BooqMetadata,
     buildFragment, previewForPath, textForRange,
 } from '@/core'
 import { getBookmarks } from '@/backend/bookmarks'
@@ -29,7 +29,7 @@ export const booqResolver: IResolvers<BooqParent> = {
             if (!card) {
                 return undefined
             }
-            return buildTags(card)
+            return buildTags(card.meta)
         },
         async bookmarks(parent, _, { user }): Promise<BookmarkParent[]> {
             return user
@@ -88,7 +88,7 @@ type Tag = {
     tag: string,
     value?: string | null,
 }
-function buildTags(card: BooqLibraryCard): Tag[] {
+function buildTags(card: BooqMetadata): Tag[] {
     return [
         {
             tag: 'pages',

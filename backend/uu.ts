@@ -254,6 +254,6 @@ async function getAllBooksWithoutUploadUsers(): Promise<DbUuCard[]> {
 function convertToLibraryCard(doc: DbUuCard): InLibraryCard {
     return {
         id: doc.id,
-        ...doc.meta,
+        meta: doc.meta,
     }
 }

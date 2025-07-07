@@ -23,8 +23,8 @@ export async function uploadEpubAction(file: File) {
         return {
             success: true,
             booqId,
-            title: result.title ?? undefined,
-            coverUrl: result.coverSrc ? booqImageUrl(booqId, result.coverSrc) : undefined,
+            title: result.meta.title ?? undefined,
+            coverUrl: result.meta.coverSrc ? booqImageUrl(booqId, result.meta.coverSrc) : undefined,
         } as const
     } else {
         return {

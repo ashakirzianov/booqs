@@ -6,13 +6,12 @@ import { ReactNode } from 'react'
 import { BooqCardData } from '@/data/booqs'
 
 export function BooqCard({
-    card: { title, authors, coverUrl, extra },
+    card: { title, authors, coverUrl, tags },
     actions,
 }: {
     card: BooqCardData,
     actions?: ReactNode,
 }) {
-    const tags = extra.map(e => [e.name, e.value] as const)
     const author = authors?.join(', ')
     return <div className="flex flex-col grow gap-4 items-center sm:flex-row sm:flex-wrap sm:items-stretch h-full">
         <BooqCover

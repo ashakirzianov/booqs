@@ -1,11 +1,17 @@
-import { AuthorSearchResult, BooqId, BooqLibraryCard, BooqMetadata, BooqSearchResult, InLibraryId, LibraryId, makeId, parseId, SearchResult } from '@/core'
+import { AuthorSearchResult, BooqId, BooqMetadata, BooqSearchResult, InLibraryId, LibraryId, makeId, parseId, SearchResult } from '@/core'
 import groupBy from 'lodash-es/groupBy'
 import { pgLibrary } from './pg'
 import { userUploadsLibrary } from './uu'
 import { localLibrary } from './lo'
 
-export type InLibraryCard = BooqMetadata & {
+type BooqLibraryCard = {
+    booqId: BooqId,
+    meta: BooqMetadata,
+}
+
+export type InLibraryCard = {
     id: InLibraryId,
+    meta: BooqMetadata,
 }
 export type BookFile = {
     kind: 'epub',
@@ -31,13 +37,6 @@ const libraries: {
     lo: localLibrary,
 }
 
-export function processCard(prefix: string): (card: InLibraryCard) => BooqLibraryCard {
-    return ({ id, ...meta }: InLibraryCard) => ({
-        booqId: makeId(prefix, id),
-        ...meta,
-    })
-}
-
 export async function libraryCardForId(id: string) {
     const [result] = await libraryCardsForIds([id])
     return result
@@ -60,7 +59,10 @@ export async function libraryCardsForIds(ids: string[]): Promise<Array<BooqLibra
         const library = libraries[libraryPrefix]
         if (library) {
             const forLibrary = await library.cards(pids.map(p => p.id))
-            return forLibrary.map(processCard(libraryPrefix))
+            return forLibrary.map(card => ({
+                booqId: makeId(libraryPrefix, card.id),
+                meta: card.meta,
+            }))
         } else {
             return undefined
         }
@@ -73,12 +75,15 @@ export async function libraryCardsForIds(ids: string[]): Promise<Array<BooqLibra
     )
 }
 
-export async function booqsForAuthor(author: string, limit?: number, offset?: number) {
+export async function booqsForAuthor(author: string, limit?: number, offset?: number): Promise<BooqLibraryCard[]> {
     const supported: Array<keyof typeof libraries> = ['pg']
     const results = await Promise.all(
         supported.map(
             library => libraries[library]!.forAuthor(author, limit, offset)
-                .then(cards => cards.map(processCard(library))),
+                .then(cards => cards.map(card => ({
+                    booqId: makeId(library, card.id),
+                    meta: card.meta,
+                }))),
         ),
     )
     return results.flat()

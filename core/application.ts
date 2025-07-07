@@ -29,9 +29,6 @@ export type PartialBooqData = {
     meta: BooqMetadata,
     toc: TableOfContents,
 }
-export type BooqLibraryCard = BooqMetadata & {
-    booqId: BooqId,
-}
 export type BooqCollection = {
     name: string,
     booqIds: BooqId[],
