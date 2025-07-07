@@ -115,7 +115,13 @@ async function syncBlobToDB(options: CliOptions) {
                 info(`Parsed and inserted ${assetId}`)
                 if (needToUploadImages) {
                     info(`Uploading images for ${assetId}`)
-                    await uploadBooqImages(`pg/${assetId}`, parseResult.booq)
+                    const imagesResults = await uploadBooqImages(`pg/${id}`, parseResult.booq)
+                    for (const imageResult of imagesResults) {
+                        if (!imageResult.success) {
+                            reportProblem(assetId, 'Image upload error', new Error(`Failed to upload image: ${imageResult.id}`))
+                        }
+                    }
+
                 }
                 info(`Successfully processed ${assetId}`)
                 return true
@@ -208,7 +214,7 @@ async function hasProblems(id: string) {
 }
 
 async function reportProblem(id: string, message: string, err?: any) {
-    console.error(`PG: Problem with ${id}: ${message}`, err)
+    console.error('\x1b[31m%s\x1b[0m', `PG: Problem with ${id}: ${message}`, err)
     return redis.hset('pg:problems', {
         [id]: {
             message, err,
