@@ -103,7 +103,10 @@ async function insertDbCard(card: DbPgCard): Promise<boolean> {
   const rows = await sql`
     INSERT INTO pg_assets (id, asset_id, meta)
     VALUES (${card.id}, ${card.asset_id}, ${card.meta})
-    ON CONFLICT (id) DO NOTHING
+    ON CONFLICT (id) DO UPDATE
+    SET asset_id = EXCLUDED.asset_id,
+      meta = EXCLUDED.meta
+    RETURNING id
   `
   return rows.length > 0
 }

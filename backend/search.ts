@@ -91,6 +91,7 @@ export async function addToSearchIndex({
             languages = EXCLUDED.languages,
             subjects = EXCLUDED.subjects,
             meta = EXCLUDED.meta
+        RETURNING id
     `
     if (result.length === 0) {
         return false
