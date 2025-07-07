@@ -4,7 +4,7 @@ import { pgLibrary } from './pg'
 import { userUploadsLibrary } from './uu'
 import { localLibrary } from './lo'
 
-export type BooqLibraryCard = {
+export type BooqCard = {
     booqId: BooqId,
     meta: BooqMetadata,
 }
@@ -53,7 +53,7 @@ export async function libraryCardForId(id: string) {
     return result
 }
 
-export async function libraryCardsForIds(ids: string[]): Promise<Array<BooqLibraryCard | undefined>> {
+export async function libraryCardsForIds(ids: string[]): Promise<Array<BooqCard | undefined>> {
     const parsed = ids
         .map(idString => {
             const [library, id] = parseId(idString)
@@ -86,7 +86,7 @@ export async function libraryCardsForIds(ids: string[]): Promise<Array<BooqLibra
     )
 }
 
-export async function booqsForAuthor(author: string, limit?: number, offset?: number): Promise<BooqLibraryCard[]> {
+export async function booqsForAuthor(author: string, limit?: number, offset?: number): Promise<BooqCard[]> {
     const supported: Array<keyof typeof libraries> = ['pg']
     const results = await Promise.all(
         supported.map(
