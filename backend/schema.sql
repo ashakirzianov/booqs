@@ -45,7 +45,7 @@ CREATE TABLE IF NOT EXISTS pg_assets (
 -- Library metadata (for searching)
 CREATE TABLE IF NOT EXISTS library_metadata (
   source TEXT NOT NULL, -- 'uu' for uu_assets, 'pg' for pg_assets
-  id TEXT PRIMARY KEY DEFAULT uuid_generate_v4()::TEXT,
+  id TEXT NOT NULL,
   asset_id TEXT NOT NULL,
   title TEXT NOT NULL,
   authors CITEXT[],
@@ -53,12 +53,12 @@ CREATE TABLE IF NOT EXISTS library_metadata (
   languages CITEXT[],
   subjects CITEXT[],
   meta JSONB NOT NULL,
-  PRIMARY KEY (source, id),
+  PRIMARY KEY (source, id)
 );
 
 -- For efficient search in title and authors
 CREATE INDEX idx_library_metadata_source_title ON library_metadata (source, title);
-CREATE INDEX idx_library_metadata_source_authors ON library_metadata (source, unnest(authors));
+CREATE INDEX idx_library_metadata_authors_gin ON library_metadata USING GIN (authors);
 
 -- For filtering by language
 CREATE INDEX idx_library_metadata_languages ON library_metadata USING GIN (languages);
