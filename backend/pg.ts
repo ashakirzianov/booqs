@@ -24,7 +24,7 @@ export async function cards(ids: string[]): Promise<InLibraryCard[]> {
 
   const rows = await sql`
     SELECT *
-    FROM uu_assets
+    FROM pg_assets
     WHERE id = ANY(${ids})
   ` as DbPgCard[]
   return rows.map(row => {
@@ -60,7 +60,7 @@ export async function search(query: string, _limit = 20, _offset = 0): Promise<I
 async function assetIdForId(id: string): Promise<string | undefined> {
   const rows = await sql`
     SELECT asset_id
-    FROM uu_assets
+    FROM pg_assets
     WHERE id = ${id}
     LIMIT 1
   ` as Array<Pick<DbPgCard, 'asset_id'>>
@@ -94,14 +94,14 @@ export async function insertPgRecord({ booq, assetId, id }: {
 export async function existingIds(): Promise<string[]> {
   const rows = await sql`
     SELECT id
-    FROM uu_assets
+    FROM pg_assets
   `
   return rows.map(r => r.id)
 }
 
 async function insertDbCard(card: DbPgCard): Promise<boolean> {
   const rows = await sql`
-    INSERT INTO uu_assets (id, asset_id, meta)
+    INSERT INTO pg_assets (id, asset_id, meta)
     VALUES (${card.id}, ${card.asset_id}, ${card.meta})
     ON CONFLICT (id) DO NOTHING
   `
