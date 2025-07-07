@@ -2,7 +2,7 @@ import type { InLibraryCard, Library, InLibrarySearchResult } from './library'
 import { downloadAsset } from './blob'
 import { sql } from './db'
 import { Booq, BooqMetadata } from '@/core'
-import { addToSearchIndex } from './search'
+import { getExtraMetadataValues } from '@/core/meta'
 
 export const pgLibrary: Library = {
   search,
@@ -35,6 +35,95 @@ export async function cards(ids: string[]): Promise<InLibraryCard[]> {
   })
 }
 
+type DbLibraryMetadata = {
+  id: string,
+  source: string,
+  title: string,
+  authors: string[],
+  file_as: string[],
+  languages: string[],
+  subjects: string[],
+  meta: BooqMetadata,
+}
+
+type BooqSource = 'pg' | 'uu'
+export async function search(query: string, limit: number): Promise<InLibrarySearchResult[]> {
+  const like = `%${query}%`
+  const result = await sql`
+    SELECT *
+    FROM library_metadata
+    WHERE source = 'pg'
+      AND (title ILIKE ${like} OR EXISTS (
+        SELECT 1 FROM unnest(authors) AS author WHERE author ILIKE ${like}
+      ))
+    ORDER BY title
+    LIMIT ${limit}
+  ` as DbLibraryMetadata[]
+  return result.map(({
+    id, meta, authors,
+  }) => ({
+    kind: 'booq',
+    id,
+    title: meta.title,
+    authors,
+    coverSrc: meta.coverSrc,
+  }))
+}
+
+export async function addToSearchIndex({
+  id, source, assetId,
+  metadata,
+}: {
+  id: string,
+  source: BooqSource,
+  assetId: string,
+  metadata: BooqMetadata,
+}): Promise<boolean> {
+  const { title, authors, extra } = metadata
+  const languages = getExtraMetadataValues('language', extra)
+  const subjects = getExtraMetadataValues('subject', extra)
+  const fileAs = authors
+    .map(author => author.fileAs ?? author.name)
+  const result = await sql`
+        INSERT INTO library_metadata (
+            source,
+            id,
+            asset_id,
+            title,
+            authors,
+            file_as,
+            languages,
+            subjects,
+            meta
+        )
+        VALUES (
+            ${source},
+            ${id},
+            ${assetId},
+            ${title},
+            ${authors},
+            ${fileAs},
+            ${languages},
+            ${subjects},
+            ${metadata}
+    )
+        ON CONFLICT (source, id) DO UPDATE
+        SET
+            asset_id = EXCLUDED.asset_id,
+            title = EXCLUDED.title,
+            authors = EXCLUDED.authors,
+            file_as = EXCLUDED.file_as,
+            languages = EXCLUDED.languages,
+            subjects = EXCLUDED.subjects,
+            meta = EXCLUDED.meta
+        RETURNING id
+    `
+  if (result.length === 0) {
+    return false
+  }
+  return true
+}
+
 export async function fileForId(id: string) {
   const assetId = await assetIdForId(id)
   if (!assetId) {
@@ -48,11 +137,6 @@ export async function fileForId(id: string) {
 }
 
 export async function forAuthor(_name: string, _limit?: number, _offset?: number): Promise<InLibraryCard[]> {
-  // TODO: implement this
-  return []
-}
-
-export async function search(query: string, _limit = 20, _offset = 0): Promise<InLibrarySearchResult[]> {
   // TODO: implement this
   return []
 }
