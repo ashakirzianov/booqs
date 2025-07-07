@@ -33,15 +33,3 @@ export type BooqCollection = {
     name: string,
     booqIds: BooqId[],
 }
-export type SearchResult = AuthorSearchResult | BooqSearchResult
-export type AuthorSearchResult = {
-    kind: 'author',
-    name: string,
-}
-export type BooqSearchResult = {
-    kind: 'booq',
-    booqId: BooqId,
-    title: string | undefined,
-    authors: string[] | undefined,
-    coverSrc: string | undefined,
-}

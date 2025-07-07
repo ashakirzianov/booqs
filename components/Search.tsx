@@ -8,7 +8,7 @@ import { ReactNode, useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Spinner } from './Icons'
 import { useDebouncedValue } from '@/application/utils'
-import { AuthorSearchResultClient, BooqSearchResultClient } from '@/data/search'
+import { AuthorSearchResultData, BooqSearchResultData } from '@/data/search'
 
 export function Search() {
     const { isOpen, openModal, closeModal } = useModalState()
@@ -157,7 +157,7 @@ function SearchResultItem({ selected, children }: {
 }
 
 function BooqSearchResultContent({ result, query }: {
-    result: BooqSearchResultClient,
+    result: BooqSearchResultData,
     query: string,
 }) {
     return <Link href={booqHref({ booqId: result.booqId, path: [0] })} className='flex flex-row'>
@@ -178,7 +178,7 @@ function BooqSearchResultContent({ result, query }: {
 }
 
 function AuthorSearchResultContent({ result, query }: {
-    result: AuthorSearchResultClient,
+    result: AuthorSearchResultData,
     query: string,
     selected?: boolean,
 }) {

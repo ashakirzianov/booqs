@@ -1,4 +1,4 @@
-import type { InLibraryCard, Library, InLibrarySearchResult } from './library'
+import type { InLibraryCard, Library } from './library'
 import { downloadAsset } from './blob'
 import { sql } from './db'
 import { Booq, BooqMetadata } from '@/core'
@@ -47,7 +47,7 @@ type DbLibraryMetadata = {
 }
 
 type BooqSource = 'pg' | 'uu'
-export async function search(query: string, limit: number): Promise<InLibrarySearchResult[]> {
+export async function search(query: string, limit: number): Promise<InLibraryCard[]> {
   const like = `%${query}%`
   const result = await sql`
     SELECT *
@@ -60,13 +60,10 @@ export async function search(query: string, limit: number): Promise<InLibrarySea
     LIMIT ${limit}
   ` as DbLibraryMetadata[]
   return result.map(({
-    id, meta, authors,
+    id, meta,
   }) => ({
-    kind: 'booq',
     id,
-    title: meta.title,
-    authors,
-    coverSrc: meta.coverSrc,
+    meta,
   }))
 }
 

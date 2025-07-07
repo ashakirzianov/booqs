@@ -1,24 +1,33 @@
 import { booqImageUrl } from '@/backend/images'
-import { searchBooqs, } from '@/backend/library'
-import { AuthorSearchResult, BooqSearchResult, SearchResult } from '@/core'
+import { searchBooqs, LibrarySearchResult, } from '@/backend/library'
+import { BooqId } from '@/core'
 
-export type SearchResultClient = AuthorSearchResultClient | BooqSearchResultClient
-export type AuthorSearchResultClient = AuthorSearchResult
-export type BooqSearchResultClient = Omit<BooqSearchResult, 'coverSrc'> & {
+export type SearchResultData = AuthorSearchResultData | BooqSearchResultData
+export type AuthorSearchResultData = {
+    kind: 'author',
+    name: string,
+}
+export type BooqSearchResultData = {
+    kind: 'booq',
+    booqId: BooqId,
+    title: string,
+    authors?: string[],
     coverUrl: string | undefined,
 }
-export async function fetchSearchQuery(query: string, limit: number = 20): Promise<SearchResultClient[]> {
+export async function fetchSearchQuery(query: string, limit: number = 20): Promise<SearchResultData[]> {
     const results = await searchBooqs(query, limit)
     return results.map(toClientSearchResult)
 }
 
-export function toClientSearchResult(result: SearchResult): SearchResultClient {
+export function toClientSearchResult(result: LibrarySearchResult): SearchResultData {
     if (result.kind === 'booq') {
-        const { coverSrc, ...rest } = result
         return {
-            ...rest,
-            coverUrl: coverSrc
-                ? booqImageUrl(rest.booqId, coverSrc)
+            kind: 'booq',
+            booqId: result.booqId,
+            title: result.meta.title,
+            authors: result.meta.authors.map(author => author.name),
+            coverUrl: result.meta.coverSrc
+                ? booqImageUrl(result.booqId, result.meta.coverSrc)
                 : undefined,
         }
     } else {

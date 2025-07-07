@@ -1,5 +1,5 @@
 import { authorHref, booqHref } from '@/application/href'
-import { AuthorSearchResultClient, BooqSearchResultClient, fetchSearchQuery, SearchResultClient } from '@/data/search'
+import { AuthorSearchResultData, BooqSearchResultData, fetchSearchQuery, SearchResultData } from '@/data/search'
 import Link from 'next/link'
 
 export async function generateMetadata({
@@ -35,7 +35,7 @@ export default async function SearchPage({
 }
 
 function SearchResultItem({ result }: {
-    result: SearchResultClient,
+    result: SearchResultData,
 }) {
     if (result.kind === 'booq') {
         return <BooqSearchResultItem result={result} />
@@ -49,7 +49,7 @@ function SearchResultItem({ result }: {
 function BooqSearchResultItem({
     result,
 }: {
-    result: BooqSearchResultClient,
+    result: BooqSearchResultData,
 }) {
     return (
         <div>
@@ -66,7 +66,7 @@ function BooqSearchResultItem({
 function AuthorSearchResultItem({
     result,
 }: {
-    result: AuthorSearchResultClient,
+    result: AuthorSearchResultData,
 }) {
     return (
         <div>

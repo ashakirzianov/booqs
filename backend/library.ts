@@ -1,10 +1,25 @@
-import { AuthorSearchResult, BooqId, BooqMetadata, BooqSearchResult, InLibraryId, LibraryId, makeId, parseId, SearchResult } from '@/core'
+import { BooqId, BooqMetadata, InLibraryId, LibraryId, makeId, parseId } from '@/core'
 import groupBy from 'lodash-es/groupBy'
 import { pgLibrary } from './pg'
 import { userUploadsLibrary } from './uu'
 import { localLibrary } from './lo'
 
-type BooqLibraryCard = {
+export type BooqLibraryCard = {
+    booqId: BooqId,
+    meta: BooqMetadata,
+}
+
+export type LibrarySearchResult =
+    | AuthorSearchResult
+    | BooqSearchResult
+
+export type AuthorSearchResult = {
+    kind: 'author',
+    name: string,
+}
+
+export type BooqSearchResult = {
+    kind: 'booq',
     booqId: BooqId,
     meta: BooqMetadata,
 }
@@ -17,13 +32,9 @@ export type BookFile = {
     kind: 'epub',
     file: Buffer,
 }
-export type InLibrarySearchResult = AuthorSearchResult
-    | Omit<BooqSearchResult, 'booqId' | 'coverUrl'> & {
-        id: InLibraryId,
-        coverSrc: string | undefined,
-    }
+
 export type Library = {
-    search(query: string, limit: number): Promise<InLibrarySearchResult[]>,
+    search(query: string, limit: number): Promise<InLibraryCard[]>,
     cards(ids: InLibraryId[]): Promise<InLibraryCard[]>,
     forAuthor(author: string, limit?: number, offset?: number): Promise<InLibraryCard[]>,
     fileForId(id: string): Promise<BookFile | undefined>,
@@ -89,15 +100,19 @@ export async function booqsForAuthor(author: string, limit?: number, offset?: nu
     return results.flat()
 }
 
-export async function searchBooqs(query: string, limit: number): Promise<SearchResult[]> {
+export async function searchBooqs(query: string, limit: number): Promise<LibrarySearchResult[]> {
     if (!query) {
         return []
     }
     const cards = Object.entries(libraries).map(
-        async ([prefix, library]) => {
+        async ([prefix, library]): Promise<LibrarySearchResult[]> => {
             if (library) {
                 const results = await library.search(query, limit)
-                return results.map(processSearchResult(prefix))
+                return results.map(result => ({
+                    kind: 'booq',
+                    booqId: makeId(prefix, result.id),
+                    meta: result.meta,
+                }))
             } else {
                 return []
             }
@@ -114,21 +129,6 @@ export async function fileForId(booqId: BooqId) {
     return library && id
         ? library.fileForId(id)
         : undefined
-}
-
-function processSearchResult(prefix: string) {
-    return function (result: InLibrarySearchResult): SearchResult {
-        if (result.kind === 'booq') {
-            const { id, ...rest } = result
-            const booqId = makeId(prefix, result.id)
-            return {
-                ...rest,
-                booqId,
-            }
-        } else {
-            return result
-        }
-    }
 }
 
 export async function featuredBooqIds(_limit?: number) {

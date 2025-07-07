@@ -1,10 +1,10 @@
 import { searchBooqs } from '@/backend/library'
-import { SearchResultClient, toClientSearchResult } from '@/data/search'
+import { SearchResultData, toClientSearchResult } from '@/data/search'
 import { NextRequest } from 'next/server'
 
 export type GetResponse = {
     query: string,
-    results: SearchResultClient[],
+    results: SearchResultData[],
 }
 export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams
