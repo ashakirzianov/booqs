@@ -324,6 +324,10 @@ function processAttributes(attrs: XmlAttributes, _env: Env) {
                     return ['xmlSpace', value]
                 case 'xml:lang':
                     return ['xmlLang', value]
+                case 'xmlns:xlink':
+                    return ['xmlnsXlink', value]
+                case 'xlink:href':
+                    return ['xlinkHref', value]
                 case 'colspan':
                     return ['colSpan', value]
                 case 'rowspan':

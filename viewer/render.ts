@@ -119,7 +119,17 @@ function getProps(node: BooqElementNode, { path, booqId, range, hrefForPath }: R
                     : imageFullSrc(booqId, node.attrs.src)
             )
             : undefined,
+        xlinkHref: node.attrs?.xlinkHref
+            ? (isImageLink(node.attrs?.xlinkHref)
+                ? imageFullSrc(booqId, node.attrs?.xlinkHref)
+                : node.attrs.xlinkHref)
+            : undefined,
     }
+}
+
+function isImageLink(link: string) {
+    console.log('isImageLink', link)
+    return link.endsWith('.png') || link.endsWith('.jpg') || link.endsWith('.jpeg') || link.endsWith('.gif')
 }
 
 function isExternalSrc(src: string) {
