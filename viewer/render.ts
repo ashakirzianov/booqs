@@ -57,6 +57,10 @@ function renderNode(node: BooqNode, ctx: RenderContext): ReactNode {
 function renderTextNode(text: string, {
     path, augmentations, onAugmentationClick,
 }: RenderContext): ReactNode {
+    const isWhitespace = text.trim().length === 0
+    if (isWhitespace) {
+        return null
+    }
     const spans = applyAugmentations({
         text, path: [...path, 0],
         id: undefined,
