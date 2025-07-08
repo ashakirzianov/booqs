@@ -48,7 +48,7 @@
     "jwks-rsa": "^3.2.0",
     "lodash-es": "^4.17.21",
     "nanoid": "^5.1.5",
-    "next": "^15.2.3",
+    "next": "^15.3.5",
     "openai": "^4.94.0",
     "postcss": "^8.5.3",
     "postcss-prefix-selector": "^2.1.1",
