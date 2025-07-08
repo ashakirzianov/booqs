@@ -35,90 +35,80 @@ export async function cards(ids: string[]): Promise<InLibraryCard[]> {
   })
 }
 
-type DbLibraryMetadata = {
+type DbPgMetadata = {
   id: string,
-  source: string,
+  asset_id: string,
   title: string,
   authors: string[],
-  file_as: string[],
+  authors_text: string,
   languages: string[],
   subjects: string[],
   meta: BooqMetadata,
 }
 
-type BooqSource = 'pg' | 'uu'
 export async function search(query: string, limit: number): Promise<InLibraryCard[]> {
-  const like = `%${query}%`
+  const like = `%${query.toLowerCase()}%`
   const result = await sql`
     SELECT *
-    FROM library_metadata
-    WHERE source = 'pg'
-      AND (title ILIKE ${like} OR EXISTS (
-        SELECT 1 FROM unnest(authors) AS author WHERE author ILIKE ${like}
-      ))
+    FROM pg_metadata
+    WHERE lower(title) LIKE ${like}
+       OR lower(authors_text) LIKE ${like}
     ORDER BY title
     LIMIT ${limit}
-  ` as DbLibraryMetadata[]
-  return result.map(({
-    id, meta,
-  }) => ({
+  ` as DbPgMetadata[]
+  return result.map(({ id, meta }) => ({
     id,
     meta,
   }))
 }
 
 export async function addToSearchIndex({
-  id, source, assetId,
+  id,
+  assetId,
   metadata,
 }: {
   id: string,
-  source: BooqSource,
   assetId: string,
   metadata: BooqMetadata,
 }): Promise<boolean> {
   const { title, authors, extra } = metadata
   const languages = getExtraMetadataValues('language', extra)
   const subjects = getExtraMetadataValues('subject', extra)
-  const fileAs = authors
-    .map(author => author.fileAs ?? author.name)
+  const authorNames = authors.map(a => a.name)
+  const authorsText = authorNames.join(' ')
+
   const result = await sql`
-        INSERT INTO library_metadata (
-            source,
-            id,
-            asset_id,
-            title,
-            authors,
-            file_as,
-            languages,
-            subjects,
-            meta
-        )
-        VALUES (
-            ${source},
-            ${id},
-            ${assetId},
-            ${title},
-            ${authors},
-            ${fileAs},
-            ${languages},
-            ${subjects},
-            ${metadata}
+    INSERT INTO pg_metadata (
+      id,
+      asset_id,
+      title,
+      authors,
+      authors_text,
+      languages,
+      subjects,
+      meta
+    ) VALUES (
+      ${id},
+      ${assetId},
+      ${title},
+      ${authorNames},
+      ${authorsText},
+      ${languages},
+      ${subjects},
+      ${metadata}
     )
-        ON CONFLICT (source, id) DO UPDATE
-        SET
-            asset_id = EXCLUDED.asset_id,
-            title = EXCLUDED.title,
-            authors = EXCLUDED.authors,
-            file_as = EXCLUDED.file_as,
-            languages = EXCLUDED.languages,
-            subjects = EXCLUDED.subjects,
-            meta = EXCLUDED.meta
-        RETURNING id
-    `
-  if (result.length === 0) {
-    return false
-  }
-  return true
+    ON CONFLICT (id) DO UPDATE
+    SET
+      asset_id = EXCLUDED.asset_id,
+      title = EXCLUDED.title,
+      authors = EXCLUDED.authors,
+      authors_text = EXCLUDED.authors_text,
+      languages = EXCLUDED.languages,
+      subjects = EXCLUDED.subjects,
+      meta = EXCLUDED.meta
+    RETURNING id
+  `
+  return result.length > 0
 }
 
 export async function fileForId(id: string) {
@@ -161,7 +151,6 @@ export async function insertPgRecord({ booq, assetId, id }: {
   if (insertSuccess) {
     const indexSuccess = await addToSearchIndex({
       id,
-      source: 'pg',
       assetId,
       metadata: booq.metadata,
     })

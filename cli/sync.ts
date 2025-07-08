@@ -73,10 +73,14 @@ async function syncBlobToDB(options: CliOptions) {
     const batchSize = parseInt(options.switches['batch'] || '1')
     const retryProblems = options.switches['retry-problems'] === 'true'
     const needToUploadImages = options.switches['upload-images'] === 'true'
+    const all = options.switches['all'] === 'true'
     const existing = await existingIds()
     info(`Found ${existing.length} ids in DB`)
     const existingIdsSet = new Set(existing)
     const filteredGenerator = filter(existingBlobAssetIds(), (id) => {
+        if (all) {
+            return true
+        }
         if (existingIdsSet.has(id)) {
             info(`Skipping ${id} because it already exists in DB`)
             return false

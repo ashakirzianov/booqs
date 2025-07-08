@@ -42,33 +42,37 @@ CREATE TABLE IF NOT EXISTS pg_assets (
   meta JSONB NOT NULL
 );
 
--- Library metadata (for searching)
-CREATE TABLE IF NOT EXISTS library_metadata (
-  source TEXT NOT NULL, -- 'uu' for uu_assets, 'pg' for pg_assets
-  id TEXT NOT NULL,
+-- Project Gutenberg metadata table
+CREATE TABLE IF NOT EXISTS pg_metadata (
+  id TEXT PRIMARY KEY,
   asset_id TEXT NOT NULL,
   title TEXT NOT NULL,
-  authors CITEXT[],
-  file_as CITEXT[],
-  languages CITEXT[],
-  subjects CITEXT[],
-  meta JSONB NOT NULL,
-  PRIMARY KEY (source, id)
+  authors TEXT[],
+  authors_text TEXT,
+  languages TEXT[],
+  subjects TEXT[],
+  meta JSONB NOT NULL
 );
 
--- For efficient search in title and authors
-CREATE INDEX idx_library_metadata_source_title ON library_metadata (source, title);
-CREATE INDEX idx_library_metadata_authors_gin ON library_metadata USING GIN (authors);
+-- Efficient case-insensitive partial title match
+CREATE INDEX idx_pg_metadata_title_lower
+ON pg_metadata (lower(title));
 
--- For filtering by language
-CREATE INDEX idx_library_metadata_languages ON library_metadata USING GIN (languages);
+-- Efficient exact author match: 'Leo Tolstoy' = ANY(authors)
+CREATE INDEX idx_pg_metadata_authors_gin
+ON pg_metadata USING GIN (authors);
 
--- For filtering by subject
-CREATE INDEX idx_library_metadata_subjects ON library_metadata USING GIN (subjects);
+-- Efficient partial author match: '%tolst%' in authors_text
+CREATE INDEX idx_pg_metadata_authors_text_lower
+ON pg_metadata (lower(authors_text));
 
--- For prefix search on authors (optional optimization)
-CREATE INDEX idx_library_metadata_authors_prefix ON library_metadata
-USING GIN (authors gin_trgm_ops); -- Requires pg_trgm extension
+-- Exact language match: 'English' = ANY(languages)
+CREATE INDEX idx_pg_metadata_languages_gin
+ON pg_metadata USING GIN (languages);
+
+-- Exact subject match: 'Science Fiction' = ANY(subjects)
+CREATE INDEX idx_pg_metadata_subjects_gin
+ON pg_metadata USING GIN (subjects);
 
 -- Collections
 CREATE TABLE IF NOT EXISTS collections (
