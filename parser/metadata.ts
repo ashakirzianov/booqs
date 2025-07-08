@@ -50,6 +50,7 @@ function extractTitle(records: Records, diags?: Diagnoser): string | undefined {
     return records
         ?.filter(r => validateMetadataRecord(r, {
             expectedAttributes: ['#text'],
+            optionalAttributes: ['@id'],
             diags,
         }))
         ?.map(r => r['#text']).join(' ')
@@ -59,7 +60,7 @@ function extractAuthors(records: Records, diags?: Diagnoser): BooqAuthor[] | und
     return records
         ?.filter(r => validateMetadataRecord(r, {
             expectedAttributes: ['#text'],
-            optionalAttributes: ['@file-as', '@role'],
+            optionalAttributes: ['@file-as', '@role', '@id'],
             diags,
         }))
         ?.map(r => ({
