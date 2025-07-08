@@ -1,10 +1,10 @@
-import { BooqPath } from '@/core'
+import { BooqId, BooqPath } from '@/core'
 import useSWR from 'swr'
 
 export type CopilotContext = {
     text: string,
     context: string,
-    booqId: string,
+    booqId: BooqId,
     title: string,
     author: string,
     language: string,

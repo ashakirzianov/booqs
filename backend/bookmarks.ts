@@ -1,4 +1,4 @@
-import { BooqPath } from '@/core'
+import { BooqId, BooqPath } from '@/core'
 import { sql } from './db'
 
 export type DbBookmark = {
@@ -13,7 +13,7 @@ export async function getBookmarks({
     booqId,
 }: {
     userId: string,
-    booqId: string,
+    booqId: BooqId,
 }): Promise<DbBookmark[]> {
     const result = await sql`
       SELECT * FROM bookmarks
@@ -31,7 +31,7 @@ export async function addBookmark({
 }: {
     id: string,
     userId: string,
-    booqId: string,
+    booqId: BooqId,
     path: BooqPath,
 }): Promise<DbBookmark> {
     const [row] = await sql`

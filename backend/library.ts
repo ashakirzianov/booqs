@@ -1,32 +1,43 @@
-import { AuthorSearchResult, BooqLibraryCard, BooqSearchResult, filterUndefined, InLibraryId, LibraryId, makeId, parseId, SearchResult } from '@/core'
+import { BooqId, BooqMetadata, InLibraryId, LibraryId, makeId, parseId } from '@/core'
 import groupBy from 'lodash-es/groupBy'
-import { Booq } from '../core'
 import { pgLibrary } from './pg'
-import { uploadBooqImages } from './images'
 import { userUploadsLibrary } from './uu'
 import { localLibrary } from './lo'
 
-export type InLibraryCard = Omit<BooqLibraryCard, 'id'> & {
+export type BooqCard = {
+    booqId: BooqId,
+    meta: BooqMetadata,
+}
+
+export type LibrarySearchResult =
+    | AuthorSearchResult
+    | BooqSearchResult
+
+export type AuthorSearchResult = {
+    kind: 'author',
+    name: string,
+}
+
+export type BooqSearchResult = {
+    kind: 'booq',
+    booqId: BooqId,
+    meta: BooqMetadata,
+}
+
+export type InLibraryCard = {
     id: InLibraryId,
+    meta: BooqMetadata,
 }
 export type BookFile = {
     kind: 'epub',
     file: Buffer,
 }
-export type InLibrarySearchResult = AuthorSearchResult
-    | Omit<BooqSearchResult, 'card'> & {
-        card: InLibraryCard,
-    }
+
 export type Library = {
-    search(query: string, limit: number): Promise<InLibrarySearchResult[]>,
+    search(query: string, limit: number): Promise<InLibraryCard[]>,
     cards(ids: InLibraryId[]): Promise<InLibraryCard[]>,
     forAuthor(author: string, limit?: number, offset?: number): Promise<InLibraryCard[]>,
     fileForId(id: string): Promise<BookFile | undefined>,
-    uploadEpub?(fileBuffer: Buffer, userId: string): Promise<{
-        card: InLibraryCard,
-        booq?: Booq,
-    } | undefined>,
-    deleteAllBooksForUserId?(userId: string): Promise<boolean>,
 }
 
 const libraries: {
@@ -37,27 +48,20 @@ const libraries: {
     lo: localLibrary,
 }
 
-export function processCard(prefix: string) {
-    return (card: InLibraryCard) => ({
-        ...card,
-        id: makeId(prefix, card.id),
-    })
-}
-
 export async function libraryCardForId(id: string) {
     const [result] = await libraryCardsForIds([id])
     return result
 }
 
-export async function libraryCardsForIds(ids: string[]): Promise<Array<BooqLibraryCard | undefined>> {
-    const parsed = filterUndefined(
-        ids.map(idString => {
+export async function libraryCardsForIds(ids: string[]): Promise<Array<BooqCard | undefined>> {
+    const parsed = ids
+        .map(idString => {
             const [library, id] = parseId(idString)
             return library && id
                 ? { library, id }
                 : undefined
-        }),
-    )
+        })
+        .filter(p => p !== undefined)
     const grouped = groupBy(
         parsed,
         id => id.library,
@@ -66,57 +70,49 @@ export async function libraryCardsForIds(ids: string[]): Promise<Array<BooqLibra
         const library = libraries[libraryPrefix]
         if (library) {
             const forLibrary = await library.cards(pids.map(p => p.id))
-            return forLibrary.map(processCard(libraryPrefix))
+            return forLibrary.map(card => ({
+                booqId: makeId(libraryPrefix, card.id),
+                meta: card.meta,
+            }))
         } else {
             return undefined
         }
     })
-    const results = filterUndefined(await Promise.all(groupedResults))
+    const results = (await Promise.all(groupedResults))
         .flat()
+        .filter(r => r !== undefined)
     return ids.map(
-        id => results.find(r => r.id === id),
+        id => results.find(r => r.booqId === id),
     )
 }
 
-export async function booqsForAuthor(author: string, limit?: number, offset?: number) {
+export async function booqsForAuthor(author: string, limit?: number, offset?: number): Promise<BooqCard[]> {
     const supported: Array<keyof typeof libraries> = ['pg']
     const results = await Promise.all(
         supported.map(
             library => libraries[library]!.forAuthor(author, limit, offset)
-                .then(cards => cards.map(processCard(library))),
+                .then(cards => cards.map(card => ({
+                    booqId: makeId(library, card.id),
+                    meta: card.meta,
+                }))),
         ),
     )
     return results.flat()
 }
 
-export async function uploadToLibrary(libraryPrefix: string, fileBuffer: Buffer, userId: string) {
-    const uploadEpub = libraries[libraryPrefix]?.uploadEpub
-    if (uploadEpub) {
-        const result = await uploadEpub(fileBuffer, userId)
-        if (result) {
-            if (result.booq) {
-                const imageResults = await uploadBooqImages(`${libraryPrefix}/${result.card.id}`, result.booq)
-                for (const imageResult of imageResults) {
-                    if (!imageResult.success) {
-                        console.warn(`Failed to upload image ${imageResult.id} for ${libraryPrefix}/${result.card.id}`)
-                    }
-                }
-            }
-            return processCard(libraryPrefix)(result.card)
-        }
-    }
-    return undefined
-}
-
-export async function searchBooqs(query: string, limit: number): Promise<SearchResult[]> {
+export async function searchBooqs(query: string, limit: number): Promise<LibrarySearchResult[]> {
     if (!query) {
         return []
     }
     const cards = Object.entries(libraries).map(
-        async ([prefix, library]) => {
+        async ([prefix, library]): Promise<LibrarySearchResult[]> => {
             if (library) {
                 const results = await library.search(query, limit)
-                return results.map(processSearchResult(prefix))
+                return results.map(result => ({
+                    kind: 'booq',
+                    booqId: makeId(prefix, result.id),
+                    meta: result.meta,
+                }))
             } else {
                 return []
             }
@@ -127,26 +123,12 @@ export async function searchBooqs(query: string, limit: number): Promise<SearchR
     return all.flat()
 }
 
-export async function fileForId(booqId: string) {
+export async function fileForId(booqId: BooqId) {
     const [prefix, id] = parseId(booqId)
     const library = libraries[prefix]
     return library && id
         ? library.fileForId(id)
         : undefined
-}
-
-function processSearchResult(prefix: string) {
-    const cardProcessor = processCard(prefix)
-    return function (result: InLibrarySearchResult): SearchResult {
-        if (result.kind === 'book') {
-            return {
-                ...result,
-                card: cardProcessor(result.card),
-            }
-        } else {
-            return result
-        }
-    }
 }
 
 export async function featuredBooqIds(_limit?: number) {

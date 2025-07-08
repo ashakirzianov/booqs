@@ -1,5 +1,5 @@
 import { BooqFragment } from './fragment'
-import { BooqId, BooqMeta, BooqMetaTag, BooqRange, TableOfContents } from './model'
+import { BooqId, BooqMetadata, BooqRange, TableOfContents } from './model'
 
 export type AccountData = {
     id: string,
@@ -11,7 +11,7 @@ export type AccountDisplayData = Pick<AccountData, 'id' | 'name' | 'profilePictu
 export type NoteColor = string // TODO: rename?
 export type NoteData = {
     id: string,
-    booqId: string,
+    booqId: BooqId,
     author: AccountDisplayData,
     range: BooqRange,
     color: string,
@@ -24,34 +24,12 @@ export type BooqNote = NoteData & {
     position?: number,
 }
 export type PartialBooqData = {
-    id: BooqId,
+    booqId: BooqId,
     fragment: BooqFragment,
-    meta: BooqMeta,
+    meta: BooqMetadata,
     toc: TableOfContents,
-}
-export type BooqLibraryCard = {
-    id: BooqId,
-    length: number,
-    title?: string,
-    authors: string[],
-    languages: string[],
-    subjects: string[],
-    description?: string,
-    coverUrl?: string,
-    tags: BooqMetaTag[],
 }
 export type BooqCollection = {
     name: string,
     booqIds: BooqId[],
-}
-export type SearchResult = AuthorSearchResult | BooqSearchResult
-export type AuthorSearchResult = {
-    kind: 'author',
-    author: {
-        name: string,
-    },
-}
-export type BooqSearchResult = {
-    kind: 'book',
-    card: BooqLibraryCard,
 }

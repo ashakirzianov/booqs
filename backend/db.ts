@@ -41,3 +41,9 @@ export async function estimatedRowCount(tableName: string): Promise<number | nul
         return null
     }
 }
+
+export function sanitizeForRedisHash(obj: Record<string, unknown>): Record<string, unknown> {
+    return Object.fromEntries(
+        Object.entries(obj).filter(([, v]) => v !== null && v !== undefined)
+    )
+}

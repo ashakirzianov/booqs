@@ -19,6 +19,7 @@ export type BooqElementNode = {
     name: string,
     id?: string,
     style?: BooqNodeStyle,
+    css?: string,
     children?: BooqNode[],
     attrs?: BooqNodeAttrs,
     fileName?: string,
@@ -44,32 +45,33 @@ export type TableOfContentsItem = {
 export type TableOfContents = {
     title: string | undefined,
     items: TableOfContentsItem[],
-    length: number,
 }
 
-export type BooqMetaTag = {
+
+export type BooqTitle = string
+export type BooqAuthor = {
+    name: string,
+    fileAs?: string,
+    role?: string,
+}
+export type BooqExtraMetadata = {
     name: string,
     value?: string,
+    attributes?: Record<string, string | undefined>,
 }
-export type BooqMeta = {
-    title: string | undefined,
-    authors: string[],
-    languages: string[],
-    contributors: string[],
-    descriptions: string[],
-    subjects: string[],
-    rights: string | undefined,
-    cover?: {
-        href: string,
-    },
-    tags: BooqMetaTag[],
+export type BooqMetadata = {
+    title: BooqTitle,
+    authors: BooqAuthor[],
+    extra: BooqExtraMetadata[],
+    coverSrc: string | undefined,
+    length: number,
 }
 export type BooqImages = {
     [src: string]: string,
 }
 export type Booq = {
     nodes: BooqNode[],
-    meta: BooqMeta,
+    metadata: BooqMetadata,
     toc: TableOfContents,
     images: BooqImages,
 }

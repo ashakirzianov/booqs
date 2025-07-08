@@ -2,7 +2,7 @@
 import '@/app/wdyr'
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { BooqAnchor, BooqNote, BooqPath, BooqRange, contextForRange, PartialBooqData, pathToId, positionForPath, samePath, textForRange } from '@/core'
+import { BooqAnchor, BooqId, BooqNote, BooqPath, BooqRange, contextForRange, PartialBooqData, pathToId, positionForPath, samePath, textForRange } from '@/core'
 import { BorderButton, PanelButton } from '@/components/Buttons'
 import { booqHref, feedHref } from '@/application/href'
 import {
@@ -36,7 +36,7 @@ export function Reader({
     const pathname = usePathname()
     const { user, isLoading: isAuthLoading } = useAuth()
     const fontScale = useFontScale()
-    const { notes } = useBooqNotes({ booqId: booq.id, user })
+    const { notes } = useBooqNotes({ booqId: booq.booqId, user })
     const resolvedNotes = useMemo(() => {
         return notes.map<BooqNote>(note => ({
             ...note,
@@ -76,7 +76,7 @@ export function Reader({
         toggleNavigationSelection,
     } = useNavigationState()
     const NavigationContent = <NavigationPanel
-        booqId={booq.id}
+        booqId={booq.booqId}
         title={booq.meta.title ?? 'Untitled'}
         toc={booq.toc.items}
         notes={resolvedNotes}
@@ -119,7 +119,7 @@ export function Reader({
         ContextMenuNode, isOpen: contextMenuVisible,
         updateMenuState: setMenuState,
     } = useContextMenu({
-        booqId: booq.id,
+        booqId: booq.booqId,
         user,
         closed: copilotState.kind !== 'empty',
         updateCopilot(selection, anchor) {
@@ -150,21 +150,21 @@ export function Reader({
             fontSize: `${fontScale}%`,
         }}>
             <BooqContent
-                booqId={booq.id}
+                booqId={booq.booqId}
                 nodes={booq.fragment.nodes}
                 range={range}
                 augmentations={augmentations}
                 onAugmentationClick={onAugmentationClick}
-                hrefForPath={(id, path) => booqHref({ id, path })}
+                hrefForPath={(id, path) => booqHref({ booqId: id, path })}
             />
         </div>}
         PrevButton={<AnchorButton
-            booqId={booq.id}
+            booqId={booq.booqId}
             anchor={booq.fragment.previous}
             title='Previous'
         />}
         NextButton={<AnchorButton
-            booqId={booq.id}
+            booqId={booq.booqId}
             anchor={booq.fragment.next}
             title='Next'
         />}
@@ -173,7 +173,7 @@ export function Reader({
             state={copilotState}
             setState={setCopilotState}
             data={{
-                id: booq.id,
+                id: booq.booqId,
                 meta: booq.meta,
             }}
         />}
@@ -314,8 +314,7 @@ function useAugmentations({
     }
 }
 
-function useScrollHandler({ id, fragment, toc }: PartialBooqData) {
-    const length = toc.length
+function useScrollHandler({ booqId, fragment, meta: { length } }: PartialBooqData) {
     const [currentPath, setCurrentPath] = useState(fragment.current.path)
 
     const position = positionForPath(fragment.nodes, currentPath)
@@ -331,7 +330,7 @@ function useScrollHandler({ id, fragment, toc }: PartialBooqData) {
         if (!samePath(path, currentPath)) {
             setCurrentPath(path)
             reportBooqHistory({
-                booqId: id,
+                booqId,
                 path,
                 source: currentSource(),
             })
@@ -345,14 +344,14 @@ function useScrollHandler({ id, fragment, toc }: PartialBooqData) {
 }
 
 function AnchorButton({ booqId, anchor, title }: {
-    booqId: string,
+    booqId: BooqId,
     anchor?: BooqAnchor,
     title: string,
 }) {
     if (!anchor) {
         return null
     }
-    return <Link href={booqHref({ id: booqId, path: anchor.path })} className='flex items-center h-header'>
+    return <Link href={booqHref({ booqId, path: anchor.path })} className='flex items-center h-header'>
         <div className='flex items-center h-header'>
             <BorderButton text={anchor.title ?? title} />
         </div>

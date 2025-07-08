@@ -1,4 +1,5 @@
 import { addToCollection, booqIdsInCollections, removeFromCollection } from '@/backend/collections'
+import { BooqId } from '@/core'
 import { getUserIdInsideRequest } from '@/data/auth'
 
 type Params = { name: string }
@@ -23,7 +24,7 @@ export async function GET(request: Request, { params }: {
 
 export type PostResponse = CollectionResponse
 export type PostBody = {
-    booqId: string
+    booqId: BooqId
 }
 export async function POST(request: Request, { params }: {
     params: Promise<Params>,
@@ -47,7 +48,7 @@ export async function POST(request: Request, { params }: {
 
 export type DeleteResponse = CollectionResponse
 export type DeleteBody = {
-    booqId: string
+    booqId: BooqId
 }
 export async function DELETE(request: Request, { params }: {
     params: Promise<Params>,

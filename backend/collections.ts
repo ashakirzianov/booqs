@@ -1,3 +1,4 @@
+import { BooqId } from '@/core'
 import { sql } from './db'
 
 export type DbCollection = {
@@ -11,7 +12,7 @@ export type DbCollection = {
 export async function booqIdsInCollections(userId: string, ...names: string[]): Promise<string[]> {
     const result = await sql`
       SELECT ucb.booq_id
-      FROM user_collections_books ucb
+      FROM user_collections_booqs ucb
       JOIN collections c ON ucb.collection_id = c.id
       WHERE c.user_id = ${userId}
         AND c.name = ANY(${names})
@@ -25,7 +26,7 @@ export async function addToCollection({
     name,
 }: {
     userId: string,
-    booqId: string,
+    booqId: BooqId,
     name: string,
 }): Promise<boolean> {
     const [collection] = await sql`
@@ -37,7 +38,7 @@ export async function addToCollection({
     if (!collection) return false
 
     const result = await sql`
-    INSERT INTO user_collections_books (collection_id, booq_id)
+    INSERT INTO user_collections_booqs (collection_id, booq_id)
     VALUES (${collection.id}, ${booqId})
     ON CONFLICT DO NOTHING
     RETURNING booq_id
@@ -51,7 +52,7 @@ export async function removeFromCollection({
     name,
 }: {
     userId: string,
-    booqId: string,
+    booqId: BooqId,
     name: string,
 }): Promise<boolean> {
     const [collection] = await sql`
@@ -61,14 +62,14 @@ export async function removeFromCollection({
     if (!collection) return false
 
     const result = await sql`
-    DELETE FROM user_collections_books
+    DELETE FROM user_collections_booqs
     WHERE collection_id = ${collection.id} AND booq_id = ${booqId}
     RETURNING booq_id
     `
     return result.length > 0
 }
 
-export async function addUpload(userId: string, uploadId: string) {
+export async function addUpload(userId: string, uploadId: BooqId) {
     return addToCollection({
         userId,
         name: 'uploads',

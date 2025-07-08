@@ -1,6 +1,5 @@
 import { authorHref, booqHref } from '@/application/href'
-import { AuthorSearchResult, BooqSearchResult, SearchResult } from '@/core'
-import { fetchSearchQuery } from '@/data/search'
+import { AuthorSearchResultData, BooqSearchResultData, fetchSearchQuery, SearchResultData } from '@/data/search'
 import Link from 'next/link'
 
 export async function generateMetadata({
@@ -36,9 +35,9 @@ export default async function SearchPage({
 }
 
 function SearchResultItem({ result }: {
-    result: SearchResult,
+    result: SearchResultData,
 }) {
-    if (result.kind === 'book') {
+    if (result.kind === 'booq') {
         return <BooqSearchResultItem result={result} />
     } else if (result.kind === 'author') {
         return <AuthorSearchResultItem result={result} />
@@ -50,16 +49,16 @@ function SearchResultItem({ result }: {
 function BooqSearchResultItem({
     result,
 }: {
-    result: BooqSearchResult,
+    result: BooqSearchResultData,
 }) {
     return (
         <div>
             <h2>
-                <Link href={booqHref({ id: result.card.id })}>
-                    {result.card.title}
+                <Link href={booqHref({ booqId: result.booqId })}>
+                    {result.title}
                 </Link>
             </h2>
-            <p>by {result.card.authors[0]}</p>
+            <p>by {result.authors?.join(', ')}</p>
         </div>
     )
 }
@@ -67,12 +66,12 @@ function BooqSearchResultItem({
 function AuthorSearchResultItem({
     result,
 }: {
-    result: AuthorSearchResult,
+    result: AuthorSearchResultData,
 }) {
     return (
         <div>
-            <h2><Link href={authorHref({ name: result.author.name })}>
-                {result.author.name}
+            <h2><Link href={authorHref({ name: result.name })}>
+                {result.name}
             </Link></h2>
         </div>
     )

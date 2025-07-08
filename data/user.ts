@@ -1,12 +1,12 @@
 'use server'
-import { BooqPath } from '@/core'
+import { BooqId, BooqPath } from '@/core'
 import { fetchAuthData } from './auth'
 import { addBooqHistory } from '@/backend/history'
 
 export async function reportBooqHistory({
     booqId, path, source,
 }: {
-    booqId: string,
+    booqId: BooqId,
     path: BooqPath,
     source: string,
 }) {

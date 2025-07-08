@@ -1,13 +1,13 @@
 import React from 'react'
 import { BooqPreview } from '@/components/BooqPreview'
 import { pageForPosition } from '@/application/common'
-import { BooqPath } from '@/core'
+import { BooqId, BooqPath } from '@/core'
 import Link from 'next/link'
 import { booqHref } from '../application/href'
 
 
 export type ReadingHistoryEntry = {
-    booqId: string,
+    booqId: BooqId,
     title?: string,
     path: BooqPath,
     text: string,
@@ -24,7 +24,7 @@ export function ReadingHistory({ history }: {
             history.map(
                 (entry, idx) =>
                     <div key={idx} className='flex snap-center'>
-                        <Link href={booqHref({ id: entry.booqId, path: entry.path })}>
+                        <Link href={booqHref({ booqId: entry.booqId, path: entry.path })}>
                             <BooqPreview
                                 path={entry.path}
                                 text={entry.text}

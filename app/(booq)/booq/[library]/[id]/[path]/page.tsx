@@ -49,7 +49,11 @@ export default async function BooqPathPage({
     const quoteRange = startPath && endPath
         ? { start: startPath, end: endPath }
         : undefined
-    const booq = await booqPart(`${library}/${id}`, booqPath)
+    const booq = await booqPart({
+        booqId: `${library}/${id}`,
+        path: booqPath,
+        bypassCache: library === 'lo',
+    })
     if (!booq)
         return notFound()
     return <Reader booq={booq} quote={quoteRange} />

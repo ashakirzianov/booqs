@@ -1,6 +1,8 @@
-import type { InLibraryCard, Library, InLibrarySearchResult } from './library'
-import { downloadAsset } from './s3'
+import type { InLibraryCard, Library } from './library'
+import { downloadAsset } from './blob'
 import { sql } from './db'
+import { Booq, BooqMetadata } from '@/core'
+import { getExtraMetadataValues } from '@/core/meta'
 
 export const pgLibrary: Library = {
   search,
@@ -11,144 +13,170 @@ export const pgLibrary: Library = {
 
 export const pgEpubsBucket = 'pg-epubs'
 
-export type DbPgCard = {
+type DbPgCard = {
   id: string,
   asset_id: string,
-  length: number | null,
-  title: string,
-  authors: string[],
-  language: string | null,
-  description: string | null,
-  subjects: string[] | null,
-  cover: string | null,
-  metadata: any,
-  created_at: string,
+  meta: BooqMetadata,
 }
-
 
 export async function cards(ids: string[]): Promise<InLibraryCard[]> {
   if (ids.length === 0) return []
 
-  const result = await sql`
-      SELECT * FROM pg_cards
-      WHERE id = ANY(${ids})
-    `
-
-  const cards = result as DbPgCard[]
-  const mapped = cards.map(convertToLibraryCard)
-  return mapped
+  const rows = await sql`
+    SELECT *
+    FROM pg_assets
+    WHERE id = ANY(${ids})
+  ` as DbPgCard[]
+  return rows.map(row => {
+    return {
+      id: row.id,
+      meta: row.meta,
+    }
+  })
 }
 
-async function fileForId(id: string) {
-  const [row] = await sql`
-    SELECT asset_id FROM pg_cards
-    WHERE id = ${id}
+type DbPgMetadata = {
+  id: string,
+  asset_id: string,
+  title: string,
+  authors: string[],
+  authors_text: string,
+  languages: string[],
+  subjects: string[],
+  meta: BooqMetadata,
+}
+
+export async function search(query: string, limit: number): Promise<InLibraryCard[]> {
+  const like = `%${query.toLowerCase()}%`
+  const result = await sql`
+    SELECT *
+    FROM pg_metadata
+    WHERE lower(title) LIKE ${like}
+       OR lower(authors_text) LIKE ${like}
+    ORDER BY title
+    LIMIT ${limit}
+  ` as DbPgMetadata[]
+  return result.map(({ id, meta }) => ({
+    id,
+    meta,
+  }))
+}
+
+export async function addToSearchIndex({
+  id,
+  assetId,
+  metadata,
+}: {
+  id: string,
+  assetId: string,
+  metadata: BooqMetadata,
+}): Promise<boolean> {
+  const { title, authors, extra } = metadata
+  const languages = getExtraMetadataValues('language', extra)
+  const subjects = getExtraMetadataValues('subject', extra)
+  const authorNames = authors.map(a => a.name)
+  const authorsText = authorNames.join(' ')
+
+  const result = await sql`
+    INSERT INTO pg_metadata (
+      id,
+      asset_id,
+      title,
+      authors,
+      authors_text,
+      languages,
+      subjects,
+      meta
+    ) VALUES (
+      ${id},
+      ${assetId},
+      ${title},
+      ${authorNames},
+      ${authorsText},
+      ${languages},
+      ${subjects},
+      ${metadata}
+    )
+    ON CONFLICT (id) DO UPDATE
+    SET
+      asset_id = EXCLUDED.asset_id,
+      title = EXCLUDED.title,
+      authors = EXCLUDED.authors,
+      authors_text = EXCLUDED.authors_text,
+      languages = EXCLUDED.languages,
+      subjects = EXCLUDED.subjects,
+      meta = EXCLUDED.meta
+    RETURNING id
   `
-  if (!row.asset_id) {
+  return result.length > 0
+}
+
+export async function fileForId(id: string) {
+  const assetId = await assetIdForId(id)
+  if (!assetId) {
     return undefined
   } else {
-    const asset = await downloadAsset(pgEpubsBucket, row.asset_id)
+    const asset = await downloadAsset(pgEpubsBucket, assetId)
     return Buffer.isBuffer(asset)
       ? { kind: 'epub', file: asset } as const
       : undefined
   }
 }
 
-export async function forAuthor(name: string, limit?: number, offset?: number): Promise<InLibraryCard[]> {
-  const result = await sql`
-      SELECT * FROM pg_cards
-      WHERE ${'%' + name + '%'} ILIKE ANY(authors)
-      ORDER BY created_at DESC
-      ${offset !== undefined ? sql`OFFSET ${offset}` : sql``}
-      ${limit !== undefined ? sql`LIMIT ${limit}` : sql``}
-    `
-  const cards = result as DbPgCard[]
-  return cards.map(convertToLibraryCard)
+export async function forAuthor(_name: string, _limit?: number, _offset?: number): Promise<InLibraryCard[]> {
+  // TODO: implement this
+  return []
 }
 
-function convertToLibraryCard({
-  id, title, authors, language, length,
-  cover, description, subjects,
-}: DbPgCard): InLibraryCard {
-  return {
-    id, title,
-    languages: language ? [language] : [],
-    authors,
-    length: length ?? 0,
-    coverUrl: cover ?? undefined,
-    description: description ?? undefined,
-    subjects: subjects ?? [],
-    tags: [],
-  }
-}
-
-export async function search(query: string, limit = 20, offset = 0): Promise<InLibrarySearchResult[]> {
+async function assetIdForId(id: string): Promise<string | undefined> {
   const rows = await sql`
-    WITH ranked_cards AS (
-      SELECT *,
-        (
-          similarity(title, ${query}) * 5 +
-          greatest_similarity(authors, ${query}) * 4 +
-          greatest_similarity(subjects, ${query}) * 3 +
-          similarity(description, ${query}) * 2 +
-          similarity(jsonb_to_text(metadata), ${query})
-        ) AS score
-      FROM pg_cards
-      WHERE
-        title % ${query} OR
-        exists_similarity(authors, ${query}) OR
-        exists_similarity(subjects, ${query}) OR
-        description % ${query} OR
-        jsonb_to_text(metadata) % ${query}
-    )
-    SELECT * FROM ranked_cards
-    ORDER BY score DESC
-    LIMIT ${limit} OFFSET ${offset}
+    SELECT asset_id
+    FROM pg_assets
+    WHERE id = ${id}
+    LIMIT 1
+  ` as Array<Pick<DbPgCard, 'asset_id'>>
+  return rows[0]?.asset_id
+}
+
+export async function insertPgRecord({ booq, assetId, id }: {
+  booq: Booq,
+  assetId: string,
+  id: string,
+}) {
+  const insertSuccess = await insertDbCard({
+    id,
+    asset_id: assetId,
+    meta: booq.metadata,
+  })
+  if (insertSuccess) {
+    const indexSuccess = await addToSearchIndex({
+      id,
+      assetId,
+      metadata: booq.metadata,
+    })
+    if (indexSuccess) {
+      return { id }
+    }
+  }
+  return undefined
+}
+
+export async function existingIds(): Promise<string[]> {
+  const rows = await sql`
+    SELECT id
+    FROM pg_assets
   `
-  const cards = rows as DbPgCard[]
-  const libCards = cards.map(convertToLibraryCard)
-  const results = libCards.map(card => ({
-    kind: 'book' as const,
-    card,
-  }))
-  return results
+  return rows.map(r => r.id)
 }
 
-export async function existingAssetIds(): Promise<string[]> {
-  const result = await sql`
-      SELECT asset_id FROM pg_cards
-    `
-  return result.map(row => row.asset_id)
-}
-
-export async function insertCard(card: Omit<DbPgCard, 'searchable_tsv' | 'created_at'>): Promise<DbPgCard | null> {
-  const [inserted] = await sql`
-      INSERT INTO pg_cards (
-        id,
-        asset_id,
-        length,
-        title,
-        authors,
-        language,
-        description,
-        subjects,
-        cover,
-        metadata
-      )
-      VALUES (
-        ${card.id},
-        ${card.asset_id},
-        ${card.length ?? null},
-        ${card.title},
-        ${card.authors},
-        ${card.language ?? null},
-        ${card.description ?? null},
-        ${card.subjects ?? null},
-        ${card.cover ?? null},
-        ${card.metadata ?? {}}
-      )
-      ON CONFLICT (id) DO NOTHING
-      RETURNING *
-    `
-  return inserted ? (inserted as DbPgCard) : null
+async function insertDbCard(card: DbPgCard): Promise<boolean> {
+  const rows = await sql`
+    INSERT INTO pg_assets (id, asset_id, meta)
+    VALUES (${card.id}, ${card.asset_id}, ${card.meta})
+    ON CONFLICT (id) DO UPDATE
+    SET asset_id = EXCLUDED.asset_id,
+      meta = EXCLUDED.meta
+    RETURNING id
+  `
+  return rows.length > 0
 }

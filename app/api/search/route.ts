@@ -1,10 +1,10 @@
 import { searchBooqs } from '@/backend/library'
-import { SearchResult } from '@/core'
+import { SearchResultData, toClientSearchResult } from '@/data/search'
 import { NextRequest } from 'next/server'
 
 export type GetResponse = {
     query: string,
-    results: SearchResult[],
+    results: SearchResultData[],
 }
 export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams
@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
     const results = await searchBooqs(query, limit)
     const response: GetResponse = {
         query,
-        results,
+        results: results.map(toClientSearchResult),
     }
     return Response.json(response)
 }

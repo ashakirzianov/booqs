@@ -1,12 +1,12 @@
 import uniq from 'lodash-es/uniq'
-import { BooqNode, BooqImages, BooqMeta } from '../core'
-import { EpubPackage } from './epub'
+import { BooqNode, BooqImages, BooqMetadata } from '../core'
+import { Epub } from './epub'
 import { resolveRelativePath } from './path'
 import { Diagnoser } from 'booqs-epub'
 
-export async function buildImages(nodes: BooqNode[], meta: BooqMeta, file: EpubPackage, diags: Diagnoser) {
+export async function buildImages(nodes: BooqNode[], meta: BooqMetadata, file: Epub, diags: Diagnoser) {
     const srcs = collectImgSrcs(nodes)
-    const cover = meta.cover?.href
+    const cover = meta.coverSrc
     const allSrcs = cover !== undefined
         ? [cover, ...srcs]
         : srcs
@@ -16,7 +16,7 @@ export async function buildImages(nodes: BooqNode[], meta: BooqMeta, file: EpubP
         if (isExternal(src)) {
             continue
         }
-        const buffer = await file.bufferResolver(src)
+        const buffer = await file.loadBinaryFile(src)
         if (buffer) {
             const image = Buffer.from(buffer).toString('base64')
             images[src] = image

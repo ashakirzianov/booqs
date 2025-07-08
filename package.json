@@ -9,7 +9,7 @@
     "lint": "next lint",
     "https": "next dev --experimental-https",
     "analyze": "ANALYZE=true next build",
-    "workers": "tsx scripts/index.ts"
+    "cli": "tsx cli/index.ts"
   },
   "dependencies": {
     "@apollo/server": "^4.11.3",
@@ -22,10 +22,11 @@
     "@simplewebauthn/browser": "^13.1.0",
     "@simplewebauthn/server": "^13.1.1",
     "@tailwindcss/postcss": "^4.0.15",
+    "@types/postcss-prefix-selector": "^1.16.3",
     "@upstash/redis": "^1.34.8",
     "@welldone-software/why-did-you-render": "^10.0.1",
     "body-parser": "^1.20.3",
-    "booqs-epub": "^0.2.0",
+    "booqs-epub": "^1.1.0",
     "clipboard-polyfill": "^4.1.1",
     "clsx": "^2.1.1",
     "cookie": "^1.0.2",
@@ -37,18 +38,21 @@
     "eslint": "9.23.0",
     "eslint-config-next": "^15.2.3",
     "express": "^4.21.2",
+    "fflate": "^0.8.2",
     "graphql": "^16.10.0",
     "graphql-tools": "^9.0.18",
     "graphql-type-json": "^0.3.2",
     "graphql-yoga": "^5.13.4",
     "htmlparser2": "^10.0.0",
     "jsonwebtoken": "^9.0.2",
-    "jszip": "^3.10.1",
     "jwks-rsa": "^3.2.0",
     "lodash-es": "^4.17.21",
+    "nanoid": "^5.1.5",
     "next": "^15.2.3",
     "openai": "^4.94.0",
     "postcss": "^8.5.3",
+    "postcss-prefix-selector": "^2.1.1",
+    "postcss-selector-parser": "^7.1.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "sharp": "^0.33.5",
@@ -57,7 +61,7 @@
     "swr": "^2.3.3",
     "tailwindcss": "^4.0.15",
     "typescript": "5.8.2",
-    "uuid": "^11.1.0"
+    "zod": "^3.24.4"
   },
   "devDependencies": {
     "@next/bundle-analyzer": "^15.3.2",

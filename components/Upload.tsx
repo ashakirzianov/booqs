@@ -80,7 +80,7 @@ function UploadModalContent({ closeModal }: {
             <ModalDivider />
             <ModalButton
                 text='Read now'
-                href={booqHref({ id: result.id, path: [0] })}
+                href={booqHref({ booqId: result.booqId, path: [0] })}
             />
             <ModalDivider />
             <ModalButton

@@ -1,12 +1,54 @@
 import {
-    parse, Rule, Declaration, Charset, Media, AtRule, Comment,
+    parse, Rule, Declaration as CssDeclaration, Charset, Media, AtRule, Comment,
 } from 'css'
 import { compile, is } from 'css-select'
+import postcss, { Plugin } from 'postcss'
+import prefixer from 'postcss-prefix-selector'
 import { selectorSpecificity, compare } from '@csstools/selector-specificity'
+import selectorParser from 'postcss-selector-parser'
 import { flatten } from 'lodash'
-import { filterUndefined } from '../core'
 import { XmlElement, attributesOf } from './xmlTree'
 import { Diagnoser } from 'booqs-epub'
+
+export function preprocessCss(cssString: string, options: {
+    prefix: string,
+}) {
+    return postcss()
+        .use(rewriteColorsPlugin())
+        .use(prefixer({
+            prefix: `.${options.prefix}`,
+        }))
+        .process(cssString).css
+}
+
+function rewriteColorsPlugin(): Plugin {
+    return {
+        postcssPlugin: 'rewrite-colors-for-dark-theme',
+        Declaration(decl) {
+            if (!['background', 'background-color', 'color'].includes(decl.prop)) {
+                return
+            }
+            const parent = decl.parent
+            if (parent?.type === 'rule') {
+                const rule = parent as Rule
+                const isGlobal = rule.selectors?.some(
+                    selector => ['*', 'html', 'body'].includes(selector),
+                )
+                if (!isGlobal) {
+                    decl.remove()
+                    return
+                }
+            }
+            const { value } = decl
+
+            if (['white', '#fff', '#ffffff', 'rgb(255,255,255)'].includes(value)) {
+                decl.remove()
+            } else if (['black', '#000', '#000000', 'rgb(0,0,0)'].includes(value)) {
+                decl.remove()
+            }
+        }
+    }
+}
 
 type CompiledQuery = ReturnType<typeof compile>
 type Specificity = ReturnType<typeof selectorSpecificity>
@@ -128,7 +170,7 @@ function parseInlineStyle(style: string, fileName: string, diags: Diagnoser) {
 function buildRule(rule: Rule, diags: Diagnoser): StyleRule | undefined {
     const supported = rule.selectors?.filter(supportedSelector) ?? []
     const value = supported.map(s => parseSelector(s, diags))
-    const selectors = filterUndefined(value ?? [])
+    const selectors = (value ?? []).filter(s => s !== undefined)
     if (selectors.length === 0) {
         return undefined
     }
@@ -136,7 +178,7 @@ function buildRule(rule: Rule, diags: Diagnoser): StyleRule | undefined {
     return {
         selectors,
         content: (rule.declarations ?? [])
-            .filter((r): r is Declaration => r.type === 'declaration')
+            .filter((r): r is CssDeclaration => r.type === 'declaration')
             .map(d => ({
                 property: d.property!,
                 value: d.value,
@@ -197,7 +239,8 @@ function isSelect(xml: XmlElement, selector: Selector) {
 function parseSelector(selector: string, diags: Diagnoser): Selector | undefined {
     try {
         const compiled = compile(selector)
-        const specificity = selectorSpecificity(selector as any)
+        const parsed = selectorParser().astSync(selector)
+        const specificity = selectorSpecificity(parsed)
         return {
             selector,
             compiled,

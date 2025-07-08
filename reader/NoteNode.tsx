@@ -5,10 +5,10 @@ import { MoreIcon } from '@/components/Icons'
 import clsx from 'clsx'
 import { booqHref } from '@/application/href'
 import Link from 'next/link'
-import { AccountDisplayData, BooqNote } from '@/core'
+import { AccountDisplayData, BooqId, BooqNote } from '@/core'
 
 export function NoteNodeComp({ booqId, note, user }: {
-    booqId: string,
+    booqId: BooqId,
     user: AccountDisplayData | undefined,
     note: BooqNote,
 }) {
@@ -16,7 +16,7 @@ export function NoteNodeComp({ booqId, note, user }: {
         borderLeft: `3px solid ${resolveNoteColor(note.color)}`,
     }}>
         <div className='w-full text-primary text-justify'>
-            <Link href={booqHref({ id: booqId, path: note.range.start })} className='text-primary hover:text-highlight'>
+            <Link href={booqHref({ booqId, path: note.range.start })} className='text-primary hover:text-highlight'>
                 {note.text}
             </Link>
         </div>

@@ -3,16 +3,16 @@ import { BooqCover } from '@/components/BooqCover'
 import { BooqTags } from '@/components/BooqTags'
 import { authorHref } from '@/application/href'
 import { ReactNode } from 'react'
-import type { BooqLibraryCard } from '@/core'
+import { BooqDetails } from '@/data/booqs'
 
 export function BooqCard({
     card: { title, authors, coverUrl, tags },
     actions,
 }: {
-    card: BooqLibraryCard,
+    card: BooqDetails,
     actions?: ReactNode,
 }) {
-    const author = authors.join(', ')
+    const author = authors?.join(', ')
     return <div className="flex flex-col grow gap-4 items-center sm:flex-row sm:flex-wrap sm:items-stretch h-full">
         <BooqCover
             title={title ?? undefined}
@@ -24,7 +24,7 @@ export function BooqCard({
                 <Header title={title} author={author} />
             </div>
             <div className='mt-4'>
-                <BooqTags tags={tags} />
+                <BooqTags tags={tags ?? []} />
             </div>
             <div className='mt-4 flex gap-2 self-stretch justify-end ml-xl'>
                 {actions}

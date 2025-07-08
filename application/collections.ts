@@ -43,7 +43,7 @@ export function useCollection(name: string) {
         ids: data?.booqIds ?? [] as BooqId[],
         isLoading,
         error,
-        addToCollection(booqId: string) {
+        addToCollection(booqId: BooqId) {
             addMutation.trigger({ booqId }, {
                 optimisticData: currentData =>
                     currentData
@@ -53,7 +53,7 @@ export function useCollection(name: string) {
                 populateCache: true,
             })
         },
-        removeFromCollection(booqId: string) {
+        removeFromCollection(booqId: BooqId) {
             removeMutation.trigger({ booqId }, {
                 optimisticData: (currentData) =>
                 ({

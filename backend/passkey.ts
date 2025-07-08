@@ -5,7 +5,7 @@ import {
     RegistrationResponseJSON, AuthenticationResponseJSON, WebAuthnCredential,
 } from '@simplewebauthn/server'
 import { config } from './config'
-import { uniqueId } from '@/core'
+import { nanoid } from 'nanoid'
 import { redis, sql } from './db'
 
 export async function initiatePasskeyRegistration({
@@ -255,7 +255,7 @@ async function createChallenge({ challenge, kind }: {
     kind: ChallengeKind,
 }) {
     const expireInSeconds = 300
-    const id = uniqueId()
+    const id = nanoid(10)
     const expiration = Math.floor(Date.now() / 1000) + expireInSeconds
     const doc: Challenge = {
         kind,

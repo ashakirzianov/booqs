@@ -4,6 +4,7 @@ import AWS_S3, {
     GetObjectCommand, GetObjectCommandOutput,
     ListObjectsV2Command,
     DeleteObjectCommand,
+    HeadObjectCommand,
 } from '@aws-sdk/client-s3'
 
 let _service: S3Client | undefined
@@ -60,6 +61,23 @@ export async function deleteAsset(bucket: string, assetId: string) {
         Key: assetId,
     })
     return service().send(command)
+}
+
+export async function assetExists(bucket: string, assetId: string): Promise<boolean> {
+    try {
+        const command = new HeadObjectCommand({
+            Bucket: bucket,
+            Key: assetId,
+        })
+        await service().send(command)
+        return true
+    } catch (e: any) {
+        if (e?.name === 'NoSuchKey' || e.$metadata?.httpStatusCode === 404) {
+            return false
+        } else {
+            throw e
+        }
+    }
 }
 
 export async function* listObjects(bucket: string) {

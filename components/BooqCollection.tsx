@@ -2,12 +2,13 @@ import { BooqCard } from '@/components/BooqCard'
 import Link from 'next/link'
 import { booqHref } from '../application/href'
 import { CollectionButton } from './CollectionButton'
-import type { BooqLibraryCard } from '@/core'
+import type { BooqId } from '@/core'
+import { BooqDetails } from '@/data/booqs'
 export function BooqCollection({
     cards, title, collection, signed,
 }: {
     title?: string,
-    cards: BooqLibraryCard[],
+    cards: BooqDetails[],
     collection?: string,
     signed: boolean,
 }) {
@@ -25,14 +26,14 @@ export function BooqCollection({
                             : null
                     }
                     {cards.map(card => (
-                        <li key={card.id} className='w-[30rem] max-w-[90vw] rounded-sm shadow py-2 px-4'>
+                        <li key={card.booqId} className='w-[30rem] max-w-[90vw] rounded-sm shadow py-2 px-4'>
                             <BooqCard
                                 card={card}
                                 actions={<>
-                                    <ReadButton booqId={card.id} />
+                                    <ReadButton booqId={card.booqId} />
                                     {signed && collection ?
                                         <CollectionButton
-                                            booqId={card.id}
+                                            booqId={card.booqId}
                                             collection={collection}
                                         />
                                         : null}
@@ -47,9 +48,9 @@ export function BooqCollection({
 }
 
 function ReadButton({ booqId }: {
-    booqId: string,
+    booqId: BooqId,
 }) {
-    return <Link href={booqHref({ id: booqId, path: [0] })}>
+    return <Link href={booqHref({ booqId, path: [0] })}>
         <span className='text-action underline text-lg cursor-pointer transition duration-300 hover:text-highlight'>
             Read
         </span>

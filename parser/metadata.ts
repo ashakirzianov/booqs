@@ -1,109 +1,133 @@
-import { EpubPackage } from './epub'
-import { BooqMeta } from '../core'
-import { Diagnoser } from 'booqs-epub'
+import { Epub } from './epub'
+import { BooqAuthor, BooqExtraMetadata, BooqMetadata } from '../core'
+import { Diagnoser, EpubMetadata, EpubMetadataItem } from 'booqs-epub'
 
-export function buildMeta(epub: EpubPackage, diags?: Diagnoser): BooqMeta {
-    const pkgMeta = epub.metadata
-    const result: BooqMeta = {
-        title: undefined,
-        authors: [],
-        languages: [],
-        contributors: [],
-        descriptions: [],
-        subjects: [],
-        rights: undefined,
-        tags: [],
-    }
-    const cover = pkgMeta.items.find(i => i.name === 'cover')
-    if (cover) {
-        result.cover = {
-            href: cover.href,
-        }
-    }
-    const titles: string[] = []
-    for (let [key, value] of Object.entries(pkgMeta.fields)) {
-        if (key.startsWith('@')) {
-            continue
-        }
-        if (!value) {
-            continue
-        }
-        if (!Array.isArray(value)) {
-            diags?.push({
-                message: `Unexpected metadata for key: ${key}, value: ${value}`,
-                severity: 'warning',
-            })
-            continue
-        }
-        if (key.startsWith('dc:')) {
-            key = key.substring('dc:'.length)
-        }
-        const texts = value
-            .map(v => v['#text'])
-            .filter((v): v is string => v !== undefined)
-        switch (key) {
-            case 'title':
-                titles.push(...texts)
-                break
-            case 'creator':
-                result.authors.push(...texts)
-                break
-            case 'contributor':
-                result.contributors.push(...texts)
-                break
-            case 'language':
-                result.languages.push(...texts)
-                break
-            case 'description':
-                result.descriptions.push(...texts)
-                break
-            case 'subject':
-                result.subjects.push(...texts.map(v => v.split(' -- ')).flat())
-                break
-            case 'rights':
-                if (result.rights || texts.length > 1) {
-                    diags?.push({
-                        message: 'Multiple rights tags found',
-                        severity: 'warning',
-                    })
-                }
-                result.rights = result.rights
-                    ? result.rights + ' ' + texts.join(' ')
-                    : texts.join(' ')
-                break
-            case 'date': {
-                const vals = value
-                    .map(v => {
-                        const event = v['@opf:event']
-                        if (event) {
-                            return {
-                                name: event,
-                                value: v['#text'] ?? '',
-                            }
-                        } else {
-                            return {
-                                name: 'date',
-                                value: v['#text'] ?? '',
-                            }
-                        }
-                    })
-                result.tags.push(...vals)
-            }
-                break
-            default:
-                result.tags.push({
-                    name: key,
-                    value: texts.join(' '),
-                })
-
-        }
-    }
-    if (titles.length === 0) {
+export async function extactBooqMeta(epub: Epub, diags?: Diagnoser): Promise<Omit<BooqMetadata, 'length'>> {
+    const epubMetadata = await epub.metadata()
+    if (!epubMetadata) {
         diags?.push({
-            message: 'No title found',
-            severity: 'error',
+            message: 'Missing metadata in epub',
+        })
+        return {
+            title: 'Untitled',
+            authors: [],
+            coverSrc: undefined,
+            extra: [],
+        }
+    }
+    const coverItem = await epub.coverItem()
+
+    const {
+        title, creator,
+        ...rest
+    } = epubMetadata
+
+    diags = diags ?? []
+
+    return {
+        title: extractTitle(title, diags) ?? 'Untitled',
+        authors: extractAuthors(creator, diags) ?? [],
+        extra: extractExtra(rest, diags),
+        coverSrc: coverItem?.['@href'],
+    }
+}
+
+type Records = EpubMetadataItem[] | undefined
+
+function extractTitle(records: Records, diags?: Diagnoser): string | undefined {
+    if (!records || records.length === 0) {
+        diags?.push({
+            message: 'Missing title in metadata',
+        })
+        return undefined
+    } else if (records.length > 1) {
+        diags?.push({
+            message: 'Multiple titles found in metadata',
+            data: { records },
+            severity: 'warning',
         })
     }
-    result.title = titles.join(', ')
-    return result
+    return records
+        ?.filter(r => validateMetadataRecord(r, {
+            expectedAttributes: ['#text'],
+            diags,
+        }))
+        ?.map(r => r['#text']).join(' ')
+}
+
+function extractAuthors(records: Records, diags?: Diagnoser): BooqAuthor[] | undefined {
+    return records
+        ?.filter(r => validateMetadataRecord(r, {
+            expectedAttributes: ['#text'],
+            optionalAttributes: ['@file-as', '@role'],
+            diags,
+        }))
+        ?.map(r => ({
+            name: r['#text'],
+            fileAs: r['@file-as'],
+            role: r['@role'],
+        }))
+}
+
+function extractExtra(epubMetadata: EpubMetadata, _diags?: Diagnoser) {
+    const extra: BooqExtraMetadata[] = []
+    for (const [name, items] of Object.entries(epubMetadata)) {
+        for (const item of items ?? []) {
+            const { '#text': value, ...attributes } = item
+            extra.push({
+                name, value, attributes
+            })
+        }
+    }
+    return extra
+}
+
+type ExtractedMetadata<Keys extends string, OptKeys extends string> = Record<Keys, string> & Record<OptKeys, string | undefined>
+function validateMetadataRecord<Keys extends string, OptKeys extends string>(item: EpubMetadataItem, {
+    expectedAttributes, optionalAttributes, ignoreAttributes,
+    diags,
+}: {
+    expectedAttributes: Keys[],
+    optionalAttributes?: OptKeys[],
+    ignoreAttributes?: string[],
+    diags?: Diagnoser,
+}): item is ExtractedMetadata<Keys, OptKeys> {
+    item = { ...item }
+    let allPresent = true
+    const result: ExtractedMetadata<Keys, OptKeys> = {} as any
+    for (const attr of expectedAttributes) {
+        const value = item[attr]
+        if (value === undefined) {
+            allPresent = false
+            diags?.push({
+                message: `Missing attribute ${attr}`,
+                data: { item },
+            })
+        } else {
+            result[attr] = value as any
+            delete item[attr]
+        }
+    }
+    for (const attr of optionalAttributes ?? []) {
+        if (item[attr] !== undefined) {
+            result[attr] = item[attr] as any
+            delete item[attr]
+        }
+    }
+    for (const attr of ignoreAttributes ?? []) {
+        if (item[attr] !== undefined) {
+            delete item[attr]
+        }
+    }
+    const unexpectedAttributes = Object.keys(item)
+    if (unexpectedAttributes.length > 0) {
+        diags?.push({
+            message: `Unexpected attributes ${unexpectedAttributes.join(', ')}`,
+            data: { item },
+        })
+    }
+    if (!allPresent) {
+        return false
+    }
+    return true
 }

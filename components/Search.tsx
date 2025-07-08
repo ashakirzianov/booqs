@@ -8,7 +8,7 @@ import { ReactNode, useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Spinner } from './Icons'
 import { useDebouncedValue } from '@/application/utils'
-import { AuthorSearchResult, BooqSearchResult } from '@/core'
+import { AuthorSearchResultData, BooqSearchResultData } from '@/data/search'
 
 export function Search() {
     const { isOpen, openModal, closeModal } = useModalState()
@@ -42,7 +42,7 @@ function SearchModal({
         query: debouncedInput,
     })
     const [selected, setSelected] = useState<number | null>(null)
-    const booqs = results.filter(r => r.kind === 'book')
+    const booqs = results.filter(r => r.kind === 'booq')
     const authors = results.filter(r => r.kind === 'author')
     const router = useRouter()
     return <Modal
@@ -61,10 +61,10 @@ function SearchModal({
                     if (selected !== null && results.length > 0) {
                         if (selected < authors.length) {
                             const author = authors[selected]
-                            push(authorHref({ name: author.author.name }))
+                            push(authorHref({ name: author.name }))
                         } else {
                             const booq = booqs[selected - authors.length]
-                            push(booqHref({ id: booq.card.id, path: [0] }))
+                            push(booqHref({ booqId: booq.booqId, path: [0] }))
                         }
                         closeModal()
                     } else {
@@ -156,35 +156,35 @@ function SearchResultItem({ selected, children }: {
     </li>
 }
 
-function BooqSearchResultContent({ result: { card }, query }: {
-    result: BooqSearchResult,
+function BooqSearchResultContent({ result, query }: {
+    result: BooqSearchResultData,
     query: string,
 }) {
-    return <Link href={booqHref({ id: card.id, path: [0] })} className='flex flex-row'>
+    return <Link href={booqHref({ booqId: result.booqId, path: [0] })} className='flex flex-row'>
         <BooqCover
-            coverUrl={card.coverUrl ?? undefined}
-            title={card.title ?? undefined}
-            author={card.authors[0] ?? null}
+            coverUrl={result.coverUrl}
+            title={result.title}
+            author={result.authors?.join(', ')}
             size={20}
         />
         <div className='flex flex-col my-0 mx-lg'>
             <EmphasizedSpan
-                text={card.title ?? ''}
+                text={result.title ?? ''}
                 emphasis={query}
             />
-            <span>{card.authors[0]}</span>
+            <span>{result.authors?.join(', ')}</span>
         </div>
     </Link>
 }
 
-function AuthorSearchResultContent({ result: { author }, query }: {
-    result: AuthorSearchResult,
+function AuthorSearchResultContent({ result, query }: {
+    result: AuthorSearchResultData,
     query: string,
     selected?: boolean,
 }) {
-    return <Link href={authorHref({ name: author.name })}>
+    return <Link href={authorHref({ name: result.name })}>
         <EmphasizedSpan
-            text={author.name}
+            text={result.name}
             emphasis={query}
         />
     </Link>

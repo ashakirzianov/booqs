@@ -36,11 +36,7 @@ export const queryResolver: IResolvers<unknown, ResolverContext> = {
             limit?: number,
         }): Promise<SearchResultParent[]> {
             const results = await searchBooqs(query, limit ?? 100)
-            return results.map(
-                r => r.kind === 'book'
-                    ? r.card
-                    : { ...r.author, kind: 'author' },
-            )
+            return results
         },
         async me(_, __, { userId }) {
             if (userId) {

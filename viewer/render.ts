@@ -2,6 +2,7 @@ import { ReactNode, createElement } from 'react'
 import {
     BooqElementNode, BooqNode, pathToString,
     pathInRange, samePath, pathLessThan, BooqPath, BooqRange, pathToId,
+    BooqId,
 } from '@/core'
 
 export type Augmentation = {
@@ -11,16 +12,16 @@ export type Augmentation = {
 }
 
 type RenderContext = {
-    booqId: string,
+    booqId: BooqId,
     path: BooqPath,
     range: BooqRange,
     parent?: BooqElementNode,
     withinAnchor?: boolean,
     augmentations: Augmentation[],
     onAugmentationClick?: (id: string) => void,
-    hrefForPath?: (booqId: string, path: BooqPath) => string,
+    hrefForPath?: (booqId: BooqId, path: BooqPath) => string,
 }
-export function renderNodes(nodes: BooqNode[], ctx: RenderContext): ReactNode {
+export function renderNodes(nodes: BooqNode[], ctx: RenderContext): ReactNode[] {
     const result = nodes.map(
         (n, idx) => renderNode(n, {
             ...ctx,
@@ -35,6 +36,8 @@ function renderNode(node: BooqNode, ctx: RenderContext): ReactNode {
             switch (ctx.parent?.name) {
                 case 'table': case 'tbody': case 'tr':
                     return null
+                case 'style':
+                    return node.content
                 default:
                     return renderTextNode(node.content, ctx)
             }
@@ -96,9 +99,10 @@ function getProps(node: BooqElementNode, { path, booqId, range, hrefForPath }: R
         ...node.attrs,
         id: pathToId(path),
         className: node.pph
-            ? 'booq-pph' : undefined,
-        style: node.style,
+            ? (node.attrs?.className ? `booq-pph ${node.attrs.className}` : 'booq-pph')
+            : node.attrs?.className,
         key: pathToString(path),
+        style: node.style,
         href: node.ref
             ? (
                 pathInRange(node.ref, range)
@@ -122,7 +126,7 @@ function isExternalSrc(src: string) {
     return src.startsWith('http://') || src.startsWith('https://') || src.startsWith('www.')
 }
 
-function imageFullSrc(booqId: string, src: string) {
+function imageFullSrc(booqId: BooqId, src: string) {
     // TODO: investigate why we need this hack for certain epubs
     if (src.startsWith('../')) {
         src = src.substring('../'.length)
@@ -131,12 +135,25 @@ function imageFullSrc(booqId: string, src: string) {
 }
 
 function getChildren(node: BooqElementNode, ctx: RenderContext) {
-    return node.children?.length
-        ? renderNodes(node.children, {
-            ...ctx,
-            parent: node,
-            withinAnchor: ctx.withinAnchor || node.name === 'a',
-        })
+    const children = node.children && renderNodes(node.children, {
+        ...ctx,
+        parent: node,
+        withinAnchor: ctx.withinAnchor || node.name === 'a',
+    })
+    if (node.css) {
+        const styleNode = createElement(
+            'style',
+            {
+                key: `${pathToString(ctx.path)}-style`,
+            },
+            node.css,
+        )
+        return children
+            ? [styleNode, ...children]
+            : styleNode
+    }
+    return (children?.length ?? 0) > 0
+        ? children
         : null
 }
 

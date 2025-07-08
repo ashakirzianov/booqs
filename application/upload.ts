@@ -1,3 +1,4 @@
+import { BooqId } from '@/core'
 import { uploadEpubAction } from '@/data/upload'
 import { useState } from 'react'
 
@@ -14,7 +15,7 @@ export function useUpload() {
     } | {
         state: 'success',
         data: {
-            id: string,
+            booqId: BooqId,
             title: string | undefined,
             coverUrl: string | undefined,
         },
@@ -31,7 +32,7 @@ export function useUpload() {
             setState({
                 state: 'success',
                 data: {
-                    id: result.id,
+                    booqId: result.booqId,
                     title: result.title,
                     coverUrl: result.coverUrl,
                 }

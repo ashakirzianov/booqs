@@ -58,8 +58,8 @@ export function Modal({
         className='pointer-events-auto transition duration-300 shadow-xl rounded bg-background
   dark:shadow-slate-800 dark:shadow
   backdrop:backdrop-blur-xs
-  opacity-0 open:opacity-100 open:translate-y-1/2 p-0
-  fixed left-1/2 top-0 -translate-x-1/2 -translate-y-1/2'
+  opacity-0 open:opacity-100 p-0
+  fixed left-1/2 top-0 -translate-x-1/2'
     >
         {children}
     </dialog>

@@ -3,13 +3,13 @@ import { NoteNodeComp } from './NoteNode'
 import { PathNotesNode } from './nodes'
 import { booqHref } from '@/application/href'
 import Link from 'next/link'
-import { AccountDisplayData, TableOfContentsItem } from '@/core'
+import { AccountDisplayData, BooqId, TableOfContentsItem } from '@/core'
 
 export function PathNotesNodeComp({
     booqId, user,
     node: { items, notes },
 }: {
-    booqId: string,
+    booqId: BooqId,
     user: AccountDisplayData | undefined,
     node: PathNotesNode,
 }) {
@@ -31,7 +31,7 @@ export function PathNotesNodeComp({
 }
 
 function Path({ items, booqId }: {
-    booqId: string,
+    booqId: BooqId,
     items: Array<TableOfContentsItem | undefined>,
 }) {
     return <div className='flex flex-wrap'>
@@ -40,7 +40,7 @@ function Path({ items, booqId }: {
                 : <Fragment key={idx}>
                     {idx === 0 ? null : <div className='mr-base'>/</div>}
                     <div className='font-bold mr-base hover:underline'>
-                        <Link href={booqHref({ id: booqId, path: item.path })}>
+                        <Link href={booqHref({ booqId, path: item.path })}>
                             {item.title}
                         </Link>
                     </div>
