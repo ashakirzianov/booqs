@@ -1,5 +1,5 @@
 'use client'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import * as clipboard from 'clipboard-polyfill'
 import { AccountDisplayData, BooqId, BooqNote, BooqRange } from '@/core'
@@ -9,7 +9,7 @@ import { BooqSelection } from '@/viewer'
 import { ProfileBadge } from '@/components/ProfilePicture'
 import { resolveNoteColor, noteColorNames } from '@/application/common'
 import { useBooqNotes } from '@/application/notes'
-import { CopilotIcon, CopyIcon, LinkIcon, RemoveIcon, ShareIcon } from '@/components/Icons'
+import { CopilotIcon, CommentIcon, CopyIcon, LinkIcon, RemoveIcon, ShareIcon } from '@/components/Icons'
 
 type EmptyTarget = {
     kind: 'empty',
@@ -26,8 +26,12 @@ type NoteTarget = {
     kind: 'note',
     note: BooqNote,
 }
+type CommentTarget = {
+    kind: 'comment',
+    selection: BooqSelection,
+}
 export type ContextMenuTarget =
-    | EmptyTarget | SelectionTarget | QuoteTarget | NoteTarget
+    | EmptyTarget | SelectionTarget | QuoteTarget | NoteTarget | CommentTarget
 
 export function ContextMenuContent({
     target, ...rest
@@ -45,6 +49,8 @@ export function ContextMenuContent({
             return <QuoteTargetMenu target={target} {...rest} />
         case 'note':
             return <NoteTargetMenu target={target} {...rest} />
+        case 'comment':
+            return <CommentTargetMenu target={target} {...rest} />
         default:
             return null
     }
@@ -62,6 +68,7 @@ function SelectionTargetMenu({
     useCopyQuote(rest.booqId, selection)
     return <>
         <AddHighlightItem {...rest} selection={selection} />
+        <AddCommentItem user={rest.user} setTarget={rest.setTarget} selection={selection} />
         <CopilotItem {...rest} selection={selection} />
         <CopyQuoteItem {...rest} selection={selection} />
         <CopyLinkItem {...rest} selection={selection} />
@@ -226,6 +233,28 @@ function AddHighlightItem({
             }
             `}</style>
     </div>
+}
+
+function AddCommentItem({
+    selection, user, setTarget,
+}: {
+    selection: BooqSelection,
+    user: AccountDisplayData | undefined,
+    setTarget: (target: ContextMenuTarget) => void,
+}) {
+    if (!user?.id) {
+        return null
+    }
+    return <MenuItem
+        text='Add comment'
+        icon={<ContextMenuIcon><CommentIcon /></ContextMenuIcon>}
+        callback={() => {
+            setTarget({
+                kind: 'comment',
+                selection,
+            })
+        }}
+    />
 }
 
 function RemoveNoteItem({
@@ -408,6 +437,137 @@ function generateLink(booqId: BooqId, range: BooqRange) {
 function baseUrl() {
     const current = window.location
     return `${current.protocol}//${current.host}`
+}
+
+function CommentTargetMenu({
+    target: { selection }, booqId, user, setTarget,
+}: {
+    target: CommentTarget,
+    booqId: BooqId,
+    user: AccountDisplayData | undefined,
+    setTarget: (target: ContextMenuTarget) => void,
+    updateCopilot?: (selection: BooqSelection) => void,
+}) {
+    const [comment, setComment] = useState('')
+    const { addNote } = useBooqNotes({ booqId, user })
+
+    const handlePost = () => {
+        if (!user?.id || !comment.trim()) return
+
+        const note = addNote({
+            color: 'yellow', // Default color for comments
+            range: selection.range,
+            content: comment.trim(),
+            privacy: 'public',
+        })
+
+        if (note) {
+            setTarget({ kind: 'empty' })
+            removeSelection()
+        }
+    }
+
+    const handleCancel = () => {
+        setTarget({ kind: 'empty' })
+        removeSelection()
+    }
+
+    return <div className='comment-panel'>
+        <div className='quoted-text'>
+            "{selection.text}"
+        </div>
+        <textarea
+            className='comment-input'
+            placeholder='Add a comment...'
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+            rows={3}
+            autoFocus
+        />
+        <div className='button-row'>
+            <button
+                className='cancel-button'
+                onClick={handleCancel}
+            >
+                Cancel
+            </button>
+            <button
+                className='post-button'
+                onClick={handlePost}
+                disabled={!comment.trim()}
+            >
+                Post
+            </button>
+        </div>
+        <style jsx>{`
+            .comment-panel {
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+                padding: 16px;
+                min-width: 300px;
+                max-width: 400px;
+            }
+            .quoted-text {
+                font-style: italic;
+                color: var(--theme-dimmed);
+                font-size: 14px;
+                line-height: 1.4;
+                border-left: 3px solid var(--theme-highlight);
+                padding-left: 12px;
+                margin-bottom: 8px;
+            }
+            .comment-input {
+                width: 100%;
+                padding: 8px 12px;
+                border: 1px solid var(--theme-border);
+                border-radius: 4px;
+                font-family: var(--font-main);
+                font-size: 14px;
+                line-height: 1.4;
+                resize: vertical;
+                min-height: 80px;
+                background: var(--theme-background);
+                color: var(--theme-primary);
+            }
+            .comment-input:focus {
+                outline: none;
+                border-color: var(--theme-action);
+            }
+            .button-row {
+                display: flex;
+                gap: 8px;
+                justify-content: flex-end;
+            }
+            .cancel-button, .post-button {
+                padding: 8px 16px;
+                border: none;
+                border-radius: 4px;
+                font-family: var(--font-main);
+                font-size: 14px;
+                cursor: pointer;
+                transition: opacity 0.2s;
+            }
+            .cancel-button {
+                background: transparent;
+                color: var(--theme-dimmed);
+            }
+            .cancel-button:hover {
+                opacity: 0.8;
+            }
+            .post-button {
+                background: var(--theme-action);
+                color: var(--theme-background);
+            }
+            .post-button:hover:not(:disabled) {
+                opacity: 0.9;
+            }
+            .post-button:disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
+            }
+        `}</style>
+    </div>
 }
 
 function ContextMenuIcon({ children }: {
