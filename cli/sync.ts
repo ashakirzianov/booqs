@@ -1,5 +1,5 @@
 import { inspect } from 'util'
-import { downloadAsset, listObjects, uploadAsset } from '@/backend/blob'
+import { deleteAsset, downloadAsset, listObjects, uploadAsset } from '@/backend/blob'
 import {
     existingAssetIds, pgEpubsBucket, insertPgRecord,
 } from '@/backend/pg'
@@ -21,6 +21,9 @@ export async function sync(options: CliOptions) {
             return
         case 'blob2db':
             await syncBlobToDB(options)
+            return
+        case 'blob-cleanup':
+            await blobCleanup(options)
             return
         default:
             console.info('Unknown command: ', command)
@@ -130,6 +133,50 @@ async function syncBlobToDB(options: CliOptions) {
         })
         await Promise.all(promises)
     }
+}
+
+async function blobCleanup(_options: CliOptions) {
+    info('Cleaning up Blob storage...')
+    const assetIds = await Array.fromAsync(existingBlobAssetIds())
+    function precedence(assetId: string): number {
+        if (assetId.endsWith('-images-3.epub')) return 3
+        if (assetId.endsWith('-images.epub')) return 2
+        if (assetId.endsWith('.epub')) return 1
+        return 0
+    }
+
+    const bestAssets = new Map<string, string>()
+
+    for (const assetId of assetIds) {
+        const numericId = idFromAssetId(assetId)
+        if (!numericId) continue
+
+        const currentBest = bestAssets.get(numericId)
+        if (!currentBest || precedence(assetId) > precedence(currentBest)) {
+            bestAssets.set(numericId, assetId)
+        }
+    }
+
+    const toKeep = new Set(bestAssets.values())
+    const toDelete = assetIds.filter(assetId => !toKeep.has(assetId))
+    info(`Found ${toDelete.length} assets to delete from blob storage`)
+    let count = 0
+    for (const assetId of toDelete) {
+        info(`Deleting asset: ${assetId}`)
+        try {
+            const result = await deleteAsset(pgEpubsBucket, assetId)
+            if (result.$metadata.httpStatusCode === 204) {
+                info(`Successfully deleted asset: ${assetId}`)
+                count++
+            } else {
+                warn(`Failed to delete asset ${assetId}: ${result.$metadata.httpStatusCode}`)
+            }
+        }
+        catch (err) {
+            warn(`Failed to delete asset ${assetId}`, err)
+        }
+    }
+    info(`Deleted ${count} assets from blob storage`)
 }
 
 async function* existingBlobIds() {
