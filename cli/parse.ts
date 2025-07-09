@@ -89,16 +89,28 @@ async function processEpubFile(filePath: string, options: CliOptions) {
     const { value: booq } = await parseEpub({
         epub, diags,
     })
+    if (options.switches['validate'] === 'true') {
+        await validateEpub({
+            epub, diags,
+        })
+    }
     if (!booq) {
         diags?.push({
             message: `Can't parse file`,
             severity: 'critical',
         })
+        return { booq, epub, diags }
     }
-    if (options.switches['validate'] === 'true') {
-        await validateEpub({
-            epub, diags,
-        })
+    if (options.switches['toc'] === 'true') {
+        const toc = booq.toc
+        console.info(`Table of Contents for ${filePath}: ${pretty(toc)}`)
+    }
+    if (options.switches['navigations'] === 'true') {
+        const navigations = await epub.navigations()
+        for (const nav of navigations) {
+            console.info(`Navigation: ${nav.title}, Type: ${nav.type}`)
+            console.info(pretty(nav))
+        }
     }
     return {
         booq, epub, diags,
@@ -108,8 +120,6 @@ async function processEpubFile(filePath: string, options: CliOptions) {
 function filterDiags(diags: Diagnostic[], options: CliOptions): Diagnostic[] {
     return diags.filter(diag => {
         return diag.severity !== 'info'
-        // && !diag.message?.startsWith('Missing attribute #text')
-        // && !diag.message?.startsWith('Multiple titles found in metadata')
     })
 }
 
