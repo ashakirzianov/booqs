@@ -57,6 +57,10 @@ function renderNode(node: BooqNode, ctx: RenderContext): ReactNode {
 function renderTextNode(text: string, {
     path, augmentations, onAugmentationClick,
 }: RenderContext): ReactNode {
+    const isWhitespace = text.trim().length === 0
+    if (isWhitespace) {
+        return null
+    }
     const spans = applyAugmentations({
         text, path: [...path, 0],
         id: undefined,
@@ -119,7 +123,16 @@ function getProps(node: BooqElementNode, { path, booqId, range, hrefForPath }: R
                     : imageFullSrc(booqId, node.attrs.src)
             )
             : undefined,
+        xlinkHref: node.attrs?.xlinkHref
+            ? (isImageLink(node.attrs?.xlinkHref)
+                ? imageFullSrc(booqId, node.attrs?.xlinkHref)
+                : node.attrs.xlinkHref)
+            : undefined,
     }
+}
+
+function isImageLink(link: string) {
+    return link.endsWith('.png') || link.endsWith('.jpg') || link.endsWith('.jpeg') || link.endsWith('.gif')
 }
 
 function isExternalSrc(src: string) {
