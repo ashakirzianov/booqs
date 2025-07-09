@@ -132,7 +132,6 @@ function getProps(node: BooqElementNode, { path, booqId, range, hrefForPath }: R
 }
 
 function isImageLink(link: string) {
-    console.log('isImageLink', link)
     return link.endsWith('.png') || link.endsWith('.jpg') || link.endsWith('.jpeg') || link.endsWith('.gif')
 }
 
