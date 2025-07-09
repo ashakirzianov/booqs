@@ -82,7 +82,7 @@ async function syncBlobToDB(options: CliOptions) {
         info(`Processing batch ${count++} with ${batch.length} assets...`)
         const promises = batch.map(async (assetId) => {
             try {
-                if (existingAssetIdsSet.has(assetId)) {
+                if (!all && existingAssetIdsSet.has(assetId)) {
                     info(`Skipping ${assetId} because it already exists in DB`)
                     return false
                 }
@@ -164,17 +164,6 @@ async function* makeBatches<T>(generator: AsyncGenerator<T>, batchSize: number) 
     }
     if (batch.length > 0) {
         yield batch
-    }
-}
-
-async function* filter<T>(
-    generator: AsyncGenerator<T>,
-    predicate: (item: T) => boolean,
-) {
-    for await (const item of generator) {
-        if (predicate(item)) {
-            yield item
-        }
     }
 }
 
