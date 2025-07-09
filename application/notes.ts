@@ -87,6 +87,7 @@ export function useBooqNotes({
             start_path: start,
             end_path: end,
             content: content ?? null,
+            privacy,
         }
 
         const now = new Date().toISOString()
