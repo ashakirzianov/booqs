@@ -28,7 +28,7 @@ type NoteTarget = {
 }
 type CommentTarget = {
     kind: 'comment',
-    selection: BooqSelection,
+    parent: SelectionTarget | QuoteTarget | NoteTarget,
 }
 export type ContextMenuTarget =
     | EmptyTarget | SelectionTarget | QuoteTarget | NoteTarget | CommentTarget
@@ -57,7 +57,7 @@ export function ContextMenuContent({
 }
 
 function SelectionTargetMenu({
-    target: { selection }, ...rest
+    target, ...rest
 }: {
     target: SelectionTarget,
     booqId: BooqId,
@@ -65,10 +65,11 @@ function SelectionTargetMenu({
     setTarget: (target: ContextMenuTarget) => void,
     updateCopilot?: (selection: BooqSelection) => void,
 }) {
+    const { selection } = target
     useCopyQuote(rest.booqId, selection)
     return <>
         <AddHighlightItem {...rest} selection={selection} />
-        <AddCommentItem user={rest.user} setTarget={rest.setTarget} selection={selection} />
+        <AddCommentItem {...rest} target={target} />
         <CopilotItem {...rest} selection={selection} />
         <CopyQuoteItem {...rest} selection={selection} />
         <CopyLinkItem {...rest} selection={selection} />
@@ -76,7 +77,7 @@ function SelectionTargetMenu({
 }
 
 function QuoteTargetMenu({
-    target: { selection }, ...rest
+    target, ...rest
 }: {
     target: QuoteTarget,
     booqId: BooqId,
@@ -84,15 +85,17 @@ function QuoteTargetMenu({
     setTarget: (target: ContextMenuTarget) => void,
     updateCopilot?: (selection: BooqSelection) => void,
 }) {
+    const { selection } = target
     return <>
         <AddHighlightItem {...rest} selection={selection} />
+        <AddCommentItem {...rest} target={target} />
         <CopilotItem {...rest} selection={selection} />
         <CopyTextItem {...rest} selection={selection} />
     </>
 }
 
 function NoteTargetMenu({
-    target: { note }, user, ...rest
+    target, user, ...rest
 }: {
     target: NoteTarget,
     booqId: BooqId,
@@ -100,6 +103,7 @@ function NoteTargetMenu({
     setTarget: (target: ContextMenuTarget) => void,
     updateCopilot?: (selection: BooqSelection) => void,
 }) {
+    const { note } = target
     const isOwnNote = user?.id === note.author?.id
     const selection = {
         range: note.range,
@@ -118,6 +122,7 @@ function NoteTargetMenu({
         {!isOwnNote ? null :
             <RemoveNoteItem  {...rest} user={user} note={note} />
         }
+        <AddCommentItem {...rest} user={user} target={target} />
         <CopilotItem {...rest} selection={selection} />
         <CopyQuoteItem {...rest} selection={selection} />
         <CopyLinkItem {...rest} selection={selection} />
@@ -236,9 +241,9 @@ function AddHighlightItem({
 }
 
 function AddCommentItem({
-    selection, user, setTarget,
+    target, user, setTarget,
 }: {
-    selection: BooqSelection,
+    target: SelectionTarget | QuoteTarget | NoteTarget,
     user: AccountDisplayData | undefined,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
@@ -251,7 +256,7 @@ function AddCommentItem({
         callback={() => {
             setTarget({
                 kind: 'comment',
-                selection,
+                parent: target,
             })
         }}
     />
@@ -440,7 +445,7 @@ function baseUrl() {
 }
 
 function CommentTargetMenu({
-    target: { selection }, booqId, user, setTarget,
+    target: { parent }, booqId, user, setTarget,
 }: {
     target: CommentTarget,
     booqId: BooqId,
@@ -450,6 +455,11 @@ function CommentTargetMenu({
 }) {
     const [comment, setComment] = useState('')
     const { addNote } = useBooqNotes({ booqId, user })
+
+    // Extract selection from parent target
+    const selection: BooqSelection = parent.kind === 'note'
+        ? { range: parent.note.range, text: parent.note.text }
+        : parent.selection
 
     const handlePost = () => {
         if (!user?.id || !comment.trim()) return
@@ -468,13 +478,12 @@ function CommentTargetMenu({
     }
 
     const handleCancel = () => {
-        setTarget({ kind: 'empty' })
-        removeSelection()
+        setTarget(parent)
     }
 
     return <div className='comment-panel'>
         <div className='quoted-text'>
-            "{selection.text}"
+            &ldquo;{selection.text}&rdquo;
         </div>
         <textarea
             className='comment-input'
