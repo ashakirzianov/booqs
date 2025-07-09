@@ -9,6 +9,8 @@ export type AccountData = {
 }
 export type AccountDisplayData = Pick<AccountData, 'id' | 'name' | 'profilePictureURL'>
 export type NoteColor = string // TODO: rename?
+export type NotePrivacy = 'private' | 'public'
+
 export type NoteData = {
     id: string,
     booqId: BooqId,
@@ -16,6 +18,7 @@ export type NoteData = {
     range: BooqRange,
     color: string,
     content?: string,
+    privacy: NotePrivacy,
     createdAt: string,
     updatedAt: string,
 }

@@ -1,6 +1,8 @@
 import { BooqId, BooqRange } from '@/core'
 import { sql } from './db'
 
+export type NotePrivacy = 'private' | 'public'
+
 export type DbNote = {
   id: string,
   author_id: string,
@@ -9,6 +11,7 @@ export type DbNote = {
   end_path: number[],
   color: string,
   content: string | null,
+  privacy: NotePrivacy,
   created_at: string,
   updated_at: string,
 }
@@ -30,11 +33,13 @@ export async function noteForId(id: string): Promise<DbNote | null> {
 export async function notesFor({
   booqId,
   authorId,
+  privacy,
   offset,
   limit,
 }: {
   booqId?: string,
   authorId?: string,
+  privacy?: NotePrivacy,
   offset?: number,
   limit?: number,
 }): Promise<DbNote[]> {
@@ -43,6 +48,7 @@ export async function notesFor({
       WHERE TRUE
       ${booqId !== undefined ? sql`AND booq_id = ${booqId}` : sql``}
       ${authorId !== undefined ? sql`AND author_id = ${authorId}` : sql``}
+      ${privacy !== undefined ? sql`AND privacy = ${privacy}` : sql``}
       ORDER BY created_at
       ${offset !== undefined ? sql`OFFSET ${offset}` : sql``}
       ${limit !== undefined ? sql`LIMIT ${limit}` : sql``}
@@ -68,6 +74,7 @@ export async function addNote({
   range,
   color,
   content,
+  privacy = 'private',
 }: {
   id: string,
   authorId: string,
@@ -75,13 +82,14 @@ export async function addNote({
   range: BooqRange,
   color: string,
   content?: string,
+  privacy?: NotePrivacy,
 }): Promise<DbNote> {
   const [note] = await sql`
       INSERT INTO notes (
-        id, author_id, booq_id, start_path, end_path, color, content
+        id, author_id, booq_id, start_path, end_path, color, content, privacy
       )
       VALUES (
-        ${id}, ${authorId}, ${booqId}, ${range.start}, ${range.end}, ${color}, ${content ?? null}
+        ${id}, ${authorId}, ${booqId}, ${range.start}, ${range.end}, ${color}, ${content ?? null}, ${privacy}
       )
       RETURNING *
     `
@@ -101,14 +109,15 @@ export async function removeNote({ id, authorId }: {
 }
 
 export async function updateNote({
-  id, authorId, color, content,
+  id, authorId, color, content, privacy,
 }: {
   id: string,
   authorId: string,
   color?: string,
   content?: string,
+  privacy?: NotePrivacy,
 }): Promise<DbNote | null> {
-  if (color === undefined && content === undefined) return null
+  if (color === undefined && content === undefined && privacy === undefined) return null
 
   const [row] = await sql`
       UPDATE notes
@@ -116,6 +125,7 @@ export async function updateNote({
         updated_at = NOW()
         ${color !== undefined ? sql`, color = ${color}` : sql``}
         ${content !== undefined ? sql`, content = ${content}` : sql``}
+        ${privacy !== undefined ? sql`, privacy = ${privacy}` : sql``}
       WHERE id = ${id} AND author_id = ${authorId}
       RETURNING *
     `
