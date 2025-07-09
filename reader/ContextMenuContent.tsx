@@ -61,7 +61,7 @@ function SelectionTargetMenu({
 }) {
     useCopyQuote(rest.booqId, selection)
     return <>
-        <AddNoteItem {...rest} selection={selection} />
+        <AddHighlightItem {...rest} selection={selection} />
         <CopilotItem {...rest} selection={selection} />
         <CopyQuoteItem {...rest} selection={selection} />
         <CopyLinkItem {...rest} selection={selection} />
@@ -78,7 +78,7 @@ function QuoteTargetMenu({
     updateCopilot?: (selection: BooqSelection) => void,
 }) {
     return <>
-        <AddNoteItem {...rest} selection={selection} />
+        <AddHighlightItem {...rest} selection={selection} />
         <CopilotItem {...rest} selection={selection} />
         <CopyTextItem {...rest} selection={selection} />
     </>
@@ -174,7 +174,7 @@ function AuthorItem({ name, pictureUrl }: {
     </div>
 }
 
-function AddNoteItem({
+function AddHighlightItem({
     selection, booqId, user, setTarget,
 }: {
     selection: BooqSelection,
