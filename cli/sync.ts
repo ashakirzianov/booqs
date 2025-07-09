@@ -1,7 +1,7 @@
 import { inspect } from 'util'
 import { downloadAsset, listObjects, uploadAsset } from '@/backend/blob'
 import {
-    existingIds, pgEpubsBucket, insertPgRecord,
+    existingAssetIds, pgEpubsBucket, insertPgRecord,
 } from '@/backend/pg'
 import { parseEpubFile } from '@/parser'
 import { uploadBooqImages } from '@/backend/images'
@@ -74,24 +74,18 @@ async function syncBlobToDB(options: CliOptions) {
     const retryProblems = options.switches['retry-problems'] === 'true'
     const needToUploadImages = options.switches['upload-images'] === 'true'
     const all = options.switches['all'] === 'true'
-    const existing = await existingIds()
-    info(`Found ${existing.length} ids in DB`)
-    const existingIdsSet = new Set(existing)
-    const filteredGenerator = filter(existingBlobAssetIds(), (id) => {
-        if (all) {
-            return true
-        }
-        if (existingIdsSet.has(id)) {
-            info(`Skipping ${id} because it already exists in DB`)
-            return false
-        }
-        return true
-    })
+    const assetIdsInDb = await existingAssetIds()
+    const existingAssetIdsSet = new Set(assetIdsInDb)
+    info(`Found ${existingAssetIdsSet.size} ids in DB`)
     let count = 0
-    for await (const batch of makeBatches(filteredGenerator, batchSize)) {
+    for await (const batch of makeBatches(existingBlobAssetIds(), batchSize)) {
         info(`Processing batch ${count++} with ${batch.length} assets...`)
         const promises = batch.map(async (assetId) => {
             try {
+                if (existingAssetIdsSet.has(assetId)) {
+                    info(`Skipping ${assetId} because it already exists in DB`)
+                    return false
+                }
                 if (!retryProblems && await hasProblems(assetId)) {
                     info(`Skipping ${assetId} because it has problems`)
                     return false

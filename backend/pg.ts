@@ -169,6 +169,14 @@ export async function existingIds(): Promise<string[]> {
   return rows.map(r => r.id)
 }
 
+export async function existingAssetIds(): Promise<string[]> {
+  const rows = await sql`
+    SELECT asset_id
+    FROM pg_assets
+  `
+  return rows.map(r => r.asset_id)
+}
+
 async function insertDbCard(card: DbPgCard): Promise<boolean> {
   const rows = await sql`
     INSERT INTO pg_assets (id, asset_id, meta)
