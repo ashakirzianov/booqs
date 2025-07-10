@@ -18,7 +18,7 @@ import { useAuth } from '@/application/auth'
 import { useBooqNotes } from '@/application/notes'
 import { AccountButton } from '@/components/AccountButton'
 import { usePathname } from 'next/navigation'
-import { BackIcon, TocIcon } from '@/components/Icons'
+import { BackIcon, TocIcon, CommentIcon } from '@/components/Icons'
 import Link from 'next/link'
 import { useScrollToQuote } from './useScrollToQuote'
 import { useScrollHandler } from './useScrollHandler'
@@ -64,6 +64,9 @@ export function Reader({
         toggleNavigationOpen, closeNavigation,
         toggleNavigationSelection,
     } = useNavigationState()
+
+    const [rightPanelOpen, setRightPanelOpen] = React.useState(false)
+    const toggleRightPanelOpen = () => setRightPanelOpen(prev => !prev)
     const NavigationContent = <NavigationPanel
         booqId={booq.booqId}
         title={booq.meta.title ?? 'Untitled'}
@@ -79,6 +82,15 @@ export function Reader({
         selected={navigationOpen}
     >
         <TocIcon />
+    </PanelButton>
+
+    const RightPanelContent = null
+
+    const RightPanelButton = <PanelButton
+        onClick={toggleRightPanelOpen}
+        selected={rightPanelOpen}
+    >
+        <CommentIcon />
     </PanelButton>
 
     const filteredNotes = useMemo(
@@ -147,6 +159,7 @@ export function Reader({
     </>
 
     const RightButtons = <>
+        {RightPanelButton}
         <ThemerButton />
         <AccountButton
             user={user}
@@ -157,7 +170,8 @@ export function Reader({
 
     return <ReaderLayout
         isControlsVisible={isControlsVisible}
-        isNavigationOpen={navigationOpen}
+        isLeftPanelOpen={navigationOpen}
+        isRightPanelOpen={rightPanelOpen}
         BooqContent={<div style={{
             fontFamily: 'var(--font-book)',
             fontSize: `${fontScale}%`,
@@ -185,9 +199,10 @@ export function Reader({
         Copilot={null}
         LeftButtons={LeftButtons}
         RightButtons={RightButtons}
-        CurrentPage={<PageLabel text={pagesLabel} />}
-        PagesLeft={<PageLabel text={leftLabel} />}
-        NavigationContent={NavigationContent}
+        LeftFooter={<PageLabel text={pagesLabel} />}
+        RightFooter={<PageLabel text={leftLabel} />}
+        LeftPanelContent={NavigationContent}
+        RightPanelContent={RightPanelContent}
     />
 }
 
