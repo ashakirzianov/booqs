@@ -2,20 +2,18 @@
 import '@/app/wdyr'
 
 import React, { useCallback, useMemo, useState } from 'react'
-import { BooqAnchor, BooqId, BooqNote, BooqPath, BooqRange, PartialBooqData, positionForPath, samePath, textForRange } from '@/core'
+import { BooqAnchor, BooqId, BooqNote, BooqRange, PartialBooqData, textForRange } from '@/core'
 import { BorderButton, PanelButton } from '@/components/Buttons'
 import { booqHref, feedHref } from '@/application/href'
 import {
     BooqContent, getAugmentationElement, getAugmentationText,
     Augmentation,
     useOnBooqClick,
-    useOnBooqScroll,
 } from '@/viewer'
 import { useContextMenu, type ContextMenuState } from './ContextMenu'
 import { ReaderLayout } from './ReaderLayout'
-import { resolveNoteColor, currentSource, pageForPosition, quoteColor } from '@/application/common'
+import { resolveNoteColor, quoteColor } from '@/application/common'
 import { NavigationPanel, useNavigationState } from './NavigationPanel'
-import { reportBooqHistory } from '@/data/user'
 import { ThemerButton } from '@/components/Themer'
 import { useFontScale } from '@/application/theme'
 import { filterNotes } from './nodes'
@@ -26,6 +24,7 @@ import { usePathname } from 'next/navigation'
 import { BackIcon, Spinner, TocIcon } from '@/components/Icons'
 import Link from 'next/link'
 import { useScrollToQuote } from './useScrollToQuote'
+import { useScrollHandler } from './useScrollHandler'
 
 export function Reader({
     booq, quote,
@@ -49,11 +48,8 @@ export function Reader({
     useScrollToQuote(quote)
 
     const {
-        onScroll, currentPage, totalPages, leftPages,
+        currentPage, totalPages, leftPages,
     } = useScrollHandler(booq)
-    useOnBooqScroll(onScroll, {
-        throttle: 500,
-    })
     const range: BooqRange = useMemo(() => ({
         start: booq.fragment.current.path,
         end: booq.fragment.next?.path ?? [booq.fragment.nodes.length],
@@ -285,34 +281,6 @@ function useAugmentations({
     }
 }
 
-function useScrollHandler({ booqId, fragment, meta: { length } }: PartialBooqData) {
-    const [currentPath, setCurrentPath] = useState(fragment.current.path)
-
-    const position = positionForPath(fragment.nodes, currentPath)
-    const nextChapter = fragment.next
-        ? positionForPath(fragment.nodes, fragment.next.path)
-        : length
-    const currentPage = pageForPosition(position) + 1
-    const totalPages = pageForPosition(length)
-    const chapter = pageForPosition(nextChapter)
-    const leftPages = chapter - currentPage + 1
-
-    const onScroll = function (path: BooqPath) {
-        if (!samePath(path, currentPath)) {
-            setCurrentPath(path)
-            reportBooqHistory({
-                booqId,
-                path,
-                source: currentSource(),
-            })
-        }
-    }
-    return {
-        currentPath,
-        currentPage, totalPages, leftPages,
-        onScroll,
-    }
-}
 
 function AnchorButton({ booqId, anchor, title }: {
     booqId: BooqId,
