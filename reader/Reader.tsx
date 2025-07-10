@@ -20,7 +20,7 @@ import { useAuth } from '@/application/auth'
 import { useBooqNotes } from '@/application/notes'
 import { AccountButton } from '@/components/AccountButton'
 import { usePathname } from 'next/navigation'
-import { BackIcon, Spinner, TocIcon } from '@/components/Icons'
+import { BackIcon, TocIcon } from '@/components/Icons'
 import Link from 'next/link'
 import { useScrollToQuote } from './useScrollToQuote'
 import { useScrollHandler } from './useScrollHandler'
@@ -158,39 +158,6 @@ export function Reader({
         CurrentPage={<PageLabel text={pagesLabel} />}
         PagesLeft={<PageLabel text={leftLabel} />}
         NavigationContent={NavigationContent}
-    />
-}
-
-export function LoadingBooqScreen() {
-    return <ReaderLayout
-        isControlsVisible={true}
-        isNavigationOpen={false}
-        BooqContent={<div style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            alignSelf: 'center',
-            width: '100vw',
-            height: '100vh',
-            fontSize: 'xx-large',
-        }}>
-            <Spinner />
-        </div>}
-        PrevButton={null}
-        NextButton={null}
-        ContextMenu={null}
-        Copilot={null}
-        MainButton={<Link href={feedHref()}>
-            <PanelButton>
-                <BackIcon />
-            </PanelButton>
-        </Link>}
-        NavigationButton={null}
-        ThemerButton={<ThemerButton />}
-        AccountButton={<AccountButton />}
-        CurrentPage={null}
-        PagesLeft={null}
-        NavigationContent={null}
     />
 }
 
