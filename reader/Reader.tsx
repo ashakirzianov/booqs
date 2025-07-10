@@ -1,8 +1,8 @@
 'use client'
 import '@/app/wdyr'
 
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { BooqAnchor, BooqId, BooqNote, BooqPath, BooqRange, PartialBooqData, pathToId, positionForPath, samePath, textForRange } from '@/core'
+import React, { useCallback, useMemo, useState } from 'react'
+import { BooqAnchor, BooqId, BooqNote, BooqPath, BooqRange, PartialBooqData, positionForPath, samePath, textForRange } from '@/core'
 import { BorderButton, PanelButton } from '@/components/Buttons'
 import { booqHref, feedHref } from '@/application/href'
 import {
@@ -25,6 +25,7 @@ import { AccountButton } from '@/components/AccountButton'
 import { usePathname } from 'next/navigation'
 import { BackIcon, Spinner, TocIcon } from '@/components/Icons'
 import Link from 'next/link'
+import { useScrollToQuote } from './useScrollToQuote'
 
 export function Reader({
     booq, quote,
@@ -45,18 +46,7 @@ export function Reader({
         }))
     }, [notes, booq.fragment.nodes])
 
-    const quoteRef = useRef(quote)
-    useEffect(() => {
-        if (quoteRef.current) {
-            const id = pathToId(quoteRef.current.start)
-            const element = document.getElementById(id)
-            if (element) {
-                element.scrollIntoView({
-                    behavior: 'instant',
-                })
-            }
-        }
-    }, [quoteRef])
+    useScrollToQuote(quote)
 
     const {
         onScroll, currentPage, totalPages, leftPages,
