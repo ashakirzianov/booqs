@@ -1,7 +1,7 @@
 'use client'
 import { useCallback, ReactNode, useState, useEffect } from 'react'
 import {
-    getBooqSelection, VirtualElement, getSelectionElement, BooqSelection,
+    getBooqSelection, VirtualElement, getSelectionElement,
 } from '@/viewer'
 import { ContextMenuContent, ContextMenuTarget } from './ContextMenuContent'
 import { useFloater } from '@/components/Floater'
@@ -14,12 +14,11 @@ export type ContextMenuState = {
 }
 
 export function useContextMenu({
-    booqId, user, updateCopilot, closed,
+    booqId, user, closed,
 }: {
     booqId: BooqId,
     user: AccountDisplayData | undefined,
     closed: boolean,
-    updateCopilot: (selection: BooqSelection, anchor: VirtualElement) => void,
 }) {
     const [menuState, setMenuState] = useState<ContextMenuState>({
         target: { kind: 'empty' },
@@ -43,15 +42,6 @@ export function useContextMenu({
                 ...menuState,
                 target,
             })}
-            updateCopilot={selection => {
-                if (menuState.anchor) {
-                    const anchor = menuState.anchor
-                    updateMenuState({
-                        target: { kind: 'empty' },
-                    })
-                    updateCopilot(selection, anchor)
-                }
-            }}
         />
         </div>,
     })
@@ -117,6 +107,7 @@ export function useContextMenu({
         isOpen,
         ContextMenuNode: FloaterNode,
         updateMenuState,
+        menuState,
     }
 }
 

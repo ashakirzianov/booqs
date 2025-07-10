@@ -30,8 +30,13 @@ type CommentTarget = {
     kind: 'comment',
     parent: SelectionTarget | QuoteTarget | NoteTarget,
 }
+type CopilotTarget = {
+    kind: 'copilot',
+    selection: BooqSelection,
+    context: string,
+}
 export type ContextMenuTarget =
-    | EmptyTarget | SelectionTarget | QuoteTarget | NoteTarget | CommentTarget
+    | EmptyTarget | SelectionTarget | QuoteTarget | NoteTarget | CommentTarget | CopilotTarget
 
 export function ContextMenuContent({
     target, ...rest
@@ -40,7 +45,6 @@ export function ContextMenuContent({
     booqId: BooqId,
     user: AccountDisplayData | undefined,
     setTarget: (target: ContextMenuTarget) => void,
-    updateCopilot?: (selection: BooqSelection) => void,
 }) {
     switch (target.kind) {
         case 'selection':
@@ -51,6 +55,8 @@ export function ContextMenuContent({
             return <NoteTargetMenu target={target} {...rest} />
         case 'comment':
             return <CommentTargetMenu target={target} {...rest} />
+        case 'copilot':
+            return null
         default:
             return null
     }
@@ -63,14 +69,13 @@ function SelectionTargetMenu({
     booqId: BooqId,
     user: AccountDisplayData | undefined,
     setTarget: (target: ContextMenuTarget) => void,
-    updateCopilot?: (selection: BooqSelection) => void,
 }) {
     const { selection } = target
     useCopyQuote(rest.booqId, selection)
     return <>
         <AddHighlightItem {...rest} selection={selection} />
         <AddCommentItem {...rest} target={target} />
-        <CopilotItem {...rest} selection={selection} />
+        <CopilotItem selection={selection} setTarget={rest.setTarget} />
         <CopyQuoteItem {...rest} selection={selection} />
         <CopyLinkItem {...rest} selection={selection} />
     </>
@@ -83,13 +88,12 @@ function QuoteTargetMenu({
     booqId: BooqId,
     user: AccountDisplayData | undefined,
     setTarget: (target: ContextMenuTarget) => void,
-    updateCopilot?: (selection: BooqSelection) => void,
 }) {
     const { selection } = target
     return <>
         <AddHighlightItem {...rest} selection={selection} />
         <AddCommentItem {...rest} target={target} />
-        <CopilotItem {...rest} selection={selection} />
+        <CopilotItem selection={selection} setTarget={rest.setTarget} />
         <CopyTextItem {...rest} selection={selection} />
     </>
 }
@@ -101,7 +105,6 @@ function NoteTargetMenu({
     booqId: BooqId,
     user: AccountDisplayData | undefined,
     setTarget: (target: ContextMenuTarget) => void,
-    updateCopilot?: (selection: BooqSelection) => void,
 }) {
     const { note } = target
     const isOwnNote = user?.id === note.author?.id
@@ -123,24 +126,25 @@ function NoteTargetMenu({
             <RemoveNoteItem  {...rest} user={user} note={note} />
         }
         <AddCommentItem {...rest} user={user} target={target} />
-        <CopilotItem {...rest} selection={selection} />
+        <CopilotItem selection={selection} setTarget={rest.setTarget} />
         <CopyQuoteItem {...rest} selection={selection} />
         <CopyLinkItem {...rest} selection={selection} />
     </>
 }
 
-function CopilotItem({ selection, updateCopilot }: {
+function CopilotItem({ selection, setTarget }: {
     selection: BooqSelection,
-    updateCopilot?: (selection: BooqSelection) => void,
+    setTarget: (target: ContextMenuTarget) => void,
 }) {
-    if (updateCopilot === undefined) {
-        return null
-    }
     return <MenuItem
         text='Ask copilot'
         icon={<ContextMenuIcon><CopilotIcon /></ContextMenuIcon>}
         callback={() => {
-            updateCopilot(selection)
+            setTarget({
+                kind: 'copilot',
+                selection,
+                context: 'context placeholder', // Will be set properly by the consumer
+            })
         }}
     />
 }
@@ -451,7 +455,6 @@ function CommentTargetMenu({
     booqId: BooqId,
     user: AccountDisplayData | undefined,
     setTarget: (target: ContextMenuTarget) => void,
-    updateCopilot?: (selection: BooqSelection) => void,
 }) {
     const [comment, setComment] = useState('')
     const { addNote } = useBooqNotes({ booqId, user })
@@ -578,6 +581,7 @@ function CommentTargetMenu({
         `}</style>
     </div>
 }
+
 
 function ContextMenuIcon({ children }: {
     children: React.ReactNode,

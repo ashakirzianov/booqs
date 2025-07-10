@@ -2,7 +2,7 @@
 import '@/app/wdyr'
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { BooqAnchor, BooqId, BooqNote, BooqPath, BooqRange, contextForRange, PartialBooqData, pathToId, positionForPath, samePath, textForRange } from '@/core'
+import { BooqAnchor, BooqId, BooqNote, BooqPath, BooqRange, PartialBooqData, pathToId, positionForPath, samePath, textForRange, contextForRange } from '@/core'
 import { BorderButton, PanelButton } from '@/components/Buttons'
 import { booqHref, feedHref } from '@/application/href'
 import {
@@ -111,26 +111,33 @@ export function Reader({
     const leftLabel = leftPages <= 1 ? 'Last page'
         : `${leftPages} pages left`
 
-    const [copilotState, setCopilotState] = useState<CopilotState>({
-        kind: 'empty',
-    })
-    const copilotVisible = copilotState.kind !== 'empty'
     const {
         ContextMenuNode, isOpen: contextMenuVisible,
         updateMenuState: setMenuState,
+        menuState,
     } = useContextMenu({
         booqId: booq.booqId,
         user,
-        closed: copilotState.kind !== 'empty',
-        updateCopilot(selection, anchor) {
-            setCopilotState({
-                kind: 'selected',
-                selection,
-                anchor,
-                context: contextForRange(booq.fragment.nodes, selection.range, 1000) ?? 'failed',
-            })
-        },
+        closed: false,
     })
+    
+    // Convert copilot target to copilot state
+    const copilotState: CopilotState = useMemo(() => {
+        if (menuState.target.kind === 'copilot') {
+            const target = menuState.target
+            return {
+                kind: 'selected',
+                selection: target.selection,
+                anchor: menuState.anchor!,
+                context: contextForRange(booq.fragment.nodes, target.selection.range, 1000) ?? 'failed',
+            }
+        }
+        return { kind: 'empty' }
+    }, [menuState, booq.fragment.nodes])
+    
+    const copilotVisible = copilotState.kind !== 'empty'
+    const effectiveContextMenuVisible = contextMenuVisible && !copilotVisible
+    
     const onAugmentationClick = useMemo(() => {
         return (id: string) => {
             const next = menuStateForAugmentation(id)
@@ -139,8 +146,7 @@ export function Reader({
             }
         }
     }, [menuStateForAugmentation, setMenuState])
-
-    const isControlsVisible = !contextMenuVisible && !copilotVisible && visible
+    const isControlsVisible = !effectiveContextMenuVisible && !copilotVisible && visible
 
     return <ReaderLayout
         isControlsVisible={isControlsVisible}
@@ -171,7 +177,11 @@ export function Reader({
         ContextMenu={ContextMenuNode}
         Copilot={<Copilot
             state={copilotState}
-            setState={setCopilotState}
+            setState={(state) => {
+                if (state.kind === 'empty') {
+                    setMenuState({ target: { kind: 'empty' } })
+                }
+            }}
             data={{
                 id: booq.booqId,
                 meta: booq.meta,
