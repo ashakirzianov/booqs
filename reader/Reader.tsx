@@ -35,6 +35,11 @@ export function Reader({
     const pathname = usePathname()
     const { user, isLoading: isAuthLoading } = useAuth()
     const fontScale = useFontScale()
+    useScrollToQuote(quote)
+    const {
+        currentPage, totalPages, leftPages,
+    } = useScrollHandler(booq)
+
     const { notes } = useBooqNotes({ booqId: booq.booqId, user })
     const resolvedNotes = useMemo(() => {
         return notes.map<BooqNote>(note => ({
@@ -44,16 +49,6 @@ export function Reader({
             text: textForRange(booq.fragment.nodes, note.range) ?? '',
         }))
     }, [notes, booq.fragment.nodes])
-
-    useScrollToQuote(quote)
-
-    const {
-        currentPage, totalPages, leftPages,
-    } = useScrollHandler(booq)
-    const range: BooqRange = useMemo(() => ({
-        start: booq.fragment.current.path,
-        end: booq.fragment.next?.path ?? [booq.fragment.nodes.length],
-    }), [booq])
 
     const {
         navigationOpen, navigationSelection,
@@ -114,6 +109,11 @@ export function Reader({
         }
     }, [menuStateForAugmentation, setMenuState])
     const isControlsVisible = !contextMenuVisible && visible
+
+    const range: BooqRange = useMemo(() => ({
+        start: booq.fragment.current.path,
+        end: booq.fragment.next?.path ?? [booq.fragment.nodes.length],
+    }), [booq])
 
     return <ReaderLayout
         isControlsVisible={isControlsVisible}
