@@ -80,19 +80,22 @@ async function syncBlobToDB(options: CliOptions) {
     const assetIdsInDb = await existingAssetIds()
     const existingAssetIdsSet = new Set(assetIdsInDb)
     info(`Found ${existingAssetIdsSet.size} ids in DB`)
+    const filteredAssetIds = filterAsyncGenerator(existingBlobAssetIds(), async (assetId) => {
+        if (!all && existingAssetIdsSet.has(assetId)) {
+            info(`Skipping ${assetId} because it already exists in DB`)
+            return false
+        }
+        if (!retryProblems && await hasProblems(assetId)) {
+            info(`Skipping ${assetId} because it has problems`)
+            return false
+        }
+        return true
+    })
     let count = 0
-    for await (const batch of makeBatches(existingBlobAssetIds(), batchSize)) {
+    for await (const batch of makeBatches(filteredAssetIds, batchSize)) {
         info(`Processing batch ${count++} with ${batch.length} assets...`)
         const promises = batch.map(async (assetId) => {
             try {
-                if (!all && existingAssetIdsSet.has(assetId)) {
-                    info(`Skipping ${assetId} because it already exists in DB`)
-                    return false
-                }
-                if (!retryProblems && await hasProblems(assetId)) {
-                    info(`Skipping ${assetId} because it has problems`)
-                    return false
-                }
                 const id = idFromAssetId(assetId)
                 if (!id) {
                     warn(`Couldn't get id from assetId: ${assetId}`)
@@ -132,6 +135,14 @@ async function syncBlobToDB(options: CliOptions) {
             }
         })
         await Promise.all(promises)
+    }
+}
+
+async function* filterAsyncGenerator<T>(generator: AsyncGenerator<T>, predicate: (item: T) => Promise<boolean>) {
+    for await (const item of generator) {
+        if (await predicate(item)) {
+            yield item
+        }
     }
 }
 
