@@ -26,6 +26,7 @@ import { useControlsVisibility } from './useControlsVisibility'
 import { useAugmentations } from './useAugmentations'
 import { useContextMenuState } from './useContextMenuState'
 import { ContextMenuContent } from './ContextMenuContent'
+import { usePageData } from './usePageData'
 
 export function Reader({
     booq, quote,
@@ -38,8 +39,15 @@ export function Reader({
     const fontScale = useFontScale()
     useScrollToQuote(quote)
     const {
-        currentPage, totalPages, leftPages,
-    } = useScrollHandler(booq)
+        currentPath,
+    } = useScrollHandler({
+        booqId: booq.booqId,
+        initialPath: booq.fragment.current.path,
+    })
+    const { currentPage, leftPages, totalPages } = usePageData({
+        booq,
+        currentPath,
+    })
 
     const { notes } = useBooqNotes({ booqId: booq.booqId, user })
     const resolvedNotes = useMemo(() => {
