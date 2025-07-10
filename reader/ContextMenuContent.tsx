@@ -19,7 +19,7 @@ import {
     CopyLinkItem,
     generateQuote,
 } from './ContextMenuItems'
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/navigation'
 import { quoteHref } from '@/application/href'
 
 type EmptyTarget = {
