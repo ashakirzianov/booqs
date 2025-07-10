@@ -2,14 +2,17 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import * as clipboard from 'clipboard-polyfill'
-import { AccountDisplayData, BooqId, BooqNote, BooqRange } from '@/core'
+import { AccountDisplayData, BooqId, BooqNote, BooqRange, BooqMetadata } from '@/core'
 import { MenuItem } from '@/components/Menu'
 import { quoteHref } from '@/application/href'
 import { BooqSelection } from '@/viewer'
 import { ProfileBadge } from '@/components/ProfilePicture'
 import { resolveNoteColor, noteColorNames } from '@/application/common'
 import { useBooqNotes } from '@/application/notes'
-import { CopilotIcon, CommentIcon, CopyIcon, LinkIcon, RemoveIcon, ShareIcon } from '@/components/Icons'
+import { CopilotIcon, CommentIcon, CopyIcon, LinkIcon, RemoveIcon, ShareIcon, Spinner } from '@/components/Icons'
+import { CopilotContext, useCopilotAnswer, useCopilotSuggestions } from '@/application/copilot'
+import { getExtraMetadataValues } from '@/core/meta'
+import { ModalDivider } from '@/components/Modal'
 
 type EmptyTarget = {
     kind: 'empty',
@@ -39,10 +42,11 @@ export type ContextMenuTarget =
     | EmptyTarget | SelectionTarget | QuoteTarget | NoteTarget | CommentTarget | CopilotTarget
 
 export function ContextMenuContent({
-    target, ...rest
+    target, booqMeta, ...rest
 }: {
     target: ContextMenuTarget,
     booqId: BooqId,
+    booqMeta?: BooqMetadata,
     user: AccountDisplayData | undefined,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
@@ -56,7 +60,7 @@ export function ContextMenuContent({
         case 'comment':
             return <CommentTargetMenu target={target} {...rest} />
         case 'copilot':
-            return null
+            return booqMeta ? <CopilotTargetMenu target={target} booqMeta={booqMeta} {...rest} /> : null
         default:
             return null
     }
@@ -582,6 +586,195 @@ function CommentTargetMenu({
     </div>
 }
 
+function CopilotTargetMenu({
+    target, booqId, booqMeta, setTarget,
+}: {
+    target: CopilotTarget,
+    booqId: BooqId,
+    booqMeta: BooqMetadata,
+    user: AccountDisplayData | undefined,
+    setTarget: (target: ContextMenuTarget) => void,
+}) {
+    const { selection, context } = target
+    
+    const copilotContext: CopilotContext = {
+        text: selection.text,
+        context: context,
+        booqId: booqId,
+        title: booqMeta.title ?? 'Unknown',
+        author: booqMeta.authors?.join(', ') ?? 'Unknown author',
+        language: getExtraMetadataValues('language', booqMeta.extra)[0] ?? 'en-US',
+        start: selection.range.start,
+        end: selection.range.end,
+    }
+    
+    const { loading, suggestions } = useCopilotSuggestions(copilotContext)
+    const [question, setQuestion] = useState<string | undefined>(undefined)
+    
+    if (question) {
+        return <CopilotQuestion 
+            context={copilotContext} 
+            question={question} 
+            onBack={() => setQuestion(undefined)}
+            onClose={() => setTarget({ kind: 'empty' })}
+        />
+    }
+    
+    return <div className='copilot-menu'>
+        <div className='quoted-text'>
+            &ldquo;{selection.text}&rdquo;
+        </div>
+        {loading ? (
+            <div className='spinner-container'>
+                <Spinner />
+            </div>
+        ) : (
+            <div className='suggestions-container'>
+                {suggestions.map((suggestion, i) => (
+                    <div key={i}>
+                        <div 
+                            className='suggestion-item'
+                            onClick={() => setQuestion(suggestion)}
+                        >
+                            {`${i + 1}. ${suggestion}`}
+                        </div>
+                        {i < suggestions.length - 1 && <ModalDivider />}
+                    </div>
+                ))}
+            </div>
+        )}
+        <style jsx>{`
+            .copilot-menu {
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+                padding: 16px;
+                min-width: 300px;
+                max-width: 400px;
+                font-family: var(--font-main);
+            }
+            .quoted-text {
+                font-style: italic;
+                color: var(--theme-dimmed);
+                font-size: 14px;
+                line-height: 1.4;
+                border-left: 3px solid var(--theme-highlight);
+                padding-left: 12px;
+                margin-bottom: 8px;
+            }
+            .spinner-container {
+                display: flex;
+                justify-content: center;
+                padding: 20px;
+            }
+            .suggestions-container {
+                display: flex;
+                flex-direction: column;
+            }
+            .suggestion-item {
+                display: flex;
+                cursor: pointer;
+                text-decoration: dotted;
+                color: var(--theme-dimmed);
+                font-size: 16px;
+                font-weight: bold;
+                padding: 12px;
+                transition: all 0.2s;
+            }
+            .suggestion-item:hover {
+                text-decoration: underline;
+                color: var(--theme-highlight);
+            }
+        `}</style>
+    </div>
+}
+
+function CopilotQuestion({ 
+    context, 
+    question, 
+    onBack, 
+    onClose 
+}: {
+    context: CopilotContext,
+    question: string,
+    onBack: () => void,
+    onClose: () => void,
+}) {
+    const { loading, answer } = useCopilotAnswer(context, question)
+    
+    return <div className='copilot-question'>
+        <div className='question-header'>
+            <button className='back-button' onClick={onBack}>← Back</button>
+            <button className='close-button' onClick={onClose}>×</button>
+        </div>
+        <div className='question-text'>
+            <strong>Q: {question}</strong>
+        </div>
+        <ModalDivider />
+        <div className='answer-content'>
+            {loading ? (
+                <div className='spinner-container'>
+                    <Spinner />
+                </div>
+            ) : (
+                <div className='answer-text'>
+                    {answer}
+                </div>
+            )}
+        </div>
+        <style jsx>{`
+            .copilot-question {
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+                padding: 16px;
+                min-width: 300px;
+                max-width: 400px;
+                font-family: var(--font-main);
+            }
+            .question-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+            .back-button, .close-button {
+                background: transparent;
+                border: none;
+                color: var(--theme-dimmed);
+                cursor: pointer;
+                font-size: 14px;
+                padding: 4px 8px;
+                transition: color 0.2s;
+            }
+            .back-button:hover, .close-button:hover {
+                color: var(--theme-primary);
+            }
+            .close-button {
+                font-size: 18px;
+                font-weight: bold;
+            }
+            .question-text {
+                font-size: 14px;
+                line-height: 1.4;
+                color: var(--theme-primary);
+            }
+            .answer-content {
+                flex: 1;
+            }
+            .spinner-container {
+                display: flex;
+                justify-content: center;
+                padding: 20px;
+            }
+            .answer-text {
+                font-size: 14px;
+                line-height: 1.6;
+                color: var(--theme-primary);
+                white-space: pre-wrap;
+            }
+        `}</style>
+    </div>
+}
 
 function ContextMenuIcon({ children }: {
     children: React.ReactNode,

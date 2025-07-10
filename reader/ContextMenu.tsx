@@ -1,12 +1,11 @@
 'use client'
-import { useCallback, ReactNode, useState, useEffect } from 'react'
+import { useCallback, useState, useEffect } from 'react'
 import {
     getBooqSelection, VirtualElement, getSelectionElement,
 } from '@/viewer'
 import { ContextMenuContent, ContextMenuTarget } from './ContextMenuContent'
 import { useFloater } from '@/components/Floater'
-import clsx from 'clsx'
-import { AccountDisplayData, BooqId } from '@/core'
+import { AccountDisplayData, BooqId, BooqMetadata } from '@/core'
 
 export type ContextMenuState = {
     target: ContextMenuTarget,
@@ -14,9 +13,10 @@ export type ContextMenuState = {
 }
 
 export function useContextMenu({
-    booqId, user, closed,
+    booqId, booqMeta, user, closed,
 }: {
     booqId: BooqId,
+    booqMeta?: BooqMetadata,
     user: AccountDisplayData | undefined,
     closed: boolean,
 }) {
@@ -36,6 +36,7 @@ export function useContextMenu({
         setIsOpen,
         Content: <div className='w-40'><ContextMenuContent
             booqId={booqId}
+            booqMeta={booqMeta}
             user={user}
             target={menuState.target}
             setTarget={target => updateMenuState({
@@ -142,16 +143,3 @@ function sameState(a: ContextMenuState, b: ContextMenuState) {
     return false
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function ContextMenuPanel({ content, anchor }: {
-    content: ReactNode,
-    anchor?: VirtualElement,
-}) {
-    return <div id='ctxmenu' className='flex flex-1 flex-col h-full justify-end items-stretch self-stretch pointer-events-none select-none' style={{
-        padding: 'env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)',
-    }}>
-        <div className={clsx('rounded-sm m-base pointer-events-auto bg-background border border-border transition-all', {
-            'translate-y-full opacity-0': !anchor,
-        })}>{content}</div>
-    </div>
-}
