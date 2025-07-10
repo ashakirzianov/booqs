@@ -8,7 +8,7 @@ import { booqHref, feedHref } from '@/application/href'
 import {
     BooqContent,
 } from '@/viewer'
-import { useContextMenu } from './ContextMenu'
+import { useContextMenuFloater } from './useContextMenuFloater'
 import { ReaderLayout } from './ReaderLayout'
 import { NavigationPanel, useNavigationState } from './NavigationPanel'
 import { ThemerButton } from '@/components/Themer'
@@ -25,6 +25,7 @@ import { useScrollHandler } from './useScrollHandler'
 import { useControlsVisibility } from './useControlsVisibility'
 import { useAugmentations } from './useAugmentations'
 import { useContextMenuState } from './useContextMenuState'
+import { ContextMenuContent } from './ContextMenuContent'
 
 export function Reader({
     booq, quote,
@@ -92,14 +93,27 @@ export function Reader({
 
     const { menuState, setMenuState } = useContextMenuState()
 
+    const MenuContent = useMemo(() => {
+        if (menuState.target.kind === 'empty') {
+            return null
+        }
+        return <div><ContextMenuContent
+            booqId={booq.booqId}
+            booqMeta={booq.meta}
+            user={user}
+            target={menuState.target}
+            setTarget={target => setMenuState({
+                ...menuState,
+                target,
+            })}
+        /></div>
+    }, [booq.booqId, booq.meta, user, menuState, setMenuState])
+
     const {
-        ContextMenuNode, isOpen: contextMenuVisible,
-    } = useContextMenu({
-        booqId: booq.booqId,
-        booqMeta: booq.meta,
-        user,
-        closed: false,
-        menuState,
+        ContextMenuNode
+    } = useContextMenuFloater({
+        Content: MenuContent,
+        anchor: menuState.anchor,
         setMenuState,
     })
 
@@ -111,7 +125,7 @@ export function Reader({
             }
         }
     }, [menuStateForAugmentation, setMenuState])
-    const isControlsVisible = !contextMenuVisible && visible
+    const isControlsVisible = (MenuContent === null) && visible
 
     const range: BooqRange = useMemo(() => ({
         start: booq.fragment.current.path,

@@ -46,6 +46,7 @@ export function ContextMenuContent({
 }: {
     target: ContextMenuTarget,
     booqId: BooqId,
+    // TODO: remove this prop, put it into CopilotTarget
     booqMeta?: BooqMetadata,
     user: AccountDisplayData | undefined,
     setTarget: (target: ContextMenuTarget) => void,
@@ -596,7 +597,7 @@ function CopilotTargetMenu({
     setTarget: (target: ContextMenuTarget) => void,
 }) {
     const { selection, context } = target
-    
+
     const copilotContext: CopilotContext = {
         text: selection.text,
         context: context,
@@ -607,19 +608,19 @@ function CopilotTargetMenu({
         start: selection.range.start,
         end: selection.range.end,
     }
-    
+
     const { loading, suggestions } = useCopilotSuggestions(copilotContext)
     const [question, setQuestion] = useState<string | undefined>(undefined)
-    
+
     if (question) {
-        return <CopilotQuestion 
-            context={copilotContext} 
-            question={question} 
+        return <CopilotQuestion
+            context={copilotContext}
+            question={question}
             onBack={() => setQuestion(undefined)}
             onClose={() => setTarget({ kind: 'empty' })}
         />
     }
-    
+
     return <div className='copilot-menu'>
         <div className='quoted-text'>
             &ldquo;{selection.text}&rdquo;
@@ -632,7 +633,7 @@ function CopilotTargetMenu({
             <div className='suggestions-container'>
                 {suggestions.map((suggestion, i) => (
                     <div key={i}>
-                        <div 
+                        <div
                             className='suggestion-item'
                             onClick={() => setQuestion(suggestion)}
                         >
@@ -689,11 +690,11 @@ function CopilotTargetMenu({
     </div>
 }
 
-function CopilotQuestion({ 
-    context, 
-    question, 
-    onBack, 
-    onClose 
+function CopilotQuestion({
+    context,
+    question,
+    onBack,
+    onClose
 }: {
     context: CopilotContext,
     question: string,
@@ -701,7 +702,7 @@ function CopilotQuestion({
     onClose: () => void,
 }) {
     const { loading, answer } = useCopilotAnswer(context, question)
-    
+
     return <div className='copilot-question'>
         <div className='question-header'>
             <button className='back-button' onClick={onBack}>← Back</button>

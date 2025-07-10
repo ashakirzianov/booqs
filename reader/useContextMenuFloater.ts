@@ -1,26 +1,22 @@
 'use client'
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
     getBooqSelection, getSelectionElement,
+    VirtualElement,
 } from '@/viewer'
-import { ContextMenuContent } from './ContextMenuContent'
 import { useFloater } from '@/components/Floater'
-import { AccountDisplayData, BooqId, BooqMetadata } from '@/core'
 import { ContextMenuState, ContextMenuStateSetter } from './useContextMenuState'
 
-export function useContextMenu({
-    booqId, booqMeta, user, closed,
-    menuState, setMenuState,
+export function useContextMenuFloater({
+    anchor, Content,
+    setMenuState,
 }: {
-    booqId: BooqId,
-    booqMeta?: BooqMetadata,
-    user: AccountDisplayData | undefined,
-    closed: boolean,
-    menuState: ContextMenuState,
+    anchor?: VirtualElement,
+    Content: React.ReactNode,
     setMenuState: ContextMenuStateSetter,
 }) {
     const [locked, setLocked] = useState(false)
-    const isOpen = menuState.target.kind !== 'empty' && !locked && !closed
+    const isOpen = !locked && (Content !== null)
 
     const { FloaterNode, setReference, floating } = useFloater({
         isOpen,
@@ -29,24 +25,14 @@ export function useContextMenu({
                 setMenuState({ target: { kind: 'empty' } })
             }
         },
-        Content: <div className='w-40'><ContextMenuContent
-            booqId={booqId}
-            booqMeta={booqMeta}
-            user={user}
-            target={menuState.target}
-            setTarget={target => setMenuState({
-                ...menuState,
-                target,
-            })}
-        />
-        </div>,
+        Content,
     })
 
     useEffect(() => {
-        if (menuState.anchor) {
-            setReference(menuState.anchor)
+        if (anchor) {
+            setReference(anchor)
         }
-    }, [menuState.anchor, setReference])
+    }, [anchor, setReference])
 
     useEffect(() => {
         function handleSelectionChange() {
@@ -91,9 +77,7 @@ export function useContextMenu({
     }, [setMenuState, setLocked, floating])
 
     return {
-        isOpen,
         ContextMenuNode: FloaterNode,
-        menuState,
     }
 }
 
