@@ -3,12 +3,12 @@ import styles from './ReaderLayout.module.css'
 
 type ControlsProps = {
     isControlsVisible: boolean,
-    isNavigationOpen: boolean,
+    isLeftPanelOpen: boolean,
     LeftButtons: ReactNode,
     RightButtons: ReactNode,
     CurrentPage?: ReactNode,
     PagesLeft?: ReactNode,
-    NavigationContent?: ReactNode,
+    LeftPanelContent?: ReactNode,
     ContextMenu?: ReactNode,
     Copilot?: ReactNode,
 }
@@ -34,15 +34,15 @@ export function ReaderLayout({
 }
 
 function BooqControls({
-    isControlsVisible, isNavigationOpen,
+    isControlsVisible, isLeftPanelOpen,
     LeftButtons, RightButtons,
     CurrentPage, PagesLeft,
-    NavigationContent,
+    LeftPanelContent,
     ContextMenu, Copilot,
 }: ControlsProps) {
-    const showControls = isControlsVisible || isNavigationOpen
+    const showControls = isControlsVisible || isLeftPanelOpen
     const showCtrlClass = showControls ? styles.showCtr : ''
-    const navOpenClass = isNavigationOpen ? styles.navopen : ''
+    const leftPanelOpenClass = isLeftPanelOpen ? styles.leftPanelOpen : ''
     return <div className={`${styles.reader}`}>
         <div className={`${styles.leftButtons} ${showCtrlClass}`}>{LeftButtons}</div>
         <div className={`${styles.rightButtons} ${showCtrlClass}`}>{RightButtons}</div>
@@ -52,6 +52,6 @@ function BooqControls({
         <div className={`${styles.backTop} ${showCtrlClass}`} />
         <div className={`${styles.backBottom} ${showCtrlClass}`} />
         <div className={`${styles.ctx} ${showCtrlClass}`}>{ContextMenu}{Copilot}</div>
-        <div className={`${styles.navc} ${navOpenClass}`}>{NavigationContent}</div>
+        <div className={`${styles.leftPanelc} ${leftPanelOpenClass}`}>{LeftPanelContent}</div>
     </div>
 }

@@ -36,9 +36,9 @@
     grid-template-columns: 1fr var(--content-width) 1fr;
     grid-template-rows: var(--header-height) 1fr var(--header-height);
     grid-template-areas:
-        "left-btns  content right-btns"
-        "navc       content .         "
-        "page       content left      ";
+        "left-btns    content right-btns"
+        "left-panelc  content .         "
+        "page         content left      ";
 }
 
 .content {
@@ -54,7 +54,7 @@
     justify-self: stretch;
 }
 
-.navc {
+.leftPanelc {
     display: flex;
     flex: 1 1;
     grid-area: 2 / 1 / 4 / 2;
@@ -113,11 +113,11 @@
     transition: 250ms transform;
 }
 
-.navc {
+.leftPanelc {
     transform: translateX(-100%);
 }
 
-.navc.navopen {
+.leftPanelc.leftPanelOpen {
     transform: initial;
 }
 
@@ -135,7 +135,7 @@
         grid-area: 2 / 1 / 4 / 3;
     }
 
-    .navc {
+    .leftPanelc {
         grid-area: 2 / 1 / 4 / 3;
         padding: var(--meter-regular) var(--meter-large) 0 var(--meter-large);
     }
