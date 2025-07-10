@@ -24,6 +24,7 @@ import { useScrollToQuote } from './useScrollToQuote'
 import { useScrollHandler } from './useScrollHandler'
 import { useControlsVisibility } from './useControlsVisibility'
 import { useAugmentations } from './useAugmentations'
+import { useContextMenuState } from './useContextMenuState'
 
 export function Reader({
     booq, quote,
@@ -89,14 +90,17 @@ export function Reader({
     const leftLabel = leftPages <= 1 ? 'Last page'
         : `${leftPages} pages left`
 
+    const { menuState, setMenuState } = useContextMenuState()
+
     const {
         ContextMenuNode, isOpen: contextMenuVisible,
-        updateMenuState: setMenuState,
     } = useContextMenu({
         booqId: booq.booqId,
         booqMeta: booq.meta,
         user,
         closed: false,
+        menuState,
+        setMenuState,
     })
 
     const onAugmentationClick = useMemo(() => {

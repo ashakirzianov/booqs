@@ -1,45 +1,40 @@
 'use client'
-import { useCallback, useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import {
-    getBooqSelection, VirtualElement, getSelectionElement,
+    getBooqSelection, getSelectionElement,
 } from '@/viewer'
-import { ContextMenuContent, ContextMenuTarget } from './ContextMenuContent'
+import { ContextMenuContent } from './ContextMenuContent'
 import { useFloater } from '@/components/Floater'
 import { AccountDisplayData, BooqId, BooqMetadata } from '@/core'
-
-export type ContextMenuState = {
-    target: ContextMenuTarget,
-    anchor?: VirtualElement,
-}
+import { ContextMenuState, ContextMenuStateSetter } from './useContextMenuState'
 
 export function useContextMenu({
     booqId, booqMeta, user, closed,
+    menuState, setMenuState,
 }: {
     booqId: BooqId,
     booqMeta?: BooqMetadata,
     user: AccountDisplayData | undefined,
     closed: boolean,
+    menuState: ContextMenuState,
+    setMenuState: ContextMenuStateSetter,
 }) {
-    const [menuState, setMenuState] = useState<ContextMenuState>({
-        target: { kind: 'empty' },
-    })
     const [locked, setLocked] = useState(false)
     const isOpen = menuState.target.kind !== 'empty' && !locked && !closed
-    function setIsOpen(open: boolean) {
-        if (!open) {
-            setMenuState({ target: { kind: 'empty' } })
-        }
-    }
 
     const { FloaterNode, setReference, floating } = useFloater({
         isOpen,
-        setIsOpen,
+        setIsOpen(open: boolean) {
+            if (!open) {
+                setMenuState({ target: { kind: 'empty' } })
+            }
+        },
         Content: <div className='w-40'><ContextMenuContent
             booqId={booqId}
             booqMeta={booqMeta}
             user={user}
             target={menuState.target}
-            setTarget={target => updateMenuState({
+            setTarget={target => setMenuState({
                 ...menuState,
                 target,
             })}
@@ -47,24 +42,15 @@ export function useContextMenu({
         </div>,
     })
 
-    type ContextMenuStateSetter = (prev: ContextMenuState) => ContextMenuState
-    const updateMenuState = useCallback(function (setterOrValue: ContextMenuStateSetter | ContextMenuState) {
-        setMenuState(prev => {
-            const next =
-                typeof setterOrValue === 'function' ? setterOrValue(prev) : setterOrValue
-            if (sameState(prev, next)) {
-                return prev
-            }
-            if (next.anchor) {
-                setReference(next.anchor)
-            }
-            return next
-        })
-    }, [setMenuState, setReference])
+    useEffect(() => {
+        if (menuState.anchor) {
+            setReference(menuState.anchor)
+        }
+    }, [menuState.anchor, setReference])
 
     useEffect(() => {
         function handleSelectionChange() {
-            updateMenuState(prev => {
+            setMenuState(prev => {
                 if (prev.target.kind === 'empty' || prev.target.kind === 'selection') {
                     return getSelectionState()
                 } else {
@@ -102,12 +88,11 @@ export function useContextMenu({
             window.document.removeEventListener('touchcancel', unlock)
             window.document.removeEventListener('selectionchange', handleSelectionChange)
         }
-    }, [updateMenuState, setLocked, floating])
+    }, [setMenuState, setLocked, floating])
 
     return {
         isOpen,
         ContextMenuNode: FloaterNode,
-        updateMenuState,
         menuState,
     }
 }
@@ -129,17 +114,5 @@ function getSelectionState(): ContextMenuState {
     return {
         target: { kind: 'empty' },
     }
-}
-
-function sameState(a: ContextMenuState, b: ContextMenuState) {
-    if (a.target.kind === 'empty' && b.target.kind === 'empty' && a.anchor === b.anchor) {
-        return true
-    }
-    if (a.target.kind === 'selection' && b.target.kind === 'selection') {
-        if (a.target.selection.text === b.target.selection.text) {
-            return true
-        }
-    }
-    return false
 }
 

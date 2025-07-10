@@ -2,7 +2,7 @@ import { useMemo, useCallback } from 'react'
 import { resolveNoteColor, quoteColor } from '@/application/common'
 import { getAugmentationElement, getAugmentationText, Augmentation } from '@/viewer'
 import { BooqNote, BooqRange } from '@/core'
-import { ContextMenuState } from './ContextMenu'
+import { ContextMenuState } from './useContextMenuState'
 
 export function useAugmentations({
     quote, notes,
