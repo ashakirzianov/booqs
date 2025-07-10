@@ -1,17 +1,15 @@
 'use client'
 import '@/app/wdyr'
 
-import React, { useCallback, useMemo } from 'react'
+import React, { useMemo } from 'react'
 import { BooqAnchor, BooqId, BooqNote, BooqRange, PartialBooqData, textForRange } from '@/core'
 import { BorderButton, PanelButton } from '@/components/Buttons'
 import { booqHref, feedHref } from '@/application/href'
 import {
-    BooqContent, getAugmentationElement, getAugmentationText,
-    Augmentation,
+    BooqContent,
 } from '@/viewer'
-import { useContextMenu, type ContextMenuState } from './ContextMenu'
+import { useContextMenu } from './ContextMenu'
 import { ReaderLayout } from './ReaderLayout'
-import { resolveNoteColor, quoteColor } from '@/application/common'
 import { NavigationPanel, useNavigationState } from './NavigationPanel'
 import { ThemerButton } from '@/components/Themer'
 import { useFontScale } from '@/application/theme'
@@ -25,6 +23,7 @@ import Link from 'next/link'
 import { useScrollToQuote } from './useScrollToQuote'
 import { useScrollHandler } from './useScrollHandler'
 import { useControlsVisibility } from './useControlsVisibility'
+import { useAugmentations } from './useAugmentations'
 
 export function Reader({
     booq, quote,
@@ -160,72 +159,6 @@ export function Reader({
         NavigationContent={NavigationContent}
     />
 }
-
-function useAugmentations({
-    quote, notes,
-}: {
-    notes: BooqNote[],
-    quote?: BooqRange,
-}) {
-    const augmentations = useMemo(() => {
-        const augmentations = notes.map<Augmentation>(note => ({
-            id: `note/${note.id}`,
-            range: note.range,
-            color: resolveNoteColor(note.color),
-        }))
-        if (quote) {
-            const quoteAugmentation: Augmentation = {
-                range: quote,
-                color: quoteColor,
-                id: 'quote/0',
-            }
-            return [quoteAugmentation, ...augmentations]
-        } else {
-            return augmentations
-        }
-    }, [quote, notes])
-    const menuStateForAugmentation = useCallback(function (augmentationId: string): ContextMenuState | undefined {
-        const anchor = getAugmentationElement(augmentationId)
-        if (!anchor) {
-            return undefined
-        }
-        const [kind, id] = augmentationId.split('/')
-        switch (kind) {
-            case 'quote':
-                return quote
-                    ? {
-                        anchor,
-                        target: {
-                            kind: 'quote',
-                            selection: {
-                                range: quote,
-                                text: getAugmentationText('quote/0'),
-                            },
-                        },
-                    }
-                    : undefined
-            case 'note': {
-                const note = notes.find(hl => hl.id === id)
-                return note
-                    ? {
-                        anchor,
-                        target: {
-                            kind: 'note',
-                            note,
-                        }
-                    }
-                    : undefined
-            }
-            default:
-                return undefined
-        }
-    }, [quote, notes])
-    return {
-        augmentations,
-        menuStateForAugmentation,
-    }
-}
-
 
 function AnchorButton({ booqId, anchor, title }: {
     booqId: BooqId,
