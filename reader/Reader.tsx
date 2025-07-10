@@ -1,5 +1,5 @@
 'use client'
-import '@/app/wdyr'
+// import '@/app/wdyr'
 
 import React, { useMemo } from 'react'
 import { BooqAnchor, BooqId, BooqNote, BooqRange, PartialBooqData, textForRange } from '@/core'
