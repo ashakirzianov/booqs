@@ -36,8 +36,8 @@
     grid-template-columns: 1fr var(--content-width) 1fr;
     grid-template-rows: var(--header-height) 1fr var(--header-height);
     grid-template-areas:
-        "left-btns    content right-btns "
-        "left-panelc  content .          "
+        "left-btns    content right-btns  "
+        "left-panelc  content right-panelc"
         "left-footer  content right-footer";
 }
 
@@ -121,6 +121,24 @@
     transform: initial;
 }
 
+.rightPanelc {
+    display: flex;
+    flex: 1 1;
+    grid-area: 2 / 3 / 4 / 4;
+    padding: var(--meter-regular) 0 0 0;
+    pointer-events: auto;
+    overflow: hidden;
+    align-self: stretch;
+    justify-self: stretch;
+    transition: 250ms transform;
+    background: var(--theme-background);
+    transform: translateX(100%);
+}
+
+.rightPanelc.rightPanelOpen {
+    transform: initial;
+}
+
 @media (max-width: 1280px) {
     .reader {
         grid-template-columns: 1fr 1fr;
@@ -136,6 +154,11 @@
     }
 
     .leftPanelc {
+        grid-area: 2 / 1 / 4 / 3;
+        padding: var(--meter-regular) var(--meter-large) 0 var(--meter-large);
+    }
+
+    .rightPanelc {
         grid-area: 2 / 1 / 4 / 3;
         padding: var(--meter-regular) var(--meter-large) 0 var(--meter-large);
     }
