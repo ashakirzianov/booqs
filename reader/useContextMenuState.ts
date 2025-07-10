@@ -17,15 +17,15 @@ export function useContextMenuState() {
             if (sameTarget(prev, next)) {
                 return prev
             }
-            setAnchor(undefined)
-            setTimeout(() => {
-                const newAnchor = getAnchorForTarget(next)
-                if (newAnchor) {
-                    setAnchor(newAnchor)
-                } else {
-                    setAnchor(undefined)
-                }
-            }, 0)
+            const newAnchor = getAnchorForTarget(next)
+            if (newAnchor === undefined && next.kind === 'note') {
+                setAnchor(undefined)
+                setTimeout(() => {
+                    setAnchor(getAnchorForTarget(next))
+                }, 0)
+            } else {
+                setAnchor(newAnchor)
+            }
             return next
         })
     }, [setTarget])
@@ -63,6 +63,8 @@ function getAnchorForTarget(target: ContextMenuTarget): VirtualElement | undefin
             const augmentationId = quoteAugmentationId()
             return getAugmentationElement(augmentationId)
         }
+        case 'comment':
+            return getAnchorForTarget(target.parent)
         default:
             return undefined
     }
