@@ -6,8 +6,8 @@ type ControlsProps = {
     isLeftPanelOpen: boolean,
     LeftButtons: ReactNode,
     RightButtons: ReactNode,
-    CurrentPage?: ReactNode,
-    PagesLeft?: ReactNode,
+    LeftFooter?: ReactNode,
+    RightFooter?: ReactNode,
     LeftPanelContent?: ReactNode,
     ContextMenu?: ReactNode,
     Copilot?: ReactNode,
@@ -36,7 +36,7 @@ export function ReaderLayout({
 function BooqControls({
     isControlsVisible, isLeftPanelOpen,
     LeftButtons, RightButtons,
-    CurrentPage, PagesLeft,
+    LeftFooter, RightFooter,
     LeftPanelContent,
     ContextMenu, Copilot,
 }: ControlsProps) {
@@ -46,8 +46,8 @@ function BooqControls({
     return <div className={`${styles.reader}`}>
         <div className={`${styles.leftButtons} ${showCtrlClass}`}>{LeftButtons}</div>
         <div className={`${styles.rightButtons} ${showCtrlClass}`}>{RightButtons}</div>
-        <div className={`${styles.page} ${showCtrlClass}`}>{CurrentPage}</div>
-        <div className={`${styles.left} ${showCtrlClass}`}>{PagesLeft}</div>
+        <div className={`${styles.leftFooter} ${showCtrlClass}`}>{LeftFooter}</div>
+        <div className={`${styles.rightFooter} ${showCtrlClass}`}>{RightFooter}</div>
         <div className={`${styles.content} ${showCtrlClass}`} />
         <div className={`${styles.backTop} ${showCtrlClass}`} />
         <div className={`${styles.backBottom} ${showCtrlClass}`} />

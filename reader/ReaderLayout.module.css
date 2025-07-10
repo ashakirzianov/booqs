@@ -36,9 +36,9 @@
     grid-template-columns: 1fr var(--content-width) 1fr;
     grid-template-rows: var(--header-height) 1fr var(--header-height);
     grid-template-areas:
-        "left-btns    content right-btns"
-        "left-panelc  content .         "
-        "page         content left      ";
+        "left-btns    content right-btns "
+        "left-panelc  content .          "
+        "left-footer  content right-footer";
 }
 
 .content {
@@ -69,8 +69,8 @@
 
 .leftButtons,
 .rightButtons,
-.page,
-.left {
+.leftFooter,
+.rightFooter {
     transition: 250ms transform;
 }
 
@@ -95,14 +95,14 @@
     justify-self: end;
 }
 
-.page {
-    grid-area: page;
+.leftFooter {
+    grid-area: left-footer;
     justify-self: start;
     padding: var(--meter-large);
 }
 
-.left {
-    grid-area: left;
+.rightFooter {
+    grid-area: right-footer;
     justify-self: end;
     padding: var(--meter-large);
 }
@@ -126,9 +126,9 @@
         grid-template-columns: 1fr 1fr;
         grid-template-rows: var(--header-height) 1fr var(--header-height);
         grid-template-areas:
-            "left-btns right-btns"
-            "content   content   "
-            "page      left      ";
+            "left-btns    right-btns   "
+            "content      content      "
+            "left-footer  right-footer ";
     }
 
     .ctx {
@@ -178,14 +178,14 @@
         transform: initial;
     }
 
-    .page,
-    .left,
+    .leftFooter,
+    .rightFooter,
     .backBottom {
         transform: translateY(var(--header-height));
     }
 
-    .page.showCtr,
-    .left.showCtr,
+    .leftFooter.showCtr,
+    .rightFooter.showCtr,
     .backBottom.showCtr {
         transform: initial;
     }
