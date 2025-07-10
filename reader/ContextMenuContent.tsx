@@ -42,7 +42,7 @@ export type ContextMenuTarget =
     | EmptyTarget | SelectionTarget | QuoteTarget | NoteTarget | CommentTarget | CopilotTarget
 
 export function ContextMenuContent({
-    target, booqMeta, ...rest
+    target, booqMeta, booqId, user, setTarget
 }: {
     target: ContextMenuTarget,
     booqId: BooqId,
@@ -53,22 +53,22 @@ export function ContextMenuContent({
 }) {
     switch (target.kind) {
         case 'selection':
-            return <SelectionTargetMenu target={target} {...rest} />
+            return <SelectionTargetMenu target={target} booqId={booqId} user={user} setTarget={setTarget} />
         case 'quote':
-            return <QuoteTargetMenu target={target} {...rest} />
+            return <QuoteTargetMenu target={target} booqId={booqId} user={user} setTarget={setTarget} />
         case 'note':
-            return <NoteTargetMenu target={target} {...rest} />
+            return <NoteTargetMenu target={target} booqId={booqId} user={user} setTarget={setTarget} />
         case 'comment':
-            return <CommentTargetMenu target={target} {...rest} />
+            return <CommentTargetMenu target={target} booqId={booqId} user={user} setTarget={setTarget} />
         case 'copilot':
-            return booqMeta ? <CopilotTargetMenu target={target} booqMeta={booqMeta} {...rest} /> : null
+            return booqMeta ? <CopilotTargetMenu target={target} booqMeta={booqMeta} booqId={booqId} user={user} setTarget={setTarget} /> : null
         default:
             return null
     }
 }
 
 function SelectionTargetMenu({
-    target, ...rest
+    target, booqId, user, setTarget
 }: {
     target: SelectionTarget,
     booqId: BooqId,
@@ -76,18 +76,18 @@ function SelectionTargetMenu({
     setTarget: (target: ContextMenuTarget) => void,
 }) {
     const { selection } = target
-    useCopyQuote(rest.booqId, selection)
+    useCopyQuote(booqId, selection)
     return <>
-        <AddHighlightItem {...rest} selection={selection} />
-        <AddCommentItem {...rest} target={target} />
-        <CopilotItem selection={selection} setTarget={rest.setTarget} />
-        <CopyQuoteItem {...rest} selection={selection} />
-        <CopyLinkItem {...rest} selection={selection} />
+        <AddHighlightItem booqId={booqId} user={user} setTarget={setTarget} selection={selection} />
+        <AddCommentItem target={target} user={user} setTarget={setTarget} />
+        <CopilotItem selection={selection} setTarget={setTarget} />
+        <CopyQuoteItem selection={selection} booqId={booqId} setTarget={setTarget} />
+        <CopyLinkItem selection={selection} booqId={booqId} setTarget={setTarget} />
     </>
 }
 
 function QuoteTargetMenu({
-    target, ...rest
+    target, booqId, user, setTarget
 }: {
     target: QuoteTarget,
     booqId: BooqId,
@@ -96,15 +96,15 @@ function QuoteTargetMenu({
 }) {
     const { selection } = target
     return <>
-        <AddHighlightItem {...rest} selection={selection} />
-        <AddCommentItem {...rest} target={target} />
-        <CopilotItem selection={selection} setTarget={rest.setTarget} />
-        <CopyTextItem {...rest} selection={selection} />
+        <AddHighlightItem booqId={booqId} user={user} setTarget={setTarget} selection={selection} />
+        <AddCommentItem target={target} user={user} setTarget={setTarget} />
+        <CopilotItem selection={selection} setTarget={setTarget} />
+        <CopyTextItem selection={selection} booqId={booqId} setTarget={setTarget} />
     </>
 }
 
 function NoteTargetMenu({
-    target, user, ...rest
+    target, booqId, user, setTarget
 }: {
     target: NoteTarget,
     booqId: BooqId,
@@ -125,15 +125,15 @@ function NoteTargetMenu({
             />
         }
         {!isOwnNote ? null :
-            <SelectNoteColorItem  {...rest} user={user} note={note} />
+            <SelectNoteColorItem booqId={booqId} user={user} setTarget={setTarget} note={note} />
         }
         {!isOwnNote ? null :
-            <RemoveNoteItem  {...rest} user={user} note={note} />
+            <RemoveNoteItem booqId={booqId} user={user} setTarget={setTarget} note={note} />
         }
-        <AddCommentItem {...rest} user={user} target={target} />
-        <CopilotItem selection={selection} setTarget={rest.setTarget} />
-        <CopyQuoteItem {...rest} selection={selection} />
-        <CopyLinkItem {...rest} selection={selection} />
+        <AddCommentItem target={target} user={user} setTarget={setTarget} />
+        <CopilotItem selection={selection} setTarget={setTarget} />
+        <CopyQuoteItem selection={selection} booqId={booqId} setTarget={setTarget} />
+        <CopyLinkItem selection={selection} booqId={booqId} setTarget={setTarget} />
     </>
 }
 
