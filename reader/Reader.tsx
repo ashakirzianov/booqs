@@ -11,6 +11,7 @@ import {
 import { useContextMenuFloater } from './useContextMenuFloater'
 import { ReaderLayout } from './ReaderLayout'
 import { NavigationPanel, useNavigationState } from './NavigationPanel'
+import { NotesPanel } from './NotesPanel'
 import { ThemerButton } from '@/components/Themer'
 import { useFontScale } from '@/application/theme'
 import { filterNotes } from './nodes'
@@ -84,8 +85,6 @@ export function Reader({
         <TocIcon />
     </PanelButton>
 
-    const RightPanelContent = null
-
     const RightPanelButton = <PanelButton
         onClick={toggleRightPanelOpen}
         selected={rightPanelOpen}
@@ -100,6 +99,8 @@ export function Reader({
             user,
         }), [resolvedNotes, navigationSelection, user]
     )
+
+    const RightPanelContent = <NotesPanel notes={filteredNotes} />
 
     const { augmentations, menuTargetForAugmentation } = useAugmentations({
         notes: filteredNotes,
