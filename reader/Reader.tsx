@@ -1,14 +1,13 @@
 'use client'
 import '@/app/wdyr'
 
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { BooqAnchor, BooqId, BooqNote, BooqRange, PartialBooqData, textForRange } from '@/core'
 import { BorderButton, PanelButton } from '@/components/Buttons'
 import { booqHref, feedHref } from '@/application/href'
 import {
     BooqContent, getAugmentationElement, getAugmentationText,
     Augmentation,
-    useOnBooqClick,
 } from '@/viewer'
 import { useContextMenu, type ContextMenuState } from './ContextMenu'
 import { ReaderLayout } from './ReaderLayout'
@@ -25,6 +24,7 @@ import { BackIcon, Spinner, TocIcon } from '@/components/Icons'
 import Link from 'next/link'
 import { useScrollToQuote } from './useScrollToQuote'
 import { useScrollHandler } from './useScrollHandler'
+import { useControlsVisibility } from './useControlsVisibility'
 
 export function Reader({
     booq, quote,
@@ -89,8 +89,7 @@ export function Reader({
         notes: filteredNotes,
         quote: quote,
     })
-    const { visible, toggle } = useControlsVisibility()
-    useOnBooqClick(toggle)
+    const { visible } = useControlsVisibility()
 
     const pagesLabel = `${currentPage} of ${totalPages}`
     const leftLabel = leftPages <= 1 ? 'Last page'
@@ -105,7 +104,7 @@ export function Reader({
         user,
         closed: false,
     })
-    
+
     const onAugmentationClick = useMemo(() => {
         return (id: string) => {
             const next = menuStateForAugmentation(id)
@@ -193,27 +192,6 @@ export function LoadingBooqScreen() {
         PagesLeft={null}
         NavigationContent={null}
     />
-}
-
-function useControlsVisibility() {
-    const [visible, setVisible] = useState(false)
-    return {
-        visible,
-        toggle: useCallback(() => {
-            if (!isAnythingSelected()) {
-                setVisible(!visible)
-            }
-        }, [visible, setVisible]),
-    }
-}
-
-function isAnythingSelected() {
-    const selection = window.getSelection()
-    if (!selection) {
-        return false
-    }
-    return selection.anchorNode !== selection.focusNode
-        || selection.anchorOffset !== selection.focusOffset
 }
 
 function useAugmentations({
