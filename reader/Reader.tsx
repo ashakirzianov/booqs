@@ -89,7 +89,7 @@ export function Reader({
         }), [resolvedNotes, navigationSelection, user]
     )
 
-    const { augmentations, menuStateForAugmentation } = useAugmentations({
+    const { augmentations, menuTargetForAugmentation } = useAugmentations({
         notes: filteredNotes,
         quote: quote,
     })
@@ -99,40 +99,37 @@ export function Reader({
     const leftLabel = leftPages <= 1 ? 'Last page'
         : `${leftPages} pages left`
 
-    const { menuState, setMenuState } = useContextMenuState()
+    const { anchor, menuTarget, setMenuTarget } = useContextMenuState()
 
     const MenuContent = useMemo(() => {
-        if (menuState.target.kind === 'empty') {
+        if (menuTarget.kind === 'empty') {
             return null
         }
         return <div><ContextMenuContent
             booqId={booq.booqId}
             booqMeta={booq.meta}
             user={user}
-            target={menuState.target}
-            setTarget={target => setMenuState({
-                ...menuState,
-                target,
-            })}
+            target={menuTarget}
+            setTarget={setMenuTarget}
         /></div>
-    }, [booq.booqId, booq.meta, user, menuState, setMenuState])
+    }, [booq.booqId, booq.meta, user, menuTarget, setMenuTarget])
 
     const {
         ContextMenuNode
     } = useContextMenuFloater({
         Content: MenuContent,
-        anchor: menuState.anchor,
-        setMenuState,
+        anchor: anchor,
+        setTarget: setMenuTarget,
     })
 
     const onAugmentationClick = useMemo(() => {
         return (id: string) => {
-            const next = menuStateForAugmentation(id)
+            const next = menuTargetForAugmentation(id)
             if (next) {
-                setMenuState(next)
+                setMenuTarget(next)
             }
         }
-    }, [menuStateForAugmentation, setMenuState])
+    }, [menuTargetForAugmentation, setMenuTarget])
     const isControlsVisible = (MenuContent === null) && visible
 
     const range: BooqRange = useMemo(() => ({

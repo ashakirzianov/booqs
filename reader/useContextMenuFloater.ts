@@ -1,28 +1,28 @@
 'use client'
 import React, { useState, useEffect } from 'react'
 import {
-    getBooqSelection, getSelectionElement,
+    getBooqSelection,
     VirtualElement,
 } from '@/viewer'
 import { useFloater } from '@/components/Floater'
-import { ContextMenuState, ContextMenuStateSetter } from './useContextMenuState'
+import { ContextMenuTargetSetter } from './useContextMenuState'
 
 export function useContextMenuFloater({
     anchor, Content,
-    setMenuState,
+    setTarget,
 }: {
     anchor?: VirtualElement,
     Content: React.ReactNode,
-    setMenuState: ContextMenuStateSetter,
+    setTarget: ContextMenuTargetSetter,
 }) {
     const [locked, setLocked] = useState(false)
-    const isOpen = !locked && (Content !== null)
+    const isOpen = !locked && (Content !== null) && (anchor !== undefined)
 
     const { FloaterNode, setReference, floating } = useFloater({
         isOpen,
         setIsOpen(open: boolean) {
             if (!open) {
-                setMenuState({ target: { kind: 'empty' } })
+                setTarget({ kind: 'empty' })
             }
         },
         Content,
@@ -36,12 +36,14 @@ export function useContextMenuFloater({
 
     useEffect(() => {
         function handleSelectionChange() {
-            setMenuState(prev => {
-                if (prev.target.kind === 'empty' || prev.target.kind === 'selection') {
-                    return getSelectionState()
-                } else {
-                    return prev
+            setTarget(prev => {
+                if (prev.kind === 'empty') {
+                    const selection = getBooqSelection()
+                    if (selection) {
+                        return { kind: 'selection', selection }
+                    }
                 }
+                return prev
             })
         }
         function isWithinCtxMenu(event: Event) {
@@ -74,29 +76,10 @@ export function useContextMenuFloater({
             window.document.removeEventListener('touchcancel', unlock)
             window.document.removeEventListener('selectionchange', handleSelectionChange)
         }
-    }, [setMenuState, setLocked, floating])
+    }, [setTarget, setLocked, floating])
 
     return {
         ContextMenuNode: FloaterNode,
-    }
-}
-
-function getSelectionState(): ContextMenuState {
-    const element = getSelectionElement()
-    if (element) {
-        const selection = getBooqSelection()
-        if (selection) {
-            return {
-                anchor: element,
-                target: {
-                    kind: 'selection',
-                    selection,
-                },
-            }
-        }
-    }
-    return {
-        target: { kind: 'empty' },
     }
 }
 

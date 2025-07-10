@@ -1,8 +1,8 @@
 import { useMemo, useCallback } from 'react'
 import { resolveNoteColor, quoteColor } from '@/application/common'
-import { getAugmentationElement, getAugmentationText, Augmentation } from '@/viewer'
+import { getAugmentationText, Augmentation } from '@/viewer'
 import { BooqNote, BooqRange } from '@/core'
-import { ContextMenuState } from './useContextMenuState'
+import { ContextMenuTarget } from './ContextMenuContent'
 
 export function useAugmentations({
     quote, notes,
@@ -13,7 +13,7 @@ export function useAugmentations({
     const augmentations = useMemo(function () {
         const augmentations = notes.map<Augmentation>(function (note) {
             return {
-                id: `note/${note.id}`,
+                id: noteAugmentationId(note),
                 range: note.range,
                 color: resolveNoteColor(note.color),
             }
@@ -22,30 +22,23 @@ export function useAugmentations({
             const quoteAugmentation: Augmentation = {
                 range: quote,
                 color: quoteColor,
-                id: 'quote/0',
+                id: quoteAugmentationId(),
             }
             return [quoteAugmentation, ...augmentations]
         } else {
             return augmentations
         }
     }, [quote, notes])
-    const menuStateForAugmentation = useCallback(function (augmentationId: string): ContextMenuState | undefined {
-        const anchor = getAugmentationElement(augmentationId)
-        if (!anchor) {
-            return undefined
-        }
+    const menuTargetForAugmentation = useCallback(function (augmentationId: string): ContextMenuTarget | undefined {
         const [kind, id] = augmentationId.split('/')
         switch (kind) {
             case 'quote':
                 return quote
                     ? {
-                        anchor,
-                        target: {
-                            kind: 'quote',
-                            selection: {
-                                range: quote,
-                                text: getAugmentationText('quote/0'),
-                            },
+                        kind: 'quote',
+                        selection: {
+                            range: quote,
+                            text: getAugmentationText(augmentationId),
                         },
                     }
                     : undefined
@@ -53,11 +46,8 @@ export function useAugmentations({
                 const note = notes.find(function (hl) { return hl.id === id })
                 return note
                     ? {
-                        anchor,
-                        target: {
-                            kind: 'note',
-                            note,
-                        }
+                        kind: 'note',
+                        note,
                     }
                     : undefined
             }
@@ -67,6 +57,14 @@ export function useAugmentations({
     }, [quote, notes])
     return {
         augmentations,
-        menuStateForAugmentation,
+        menuTargetForAugmentation,
     }
-} 
+}
+
+export function noteAugmentationId(note: BooqNote): string {
+    return `note/${note.id}`
+}
+
+export function quoteAugmentationId(): string {
+    return 'quote/0'
+}

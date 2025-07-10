@@ -1,45 +1,70 @@
 'use client'
 import { useCallback, useState } from 'react'
-import { VirtualElement } from '@/viewer'
+import { getAugmentationElement, getSelectionElement, VirtualElement } from '@/viewer'
 import { ContextMenuTarget } from './ContextMenuContent'
+import { noteAugmentationId, quoteAugmentationId } from './useAugmentations'
 
-export type ContextMenuState = {
-    target: ContextMenuTarget,
-    anchor?: VirtualElement,
-}
-export type ContextMenuStateSetter = (setterOrValue: ContextMenuState | ((prev: ContextMenuState) => ContextMenuState)) => void
+export type ContextMenuTargetSetter = (setterOrValue: ContextMenuTarget | ((prev: ContextMenuTarget) => ContextMenuTarget)) => void
 
 export function useContextMenuState() {
-    const [menuState, setMenuState] = useState<ContextMenuState>({
-        target: { kind: 'empty' },
-    })
+    const [anchor, setAnchor] = useState<VirtualElement | undefined>(undefined)
+    const [target, setTarget] = useState<ContextMenuTarget>({ kind: 'empty' })
 
-    const updateMenuState = useCallback<ContextMenuStateSetter>(function (setterOrValue) {
-        setMenuState(prev => {
+    const setMenuTarget = useCallback<ContextMenuTargetSetter>(function (setterOrValue) {
+        setTarget(prev => {
             const next =
                 typeof setterOrValue === 'function' ? setterOrValue(prev) : setterOrValue
-            if (sameState(prev, next)) {
+            if (sameTarget(prev, next)) {
                 return prev
             }
+            setAnchor(undefined)
+            setTimeout(() => {
+                const newAnchor = getAnchorForTarget(next)
+                if (newAnchor) {
+                    setAnchor(newAnchor)
+                } else {
+                    setAnchor(undefined)
+                }
+            }, 0)
             return next
         })
-    }, [setMenuState])
+    }, [setTarget])
 
     return {
-        setMenuState: updateMenuState,
-        menuState,
+        menuTarget: target,
+        setMenuTarget,
+        anchor,
     }
 }
 
-function sameState(a: ContextMenuState, b: ContextMenuState) {
-    if (a.target.kind === 'empty' && b.target.kind === 'empty' && a.anchor === b.anchor) {
+function sameTarget(a: ContextMenuTarget, b: ContextMenuTarget) {
+    if (a.kind === 'empty' && b.kind === 'empty') {
         return true
     }
-    if (a.target.kind === 'selection' && b.target.kind === 'selection') {
-        if (a.target.selection.text === b.target.selection.text) {
+    if (a.kind === 'selection' && b.kind === 'selection') {
+        if (a.selection.text === b.selection.text) {
             return true
         }
     }
     return false
+}
+
+function getAnchorForTarget(target: ContextMenuTarget): VirtualElement | undefined {
+    switch (target.kind) {
+        case 'empty':
+            return undefined
+        case 'selection':
+            return getSelectionElement()
+        case 'note': {
+            const augmentationId = noteAugmentationId(target.note)
+            return getAugmentationElement(augmentationId)
+        }
+        case 'quote': {
+            const augmentationId = quoteAugmentationId()
+            return getAugmentationElement(augmentationId)
+        }
+        default:
+            return undefined
+    }
 }
 
