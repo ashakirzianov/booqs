@@ -137,6 +137,24 @@ export function Reader({
         end: booq.fragment.next?.path ?? [booq.fragment.nodes.length],
     }), [booq])
 
+    const LeftButtons = <>
+        <Link href={feedHref()}>
+            <PanelButton>
+                <BackIcon />
+            </PanelButton>
+        </Link>
+        {NavigationButton}
+    </>
+
+    const RightButtons = <>
+        <ThemerButton />
+        <AccountButton
+            user={user}
+            from={pathname}
+            loading={isAuthLoading}
+        />
+    </>
+
     return <ReaderLayout
         isControlsVisible={isControlsVisible}
         isNavigationOpen={navigationOpen}
@@ -165,18 +183,8 @@ export function Reader({
         />}
         ContextMenu={ContextMenuNode}
         Copilot={null}
-        MainButton={<Link href={feedHref()}>
-            <PanelButton>
-                <BackIcon />
-            </PanelButton>
-        </Link>}
-        NavigationButton={NavigationButton}
-        ThemerButton={<ThemerButton />}
-        AccountButton={<AccountButton
-            user={user}
-            from={pathname}
-            loading={isAuthLoading}
-        />}
+        LeftButtons={LeftButtons}
+        RightButtons={RightButtons}
         CurrentPage={<PageLabel text={pagesLabel} />}
         PagesLeft={<PageLabel text={leftLabel} />}
         NavigationContent={NavigationContent}
