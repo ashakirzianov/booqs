@@ -4,7 +4,8 @@
       "Bash(npm run typecheck:*)",
       "Bash(npm run:*)",
       "Bash(mv:*)",
-      "Bash(rg:*)"
+      "Bash(rg:*)",
+      "Bash(git add:*)"
     ]
   },
   "enableAllProjectMcpServers": false

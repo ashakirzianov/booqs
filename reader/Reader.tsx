@@ -99,6 +99,7 @@ export function Reader({
 
     const { augmentations, menuTargetForAugmentation } = useAugmentations({
         notes: navigationSelection.notes ? notes : [],
+        comments: comments,
         quote: quote,
         temporaryAugmentations,
     })
