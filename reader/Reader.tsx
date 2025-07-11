@@ -15,7 +15,7 @@ import { NotesPanel } from './NotesPanel'
 import { ThemerButton } from '@/components/Themer'
 import { useFontScale } from '@/application/theme'
 import { useAuth } from '@/application/auth'
-import { useNoteData } from './useNoteData'
+import { useNotesData } from './useNotesData'
 import { AccountButton } from '@/components/AccountButton'
 import { usePathname } from 'next/navigation'
 import { BackIcon, TocIcon, CommentIcon } from '@/components/Icons'
@@ -49,10 +49,16 @@ export function Reader({
         currentPath,
     })
 
-    const { notes } = useNoteData({
+    const range: BooqRange = useMemo(() => ({
+        start: booq.fragment.current.path,
+        end: booq.fragment.next?.path ?? [booq.fragment.nodes.length],
+    }), [booq])
+
+    const { notes, comments } = useNotesData({
         booqId: booq.booqId,
         nodes: booq.fragment.nodes,
         user,
+        currentRange: range,
     })
 
     const {
@@ -87,10 +93,10 @@ export function Reader({
         <CommentIcon />
     </PanelButton>
 
-    const RightPanelContent = <NotesPanel notes={notes} />
+    const RightPanelContent = <NotesPanel notes={comments} />
 
     const { anchor, menuTarget, setMenuTarget, temporaryAugmentations } = useContextMenuState()
-    
+
     const { augmentations, menuTargetForAugmentation } = useAugmentations({
         notes: navigationSelection.notes ? notes : [],
         quote: quote,
@@ -132,11 +138,6 @@ export function Reader({
         }
     }, [menuTargetForAugmentation, setMenuTarget])
     const isControlsVisible = (MenuContent === null) && visible
-
-    const range: BooqRange = useMemo(() => ({
-        start: booq.fragment.current.path,
-        end: booq.fragment.next?.path ?? [booq.fragment.nodes.length],
-    }), [booq])
 
     const LeftButtons = <>
         <Link href={feedHref()}>
