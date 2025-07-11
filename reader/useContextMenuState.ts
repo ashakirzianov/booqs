@@ -24,7 +24,7 @@ export function useContextMenuState() {
                 return prev
             }
             const newAnchor = getAnchorForTarget(next)
-            if (newAnchor === undefined && (next.kind === 'note' || next.kind === 'comment')) {
+            if (newAnchor === undefined && (next.kind === 'note' || next.kind === 'comment' || next.kind === 'copilot')) {
                 setAnchor(undefined)
                 setTimeout(() => {
                     setAnchor(getAnchorForTarget(next))
@@ -51,6 +51,12 @@ export function useContextMenuState() {
                     name: 'comment',
                 }]
             }
+        }
+        if (target.kind === 'copilot') {
+            return [{
+                range: target.selection.range,
+                name: 'copilot',
+            }]
         }
         return []
     }, [target])
@@ -91,6 +97,10 @@ function getAnchorForTarget(target: ContextMenuTarget): VirtualElement | undefin
         }
         case 'comment': {
             const augmentationId = temporaryAugmentationId('comment')
+            return getAugmentationElement(augmentationId)
+        }
+        case 'copilot': {
+            const augmentationId = temporaryAugmentationId('copilot')
             return getAugmentationElement(augmentationId)
         }
         default:
