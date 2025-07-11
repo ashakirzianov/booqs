@@ -1,5 +1,6 @@
 import React from 'react'
-import { BooqNote } from '@/core'
+import Link from 'next/link'
+import { BooqNote, pathToId } from '@/core'
 import { Avatar } from '@/components/Avatar'
 
 export function CommentsPanel({ comments }: {
@@ -36,10 +37,11 @@ function CommentItem({ comment }: { comment: BooqNote }) {
         <div className='rounded-lg p-3 space-y-2 w-full max-w-md'>
 
             {/* Referenced text */}
-            <div className='p-2 rounded text-sm italic border-l-2'
+            <Link href={`#${pathToId(comment.range.start)}`}
+                className='block p-2 rounded text-sm italic border-l-2 hover:bg-gray-50 transition-colors cursor-pointer'
                 style={{ borderLeftColor: comment.color }}>
                 &quot;{comment.text}&quot;
-            </div>
+            </Link>
 
             {/* Note content */}
             {comment.content && (
@@ -61,17 +63,17 @@ function CommentItem({ comment }: { comment: BooqNote }) {
 
 function formatDateString(date: Date, currentDate: Date): string {
     const isSameYear = date.getFullYear() === currentDate.getFullYear()
-    
+
     if (isSameYear) {
-        return date.toLocaleDateString('en-US', { 
-            month: 'short', 
-            day: 'numeric' 
+        return date.toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric'
         })
     } else {
-        return date.toLocaleDateString('en-US', { 
-            month: 'short', 
-            day: 'numeric', 
-            year: 'numeric' 
+        return date.toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric'
         })
     }
 }
@@ -82,12 +84,12 @@ function formatRelativeTime(date: Date, currentDate: Date = new Date()): string 
     const diffMinutes = Math.floor(diffSeconds / 60)
     const diffHours = Math.floor(diffMinutes / 60)
     const diffDays = Math.floor(diffHours / 24)
-    
+
     // If more than 7 days, show date
     if (diffDays > 7) {
         return formatDateString(date, currentDate)
     }
-    
+
     // Relative time formatting
     if (diffSeconds < 60) {
         return `${diffSeconds} second${diffSeconds !== 1 ? 's' : ''} ago`

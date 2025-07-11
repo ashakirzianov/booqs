@@ -93,7 +93,9 @@ export function Reader({
         <CommentIcon />
     </PanelButton>
 
-    const RightPanelContent = <CommentsPanel comments={comments} />
+    const RightPanelContent = <CommentsPanel
+        comments={comments}
+    />
 
     const { anchor, menuTarget, setMenuTarget, temporaryAugmentations } = useContextMenuState()
 
