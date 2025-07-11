@@ -34,6 +34,7 @@ export async function sync(options: CliOptions) {
 async function syncWebToBlob(options: CliOptions) {
     info('Syncing web to blob storage...')
     const retryProblems = options.switches['retry-problems'] === 'true'
+    const retryIgnored = options.switches['retry-ignored'] === 'true'
     const limitSwitch = options.switches['limit']
     const webIds = limitSwitch
         ? allGutenbergIdsUpTo(parseInt(limitSwitch))
@@ -42,7 +43,7 @@ async function syncWebToBlob(options: CliOptions) {
     info(`Found ${webIds.length} ids in Gutenberg Collection`)
     info(`Found ${blobIds.length} ids in blob storage`)
     const existingSet = new Set(blobIds)
-    const downloadProblemsSet = retryProblems ? new Set() : new Set(await getProblemIds('download'))
+    const downloadProblemsSet = new Set(await getProblemIds('download'))
     info(`Found ${downloadProblemsSet.size} download problems: ${Array.from(downloadProblemsSet).join(', ')}`)
     const ignoreSet = new Set(await getProblemIds('ignore'))
     info(`Found ${ignoreSet.size} ids in ignore set: ${Array.from(ignoreSet).join(', ')}`)
@@ -55,7 +56,7 @@ async function syncWebToBlob(options: CliOptions) {
             info(`Skipping ${id} because it already exists in blob storage`)
             continue
         }
-        if (ignoreSet.has(id)) {
+        if (!retryIgnored && ignoreSet.has(id)) {
             info(`Skipping ${id} because it is in ignore set`)
             continue
         }
@@ -78,8 +79,8 @@ async function syncWebToBlob(options: CliOptions) {
                 continue
             }
             info(`Uploaded asset for id: ${id}`)
-            // Remove any previous download problems since this succeeded
-            if (downloadProblemsSet.has(id)) {
+            // Remove any previous problems since this succeeded
+            if (downloadProblemsSet.has(id) || ignoreSet.has(id)) {
                 await removeProblem(id)
             }
             successfullyProcessed++
