@@ -3,7 +3,11 @@ import { resolveNoteColor, quoteColor, temporaryColor } from '@/application/comm
 import { getAugmentationText, Augmentation } from '@/viewer'
 import { BooqNote, BooqRange } from '@/core'
 import { ContextMenuTarget } from './ContextMenuContent'
-import { TemporaryAugmentation } from './useContextMenuState'
+
+export type TemporaryAugmentation = {
+    range: BooqRange,
+    name: string,
+}
 
 export function useAugmentations({
     quote, notes, comments = [], temporaryAugmentations = [],

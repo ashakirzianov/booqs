@@ -5,12 +5,8 @@ import { ContextMenuTarget } from './ContextMenuContent'
 import { noteAugmentationId, quoteAugmentationId, temporaryAugmentationId } from './useAugmentations'
 import { BooqRange } from '@/core'
 
-export type TemporaryAugmentation = {
-    range: BooqRange,
-    name: string,
-}
-
 export type ContextMenuTargetSetter = (setterOrValue: ContextMenuTarget | ((prev: ContextMenuTarget) => ContextMenuTarget)) => void
+export const MENU_ANCHOR_ID = 'menu-anchor'
 
 export function useContextMenuState() {
     const [anchor, setAnchor] = useState<VirtualElement | undefined>(undefined)
@@ -36,36 +32,30 @@ export function useContextMenuState() {
         })
     }, [setTarget])
 
-    const temporaryAugmentations = useMemo<TemporaryAugmentation[]>(() => {
+    const anchorRange = useMemo<BooqRange | undefined>(() => {
         if (target.kind === 'comment') {
             // Get the range from the parent target
-            const parentRange = target.parent.kind === 'selection' || target.parent.kind === 'quote' 
+            const parentRange = target.parent.kind === 'selection' || target.parent.kind === 'quote'
                 ? target.parent.selection.range
-                : target.parent.kind === 'note' 
+                : target.parent.kind === 'note'
                     ? target.parent.note.range
                     : undefined
-            
+
             if (parentRange) {
-                return [{
-                    range: parentRange,
-                    name: 'comment',
-                }]
+                return parentRange
             }
         }
         if (target.kind === 'copilot') {
-            return [{
-                range: target.selection.range,
-                name: 'copilot',
-            }]
+            return target.selection.range
         }
-        return []
+        return undefined
     }, [target])
 
     return {
         menuTarget: target,
         setMenuTarget,
         anchor,
-        temporaryAugmentations,
+        anchorRange,
     }
 }
 
@@ -95,12 +85,9 @@ function getAnchorForTarget(target: ContextMenuTarget): VirtualElement | undefin
             const augmentationId = quoteAugmentationId()
             return getAugmentationElement(augmentationId)
         }
+        case 'copilot':
         case 'comment': {
-            const augmentationId = temporaryAugmentationId('comment')
-            return getAugmentationElement(augmentationId)
-        }
-        case 'copilot': {
-            const augmentationId = temporaryAugmentationId('copilot')
+            const augmentationId = temporaryAugmentationId(MENU_ANCHOR_ID)
             return getAugmentationElement(augmentationId)
         }
         default:
