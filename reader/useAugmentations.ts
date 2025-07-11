@@ -21,7 +21,7 @@ export function useAugmentations({
                 color: resolveNoteColor(note.color),
             }
         })
-        
+
         const tempAugmentations = temporaryAugmentations.map<Augmentation>(function (temp) {
             return {
                 id: temporaryAugmentationId(temp.name),
@@ -29,10 +29,10 @@ export function useAugmentations({
                 color: temporaryColor,
             }
         })
-        
+
         // Create a Set of note IDs for efficient lookup
         const noteIds = new Set(notes.map(note => note.id))
-        
+
         // Generate dashed augmentations for comments not present in notes
         const commentAugmentations = comments
             .filter(comment => !noteIds.has(comment.id))
@@ -40,13 +40,12 @@ export function useAugmentations({
                 return {
                     id: noteAugmentationId(comment),
                     range: comment.range,
-                    color: resolveNoteColor(comment.color),
                     underline: 'dashed',
                 }
             })
-        
+
         let result = [...tempAugmentations, ...noteAugmentations, ...commentAugmentations]
-        
+
         if (quote) {
             const quoteAugmentation: Augmentation = {
                 range: quote,
@@ -55,7 +54,7 @@ export function useAugmentations({
             }
             result = [quoteAugmentation, ...result]
         }
-        
+
         return result
     }, [quote, notes, comments, temporaryAugmentations])
     const menuTargetForAugmentation = useCallback(function (augmentationId: string): ContextMenuTarget | undefined {
@@ -73,7 +72,7 @@ export function useAugmentations({
                     : undefined
             case 'note': {
                 const note = notes.find(function (hl) { return hl.id === id }) ||
-                           comments.find(function (hl) { return hl.id === id })
+                    comments.find(function (hl) { return hl.id === id })
                 return note
                     ? {
                         kind: 'note',
