@@ -28,7 +28,7 @@ export function rootIterator(nodes: BooqNode[]) {
 
 export function firstLeaf(iter: BooqNodeIterator): BooqNodeIterator {
     const node = iteratorsNode(iter)
-    if (node.kind === 'element' && node.children?.length) {
+    if (node?.kind === 'element' && node.children?.length) {
         return firstLeaf({
             parent: iter,
             nodes: node.children,
@@ -41,7 +41,7 @@ export function firstLeaf(iter: BooqNodeIterator): BooqNodeIterator {
 
 export function lastLeaf(iter: BooqNodeIterator): BooqNodeIterator {
     const node = iteratorsNode(iter)
-    if (node.kind === 'element' && node.children?.length) {
+    if (node?.kind === 'element' && node.children?.length) {
         return lastLeaf({
             parent: iter,
             nodes: node.children,
@@ -63,10 +63,10 @@ export function findPath(iter: BooqNodeIterator, path: BooqPath): BooqNodeIterat
     } else {
         const node = iteratorsNode(curr)
         // If path is within text node, return current iterator
-        if (node.kind === 'text' && tail.length === 1) {
+        if (node?.kind === 'text' && tail.length === 1) {
             return curr
         }
-        if (node.kind !== 'element' || !node?.children?.length) {
+        if (node?.kind !== 'element' || !node?.children?.length) {
             return undefined
         }
         const childrenIter = {

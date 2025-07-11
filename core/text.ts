@@ -5,12 +5,13 @@ import {
 import { assertNever } from './misc'
 
 export function nodeText(node: BooqNode): string {
-    switch (node.kind) {
+    switch (node?.kind) {
         case 'element':
             return node.children?.map(nodeText).join('') ?? ''
         case 'text':
             return node.content
         case 'stub':
+        case undefined:
             return ''
         default:
             assertNever(node)
@@ -31,7 +32,7 @@ export function previewForPath(nodes: BooqNode[], path: BooqPath, length: number
     let preview = ''
     while (iter) {
         const node = iteratorsNode(iter)
-        preview += node.kind === 'text'
+        preview += node?.kind === 'text'
             ? node.content
             : ''
         if (preview.trim().length >= length) {
@@ -84,7 +85,7 @@ export function textForRange(nodes: BooqNode[], { start, end }: BooqRange): stri
 
     let result = ''
     const startNode = nodes[startHead]
-    if (startNode.kind === 'element') {
+    if (startNode?.kind === 'element') {
         const startText = textForRange(startNode.children ?? [], {
             start: startTail,
             end: startHead === endHead
@@ -96,7 +97,7 @@ export function textForRange(nodes: BooqNode[], { start, end }: BooqRange): stri
         } else {
             return undefined
         }
-    } else if (startNode.kind === 'text') {
+    } else if (startNode?.kind === 'text') {
         if (startTail.length <= 1) {
             result += startNode.content.substring(
                 startTail[0] ?? 0,

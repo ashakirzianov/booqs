@@ -5,7 +5,7 @@ export function markParagraphs(nodes: BooqNode[]): BooqNode[] {
 }
 
 function markParagraphNode(node: BooqNode): BooqNode {
-    if (node.kind !== 'element') {
+    if (node?.kind !== 'element') {
         return node
     } else if (isParagraph(node)) {
         return {
@@ -23,7 +23,7 @@ function markParagraphNode(node: BooqNode): BooqNode {
 }
 
 function isParagraph(node: BooqNode) {
-    if (node.kind !== 'element') {
+    if (node?.kind !== 'element') {
         return false
     }
     switch (node.name) {
@@ -35,7 +35,7 @@ function isParagraph(node: BooqNode) {
 }
 
 function hasChildParagraphs(node: BooqNode): boolean {
-    return node.kind === 'element' && node.children !== undefined && node.children.some(
+    return node?.kind === 'element' && node.children !== undefined && node.children.some(
         ch => isParagraph(ch) || hasChildParagraphs(ch),
     )
 }

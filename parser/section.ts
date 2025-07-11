@@ -65,7 +65,7 @@ async function processSectionContent(content: string, env: Env): Promise<BooqNod
                 break
             case 'body':
                 child = await processXml(element, env)
-                if (child.kind === 'element') {
+                if (child?.kind === 'element') {
                     child.name = 'div'
                 }
                 else {
@@ -303,10 +303,7 @@ function generateSelectorPrefix(id: string) {
 }
 
 function stub(): BooqNode {
-    return {
-        kind: 'stub',
-        length: 0,
-    }
+    return null
 }
 
 function processId(id: string | undefined, env: Env) {

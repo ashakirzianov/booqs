@@ -3,6 +3,7 @@ import {
     BooqElementNode, BooqNode, pathToString,
     pathInRange, samePath, pathLessThan, BooqPath, BooqRange, pathToId,
     BooqId,
+    assertNever,
 } from '@/core'
 
 export type Augmentation = {
@@ -32,7 +33,7 @@ export function renderNodes(nodes: BooqNode[], ctx: RenderContext): ReactNode[] 
     return result
 }
 function renderNode(node: BooqNode, ctx: RenderContext): ReactNode {
-    switch (node.kind) {
+    switch (node?.kind) {
         case 'text':
             switch (ctx.parent?.name) {
                 case 'table': case 'tbody': case 'tr':
@@ -43,6 +44,7 @@ function renderNode(node: BooqNode, ctx: RenderContext): ReactNode {
                     return renderTextNode(node.content, ctx)
             }
         case 'stub':
+        case undefined:
             return null
         case 'element':
             return createElement(
@@ -52,6 +54,9 @@ function renderNode(node: BooqNode, ctx: RenderContext): ReactNode {
                 getProps(node, ctx),
                 getChildren(node, ctx),
             )
+        default:
+            assertNever(node)
+            return null
     }
 }
 

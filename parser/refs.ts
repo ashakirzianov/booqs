@@ -11,7 +11,7 @@ function resolveNodesRefs(root: BooqNode[], nodes: BooqNode[]): BooqNode[] {
 }
 
 function resolveNodeRefs(root: BooqNode[], node: BooqNode): BooqNode {
-    if (node.kind !== 'element') {
+    if (node?.kind !== 'element') {
         return node
     }
     const { href, ...rest } = node.attrs ?? {}
