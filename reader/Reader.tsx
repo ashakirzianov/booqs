@@ -2,7 +2,7 @@
 // import '@/app/wdyr'
 
 import React, { useMemo } from 'react'
-import { BooqAnchor, BooqId, BooqNote, BooqRange, PartialBooqData, textForRange } from '@/core'
+import { BooqAnchor, BooqId, BooqRange, PartialBooqData } from '@/core'
 import { BorderButton, PanelButton } from '@/components/Buttons'
 import { booqHref, feedHref } from '@/application/href'
 import {
@@ -14,9 +14,8 @@ import { NavigationPanel, useNavigationState } from './NavigationPanel'
 import { NotesPanel } from './NotesPanel'
 import { ThemerButton } from '@/components/Themer'
 import { useFontScale } from '@/application/theme'
-import { filterNotes } from './nodes'
 import { useAuth } from '@/application/auth'
-import { useBooqNotes } from '@/application/notes'
+import { useNoteData } from './useNoteData'
 import { AccountButton } from '@/components/AccountButton'
 import { usePathname } from 'next/navigation'
 import { BackIcon, TocIcon, CommentIcon } from '@/components/Icons'
@@ -50,15 +49,11 @@ export function Reader({
         currentPath,
     })
 
-    const { notes } = useBooqNotes({ booqId: booq.booqId, user })
-    const resolvedNotes = useMemo(() => {
-        return notes.map<BooqNote>(note => ({
-            ...note,
-            start: note.range.start,
-            end: note.range.end,
-            text: textForRange(booq.fragment.nodes, note.range) ?? '',
-        }))
-    }, [notes, booq.fragment.nodes])
+    const { notes } = useNoteData({
+        booqId: booq.booqId,
+        nodes: booq.fragment.nodes,
+        user,
+    })
 
     const {
         navigationOpen, navigationSelection,
@@ -72,7 +67,7 @@ export function Reader({
         booqId={booq.booqId}
         title={booq.meta.title ?? 'Untitled'}
         toc={booq.toc.items}
-        notes={resolvedNotes}
+        notes={notes}
         selection={navigationSelection}
         user={user}
         toggleSelection={toggleNavigationSelection}
@@ -92,20 +87,12 @@ export function Reader({
         <CommentIcon />
     </PanelButton>
 
-    const filteredNotes = useMemo(
-        () => filterNotes({
-            notes: resolvedNotes,
-            selection: navigationSelection,
-            user,
-        }), [resolvedNotes, navigationSelection, user]
-    )
-
-    const RightPanelContent = <NotesPanel notes={filteredNotes} />
+    const RightPanelContent = <NotesPanel notes={notes} />
 
     const { anchor, menuTarget, setMenuTarget, temporaryAugmentations } = useContextMenuState()
     
     const { augmentations, menuTargetForAugmentation } = useAugmentations({
-        notes: filteredNotes,
+        notes: navigationSelection.notes ? notes : [],
         quote: quote,
         temporaryAugmentations,
     })
