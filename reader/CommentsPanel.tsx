@@ -6,7 +6,7 @@ export function CommentsPanel({ comments }: {
     comments: BooqNote[],
 }) {
     return (
-        <div className='flex flex-col h-full'>
+        <div className='flex flex-col h-full w-full'>
             <div className='p-4 border-b border-gray-200'>
                 <div className='self-center tracking-widest font-bold'>NOTES</div>
             </div>
@@ -27,7 +27,7 @@ export function CommentsPanel({ comments }: {
 
 function CommentItem({ comment }: { comment: BooqNote }) {
     return (
-        <div className='border border-gray-200 rounded-lg p-3 space-y-2'>
+        <div className='border border-gray-200 rounded-lg p-3 space-y-2 w-full max-w-md'>
 
             {/* Referenced text */}
             <div className='bg-gray-50 p-2 rounded text-sm italic border-l-2'
