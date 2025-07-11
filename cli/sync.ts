@@ -65,6 +65,10 @@ async function syncWebToBlob(options: CliOptions) {
                 continue
             }
             info(`Uploaded asset for id: ${id}`)
+            // Remove any previous download problems since this succeeded
+            if (downloadProblemsSet.has(id)) {
+                await removeProblem(id)
+            }
         } catch (err) {
             console.error(`Error processing ${id}`, err)
             await reportProblem(id, 'download', 'Processing error', err)
@@ -130,6 +134,10 @@ async function syncBlobToDB(options: CliOptions) {
 
                 }
                 info(`Successfully processed ${assetId}`)
+                // Remove any previous parsing problems since this succeeded
+                if (parsingProblemsSet.has(assetId)) {
+                    await removeProblem(assetId)
+                }
                 return true
             } catch (err) {
                 console.error(`Error processing ${assetId}`, err)
@@ -279,6 +287,10 @@ async function reportProblem(id: string, label: string, message: string, err?: a
             err,
         },
     })
+}
+
+async function removeProblem(id: string) {
+    return redis.hdel('pg:problems', id)
 }
 
 function info(label: string, data?: any) {
