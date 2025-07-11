@@ -44,6 +44,10 @@ async function syncWebToBlob(options: CliOptions) {
     const existingSet = new Set(blobIds)
     const downloadProblemsSet = retryProblems ? new Set() : new Set(await getProblemIds('download'))
     info(`Found ${downloadProblemsSet.size} download problems: ${Array.from(downloadProblemsSet).join(', ')}`)
+    
+    let successfullyProcessed = 0
+    let newProblems = 0
+    
     for (const id of webIds) {
         if (existingSet.has(id)) {
             info(`Skipping ${id} because it already exists in blob storage`)
@@ -57,6 +61,7 @@ async function syncWebToBlob(options: CliOptions) {
             const assetRecord = await downloadGutenbergEpub(id)
             if (!assetRecord) {
                 await reportProblem(id, 'download', `Couldn't download asset for ${id}`)
+                newProblems++
                 continue
             }
             info(`Downloaded gutenberg epub file: ${assetRecord.assetId}`)
@@ -70,11 +75,17 @@ async function syncWebToBlob(options: CliOptions) {
             if (downloadProblemsSet.has(id)) {
                 await removeProblem(id)
             }
+            successfullyProcessed++
         } catch (err) {
             console.error(`Error processing ${id}`, err)
             await reportProblem(id, 'download', 'Processing error', err)
+            newProblems++
         }
     }
+    
+    info(`=== Web to Blob Sync Complete ===`)
+    info(`Successfully processed: ${successfullyProcessed} files`)
+    info(`New problems encountered: ${newProblems}`)
 }
 
 async function syncBlobToDB(options: CliOptions) {
@@ -88,6 +99,10 @@ async function syncBlobToDB(options: CliOptions) {
     info(`Found ${existingAssetIdsSet.size} ids in DB`)
     const parsingProblemsSet = retryProblems ? new Set() : new Set(await getProblemIds('parsing'))
     info(`Found ${parsingProblemsSet.size} parsing problems: ${Array.from(parsingProblemsSet).join(', ')}`)
+    
+    let successfullyProcessed = 0
+    let newProblems = 0
+    
     const filteredAssetIds = filterAsyncGenerator(existingBlobAssetIds(), async (assetId) => {
         if (!all && existingAssetIdsSet.has(assetId)) {
             info(`Skipping ${assetId} because it already exists in DB`)
@@ -107,12 +122,12 @@ async function syncBlobToDB(options: CliOptions) {
                 const id = idFromAssetId(assetId)
                 if (!id) {
                     warn(`Couldn't get id from assetId: ${assetId}`)
-                    return false
+                    return { success: false, newProblem: false }
                 }
                 const asset = await downloadAsset(pgEpubsBucket, assetId)
                 if (!asset) {
                     warn(`Couldn't download asset for id: ${id}`)
-                    return false
+                    return { success: false, newProblem: false }
                 }
                 const parseResult = await parseAndInsert({
                     id,
@@ -123,7 +138,7 @@ async function syncBlobToDB(options: CliOptions) {
                 })
                 if (!parseResult) {
                     reportProblem(assetId, 'parsing', 'Failed to parse and insert')
-                    return false
+                    return { success: false, newProblem: true }
                 }
                 info(`Parsed and inserted ${assetId}`)
                 info(`Successfully processed ${assetId}`)
@@ -131,14 +146,29 @@ async function syncBlobToDB(options: CliOptions) {
                 if (parsingProblemsSet.has(assetId)) {
                     await removeProblem(assetId)
                 }
-                return true
+                return { success: true, newProblem: false }
             } catch (err) {
                 console.error(`Error processing ${assetId}`, err)
                 await reportProblem(assetId, 'parsing', 'Processing error', err)
+                return { success: false, newProblem: true }
             }
         })
-        await Promise.all(promises)
+        const results = await Promise.all(promises)
+        
+        // Count results
+        for (const result of results) {
+            if (result.success) {
+                successfullyProcessed++
+            }
+            if (result.newProblem) {
+                newProblems++
+            }
+        }
     }
+    
+    info(`=== Blob to DB Sync Complete ===`)
+    info(`Successfully processed: ${successfullyProcessed} files`)
+    info(`New problems encountered: ${newProblems}`)
 }
 
 async function* filterAsyncGenerator<T>(generator: AsyncGenerator<T>, predicate: (item: T) => Promise<boolean>) {
@@ -257,10 +287,16 @@ async function parseAndInsert({
     if (needToUploadImages) {
         info(`Uploading images for ${assetId}`)
         const imagesResults = await uploadBooqImages(`pg/${id}`, booq)
+        let hasImageErrors = false
         for (const imageResult of imagesResults) {
             if (!imageResult.success) {
                 reportProblem(assetId, 'parsing', `Image upload error: Failed to upload image: ${imageResult.id}`)
+                hasImageErrors = true
             }
+        }
+        // If there were image errors, don't proceed with database insert
+        if (hasImageErrors) {
+            return
         }
     }
     
