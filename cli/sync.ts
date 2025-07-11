@@ -43,6 +43,7 @@ async function syncWebToBlob(options: CliOptions) {
     info(`Found ${blobIds.length} ids in blob storage`)
     const existingSet = new Set(blobIds)
     const downloadProblemsSet = retryProblems ? new Set() : new Set(await getProblemIds('download'))
+    info(`Found ${downloadProblemsSet.size} download problems: ${Array.from(downloadProblemsSet).join(', ')}`)
     for (const id of webIds) {
         if (existingSet.has(id)) {
             info(`Skipping ${id} because it already exists in blob storage`)
@@ -86,6 +87,7 @@ async function syncBlobToDB(options: CliOptions) {
     const existingAssetIdsSet = new Set(assetIdsInDb)
     info(`Found ${existingAssetIdsSet.size} ids in DB`)
     const parsingProblemsSet = retryProblems ? new Set() : new Set(await getProblemIds('parsing'))
+    info(`Found ${parsingProblemsSet.size} parsing problems: ${Array.from(parsingProblemsSet).join(', ')}`)
     const filteredAssetIds = filterAsyncGenerator(existingBlobAssetIds(), async (assetId) => {
         if (!all && existingAssetIdsSet.has(assetId)) {
             info(`Skipping ${assetId} because it already exists in DB`)
