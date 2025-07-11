@@ -11,7 +11,7 @@ import {
 import { useContextMenuFloater } from './useContextMenuFloater'
 import { ReaderLayout } from './ReaderLayout'
 import { NavigationPanel, useNavigationState } from './NavigationPanel'
-import { NotesPanel } from './NotesPanel'
+import { CommentsPanel } from './CommentsPanel'
 import { ThemerButton } from '@/components/Themer'
 import { useFontScale } from '@/application/theme'
 import { useAuth } from '@/application/auth'
@@ -86,14 +86,14 @@ export function Reader({
         <TocIcon />
     </PanelButton>
 
-    const RightPanelButton = <PanelButton
+    const CommentsButton = <PanelButton
         onClick={toggleRightPanelOpen}
         selected={rightPanelOpen}
     >
         <CommentIcon />
     </PanelButton>
 
-    const RightPanelContent = <NotesPanel notes={comments} />
+    const RightPanelContent = <CommentsPanel comments={comments} />
 
     const { anchor, menuTarget, setMenuTarget, temporaryAugmentations } = useContextMenuState()
 
@@ -150,7 +150,7 @@ export function Reader({
     </>
 
     const RightButtons = <>
-        {RightPanelButton}
+        {CommentsButton}
         <ThemerButton />
         <AccountButton
             user={user}
