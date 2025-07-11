@@ -42,19 +42,20 @@ async function syncWebToBlob(options: CliOptions) {
     info(`Found ${webIds.length} ids in Gutenberg Collection`)
     info(`Found ${blobIds.length} ids in blob storage`)
     const existingSet = new Set(blobIds)
+    const downloadProblemsSet = retryProblems ? new Set() : new Set(await getProblemIds('download'))
     for (const id of webIds) {
         if (existingSet.has(id)) {
             info(`Skipping ${id} because it already exists in blob storage`)
             continue
         }
-        if (!retryProblems && await hasProblems(id)) {
-            info(`Skipping ${id} because it has problems`)
+        if (!retryProblems && downloadProblemsSet.has(id)) {
+            info(`Skipping ${id} because it has download problems`)
             continue
         }
         try {
             const assetRecord = await downloadGutenbergEpub(id)
             if (!assetRecord) {
-                await reportProblem(id, `Couldn't download asset for ${id}`)
+                await reportProblem(id, 'download', `Couldn't download asset for ${id}`)
                 continue
             }
             info(`Downloaded gutenberg epub file: ${assetRecord.assetId}`)
@@ -66,7 +67,7 @@ async function syncWebToBlob(options: CliOptions) {
             info(`Uploaded asset for id: ${id}`)
         } catch (err) {
             console.error(`Error processing ${id}`, err)
-            await reportProblem(id, 'Processing error', err)
+            await reportProblem(id, 'download', 'Processing error', err)
         }
     }
 }
@@ -80,13 +81,14 @@ async function syncBlobToDB(options: CliOptions) {
     const assetIdsInDb = await existingAssetIds()
     const existingAssetIdsSet = new Set(assetIdsInDb)
     info(`Found ${existingAssetIdsSet.size} ids in DB`)
+    const parsingProblemsSet = retryProblems ? new Set() : new Set(await getProblemIds('parsing'))
     const filteredAssetIds = filterAsyncGenerator(existingBlobAssetIds(), async (assetId) => {
         if (!all && existingAssetIdsSet.has(assetId)) {
             info(`Skipping ${assetId} because it already exists in DB`)
             return false
         }
-        if (!retryProblems && await hasProblems(assetId)) {
-            info(`Skipping ${assetId} because it has problems`)
+        if (parsingProblemsSet.has(assetId)) {
+            info(`Skipping ${assetId} because it has parsing problems`)
             return false
         }
         return true
@@ -113,7 +115,7 @@ async function syncBlobToDB(options: CliOptions) {
                     },
                 })
                 if (!parseResult) {
-                    reportProblem(id, 'Failed to parse and insert', new Error('Parse error'))
+                    reportProblem(assetId, 'parsing', 'Failed to parse and insert')
                     return false
                 }
                 info(`Parsed and inserted ${assetId}`)
@@ -122,7 +124,7 @@ async function syncBlobToDB(options: CliOptions) {
                     const imagesResults = await uploadBooqImages(`pg/${id}`, parseResult.booq)
                     for (const imageResult of imagesResults) {
                         if (!imageResult.success) {
-                            reportProblem(assetId, 'Image upload error', new Error(`Failed to upload image: ${imageResult.id}`))
+                            reportProblem(assetId, 'parsing', `Image upload error: Failed to upload image: ${imageResult.id}`)
                         }
                     }
 
@@ -131,7 +133,7 @@ async function syncBlobToDB(options: CliOptions) {
                 return true
             } catch (err) {
                 console.error(`Error processing ${assetId}`, err)
-                await reportProblem(assetId, 'Processing error', err)
+                await reportProblem(assetId, 'parsing', 'Processing error', err)
             }
         })
         await Promise.all(promises)
@@ -245,7 +247,7 @@ async function parseAndInsert({
     })
     if (!booq) {
         info(`Couldn't parse epub: ${assetId}`)
-        await reportProblem(assetId, 'Parsing errors', diags)
+        await reportProblem(assetId, 'parsing', 'Parsing errors', diags)
         return
     }
     const insertResult = await insertPgRecord({ booq, assetId, id })
@@ -254,15 +256,27 @@ async function parseAndInsert({
         : undefined
 }
 
-async function hasProblems(id: string) {
-    return redis.hexists('pg:problems', id)
+async function getProblemIds(label: string): Promise<string[]> {
+    const problems = await redis.hgetall('pg:problems')
+    if (!problems) {
+        return []
+    }
+    const ids: string[] = []
+    for (const [id, problemData] of Object.entries(problems)) {
+        if (problemData && typeof problemData === 'object' && 'label' in problemData && problemData.label === label) {
+            ids.push(id)
+        }
+    }
+    return ids
 }
 
-async function reportProblem(id: string, message: string, err?: any) {
-    console.error('\x1b[31m%s\x1b[0m', `PG: Problem with ${id}: ${message}`, err)
+async function reportProblem(id: string, label: string, message: string, err?: any) {
+    console.error('\x1b[31m%s\x1b[0m', `PG: Problem with ${id} [${label}]: ${message}`, err)
     return redis.hset('pg:problems', {
         [id]: {
-            message, err,
+            label,
+            message,
+            err,
         },
     })
 }
