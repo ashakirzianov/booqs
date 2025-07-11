@@ -1,31 +1,32 @@
 'use client'
-import '@/app/wdyr'
+// import '@/app/wdyr'
 
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { BooqAnchor, BooqId, BooqNote, BooqPath, BooqRange, contextForRange, PartialBooqData, pathToId, positionForPath, samePath, textForRange } from '@/core'
+import React, { useMemo } from 'react'
+import { BooqAnchor, BooqId, BooqRange, PartialBooqData } from '@/core'
 import { BorderButton, PanelButton } from '@/components/Buttons'
 import { booqHref, feedHref } from '@/application/href'
 import {
-    BooqContent, getAugmentationElement, getAugmentationText,
-    Augmentation,
-    useOnBooqClick,
-    useOnBooqScroll,
+    BooqContent,
 } from '@/viewer'
-import { useContextMenu, type ContextMenuState } from './ContextMenu'
+import { useContextMenuFloater } from './useContextMenuFloater'
 import { ReaderLayout } from './ReaderLayout'
-import { resolveNoteColor, currentSource, pageForPosition, quoteColor } from '@/application/common'
 import { NavigationPanel, useNavigationState } from './NavigationPanel'
-import { reportBooqHistory } from '@/data/user'
+import { CommentsPanel } from './CommentsPanel'
 import { ThemerButton } from '@/components/Themer'
 import { useFontScale } from '@/application/theme'
-import { filterNotes } from './nodes'
 import { useAuth } from '@/application/auth'
-import { Copilot, CopilotState } from '@/components/Copilot'
-import { useBooqNotes } from '@/application/notes'
+import { useNotesData } from './useNotesData'
 import { AccountButton } from '@/components/AccountButton'
 import { usePathname } from 'next/navigation'
-import { BackIcon, Spinner, TocIcon } from '@/components/Icons'
+import { BackIcon, TocIcon, CommentIcon } from '@/components/Icons'
 import Link from 'next/link'
+import { useScrollToQuote } from './useScrollToQuote'
+import { useScrollHandler } from './useScrollHandler'
+import { useControlsVisibility } from './useControlsVisibility'
+import { useAugmentations, TemporaryAugmentation } from './useAugmentations'
+import { MENU_ANCHOR_ID, useContextMenuState } from './useContextMenuState'
+import { ContextMenuContent } from './ContextMenuContent'
+import { usePageData } from './usePageData'
 
 export function Reader({
     booq, quote,
@@ -36,50 +37,43 @@ export function Reader({
     const pathname = usePathname()
     const { user, isLoading: isAuthLoading } = useAuth()
     const fontScale = useFontScale()
-    const { notes } = useBooqNotes({ booqId: booq.booqId, user })
-    const resolvedNotes = useMemo(() => {
-        return notes.map<BooqNote>(note => ({
-            ...note,
-            start: note.range.start,
-            end: note.range.end,
-            text: textForRange(booq.fragment.nodes, note.range) ?? '',
-        }))
-    }, [notes, booq.fragment.nodes])
-
-    const quoteRef = useRef(quote)
-    useEffect(() => {
-        if (quoteRef.current) {
-            const id = pathToId(quoteRef.current.start)
-            const element = document.getElementById(id)
-            if (element) {
-                element.scrollIntoView({
-                    behavior: 'instant',
-                })
-            }
-        }
-    }, [quoteRef])
-
+    useScrollToQuote(quote)
     const {
-        onScroll, currentPage, totalPages, leftPages,
-    } = useScrollHandler(booq)
-    useOnBooqScroll(onScroll, {
-        throttle: 500,
+        currentPath,
+    } = useScrollHandler({
+        booqId: booq.booqId,
+        initialPath: booq.fragment.current.path,
     })
+    const { currentPage, leftPages, totalPages } = usePageData({
+        booq,
+        currentPath,
+    })
+
     const range: BooqRange = useMemo(() => ({
         start: booq.fragment.current.path,
         end: booq.fragment.next?.path ?? [booq.fragment.nodes.length],
     }), [booq])
+
+    const { notes, comments } = useNotesData({
+        booqId: booq.booqId,
+        nodes: booq.fragment.nodes,
+        user,
+        currentRange: range,
+    })
 
     const {
         navigationOpen, navigationSelection,
         toggleNavigationOpen, closeNavigation,
         toggleNavigationSelection,
     } = useNavigationState()
+
+    const [rightPanelOpen, setRightPanelOpen] = React.useState(false)
+    const toggleRightPanelOpen = () => setRightPanelOpen(prev => !prev)
     const NavigationContent = <NavigationPanel
         booqId={booq.booqId}
         title={booq.meta.title ?? 'Untitled'}
         toc={booq.toc.items}
-        notes={resolvedNotes}
+        notes={notes}
         selection={navigationSelection}
         user={user}
         toggleSelection={toggleNavigationSelection}
@@ -92,59 +86,96 @@ export function Reader({
         <TocIcon />
     </PanelButton>
 
-    const filteredNotes = useMemo(
-        () => filterNotes({
-            notes: resolvedNotes,
-            selection: navigationSelection,
-            user,
-        }), [resolvedNotes, navigationSelection, user]
-    )
+    const CommentsButton = <PanelButton
+        onClick={toggleRightPanelOpen}
+        selected={rightPanelOpen}
+    >
+        <CommentIcon />
+    </PanelButton>
 
-    const { augmentations, menuStateForAugmentation } = useAugmentations({
-        notes: filteredNotes,
+    const RightPanelContent = <CommentsPanel
+        comments={comments}
+    />
+
+    const { anchor, menuTarget, setMenuTarget, anchorRange } = useContextMenuState()
+
+    const temporaryAugmentations = useMemo<TemporaryAugmentation[]>(() => {
+        if (!anchorRange) {
+            return []
+        }
+
+        return [{
+            range: anchorRange,
+            name: MENU_ANCHOR_ID,
+        }]
+    }, [anchorRange])
+
+    const { augmentations, menuTargetForAugmentation } = useAugmentations({
+        notes: navigationSelection.notes ? notes : [],
+        comments: comments,
         quote: quote,
+        temporaryAugmentations,
     })
-    const { visible, toggle } = useControlsVisibility()
-    useOnBooqClick(toggle)
+    const { visible } = useControlsVisibility()
 
     const pagesLabel = `${currentPage} of ${totalPages}`
     const leftLabel = leftPages <= 1 ? 'Last page'
         : `${leftPages} pages left`
 
-    const [copilotState, setCopilotState] = useState<CopilotState>({
-        kind: 'empty',
-    })
-    const copilotVisible = copilotState.kind !== 'empty'
+    const MenuContent = useMemo(() => {
+        if (menuTarget.kind === 'empty') {
+            return null
+        }
+        return <div><ContextMenuContent
+            booqId={booq.booqId}
+            booqMeta={booq.meta}
+            user={user}
+            target={menuTarget}
+            setTarget={setMenuTarget}
+        /></div>
+    }, [booq.booqId, booq.meta, user, menuTarget, setMenuTarget])
+
     const {
-        ContextMenuNode, isOpen: contextMenuVisible,
-        updateMenuState: setMenuState,
-    } = useContextMenu({
-        booqId: booq.booqId,
-        user,
-        closed: copilotState.kind !== 'empty',
-        updateCopilot(selection, anchor) {
-            setCopilotState({
-                kind: 'selected',
-                selection,
-                anchor,
-                context: contextForRange(booq.fragment.nodes, selection.range, 1000) ?? 'failed',
-            })
-        },
+        ContextMenuNode
+    } = useContextMenuFloater({
+        Content: MenuContent,
+        anchor: anchor,
+        setTarget: setMenuTarget,
     })
+
     const onAugmentationClick = useMemo(() => {
         return (id: string) => {
-            const next = menuStateForAugmentation(id)
+            const next = menuTargetForAugmentation(id)
             if (next) {
-                setMenuState(next)
+                setMenuTarget(next)
             }
         }
-    }, [menuStateForAugmentation, setMenuState])
+    }, [menuTargetForAugmentation, setMenuTarget])
+    const isControlsVisible = (MenuContent === null) && visible
 
-    const isControlsVisible = !contextMenuVisible && !copilotVisible && visible
+    const LeftButtons = <>
+        <Link href={feedHref()}>
+            <PanelButton>
+                <BackIcon />
+            </PanelButton>
+        </Link>
+        {NavigationButton}
+    </>
+
+    const RightButtons = <>
+        {CommentsButton}
+        <ThemerButton />
+        <AccountButton
+            user={user}
+            from={pathname}
+            loading={isAuthLoading}
+        />
+    </>
 
     return <ReaderLayout
         isControlsVisible={isControlsVisible}
-        isNavigationOpen={navigationOpen}
+        isLeftPanelOpen={navigationOpen}
+        isRightPanelOpen={rightPanelOpen}
         BooqContent={<div style={{
             fontFamily: 'var(--font-book)',
             fontSize: `${fontScale}%`,
@@ -169,178 +200,14 @@ export function Reader({
             title='Next'
         />}
         ContextMenu={ContextMenuNode}
-        Copilot={<Copilot
-            state={copilotState}
-            setState={setCopilotState}
-            data={{
-                id: booq.booqId,
-                meta: booq.meta,
-            }}
-        />}
-        MainButton={<Link href={feedHref()}>
-            <PanelButton>
-                <BackIcon />
-            </PanelButton>
-        </Link>}
-        NavigationButton={NavigationButton}
-        ThemerButton={<ThemerButton />}
-        AccountButton={<AccountButton
-            user={user}
-            from={pathname}
-            loading={isAuthLoading}
-        />}
-        CurrentPage={<PageLabel text={pagesLabel} />}
-        PagesLeft={<PageLabel text={leftLabel} />}
-        NavigationContent={NavigationContent}
-    />
-}
-
-export function LoadingBooqScreen() {
-    return <ReaderLayout
-        isControlsVisible={true}
-        isNavigationOpen={false}
-        BooqContent={<div style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            alignSelf: 'center',
-            width: '100vw',
-            height: '100vh',
-            fontSize: 'xx-large',
-        }}>
-            <Spinner />
-        </div>}
-        PrevButton={null}
-        NextButton={null}
-        ContextMenu={null}
         Copilot={null}
-        MainButton={<Link href={feedHref()}>
-            <PanelButton>
-                <BackIcon />
-            </PanelButton>
-        </Link>}
-        NavigationButton={null}
-        ThemerButton={<ThemerButton />}
-        AccountButton={<AccountButton />}
-        CurrentPage={null}
-        PagesLeft={null}
-        NavigationContent={null}
+        LeftButtons={LeftButtons}
+        RightButtons={RightButtons}
+        LeftFooter={<PageLabel text={pagesLabel} />}
+        RightFooter={<PageLabel text={leftLabel} />}
+        LeftPanelContent={NavigationContent}
+        RightPanelContent={RightPanelContent}
     />
-}
-
-function useControlsVisibility() {
-    const [visible, setVisible] = useState(false)
-    return {
-        visible,
-        toggle: useCallback(() => {
-            if (!isAnythingSelected()) {
-                setVisible(!visible)
-            }
-        }, [visible, setVisible]),
-    }
-}
-
-function isAnythingSelected() {
-    const selection = window.getSelection()
-    if (!selection) {
-        return false
-    }
-    return selection.anchorNode !== selection.focusNode
-        || selection.anchorOffset !== selection.focusOffset
-}
-
-function useAugmentations({
-    quote, notes,
-}: {
-    notes: BooqNote[],
-    quote?: BooqRange,
-}) {
-    const augmentations = useMemo(() => {
-        const augmentations = notes.map<Augmentation>(note => ({
-            id: `note/${note.id}`,
-            range: note.range,
-            color: resolveNoteColor(note.color),
-        }))
-        if (quote) {
-            const quoteAugmentation: Augmentation = {
-                range: quote,
-                color: quoteColor,
-                id: 'quote/0',
-            }
-            return [quoteAugmentation, ...augmentations]
-        } else {
-            return augmentations
-        }
-    }, [quote, notes])
-    const menuStateForAugmentation = useCallback(function (augmentationId: string): ContextMenuState | undefined {
-        const anchor = getAugmentationElement(augmentationId)
-        if (!anchor) {
-            return undefined
-        }
-        const [kind, id] = augmentationId.split('/')
-        switch (kind) {
-            case 'quote':
-                return quote
-                    ? {
-                        anchor,
-                        target: {
-                            kind: 'quote',
-                            selection: {
-                                range: quote,
-                                text: getAugmentationText('quote/0'),
-                            },
-                        },
-                    }
-                    : undefined
-            case 'note': {
-                const note = notes.find(hl => hl.id === id)
-                return note
-                    ? {
-                        anchor,
-                        target: {
-                            kind: 'note',
-                            note,
-                        }
-                    }
-                    : undefined
-            }
-            default:
-                return undefined
-        }
-    }, [quote, notes])
-    return {
-        augmentations,
-        menuStateForAugmentation,
-    }
-}
-
-function useScrollHandler({ booqId, fragment, meta: { length } }: PartialBooqData) {
-    const [currentPath, setCurrentPath] = useState(fragment.current.path)
-
-    const position = positionForPath(fragment.nodes, currentPath)
-    const nextChapter = fragment.next
-        ? positionForPath(fragment.nodes, fragment.next.path)
-        : length
-    const currentPage = pageForPosition(position) + 1
-    const totalPages = pageForPosition(length)
-    const chapter = pageForPosition(nextChapter)
-    const leftPages = chapter - currentPage + 1
-
-    const onScroll = function (path: BooqPath) {
-        if (!samePath(path, currentPath)) {
-            setCurrentPath(path)
-            reportBooqHistory({
-                booqId,
-                path,
-                source: currentSource(),
-            })
-        }
-    }
-    return {
-        currentPath,
-        currentPage, totalPages, leftPages,
-        onScroll,
-    }
 }
 
 function AnchorButton({ booqId, anchor, title }: {

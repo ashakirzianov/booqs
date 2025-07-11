@@ -44,7 +44,7 @@ function collectImgSrcs(nodes: BooqNode[], env?: CollectSrcEnv): string[] {
 }
 
 function collectImgSrcsFromNode(node: BooqNode, env?: CollectSrcEnv): string[] {
-    if (node.kind !== 'element') {
+    if (node?.kind !== 'element') {
         return []
     }
     if (node.fileName) {

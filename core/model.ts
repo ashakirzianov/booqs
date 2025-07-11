@@ -32,8 +32,8 @@ export type BooqTextNode = {
 }
 export type BooqStubNode = {
     kind: 'stub',
-    length: number,
-}
+    length?: number,
+} | null
 export type BooqNode = BooqElementNode | BooqTextNode | BooqStubNode
 
 export type TableOfContentsItem = {

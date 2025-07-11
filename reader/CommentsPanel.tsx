@@ -1,0 +1,103 @@
+import React from 'react'
+import Link from 'next/link'
+import { BooqNote, pathToId } from '@/core'
+import { Avatar } from '@/components/Avatar'
+
+export function CommentsPanel({ comments }: {
+    comments: BooqNote[],
+}) {
+    return (
+        <div className='flex flex-1' style={{
+            padding: '0 env(safe-area-inset-right) 0 env(safe-area-inset-left)',
+        }}>
+            <div className='flex flex-1 flex-col text-dimmed max-h-full text-sm'>
+                <div className='flex flex-col flex-1 overflow-auto mt-lg'>
+                    <div className='flex flex-col xl:py-0 xl:px-4'>
+                        <div className='self-center tracking-widest font-bold'>COMMENTS</div>
+                    </div>
+                    <div className='flex flex-col flex-1 xl:py-0 xl:px-4 space-y-6'>
+                        {comments.length === 0 ? (
+                            <div className='text-center py-8'>
+                                No comments available
+                            </div>
+                        ) : (
+                            comments.map(note => (
+                                <CommentItem key={note.id} comment={note} />
+                            ))
+                        )}
+                    </div>
+                </div>
+            </div>
+        </div>
+    )
+}
+
+function CommentItem({ comment }: { comment: BooqNote }) {
+    return (
+        <div className='rounded-lg p-3 space-y-2 w-full max-w-md'>
+
+            {/* Referenced text */}
+            <Link href={`#${pathToId(comment.range.start)}`}
+                className='block p-2 rounded text-sm italic border-l-2 hover:bg-gray-50 transition-colors cursor-pointer'
+                style={{ borderLeftColor: comment.color }}>
+                &quot;{comment.text}&quot;
+            </Link>
+
+            {/* Note content */}
+            {comment.content && (
+                <div className='text-sm text-primary'>
+                    {comment.content}
+                </div>
+            )}
+
+            {/* Note metadata */}
+            <div className='flex items-center justify-end gap-2 pt-1'>
+                <Avatar user={comment.author} />
+                <div className='text-xs text-dimmed'>
+                    {formatRelativeTime(new Date(comment.createdAt))}
+                </div>
+            </div>
+        </div>
+    )
+}
+
+function formatDateString(date: Date, currentDate: Date): string {
+    const isSameYear = date.getFullYear() === currentDate.getFullYear()
+
+    if (isSameYear) {
+        return date.toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric'
+        })
+    } else {
+        return date.toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric'
+        })
+    }
+}
+
+function formatRelativeTime(date: Date, currentDate: Date = new Date()): string {
+    const diffMs = currentDate.getTime() - date.getTime()
+    const diffSeconds = Math.floor(diffMs / 1000)
+    const diffMinutes = Math.floor(diffSeconds / 60)
+    const diffHours = Math.floor(diffMinutes / 60)
+    const diffDays = Math.floor(diffHours / 24)
+
+    // If more than 7 days, show date
+    if (diffDays > 7) {
+        return formatDateString(date, currentDate)
+    }
+
+    // Relative time formatting
+    if (diffSeconds < 60) {
+        return `${diffSeconds} second${diffSeconds !== 1 ? 's' : ''} ago`
+    } else if (diffMinutes < 60) {
+        return `${diffMinutes} minute${diffMinutes !== 1 ? 's' : ''} ago`
+    } else if (diffHours < 24) {
+        return `${diffHours} hour${diffHours !== 1 ? 's' : ''} ago`
+    } else {
+        return `${diffDays} day${diffDays !== 1 ? 's' : ''} ago`
+    }
+}

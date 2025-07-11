@@ -1,7 +1,7 @@
 import { inspect } from 'util'
-import { downloadAsset, listObjects, uploadAsset } from '@/backend/blob'
+import { deleteAsset, downloadAsset, listObjects, uploadAsset } from '@/backend/blob'
 import {
-    existingIds, pgEpubsBucket, insertPgRecord,
+    existingAssetIds, pgEpubsBucket, insertPgRecord,
 } from '@/backend/pg'
 import { parseEpubFile } from '@/parser'
 import { uploadBooqImages } from '@/backend/images'
@@ -21,6 +21,9 @@ export async function sync(options: CliOptions) {
             return
         case 'blob2db':
             await syncBlobToDB(options)
+            return
+        case 'blob-cleanup':
+            await blobCleanup(options)
             return
         default:
             console.info('Unknown command: ', command)
@@ -74,28 +77,25 @@ async function syncBlobToDB(options: CliOptions) {
     const retryProblems = options.switches['retry-problems'] === 'true'
     const needToUploadImages = options.switches['upload-images'] === 'true'
     const all = options.switches['all'] === 'true'
-    const existing = await existingIds()
-    info(`Found ${existing.length} ids in DB`)
-    const existingIdsSet = new Set(existing)
-    const filteredGenerator = filter(existingBlobAssetIds(), (id) => {
-        if (all) {
-            return true
+    const assetIdsInDb = await existingAssetIds()
+    const existingAssetIdsSet = new Set(assetIdsInDb)
+    info(`Found ${existingAssetIdsSet.size} ids in DB`)
+    const filteredAssetIds = filterAsyncGenerator(existingBlobAssetIds(), async (assetId) => {
+        if (!all && existingAssetIdsSet.has(assetId)) {
+            info(`Skipping ${assetId} because it already exists in DB`)
+            return false
         }
-        if (existingIdsSet.has(id)) {
-            info(`Skipping ${id} because it already exists in DB`)
+        if (!retryProblems && await hasProblems(assetId)) {
+            info(`Skipping ${assetId} because it has problems`)
             return false
         }
         return true
     })
     let count = 0
-    for await (const batch of makeBatches(filteredGenerator, batchSize)) {
+    for await (const batch of makeBatches(filteredAssetIds, batchSize)) {
         info(`Processing batch ${count++} with ${batch.length} assets...`)
         const promises = batch.map(async (assetId) => {
             try {
-                if (!retryProblems && await hasProblems(assetId)) {
-                    info(`Skipping ${assetId} because it has problems`)
-                    return false
-                }
                 const id = idFromAssetId(assetId)
                 if (!id) {
                     warn(`Couldn't get id from assetId: ${assetId}`)
@@ -138,6 +138,58 @@ async function syncBlobToDB(options: CliOptions) {
     }
 }
 
+async function* filterAsyncGenerator<T>(generator: AsyncGenerator<T>, predicate: (item: T) => Promise<boolean>) {
+    for await (const item of generator) {
+        if (await predicate(item)) {
+            yield item
+        }
+    }
+}
+
+async function blobCleanup(_options: CliOptions) {
+    info('Cleaning up Blob storage...')
+    const assetIds = await Array.fromAsync(existingBlobAssetIds())
+    function precedence(assetId: string): number {
+        if (assetId.endsWith('-images-3.epub')) return 3
+        if (assetId.endsWith('-images.epub')) return 2
+        if (assetId.endsWith('.epub')) return 1
+        return 0
+    }
+
+    const bestAssets = new Map<string, string>()
+
+    for (const assetId of assetIds) {
+        const numericId = idFromAssetId(assetId)
+        if (!numericId) continue
+
+        const currentBest = bestAssets.get(numericId)
+        if (!currentBest || precedence(assetId) > precedence(currentBest)) {
+            bestAssets.set(numericId, assetId)
+        }
+    }
+
+    const toKeep = new Set(bestAssets.values())
+    const toDelete = assetIds.filter(assetId => !toKeep.has(assetId))
+    info(`Found ${toDelete.length} assets to delete from blob storage`)
+    let count = 0
+    for (const assetId of toDelete) {
+        info(`Deleting asset: ${assetId}`)
+        try {
+            const result = await deleteAsset(pgEpubsBucket, assetId)
+            if (result.$metadata.httpStatusCode === 204) {
+                info(`Successfully deleted asset: ${assetId}`)
+                count++
+            } else {
+                warn(`Failed to delete asset ${assetId}: ${result.$metadata.httpStatusCode}`)
+            }
+        }
+        catch (err) {
+            warn(`Failed to delete asset ${assetId}`, err)
+        }
+    }
+    info(`Deleted ${count} assets from blob storage`)
+}
+
 async function* existingBlobIds() {
     for await (const assetId of existingBlobAssetIds()) {
         const id = idFromAssetId(assetId)
@@ -170,17 +222,6 @@ async function* makeBatches<T>(generator: AsyncGenerator<T>, batchSize: number) 
     }
     if (batch.length > 0) {
         yield batch
-    }
-}
-
-async function* filter<T>(
-    generator: AsyncGenerator<T>,
-    predicate: (item: T) => boolean,
-) {
-    for await (const item of generator) {
-        if (predicate(item)) {
-            yield item
-        }
     }
 }
 

@@ -9,7 +9,7 @@ export function nodeForPath(nodes: BooqNode[], path: BooqPath): BooqNode | undef
     const node = nodes[head]
     if (tail.length === 0) {
         return node
-    } else if (node.kind === 'element') {
+    } else if (node?.kind === 'element') {
         return nodeForPath(node.children ?? [], tail)
     } else {
         return undefined
@@ -25,12 +25,9 @@ export function nodesForRange(nodes: BooqNode[], range: BooqRange): BooqNode[] {
     for (let idx = 0; idx < nodes.length; idx++) {
         const node = nodes[idx]
         if (idx < actualStart) {
-            result.push({
-                kind: 'stub',
-                length: nodeLength(node),
-            })
+            result.push(stubNode(nodeLength(node)))
         } else if (idx === actualStart) {
-            if (node.kind === 'element' && node.children) {
+            if (node?.kind === 'element' && node.children) {
                 result.push({
                     ...node,
                     children: nodesForRange(node.children, {
@@ -46,7 +43,7 @@ export function nodesForRange(nodes: BooqNode[], range: BooqRange): BooqNode[] {
         } else if (idx < actualEnd) {
             result.push(node)
         } else if (idx === actualEnd && endTail.length) {
-            if (node.kind === 'element' && node.children) {
+            if (node?.kind === 'element' && node.children) {
                 result.push({
                     ...node,
                     children: nodesForRange(node.children, {
@@ -58,10 +55,7 @@ export function nodesForRange(nodes: BooqNode[], range: BooqRange): BooqNode[] {
                 result.push(node)
             }
         } else {
-            result.push({
-                kind: 'stub',
-                length: nodeLength(node),
-            })
+            result.push(stubNode(nodeLength(node)))
         }
     }
     return result
@@ -70,7 +64,7 @@ export function nodesForRange(nodes: BooqNode[], range: BooqRange): BooqNode[] {
 export function findPathForId(nodes: BooqNode[], targetId: string): BooqPath | undefined {
     for (let idx = 0; idx < nodes.length; idx++) {
         const node = nodes[idx]
-        if (node.kind === 'element') {
+        if (node?.kind === 'element') {
             const { id, children } = node
             if (id === targetId) {
                 return [idx]
@@ -83,4 +77,10 @@ export function findPathForId(nodes: BooqNode[], targetId: string): BooqPath | u
         }
     }
     return undefined
+}
+
+function stubNode(length: number): BooqNode {
+    return length > 0
+        ? { kind: 'stub', length }
+        : null
 }

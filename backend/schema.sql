@@ -94,6 +94,9 @@ CREATE TABLE IF NOT EXISTS user_collections_booqs (
 );
 CREATE INDEX IF NOT EXISTS user_collections_booqs_booq_id_idx ON user_collections_booqs(booq_id);
 
+-- Notes privacy enum
+CREATE TYPE note_privacy AS ENUM ('private', 'public');
+
 -- Notes
 CREATE TABLE IF NOT EXISTS notes (
   id TEXT PRIMARY KEY DEFAULT uuid_generate_v4()::TEXT,
@@ -103,6 +106,7 @@ CREATE TABLE IF NOT EXISTS notes (
   end_path INTEGER[] NOT NULL,
   color TEXT NOT NULL,
   content TEXT,
+  privacy note_privacy NOT NULL DEFAULT 'private',
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -110,6 +114,8 @@ CREATE INDEX IF NOT EXISTS notes_author_id_idx ON notes(author_id);
 CREATE INDEX IF NOT EXISTS notes_booq_id_idx ON notes(booq_id);
 CREATE INDEX IF NOT EXISTS notes_user_id_booq_id_idx ON notes(author_id, booq_id);
 CREATE INDEX IF NOT EXISTS notes_created_at_idx ON notes(created_at);
+CREATE INDEX IF NOT EXISTS notes_privacy_idx ON notes(privacy);
+CREATE INDEX IF NOT EXISTS notes_booq_id_privacy_idx ON notes(booq_id, privacy);
 
 -- Passkey credentials
 CREATE TABLE IF NOT EXISTS passkey_credentials (

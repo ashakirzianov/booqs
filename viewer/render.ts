@@ -3,12 +3,14 @@ import {
     BooqElementNode, BooqNode, pathToString,
     pathInRange, samePath, pathLessThan, BooqPath, BooqRange, pathToId,
     BooqId,
+    assertNever,
 } from '@/core'
 
 export type Augmentation = {
     range: BooqRange,
     id: string,
     color?: string,
+    underline?: 'solid' | 'dashed',
 }
 
 type RenderContext = {
@@ -31,7 +33,7 @@ export function renderNodes(nodes: BooqNode[], ctx: RenderContext): ReactNode[] 
     return result
 }
 function renderNode(node: BooqNode, ctx: RenderContext): ReactNode {
-    switch (node.kind) {
+    switch (node?.kind) {
         case 'text':
             switch (ctx.parent?.name) {
                 case 'table': case 'tbody': case 'tr':
@@ -42,6 +44,7 @@ function renderNode(node: BooqNode, ctx: RenderContext): ReactNode {
                     return renderTextNode(node.content, ctx)
             }
         case 'stub':
+        case undefined:
             return null
         case 'element':
             return createElement(
@@ -51,6 +54,9 @@ function renderNode(node: BooqNode, ctx: RenderContext): ReactNode {
                 getProps(node, ctx),
                 getChildren(node, ctx),
             )
+        default:
+            assertNever(node)
+            return null
     }
 }
 
@@ -64,6 +70,7 @@ function renderTextNode(text: string, {
     const spans = applyAugmentations({
         text, path: [...path, 0],
         id: undefined,
+        underline: undefined,
     },
         augmentations,
     )
@@ -80,6 +87,10 @@ function renderTextNode(text: string, {
                 style: {
                     background: span.color,
                     cursor: 'pointer',
+                    ...(span.underline && {
+                        textDecoration: 'underline',
+                        textDecorationStyle: span.underline,
+                    }),
                 },
                 onClick: onAugmentationClick
                     ? () => onAugmentationClick(augmentationId)
@@ -176,6 +187,7 @@ type AugmentedSpan = {
     path: BooqPath,
     text: string,
     color?: string,
+    underline?: 'solid' | 'dashed',
     id: string | undefined,
 }
 
@@ -199,7 +211,7 @@ function applyAugmentationOnSpans(spans: AugmentedSpan[], augmentation: Augmenta
         [])
 }
 
-function applyAugmentationOnSpan(span: AugmentedSpan, { range, color, id }: Augmentation): AugmentedSpan[] {
+function applyAugmentationOnSpan(span: AugmentedSpan, { range, color, underline, id }: Augmentation): AugmentedSpan[] {
     const [prefix, offset] = breakPath(span.path)
     const [startPrefix, startOffset] = breakPath(range.start)
     const [endPrefix, endOffset] = range.end
@@ -226,6 +238,7 @@ function applyAugmentationOnSpan(span: AugmentedSpan, { range, color, id }: Augm
             text: span.text.substring(pointA, pointB),
             path: span.path,
             color: span.color,
+            underline: span.underline,
             id: span.id,
         })
     }
@@ -233,7 +246,7 @@ function applyAugmentationOnSpan(span: AugmentedSpan, { range, color, id }: Augm
         result.push({
             text: span.text.substring(pointB, pointC),
             path: [...prefix, pointB + offset],
-            color, id,
+            color, underline, id,
         })
     }
     if (pointC < pointD) {
@@ -241,6 +254,7 @@ function applyAugmentationOnSpan(span: AugmentedSpan, { range, color, id }: Augm
             text: span.text.substring(pointC, pointD),
             path: [...prefix, pointC + offset],
             color: span.color,
+            underline: span.underline,
             id: span.id,
         })
     }
