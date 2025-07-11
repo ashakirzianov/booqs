@@ -1,6 +1,6 @@
 import React from 'react'
 import { BooqNote } from '@/core'
-import { resolveNoteColor } from '@/application/common'
+import { Avatar } from '@/components/Avatar'
 
 export function CommentsPanel({ comments }: {
     comments: BooqNote[],
@@ -28,18 +28,6 @@ export function CommentsPanel({ comments }: {
 function CommentItem({ comment }: { comment: BooqNote }) {
     return (
         <div className='border border-gray-200 rounded-lg p-3 space-y-2'>
-            {/* Note color indicator */}
-            <div className='flex items-center gap-2'>
-                <div
-                    className='w-3 h-3 rounded-full'
-                    style={{
-                        backgroundColor: resolveNoteColor(comment.color),
-                    }}
-                />
-                <span className='text-xs text-gray-500'>
-                    {comment.author.name || 'Anonymous'}
-                </span>
-            </div>
 
             {/* Referenced text */}
             <div className='bg-gray-50 p-2 rounded text-sm italic border-l-2'
@@ -55,8 +43,11 @@ function CommentItem({ comment }: { comment: BooqNote }) {
             )}
 
             {/* Note metadata */}
-            <div className='text-xs text-gray-400 pt-1'>
-                {new Date(comment.createdAt).toLocaleDateString()}
+            <div className='flex items-center gap-2 pt-1'>
+                <Avatar user={comment.author} />
+                <div className='text-xs text-gray-400'>
+                    {new Date(comment.createdAt).toLocaleDateString()}
+                </div>
             </div>
         </div>
     )
