@@ -119,22 +119,13 @@ async function syncBlobToDB(options: CliOptions) {
                     record: {
                         asset, assetId,
                     },
+                    needToUploadImages,
                 })
                 if (!parseResult) {
                     reportProblem(assetId, 'parsing', 'Failed to parse and insert')
                     return false
                 }
                 info(`Parsed and inserted ${assetId}`)
-                if (needToUploadImages) {
-                    info(`Uploading images for ${assetId}`)
-                    const imagesResults = await uploadBooqImages(`pg/${id}`, parseResult.booq)
-                    for (const imageResult of imagesResults) {
-                        if (!imageResult.success) {
-                            reportProblem(assetId, 'parsing', `Image upload error: Failed to upload image: ${imageResult.id}`)
-                        }
-                    }
-
-                }
                 info(`Successfully processed ${assetId}`)
                 // Remove any previous parsing problems since this succeeded
                 if (parsingProblemsSet.has(assetId)) {
@@ -246,10 +237,11 @@ function idFromAssetId(assetId: string) {
 }
 
 async function parseAndInsert({
-    id, record: { assetId, asset },
+    id, record: { assetId, asset }, needToUploadImages,
 }: {
     id: string,
     record: AssetRecord,
+    needToUploadImages: boolean,
 }) {
     info(`Processing ${assetId}`)
     const { value: booq, diags } = await parseEpubFile({
@@ -260,6 +252,18 @@ async function parseAndInsert({
         await reportProblem(assetId, 'parsing', 'Parsing errors', diags)
         return
     }
+    
+    // Upload images after parsing but before database insert
+    if (needToUploadImages) {
+        info(`Uploading images for ${assetId}`)
+        const imagesResults = await uploadBooqImages(`pg/${id}`, booq)
+        for (const imageResult of imagesResults) {
+            if (!imageResult.success) {
+                reportProblem(assetId, 'parsing', `Image upload error: Failed to upload image: ${imageResult.id}`)
+            }
+        }
+    }
+    
     const insertResult = await insertPgRecord({ booq, assetId, id })
     return insertResult !== undefined
         ? { booq }
