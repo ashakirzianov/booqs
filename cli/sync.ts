@@ -99,7 +99,7 @@ async function syncBlobToDB(options: CliOptions) {
     info('Syncing Blob to DB...')
     const batchSize = parseInt(options.switches['batch'] || '1')
     const retryProblems = options.switches['retry-problems'] === 'true'
-    const needToUploadImages = options.switches['upload-images'] === 'true'
+    const skipImages = options.switches['skip-images'] === 'true'
     const all = options.switches['all'] === 'true'
     const assetIdsInDb = await existingAssetIds()
     const existingAssetIdsSet = new Set(assetIdsInDb)
@@ -141,7 +141,7 @@ async function syncBlobToDB(options: CliOptions) {
                     record: {
                         asset, assetId,
                     },
-                    needToUploadImages,
+                    needToUploadImages: !skipImages,
                 })
                 if (!parseResult) {
                     await reportProblem(assetId, 'parsing', 'Failed to parse and insert')
