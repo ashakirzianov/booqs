@@ -1,34 +1,47 @@
 import { useMemo, useCallback } from 'react'
-import { resolveNoteColor, quoteColor } from '@/application/common'
+import { resolveNoteColor, quoteColor, temporaryColor } from '@/application/common'
 import { getAugmentationText, Augmentation } from '@/viewer'
 import { BooqNote, BooqRange } from '@/core'
 import { ContextMenuTarget } from './ContextMenuContent'
+import { TemporaryAugmentation } from './useContextMenuState'
 
 export function useAugmentations({
-    quote, notes,
+    quote, notes, temporaryAugmentations = [],
 }: {
     notes: BooqNote[],
     quote?: BooqRange,
+    temporaryAugmentations?: TemporaryAugmentation[],
 }) {
     const augmentations = useMemo(function () {
-        const augmentations = notes.map<Augmentation>(function (note) {
+        const noteAugmentations = notes.map<Augmentation>(function (note) {
             return {
                 id: noteAugmentationId(note),
                 range: note.range,
                 color: resolveNoteColor(note.color),
             }
         })
+        
+        const tempAugmentations = temporaryAugmentations.map<Augmentation>(function (temp) {
+            return {
+                id: temporaryAugmentationId(temp.name),
+                range: temp.range,
+                color: temporaryColor,
+            }
+        })
+        
+        let result = [...tempAugmentations, ...noteAugmentations]
+        
         if (quote) {
             const quoteAugmentation: Augmentation = {
                 range: quote,
                 color: quoteColor,
                 id: quoteAugmentationId(),
             }
-            return [quoteAugmentation, ...augmentations]
-        } else {
-            return augmentations
+            result = [quoteAugmentation, ...result]
         }
-    }, [quote, notes])
+        
+        return result
+    }, [quote, notes, temporaryAugmentations])
     const menuTargetForAugmentation = useCallback(function (augmentationId: string): ContextMenuTarget | undefined {
         const [kind, id] = augmentationId.split('/')
         switch (kind) {
@@ -51,10 +64,22 @@ export function useAugmentations({
                     }
                     : undefined
             }
+            case 'temp': {
+                const temp = temporaryAugmentations.find(function (ta) { return ta.name === id })
+                return temp
+                    ? {
+                        kind: 'selection',
+                        selection: {
+                            range: temp.range,
+                            text: getAugmentationText(augmentationId),
+                        },
+                    }
+                    : undefined
+            }
             default:
                 return undefined
         }
-    }, [quote, notes])
+    }, [quote, notes, temporaryAugmentations])
     return {
         augmentations,
         menuTargetForAugmentation,
@@ -67,4 +92,8 @@ export function noteAugmentationId(note: BooqNote): string {
 
 export function quoteAugmentationId(): string {
     return 'quote/0'
+}
+
+export function temporaryAugmentationId(name: string): string {
+    return `temp/${name}`
 }

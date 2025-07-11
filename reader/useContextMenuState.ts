@@ -1,8 +1,14 @@
 'use client'
-import { useCallback, useState } from 'react'
+import { useCallback, useState, useMemo } from 'react'
 import { getAugmentationElement, getSelectionElement, VirtualElement } from '@/viewer'
 import { ContextMenuTarget } from './ContextMenuContent'
-import { noteAugmentationId, quoteAugmentationId } from './useAugmentations'
+import { noteAugmentationId, quoteAugmentationId, temporaryAugmentationId } from './useAugmentations'
+import { BooqRange } from '@/core'
+
+export type TemporaryAugmentation = {
+    range: BooqRange,
+    name: string,
+}
 
 export type ContextMenuTargetSetter = (setterOrValue: ContextMenuTarget | ((prev: ContextMenuTarget) => ContextMenuTarget)) => void
 
@@ -18,7 +24,7 @@ export function useContextMenuState() {
                 return prev
             }
             const newAnchor = getAnchorForTarget(next)
-            if (newAnchor === undefined && next.kind === 'note') {
+            if (newAnchor === undefined && (next.kind === 'note' || next.kind === 'comment')) {
                 setAnchor(undefined)
                 setTimeout(() => {
                     setAnchor(getAnchorForTarget(next))
@@ -30,10 +36,30 @@ export function useContextMenuState() {
         })
     }, [setTarget])
 
+    const temporaryAugmentations = useMemo<TemporaryAugmentation[]>(() => {
+        if (target.kind === 'comment') {
+            // Get the range from the parent target
+            const parentRange = target.parent.kind === 'selection' || target.parent.kind === 'quote' 
+                ? target.parent.selection.range
+                : target.parent.kind === 'note' 
+                    ? target.parent.note.range
+                    : undefined
+            
+            if (parentRange) {
+                return [{
+                    range: parentRange,
+                    name: 'comment',
+                }]
+            }
+        }
+        return []
+    }, [target])
+
     return {
         menuTarget: target,
         setMenuTarget,
         anchor,
+        temporaryAugmentations,
     }
 }
 
@@ -63,8 +89,10 @@ function getAnchorForTarget(target: ContextMenuTarget): VirtualElement | undefin
             const augmentationId = quoteAugmentationId()
             return getAugmentationElement(augmentationId)
         }
-        case 'comment':
-            return getAnchorForTarget(target.parent)
+        case 'comment': {
+            const augmentationId = temporaryAugmentationId('comment')
+            return getAugmentationElement(augmentationId)
+        }
         default:
             return undefined
     }

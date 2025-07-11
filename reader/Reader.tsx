@@ -102,17 +102,18 @@ export function Reader({
 
     const RightPanelContent = <NotesPanel notes={filteredNotes} />
 
+    const { anchor, menuTarget, setMenuTarget, temporaryAugmentations } = useContextMenuState()
+    
     const { augmentations, menuTargetForAugmentation } = useAugmentations({
         notes: filteredNotes,
         quote: quote,
+        temporaryAugmentations,
     })
     const { visible } = useControlsVisibility()
 
     const pagesLabel = `${currentPage} of ${totalPages}`
     const leftLabel = leftPages <= 1 ? 'Last page'
         : `${leftPages} pages left`
-
-    const { anchor, menuTarget, setMenuTarget } = useContextMenuState()
 
     const MenuContent = useMemo(() => {
         if (menuTarget.kind === 'empty') {
