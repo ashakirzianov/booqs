@@ -21,6 +21,7 @@ import {
 } from './ContextMenuItems'
 import { useRouter } from 'next/navigation'
 import { quoteHref } from '@/application/href'
+import { noteColorNames } from '@/application/common'
 
 type EmptyTarget = {
     kind: 'empty',
@@ -165,7 +166,7 @@ function CommentTargetMenu({
         if (!user?.id || !comment.trim()) return
 
         const note = addNote({
-            color: 'yellow', // Default color for comments
+            color: noteColorNames[0], // Default color for comments
             range: selection.range,
             content: comment.trim(),
             privacy: 'public',
