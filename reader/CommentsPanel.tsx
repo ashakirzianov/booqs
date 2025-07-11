@@ -10,7 +10,7 @@ export function CommentsPanel({ comments }: {
             <div className='p-4 border-b border-gray-200'>
                 <div className='self-center tracking-widest font-bold'>NOTES</div>
             </div>
-            <div className='flex-1 overflow-y-auto p-4 space-y-4'>
+            <div className='flex-1 overflow-y-auto p-4 space-y-6'>
                 {comments.length === 0 ? (
                     <div className='text-gray-500 text-center py-8'>
                         No notes available
@@ -27,7 +27,7 @@ export function CommentsPanel({ comments }: {
 
 function CommentItem({ comment }: { comment: BooqNote }) {
     return (
-        <div className='border border-gray-200 rounded-lg p-3 space-y-2 w-full max-w-md'>
+        <div className='rounded-lg p-3 space-y-2 w-full max-w-md'>
 
             {/* Referenced text */}
             <div className='bg-gray-50 p-2 rounded text-sm italic border-l-2'
@@ -43,7 +43,7 @@ function CommentItem({ comment }: { comment: BooqNote }) {
             )}
 
             {/* Note metadata */}
-            <div className='flex items-center gap-2 pt-1'>
+            <div className='flex items-center justify-end gap-2 pt-1'>
                 <Avatar user={comment.author} />
                 <div className='text-xs text-gray-400'>
                     {new Date(comment.createdAt).toLocaleDateString()}
