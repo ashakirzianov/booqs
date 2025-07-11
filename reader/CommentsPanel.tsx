@@ -52,9 +52,50 @@ function CommentItem({ comment }: { comment: BooqNote }) {
             <div className='flex items-center justify-end gap-2 pt-1'>
                 <Avatar user={comment.author} />
                 <div className='text-xs text-dimmed'>
-                    {new Date(comment.createdAt).toLocaleDateString()}
+                    {formatRelativeTime(new Date(comment.createdAt))}
                 </div>
             </div>
         </div>
     )
+}
+
+function formatDateString(date: Date, currentDate: Date): string {
+    const isSameYear = date.getFullYear() === currentDate.getFullYear()
+    
+    if (isSameYear) {
+        return date.toLocaleDateString('en-US', { 
+            month: 'short', 
+            day: 'numeric' 
+        })
+    } else {
+        return date.toLocaleDateString('en-US', { 
+            month: 'short', 
+            day: 'numeric', 
+            year: 'numeric' 
+        })
+    }
+}
+
+function formatRelativeTime(date: Date, currentDate: Date = new Date()): string {
+    const diffMs = currentDate.getTime() - date.getTime()
+    const diffSeconds = Math.floor(diffMs / 1000)
+    const diffMinutes = Math.floor(diffSeconds / 60)
+    const diffHours = Math.floor(diffMinutes / 60)
+    const diffDays = Math.floor(diffHours / 24)
+    
+    // If more than 7 days, show date
+    if (diffDays > 7) {
+        return formatDateString(date, currentDate)
+    }
+    
+    // Relative time formatting
+    if (diffSeconds < 60) {
+        return `${diffSeconds} second${diffSeconds !== 1 ? 's' : ''} ago`
+    } else if (diffMinutes < 60) {
+        return `${diffMinutes} minute${diffMinutes !== 1 ? 's' : ''} ago`
+    } else if (diffHours < 24) {
+        return `${diffHours} hour${diffHours !== 1 ? 's' : ''} ago`
+    } else {
+        return `${diffDays} day${diffDays !== 1 ? 's' : ''} ago`
+    }
 }
