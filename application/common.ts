@@ -20,5 +20,5 @@ export function resolveNoteColor(color: string) {
     return noteColorMapping[color] ?? defaultColor
 }
 export const quoteColor = 'rgba(255, 165, 0, 0.6)'
-export const temporaryColor = 'rgba(227, 242, 253, 0.6)'
+export const temporaryColor = 'rgba(180, 213, 255, 0.99)'
 export const noteColorNames = Object.keys(noteColorMapping)
