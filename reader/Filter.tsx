@@ -3,7 +3,7 @@ import { NavigationSelection } from './nodes'
 import { AccountDisplayData } from '@/core'
 
 export function NavigationFilter({
-    authors, selection, toggle,
+    selection, toggle,
 }: {
     authors: AccountDisplayData[],
     selection: NavigationSelection,
@@ -25,18 +25,6 @@ export function NavigationFilter({
                 toggle={() => toggle('notes')}
             />
         </div>
-        {
-            authors.map(author => {
-                const [first] = author.name?.split(' ') ?? ['Incognito']
-                return <div className={itemClass} key={author.id}>
-                    <FilterButton
-                        text={first ?? 'Incognito'}
-                        selected={selection[`author:${author.id}`] ?? false}
-                        toggle={() => toggle(`author:${author.id}`)}
-                    />
-                </div>
-            })
-        }
     </div>
 }
 
