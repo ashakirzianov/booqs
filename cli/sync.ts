@@ -67,7 +67,8 @@ async function syncWebToBlob(options: CliOptions) {
             info(`Downloaded gutenberg epub file: ${assetRecord.assetId}`)
             const result = await uploadAsset(pgEpubsBucket, assetRecord.assetId, assetRecord.asset)
             if (result.$metadata.httpStatusCode !== 200) {
-                info(`Failed to upload asset for id: ${id}`)
+                await reportProblem(id, 'download', `Failed to upload asset for id: ${id}`)
+                newProblems++
                 continue
             }
             info(`Uploaded asset for id: ${id}`)
@@ -108,7 +109,7 @@ async function syncBlobToDB(options: CliOptions) {
             info(`Skipping ${assetId} because it already exists in DB`)
             return false
         }
-        if (parsingProblemsSet.has(assetId)) {
+        if (!retryProblems && parsingProblemsSet.has(assetId)) {
             info(`Skipping ${assetId} because it has parsing problems`)
             return false
         }
@@ -137,7 +138,7 @@ async function syncBlobToDB(options: CliOptions) {
                     needToUploadImages,
                 })
                 if (!parseResult) {
-                    reportProblem(assetId, 'parsing', 'Failed to parse and insert')
+                    await reportProblem(assetId, 'parsing', 'Failed to parse and insert')
                     return { success: false, newProblem: true }
                 }
                 info(`Parsed and inserted ${assetId}`)
@@ -290,7 +291,7 @@ async function parseAndInsert({
         let hasImageErrors = false
         for (const imageResult of imagesResults) {
             if (!imageResult.success) {
-                reportProblem(assetId, 'parsing', `Image upload error: Failed to upload image: ${imageResult.id}`)
+                await reportProblem(assetId, 'parsing', `Image upload error: Failed to upload image: ${imageResult.id}`)
                 hasImageErrors = true
             }
         }
