@@ -21,20 +21,36 @@ function parseVerbosity(options: CliOptions): number {
     return verbosity
 }
 
-export async function sync(options: CliOptions) {
-    const [command] = options.commands
-    switch (command) {
-        case 'web2blob':
-            await syncWebToBlob(options)
-            return
-        case 'blob2db':
-            await syncBlobToDB(options)
-            return
-        case 'blob-cleanup':
-            await blobCleanup(options)
-            return
+export async function pg(options: CliOptions) {
+    const [subcommand, subSubcommand] = options.commands
+    
+    switch (subcommand) {
+        case 'sync':
+            switch (subSubcommand) {
+                case 'web2blob':
+                    await syncWebToBlob(options)
+                    return
+                case 'blob2db':
+                    await syncBlobToDB(options)
+                    return
+                default:
+                    console.info('Unknown sync subcommand: ', subSubcommand)
+                    console.info('Available sync subcommands: web2blob, blob2db')
+                    return
+            }
+        case 'cleanup':
+            switch (subSubcommand) {
+                case 'blob':
+                    await blobCleanup(options)
+                    return
+                default:
+                    console.info('Unknown cleanup subcommand: ', subSubcommand)
+                    console.info('Available cleanup subcommands: blob')
+                    return
+            }
         default:
-            console.info('Unknown command: ', command)
+            console.info('Unknown pg subcommand: ', subcommand)
+            console.info('Available pg subcommands: sync, cleanup')
             return
     }
 }
