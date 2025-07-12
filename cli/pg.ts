@@ -129,7 +129,7 @@ async function syncWebToBlob(options: CliOptions) {
 async function syncBlobToDB(options: CliOptions) {
     const verbosity = parseVerbosity(options)
     basic(verbosity, 'Syncing Blob to DB...')
-    const batchSize = parseInt(options.switches['batch'] || '1')
+    const batchSize = parseInt(options.switches['batch'] || '25')
     const retryProblems = options.switches['retry-problems'] === 'true'
     const skipImages = options.switches['skip-images'] === 'true'
     const all = options.switches['all'] === 'true'
