@@ -13,6 +13,14 @@ type AssetRecord = {
     asset: Buffer,
 }
 
+function parseVerbosity(options: CliOptions): number {
+    let verbosity = parseInt(options.switches['verbosity'] || '2')
+    if (verbosity < 0 || verbosity > 3) {
+        verbosity = 2 // Default to level 2 if invalid
+    }
+    return verbosity
+}
+
 export async function sync(options: CliOptions) {
     const [command] = options.commands
     switch (command) {
@@ -32,7 +40,8 @@ export async function sync(options: CliOptions) {
 }
 
 async function syncWebToBlob(options: CliOptions) {
-    info('Syncing web to blob storage...')
+    const verbosity = parseVerbosity(options)
+    basic(verbosity, 'Syncing web to blob storage...')
     const retryProblems = options.switches['retry-problems'] === 'true'
     const retryIgnored = options.switches['retry-ignored'] === 'true'
     const limitSwitch = options.switches['limit']
@@ -40,28 +49,28 @@ async function syncWebToBlob(options: CliOptions) {
         ? allGutenbergIdsUpTo(parseInt(limitSwitch))
         : await getAllGutenbergIds()
     const blobIds = await Array.fromAsync(existingBlobIds())
-    info(`Found ${webIds.length} ids in Gutenberg Collection`)
-    info(`Found ${blobIds.length} ids in blob storage`)
+    basic(verbosity, `Found ${webIds.length} ids in Gutenberg Collection`)
+    basic(verbosity, `Found ${blobIds.length} ids in blob storage`)
     const existingSet = new Set(blobIds)
     const downloadProblemsSet = new Set(await getProblemIds('download'))
-    info(`Found ${downloadProblemsSet.size} download problems: ${Array.from(downloadProblemsSet).join(', ')}`)
+    basic(verbosity, `Found ${downloadProblemsSet.size} download problems: ${Array.from(downloadProblemsSet).join(', ')}`)
     const ignoreSet = new Set(await getProblemIds('ignore'))
-    info(`Found ${ignoreSet.size} ids in ignore set: ${Array.from(ignoreSet).join(', ')}`)
+    basic(verbosity, `Found ${ignoreSet.size} ids in ignore set: ${Array.from(ignoreSet).join(', ')}`)
 
     let successfullyProcessed = 0
     let newProblems = 0
 
     for (const id of webIds) {
         if (existingSet.has(id)) {
-            info(`Skipping ${id} because it already exists in blob storage`)
+            verbose(verbosity, `Skipping ${id} because it already exists in blob storage`)
             continue
         }
         if (!retryIgnored && ignoreSet.has(id)) {
-            info(`Skipping ${id} because it is in ignore set`)
+            info(verbosity, `Skipping ${id} because it is in ignore set`)
             continue
         }
         if (!retryProblems && downloadProblemsSet.has(id)) {
-            info(`Skipping ${id} because it has download problems`)
+            info(verbosity, `Skipping ${id} because it has download problems`)
             continue
         }
         try {
@@ -71,14 +80,14 @@ async function syncWebToBlob(options: CliOptions) {
                 newProblems++
                 continue
             }
-            info(`Downloaded gutenberg epub file: ${assetRecord.assetId}`)
+            verbose(verbosity, `Downloaded gutenberg epub file: ${assetRecord.assetId}`)
             const result = await uploadAsset(pgEpubsBucket, assetRecord.assetId, assetRecord.asset)
             if (result.$metadata.httpStatusCode !== 200) {
                 await reportProblem(id, 'download', `Failed to upload asset for id: ${id}`)
                 newProblems++
                 continue
             }
-            info(`Uploaded asset for id: ${id}`)
+            verbose(verbosity, `Uploaded asset for id: ${id}`)
             // Remove any previous problems since this succeeded
             if (downloadProblemsSet.has(id) || ignoreSet.has(id)) {
                 await removeProblem(id)
@@ -90,50 +99,51 @@ async function syncWebToBlob(options: CliOptions) {
         }
     }
 
-    info(`=== Web to Blob Sync Complete ===`)
-    info(`Successfully processed: ${successfullyProcessed} files`)
-    info(`New problems encountered: ${newProblems}`)
+    always(verbosity, `=== Web to Blob Sync Complete ===`)
+    always(verbosity, `Successfully processed: ${successfullyProcessed} files`)
+    always(verbosity, `New problems encountered: ${newProblems}`)
 }
 
 async function syncBlobToDB(options: CliOptions) {
-    info('Syncing Blob to DB...')
+    const verbosity = parseVerbosity(options)
+    basic(verbosity, 'Syncing Blob to DB...')
     const batchSize = parseInt(options.switches['batch'] || '1')
     const retryProblems = options.switches['retry-problems'] === 'true'
     const skipImages = options.switches['skip-images'] === 'true'
     const all = options.switches['all'] === 'true'
     const assetIdsInDb = await existingAssetIds()
     const existingAssetIdsSet = new Set(assetIdsInDb)
-    info(`Found ${existingAssetIdsSet.size} ids in DB`)
+    basic(verbosity, `Found ${existingAssetIdsSet.size} ids in DB`)
     const parsingProblemsSet = retryProblems ? new Set() : new Set(await getProblemIds('parsing'))
-    info(`Found ${parsingProblemsSet.size} parsing problems: ${Array.from(parsingProblemsSet).join(', ')}`)
+    basic(verbosity, `Found ${parsingProblemsSet.size} parsing problems: ${Array.from(parsingProblemsSet).join(', ')}`)
 
     let successfullyProcessed = 0
     let newProblems = 0
 
     const filteredAssetIds = filterAsyncGenerator(existingBlobAssetIds(), async (assetId) => {
         if (!all && existingAssetIdsSet.has(assetId)) {
-            info(`Skipping ${assetId} because it already exists in DB`)
+            verbose(verbosity, `Skipping ${assetId} because it already exists in DB`)
             return false
         }
         if (!retryProblems && parsingProblemsSet.has(assetId)) {
-            info(`Skipping ${assetId} because it has parsing problems`)
+            info(verbosity, `Skipping ${assetId} because it has parsing problems`)
             return false
         }
         return true
     })
     let count = 0
     for await (const batch of makeBatches(filteredAssetIds, batchSize)) {
-        info(`Processing batch ${count++} with ${batch.length} assets...`)
+        info(verbosity, `Processing batch ${count++} with ${batch.length} assets...`)
         const promises = batch.map(async (assetId) => {
             try {
                 const id = idFromAssetId(assetId)
                 if (!id) {
-                    warn(`Couldn't get id from assetId: ${assetId}`)
+                    warn(verbosity, `Couldn't get id from assetId: ${assetId}`)
                     return { success: false, newProblem: false }
                 }
                 const asset = await downloadAsset(pgEpubsBucket, assetId)
                 if (!asset) {
-                    warn(`Couldn't download asset for id: ${id}`)
+                    warn(verbosity, `Couldn't download asset for id: ${id}`)
                     return { success: false, newProblem: false }
                 }
                 const parseResult = await parseAndInsert({
@@ -142,13 +152,14 @@ async function syncBlobToDB(options: CliOptions) {
                         asset, assetId,
                     },
                     needToUploadImages: !skipImages,
+                    verbosity,
                 })
                 if (!parseResult) {
                     await reportProblem(assetId, 'parsing', 'Failed to parse and insert')
                     return { success: false, newProblem: true }
                 }
-                info(`Parsed and inserted ${assetId}`)
-                info(`Successfully processed ${assetId}`)
+                verbose(verbosity, `Parsed and inserted ${assetId}`)
+                verbose(verbosity, `Successfully processed ${assetId}`)
                 // Remove any previous parsing problems since this succeeded
                 if (parsingProblemsSet.has(assetId)) {
                     await removeProblem(assetId)
@@ -173,9 +184,9 @@ async function syncBlobToDB(options: CliOptions) {
         }
     }
 
-    info(`=== Blob to DB Sync Complete ===`)
-    info(`Successfully processed: ${successfullyProcessed} files`)
-    info(`New problems encountered: ${newProblems}`)
+    always(verbosity, `=== Blob to DB Sync Complete ===`)
+    always(verbosity, `Successfully processed: ${successfullyProcessed} files`)
+    always(verbosity, `New problems encountered: ${newProblems}`)
 }
 
 async function* filterAsyncGenerator<T>(generator: AsyncGenerator<T>, predicate: (item: T) => Promise<boolean>) {
@@ -186,8 +197,9 @@ async function* filterAsyncGenerator<T>(generator: AsyncGenerator<T>, predicate:
     }
 }
 
-async function blobCleanup(_options: CliOptions) {
-    info('Cleaning up Blob storage...')
+async function blobCleanup(options: CliOptions) {
+    const verbosity = parseVerbosity(options)
+    basic(verbosity, 'Cleaning up Blob storage...')
     const assetIds = await Array.fromAsync(existingBlobAssetIds())
     function precedence(assetId: string): number {
         if (assetId.endsWith('-images-3.epub')) return 3
@@ -210,24 +222,24 @@ async function blobCleanup(_options: CliOptions) {
 
     const toKeep = new Set(bestAssets.values())
     const toDelete = assetIds.filter(assetId => !toKeep.has(assetId))
-    info(`Found ${toDelete.length} assets to delete from blob storage`)
+    basic(verbosity, `Found ${toDelete.length} assets to delete from blob storage`)
     let count = 0
     for (const assetId of toDelete) {
-        info(`Deleting asset: ${assetId}`)
+        verbose(verbosity, `Deleting asset: ${assetId}`)
         try {
             const result = await deleteAsset(pgEpubsBucket, assetId)
             if (result.$metadata.httpStatusCode === 204) {
-                info(`Successfully deleted asset: ${assetId}`)
+                verbose(verbosity, `Successfully deleted asset: ${assetId}`)
                 count++
             } else {
-                warn(`Failed to delete asset ${assetId}: ${result.$metadata.httpStatusCode}`)
+                warn(verbosity, `Failed to delete asset ${assetId}: ${result.$metadata.httpStatusCode}`)
             }
         }
         catch (err) {
-            warn(`Failed to delete asset ${assetId}`, err)
+            warn(verbosity, `Failed to delete asset ${assetId}`, err)
         }
     }
-    info(`Deleted ${count} assets from blob storage`)
+    always(verbosity, `Deleted ${count} assets from blob storage`)
 }
 
 async function* existingBlobIds() {
@@ -236,7 +248,7 @@ async function* existingBlobIds() {
         if (id) {
             yield id
         } else {
-            warn('Skipping non-pg-epub asset:', assetId)
+            warn(2, 'Skipping non-pg-epub asset:', assetId)
         }
     }
 }
@@ -246,7 +258,7 @@ async function* existingBlobAssetIds() {
         if (object.Key) {
             yield object.Key
         } else {
-            warn(`Invalid object in blob: ${object}`)
+            warn(2, `Invalid object in blob: ${object}`)
         }
     }
 }
@@ -274,25 +286,26 @@ function idFromAssetId(assetId: string) {
 }
 
 async function parseAndInsert({
-    id, record: { assetId, asset }, needToUploadImages,
+    id, record: { assetId, asset }, needToUploadImages, verbosity,
 }: {
     id: string,
     record: AssetRecord,
     needToUploadImages: boolean,
+    verbosity: number,
 }) {
-    info(`Processing ${assetId}`)
+    verbose(verbosity, `Processing ${assetId}`)
     const { value: booq, diags } = await parseEpubFile({
         fileBuffer: asset as any,
     })
     if (!booq) {
-        info(`Couldn't parse epub: ${assetId}`)
+        info(verbosity, `Couldn't parse epub: ${assetId}`)
         await reportProblem(assetId, 'parsing', 'Parsing errors', diags)
         return
     }
 
     // Upload images after parsing but before database insert
     if (needToUploadImages) {
-        info(`Uploading images for ${assetId}`)
+        verbose(verbosity, `Uploading images for ${assetId}`)
         const imagesResults = await uploadBooqImages(`pg/${id}`, booq)
         let hasImageErrors = false
         for (const imageResult of imagesResults) {
@@ -342,18 +355,34 @@ async function removeProblem(id: string) {
     return redis.hdel('pg:problems', id)
 }
 
-function info(label: string, data?: any) {
-    console.info('\x1b[32m%s\x1b[0m', label)
-    if (data) {
-        console.info(inspect(data, false, 3, true))
+function info(verbosity: number, label: string, data?: any, minLevel: number = 2) {
+    if (verbosity >= minLevel) {
+        console.info('\x1b[32m%s\x1b[0m', label)
+        if (data) {
+            console.info(inspect(data, false, 3, true))
+        }
     }
 }
 
-function warn(label: string, data?: any) {
-    console.warn('\x1b[33m%s\x1b[0m', label)
-    if (data) {
-        console.warn(inspect(data, false, 3, true))
+function warn(verbosity: number, label: string, data?: any, minLevel: number = 1) {
+    if (verbosity >= minLevel) {
+        console.warn('\x1b[33m%s\x1b[0m', label)
+        if (data) {
+            console.warn(inspect(data, false, 3, true))
+        }
     }
+}
+
+function verbose(verbosity: number, label: string, data?: any) {
+    info(verbosity, label, data, 3)
+}
+
+function basic(verbosity: number, label: string, data?: any) {
+    info(verbosity, label, data, 1)
+}
+
+function always(verbosity: number, label: string, data?: any) {
+    info(verbosity, label, data, 0)
 }
 
 function allGutenbergIdsUpTo(limit: number): string[] {
