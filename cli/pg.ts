@@ -65,13 +65,13 @@ async function syncWebToBlob(options: CliOptions) {
         ? allGutenbergIdsUpTo(parseInt(limitSwitch))
         : await getAllGutenbergIds()
     basic(verbosity, `Found ${webIds.length} ids in Gutenberg Collection`)
-    const blobIds = await Array.fromAsync(existingBlobIds())
     const downloadProblemsSet = new Set(await getProblemIds('download'))
     basic(verbosity, `Found ${downloadProblemsSet.size} download problems: ${Array.from(downloadProblemsSet).join(', ')}`)
     const ignoreSet = new Set(await getProblemIds('ignore'))
     basic(verbosity, `Found ${ignoreSet.size} ids in ignore set: ${Array.from(ignoreSet).join(', ')}`)
-    basic(verbosity, `Found ${blobIds.length} ids in blob storage`)
+    const blobIds = await Array.fromAsync(existingBlobIds())
     const existingSet = new Set(blobIds)
+    basic(verbosity, `Found ${existingSet.size} ids in blob storage`)
 
     let successfullyProcessed = 0
     let newProblems = 0
