@@ -66,9 +66,11 @@ async function syncWebToBlob(options: CliOptions) {
         : await getAllGutenbergIds()
     basic(verbosity, `Found ${webIds.length} ids in Gutenberg Collection`)
     const downloadProblemsSet = new Set(await getProblemIds('download'))
-    basic(verbosity, `Found ${downloadProblemsSet.size} download problems: ${Array.from(downloadProblemsSet).join(', ')}`)
+    basic(verbosity, `Found ${downloadProblemsSet.size} download problems`)
+    verbose(verbosity, `Download problem ids: ${Array.from(downloadProblemsSet).join(', ')}`)
     const ignoreSet = new Set(await getProblemIds('ignore'))
-    basic(verbosity, `Found ${ignoreSet.size} ids in ignore set: ${Array.from(ignoreSet).join(', ')}`)
+    basic(verbosity, `Found ${ignoreSet.size} ids in ignore set`)
+    verbose(verbosity, `Ignore set ids: ${Array.from(ignoreSet).join(', ')}`)
     const blobIds = await Array.fromAsync(existingBlobIds())
     const existingSet = new Set(blobIds)
     basic(verbosity, `Found ${existingSet.size} ids in blob storage`)
@@ -131,7 +133,8 @@ async function syncBlobToDB(options: CliOptions) {
     const existingAssetIdsSet = new Set(assetIdsInDb)
     basic(verbosity, `Found ${existingAssetIdsSet.size} ids in DB`)
     const parsingProblemsSet = retryProblems ? new Set() : new Set(await getProblemIds('parsing'))
-    basic(verbosity, `Found ${parsingProblemsSet.size} parsing problems: ${Array.from(parsingProblemsSet).join(', ')}`)
+    basic(verbosity, `Found ${parsingProblemsSet.size} parsing problems`)
+    verbose(verbosity, `Parsing problem ids: ${Array.from(parsingProblemsSet).join(', ')}`)
 
     let successfullyProcessed = 0
     let newProblems = 0
