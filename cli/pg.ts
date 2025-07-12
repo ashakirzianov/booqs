@@ -78,7 +78,11 @@ async function syncWebToBlob(options: CliOptions) {
     let successfullyProcessed = 0
     let newProblems = 0
 
+    let count = 0
     for (const id of webIds) {
+        if (++count % 1000 === 0) {
+            basic(verbosity, `Processing id ${count}/${webIds.length}: ${id}`)
+        }
         if (existingSet.has(id)) {
             verbose(verbosity, `Skipping ${id} because it already exists in blob storage`)
             continue
@@ -105,7 +109,7 @@ async function syncWebToBlob(options: CliOptions) {
                 newProblems++
                 continue
             }
-            verbose(verbosity, `Uploaded asset for id: ${id}`)
+            basic(verbosity, `Uploaded asset for id: ${id}`)
             // Remove any previous problems since this succeeded
             if (downloadProblemsSet.has(id) || ignoreSet.has(id)) {
                 await removeProblem(id)
