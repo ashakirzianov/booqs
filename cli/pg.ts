@@ -23,7 +23,7 @@ function parseVerbosity(options: CliOptions): number {
 
 export async function pg(options: CliOptions) {
     const [subcommand, subSubcommand] = options.commands
-    
+
     switch (subcommand) {
         case 'sync':
             switch (subSubcommand) {
@@ -82,11 +82,11 @@ async function syncWebToBlob(options: CliOptions) {
             continue
         }
         if (!retryIgnored && ignoreSet.has(id)) {
-            info(verbosity, `Skipping ${id} because it is in ignore set`)
+            verbose(verbosity, `Skipping ${id} because it is in ignore set`)
             continue
         }
         if (!retryProblems && downloadProblemsSet.has(id)) {
-            info(verbosity, `Skipping ${id} because it has download problems`)
+            verbose(verbosity, `Skipping ${id} because it has download problems`)
             continue
         }
         try {
@@ -142,7 +142,7 @@ async function syncBlobToDB(options: CliOptions) {
             return false
         }
         if (!retryProblems && parsingProblemsSet.has(assetId)) {
-            info(verbosity, `Skipping ${assetId} because it has parsing problems`)
+            verbose(verbosity, `Skipping ${assetId} because it has parsing problems`)
             return false
         }
         return true
