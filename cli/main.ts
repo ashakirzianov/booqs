@@ -1,5 +1,5 @@
 import { parseEpubs } from './parse'
-import { sync } from './sync'
+import { pg } from './pg'
 
 main().catch((err) => {
     console.error(err)
@@ -7,17 +7,20 @@ main().catch((err) => {
 })
 
 async function main() {
-    let options = parseCliOptions()
+    const options = parseCliOptions()
     const [command, ...subCommands] = options.commands
-    options = { ...options, commands: subCommands }
+    const updatedOptions = { ...options, commands: subCommands }
+    
     switch (command) {
         case 'parse':
-            await parseEpubs(options)
+            await parseEpubs(updatedOptions)
             return
-        case 'sync':
-            await sync(options)
+        case 'pg':
+            await pg(updatedOptions)
+            return
         default:
-            console.info('Unknown command')
+            console.info('Unknown command: ', command)
+            console.info('Available commands: parse, pg')
     }
 }
 

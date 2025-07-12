@@ -357,7 +357,7 @@ function parseInlineStyle(style: string): Record<string, string> {
                 .replace(/-([a-z])/g, (_, char) => char.toUpperCase())
             return [
                 camelCaseProperty,
-                value.trim(),
+                value?.trim(),
             ]
         })
     const styleObject = Object.fromEntries(rules)
