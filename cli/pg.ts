@@ -189,7 +189,6 @@ async function syncBlobToDB(options: CliOptions) {
                 }
                 return { success: true, newProblem: false }
             } catch (err) {
-                console.error(`Error processing ${assetId}`, err)
                 await reportProblem(assetId, 'parsing', 'Processing error', err)
                 return { success: false, newProblem: true }
             }
