@@ -136,7 +136,7 @@ async function syncBlobToDB(options: CliOptions) {
     const assetIdsInDb = await existingAssetIds()
     const existingAssetIdsSet = new Set(assetIdsInDb)
     basic(verbosity, `Found ${existingAssetIdsSet.size} ids in DB`)
-    const parsingProblemsSet = retryProblems ? new Set() : new Set(await getProblemIds('parsing'))
+    const parsingProblemsSet = new Set(await getProblemIds('parsing'))
     basic(verbosity, `Found ${parsingProblemsSet.size} parsing problems`)
     verbose(verbosity, `Parsing problem ids: ${Array.from(parsingProblemsSet).join(', ')}`)
 
