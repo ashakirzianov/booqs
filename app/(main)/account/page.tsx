@@ -17,7 +17,7 @@ export default async function Page() {
         booqCollection(READING_LIST_COLLECTION, user.id), booqCollection('uploads', user.id),
     ])
     return (
-        <div className="max-w-4xl mx-auto px-4 py-8 space-y-8 min-h-screen flex flex-col">
+        <div className="max-w-4xl mx-auto px-4 py-8 space-y-8 min-h-[calc(100vh-3rem)] flex flex-col">
             {/* Profile Section */}
             <div className="bg-background border border-dimmed rounded-lg p-6">
                 <div className="flex items-center gap-4">
