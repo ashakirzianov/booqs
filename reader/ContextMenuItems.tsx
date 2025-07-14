@@ -28,19 +28,21 @@ export function CopilotItem({ selection, setTarget }: {
     />
 }
 
-export function AuthorItem({ name, pictureUrl }: {
+export function AuthorItem({ name, pictureUrl, emoji }: {
     name?: string,
     pictureUrl?: string,
+    emoji: string,
 }) {
     return <div className='container font-bold p-lg'>
         {
-            pictureUrl
+            pictureUrl || emoji
                 ? <div className="picture mr-lg">
                     <ProfileBadge
                         border={false}
                         size={1.5}
                         name={name}
                         picture={pictureUrl}
+                        emoji={emoji}
                     />
                 </div>
                 : null

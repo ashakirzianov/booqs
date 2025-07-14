@@ -83,6 +83,7 @@ function SignedButton({ user }: {
         anchor={<ProfileBadge
             name={user.name ?? undefined}
             picture={user.profilePictureURL ?? undefined}
+            emoji={user.emoji ?? undefined}
             size={2}
             border={true}
         />}

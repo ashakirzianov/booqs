@@ -16,6 +16,7 @@ export function AccountButton({ user, loading, from }: {
                 : user ? <SignedAccountButton
                     name={user.name}
                     profilePictureURL={user.profilePictureURL}
+                    emoji={user.emoji}
                 />
                     : <NotSignedAccountButton from={from} />
         }
@@ -26,13 +27,14 @@ export function LoadingAccountButton() {
     return <Spinner />
 }
 
-export function SignedAccountButton({ name, profilePictureURL }: Pick<AccountData, 'name' | 'profilePictureURL'>) {
+export function SignedAccountButton({ name, profilePictureURL, emoji }: Pick<AccountData, 'name' | 'profilePictureURL' | 'emoji'>) {
     return <Link href={accountHref()}>
         <ProfileBadge
             name={name ?? undefined}
             picture={profilePictureURL ?? undefined}
+            emoji={emoji ?? undefined}
             size={2}
-            border={true}
+            border={false}
         />
     </Link>
 }

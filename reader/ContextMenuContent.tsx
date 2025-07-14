@@ -131,6 +131,7 @@ function NoteTargetMenu({
             <AuthorItem
                 name={note.author.name ?? undefined}
                 pictureUrl={note.author.profilePictureURL ?? undefined}
+                emoji={note.author.emoji}
             />
         }
         {!isOwnNote || !user ? null :

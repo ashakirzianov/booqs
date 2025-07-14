@@ -20,6 +20,7 @@ export type DbNoteWithAuthor = DbNote & {
   author_id: string,
   author_name: string | null,
   author_profile_picture_url: string | null,
+  author_emoji: string,
 }
 
 export async function noteForId(id: string): Promise<DbNote | null> {
@@ -57,7 +58,7 @@ export async function notesFor({
 }
 export async function notesWithAuthorForBooqId(booqId: BooqId) {
   const notes = await sql`
-      SELECT n.*, u.name AS author_name, u.profile_picture_url AS author_profile_picture_url
+      SELECT n.*, u.name AS author_name, u.profile_picture_url AS author_profile_picture_url, u.emoji AS author_emoji
       FROM notes n
       JOIN users u ON u.id = n.author_id
       WHERE booq_id = ${booqId}

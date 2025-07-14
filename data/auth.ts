@@ -141,6 +141,7 @@ export async function fetchAuthData(): Promise<AccountData | undefined> {
         joinedAt: user.joined_at,
         name: user.name ?? undefined,
         profilePictureURL: user.profile_picture_url ?? undefined,
+        emoji: user.emoji ?? undefined,
     }
 }
 
