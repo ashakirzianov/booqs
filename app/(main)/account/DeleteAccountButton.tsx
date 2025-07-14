@@ -30,7 +30,7 @@ export function DeleteAccountButton({ account }: {
         try {
             await deleteAccountAction()
             push(feedHref())
-        } catch (error) {
+        } catch {
             setIsDeleting(false)
         }
     }

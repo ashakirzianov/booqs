@@ -17,10 +17,10 @@ export default async function Page() {
         booqCollection(READING_LIST_COLLECTION, user.id), booqCollection('uploads', user.id),
     ])
     return (
-        <div className="max-w-4xl mx-auto px-4 py-8 space-y-8">
+        <div className="max-w-4xl mx-auto px-4 py-8 space-y-8 min-h-screen flex flex-col">
             {/* Profile Section */}
             <div className="bg-background border border-dimmed rounded-lg p-6">
-                <div className="flex items-center gap-4 mb-4">
+                <div className="flex items-center gap-4">
                     <ProfileBadge
                         name={user.name ?? undefined}
                         picture={user.profilePictureURL ?? undefined}
@@ -28,28 +28,29 @@ export default async function Page() {
                         size={4}
                         border={true}
                     />
-                    <div>
+                    <div className="flex-1">
                         <h1 className="text-2xl font-bold text-primary">
                             {user.name || 'Anonymous User'}
                         </h1>
-                        <p className="text-dimmed">
-                            Member since {formatDate(user.joinedAt)}
-                        </p>
+                        <div className="space-y-1 text-dimmed">
+                            <p className="text-sm">
+                                <span className="font-medium">Username:</span> {user.username}
+                            </p>
+                            {user.email && (
+                                <p className="text-sm">
+                                    <span className="font-medium">Email:</span> {user.email}
+                                </p>
+                            )}
+                            <p className="text-sm">
+                                <span className="font-medium">Member since:</span> {formatDate(user.joinedAt)}
+                            </p>
+                        </div>
                     </div>
-                </div>
-                
-                {/* Account Actions */}
-                <div className="flex gap-3 pt-4 border-t border-dimmed">
-                    <SignoutButton />
-                    <DeleteAccountButton account={{
-                        name: user.name,
-                        joinedAt: user.joinedAt,
-                    }} />
                 </div>
             </div>
 
             {/* Books Section */}
-            <div className="space-y-6">
+            <div className="space-y-6 flex-1">
                 <BooqCollection
                     title='My Uploads'
                     cards={uploads}
@@ -61,6 +62,17 @@ export default async function Page() {
                     collection={READING_LIST_COLLECTION}
                     signed={true}
                 />
+            </div>
+
+            {/* Account Actions - At Bottom */}
+            <div className="border-t border-dimmed pt-6 mt-8">
+                <div className="flex gap-3 justify-center">
+                    <SignoutButton />
+                    <DeleteAccountButton account={{
+                        name: user.name,
+                        joinedAt: user.joinedAt,
+                    }} />
+                </div>
             </div>
         </div>
     )
