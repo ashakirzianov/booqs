@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS users (
   email CITEXT UNIQUE,
   name TEXT,
   profile_picture_url TEXT,
+  emoji VARCHAR(10) NOT NULL,
   joined_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 

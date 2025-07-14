@@ -78,6 +78,7 @@ type User {
     joinedAt: String!
     name: String
     pictureUrl: String
+    emoji: String
 }
 
 union SearchResult = Booq | Author

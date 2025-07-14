@@ -10,6 +10,7 @@ export type DbUser = {
     name: string | null,
     profile_picture_url: string | null,
     joined_at: string,
+    emoji: string,
 }
 
 export async function userForId(id: string): Promise<DbUser | null> {
@@ -31,9 +32,10 @@ export async function createUser({
     username = username ?? await proposeUsername({
         name, email,
     })
+    const emoji = getRandomEmoji()
     const [user] = await sql`
-      INSERT INTO users (username, email, name, profile_picture_url)
-      VALUES (${username}, ${email ?? null}, ${name ?? null}, ${profilePictureUrl ?? null})
+      INSERT INTO users (username, email, name, profile_picture_url, emoji)
+      VALUES (${username}, ${email ?? null}, ${name ?? null}, ${profilePictureUrl ?? null}, ${emoji})
       RETURNING *
     `
     return user as DbUser
@@ -100,4 +102,15 @@ function generateUsername({ name, email }: UserDataForNameGeneration) {
         locale: 'en',
     })
     return username
+}
+
+const USER_EMOJIS = [
+    '😊', '😄', '😃', '😁', '😌', '😉', '😎', '🤓', '🤗', '🙂',
+    '🤔', '🤠', '😇', '😋', '😍', '🥰', '🤩', '😚', '😙', '😗',
+    '🐱', '🐰', '🐻', '🐼', '🐨', '🐯', '🦁', '🐸', '🐵', '🦊',
+    '🐧', '🦆', '🐺', '🐴', '🦄', '🐮', '🐷', '🐹', '🐭', '🐶'
+]
+
+function getRandomEmoji(): string {
+    return USER_EMOJIS[Math.floor(Math.random() * USER_EMOJIS.length)]
 }
