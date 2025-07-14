@@ -6,7 +6,7 @@ import { booqCollection } from '@/data/booqs'
 import { READING_LIST_COLLECTION } from '@/application/collections'
 import { BooqCollection } from '@/components/BooqCollection'
 import { SignoutButton } from './SignoutButton'
-import { ProfileBadge } from '@/components/ProfilePicture'
+import { EditableProfileBadge } from './EditableProfileBadge'
 
 export default async function Page() {
     const user = await fetchAuthData()
@@ -21,7 +21,7 @@ export default async function Page() {
             {/* Profile Section */}
             <div className="bg-background border border-dimmed rounded-lg p-6">
                 <div className="flex items-center gap-4">
-                    <ProfileBadge
+                    <EditableProfileBadge
                         name={user.name ?? undefined}
                         picture={user.profilePictureURL ?? undefined}
                         emoji={user.emoji ?? undefined}
