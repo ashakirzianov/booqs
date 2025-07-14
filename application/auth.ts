@@ -62,6 +62,7 @@ export function useAuth() {
         ? {
             id: data.user.id,
             name: data.user.name ?? undefined,
+            username: data.user.username ?? undefined,
             profilePictureURL: data.user.profile_picture_url ?? undefined,
             joinedAt: data.user.joined_at,
             emoji: data.user.emoji ?? undefined,
