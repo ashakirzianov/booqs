@@ -111,6 +111,31 @@ const USER_EMOJIS = [
     '🐧', '🦆', '🐺', '🐴', '🦄', '🐮', '🐷', '🐹', '🐭', '🐶'
 ]
 
+export async function updateUser({
+    id,
+    name,
+    emoji,
+}: {
+    id: string,
+    name?: string,
+    emoji?: string,
+}): Promise<DbUser | null> {
+    if (name === undefined && emoji === undefined) {
+        return null
+    }
+
+    const [user] = await sql`
+        UPDATE users
+        SET
+            ${name !== undefined ? sql`name = ${name}` : sql``}
+            ${name !== undefined && emoji !== undefined ? sql`,` : sql``}
+            ${emoji !== undefined ? sql`emoji = ${emoji}` : sql``}
+        WHERE id = ${id}
+        RETURNING *
+    `
+    return user ? (user as DbUser) : null
+}
+
 function getRandomEmoji(): string {
     return USER_EMOJIS[Math.floor(Math.random() * USER_EMOJIS.length)]
 }

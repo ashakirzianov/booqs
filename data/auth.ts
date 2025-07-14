@@ -4,7 +4,7 @@ import {
     initiatePasskeyLogin, verifyPasskeyLogin,
 } from '@/backend/passkey'
 import { generateToken, userIdFromToken } from '@/backend/token'
-import { deleteUserForId, userForId } from '@/backend/users'
+import { deleteUserForId, userForId, updateUser } from '@/backend/users'
 import { AccountData } from '@/core'
 import { RegistrationResponseJSON, AuthenticationResponseJSON } from '@simplewebauthn/browser'
 import { cookies, headers } from 'next/headers'
@@ -144,6 +144,39 @@ export async function fetchAuthData(): Promise<AccountData | undefined> {
         name: user.name ?? undefined,
         profilePictureURL: user.profile_picture_url ?? undefined,
         emoji: user.emoji ?? undefined,
+    }
+}
+
+export async function updateAccountAction({ 
+    name, 
+    emoji 
+}: { 
+    name?: string, 
+    emoji?: string 
+}): Promise<AccountData | null> {
+    const userId = await getUserIdInsideRequest()
+    if (!userId) {
+        return null
+    }
+    
+    const updatedUser = await updateUser({
+        id: userId,
+        name,
+        emoji,
+    })
+    
+    if (!updatedUser) {
+        return null
+    }
+    
+    return {
+        id: updatedUser.id,
+        username: updatedUser.username,
+        email: updatedUser.email ?? undefined,
+        joinedAt: updatedUser.joined_at,
+        name: updatedUser.name ?? undefined,
+        profilePictureURL: updatedUser.profile_picture_url ?? undefined,
+        emoji: updatedUser.emoji ?? undefined,
     }
 }
 
