@@ -45,7 +45,7 @@ export function DeleteAccountButton({ account }: {
             </button>
             
             <Modal isOpen={modal} closeModal={closeModal}>
-                <div className='max-w-sm mx-auto p-6 space-y-4'>
+                <div className='w-96 max-w-[90vw] mx-auto p-6 space-y-4'>
                     <div className='text-center'>
                         <h2 className='text-xl font-bold text-alert mb-2'>
                             Delete Account
