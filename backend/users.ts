@@ -2,6 +2,7 @@ import slugify from 'slugify'
 import { deleteAllBooksForUserId } from './uu'
 import { deleteUserCredentials } from './passkey'
 import { estimatedRowCount, sql } from './db'
+import { AccountData } from '@/core'
 
 export type DbUser = {
     id: string,
@@ -11,6 +12,18 @@ export type DbUser = {
     profile_picture_url: string | null,
     joined_at: string,
     emoji: string,
+}
+
+export function accountDataFromDbUser(dbUser: DbUser): AccountData {
+    return {
+        id: dbUser.id,
+        username: dbUser.username,
+        email: dbUser.email ?? undefined,
+        joinedAt: dbUser.joined_at,
+        name: dbUser.name ?? undefined,
+        profilePictureURL: dbUser.profile_picture_url ?? undefined,
+        emoji: dbUser.emoji ?? undefined,
+    }
 }
 
 export async function userForId(id: string): Promise<DbUser | null> {

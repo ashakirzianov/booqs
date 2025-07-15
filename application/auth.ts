@@ -68,23 +68,14 @@ export function useAuth() {
             const updatedUser = await updateAccountAction({ name, emoji })
             if (updatedUser) {
                 return {
-                    user: {
-                        ...data?.user,
-                        id: updatedUser.id,
-                        username: updatedUser.username ?? undefined,
-                        profile_picture_url: updatedUser.profilePictureURL ?? null,
-                        email: updatedUser.email ?? null,
-                        joined_at: updatedUser.joinedAt ?? null,
-                        name: updatedUser.name ?? null,
-                        emoji: updatedUser.emoji ?? null,
-                    },
+                    user: updatedUser,
                 } satisfies GetResponse
             }
             throw new Error('Failed to update account')
         }, {
             optimisticData: data?.user ? {
                 user: {
-                    ...data?.user,
+                    ...data.user,
                     name: name !== undefined ? name : data.user.name,
                     emoji: emoji !== undefined ? emoji : data.user.emoji,
                 }
@@ -93,26 +84,10 @@ export function useAuth() {
             revalidate: false,
         })
 
-        return result?.user ? {
-            id: result.user.id,
-            name: result.user.name ?? undefined,
-            username: result.user.username ?? undefined,
-            profilePictureURL: result.user.profile_picture_url ?? undefined,
-            joinedAt: result.user.joined_at,
-            emoji: result.user.emoji ?? undefined,
-        } : null
+        return result?.user ?? null
     }
 
-    const user: AccountData | undefined = data?.user
-        ? {
-            id: data.user.id,
-            name: data.user.name ?? undefined,
-            username: data.user.username ?? undefined,
-            profilePictureURL: data.user.profile_picture_url ?? undefined,
-            joinedAt: data.user.joined_at,
-            emoji: data.user.emoji ?? undefined,
-        }
-        : undefined
+    const user: AccountData | undefined = data?.user ?? undefined
 
     return {
         user,
@@ -122,7 +97,7 @@ export function useAuth() {
                 if (result.success) {
                     return {
                         user: result.user,
-                    }
+                    } satisfies GetResponse
                 } else {
                     throw new Error(result.error)
                 }
@@ -137,7 +112,7 @@ export function useAuth() {
                 if (result.success) {
                     return {
                         user: result.user,
-                    }
+                    } satisfies GetResponse
                 } else {
                     throw new Error(result.error)
                 }

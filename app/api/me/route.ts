@@ -1,8 +1,9 @@
-import { userForId, DbUser } from '@/backend/users'
+import { userForId, accountDataFromDbUser } from '@/backend/users'
 import { getUserIdInsideRequest } from '@/data/auth'
+import { AccountData } from '@/core'
 
 export type GetResponse = {
-    user: DbUser | null,
+    user: AccountData | null,
 }
 export async function GET(_request: Request) {
     const userId = await getUserIdInsideRequest()
@@ -11,12 +12,15 @@ export async function GET(_request: Request) {
             user: null,
         } satisfies GetResponse)
     }
-    const user = await userForId(userId)
-    if (!user) {
+    const dbUser = await userForId(userId)
+    if (!dbUser) {
         return new Response('User not found', {
             status: 404,
         })
     }
+    
+    const user: AccountData = accountDataFromDbUser(dbUser)
+    
     const response: GetResponse = {
         user,
     }
