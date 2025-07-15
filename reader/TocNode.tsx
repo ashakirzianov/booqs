@@ -1,7 +1,7 @@
 import { pageForPosition } from '@/application/common'
 import { TocNode } from './nodes'
 import Link from 'next/link'
-import { booqHref } from '@/application/href'
+import { booqHref } from '@/core/href'
 import { BooqId } from '@/core'
 
 

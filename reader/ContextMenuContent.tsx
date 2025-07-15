@@ -20,7 +20,7 @@ import {
     generateQuote,
 } from './ContextMenuItems'
 import { useRouter } from 'next/navigation'
-import { quoteHref } from '@/application/href'
+import { quoteHref } from '@/core/href'
 import { noteColorNames } from '@/application/common'
 
 type EmptyTarget = {

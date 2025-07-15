@@ -5,7 +5,7 @@ import { PanelButton } from '@/components/Buttons'
 import { ProfileBadge } from '@/components/ProfilePicture'
 import { ModalButton, ModalDivider, ModalLabel, Modal } from '@/components/Modal'
 import { Popover } from '@/components/Popover'
-import { accountHref, myBooqsHref } from '@/application/href'
+import { accountHref, myBooqsHref } from '@/core/href'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/application/auth'
 import {

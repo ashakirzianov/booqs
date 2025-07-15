@@ -1,6 +1,6 @@
 'use client'
 
-import { feedHref } from '@/application/href'
+import { feedHref } from '@/core/href'
 import { Modal } from '@/components/Modal'
 import { BorderButton } from '@/components/Buttons'
 import { deleteAccountAction } from '@/data/auth'
@@ -16,16 +16,16 @@ export function DeleteAccountButton({ account }: {
     const [modal, setModal] = useState(false)
     const [isDeleting, setIsDeleting] = useState(false)
     const { push } = useRouter()
-    
+
     function openModal() {
         setModal(true)
     }
-    
+
     function closeModal() {
         setModal(false)
         setIsDeleting(false)
     }
-    
+
     async function performDelete() {
         setIsDeleting(true)
         try {
@@ -35,15 +35,15 @@ export function DeleteAccountButton({ account }: {
             setIsDeleting(false)
         }
     }
-    
+
     return (
         <>
-            <BorderButton 
+            <BorderButton
                 text="Delete Account"
                 onClick={openModal}
                 color="alert"
             />
-            
+
             <Modal isOpen={modal} closeModal={closeModal}>
                 <div className='w-96 max-w-[90vw] mx-auto p-6 space-y-4'>
                     <div className='text-center'>
@@ -54,7 +54,7 @@ export function DeleteAccountButton({ account }: {
                             Are you sure you want to delete your account? This action cannot be undone.
                         </p>
                     </div>
-                    
+
                     <div className='bg-background border border-dimmed rounded-md p-4'>
                         <p className='text-sm text-dimmed'>
                             <span className='font-medium'>Account:</span> {account.name || 'Anonymous User'}
@@ -63,10 +63,10 @@ export function DeleteAccountButton({ account }: {
                             <span className='font-medium'>Member since:</span> {formatDate(account.joinedAt)}
                         </p>
                     </div>
-                    
+
                     <div className='flex gap-3 pt-2'>
                         <div className='flex-1'>
-                            <BorderButton 
+                            <BorderButton
                                 text="Cancel"
                                 onClick={closeModal}
                                 color="primary"
@@ -74,7 +74,7 @@ export function DeleteAccountButton({ account }: {
                             />
                         </div>
                         <div className='flex-1'>
-                            <BorderButton 
+                            <BorderButton
                                 text={isDeleting ? 'Deleting...' : 'Delete Account'}
                                 onClick={performDelete}
                                 disabled={isDeleting}
