@@ -1,5 +1,7 @@
 import { redis } from './db'
 import { nanoid } from 'nanoid'
+import { userForEmail } from './users'
+import { sendSignInLink, sendSignUpLink } from './send'
 
 const SECRET_EXPIRE_SECONDS = 3600 // 1 hour
 
@@ -11,6 +13,11 @@ type SignSecret = {
     expiration: string,
     data?: unknown,
 }
+
+export type InitiateSignRequestResult = 
+    | { kind: 'signin' }
+    | { kind: 'signup' }
+    | { kind: 'error', error: string }
 
 export async function createSignSecret({
     email,
@@ -66,4 +73,59 @@ export async function verifySignSecret({
     await redis.del(`auth:secret:${email}`)
     
     return { success: true, data: stored.data }
+}
+
+export async function initiateSignRequest({
+    email,
+    from,
+}: {
+    email: string,
+    from: string,
+}): Promise<InitiateSignRequestResult> {
+    try {
+        const existingUser = await userForEmail(email)
+        
+        if (existingUser) {
+            // User exists, send sign-in link
+            const { secret } = await createSignSecret({
+                email,
+                kind: 'signin',
+                data: { from },
+            })
+            
+            const emailSent = await sendSignInLink({
+                secret,
+                email,
+                name: existingUser.name ?? undefined,
+                username: existingUser.username,
+            })
+            
+            if (!emailSent) {
+                return { kind: 'error', error: 'Failed to send sign-in email' }
+            }
+            
+            return { kind: 'signin' }
+        } else {
+            // User doesn't exist, send sign-up link
+            const { secret } = await createSignSecret({
+                email,
+                kind: 'signup',
+                data: { from },
+            })
+            
+            const emailSent = await sendSignUpLink({
+                secret,
+                email,
+            })
+            
+            if (!emailSent) {
+                return { kind: 'error', error: 'Failed to send sign-up email' }
+            }
+            
+            return { kind: 'signup' }
+        }
+    } catch (err) {
+        console.error('Error initiating sign request:', err)
+        return { kind: 'error', error: 'An error occurred while processing the request' }
+    }
 }
