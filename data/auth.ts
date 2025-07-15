@@ -5,7 +5,7 @@ import {
 } from '@/backend/passkey'
 import { generateToken, userIdFromToken } from '@/backend/token'
 import { deleteUserForId, userForId, updateUser, accountDataFromDbUser } from '@/backend/users'
-import { completeSignInRequest, completeSignUp } from '@/backend/sign'
+import { completeSignInRequest, completeSignUp, prevalidateSignup } from '@/backend/sign'
 import { AccountData } from '@/core'
 import { RegistrationResponseJSON, AuthenticationResponseJSON } from '@simplewebauthn/browser'
 import { cookies, headers } from 'next/headers'
@@ -238,6 +238,21 @@ export async function completeSignUpAction({
     } catch (err) {
         console.error('Error completing sign-up:', err)
         return { success: false, reason: 'An error occurred during sign-up' }
+    }
+}
+
+export async function prevalidateSignupAction({
+    email,
+    secret,
+}: {
+    email: string,
+    secret: string,
+}): Promise<{ success: true } | { success: false, reason: string }> {
+    try {
+        return await prevalidateSignup({ email, secret })
+    } catch (err) {
+        console.error('Error prevalidating signup:', err)
+        return { success: false, reason: 'An error occurred during validation' }
     }
 }
 

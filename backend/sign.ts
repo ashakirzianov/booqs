@@ -28,6 +28,10 @@ export type CompleteSignUpResult =
     | { success: true, token: string, user: DbUser }
     | { success: false, reason: string }
 
+export type PrevalidateSignupResult =
+    | { success: true }
+    | { success: false, reason: string }
+
 export async function createSignSecret({
     email,
     kind,
@@ -82,6 +86,43 @@ export async function verifySignSecret({
     await redis.del(`auth:secret:${email}`)
 
     return { success: true, data: stored.data }
+}
+
+export async function prevalidateSignup({
+    email,
+    secret,
+}: {
+    email: string,
+    secret: string,
+}): Promise<PrevalidateSignupResult> {
+    try {
+        const stored = await redis.get<SignSecret>(`auth:secret:${email}`)
+
+        if (!stored) {
+            return { success: false, reason: 'Sign-up link not found' }
+        }
+
+        // Check expiration
+        if (Number(stored.expiration) < (Date.now() / 1000)) {
+            return { success: false, reason: 'Sign-up link has expired' }
+        }
+
+        // Check kind and secret match
+        if (stored.kind !== 'signup' || stored.secret !== secret) {
+            return { success: false, reason: 'Invalid sign-up link' }
+        }
+
+        // Check if user already exists
+        const existingUser = await userForEmail(email)
+        if (existingUser) {
+            return { success: false, reason: 'An account with this email already exists' }
+        }
+
+        return { success: true }
+    } catch (err) {
+        console.error('Error prevalidating signup:', err)
+        return { success: false, reason: 'An error occurred while validating the sign-up link' }
+    }
 }
 
 export async function initiateSignRequest({
