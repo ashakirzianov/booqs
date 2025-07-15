@@ -13,6 +13,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `npm run analyze` - Build with bundle analyzer
 - `npm run cli` - Run CLI tools (tsx cli/index.ts)
 
+## Coding preferences
+
+Put local/private utility functions after all exported/public functions
+
 ## Architecture Overview
 
 ### Core Structure
