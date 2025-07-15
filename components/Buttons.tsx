@@ -20,11 +20,23 @@ export function PanelButton({
     </button>
 }
 
-export function BorderButton({ text, onClick }: {
+export function BorderButton({ text, onClick, color = 'primary', disabled = false, className = '' }: {
     text: string,
     onClick?: () => void,
+    color?: 'primary' | 'alert',
+    disabled?: boolean,
+    className?: string,
 }) {
-    return <div className='flex text-center text-dimmed border-2 border-dimmed no-underline cursor-pointer transition-all duration-300 hover:text-highlight hover:border-highlight rounded-sm font-bold py-sm px-base' onClick={onClick}>
+    const colorClasses = {
+        primary: 'text-primary border-primary hover:bg-primary hover:text-background',
+        alert: 'text-alert border-alert hover:bg-alert hover:text-background'
+    }
+    
+    return <button 
+        className={`px-4 py-2 font-medium border rounded-md transition-colors duration-200 ${colorClasses[color]} ${disabled ? 'disabled:opacity-50' : ''} ${className}`}
+        onClick={onClick}
+        disabled={disabled}
+    >
         {text}
-    </div>
+    </button>
 }

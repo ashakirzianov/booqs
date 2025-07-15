@@ -2,6 +2,7 @@
 
 import { feedHref } from '@/application/href'
 import { Modal } from '@/components/Modal'
+import { BorderButton } from '@/components/Buttons'
 import { deleteAccountAction } from '@/data/auth'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
@@ -37,12 +38,11 @@ export function DeleteAccountButton({ account }: {
     
     return (
         <>
-            <button 
-                className='px-4 py-2 text-alert font-medium border border-alert rounded-md hover:bg-alert hover:text-background transition-colors duration-200' 
+            <BorderButton 
+                text="Delete Account"
                 onClick={openModal}
-            >
-                Delete Account
-            </button>
+                color="alert"
+            />
             
             <Modal isOpen={modal} closeModal={closeModal}>
                 <div className='w-96 max-w-[90vw] mx-auto p-6 space-y-4'>
@@ -65,22 +65,23 @@ export function DeleteAccountButton({ account }: {
                     </div>
                     
                     <div className='flex gap-3 pt-2'>
-                        <button 
-                            tabIndex={1} 
-                            className='flex-1 px-4 py-2 text-primary font-medium border border-primary rounded-md hover:bg-primary hover:text-background transition-colors duration-200' 
-                            onClick={closeModal}
-                            disabled={isDeleting}
-                        >
-                            Cancel
-                        </button>
-                        <button 
-                            tabIndex={2} 
-                            className='flex-1 px-4 py-2 text-alert font-medium border border-alert rounded-md hover:bg-alert hover:text-background transition-colors duration-200 disabled:opacity-50' 
-                            onClick={performDelete}
-                            disabled={isDeleting}
-                        >
-                            {isDeleting ? 'Deleting...' : 'Delete Account'}
-                        </button>
+                        <div className='flex-1'>
+                            <BorderButton 
+                                text="Cancel"
+                                onClick={closeModal}
+                                color="primary"
+                                className="w-full"
+                            />
+                        </div>
+                        <div className='flex-1'>
+                            <BorderButton 
+                                text={isDeleting ? 'Deleting...' : 'Delete Account'}
+                                onClick={performDelete}
+                                disabled={isDeleting}
+                                color="alert"
+                                className="w-full"
+                            />
+                        </div>
                     </div>
                 </div>
             </Modal>
