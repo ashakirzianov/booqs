@@ -45,6 +45,10 @@ export type CreateUserResult =
     | { success: true, user: DbUser }
     | { success: false, reason: string }
 
+export type UpdateUserResult =
+    | { success: true, user: DbUser }
+    | { success: false, user?: undefined, reason: string }
+
 export async function createUser({
     username, email, name, profilePictureUrl, emoji,
 }: {
@@ -64,18 +68,8 @@ export async function createUser({
         return { success: true, user: user as DbUser }
     } catch (err: any) {
         console.error('Error creating user:', err)
-
-        // Handle specific database errors
-        if (err.code === '23505') { // unique_violation
-            if (err.constraint === 'users_username_key') {
-                return { success: false, reason: 'Username already exists' }
-            }
-            if (err.constraint === 'users_email_key') {
-                return { success: false, reason: 'Email already exists' }
-            }
-        }
-
-        return { success: false, reason: 'Failed to create user' }
+        const reason = getReasonFromError(err, 'Failed to create user')
+        return { success: false, reason }
     }
 }
 
@@ -119,21 +113,46 @@ export async function updateUser({
     id: string,
     name?: string,
     emoji?: string,
-}): Promise<DbUser | null> {
-    if (name === undefined && emoji === undefined) {
-        return null
-    }
+}): Promise<UpdateUserResult> {
+    try {
+        if (name === undefined && emoji === undefined) {
+            return { success: false, reason: 'No fields provided to update' }
+        }
 
-    const [user] = await sql`
-        UPDATE users
-        SET
-            ${name !== undefined ? sql`name = ${name}` : sql``}
-            ${name !== undefined && emoji !== undefined ? sql`,` : sql``}
-            ${emoji !== undefined ? sql`emoji = ${emoji}` : sql``}
-        WHERE id = ${id}
-        RETURNING *
-    `
-    return user ? (user as DbUser) : null
+        const [user] = await sql`
+            UPDATE users
+            SET
+                ${name !== undefined ? sql`name = ${name}` : sql``}
+                ${name !== undefined && emoji !== undefined ? sql`,` : sql``}
+                ${emoji !== undefined ? sql`emoji = ${emoji}` : sql``}
+            WHERE id = ${id}
+            RETURNING *
+        `
+
+        if (!user) {
+            return { success: false, reason: 'User not found' }
+        }
+
+        return { success: true, user: user as DbUser }
+    } catch (err: any) {
+        console.error('Error updating user:', err)
+        const reason = getReasonFromError(err, 'Failed to update user')
+        return { success: false, reason }
+    }
+}
+
+function getReasonFromError(err: any, defaultReason: string): string {
+    // Handle specific database errors
+    if (err.code === '23505') { // unique_violation
+        if (err.constraint === 'users_username_key') {
+            return 'Username already exists'
+        }
+        if (err.constraint === 'users_email_key') {
+            return 'Email already exists'
+        }
+    }
+    
+    return defaultReason
 }
 
 function getRandomEmoji(): string {

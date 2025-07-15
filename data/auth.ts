@@ -139,28 +139,28 @@ export async function fetchAuthData(): Promise<AccountData | undefined> {
     return accountDataFromDbUser(user)
 }
 
-export async function updateAccountAction({ 
-    name, 
-    emoji 
-}: { 
-    name?: string, 
-    emoji?: string 
+export async function updateAccountAction({
+    name,
+    emoji
+}: {
+    name?: string,
+    emoji?: string
 }): Promise<AccountData | null> {
     const userId = await getUserIdInsideRequest()
     if (!userId) {
         return null
     }
-    
-    const updatedUser = await updateUser({
+
+    const { user: updatedUser } = await updateUser({
         id: userId,
         name,
         emoji,
     })
-    
+
     if (!updatedUser) {
         return null
     }
-    
+
     return accountDataFromDbUser(updatedUser)
 }
 
