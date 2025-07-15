@@ -40,3 +40,16 @@ export function BorderButton({ text, onClick, color = 'primary', disabled = fals
         {text}
     </button>
 }
+
+export function LightButton({ children, onClick, className = '' }: {
+    children: React.ReactNode,
+    onClick?: () => void,
+    className?: string,
+}) {
+    return <button
+        onClick={onClick}
+        className={`flex items-center gap-2 px-3 py-2 text-action hover:text-highlight transition-colors ${className}`}
+    >
+        {children}
+    </button>
+}

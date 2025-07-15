@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { ProfileBadge } from '@/components/ProfilePicture'
 import { EmojiSelector } from './EmojiSelector'
 import { PencilIcon } from '@/components/Icons'
+import { LightButton } from '@/components/Buttons'
 import { AccountData } from '@/core'
 import { updateProfileServerAction } from './actions'
 
@@ -139,15 +140,14 @@ export function ProfileData({ user }: { user: AccountData }) {
             
             {/* Edit Profile Button - Bottom Right Corner */}
             {!isEditMode && (
-                <button
-                    onClick={handleEditClick}
-                    className="absolute bottom-4 right-4 flex items-center gap-2 px-3 py-2 text-action hover:text-highlight transition-colors"
-                >
-                    <div className="w-4 h-4">
-                        <PencilIcon />
-                    </div>
-                    Edit Profile
-                </button>
+                <div className="absolute bottom-4 right-4">
+                    <LightButton onClick={handleEditClick}>
+                        <div className="w-4 h-4">
+                            <PencilIcon />
+                        </div>
+                        Edit Profile
+                    </LightButton>
+                </div>
             )}
             
             <EmojiSelector
