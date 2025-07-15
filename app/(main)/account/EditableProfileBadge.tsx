@@ -42,12 +42,10 @@ export function EditableProfileBadge({
                     border={border}
                 />
 
-                {/* Edit label on top */}
+                {/* Hover overlay */}
                 {isHovered && (
-                    <div className="absolute -top-8 left-1/2 transform -translate-x-1/2">
-                        <div className="bg-background border border-dimmed rounded px-2 py-1 text-xs font-medium text-primary shadow-md">
-                            Edit
-                        </div>
+                    <div className="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center">
+                        <span className="text-white text-xs font-medium">Edit</span>
                     </div>
                 )}
             </div>
