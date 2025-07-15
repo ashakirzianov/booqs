@@ -43,20 +43,21 @@ export async function userForEmail(email: string): Promise<DbUser | null> {
 }
 
 export async function createUser({
-    username, email, name, profilePictureUrl,
+    username, email, name, profilePictureUrl, emoji,
 }: {
     username?: string,
     email?: string,
     name?: string,
-    profilePictureUrl?: string
+    profilePictureUrl?: string,
+    emoji?: string,
 }): Promise<DbUser> {
     username = username ?? await proposeUsername({
         name, email,
     })
-    const emoji = getRandomEmoji()
+    const userEmoji = emoji ?? getRandomEmoji()
     const [user] = await sql`
       INSERT INTO users (username, email, name, profile_picture_url, emoji)
-      VALUES (${username}, ${email ?? null}, ${name ?? null}, ${profilePictureUrl ?? null}, ${emoji})
+      VALUES (${username}, ${email ?? null}, ${name ?? null}, ${profilePictureUrl ?? null}, ${userEmoji})
       RETURNING *
     `
     return user as DbUser

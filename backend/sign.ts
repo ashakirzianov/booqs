@@ -1,6 +1,6 @@
 import { redis } from './db'
 import { nanoid } from 'nanoid'
-import { userForEmail } from './users'
+import { userForEmail, createUser, DbUser } from './users'
 import { sendSignInLink, sendSignUpLink } from './send'
 import { generateToken } from './token'
 
@@ -22,6 +22,10 @@ export type InitiateSignRequestResult =
 
 export type CompleteSignInRequestResult = 
     | { success: true, token: string }
+    | { success: false, reason: string }
+
+export type CompleteSignUpResult = 
+    | { success: true, token: string, user: DbUser }
     | { success: false, reason: string }
 
 export async function createSignSecret({
@@ -163,6 +167,54 @@ export async function completeSignInRequest({
         return { success: true, token }
     } catch (err) {
         console.error('Error completing sign-in request:', err)
+        return { success: false, reason: 'An error occurred while processing the request' }
+    }
+}
+
+export async function completeSignUp({
+    email,
+    secret,
+    username,
+    name,
+    emoji,
+}: {
+    email: string,
+    secret: string,
+    username?: string,
+    name?: string,
+    emoji?: string,
+}): Promise<CompleteSignUpResult> {
+    try {
+        const verification = await verifySignSecret({
+            email,
+            kind: 'signup',
+            secret,
+        })
+        
+        if (!verification.success) {
+            return { success: false, reason: verification.reason }
+        }
+        
+        // Check if user already exists
+        const existingUser = await userForEmail(email)
+        if (existingUser) {
+            return { success: false, reason: 'User already exists' }
+        }
+        
+        // Create new user
+        const user = await createUser({
+            email,
+            username,
+            name,
+            profilePictureUrl: undefined,
+            emoji,
+        })
+        
+        const token = generateToken(user.id)
+        
+        return { success: true, token, user }
+    } catch (err) {
+        console.error('Error completing sign-up:', err)
         return { success: false, reason: 'An error occurred while processing the request' }
     }
 }
