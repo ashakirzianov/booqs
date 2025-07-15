@@ -9,22 +9,21 @@ export function EditableProfileBadge({
     picture,
     emoji,
     size,
-    border
+    border,
+    onEmojiChange
 }: {
     name?: string
     picture?: string
     emoji?: string
     size: number
     border: boolean
+    onEmojiChange: (emoji: string) => void
 }) {
     const [isHovered, setIsHovered] = useState(false)
     const [isEmojiSelectorOpen, setIsEmojiSelectorOpen] = useState(false)
-    const [currentEmoji, setCurrentEmoji] = useState(emoji)
 
     const handleEmojiSelect = (newEmoji: string) => {
-        setCurrentEmoji(newEmoji)
-        // TODO: Wire to backend - for now just update local state
-        console.log('Selected emoji:', newEmoji)
+        onEmojiChange(newEmoji)
     }
 
     return (
@@ -38,7 +37,7 @@ export function EditableProfileBadge({
                 <ProfileBadge
                     name={name}
                     picture={picture}
-                    emoji={currentEmoji}
+                    emoji={emoji}
                     size={size}
                     border={border}
                 />
@@ -56,7 +55,7 @@ export function EditableProfileBadge({
             <EmojiSelector
                 isOpen={isEmojiSelectorOpen}
                 onClose={() => setIsEmojiSelectorOpen(false)}
-                currentEmoji={currentEmoji}
+                currentEmoji={emoji}
                 onSelect={handleEmojiSelect}
             />
         </>
