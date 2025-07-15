@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { ProfileBadge } from '@/components/ProfilePicture'
 import { EmojiSelector } from './EmojiSelector'
+import { PencilIcon } from '@/components/Icons'
 import { AccountData } from '@/core'
 import { updateProfileServerAction } from './actions'
 
@@ -21,6 +22,10 @@ export function ProfileData({ user }: { user: AccountData }) {
 
     const handleEmojiClick = () => {
         setIsEmojiSelectorOpen(true)
+    }
+
+    const handleEditClick = () => {
+        setIsEditMode(true)
     }
 
     const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -56,7 +61,7 @@ export function ProfileData({ user }: { user: AccountData }) {
     }
 
     return (
-        <div className="bg-background border border-dimmed rounded-lg p-6">
+        <div className="bg-background border border-dimmed rounded-lg p-6 relative">
             <div className="flex items-center gap-4">
                 <div 
                     className="relative cursor-pointer"
@@ -131,6 +136,19 @@ export function ProfileData({ user }: { user: AccountData }) {
                     )}
                 </div>
             </div>
+            
+            {/* Edit Profile Button - Bottom Right Corner */}
+            {!isEditMode && (
+                <button
+                    onClick={handleEditClick}
+                    className="absolute bottom-4 right-4 flex items-center gap-2 px-3 py-2 text-action hover:text-highlight transition-colors"
+                >
+                    <div className="w-4 h-4">
+                        <PencilIcon />
+                    </div>
+                    Edit Profile
+                </button>
+            )}
             
             <EmojiSelector
                 isOpen={isEmojiSelectorOpen}
