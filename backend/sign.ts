@@ -15,16 +15,16 @@ type SignSecret = {
     data?: unknown,
 }
 
-export type InitiateSignRequestResult = 
+export type InitiateSignRequestResult =
     | { kind: 'signin' }
     | { kind: 'signup' }
     | { kind: 'error', error: string }
 
-export type CompleteSignInRequestResult = 
+export type CompleteSignInRequestResult =
     | { success: true, token: string }
     | { success: false, reason: string }
 
-export type CompleteSignUpResult = 
+export type CompleteSignUpResult =
     | { success: true, token: string, user: DbUser }
     | { success: false, reason: string }
 
@@ -39,17 +39,17 @@ export async function createSignSecret({
 }): Promise<{ secret: string }> {
     const secret = nanoid(32)
     const expiration = Math.floor(Date.now() / 1000) + SECRET_EXPIRE_SECONDS
-    
+
     const doc: SignSecret = {
         kind,
         secret,
         expiration: `${expiration}`,
         data,
     }
-    
+
     await redis.set(`auth:secret:${email}`, doc)
     await redis.expire(`auth:secret:${email}`, SECRET_EXPIRE_SECONDS)
-    
+
     return { secret }
 }
 
@@ -63,24 +63,24 @@ export async function verifySignSecret({
     secret: string,
 }): Promise<{ success: true, data?: unknown } | { success: false, reason: string }> {
     const stored = await redis.get<SignSecret>(`auth:secret:${email}`)
-    
+
     if (!stored) {
         return { success: false, reason: 'Secret not found' }
     }
-    
+
     // Check expiration
     if (Number(stored.expiration) < (Date.now() / 1000)) {
         return { success: false, reason: 'Secret expired' }
     }
-    
+
     // Check kind and secret match
     if (stored.kind !== kind || stored.secret !== secret) {
         return { success: false, reason: 'Invalid secret' }
     }
-    
+
     // Clean up the secret after successful verification
     await redis.del(`auth:secret:${email}`)
-    
+
     return { success: true, data: stored.data }
 }
 
@@ -93,7 +93,7 @@ export async function initiateSignRequest({
 }): Promise<InitiateSignRequestResult> {
     try {
         const existingUser = await userForEmail(email)
-        
+
         if (existingUser) {
             // User exists, send sign-in link
             const { secret } = await createSignSecret({
@@ -101,18 +101,18 @@ export async function initiateSignRequest({
                 kind: 'signin',
                 data: { from },
             })
-            
+
             const emailSent = await sendSignInLink({
                 secret,
                 email,
                 name: existingUser.name ?? undefined,
                 username: existingUser.username,
             })
-            
+
             if (!emailSent) {
                 return { kind: 'error', error: 'Failed to send sign-in email' }
             }
-            
+
             return { kind: 'signin' }
         } else {
             // User doesn't exist, send sign-up link
@@ -121,16 +121,16 @@ export async function initiateSignRequest({
                 kind: 'signup',
                 data: { from },
             })
-            
+
             const emailSent = await sendSignUpLink({
                 secret,
                 email,
             })
-            
+
             if (!emailSent) {
                 return { kind: 'error', error: 'Failed to send sign-up email' }
             }
-            
+
             return { kind: 'signup' }
         }
     } catch (err) {
@@ -152,18 +152,18 @@ export async function completeSignInRequest({
             kind: 'signin',
             secret,
         })
-        
+
         if (!verification.success) {
             return { success: false, reason: verification.reason }
         }
-        
+
         const user = await userForEmail(email)
         if (!user) {
             return { success: false, reason: 'User not found' }
         }
-        
+
         const token = generateToken(user.id)
-        
+
         return { success: true, token }
     } catch (err) {
         console.error('Error completing sign-in request:', err)
@@ -180,8 +180,8 @@ export async function completeSignUp({
 }: {
     email: string,
     secret: string,
-    username?: string,
-    name?: string,
+    username: string,
+    name: string,
     emoji?: string,
 }): Promise<CompleteSignUpResult> {
     try {
@@ -190,28 +190,35 @@ export async function completeSignUp({
             kind: 'signup',
             secret,
         })
-        
+
         if (!verification.success) {
             return { success: false, reason: verification.reason }
         }
-        
+
         // Check if user already exists
         const existingUser = await userForEmail(email)
         if (existingUser) {
             return { success: false, reason: 'User already exists' }
         }
-        
-        // Create new user
-        const user = await createUser({
+
+        // Username and name are now required parameters, no need for additional validation
+
+        const userResult = await createUser({
             email,
             username,
             name,
             profilePictureUrl: undefined,
             emoji,
         })
-        
+
+        if (!userResult.success) {
+            return { success: false, reason: userResult.reason }
+        }
+
+        const user = userResult.user
+
         const token = generateToken(user.id)
-        
+
         return { success: true, token, user }
     } catch (err) {
         console.error('Error completing sign-up:', err)
