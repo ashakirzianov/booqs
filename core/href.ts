@@ -47,6 +47,21 @@ export function signInLinkHref({ email, secret, returnTo }: {
     return `/auth/signin?${params.toString()}`
 }
 
+export function signUpLinkHref({ email, secret, returnTo }: {
+    email: string,
+    secret: string,
+    returnTo?: string,
+}) {
+    const params = new URLSearchParams({
+        email,
+        secret,
+    })
+    if (returnTo) {
+        params.set('return_to', returnTo)
+    }
+    return `/auth/signup?${params.toString()}`
+}
+
 export function accountHref() {
     return '/account'
 }

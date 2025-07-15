@@ -5,7 +5,7 @@ import {
 } from '@/backend/passkey'
 import { generateToken, userIdFromToken } from '@/backend/token'
 import { deleteUserForId, userForId, updateUser, accountDataFromDbUser } from '@/backend/users'
-import { completeSignInRequest } from '@/backend/sign'
+import { completeSignInRequest, completeSignUp } from '@/backend/sign'
 import { AccountData } from '@/core'
 import { RegistrationResponseJSON, AuthenticationResponseJSON } from '@simplewebauthn/browser'
 import { cookies, headers } from 'next/headers'
@@ -200,6 +200,44 @@ export async function completeSignInAction({
     } catch (err) {
         console.error('Error completing sign-in:', err)
         return { success: false, reason: 'An error occurred during sign-in' }
+    }
+}
+
+export async function completeSignUpAction({
+    email,
+    secret,
+    username,
+    name,
+    emoji,
+}: {
+    email: string,
+    secret: string,
+    username: string,
+    name: string,
+    emoji?: string,
+}): Promise<{ success: true, user: AccountData } | { success: false, reason: string }> {
+    try {
+        const result = await completeSignUp({
+            email,
+            secret,
+            username,
+            name,
+            emoji,
+        })
+
+        if (!result.success) {
+            return { success: false, reason: result.reason }
+        }
+
+        await setAuthToken(result.token)
+
+        return {
+            success: true,
+            user: accountDataFromDbUser(result.user),
+        }
+    } catch (err) {
+        console.error('Error completing sign-up:', err)
+        return { success: false, reason: 'An error occurred during sign-up' }
     }
 }
 
