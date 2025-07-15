@@ -32,6 +32,21 @@ export function authHref({ returnTo }: {
     return `/auth${returnTo ? `?return_to=${encodeURIComponent(returnTo)}` : ''}`
 }
 
+export function signInLinkHref({ email, secret, returnTo }: {
+    email: string,
+    secret: string,
+    returnTo?: string,
+}) {
+    const params = new URLSearchParams({
+        email,
+        secret,
+    })
+    if (returnTo) {
+        params.set('return_to', returnTo)
+    }
+    return `/auth/signin?${params.toString()}`
+}
+
 export function accountHref() {
     return '/account'
 }

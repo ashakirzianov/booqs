@@ -21,8 +21,8 @@ export type InitiateSignRequestResult =
     | { kind: 'error', error: string }
 
 export type CompleteSignInRequestResult =
-    | { success: true, token: string }
-    | { success: false, reason: string }
+    | { success: true, user: DbUser, token: string }
+    | { success: false, user?: undefined, reason: string }
 
 export type CompleteSignUpResult =
     | { success: true, token: string, user: DbUser }
@@ -164,7 +164,7 @@ export async function completeSignInRequest({
 
         const token = generateToken(user.id)
 
-        return { success: true, token }
+        return { success: true, user, token }
     } catch (err) {
         console.error('Error completing sign-in request:', err)
         return { success: false, reason: 'An error occurred while processing the request' }

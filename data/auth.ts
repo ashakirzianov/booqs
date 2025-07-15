@@ -5,6 +5,7 @@ import {
 } from '@/backend/passkey'
 import { generateToken, userIdFromToken } from '@/backend/token'
 import { deleteUserForId, userForId, updateUser, accountDataFromDbUser } from '@/backend/users'
+import { completeSignInRequest } from '@/backend/sign'
 import { AccountData } from '@/core'
 import { RegistrationResponseJSON, AuthenticationResponseJSON } from '@simplewebauthn/browser'
 import { cookies, headers } from 'next/headers'
@@ -151,17 +152,17 @@ export async function updateAccountAction({
         return null
     }
 
-    const { user: updatedUser } = await updateUser({
+    const result = await updateUser({
         id: userId,
         name,
         emoji,
     })
 
-    if (!updatedUser) {
+    if (!result.success) {
         return null
     }
 
-    return accountDataFromDbUser(updatedUser)
+    return accountDataFromDbUser(result.user)
 }
 
 export async function deleteAccountAction() {
@@ -174,6 +175,32 @@ export async function deleteAccountAction() {
         setAuthToken(undefined)
     }
     return result
+}
+
+export async function completeSignInAction({
+    email,
+    secret,
+}: {
+    email: string,
+    secret: string,
+}): Promise<{ success: true, user: AccountData } | { success: false, reason: string }> {
+    try {
+        const result = await completeSignInRequest({ email, secret })
+
+        if (!result.success) {
+            return { success: false, reason: result.reason }
+        }
+
+        await setAuthToken(result.token)
+
+        return {
+            success: true,
+            user: accountDataFromDbUser(result.user),
+        }
+    } catch (err) {
+        console.error('Error completing sign-in:', err)
+        return { success: false, reason: 'An error occurred during sign-in' }
+    }
 }
 
 async function getOrigin() {
