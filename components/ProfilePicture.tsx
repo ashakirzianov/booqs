@@ -1,10 +1,11 @@
 import { ProfileIcon } from '@/components/Icons'
 
 export function ProfileBadge({
-    picture, name, size, border,
+    picture, name, emoji, size, border,
 }: {
     picture?: string,
     name?: string,
+    emoji?: string,
     size: number,
     border: boolean,
 }) {
@@ -15,11 +16,9 @@ export function ProfileBadge({
             border={border}
         />
     } else {
-        const initials = name
-            ? getInitials(name)
-            : 'X'
+        const display = emoji || (name ? getInitials(name) : 'X')
         return <ProfilePicturePlaceholder
-            initials={initials}
+            display={display}
             size={size}
             border={border}
         />
@@ -44,22 +43,25 @@ function ProfilePicture({ picture, size, border }: {
     </div>
 }
 
-function ProfilePicturePlaceholder({ }: {
-    initials: string,
+function ProfilePicturePlaceholder({ display, size, border }: {
+    display: string,
     size: number,
     border: boolean,
 }) {
+    return <div className='container font-bold text-xl flex items-center justify-center p-0 shrink-0 overflow-hidden bg-background text-dimmed hover:border-highlight' style={{
+        borderRadius: '50%',
+        border: border ? `1.5px solid var(--theme-dimmed)` : 'none',
+        width: `${size}rem`,
+        height: `${size}rem`,
+        transition: '250ms color, 250ms border',
+        fontSize: `${size / 2}rem`,
+    }}>
+        {display}
+    </div>
+}
 
-    // return <div className='container font-bold text-xl flex items-center justify-center p-0 shrink-0 overflow-hidden bg-background text-dimmed hover:border-highlight' style={{
-    //     borderRadius: '50%',
-    //     border: border ? `1.5px solid var(--theme-dimmed)` : 'none',
-    //     width: `${size}rem`,
-    //     height: `${size}rem`,
-    //     transition: '250ms color, 250ms border',
-    //     fontSize: `${size / 2}rem`,
-    // }}>
-    //     {initials}
-    // </div>
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function ProfilePictureIcon() {
     return <ProfileIcon />
 }
 

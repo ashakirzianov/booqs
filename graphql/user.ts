@@ -10,5 +10,8 @@ export const userResolver: IResolvers<UserParent> = {
         pictureUrl(parent) {
             return parent.profile_picture_url
         },
+        emoji(parent) {
+            return parent.emoji
+        },
     },
 }

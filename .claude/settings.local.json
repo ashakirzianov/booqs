@@ -6,7 +6,8 @@
       "Bash(mv:*)",
       "Bash(rg:*)",
       "Bash(git add:*)",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "Bash(find:*)"
     ]
   },
   "enableAllProjectMcpServers": false

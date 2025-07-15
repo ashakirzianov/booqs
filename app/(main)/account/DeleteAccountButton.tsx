@@ -2,6 +2,7 @@
 
 import { feedHref } from '@/application/href'
 import { Modal } from '@/components/Modal'
+import { BorderButton } from '@/components/Buttons'
 import { deleteAccountAction } from '@/data/auth'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
@@ -13,35 +14,78 @@ export function DeleteAccountButton({ account }: {
     },
 }) {
     const [modal, setModal] = useState(false)
+    const [isDeleting, setIsDeleting] = useState(false)
     const { push } = useRouter()
+    
     function openModal() {
         setModal(true)
     }
+    
     function closeModal() {
         setModal(false)
+        setIsDeleting(false)
     }
+    
     async function performDelete() {
-        await deleteAccountAction()
-        push(feedHref())
+        setIsDeleting(true)
+        try {
+            await deleteAccountAction()
+            push(feedHref())
+        } catch {
+            setIsDeleting(false)
+        }
     }
+    
     return (
-        <div className='flex w-full justify-center'>
-            <div className='flex flex-col w-panel max-w-full gap-2'>
-                <h1 className='font-bold'>{account.name}</h1>
-                <p>Joined {formatDate(account.joinedAt)}</p>
-                <button className='text-alert font-bold max-w-fit p-2 rounded-sm border-2 border-alert hover:bg-alert hover:text-background' onClick={openModal}>Delete Account</button>
-            </div>
+        <>
+            <BorderButton 
+                text="Delete Account"
+                onClick={openModal}
+                color="alert"
+            />
+            
             <Modal isOpen={modal} closeModal={closeModal}>
-                <div className='flex flex-col w-panel max-w-full gap-2 p-4'>
-                    <h1 className='font-bold'>Are you sure you want to delete your account?</h1>
-                    <p>This action cannot be undone.</p>
-                    <div className='flex gap-2'>
-                        <button tabIndex={2} className='text-alert font-bold max-w-fit p-2 rounded-sm border-2 border-alert hover:bg-alert hover:text-background' onClick={performDelete}>Delete Account</button>
-                        <button tabIndex={1} className='text-primary font-bold max-w-fit p-2 rounded-sm border-2 border-primary hover:bg-primary hover:text-background' onClick={closeModal}>Cancel</button>
+                <div className='w-96 max-w-[90vw] mx-auto p-6 space-y-4'>
+                    <div className='text-center'>
+                        <h2 className='text-xl font-bold text-alert mb-2'>
+                            Delete Account
+                        </h2>
+                        <p className='text-dimmed text-sm'>
+                            Are you sure you want to delete your account? This action cannot be undone.
+                        </p>
+                    </div>
+                    
+                    <div className='bg-background border border-dimmed rounded-md p-4'>
+                        <p className='text-sm text-dimmed'>
+                            <span className='font-medium'>Account:</span> {account.name || 'Anonymous User'}
+                        </p>
+                        <p className='text-sm text-dimmed'>
+                            <span className='font-medium'>Member since:</span> {formatDate(account.joinedAt)}
+                        </p>
+                    </div>
+                    
+                    <div className='flex gap-3 pt-2'>
+                        <div className='flex-1'>
+                            <BorderButton 
+                                text="Cancel"
+                                onClick={closeModal}
+                                color="primary"
+                                className="w-full"
+                            />
+                        </div>
+                        <div className='flex-1'>
+                            <BorderButton 
+                                text={isDeleting ? 'Deleting...' : 'Delete Account'}
+                                onClick={performDelete}
+                                disabled={isDeleting}
+                                color="alert"
+                                className="w-full"
+                            />
+                        </div>
                     </div>
                 </div>
             </Modal>
-        </div>
+        </>
     )
 }
 

@@ -2,6 +2,7 @@ import slugify from 'slugify'
 import { deleteAllBooksForUserId } from './uu'
 import { deleteUserCredentials } from './passkey'
 import { estimatedRowCount, sql } from './db'
+import { AccountData } from '@/core'
 
 export type DbUser = {
     id: string,
@@ -10,6 +11,19 @@ export type DbUser = {
     name: string | null,
     profile_picture_url: string | null,
     joined_at: string,
+    emoji: string,
+}
+
+export function accountDataFromDbUser(dbUser: DbUser): AccountData {
+    return {
+        id: dbUser.id,
+        username: dbUser.username,
+        email: dbUser.email ?? undefined,
+        joinedAt: dbUser.joined_at,
+        name: dbUser.name ?? undefined,
+        profilePictureURL: dbUser.profile_picture_url ?? undefined,
+        emoji: dbUser.emoji ?? undefined,
+    }
 }
 
 export async function userForId(id: string): Promise<DbUser | null> {
@@ -31,9 +45,10 @@ export async function createUser({
     username = username ?? await proposeUsername({
         name, email,
     })
+    const emoji = getRandomEmoji()
     const [user] = await sql`
-      INSERT INTO users (username, email, name, profile_picture_url)
-      VALUES (${username}, ${email ?? null}, ${name ?? null}, ${profilePictureUrl ?? null})
+      INSERT INTO users (username, email, name, profile_picture_url, emoji)
+      VALUES (${username}, ${email ?? null}, ${name ?? null}, ${profilePictureUrl ?? null}, ${emoji})
       RETURNING *
     `
     return user as DbUser
@@ -100,4 +115,40 @@ function generateUsername({ name, email }: UserDataForNameGeneration) {
         locale: 'en',
     })
     return username
+}
+
+const USER_EMOJIS = [
+    '😊', '😄', '😃', '😁', '😌', '😉', '😎', '🤓', '🤗', '🙂',
+    '🤔', '🤠', '😇', '😋', '😍', '🥰', '🤩', '😚', '😙', '😗',
+    '🐱', '🐰', '🐻', '🐼', '🐨', '🐯', '🦁', '🐸', '🐵', '🦊',
+    '🐧', '🦆', '🐺', '🐴', '🦄', '🐮', '🐷', '🐹', '🐭', '🐶'
+]
+
+export async function updateUser({
+    id,
+    name,
+    emoji,
+}: {
+    id: string,
+    name?: string,
+    emoji?: string,
+}): Promise<DbUser | null> {
+    if (name === undefined && emoji === undefined) {
+        return null
+    }
+
+    const [user] = await sql`
+        UPDATE users
+        SET
+            ${name !== undefined ? sql`name = ${name}` : sql``}
+            ${name !== undefined && emoji !== undefined ? sql`,` : sql``}
+            ${emoji !== undefined ? sql`emoji = ${emoji}` : sql``}
+        WHERE id = ${id}
+        RETURNING *
+    `
+    return user ? (user as DbUser) : null
+}
+
+function getRandomEmoji(): string {
+    return USER_EMOJIS[Math.floor(Math.random() * USER_EMOJIS.length)]
 }

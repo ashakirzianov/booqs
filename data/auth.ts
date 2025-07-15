@@ -4,7 +4,7 @@ import {
     initiatePasskeyLogin, verifyPasskeyLogin,
 } from '@/backend/passkey'
 import { generateToken, userIdFromToken } from '@/backend/token'
-import { deleteUserForId, userForId } from '@/backend/users'
+import { deleteUserForId, userForId, updateUser, accountDataFromDbUser } from '@/backend/users'
 import { AccountData } from '@/core'
 import { RegistrationResponseJSON, AuthenticationResponseJSON } from '@simplewebauthn/browser'
 import { cookies, headers } from 'next/headers'
@@ -48,7 +48,7 @@ export async function verifyPasskeyRegistrationAction({ id, response }: {
             await setAuthToken(token)
             return {
                 success: true,
-                user: result.user,
+                user: accountDataFromDbUser(result.user),
             } as const
         } else {
             return {
@@ -100,7 +100,7 @@ export async function verifyPasskeySigninAction({ id, response }: {
             await setAuthToken(token)
             return {
                 success: true,
-                user: result.user,
+                user: accountDataFromDbUser(result.user),
             } as const
         } else {
             return {
@@ -136,12 +136,32 @@ export async function fetchAuthData(): Promise<AccountData | undefined> {
     if (!user) {
         return undefined
     }
-    return {
-        id: user.id,
-        joinedAt: user.joined_at,
-        name: user.name ?? undefined,
-        profilePictureURL: user.profile_picture_url ?? undefined,
+    return accountDataFromDbUser(user)
+}
+
+export async function updateAccountAction({ 
+    name, 
+    emoji 
+}: { 
+    name?: string, 
+    emoji?: string 
+}): Promise<AccountData | null> {
+    const userId = await getUserIdInsideRequest()
+    if (!userId) {
+        return null
     }
+    
+    const updatedUser = await updateUser({
+        id: userId,
+        name,
+        emoji,
+    })
+    
+    if (!updatedUser) {
+        return null
+    }
+    
+    return accountDataFromDbUser(updatedUser)
 }
 
 export async function deleteAccountAction() {

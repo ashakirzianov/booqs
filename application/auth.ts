@@ -8,6 +8,7 @@ import {
     initPasskeySigninAction, verifyPasskeySigninAction,
     signOutAction,
     deleteAccountAction,
+    updateAccountAction,
 } from '@/data/auth'
 import useSWR from 'swr'
 import { GetResponse } from '@/app/api/me/route'
@@ -58,14 +59,35 @@ export function useAuth() {
         })
     }
 
-    const user: AccountData | undefined = data?.user
-        ? {
-            id: data.user.id,
-            name: data.user.name ?? undefined,
-            profilePictureURL: data.user.profile_picture_url ?? undefined,
-            joinedAt: data.user.joined_at,
+    async function updateAccount({ name, emoji }: { name?: string, emoji?: string }) {
+        if (!user) {
+            throw new Error('User not authenticated')
         }
-        : undefined
+
+        const result = await mutate(async function () {
+            const updatedUser = await updateAccountAction({ name, emoji })
+            if (updatedUser) {
+                return {
+                    user: updatedUser,
+                } satisfies GetResponse
+            }
+            throw new Error('Failed to update account')
+        }, {
+            optimisticData: data?.user ? {
+                user: {
+                    ...data.user,
+                    name: name !== undefined ? name : data.user.name,
+                    emoji: emoji !== undefined ? emoji : data.user.emoji,
+                }
+            } : undefined,
+            rollbackOnError: true,
+            revalidate: false,
+        })
+
+        return result?.user ?? null
+    }
+
+    const user: AccountData | undefined = data?.user ?? undefined
 
     return {
         user,
@@ -75,7 +97,7 @@ export function useAuth() {
                 if (result.success) {
                     return {
                         user: result.user,
-                    }
+                    } satisfies GetResponse
                 } else {
                     throw new Error(result.error)
                 }
@@ -90,7 +112,7 @@ export function useAuth() {
                 if (result.success) {
                     return {
                         user: result.user,
-                    }
+                    } satisfies GetResponse
                 } else {
                     throw new Error(result.error)
                 }
@@ -99,6 +121,7 @@ export function useAuth() {
                 rollbackOnError: true,
             })
         },
+        updateAccount,
         deleteAccount,
         signOut,
         isLoading,
