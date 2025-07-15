@@ -26,10 +26,10 @@ export function searchHref({ query }: {
     return `/search?query=${encodeURIComponent(query)}`
 }
 
-export function signInHref({ returnTo }: {
+export function authHref({ returnTo }: {
     returnTo?: string,
 }) {
-    return `/signin${returnTo ? `?return_to=${encodeURIComponent(returnTo)}` : ''}`
+    return `/auth${returnTo ? `?return_to=${encodeURIComponent(returnTo)}` : ''}`
 }
 
 export function accountHref() {
