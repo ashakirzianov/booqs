@@ -1,3 +1,5 @@
+import { signInLinkHref, signUpLinkHref } from '@/core/href'
+
 export async function sendSignInLink({
     secret,
     email,
@@ -10,12 +12,17 @@ export async function sendSignInLink({
     username?: string,
 }): Promise<boolean> {
     const displayName = name || username || email
+    const baseUrl = process.env.NEXT_PUBLIC_URL ?? 'https://booqs.app'
+    const signInUrl = `${baseUrl}${signInLinkHref({ email, secret })}`
+    
     const content = `Hi ${displayName},
 
 Click here to sign in to your account:
-[Sign In Link with secret: ${secret}]
+${signInUrl}
 
-If you didn't request this, please ignore this email.`
+If you didn't request this, please ignore this email.
+
+This link will expire in 1 hour for security reasons.`
 
     return await sendEmail({ email, content })
 }
@@ -27,12 +34,17 @@ export async function sendSignUpLink({
     secret: string,
     email: string,
 }): Promise<boolean> {
+    const baseUrl = process.env.NEXT_PUBLIC_URL ?? 'https://booqs.app'
+    const signUpUrl = `${baseUrl}${signUpLinkHref({ email, secret })}`
+    
     const content = `Welcome to Booqs!
 
 Click here to complete your account setup:
-[Sign Up Link with secret: ${secret}]
+${signUpUrl}
 
-If you didn't request this, please ignore this email.`
+If you didn't request this, please ignore this email.
+
+This link will expire in 1 hour for security reasons.`
 
     return await sendEmail({ email, content })
 }
