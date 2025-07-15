@@ -22,7 +22,7 @@ export type InitiateSignRequestResult =
 
 export type CompleteSignInRequestResult = 
     | { success: true, token: string }
-    | { success: false, error: string }
+    | { success: false, reason: string }
 
 export async function createSignSecret({
     email,
@@ -57,21 +57,21 @@ export async function verifySignSecret({
     email: string,
     kind: SignKind,
     secret: string,
-}): Promise<{ success: boolean, data?: unknown }> {
+}): Promise<{ success: true, data?: unknown } | { success: false, reason: string }> {
     const stored = await redis.get<SignSecret>(`auth:secret:${email}`)
     
     if (!stored) {
-        return { success: false }
+        return { success: false, reason: 'Secret not found' }
     }
     
     // Check expiration
     if (Number(stored.expiration) < (Date.now() / 1000)) {
-        return { success: false }
+        return { success: false, reason: 'Secret expired' }
     }
     
     // Check kind and secret match
     if (stored.kind !== kind || stored.secret !== secret) {
-        return { success: false }
+        return { success: false, reason: 'Invalid secret' }
     }
     
     // Clean up the secret after successful verification
@@ -150,12 +150,12 @@ export async function completeSignInRequest({
         })
         
         if (!verification.success) {
-            return { success: false, error: 'Invalid or expired sign-in link' }
+            return { success: false, reason: verification.reason }
         }
         
         const user = await userForEmail(email)
         if (!user) {
-            return { success: false, error: 'User not found' }
+            return { success: false, reason: 'User not found' }
         }
         
         const token = generateToken(user.id)
@@ -163,6 +163,6 @@ export async function completeSignInRequest({
         return { success: true, token }
     } catch (err) {
         console.error('Error completing sign-in request:', err)
-        return { success: false, error: 'An error occurred while processing the request' }
+        return { success: false, reason: 'An error occurred while processing the request' }
     }
 }
