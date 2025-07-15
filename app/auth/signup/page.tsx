@@ -4,17 +4,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { Logo } from '@/components/Logo'
 import { completeSignUpAction } from '@/data/auth'
 import { Spinner } from '@/components/Icons'
-
-const AVAILABLE_EMOJIS = [
-    '😊', '😄', '😃', '😁', '😌', '😉', '😎', '🤓', '🤗', '😊',
-    '😋', '😍', '🥰', '😘', '😗', '😙', '😚', '🤔', '🤨', '😐',
-    '🙂', '😇', '🤠', '🥳', '🤡', '🤖', '👻', '👽', '🎭', '🎪',
-    '🐱', '🐰', '🐻', '🐼', '🐨', '🐯', '🦁', '🐸', '🐵', '🦊',
-    '🦝', '🦌', '🦄', '🐲', '🐙', '🦀', '🐠', '🐟', '🐡', '🦋',
-    '🌸', '🌺', '🌻', '🌷', '🌹', '💐', '🌿', '🍃', '🌱', '🌲',
-    '🍊', '🍋', '🍌', '🍉', '🍇', '🍓', '🥝', '🍑', '🍒', '🥭',
-    '🍍', '🥥', '🥑', '🍅', '🥒', '🥕', '🌽', '🥦', '🥬', '🌶️'
-]
+import { AVAILABLE_EMOJIS, getRandomAvatarEmoji } from '@/core/emoji'
 
 function SignUpForm() {
     const router = useRouter()
@@ -38,8 +28,7 @@ function SignUpForm() {
         }
         
         // Select a random emoji as default
-        const randomEmoji = AVAILABLE_EMOJIS[Math.floor(Math.random() * AVAILABLE_EMOJIS.length)]
-        setSelectedEmoji(randomEmoji)
+        setSelectedEmoji(getRandomAvatarEmoji())
     }, [email])
 
     // If missing parameters, show error

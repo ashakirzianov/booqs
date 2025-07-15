@@ -1,17 +1,7 @@
 'use client'
 
 import { Modal } from '@/components/Modal'
-
-const AVAILABLE_EMOJIS = [
-    '😊', '😄', '😃', '😁', '😌', '😉', '😎', '🤓', '🤗', '😊',
-    '😋', '😍', '🥰', '😘', '😗', '😙', '😚', '🤔', '🤨', '😐',
-    '🙂', '😇', '🤠', '🥳', '🤡', '🤖', '👻', '👽', '🎭', '🎪',
-    '🐱', '🐰', '🐻', '🐼', '🐨', '🐯', '🦁', '🐸', '🐵', '🦊',
-    '🦝', '🦌', '🦄', '🐲', '🐙', '🦀', '🐠', '🐟', '🐡', '🦋',
-    '🌸', '🌺', '🌻', '🌷', '🌹', '💐', '🌿', '🍃', '🌱', '🌲',
-    '🍊', '🍋', '🍌', '🍉', '🍇', '🍓', '🥝', '🍑', '🍒', '🥭',
-    '🍍', '🥥', '🥑', '🍅', '🥒', '🥕', '🌽', '🥦', '🥬', '🌶️'
-]
+import { AVAILABLE_EMOJIS } from '@/core/emoji'
 
 export function EmojiSelector({ isOpen, onClose, currentEmoji, onSelect }: {
     isOpen: boolean
