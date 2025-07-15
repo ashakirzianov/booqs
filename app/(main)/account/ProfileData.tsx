@@ -62,7 +62,7 @@ export function ProfileData({ user }: { user: AccountData }) {
     }
 
     return (
-        <div className="bg-background border border-dimmed rounded-lg p-6 relative">
+        <div className="bg-background border border-dimmed rounded-lg p-6 flex flex-col">
             <div className="flex items-center gap-4">
                 <div 
                     className="relative cursor-pointer"
@@ -140,7 +140,7 @@ export function ProfileData({ user }: { user: AccountData }) {
             
             {/* Edit Profile Button - Bottom Right Corner */}
             {!isEditMode && (
-                <div className="absolute bottom-4 right-4">
+                <div className="flex justify-end mt-2">
                     <LightButton onClick={handleEditClick}>
                         <div className="w-4 h-4">
                             <PencilIcon />
