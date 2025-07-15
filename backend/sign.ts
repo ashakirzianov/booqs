@@ -2,6 +2,7 @@ import { redis } from './db'
 import { nanoid } from 'nanoid'
 import { userForEmail } from './users'
 import { sendSignInLink, sendSignUpLink } from './send'
+import { generateToken } from './token'
 
 const SECRET_EXPIRE_SECONDS = 3600 // 1 hour
 
@@ -18,6 +19,10 @@ export type InitiateSignRequestResult =
     | { kind: 'signin' }
     | { kind: 'signup' }
     | { kind: 'error', error: string }
+
+export type CompleteSignInRequestResult = 
+    | { success: true, token: string }
+    | { success: false, error: string }
 
 export async function createSignSecret({
     email,
@@ -127,5 +132,37 @@ export async function initiateSignRequest({
     } catch (err) {
         console.error('Error initiating sign request:', err)
         return { kind: 'error', error: 'An error occurred while processing the request' }
+    }
+}
+
+export async function completeSignInRequest({
+    email,
+    secret,
+}: {
+    email: string,
+    secret: string,
+}): Promise<CompleteSignInRequestResult> {
+    try {
+        const verification = await verifySignSecret({
+            email,
+            kind: 'signin',
+            secret,
+        })
+        
+        if (!verification.success) {
+            return { success: false, error: 'Invalid or expired sign-in link' }
+        }
+        
+        const user = await userForEmail(email)
+        if (!user) {
+            return { success: false, error: 'User not found' }
+        }
+        
+        const token = generateToken(user.id)
+        
+        return { success: true, token }
+    } catch (err) {
+        console.error('Error completing sign-in request:', err)
+        return { success: false, error: 'An error occurred while processing the request' }
     }
 }
