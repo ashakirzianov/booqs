@@ -19,6 +19,8 @@ Put local/private utility functions after all exported/public functions
 
 Do not access backend/* files directly from frontend code. Instead, create an indirection layer in data/* directory to abstract backend functionality.
 
+Prefer 'function name(...) { ... }' style to 'const name = (...) => { ... }' style
+
 ## Architecture Overview
 
 ### Core Structure
