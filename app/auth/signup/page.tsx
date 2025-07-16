@@ -2,6 +2,7 @@ import { Logo } from '@/components/Logo'
 import { getRandomAvatarEmoji } from '@/core/emoji'
 import { prevalidateSignupAction } from '@/data/auth'
 import { SignUpForm } from './SignUpForm'
+import { generateRandomName } from './name'
 
 export default async function SignUpPage({ searchParams }: {
     searchParams: Promise<{
@@ -40,6 +41,7 @@ export default async function SignUpPage({ searchParams }: {
     // Server-side preparation of initial values
     const initialUsername = email.split('@')[0]
     const initialEmoji = getRandomAvatarEmoji()
+    const initialName = generateRandomName()
 
     return (
         <main className='flex flex-col items-center justify-center min-h-screen gap-8 p-16'>
@@ -52,6 +54,7 @@ export default async function SignUpPage({ searchParams }: {
                     email={email}
                     secret={secret}
                     initialUsername={initialUsername}
+                    initialName={initialName}
                     initialEmoji={initialEmoji}
                     returnTo={returnTo}
                 />

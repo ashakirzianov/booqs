@@ -9,19 +9,21 @@ export function SignUpForm({
     email, 
     secret, 
     initialUsername, 
+    initialName,
     initialEmoji, 
     returnTo 
 }: {
     email: string
     secret: string
     initialUsername: string
+    initialName: string
     initialEmoji: string
     returnTo: string
 }) {
     const router = useRouter()
     
     const [username, setUsername] = useState(initialUsername)
-    const [name, setName] = useState('')
+    const [name, setName] = useState(initialName)
     const [selectedEmoji, setSelectedEmoji] = useState(initialEmoji)
     const [isLoading, setIsLoading] = useState(false)
     const [error, setError] = useState('')
