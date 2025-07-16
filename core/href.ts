@@ -47,6 +47,17 @@ export function signInLinkHref({ email, secret, returnTo }: {
     return `/auth/signin?${params.toString()}`
 }
 
+export function signInErrorHref({ error, returnTo }: {
+    error: string,
+    returnTo: string,
+}) {
+    const params = new URLSearchParams({
+        error,
+        return_to: returnTo,
+    })
+    return `/auth/signin/error?${params.toString()}`
+}
+
 export function signUpLinkHref({ email, secret, returnTo }: {
     email: string,
     secret: string,
