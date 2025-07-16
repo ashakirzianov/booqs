@@ -13,8 +13,17 @@ import { cookies, headers } from 'next/headers'
 export async function initPasskeyRegistrationAcion() {
     try {
         const origin = await getOrigin()
+        const userId = await getUserIdInsideRequest()
+        const user = userId ? await userForId(userId) : undefined
+        if (!user) {
+            return {
+                success: false,
+                error: 'User not found',
+            } as const
+        }
         const { id, options } = await initiatePasskeyRegistration({
             origin: origin ?? undefined,
+            user,
         })
         if (id && options) {
             return {

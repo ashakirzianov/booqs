@@ -1,4 +1,4 @@
-import { userForId, createUser } from './users'
+import { userForId, DbUser } from './users'
 import {
     generateRegistrationOptions, verifyRegistrationResponse,
     generateAuthenticationOptions, verifyAuthenticationResponse,
@@ -9,9 +9,10 @@ import { nanoid } from 'nanoid'
 import { redis, sql } from './db'
 
 export async function initiatePasskeyRegistration({
-    origin,
+    origin, user,
 }: {
     origin?: string,
+    user: DbUser,
 }) {
     try {
         const { rpID, rpName } = getRPData(origin)
@@ -19,7 +20,8 @@ export async function initiatePasskeyRegistration({
         const options = await generateRegistrationOptions({
             rpName,
             rpID,
-            userName: 'booqs-passkey',
+            userName: user.email,
+            userDisplayName: user.name,
             timeout: 60000,
             attestationType: 'none',
             authenticatorSelection: {
@@ -31,6 +33,7 @@ export async function initiatePasskeyRegistration({
         const challengeRecord = await createChallenge({
             challenge: options.challenge,
             kind: 'registration',
+            userId: user.id,
         })
         return {
             success: true,
@@ -62,6 +65,19 @@ export async function verifyPasskeyRegistration({
                 success: false as const,
             }
         }
+        if (!expectedChallenge.userId) {
+            return {
+                error: 'Registration challenge does not have an associated user',
+                success: false as const,
+            }
+        }
+        const user = await userForId(expectedChallenge.userId)
+        if (!user) {
+            return {
+                error: 'User not found for user id from the registration challenge',
+                success: false as const,
+            }
+        }
 
         const { rpID, expectedOrigin } = getRPData(origin)
 
@@ -69,7 +85,7 @@ export async function verifyPasskeyRegistration({
         // Verify the registration response
         const verification = await verifyRegistrationResponse({
             response,
-            expectedChallenge: `${expectedChallenge}`,
+            expectedChallenge: `${expectedChallenge.challenge}`,
             expectedOrigin,
             expectedRPID: rpID,
             requireUserVerification: true,
@@ -82,26 +98,6 @@ export async function verifyPasskeyRegistration({
                 success: false as const,
             }
         }
-        // Generate temporary email, username, and name for passkey-only registration
-        const tempId = nanoid(10)
-        const tempEmail = `${tempId}@passkey.booqs.temp`
-        const tempUsername = `passkey.${tempId}`
-        const tempName = `Passkey User ${tempId}`
-        
-        const userResult = await createUser({
-            email: tempEmail,
-            username: tempUsername,
-            name: tempName,
-        })
-        
-        if (!userResult.success) {
-            return {
-                error: `Failed to create user: ${userResult.reason}`,
-                success: false as const,
-            }
-        }
-        
-        const user = userResult.user
 
         await saveUserCredential({
             userId: user.id,
@@ -250,11 +246,15 @@ type Challenge = {
     kind: ChallengeKind,
     challenge: string,
     expiration: string,
+    userId?: string,
 }
 async function getChallengeForId({ id, kind }: {
     id: string,
     kind: ChallengeKind,
-}) {
+}): Promise<{
+    challenge: string,
+    userId?: string,
+} | undefined> {
     const challenge = await redis.hgetall<Challenge>(`passkey:challenge:${id}`)
     if (!challenge) {
         return undefined
@@ -266,10 +266,14 @@ async function getChallengeForId({ id, kind }: {
         console.warn('Challenge kind mismatch', challenge)
         return undefined
     }
-    return challenge.challenge
+    return {
+        challenge: challenge.challenge,
+        userId: challenge.userId,
+    }
 }
 
-async function createChallenge({ challenge, kind }: {
+async function createChallenge({ userId, challenge, kind }: {
+    userId?: string,
     challenge: string,
     kind: ChallengeKind,
 }) {
@@ -280,6 +284,7 @@ async function createChallenge({ challenge, kind }: {
         kind,
         challenge,
         expiration: `${expiration}`,
+        userId,
     }
     await redis.hmset(`passkey:challenge:${id}`, doc)
     await redis.expire(`passkey:challenge:${id}`, expireInSeconds)
