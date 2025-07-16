@@ -1,7 +1,7 @@
 'use client'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { registerWithPasskey, signInWithPasskey } from '@/application/auth'
+import { signInWithPasskey } from '@/application/auth'
 import { PasskeyIcon, Spinner } from '@/components/Icons'
 import { initiateSignAction } from '@/data/auth'
 
@@ -33,7 +33,7 @@ export function AuthForm({ returnTo }: {
 
     const handleEmailSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
-        
+
         if (!email.trim()) {
             setEmailState({ state: 'error', error: 'Email is required' })
             return
@@ -48,7 +48,7 @@ export function AuthForm({ returnTo }: {
 
         try {
             const result = await initiateSignAction({ email: email.trim(), returnTo })
-            
+
             if (result.success) {
                 setEmailState({ state: 'success', kind: result.kind })
             } else {
@@ -62,7 +62,7 @@ export function AuthForm({ returnTo }: {
 
     const handlePasskeySignIn = async () => {
         setPasskeyState({ state: 'loading' })
-        
+
         try {
             const result = await signInWithPasskey()
             if (result.success) {
@@ -76,22 +76,6 @@ export function AuthForm({ returnTo }: {
         }
     }
 
-    const handlePasskeyRegister = async () => {
-        setPasskeyState({ state: 'loading' })
-        
-        try {
-            const result = await registerWithPasskey()
-            if (result.success) {
-                router.push(returnTo)
-            } else {
-                setPasskeyState({ state: 'error', error: result.error })
-            }
-        } catch (err) {
-            console.error('Passkey registration error:', err)
-            setPasskeyState({ state: 'error', error: 'Passkey registration failed' })
-        }
-    }
-
     if (emailState.state === 'success') {
         return (
             <div className='flex flex-col items-center justify-start gap-6 w-full max-w-md'>
@@ -99,7 +83,7 @@ export function AuthForm({ returnTo }: {
                     <h2 className='text-2xl font-bold text-primary'>Check Your Email</h2>
                     <div className='space-y-2'>
                         <p className='text-lg'>
-                            {emailState.kind === 'signin' 
+                            {emailState.kind === 'signin'
                                 ? 'We sent a sign-in link to your email.'
                                 : 'We sent a sign-up link to your email.'
                             }
@@ -112,7 +96,7 @@ export function AuthForm({ returnTo }: {
                         </p>
                     </div>
                 </div>
-                
+
                 <button
                     onClick={() => {
                         setEmailState({ state: 'idle' })
@@ -131,7 +115,7 @@ export function AuthForm({ returnTo }: {
             {/* Email-based Authentication */}
             <div className='w-full space-y-6'>
                 <h1 className='text-center text-2xl font-bold'>Sign in to Booqs</h1>
-                
+
                 <form onSubmit={handleEmailSubmit} className='space-y-4'>
                     <div className='space-y-2'>
                         <label htmlFor='email' className='block text-sm font-medium text-secondary'>
@@ -153,13 +137,13 @@ export function AuthForm({ returnTo }: {
                             required
                         />
                     </div>
-                    
+
                     {emailState.state === 'error' && (
                         <div className='text-alert text-sm bg-alert/10 border border-alert/20 rounded-lg px-4 py-3' role='alert'>
                             {emailState.error}
                         </div>
                     )}
-                    
+
                     <button
                         type='submit'
                         disabled={emailState.state === 'loading' || !email.trim()}
@@ -189,7 +173,7 @@ export function AuthForm({ returnTo }: {
             {/* Passkey Authentication */}
             <div className='w-full space-y-4'>
                 <h2 className='text-center text-lg font-medium text-secondary'>Sign in with Passkey</h2>
-                
+
                 <div className='flex flex-col gap-3'>
                     <button
                         onClick={handlePasskeySignIn}
@@ -205,23 +189,8 @@ export function AuthForm({ returnTo }: {
                         </div>
                         <span>Sign in with Passkey</span>
                     </button>
-                    
-                    <button
-                        onClick={handlePasskeyRegister}
-                        disabled={passkeyState.state === 'loading'}
-                        className='w-full px-6 py-3 border border-dimmed text-secondary rounded-lg hover:bg-dimmed/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3'
-                    >
-                        <div className='w-5 h-5'>
-                            {passkeyState.state === 'loading' ? (
-                                <Spinner />
-                            ) : (
-                                <PasskeyIcon />
-                            )}
-                        </div>
-                        <span>Register new Passkey</span>
-                    </button>
                 </div>
-                
+
                 {passkeyState.state === 'error' && (
                     <div className='text-alert text-sm bg-alert/10 border border-alert/20 rounded-lg px-4 py-3 text-center' role='alert'>
                         {passkeyState.error}
