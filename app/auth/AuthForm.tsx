@@ -167,7 +167,9 @@ export function AuthForm({ returnTo }: {
                     >
                         {emailState.state === 'loading' ? (
                             <>
-                                <Spinner />
+                                <div className='w-5 h-5'>
+                                    <Spinner />
+                                </div>
                                 <span>Sending...</span>
                             </>
                         ) : (
@@ -194,11 +196,13 @@ export function AuthForm({ returnTo }: {
                         disabled={passkeyState.state === 'loading'}
                         className='w-full px-6 py-3 border border-action text-action rounded-lg hover:bg-action hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3'
                     >
-                        {passkeyState.state === 'loading' ? (
-                            <Spinner />
-                        ) : (
-                            <PasskeyIcon />
-                        )}
+                        <div className='w-5 h-5'>
+                            {passkeyState.state === 'loading' ? (
+                                <Spinner />
+                            ) : (
+                                <PasskeyIcon />
+                            )}
+                        </div>
                         <span>Sign in with Passkey</span>
                     </button>
                     
@@ -207,11 +211,13 @@ export function AuthForm({ returnTo }: {
                         disabled={passkeyState.state === 'loading'}
                         className='w-full px-6 py-3 border border-dimmed text-secondary rounded-lg hover:bg-dimmed/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3'
                     >
-                        {passkeyState.state === 'loading' ? (
-                            <Spinner />
-                        ) : (
-                            <PasskeyIcon />
-                        )}
+                        <div className='w-5 h-5'>
+                            {passkeyState.state === 'loading' ? (
+                                <Spinner />
+                            ) : (
+                                <PasskeyIcon />
+                            )}
+                        </div>
                         <span>Register new Passkey</span>
                     </button>
                 </div>
