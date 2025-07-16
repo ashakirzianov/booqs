@@ -4,7 +4,7 @@ type Params = {
     error: string,
     return_to: string,
 }
-export async function SignInErrorPage({ searchParams }: {
+export default async function SignInErrorPage({ searchParams }: {
     searchParams: Promise<Params>
 }) {
     const { error, return_to } = await searchParams
