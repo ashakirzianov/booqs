@@ -5,7 +5,7 @@ import {
 } from '@/backend/passkey'
 import { generateToken, userIdFromToken } from '@/backend/token'
 import { deleteUserForId, userForId, updateUser, accountDataFromDbUser } from '@/backend/users'
-import { completeSignInRequest, completeSignUp, prevalidateSignup } from '@/backend/sign'
+import { completeSignInRequest, completeSignUp, prevalidateSignup, initiateSignRequest } from '@/backend/sign'
 import { AccountData } from '@/core'
 import { RegistrationResponseJSON, AuthenticationResponseJSON } from '@simplewebauthn/browser'
 import { cookies, headers } from 'next/headers'
@@ -253,6 +253,33 @@ export async function prevalidateSignupAction({
     } catch (err) {
         console.error('Error prevalidating signup:', err)
         return { success: false, reason: 'An error occurred during validation' }
+    }
+}
+
+export async function initiateSignAction({
+    email,
+    returnTo,
+}: {
+    email: string,
+    returnTo?: string,
+}): Promise<
+    | { success: true, kind: 'signin' | 'signup' }
+    | { success: false, error: string }
+> {
+    try {
+        const result = await initiateSignRequest({
+            email,
+            from: returnTo ?? '/',
+        })
+
+        if (result.kind === 'error') {
+            return { success: false, error: result.error }
+        }
+
+        return { success: true, kind: result.kind }
+    } catch (err) {
+        console.error('Error initiating sign action:', err)
+        return { success: false, error: 'An error occurred while processing your request' }
     }
 }
 
