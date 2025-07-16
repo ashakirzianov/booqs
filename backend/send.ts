@@ -1,4 +1,5 @@
 import { signInLinkHref, signUpLinkHref } from '@/core/href'
+import { Resend } from 'resend'
 
 export async function sendSignInLink({
     secret,
@@ -24,7 +25,7 @@ If you didn't request this, please ignore this email.
 
 This link will expire in 1 hour for security reasons.`
 
-    return await sendEmail({ email, content })
+    return await sendEmail({ email, content, subject: 'Sign in to Booqs' })
 }
 
 export async function sendSignUpLink({
@@ -46,11 +47,35 @@ If you didn't request this, please ignore this email.
 
 This link will expire in 1 hour for security reasons.`
 
-    return await sendEmail({ email, content })
+    return await sendEmail({ email, content, subject: 'Welcome to Booqs' })
 }
 
-async function sendEmail({ email, content }: { email: string, content: string }): Promise<boolean> {
-    console.log(`Email to ${email}:`)
-    console.log(content)
-    return true
+async function sendEmail({ email, content, subject }: { email: string, content: string, subject: string }): Promise<boolean> {
+    const resendApiKey = process.env.RESEND_API_KEY
+    if (!resendApiKey) {
+        console.error('RESEND_API_KEY environment variable is not set')
+        return false
+    }
+
+    const resend = new Resend(resendApiKey)
+
+    try {
+        const { data, error } = await resend.emails.send({
+            from: 'Booqs <no-reply@booqs.app>',
+            to: [email],
+            subject,
+            text: content,
+        })
+
+        if (error) {
+            console.error('Failed to send email:', error)
+            return false
+        }
+
+        console.log('Email sent successfully:', data?.id)
+        return true
+    } catch (error) {
+        console.error('Error sending email:', error)
+        return false
+    }
 }

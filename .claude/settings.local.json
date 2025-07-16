@@ -10,7 +10,8 @@
       "Bash(find:*)",
       "Bash(ls:*)",
       "Bash(pkill:*)",
-      "Bash(node:*)"
+      "Bash(node:*)",
+      "Bash(npm install:*)"
     ]
   },
   "enableAllProjectMcpServers": false
