@@ -15,7 +15,7 @@ export async function sendSignInLink({
     const displayName = name || username || email
     const baseUrl = process.env.NEXT_PUBLIC_URL ?? 'https://booqs.app'
     const signInUrl = `${baseUrl}${signInLinkHref({ email, secret })}`
-    
+
     const content = `Hi ${displayName},
 
 Click here to sign in to your account:
@@ -37,7 +37,7 @@ export async function sendSignUpLink({
 }): Promise<boolean> {
     const baseUrl = process.env.NEXT_PUBLIC_URL ?? 'https://booqs.app'
     const signUpUrl = `${baseUrl}${signUpLinkHref({ email, secret })}`
-    
+
     const content = `Welcome to Booqs!
 
 Click here to complete your account setup:
@@ -61,8 +61,8 @@ async function sendEmail({ email, content, subject }: { email: string, content: 
 
     try {
         const { data, error } = await resend.emails.send({
-            from: 'Booqs <no-reply@booqs.app>',
-            to: [email],
+            from: 'Booqs <no-reply@auth.booqs.app>',
+            to: email,
             subject,
             text: content,
         })
