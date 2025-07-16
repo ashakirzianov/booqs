@@ -157,7 +157,7 @@ export function AuthForm({ returnTo }: {
                                 <span>Sending...</span>
                             </>
                         ) : (
-                            'Send Sign-in Link'
+                            'Send Link'
                         )}
                     </button>
                 </form>
