@@ -1,6 +1,6 @@
 'use client'
 import { BooqCover } from '@/components/BooqCover'
-import { authorHref, booqHref, searchHref } from '@/application/href'
+import { authorHref, booqHref, searchHref } from '@/core/href'
 import { Modal, useModalState } from './Modal'
 import { useSearch } from '@/application/search'
 import Link from 'next/link'

@@ -13,6 +13,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `npm run analyze` - Build with bundle analyzer
 - `npm run cli` - Run CLI tools (tsx cli/index.ts)
 
+## Coding preferences
+
+Put local/private utility functions after all exported/public functions
+
+Do not access backend/* files directly from frontend code. Instead, create an indirection layer in data/* directory to abstract backend functionality.
+
+Prefer 'function name(...) { ... }' style to 'const name = (...) => { ... }' style
+
 ## Architecture Overview
 
 ### Core Structure

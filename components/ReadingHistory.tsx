@@ -3,7 +3,7 @@ import { BooqPreview } from '@/components/BooqPreview'
 import { pageForPosition } from '@/application/common'
 import { BooqId, BooqPath } from '@/core'
 import Link from 'next/link'
-import { booqHref } from '../application/href'
+import { booqHref } from '../core/href'
 
 
 export type ReadingHistoryEntry = {

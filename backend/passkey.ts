@@ -82,7 +82,26 @@ export async function verifyPasskeyRegistration({
                 success: false as const,
             }
         }
-        const user = await createUser({})
+        // Generate temporary email, username, and name for passkey-only registration
+        const tempId = nanoid(10)
+        const tempEmail = `${tempId}@passkey.booqs.temp`
+        const tempUsername = `passkey.${tempId}`
+        const tempName = `Passkey User ${tempId}`
+        
+        const userResult = await createUser({
+            email: tempEmail,
+            username: tempUsername,
+            name: tempName,
+        })
+        
+        if (!userResult.success) {
+            return {
+                error: `Failed to create user: ${userResult.reason}`,
+                success: false as const,
+            }
+        }
+        
+        const user = userResult.user
 
         await saveUserCredential({
             userId: user.id,

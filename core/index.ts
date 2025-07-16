@@ -1,5 +1,7 @@
 export * from './application'
+export * from './emoji'
 export * from './fragment'
+export * from './href'
 export * from './misc'
 export * from './model'
 export * from './node'

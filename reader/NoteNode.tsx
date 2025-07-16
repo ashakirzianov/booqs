@@ -3,7 +3,7 @@ import { ContextMenuContent } from '@/reader/ContextMenuContent'
 import { resolveNoteColor } from '@/application/common'
 import { MoreIcon } from '@/components/Icons'
 import clsx from 'clsx'
-import { booqHref } from '@/application/href'
+import { booqHref } from '@/core/href'
 import Link from 'next/link'
 import { AccountDisplayData, BooqId, BooqNote } from '@/core'
 

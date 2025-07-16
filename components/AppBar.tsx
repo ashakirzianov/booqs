@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { ReactNode } from 'react'
-import { feedHref } from '../application/href'
+import { feedHref } from '../core/href'
 import { Logo } from './Logo'
 
 export function AppBar({ left, right }: {

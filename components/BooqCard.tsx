@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { BooqCover } from '@/components/BooqCover'
 import { BooqTags } from '@/components/BooqTags'
-import { authorHref } from '@/application/href'
+import { authorHref } from '@/core/href'
 import { ReactNode } from 'react'
 import { BooqDetails } from '@/data/booqs'
 

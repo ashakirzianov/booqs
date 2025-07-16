@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { PanelButton } from './Buttons'
-import { accountHref, signInHref } from '../application/href'
+import { accountHref, authHref } from '../core/href'
 import { ProfileBadge } from './ProfilePicture'
 import { SignInIcon, Spinner } from './Icons'
 import { AccountData } from '@/core'
@@ -42,7 +42,7 @@ export function SignedAccountButton({ name, profilePictureURL, emoji }: Pick<Acc
 export function NotSignedAccountButton({ from }: {
     from?: string,
 }) {
-    return <Link href={signInHref({ returnTo: from })}>
+    return <Link href={authHref({ returnTo: from })}>
         <SignInIcon />
     </Link>
 }

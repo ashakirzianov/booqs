@@ -7,8 +7,8 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE TABLE IF NOT EXISTS users (
   id TEXT PRIMARY KEY DEFAULT uuid_generate_v4()::TEXT,
   username CITEXT UNIQUE NOT NULL,
-  email CITEXT UNIQUE,
-  name TEXT,
+  email CITEXT UNIQUE NOT NULL,
+  name TEXT NOT NULL,
   profile_picture_url TEXT,
   emoji VARCHAR(10) NOT NULL,
   joined_at TIMESTAMPTZ NOT NULL DEFAULT NOW()

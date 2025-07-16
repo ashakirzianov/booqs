@@ -1,7 +1,7 @@
 'use client'
 import { useRouter } from 'next/navigation'
 import { signOutAction } from '@/data/auth'
-import { feedHref } from '@/application/href'
+import { feedHref } from '@/core/href'
 import { BorderButton } from '@/components/Buttons'
 
 export function SignoutButton() {
