@@ -2,10 +2,10 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { completeSignUpAction } from '@/data/auth'
-import { Spinner, PasskeyIcon } from '@/components/Icons'
+import { Spinner } from '@/components/Icons'
 import { EmojiSelector } from '@/app/(main)/account/EmojiSelector'
-import { registerPasskey } from '@/application/auth'
 import { browserSupportsWebAuthn } from '@simplewebauthn/browser'
+import { AddPasskeyPage } from './AddPasskeyPage'
 
 type FormDataState = {
     username: string
@@ -24,11 +24,6 @@ type SignUpState = {
 } | {
     state: 'signup-complete'
     supportsPasskey: boolean
-} | {
-    state: 'loading-passkey'
-} | {
-    state: 'passkey-error'
-    error: string
 }
 
 export function SignUpForm({
@@ -96,82 +91,9 @@ export function SignUpForm({
         }
     }
 
-    const handleAddPasskey = async () => {
-        setSignUpState({ state: 'loading-passkey' })
 
-        try {
-            const result = await registerPasskey()
-            if (result.success) {
-                router.push(returnTo)
-            } else {
-                setSignUpState({ state: 'passkey-error', error: result.error })
-            }
-        } catch (err) {
-            console.error('Passkey registration error:', err)
-            setSignUpState({ state: 'passkey-error', error: 'An unexpected error occurred while adding passkey' })
-        }
-    }
-
-    const handleSkipPasskey = () => {
-        router.push(returnTo)
-    }
-
-    const handleRetryPasskey = () => {
-        setSignUpState({ state: 'signup-complete', supportsPasskey: true })
-    }
-
-    if (signUpState.state === 'signup-complete' || signUpState.state === 'loading-passkey' || signUpState.state === 'passkey-error') {
-        return (
-            <div className='flex flex-col gap-6'>
-                <div className='text-center space-y-4'>
-                    <h2 className='text-2xl font-bold text-primary'>Account Created!</h2>
-                    <p className='text-lg text-secondary'>
-                        Would you like to add a passkey for faster, more secure sign-ins?
-                    </p>
-                    <p className='text-sm text-dimmed'>
-                        Passkeys use your device&apos;s biometric authentication (fingerprint, face, etc.) or PIN for secure access.
-                    </p>
-                </div>
-
-                {signUpState.state === 'passkey-error' && (
-                    <div className='text-alert text-sm bg-alert/10 border border-alert/20 rounded-lg px-4 py-3' role='alert'>
-                        {signUpState.error}
-                    </div>
-                )}
-
-                <div className='flex flex-col gap-3'>
-                    <button
-                        onClick={signUpState.state === 'passkey-error' ? handleRetryPasskey : handleAddPasskey}
-                        disabled={signUpState.state === 'loading-passkey'}
-                        className='w-full px-6 py-3 bg-action text-white rounded-lg hover:bg-highlight transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3'
-                    >
-                        <div className='w-5 h-5'>
-                            {signUpState.state === 'loading-passkey' ? (
-                                <Spinner />
-                            ) : (
-                                <PasskeyIcon />
-                            )}
-                        </div>
-                        <span>
-                            {signUpState.state === 'loading-passkey'
-                                ? 'Adding Passkey...'
-                                : signUpState.state === 'passkey-error'
-                                    ? 'Try Again'
-                                    : 'Add Passkey'
-                            }
-                        </span>
-                    </button>
-
-                    <button
-                        onClick={handleSkipPasskey}
-                        disabled={signUpState.state === 'loading-passkey'}
-                        className='w-full px-6 py-3 border border-dimmed text-secondary rounded-lg hover:bg-dimmed/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed'
-                    >
-                        I&apos;ll use sign-in links
-                    </button>
-                </div>
-            </div>
-        )
+    if (signUpState.state === 'signup-complete' && signUpState.supportsPasskey) {
+        return <AddPasskeyPage returnTo={returnTo} />
     }
 
     return (
