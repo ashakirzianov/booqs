@@ -13,6 +13,7 @@ import {
 import useSWR from 'swr'
 import { GetResponse } from '@/app/api/me/route'
 import { AccountData } from '@/core'
+import { generatePasskeyLabel } from '@/application/utils'
 
 export function useAuth() {
     const { data, isLoading, error, mutate } = useSWR(
@@ -147,9 +148,11 @@ export async function registerPasskey() {
         const response = await startRegistration({
             optionsJSON: initResult.options,
         })
+        const label = generatePasskeyLabel()
         const verificationResult = await verifyPasskeyRegistrationAction({
             id: initResult.id,
             response,
+            label,
         })
         if (!verificationResult.success) {
             return {

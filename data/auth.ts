@@ -42,16 +42,20 @@ export async function initPasskeyRegistrationAcion() {
     }
 }
 
-export async function verifyPasskeyRegistrationAction({ id, response }: {
+export async function verifyPasskeyRegistrationAction({ id, response, label }: {
     id: string,
     response: RegistrationResponseJSON, // The credential JSON received from the client
+    label?: string,
 }) {
     try {
         const origin = await getOrigin()
+        const ipAddress = await getClientIpAddress()
         const result = await verifyPasskeyRegistration({
             id,
             response,
             origin: origin ?? undefined,
+            label,
+            ipAddress,
         })
         if (result.user?.id) {
             const token = generateToken(result.user.id)
@@ -100,10 +104,12 @@ export async function verifyPasskeySigninAction({ id, response }: {
 }) {
     try {
         const origin = await getOrigin()
+        const ipAddress = await getClientIpAddress()
         const result = await verifyPasskeyLogin({
             id,
             response,
             origin: origin ?? undefined,
+            ipAddress,
         })
         if (result.user?.id) {
             const token = generateToken(result.user.id)
@@ -301,6 +307,11 @@ async function getAuthToken() {
     const cookieStore = await cookies()
     const token = cookieStore.get('token')
     return token?.value
+}
+
+async function getClientIpAddress(): Promise<string | undefined> {
+    const hs = await headers()
+    return hs.get('x-forwarded-for') || hs.get('x-real-ip') || undefined
 }
 
 async function setAuthToken(token: string | undefined) {
