@@ -15,10 +15,12 @@ export async function processEpub(epub: Epub, diags: Diagnoser): Promise<Booq | 
         const id = manifestItem['@id']
         const href = manifestItem['@href']
         if (!id || !href) {
+            nodes.push(null)
             continue
         }
         const loaded = await epub.loadItem(manifestItem)
         if (!loaded || typeof loaded.content !== 'string') {
+            nodes.push(null)
             continue
         }
         const section: EpubSection = {
@@ -27,9 +29,6 @@ export async function processEpub(epub: Epub, diags: Diagnoser): Promise<Booq | 
             content: loaded.content,
         }
         const value = await parseSection(section, epub, diags)
-        if (!value) {
-            return undefined
-        }
         nodes.push(value)
     }
 
