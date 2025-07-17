@@ -1,11 +1,8 @@
 'use client'
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { completeSignUpAction } from '@/data/auth'
 import { Spinner } from '@/components/Icons'
 import { EmojiSelector } from '@/app/(main)/account/EmojiSelector'
-import { browserSupportsWebAuthn } from '@simplewebauthn/browser'
-import { AddPasskeyPage } from './AddPasskeyPage'
 
 type FormDataState = {
     username: string
@@ -21,9 +18,6 @@ type SignUpState = {
     error: string
 } | {
     state: 'loading-signup'
-} | {
-    state: 'signup-complete'
-    supportsPasskey: boolean
 }
 
 export function SignUpForm({
@@ -32,7 +26,6 @@ export function SignUpForm({
     initialUsername,
     initialName,
     initialEmoji,
-    returnTo
 }: {
     email: string
     secret: string
@@ -41,8 +34,6 @@ export function SignUpForm({
     initialEmoji: string
     returnTo: string
 }) {
-    const router = useRouter()
-
     const [formData, setFormData] = useState<FormDataState>({
         username: initialUsername,
         name: initialName,
@@ -75,14 +66,7 @@ export function SignUpForm({
                 emoji: formData.selectedEmoji
             })
 
-            if (result.success) {
-                const supportsPasskey = browserSupportsWebAuthn()
-                if (supportsPasskey) {
-                    setSignUpState({ state: 'signup-complete', supportsPasskey: true })
-                } else {
-                    router.push(returnTo)
-                }
-            } else {
+            if (!result.success) {
                 setSignUpState({ state: 'error', error: result.reason })
             }
         } catch (err) {
@@ -91,13 +75,9 @@ export function SignUpForm({
         }
     }
 
-
-    if (signUpState.state === 'signup-complete' && signUpState.supportsPasskey) {
-        return <AddPasskeyPage returnTo={returnTo} />
-    }
-
     return (
-        <>
+        <div className='w-full max-w-md'>
+            <h1 className='text-2xl font-bold text-center mb-8'>Complete Sign Up</h1>
             <form onSubmit={handleSubmit} className='flex flex-col gap-6'>
                 {/* Email field (non-editable) */}
                 <div className='flex flex-col gap-2'>
@@ -199,6 +179,6 @@ export function SignUpForm({
                     setFormData(prev => ({ ...prev, selectedEmoji: emoji, showEmojiSelector: false }))
                 }}
             />
-        </>
+        </div>
     )
 }

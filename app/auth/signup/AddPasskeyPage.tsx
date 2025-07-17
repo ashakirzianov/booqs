@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Spinner, PasskeyIcon } from '@/components/Icons'
 import { registerPasskey } from '@/application/auth'
+import { browserSupportsWebAuthn } from '@simplewebauthn/browser'
 
 type AddPasskeyState = {
     state: 'initial'
@@ -41,8 +42,13 @@ export function AddPasskeyPage({ returnTo }: { returnTo: string }) {
         setPasskeyState({ state: 'initial' })
     }
 
+    if (!browserSupportsWebAuthn()) {
+        router.push(returnTo)
+        return null
+    }
+
     return (
-        <div className='flex flex-col gap-6'>
+        <div className='w-full max-w-md flex flex-col gap-6'>
             <div className='text-center space-y-4'>
                 <h2 className='text-2xl font-bold text-primary'>Account Created!</h2>
                 <p className='text-lg text-secondary'>
@@ -73,10 +79,10 @@ export function AddPasskeyPage({ returnTo }: { returnTo: string }) {
                         )}
                     </div>
                     <span>
-                        {passkeyState.state === 'loading' 
-                            ? 'Adding Passkey...' 
-                            : passkeyState.state === 'error' 
-                                ? 'Try Again' 
+                        {passkeyState.state === 'loading'
+                            ? 'Adding Passkey...'
+                            : passkeyState.state === 'error'
+                                ? 'Try Again'
                                 : 'Add Passkey'
                         }
                     </span>
