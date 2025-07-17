@@ -1,6 +1,6 @@
 import { Logo } from '@/components/Logo'
 import { getRandomAvatarEmoji } from '@/core/emoji'
-import { prevalidateSignupAction } from '@/data/auth'
+import { prevalidateSignupAction, fetchAuthData } from '@/data/auth'
 import { SignUpForm } from './SignUpForm'
 import { generateRandomName } from './name'
 
@@ -25,17 +25,23 @@ export default async function SignUpPage({ searchParams }: {
         )
     }
 
-    // Pre-validate the signup token on the server
-    const validation = await prevalidateSignupAction({ email, secret })
-    
-    if (!validation.success) {
-        return (
-            <SignUpErrorPage 
-                title="Sign-up Link Invalid"
-                message={validation.reason}
-                description="Please request a new sign-up link or try signing in if you already have an account."
-            />
-        )
+    // Check if user is already authenticated (sign-up completed)
+    const authData = await fetchAuthData()
+    const isAuthenticated = !!authData
+
+    // Only pre-validate if user is not authenticated yet
+    if (!isAuthenticated) {
+        const validation = await prevalidateSignupAction({ email, secret })
+        
+        if (!validation.success) {
+            return (
+                <SignUpErrorPage 
+                    title="Sign-up Link Invalid"
+                    message={validation.reason}
+                    description="Please request a new sign-up link or try signing in if you already have an account."
+                />
+            )
+        }
     }
 
     // Server-side preparation of initial values
