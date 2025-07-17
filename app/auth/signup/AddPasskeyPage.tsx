@@ -2,7 +2,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Spinner, PasskeyIcon } from '@/components/Icons'
-import { registerPasskey } from '@/application/auth'
+import { usePasskeys } from '@/application/passkeys'
 import { browserSupportsWebAuthn } from '@simplewebauthn/browser'
 
 type AddPasskeyState = {
@@ -17,20 +17,17 @@ type AddPasskeyState = {
 export function AddPasskeyPage({ returnTo }: { returnTo: string }) {
     const router = useRouter()
     const [passkeyState, setPasskeyState] = useState<AddPasskeyState>({ state: 'initial' })
+    const { registerPasskey } = usePasskeys()
 
     const handleAddPasskey = async () => {
         setPasskeyState({ state: 'loading' })
 
         try {
-            const result = await registerPasskey()
-            if (result.success) {
-                router.push(returnTo)
-            } else {
-                setPasskeyState({ state: 'error', error: result.error })
-            }
+            await registerPasskey()
+            router.push(returnTo)
         } catch (err) {
             console.error('Passkey registration error:', err)
-            setPasskeyState({ state: 'error', error: 'An unexpected error occurred while adding passkey' })
+            setPasskeyState({ state: 'error', error: err instanceof Error ? err.message : 'An unexpected error occurred while adding passkey' })
         }
     }
 
