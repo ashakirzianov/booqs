@@ -14,20 +14,17 @@ export type AccountDisplayData = Pick<AccountData, 'id' | 'name' | 'profilePictu
 export type NoteColor = string // TODO: rename?
 export type NotePrivacy = 'private' | 'public'
 
-export type NoteData = {
+export type BooqNote = {
     id: string,
     booqId: BooqId,
     author: AccountDisplayData,
     range: BooqRange,
     color: string,
     content?: string,
+    targetQuote: string,
     privacy: NotePrivacy,
     createdAt: string,
     updatedAt: string,
-}
-export type BooqNote = NoteData & {
-    text: string,
-    position?: number,
 }
 export type PartialBooqData = {
     booqId: BooqId,

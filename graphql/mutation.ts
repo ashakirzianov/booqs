@@ -53,6 +53,7 @@ export const mutationResolver: IResolvers<any, ResolverContext> = {
                         end: note.end,
                     },
                     color: note.color,
+                    targetQuote: note.targetQuote,
                 })
                 return true
             } else {

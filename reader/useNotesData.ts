@@ -1,37 +1,29 @@
 import { useMemo } from 'react'
-import { BooqNote, BooqNode, textForRange, BooqId, AccountDisplayData, BooqRange, pathInRange, pathLessThan } from '@/core'
+import { BooqId, AccountDisplayData, BooqRange, pathInRange, pathLessThan } from '@/core'
 import { useBooqNotes } from '@/application/notes'
 
 export function useNotesData({
     booqId,
-    nodes,
     user,
     currentRange,
 }: {
     booqId: BooqId,
-    nodes: BooqNode[],
     user: AccountDisplayData | undefined,
     currentRange?: BooqRange,
 }) {
-    const { notes: rawNotes } = useBooqNotes({ booqId, user })
+    const { notes: allNotes } = useBooqNotes({ booqId, user })
 
     const sortedNotes = useMemo(() => {
-        return rawNotes
-            .map<BooqNote>(note => ({
-                ...note,
-                start: note.range.start,
-                end: note.range.end,
-                text: textForRange(nodes, note.range) ?? '',
-            }))
+        return allNotes
             .sort((a, b) => {
                 // Sort by start path
                 if (pathLessThan(a.range.start, b.range.start)) return -1
                 if (pathLessThan(b.range.start, a.range.start)) return 1
                 return 0
             })
-    }, [rawNotes, nodes])
+    }, [allNotes])
 
-    const notes = useMemo(() => {
+    const userNotes = useMemo(() => {
         return sortedNotes.filter(note => note.author.id === user?.id)
     }, [sortedNotes, user?.id])
 
@@ -44,5 +36,5 @@ export function useNotesData({
         )
     }, [sortedNotes, currentRange])
 
-    return { notes, comments }
+    return { userNotes, comments }
 }

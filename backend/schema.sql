@@ -107,6 +107,7 @@ CREATE TABLE IF NOT EXISTS notes (
   end_path INTEGER[] NOT NULL,
   color TEXT NOT NULL,
   content TEXT,
+  target_quote TEXT NOT NULL,
   privacy note_privacy NOT NULL DEFAULT 'private',
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()

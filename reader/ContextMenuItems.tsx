@@ -94,13 +94,13 @@ export function AddHighlightItem({
                         const note = addNote({
                             color,
                             range: selection.range,
+                            targetQuote: selection.text,
                         })
                         if (note) {
                             setTarget({
                                 kind: 'note',
                                 note: {
                                     ...note,
-                                    text: selection.text,
                                     range: selection.range,
                                 },
                             })

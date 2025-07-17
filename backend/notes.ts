@@ -11,6 +11,7 @@ export type DbNote = {
   end_path: number[],
   color: string,
   content: string | null,
+  target_quote: string,
   privacy: NotePrivacy,
   created_at: string,
   updated_at: string,
@@ -75,6 +76,7 @@ export async function addNote({
   range,
   color,
   content,
+  targetQuote,
   privacy = 'private',
 }: {
   id: string,
@@ -83,14 +85,15 @@ export async function addNote({
   range: BooqRange,
   color: string,
   content?: string,
+  targetQuote?: string,
   privacy?: NotePrivacy,
 }): Promise<DbNote> {
   const [note] = await sql`
       INSERT INTO notes (
-        id, author_id, booq_id, start_path, end_path, color, content, privacy
+        id, author_id, booq_id, start_path, end_path, color, content, target_quote, privacy
       )
       VALUES (
-        ${id}, ${authorId}, ${booqId}, ${range.start}, ${range.end}, ${color}, ${content ?? null}, ${privacy}
+        ${id}, ${authorId}, ${booqId}, ${range.start}, ${range.end}, ${color}, ${content ?? null}, ${targetQuote ?? null}, ${privacy}
       )
       RETURNING *
     `

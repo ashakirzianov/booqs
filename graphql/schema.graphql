@@ -94,6 +94,7 @@ input NoteInput {
     color: String!
     start: [Int!]
     end: [Int!]
+    targetQuote: String
 }
 input BooqHistoryInput {
     booqId: ID!
@@ -143,6 +144,7 @@ type Note {
     end: [Int!]!
     color: String
     text: String
+    targetQuote: String
     position: Int
 }
 type BooqHistory {

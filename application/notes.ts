@@ -2,7 +2,7 @@
 
 import type { GetResponse, PostBody, PostResponse } from '@/app/api/booq/[library]/[id]/notes/route'
 import type { PatchBody, PatchResponse } from '@/app/api/notes/[id]/route'
-import { AccountDisplayData, BooqId, BooqRange, NoteData, NotePrivacy } from '@/core'
+import { AccountDisplayData, BooqId, BooqRange, BooqNote, NotePrivacy } from '@/core'
 import { nanoid } from 'nanoid'
 import { useMemo } from 'react'
 import useSWR from 'swr'
@@ -72,11 +72,13 @@ export function useBooqNotes({
         range: { start, end },
         color,
         content,
+        targetQuote,
         privacy = 'private', // Default to private if not specified
     }: {
         range: BooqRange,
         color: string,
         content?: string,
+        targetQuote: string,
         privacy?: NotePrivacy,
     }) {
         if (!user) return undefined
@@ -87,6 +89,7 @@ export function useBooqNotes({
             start_path: start,
             end_path: end,
             content: content ?? null,
+            target_quote: targetQuote,
             privacy,
         }
 
@@ -227,7 +230,7 @@ export function useBooqNotes({
 }
 
 type NoteJson = GetResponse['notes'][number]
-function noteFromJson(note: NoteJson): NoteData {
+function noteFromJson(note: NoteJson): BooqNote {
     return {
         id: note.id,
         booqId: note.booq_id as BooqId,
@@ -237,6 +240,7 @@ function noteFromJson(note: NoteJson): NoteData {
         },
         color: note.color,
         content: note.content ?? undefined,
+        targetQuote: note.target_quote,
         author: {
             id: note.author_id,
             name: note.author_name ?? undefined,
