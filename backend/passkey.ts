@@ -367,15 +367,15 @@ export async function deletePasskeyCredential(userId: string, credentialId: stri
 }
 
 function getRPData(origin: string | undefined) {
-    const { localhost, secureLocalhost, production } = config().origins
+    const { localhost, secureLocalhost, production, www } = config().origins
     const domain = config().domain
     const rpID = origin === localhost || origin === secureLocalhost
         ? 'localhost'
         : domain
 
-    const expectedOrigin = origin === production
-        || origin === localhost
-        || origin === secureLocalhost
+    const allowedOrigins = new Set([production, localhost, secureLocalhost, www])
+
+    const expectedOrigin = origin && allowedOrigins.has(origin)
         ? origin
         : production
 

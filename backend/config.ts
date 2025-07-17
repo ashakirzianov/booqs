@@ -8,6 +8,7 @@ export function config() {
     const domain = url.substring(url.indexOf('://') + '://'.length)
     const origins = {
         production: `https://${domain}`,
+        www: `https://www.${domain}`,
         localhost: 'http://localhost:3000',
         secureLocalhost: 'https://localhost:3000',
         undefined: undefined,
