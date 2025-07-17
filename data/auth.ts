@@ -61,9 +61,11 @@ export async function verifyPasskeyRegistrationAction({ id, response, label }: {
         if (result.user?.id) {
             const token = generateToken(result.user.id)
             await setAuthToken(token)
+            const updatedPasskeys = await getUserPasskeys(result.user.id)
             return {
                 success: true,
                 user: accountDataFromDbUser(result.user),
+                passkeys: updatedPasskeys,
             } as const
         } else {
             return {
@@ -329,6 +331,21 @@ export async function deletePasskeyAction(credentialId: string): Promise<boolean
         return false
     }
     return await deletePasskeyCredential(userId, credentialId)
+}
+
+export async function deletePasskeyActionWithUpdatedList(credentialId: string): Promise<{ success: boolean, passkeys?: PasskeyData[] }> {
+    const userId = await getUserIdInsideRequest()
+    if (!userId) {
+        return { success: false }
+    }
+    
+    const deleteResult = await deletePasskeyCredential(userId, credentialId)
+    if (!deleteResult) {
+        return { success: false }
+    }
+    
+    const updatedPasskeys = await getUserPasskeys(userId)
+    return { success: true, passkeys: updatedPasskeys }
 }
 
 export type PasskeyData = {

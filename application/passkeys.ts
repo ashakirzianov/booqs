@@ -6,33 +6,19 @@ import {
 import {
     initPasskeyRegistrationAcion, verifyPasskeyRegistrationAction,
     initPasskeySigninAction, verifyPasskeySigninAction,
+    deletePasskeyActionWithUpdatedList,
 } from '@/data/auth'
 import { generatePasskeyLabel } from '@/application/utils'
 
 export function usePasskeys() {
-    async function registerPasskey() {
-        const result = await registerPasskeyImpl()
-        if (!result.success) {
-            throw new Error(result.error)
-        }
-        // Ignore user data return as requested
-    }
-
-    async function signInWithPasskey() {
-        const result = await signInWithPasskeyImpl()
-        if (!result.success) {
-            throw new Error(result.error)
-        }
-        return result.user
-    }
-
     return {
         registerPasskey,
         signInWithPasskey,
+        deletePasskey,
     }
 }
 
-async function registerPasskeyImpl() {
+async function registerPasskey() {
     try {
         if (!browserSupportsWebAuthn()) {
             return {
@@ -64,6 +50,7 @@ async function registerPasskeyImpl() {
         }
         return {
             success: true as const,
+            passkeys: verificationResult.passkeys,
         }
     } catch (err: any) {
         return {
@@ -73,7 +60,7 @@ async function registerPasskeyImpl() {
     }
 }
 
-async function signInWithPasskeyImpl() {
+async function signInWithPasskey() {
     try {
         if (!browserSupportsWebAuthn()) {
             return {
@@ -104,6 +91,27 @@ async function signInWithPasskeyImpl() {
         return {
             success: true as const,
             user: verificationResult.user,
+        }
+    } catch (err: any) {
+        return {
+            success: false as const,
+            error: err.toString(),
+        }
+    }
+}
+
+async function deletePasskey(id: string) {
+    try {
+        const result = await deletePasskeyActionWithUpdatedList(id)
+        if (!result.success) {
+            return {
+                success: false as const,
+                error: 'Failed to delete passkey'
+            }
+        }
+        return {
+            success: true as const,
+            passkeys: result.passkeys,
         }
     } catch (err: any) {
         return {

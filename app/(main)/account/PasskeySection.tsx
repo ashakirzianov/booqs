@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { PasskeyData, deletePasskeyAction } from '@/data/auth'
+import { PasskeyData } from '@/data/auth'
 import { PasskeyIcon, TrashIcon } from '@/components/Icons'
 import { LightButton } from '@/components/Buttons'
 import { usePasskeys } from '@/application/passkeys'
@@ -10,14 +10,16 @@ export function PasskeySection({ initialPasskeys }: { initialPasskeys: PasskeyDa
     const [passkeys, setPasskeys] = useState(initialPasskeys)
     const [isDeleting, setIsDeleting] = useState<string | null>(null)
     const [isAddingPasskey, setIsAddingPasskey] = useState(false)
-    const { registerPasskey } = usePasskeys()
+    const { registerPasskey, deletePasskey } = usePasskeys()
 
     const handleDeletePasskey = async (id: string) => {
         setIsDeleting(id)
         try {
-            const success = await deletePasskeyAction(id)
-            if (success) {
-                setPasskeys(prev => prev.filter(p => p.id !== id))
+            const result = await deletePasskey(id)
+            if (result.success && result.passkeys) {
+                setPasskeys(result.passkeys)
+            } else {
+                console.error('Failed to delete passkey:', result.error)
             }
         } catch (error) {
             console.error('Failed to delete passkey:', error)
@@ -28,15 +30,16 @@ export function PasskeySection({ initialPasskeys }: { initialPasskeys: PasskeyDa
 
     const handleAddPasskey = async () => {
         setIsAddingPasskey(true)
-        try {
-            await registerPasskey()
-            // Refresh the page to show the new passkey
-            window.location.reload()
-        } catch (error) {
-            console.error('Failed to add passkey:', error)
-        } finally {
+        const result = await registerPasskey()
+        if (!result.success) {
+            console.error('Failed to add passkey:', result.error)
             setIsAddingPasskey(false)
+            return
         }
+        if (result.passkeys) {
+            setPasskeys(result.passkeys)
+        }
+        setIsAddingPasskey(false)
     }
 
     return (
@@ -50,7 +53,7 @@ export function PasskeySection({ initialPasskeys }: { initialPasskeys: PasskeyDa
                     {isAddingPasskey ? 'Adding...' : 'Add Passkey'}
                 </LightButton>
             </div>
-            
+
             <p className="text-sm text-dimmed mb-4">
                 Passkeys provide secure, passwordless authentication using your device&apos;s biometric features or PIN.
             </p>
