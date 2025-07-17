@@ -1,11 +1,18 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { completeSignUpAction } from '@/data/auth'
 import { Spinner, PasskeyIcon } from '@/components/Icons'
 import { EmojiSelector } from '@/app/(main)/account/EmojiSelector'
 import { registerPasskey } from '@/application/auth'
 import { browserSupportsWebAuthn } from '@simplewebauthn/browser'
+
+type FormDataState = {
+    username: string
+    name: string
+    selectedEmoji: string
+    showEmojiSelector: boolean
+}
 
 type SignUpState = {
     state: 'initial'
@@ -41,27 +48,23 @@ export function SignUpForm({
 }) {
     const router = useRouter()
 
-    const [username, setUsername] = useState(initialUsername)
-    const [name, setName] = useState(initialName)
-    const [selectedEmoji, setSelectedEmoji] = useState(initialEmoji)
-    const [showEmojiSelector, setShowEmojiSelector] = useState(false)
+    const [formData, setFormData] = useState<FormDataState>({
+        username: initialUsername,
+        name: initialName,
+        selectedEmoji: initialEmoji,
+        showEmojiSelector: false
+    })
     const [signUpState, setSignUpState] = useState<SignUpState>({ state: 'initial' })
-
-    useEffect(() => {
-        // Check passkey support on mount
-        const supportsPasskey = browserSupportsWebAuthn()
-        setSignUpState({ state: 'initial' })
-    }, [])
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
 
-        if (!name.trim()) {
+        if (!formData.name.trim()) {
             setSignUpState({ state: 'error', error: 'Name is required' })
             return
         }
 
-        if (!username.trim()) {
+        if (!formData.username.trim()) {
             setSignUpState({ state: 'error', error: 'Username is required' })
             return
         }
@@ -72,9 +75,9 @@ export function SignUpForm({
             const result = await completeSignUpAction({
                 email,
                 secret,
-                username: username.trim(),
-                name: name.trim(),
-                emoji: selectedEmoji
+                username: formData.username.trim(),
+                name: formData.name.trim(),
+                emoji: formData.selectedEmoji
             })
 
             if (result.success) {
@@ -190,9 +193,9 @@ export function SignUpForm({
                     <label className='text-sm font-medium text-secondary'>Username</label>
                     <input
                         type='text'
-                        value={username}
+                        value={formData.username}
                         onChange={(e) => {
-                            setUsername(e.target.value)
+                            setFormData(prev => ({ ...prev, username: e.target.value }))
                             if (signUpState.state === 'error') {
                                 setSignUpState({ state: 'initial' })
                             }
@@ -211,9 +214,9 @@ export function SignUpForm({
                     </label>
                     <input
                         type='text'
-                        value={name}
+                        value={formData.name}
                         onChange={(e) => {
-                            setName(e.target.value)
+                            setFormData(prev => ({ ...prev, name: e.target.value }))
                             if (signUpState.state === 'error') {
                                 setSignUpState({ state: 'initial' })
                             }
@@ -232,11 +235,11 @@ export function SignUpForm({
                     <div className='flex items-center gap-3'>
                         <button
                             type='button'
-                            onClick={() => setShowEmojiSelector(true)}
+                            onClick={() => setFormData(prev => ({ ...prev, showEmojiSelector: true }))}
                             className='w-16 h-16 text-3xl border border-dimmed rounded-lg hover:bg-dimmed/20 transition-colors flex items-center justify-center'
                             aria-label='Change profile emoji'
                         >
-                            {selectedEmoji}
+                            {formData.selectedEmoji}
                         </button>
                         <span className='text-sm text-secondary'>Click to change</span>
                     </div>
@@ -250,7 +253,7 @@ export function SignUpForm({
 
                 <button
                     type='submit'
-                    disabled={signUpState.state === 'loading-signup' || !name.trim() || !username.trim()}
+                    disabled={signUpState.state === 'loading-signup' || !formData.name.trim() || !formData.username.trim()}
                     className='px-6 py-3 bg-action text-white rounded-lg hover:bg-highlight transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2'
                 >
                     {signUpState.state === 'loading-signup' ? (
@@ -267,12 +270,11 @@ export function SignUpForm({
             </form>
 
             <EmojiSelector
-                isOpen={showEmojiSelector}
-                onClose={() => setShowEmojiSelector(false)}
-                currentEmoji={selectedEmoji}
+                isOpen={formData.showEmojiSelector}
+                onClose={() => setFormData(prev => ({ ...prev, showEmojiSelector: false }))}
+                currentEmoji={formData.selectedEmoji}
                 onSelect={(emoji) => {
-                    setSelectedEmoji(emoji)
-                    setShowEmojiSelector(false)
+                    setFormData(prev => ({ ...prev, selectedEmoji: emoji, showEmojiSelector: false }))
                 }}
             />
         </>
