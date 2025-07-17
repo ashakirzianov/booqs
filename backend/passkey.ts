@@ -183,10 +183,10 @@ export async function verifyPasskeyLogin({
         }
 
         // Retrieve expected challenge
-        const expectedChallenge = await getChallengeForId({
+        const { challenge } = await getChallengeForId({
             id, kind: 'login',
-        })
-        if (!expectedChallenge) {
+        }) ?? {}
+        if (!challenge) {
             return {
                 error: 'Authentication challenge not found or expired',
                 success: false,
@@ -204,7 +204,7 @@ export async function verifyPasskeyLogin({
         // Verify the authentication response
         const verification = await verifyAuthenticationResponse({
             response,
-            expectedChallenge: `${expectedChallenge}`,
+            expectedChallenge: challenge,
             expectedOrigin,
             expectedRPID: rpID,
             credential,
@@ -290,7 +290,9 @@ async function createChallenge({ userId, challenge, kind }: {
         kind,
         challenge,
         expiration: `${expiration}`,
-        userId,
+    }
+    if (userId) {
+        doc.userId = userId
     }
     await redis.hmset(`passkey:challenge:${id}`, doc)
     await redis.expire(`passkey:challenge:${id}`, expireInSeconds)
