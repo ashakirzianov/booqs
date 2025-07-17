@@ -22,13 +22,13 @@ export function AddPasskeyPage({ returnTo }: { returnTo: string }) {
     const handleAddPasskey = async () => {
         setPasskeyState({ state: 'loading' })
 
-        try {
-            await registerPasskey()
-            router.push(returnTo)
-        } catch (err) {
-            console.error('Passkey registration error:', err)
-            setPasskeyState({ state: 'error', error: err instanceof Error ? err.message : 'An unexpected error occurred while adding passkey' })
+        const result = await registerPasskey()
+        if (!result.success) {
+            console.error('Failed to add passkey:', result.error)
+            setPasskeyState({ state: 'error', error: result.error })
+            return
         }
+        router.push(returnTo)
     }
 
     const handleSkipPasskey = () => {

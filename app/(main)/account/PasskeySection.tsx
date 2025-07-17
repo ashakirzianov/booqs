@@ -28,14 +28,11 @@ export function PasskeySection({ initialPasskeys }: { initialPasskeys: PasskeyDa
 
     const handleAddPasskey = async () => {
         setIsAddingPasskey(true)
-        try {
-            await registerPasskey()
-            // Refresh the page to show the new passkey
-            window.location.reload()
-        } catch (error) {
-            console.error('Failed to add passkey:', error)
-        } finally {
+        const result = await registerPasskey()
+        if (!result.success) {
+            console.error('Failed to add passkey:', result.error)
             setIsAddingPasskey(false)
+            return
         }
     }
 
@@ -50,7 +47,7 @@ export function PasskeySection({ initialPasskeys }: { initialPasskeys: PasskeyDa
                     {isAddingPasskey ? 'Adding...' : 'Add Passkey'}
                 </LightButton>
             </div>
-            
+
             <p className="text-sm text-dimmed mb-4">
                 Passkeys provide secure, passwordless authentication using your device&apos;s biometric features or PIN.
             </p>

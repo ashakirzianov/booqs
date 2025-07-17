@@ -10,29 +10,13 @@ import {
 import { generatePasskeyLabel } from '@/application/utils'
 
 export function usePasskeys() {
-    async function registerPasskey() {
-        const result = await registerPasskeyImpl()
-        if (!result.success) {
-            throw new Error(result.error)
-        }
-        // Ignore user data return as requested
-    }
-
-    async function signInWithPasskey() {
-        const result = await signInWithPasskeyImpl()
-        if (!result.success) {
-            throw new Error(result.error)
-        }
-        return result.user
-    }
-
     return {
         registerPasskey,
         signInWithPasskey,
     }
 }
 
-async function registerPasskeyImpl() {
+async function registerPasskey() {
     try {
         if (!browserSupportsWebAuthn()) {
             return {
@@ -73,7 +57,7 @@ async function registerPasskeyImpl() {
     }
 }
 
-async function signInWithPasskeyImpl() {
+async function signInWithPasskey() {
     try {
         if (!browserSupportsWebAuthn()) {
             return {
