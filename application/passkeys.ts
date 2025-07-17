@@ -6,6 +6,7 @@ import {
 import {
     initPasskeyRegistrationAcion, verifyPasskeyRegistrationAction,
     initPasskeySigninAction, verifyPasskeySigninAction,
+    deletePasskeyActionWithUpdatedList,
 } from '@/data/auth'
 import { generatePasskeyLabel } from '@/application/utils'
 
@@ -13,6 +14,7 @@ export function usePasskeys() {
     return {
         registerPasskey,
         signInWithPasskey,
+        deletePasskey,
     }
 }
 
@@ -48,6 +50,7 @@ async function registerPasskey() {
         }
         return {
             success: true as const,
+            passkeys: verificationResult.passkeys,
         }
     } catch (err: any) {
         return {
@@ -88,6 +91,27 @@ async function signInWithPasskey() {
         return {
             success: true as const,
             user: verificationResult.user,
+        }
+    } catch (err: any) {
+        return {
+            success: false as const,
+            error: err.toString(),
+        }
+    }
+}
+
+async function deletePasskey(id: string) {
+    try {
+        const result = await deletePasskeyActionWithUpdatedList(id)
+        if (!result.success) {
+            return {
+                success: false as const,
+                error: 'Failed to delete passkey'
+            }
+        }
+        return {
+            success: true as const,
+            passkeys: result.passkeys,
         }
     } catch (err: any) {
         return {
