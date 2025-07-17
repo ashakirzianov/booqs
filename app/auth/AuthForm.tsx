@@ -65,11 +65,11 @@ export function AuthForm({ returnTo }: {
         setPasskeyState({ state: 'loading' })
 
         try {
-            const user = await signInWithPasskey()
-            if (user) {
+            const result = await signInWithPasskey()
+            if (result.success) {
                 router.push(returnTo)
             } else {
-                setPasskeyState({ state: 'error', error: 'Passkey sign-in failed' })
+                setPasskeyState({ state: 'error', error: `Passkey sign-in failed: ${result.error}` })
             }
         } catch (err) {
             console.error('Passkey sign-in error:', err)
