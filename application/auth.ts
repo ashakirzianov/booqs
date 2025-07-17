@@ -93,7 +93,7 @@ export function useAuth() {
         user,
         registerWithPasskey() {
             mutate(async function () {
-                const result = await registerWithPasskey()
+                const result = await registerPasskey()
                 if (result.success) {
                     return {
                         user: result.user,
@@ -129,7 +129,7 @@ export function useAuth() {
     }
 }
 
-export async function registerWithPasskey() {
+export async function registerPasskey() {
     try {
         if (!browserSupportsWebAuthn()) {
             return {
