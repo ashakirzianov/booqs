@@ -1,7 +1,6 @@
 'use client'
 import { PanelButton } from '@/components/Buttons'
 import { useSelectFileDialog } from '@/components/SelectFileDialog'
-import { Popover } from '@/components/Popover'
 import { Modal, ModalButton, ModalDivider, ModalLabel } from '@/components/Modal'
 import { BooqCover } from '@/components/BooqCover'
 import { booqHref } from '@/core/href'
@@ -19,15 +18,9 @@ export function UploadButton() {
     }, [setIsOpen])
 
     return <>
-        <Popover
-            anchor={<PanelButton onClick={openModal}>
-                <UploadIcon />
-            </PanelButton>}
-            content={<div className='m-lg w-full text-center font-bold'>
-                Click to select epub
-            </div>}
-            hasAction={true}
-        />
+        <PanelButton onClick={openModal}>
+            <UploadIcon />
+        </PanelButton>
         <Modal
             isOpen={isOpen}
             closeModal={closeModal}
