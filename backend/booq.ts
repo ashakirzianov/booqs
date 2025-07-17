@@ -1,6 +1,5 @@
 import { Booq, BooqId, BooqPath, pathToString, positionForPath, previewForPath, textForRange } from '@/core'
 import { redis } from './db'
-import { logTime, logTimeAsync } from './utils'
 import { parseEpubFile } from '@/parser'
 import { fileForId } from './library'
 import { inspect } from 'util'
@@ -42,17 +41,11 @@ export async function booqPreview(booqId: BooqId, path: BooqPath, end?: BooqPath
     if (!booq) {
         return undefined
     }
-    const full = logTime(
-        `preview for path ${pathToString(path)}`,
-        () => end
-            ? textForRange(booq.nodes, { start: path, end })
-            : previewForPath(booq.nodes, path, PREVIEW_LENGTH),
-    )
+    const full = end
+        ? textForRange(booq.nodes, { start: path, end })
+        : previewForPath(booq.nodes, path, PREVIEW_LENGTH)
     const text = full?.trim()?.substring(0, PREVIEW_LENGTH) ?? ''
-    const position = logTime(
-        `position for path ${pathToString(path)}`,
-        () => positionForPath(booq.nodes, path),
-    )
+    const position = positionForPath(booq.nodes, path)
     const length = booq.metadata.length
     const preview = {
         booqId,
@@ -71,9 +64,9 @@ async function parseBooqForId(booqId: BooqId) {
     if (!file) {
         return undefined
     }
-    const { value: booq, diags } = await logTimeAsync('parse epub', () => parseEpubFile({
+    const { value: booq, diags } = await parseEpubFile({
         fileBuffer: file.file,
-    }))
+    })
     diags.forEach(diag => {
         console.info(inspect(diag, { depth: 5, colors: true }))
     })
