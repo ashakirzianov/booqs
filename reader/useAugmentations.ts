@@ -12,13 +12,14 @@ export type TemporaryAugmentation = {
 export function useAugmentations({
     quote, notes, comments = [], temporaryAugmentations = [],
 }: {
-    notes: BooqNote[],
+    notes: BooqNote[] | undefined,
     comments?: BooqNote[],
     quote?: BooqRange,
     temporaryAugmentations?: TemporaryAugmentation[],
 }) {
     const augmentations = useMemo(function () {
-        const noteAugmentations = notes.map<Augmentation>(function (note) {
+        const noteArray = notes ?? []
+        const noteAugmentations = noteArray.map<Augmentation>(function (note) {
             return {
                 id: noteAugmentationId(note),
                 range: note.range,
@@ -35,7 +36,7 @@ export function useAugmentations({
         })
 
         // Create a Set of note IDs for efficient lookup
-        const noteIds = new Set(notes.map(note => note.id))
+        const noteIds = new Set(noteArray.map(note => note.id))
 
         // Generate dashed augmentations for comments not present in notes
         const commentAugmentations = comments
@@ -75,7 +76,7 @@ export function useAugmentations({
                     }
                     : undefined
             case 'note': {
-                const note = notes.find(function (hl) { return hl.id === id }) ||
+                const note = notes?.find(function (hl) { return hl.id === id }) ||
                     comments.find(function (hl) { return hl.id === id })
                 return note
                     ? {

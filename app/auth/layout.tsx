@@ -1,11 +1,15 @@
+import Link from 'next/link'
 import { Logo } from '@/components/Logo'
+import { feedHref } from '@/core/href'
 
-export default function SignUpLayout({ children }: {
+export default function AuthLayout({ children }: {
     children: React.ReactNode;
 }) {
     return (
         <main className='flex flex-col items-center justify-center min-h-screen gap-8 p-16'>
-            <Logo style={{ fontSize: 'xxx-large' }} />
+            <Link href={feedHref()}>
+                <Logo size="large" />
+            </Link>
             {children}
         </main>
     )

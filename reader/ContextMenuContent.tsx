@@ -124,7 +124,7 @@ function NoteTargetMenu({
     const isOwnNote = user?.id === note.author?.id
     const selection = {
         range: note.range,
-        text: note.text,
+        text: note.targetQuote,
     }
     return <>
         {isOwnNote ? null :
@@ -160,7 +160,7 @@ function CommentTargetMenu({
 
     // Extract selection from parent target
     const selection: BooqSelection = parent.kind === 'note'
-        ? { range: parent.note.range, text: parent.note.text }
+        ? { range: parent.note.range, text: parent.note.targetQuote }
         : parent.selection
 
     const handlePost = () => {
@@ -171,6 +171,7 @@ function CommentTargetMenu({
             range: selection.range,
             content: comment.trim(),
             privacy: 'public',
+            targetQuote: selection.text,
         })
 
         if (note) {

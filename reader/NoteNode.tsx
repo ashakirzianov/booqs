@@ -17,7 +17,7 @@ export function NoteNodeComp({ booqId, note, user }: {
     }}>
         <div className='w-full text-primary text-justify'>
             <Link href={booqHref({ booqId, path: note.range.start })} className='text-primary hover:text-highlight'>
-                {note.text}
+                {note.targetQuote}
             </Link>
         </div>
         <div className='flex flex-col justify-between items-stretch ml-lg'>

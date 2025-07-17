@@ -40,5 +40,8 @@ export const noteResolver: IResolvers<NoteParent> = {
         end(parent) {
             return parent.end_path
         },
+        targetQuote(parent) {
+            return parent.target_quote
+        },
     },
 }

@@ -5,7 +5,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- Users
 CREATE TABLE IF NOT EXISTS users (
-  id TEXT PRIMARY KEY DEFAULT uuid_generate_v4()::TEXT,
+  id TEXT PRIMARY KEY,
   username CITEXT UNIQUE NOT NULL,
   email CITEXT UNIQUE NOT NULL,
   name TEXT NOT NULL,
@@ -107,6 +107,7 @@ CREATE TABLE IF NOT EXISTS notes (
   end_path INTEGER[] NOT NULL,
   color TEXT NOT NULL,
   content TEXT,
+  target_quote TEXT NOT NULL,
   privacy note_privacy NOT NULL DEFAULT 'private',
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()

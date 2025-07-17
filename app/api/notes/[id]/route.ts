@@ -10,7 +10,7 @@ type Params = {
 }
 
 export type PatchBody = Partial<Pick<DbNote, 'color' | 'content'>>
-export type PatchResponse = Pick<DbNote, 'id' | 'color' | 'content' | 'created_at' | 'updated_at'>
+export type PatchResponse = Pick<DbNote, 'id' | 'color' | 'content' | 'target_quote' | 'created_at' | 'updated_at'>
 export async function PATCH(request: NextRequest, { params }: { params: Promise<Params> }) {
     const userId = await getUserIdInsideRequest()
     if (!userId) {

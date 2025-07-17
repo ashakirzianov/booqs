@@ -54,9 +54,8 @@ export function Reader({
         end: booq.fragment.next?.path ?? [booq.fragment.nodes.length],
     }), [booq])
 
-    const { notes, comments } = useNotesData({
+    const { userNotes, comments } = useNotesData({
         booqId: booq.booqId,
-        nodes: booq.fragment.nodes,
         user,
         currentRange: range,
     })
@@ -73,7 +72,7 @@ export function Reader({
         booqId={booq.booqId}
         title={booq.meta.title ?? 'Untitled'}
         toc={booq.toc.items}
-        notes={notes}
+        notes={userNotes}
         selection={navigationSelection}
         user={user}
         toggleSelection={toggleNavigationSelection}
@@ -111,7 +110,7 @@ export function Reader({
     }, [anchorRange])
 
     const { augmentations, menuTargetForAugmentation } = useAugmentations({
-        notes: navigationSelection.notes ? notes : [],
+        notes: navigationSelection.notes ? userNotes : undefined,
         comments: comments,
         quote: quote,
         temporaryAugmentations,

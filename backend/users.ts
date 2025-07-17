@@ -2,6 +2,7 @@ import { deleteAllBooksForUserId } from './uu'
 import { deleteUserCredentials } from './passkey'
 import { sql } from './db'
 import { AccountData, getRandomAvatarEmoji } from '@/core'
+import { nanoid } from 'nanoid'
 
 export type DbUser = {
     id: string,
@@ -59,10 +60,11 @@ export async function createUser({
     emoji?: string,
 }): Promise<CreateUserResult> {
     try {
+        const id = nanoid()
         const userEmoji = emoji ?? getRandomAvatarEmoji()
         const [user] = await sql`
-          INSERT INTO users (username, email, name, profile_picture_url, emoji)
-          VALUES (${username}, ${email}, ${name}, ${profilePictureUrl ?? null}, ${userEmoji})
+          INSERT INTO users (id, username, email, name, profile_picture_url, emoji)
+          VALUES (${id}, ${username}, ${email}, ${name}, ${profilePictureUrl ?? null}, ${userEmoji})
           RETURNING *
         `
         return { success: true, user: user as DbUser }

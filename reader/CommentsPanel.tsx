@@ -40,7 +40,7 @@ function CommentItem({ comment }: { comment: BooqNote }) {
             <Link href={`#${pathToId(comment.range.start)}`}
                 className='block p-2 rounded text-sm italic border-l-2 hover:bg-gray-50 transition-colors cursor-pointer'
                 style={{ borderLeftColor: comment.color }}>
-                &quot;{comment.text}&quot;
+                &quot;{comment.targetQuote}&quot;
             </Link>
 
             {/* Note content */}

@@ -26,7 +26,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Pa
     return Response.json(result)
 }
 
-export type PostBody = Pick<DbNote, 'id' | 'start_path' | 'end_path' | 'color' | 'content' | 'privacy'>
+export type PostBody = Pick<DbNote, 'id' | 'start_path' | 'end_path' | 'color' | 'content' | 'target_quote' | 'privacy'>
 export type PostResponse = DbNoteWithAuthor
 export async function POST(request: NextRequest, { params }: { params: Promise<Params> }) {
     const { library, id: paramsId } = await params
@@ -39,7 +39,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<P
     if (!author) {
         return Response.json({ error: 'User does not exist' }, { status: 401 })
     }
-    const { id, start_path, end_path, color, content, privacy }: PostBody = await request.json()
+    const { id, start_path, end_path, color, content, target_quote, privacy }: PostBody = await request.json()
     if (!id || !booqId || !start_path || !end_path || !color) {
         return Response.json({ error: 'Missing required fields' }, { status: 400 })
     }
@@ -53,6 +53,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<P
         },
         color: color,
         content: content ?? undefined,
+        targetQuote: target_quote,
         privacy: privacy ?? 'private',
     })
     const result: PostResponse = {
