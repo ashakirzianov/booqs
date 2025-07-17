@@ -2,6 +2,7 @@
 import {
     initiatePasskeyRegistration, verifyPasskeyRegistration,
     initiatePasskeyLogin, verifyPasskeyLogin,
+    getUserPasskeys, deletePasskeyCredential,
 } from '@/backend/passkey'
 import { generateToken, userIdFromToken } from '@/backend/token'
 import { deleteUserForId, userForId, updateUser, accountDataFromDbUser } from '@/backend/users'
@@ -13,8 +14,17 @@ import { cookies, headers } from 'next/headers'
 export async function initPasskeyRegistrationAcion() {
     try {
         const origin = await getOrigin()
+        const userId = await getUserIdInsideRequest()
+        const user = userId ? await userForId(userId) : undefined
+        if (!user) {
+            return {
+                success: false,
+                error: 'User not found',
+            } as const
+        }
         const { id, options } = await initiatePasskeyRegistration({
             origin: origin ?? undefined,
+            user,
         })
         if (id && options) {
             return {
@@ -33,16 +43,20 @@ export async function initPasskeyRegistrationAcion() {
     }
 }
 
-export async function verifyPasskeyRegistrationAction({ id, response }: {
+export async function verifyPasskeyRegistrationAction({ id, response, label }: {
     id: string,
     response: RegistrationResponseJSON, // The credential JSON received from the client
+    label?: string,
 }) {
     try {
         const origin = await getOrigin()
+        const ipAddress = await getClientIpAddress()
         const result = await verifyPasskeyRegistration({
             id,
             response,
             origin: origin ?? undefined,
+            label,
+            ipAddress,
         })
         if (result.user?.id) {
             const token = generateToken(result.user.id)
@@ -91,10 +105,12 @@ export async function verifyPasskeySigninAction({ id, response }: {
 }) {
     try {
         const origin = await getOrigin()
+        const ipAddress = await getClientIpAddress()
         const result = await verifyPasskeyLogin({
             id,
             response,
             origin: origin ?? undefined,
+            ipAddress,
         })
         if (result.user?.id) {
             const token = generateToken(result.user.id)
@@ -292,6 +308,35 @@ async function getAuthToken() {
     const cookieStore = await cookies()
     const token = cookieStore.get('token')
     return token?.value
+}
+
+async function getClientIpAddress(): Promise<string | undefined> {
+    const hs = await headers()
+    return hs.get('x-forwarded-for') || hs.get('x-real-ip') || undefined
+}
+
+export async function fetchPasskeyData(): Promise<PasskeyData[]> {
+    const userId = await getUserIdInsideRequest()
+    if (!userId) {
+        return []
+    }
+    return await getUserPasskeys(userId)
+}
+
+export async function deletePasskeyAction(credentialId: string): Promise<boolean> {
+    const userId = await getUserIdInsideRequest()
+    if (!userId) {
+        return false
+    }
+    return await deletePasskeyCredential(userId, credentialId)
+}
+
+export type PasskeyData = {
+    id: string
+    label: string | null
+    ipAddress: string | null
+    createdAt: string
+    updatedAt: string
 }
 
 async function setAuthToken(token: string | undefined) {

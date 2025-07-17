@@ -8,6 +8,7 @@ import { Popover } from '@/components/Popover'
 import { accountHref, myBooqsHref } from '@/core/href'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/application/auth'
+import { usePasskeys } from '@/application/passkeys'
 import {
     BookIcon, NewItemIcon, PasskeyIcon, SettingsIcon, SignInIcon, SignOutIcon, Spinner,
 } from '@/components/Icons'
@@ -17,7 +18,7 @@ export function SignInModal({ isOpen, closeModal }: {
     isOpen: boolean,
     closeModal: () => void,
 }) {
-    const { registerWithPasskey, signInWithPasskey } = useAuth()
+    const { registerPasskey, signInWithPasskey } = usePasskeys()
     // TODO: do we need this?
     const router = useRouter()
     return <Modal
@@ -30,20 +31,28 @@ export function SignInModal({ isOpen, closeModal }: {
             <ModalButton
                 text='Register with Passkey'
                 icon={<NewItemIcon />}
-                onClick={() => {
-                    registerWithPasskey()
-                    closeModal()
-                    router.refresh()
+                onClick={async () => {
+                    try {
+                        await registerPasskey()
+                        closeModal()
+                        router.refresh()
+                    } catch (error) {
+                        console.error('Failed to register passkey:', error)
+                    }
                 }}
             />
             <ModalDivider />
             <ModalButton
                 text='Sign in with Passkey'
                 icon={<PasskeyIcon />}
-                onClick={() => {
-                    signInWithPasskey()
-                    closeModal()
-                    router.refresh()
+                onClick={async () => {
+                    try {
+                        await signInWithPasskey()
+                        closeModal()
+                        router.refresh()
+                    } catch (error) {
+                        console.error('Failed to sign in with passkey:', error)
+                    }
                 }}
             />
             <ModalDivider />

@@ -1,4 +1,4 @@
-import { userForId, createUser } from './users'
+import { userForId, DbUser } from './users'
 import {
     generateRegistrationOptions, verifyRegistrationResponse,
     generateAuthenticationOptions, verifyAuthenticationResponse,
@@ -9,9 +9,10 @@ import { nanoid } from 'nanoid'
 import { redis, sql } from './db'
 
 export async function initiatePasskeyRegistration({
-    origin,
+    origin, user,
 }: {
     origin?: string,
+    user: DbUser,
 }) {
     try {
         const { rpID, rpName } = getRPData(origin)
@@ -19,7 +20,8 @@ export async function initiatePasskeyRegistration({
         const options = await generateRegistrationOptions({
             rpName,
             rpID,
-            userName: 'booqs-passkey',
+            userName: user.email,
+            userDisplayName: user.name,
             timeout: 60000,
             attestationType: 'none',
             authenticatorSelection: {
@@ -31,6 +33,7 @@ export async function initiatePasskeyRegistration({
         const challengeRecord = await createChallenge({
             challenge: options.challenge,
             kind: 'registration',
+            userId: user.id,
         })
         return {
             success: true,
@@ -47,11 +50,13 @@ export async function initiatePasskeyRegistration({
 }
 
 export async function verifyPasskeyRegistration({
-    id, response, origin,
+    id, response, origin, label, ipAddress,
 }: {
     id: string,
     response: RegistrationResponseJSON, // The credential JSON received from the client
     origin?: string,
+    label?: string,
+    ipAddress?: string,
 }) {
     try {
         // Retrieve the original challenge we generated for this user
@@ -62,6 +67,19 @@ export async function verifyPasskeyRegistration({
                 success: false as const,
             }
         }
+        if (!expectedChallenge.userId) {
+            return {
+                error: 'Registration challenge does not have an associated user',
+                success: false as const,
+            }
+        }
+        const user = await userForId(expectedChallenge.userId)
+        if (!user) {
+            return {
+                error: 'User not found for user id from the registration challenge',
+                success: false as const,
+            }
+        }
 
         const { rpID, expectedOrigin } = getRPData(origin)
 
@@ -69,7 +87,7 @@ export async function verifyPasskeyRegistration({
         // Verify the registration response
         const verification = await verifyRegistrationResponse({
             response,
-            expectedChallenge: `${expectedChallenge}`,
+            expectedChallenge: `${expectedChallenge.challenge}`,
             expectedOrigin,
             expectedRPID: rpID,
             requireUserVerification: true,
@@ -82,30 +100,12 @@ export async function verifyPasskeyRegistration({
                 success: false as const,
             }
         }
-        // Generate temporary email, username, and name for passkey-only registration
-        const tempId = nanoid(10)
-        const tempEmail = `${tempId}@passkey.booqs.temp`
-        const tempUsername = `passkey.${tempId}`
-        const tempName = `Passkey User ${tempId}`
-        
-        const userResult = await createUser({
-            email: tempEmail,
-            username: tempUsername,
-            name: tempName,
-        })
-        
-        if (!userResult.success) {
-            return {
-                error: `Failed to create user: ${userResult.reason}`,
-                success: false as const,
-            }
-        }
-        
-        const user = userResult.user
 
         await saveUserCredential({
             userId: user.id,
             credential: registrationInfo.credential,
+            label,
+            ipAddress,
         })
 
         return {
@@ -158,11 +158,12 @@ export async function initiatePasskeyLogin({
 }
 
 export async function verifyPasskeyLogin({
-    id, response, origin,
+    id, response, origin, ipAddress,
 }: {
     id: string,
     response: AuthenticationResponseJSON, // The credential assertion JSON received from the client
     origin?: string,
+    ipAddress?: string,
 }) {
     try {
         const credentialId = response.id
@@ -227,6 +228,7 @@ export async function verifyPasskeyLogin({
                     ...credential,
                     counter: newCounter,
                 },
+                ipAddress,
             })
         }
 
@@ -250,11 +252,15 @@ type Challenge = {
     kind: ChallengeKind,
     challenge: string,
     expiration: string,
+    userId?: string,
 }
 async function getChallengeForId({ id, kind }: {
     id: string,
     kind: ChallengeKind,
-}) {
+}): Promise<{
+    challenge: string,
+    userId?: string,
+} | undefined> {
     const challenge = await redis.hgetall<Challenge>(`passkey:challenge:${id}`)
     if (!challenge) {
         return undefined
@@ -266,10 +272,14 @@ async function getChallengeForId({ id, kind }: {
         console.warn('Challenge kind mismatch', challenge)
         return undefined
     }
-    return challenge.challenge
+    return {
+        challenge: challenge.challenge,
+        userId: challenge.userId,
+    }
 }
 
-async function createChallenge({ challenge, kind }: {
+async function createChallenge({ userId, challenge, kind }: {
+    userId?: string,
     challenge: string,
     kind: ChallengeKind,
 }) {
@@ -280,6 +290,7 @@ async function createChallenge({ challenge, kind }: {
         kind,
         challenge,
         expiration: `${expiration}`,
+        userId,
     }
     await redis.hmset(`passkey:challenge:${id}`, doc)
     await redis.expire(`passkey:challenge:${id}`, expireInSeconds)
@@ -293,6 +304,8 @@ type CredentialsDocument = {
     public_key: string,
     counter: number,
     transports: string[] | null,
+    label: string | null,
+    ip_address: string | null,
 }
 async function getCredentialRecordByCredentialId(credentialId: string): Promise<CredentialsDocument | null> {
     const res = await sql`SELECT * FROM passkey_credentials WHERE id = ${credentialId}`
@@ -302,24 +315,55 @@ async function getCredentialRecordByCredentialId(credentialId: string): Promise<
 async function saveUserCredential({
     userId,
     credential,
+    label,
+    ipAddress,
 }: {
     userId: string,
     credential: WebAuthnCredential,
+    label?: string,
+    ipAddress?: string,
 }) {
     const { id, publicKey, counter, transports } = credential
     const serializedPublicKey = encodeUInt8ArrayToBase64URL(publicKey)
-    return sql`INSERT INTO passkey_credentials (id, user_id, public_key, counter, transports)
-       VALUES (${id}, ${userId}, ${serializedPublicKey}, ${counter}, ${transports ?? null})
+    return sql`INSERT INTO passkey_credentials (id, user_id, public_key, counter, transports, label, ip_address)
+       VALUES (${id}, ${userId}, ${serializedPublicKey}, ${counter}, ${transports ?? null}, ${label ?? null}, ${ipAddress ?? null})
        ON CONFLICT (id)
        DO UPDATE SET
          public_key = EXCLUDED.public_key,
          counter = EXCLUDED.counter,
          transports = EXCLUDED.transports,
+         label = COALESCE(EXCLUDED.label, passkey_credentials.label),
+         ip_address = EXCLUDED.ip_address,
          updated_at = now()`
 }
 
 export async function deleteUserCredentials(userId: string) {
     return await sql`DELETE FROM passkey_credentials WHERE user_id = ${userId}`
+}
+
+export async function getUserPasskeys(userId: string) {
+    const results = await sql`
+        SELECT id, label, ip_address, created_at, updated_at 
+        FROM passkey_credentials 
+        WHERE user_id = ${userId}
+        ORDER BY created_at DESC
+    `
+    return results.map(row => ({
+        id: row.id,
+        label: row.label,
+        ipAddress: row.ip_address,
+        createdAt: row.created_at,
+        updatedAt: row.updated_at,
+    }))
+}
+
+export async function deletePasskeyCredential(userId: string, credentialId: string) {
+    const result = await sql`
+        DELETE FROM passkey_credentials 
+        WHERE user_id = ${userId} AND id = ${credentialId}
+        RETURNING id
+    `
+    return result.length > 0
 }
 
 function getRPData(origin: string | undefined) {

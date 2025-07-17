@@ -125,6 +125,8 @@ CREATE TABLE IF NOT EXISTS passkey_credentials (
   public_key TEXT NOT NULL,
   counter INTEGER NOT NULL DEFAULT 0,
   transports TEXT[],
+  label TEXT,
+  ip_address TEXT,
   created_at TIMESTAMPTZ DEFAULT now(),
   updated_at TIMESTAMPTZ DEFAULT now()
 );

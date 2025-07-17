@@ -1,11 +1,5 @@
 'use client'
 import {
-    browserSupportsWebAuthn,
-    startRegistration, startAuthentication,
-} from '@simplewebauthn/browser'
-import {
-    initPasskeyRegistrationAcion, verifyPasskeyRegistrationAction,
-    initPasskeySigninAction, verifyPasskeySigninAction,
     signOutAction,
     deleteAccountAction,
     updateAccountAction,
@@ -91,36 +85,6 @@ export function useAuth() {
 
     return {
         user,
-        registerWithPasskey() {
-            mutate(async function () {
-                const result = await registerWithPasskey()
-                if (result.success) {
-                    return {
-                        user: result.user,
-                    } satisfies GetResponse
-                } else {
-                    throw new Error(result.error)
-                }
-            }, {
-                populateCache: true,
-                rollbackOnError: true,
-            })
-        },
-        signInWithPasskey() {
-            mutate(async function () {
-                const result = await signInWithPasskey()
-                if (result.success) {
-                    return {
-                        user: result.user,
-                    } satisfies GetResponse
-                } else {
-                    throw new Error(result.error)
-                }
-            }, {
-                populateCache: true,
-                rollbackOnError: true,
-            })
-        },
         updateAccount,
         deleteAccount,
         signOut,
@@ -129,82 +93,3 @@ export function useAuth() {
     }
 }
 
-export async function registerWithPasskey() {
-    try {
-        if (!browserSupportsWebAuthn()) {
-            return {
-                success: false as const,
-                error: 'Your browser does not support WebAuthn',
-            }
-        }
-        const initResult = await initPasskeyRegistrationAcion()
-        if (!initResult.success) {
-            return {
-                success: false as const,
-                error: 'Failed to init passkey registration'
-            }
-        }
-        const response = await startRegistration({
-            optionsJSON: initResult.options,
-        })
-        const verificationResult = await verifyPasskeyRegistrationAction({
-            id: initResult.id,
-            response,
-        })
-        if (!verificationResult.success) {
-            return {
-                success: false as const,
-                error: 'Failed to verify passkey registration'
-            }
-        }
-        return {
-            success: true as const,
-            user: verificationResult.user,
-        }
-    } catch (err: any) {
-        return {
-            success: false as const,
-            error: err.toString(),
-        }
-    }
-}
-
-export async function signInWithPasskey() {
-    try {
-        if (!browserSupportsWebAuthn()) {
-            return {
-                success: false as const,
-                error: 'Your browser does not support WebAuthn',
-            }
-        }
-        const initResult = await initPasskeySigninAction()
-        if (!initResult.success) {
-            return {
-                success: false as const,
-                error: 'Failed to init passkey registration'
-            }
-        }
-        const response = await startAuthentication({
-            optionsJSON: initResult.options,
-        })
-        const verificationResult = await verifyPasskeySigninAction({
-            id: initResult.id,
-            response,
-        })
-        if (!verificationResult.success) {
-            return {
-                success: false as const,
-                error: 'Failed to verify passkey registration'
-            }
-        }
-        return {
-            success: true as const,
-            user: verificationResult.user,
-        }
-    } catch (err: any) {
-        return {
-            success: false as const,
-            error: err.toString(),
-        }
-    }
-}
