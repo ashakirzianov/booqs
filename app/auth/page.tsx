@@ -1,4 +1,3 @@
-import { Logo } from '@/components/Logo'
 import { AuthForm } from './AuthForm'
 
 export default async function Page({ searchParams }: {
@@ -9,9 +8,6 @@ export default async function Page({ searchParams }: {
     let { return_to } = await searchParams
     return_to = return_to ?? '/'
     return (
-        <main className='flex flex-col items-center justify-center min-h-screen gap-8 p-16'>
-            <Logo size="large" />
-            <AuthForm returnTo={return_to} />
-        </main>
+        <AuthForm returnTo={return_to} />
     )
 }

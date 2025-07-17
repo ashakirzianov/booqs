@@ -1,6 +1,6 @@
 import { Logo } from '@/components/Logo'
 
-export default function SignUpLayout({ children }: {
+export default function AuthLayout({ children }: {
     children: React.ReactNode;
 }) {
     return (
