@@ -50,11 +50,13 @@ export async function initiatePasskeyRegistration({
 }
 
 export async function verifyPasskeyRegistration({
-    id, response, origin,
+    id, response, origin, label, ipAddress,
 }: {
     id: string,
     response: RegistrationResponseJSON, // The credential JSON received from the client
     origin?: string,
+    label?: string,
+    ipAddress?: string,
 }) {
     try {
         // Retrieve the original challenge we generated for this user
@@ -102,6 +104,8 @@ export async function verifyPasskeyRegistration({
         await saveUserCredential({
             userId: user.id,
             credential: registrationInfo.credential,
+            label,
+            ipAddress,
         })
 
         return {
@@ -154,11 +158,12 @@ export async function initiatePasskeyLogin({
 }
 
 export async function verifyPasskeyLogin({
-    id, response, origin,
+    id, response, origin, ipAddress,
 }: {
     id: string,
     response: AuthenticationResponseJSON, // The credential assertion JSON received from the client
     origin?: string,
+    ipAddress?: string,
 }) {
     try {
         const credentialId = response.id
@@ -223,6 +228,7 @@ export async function verifyPasskeyLogin({
                     ...credential,
                     counter: newCounter,
                 },
+                ipAddress,
             })
         }
 
@@ -298,6 +304,8 @@ type CredentialsDocument = {
     public_key: string,
     counter: number,
     transports: string[] | null,
+    label: string | null,
+    ip_address: string | null,
 }
 async function getCredentialRecordByCredentialId(credentialId: string): Promise<CredentialsDocument | null> {
     const res = await sql`SELECT * FROM passkey_credentials WHERE id = ${credentialId}`
@@ -307,19 +315,25 @@ async function getCredentialRecordByCredentialId(credentialId: string): Promise<
 async function saveUserCredential({
     userId,
     credential,
+    label,
+    ipAddress,
 }: {
     userId: string,
     credential: WebAuthnCredential,
+    label?: string,
+    ipAddress?: string,
 }) {
     const { id, publicKey, counter, transports } = credential
     const serializedPublicKey = encodeUInt8ArrayToBase64URL(publicKey)
-    return sql`INSERT INTO passkey_credentials (id, user_id, public_key, counter, transports)
-       VALUES (${id}, ${userId}, ${serializedPublicKey}, ${counter}, ${transports ?? null})
+    return sql`INSERT INTO passkey_credentials (id, user_id, public_key, counter, transports, label, ip_address)
+       VALUES (${id}, ${userId}, ${serializedPublicKey}, ${counter}, ${transports ?? null}, ${label ?? null}, ${ipAddress ?? null})
        ON CONFLICT (id)
        DO UPDATE SET
          public_key = EXCLUDED.public_key,
          counter = EXCLUDED.counter,
          transports = EXCLUDED.transports,
+         label = COALESCE(EXCLUDED.label, passkey_credentials.label),
+         ip_address = EXCLUDED.ip_address,
          updated_at = now()`
 }
 
