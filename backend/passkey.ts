@@ -341,6 +341,31 @@ export async function deleteUserCredentials(userId: string) {
     return await sql`DELETE FROM passkey_credentials WHERE user_id = ${userId}`
 }
 
+export async function getUserPasskeys(userId: string) {
+    const results = await sql`
+        SELECT id, label, ip_address, created_at, updated_at 
+        FROM passkey_credentials 
+        WHERE user_id = ${userId}
+        ORDER BY created_at DESC
+    `
+    return results.map(row => ({
+        id: row.id,
+        label: row.label,
+        ipAddress: row.ip_address,
+        createdAt: row.created_at,
+        updatedAt: row.updated_at,
+    }))
+}
+
+export async function deletePasskeyCredential(userId: string, credentialId: string) {
+    const result = await sql`
+        DELETE FROM passkey_credentials 
+        WHERE user_id = ${userId} AND id = ${credentialId}
+        RETURNING id
+    `
+    return result.length > 0
+}
+
 function getRPData(origin: string | undefined) {
     const { localhost, secureLocalhost, production } = config().origins
     const domain = config().domain

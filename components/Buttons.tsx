@@ -41,14 +41,16 @@ export function BorderButton({ text, onClick, color = 'primary', disabled = fals
     </button>
 }
 
-export function LightButton({ children, onClick, className = '' }: {
+export function LightButton({ children, onClick, className = '', disabled = false }: {
     children: React.ReactNode,
     onClick?: () => void,
     className?: string,
+    disabled?: boolean,
 }) {
     return <button
         onClick={onClick}
-        className={`flex items-center gap-2 px-3 py-2 text-action hover:text-highlight transition-colors ${className}`}
+        disabled={disabled}
+        className={`flex items-center gap-2 px-3 py-2 text-action hover:text-highlight transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
     >
         {children}
     </button>

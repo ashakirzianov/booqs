@@ -1,7 +1,7 @@
 'use client'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { signInWithPasskey } from '@/application/auth'
+import { usePasskeys } from '@/application/passkeys'
 import { PasskeyIcon, Spinner } from '@/components/Icons'
 import { initiateSignAction } from '@/data/auth'
 
@@ -9,6 +9,7 @@ export function AuthForm({ returnTo }: {
     returnTo: string,
 }) {
     const router = useRouter()
+    const { signInWithPasskey } = usePasskeys()
     const [email, setEmail] = useState('')
     const [emailState, setEmailState] = useState<{
         state: 'idle'
@@ -64,15 +65,15 @@ export function AuthForm({ returnTo }: {
         setPasskeyState({ state: 'loading' })
 
         try {
-            const result = await signInWithPasskey()
-            if (result.success) {
+            const user = await signInWithPasskey()
+            if (user) {
                 router.push(returnTo)
             } else {
-                setPasskeyState({ state: 'error', error: result.error })
+                setPasskeyState({ state: 'error', error: 'Passkey sign-in failed' })
             }
         } catch (err) {
             console.error('Passkey sign-in error:', err)
-            setPasskeyState({ state: 'error', error: 'Passkey sign-in failed' })
+            setPasskeyState({ state: 'error', error: err instanceof Error ? err.message : 'Passkey sign-in failed' })
         }
     }
 

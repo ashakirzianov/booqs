@@ -2,6 +2,7 @@
 import {
     initiatePasskeyRegistration, verifyPasskeyRegistration,
     initiatePasskeyLogin, verifyPasskeyLogin,
+    getUserPasskeys, deletePasskeyCredential,
 } from '@/backend/passkey'
 import { generateToken, userIdFromToken } from '@/backend/token'
 import { deleteUserForId, userForId, updateUser, accountDataFromDbUser } from '@/backend/users'
@@ -312,6 +313,30 @@ async function getAuthToken() {
 async function getClientIpAddress(): Promise<string | undefined> {
     const hs = await headers()
     return hs.get('x-forwarded-for') || hs.get('x-real-ip') || undefined
+}
+
+export async function fetchPasskeyData(): Promise<PasskeyData[]> {
+    const userId = await getUserIdInsideRequest()
+    if (!userId) {
+        return []
+    }
+    return await getUserPasskeys(userId)
+}
+
+export async function deletePasskeyAction(credentialId: string): Promise<boolean> {
+    const userId = await getUserIdInsideRequest()
+    if (!userId) {
+        return false
+    }
+    return await deletePasskeyCredential(userId, credentialId)
+}
+
+export type PasskeyData = {
+    id: string
+    label: string | null
+    ipAddress: string | null
+    createdAt: string
+    updatedAt: string
 }
 
 async function setAuthToken(token: string | undefined) {
