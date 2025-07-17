@@ -10,9 +10,7 @@ export default async function Page({ searchParams }: {
     return_to = return_to ?? '/'
     return (
         <main className='flex flex-col items-center justify-center min-h-screen gap-8 p-16'>
-            <Logo style={{
-                fontSize: 'xxx-large',
-            }} />
+            <Logo size="large" />
             <AuthForm returnTo={return_to} />
         </main>
     )

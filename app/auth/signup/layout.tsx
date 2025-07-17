@@ -5,7 +5,7 @@ export default function SignUpLayout({ children }: {
 }) {
     return (
         <main className='flex flex-col items-center justify-center min-h-screen gap-8 p-16'>
-            <Logo style={{ fontSize: 'xxx-large' }} />
+            <Logo size="large" />
             {children}
         </main>
     )

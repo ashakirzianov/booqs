@@ -1,16 +1,26 @@
-export function Logo({ style }: {
+import Image from 'next/image'
+
+export function Logo({ size = 'small', style }: {
+    size?: 'small' | 'large',
     style?: React.CSSProperties,
 }) {
-    return <div className='font-normal' style={{
-        color: 'rgba(253,163,2,1)',
-        fontFamily: 'var(--font-main)',
-        fontSize: 'x-large',
-        background: '-webkit-linear-gradient(180deg, rgba(253,163,2,1) 50%, rgb(200, 145, 2) 100%)',
-        WebkitBackgroundClip: 'text',
-        WebkitTextFillColor: 'transparent',
-        userSelect: 'none',
-        ...style,
-    }}>
-        BOOQS
-    </div>
+    const sizeConfig = {
+        small: { height: '2rem', width: 32, height_px: 32 },
+        large: { height: '4rem', width: 64, height_px: 64 }
+    }
+    
+    const config = sizeConfig[size]
+    
+    return <Image 
+        src="/icon.png" 
+        alt="BOOQS" 
+        width={config.width}
+        height={config.height_px}
+        style={{
+            height: config.height,
+            width: 'auto',
+            userSelect: 'none',
+            ...style,
+        }}
+    />
 }

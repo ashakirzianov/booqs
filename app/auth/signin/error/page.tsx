@@ -10,9 +10,7 @@ export default async function SignInErrorPage({ searchParams }: {
     const { error, return_to } = await searchParams
     return (
         <main className='flex flex-col items-center justify-center h-screen gap-8 p-16'>
-            <Logo style={{
-                fontSize: 'xxx-large',
-            }} />
+            <Logo size="large" />
 
             <div className='flex flex-col items-center gap-4 max-w-md text-center'>
                 <h1 className='text-2xl font-bold text-alert'>Sign-in Failed</h1>
