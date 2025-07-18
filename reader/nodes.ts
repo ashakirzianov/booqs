@@ -1,5 +1,5 @@
 import groupBy from 'lodash-es/groupBy'
-import { AccountDisplayData, BooqNote, pathInRange, TableOfContentsItem } from '@/core'
+import { AuthorData, BooqNote, pathInRange, TableOfContentsItem } from '@/core'
 
 export type NavigationSelection = Record<string, boolean>
 export type TocNode = {
@@ -24,7 +24,7 @@ export function buildNavigationNodes({
     toc: TableOfContentsItem[],
     notes: BooqNote[],
     selection: NavigationSelection,
-    user?: AccountDisplayData,
+    user?: AuthorData,
 }) {
     const authors = notesAuthors(notes)
 
@@ -53,7 +53,7 @@ export function filterNotes({
 }: {
     notes: BooqNote[],
     selection: NavigationSelection,
-    user: AccountDisplayData | undefined,
+    user: AuthorData | undefined,
 }) {
     const showNotes = selection.notes
     const showAuthors = Object.entries(selection)
@@ -119,7 +119,7 @@ function buildNodes({ toc, filter, notes, title }: {
     return nodes
 }
 
-function notesAuthors(notes: BooqNote[]): AccountDisplayData[] {
+function notesAuthors(notes: BooqNote[]): AuthorData[] {
     const grouped = groupBy(notes, n => n.author.id)
     return Object.entries(grouped).map(
         ([_, [{ author }]]) => author

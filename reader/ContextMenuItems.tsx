@@ -1,7 +1,7 @@
 'use client'
 import { useRouter } from 'next/navigation'
 import * as clipboard from 'clipboard-polyfill'
-import { AccountDisplayData, BooqId, BooqNote, BooqRange } from '@/core'
+import { AuthorData, BooqId, BooqNote, BooqRange } from '@/core'
 import { MenuItem } from '@/components/Menu'
 import { quoteHref } from '@/core/href'
 import { BooqSelection } from '@/viewer'
@@ -76,7 +76,7 @@ export function AddHighlightItem({
 }: {
     selection: BooqSelection,
     booqId: BooqId,
-    user: AccountDisplayData | undefined,
+    user: AuthorData | undefined,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
     const { addNote } = useBooqNotes({ booqId, user })
@@ -129,7 +129,7 @@ export function AddCommentItem({
     target, user, setTarget,
 }: {
     target: SelectionTarget | QuoteTarget | NoteTarget,
-    user: AccountDisplayData | undefined,
+    user: AuthorData | undefined,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
     if (!user?.id) {
@@ -152,7 +152,7 @@ export function RemoveNoteItem({
 }: {
     note: BooqNote,
     booqId: BooqId,
-    user: AccountDisplayData | undefined,
+    user: AuthorData | undefined,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
     const { removeNote } = useBooqNotes({ booqId, user })
@@ -171,7 +171,7 @@ export function SelectNoteColorItem({
 }: {
     note: BooqNote,
     booqId: BooqId,
-    user: AccountDisplayData | undefined,
+    user: AuthorData | undefined,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
     const { updateNote } = useBooqNotes({ booqId, user })

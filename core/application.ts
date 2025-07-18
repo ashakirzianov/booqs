@@ -10,14 +10,14 @@ export type AccountData = {
     profilePictureURL?: string,
     emoji: string,
 }
-export type AccountDisplayData = Pick<AccountData, 'id' | 'name' | 'profilePictureURL' | 'emoji'>
+export type AuthorData = Pick<AccountData, 'id' | 'name' | 'profilePictureURL' | 'emoji'>
 export type NoteColor = string // TODO: rename?
 export type NotePrivacy = 'private' | 'public'
 
 export type BooqNote = {
     id: string,
     booqId: BooqId,
-    author: AccountDisplayData,
+    author: AuthorData,
     range: BooqRange,
     color: string,
     content?: string,

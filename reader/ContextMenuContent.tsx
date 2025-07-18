@@ -1,6 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react'
-import { AccountDisplayData, BooqId, BooqNote, BooqMetadata } from '@/core'
+import { AuthorData, BooqId, BooqNote, BooqMetadata } from '@/core'
 import { BooqSelection } from '@/viewer'
 import { CopilotContext, useCopilotAnswer, useCopilotSuggestions } from '@/application/copilot'
 import { getExtraMetadataValues } from '@/core/meta'
@@ -57,7 +57,7 @@ export function ContextMenuContent({
     booqId: BooqId,
     // TODO: remove this prop, put it into CopilotTarget
     booqMeta?: BooqMetadata,
-    user: AccountDisplayData | undefined,
+    user: AuthorData | undefined,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
     switch (target.kind) {
@@ -81,7 +81,7 @@ function SelectionTargetMenu({
 }: {
     target: SelectionTarget,
     booqId: BooqId,
-    user: AccountDisplayData | undefined,
+    user: AuthorData | undefined,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
     const { selection } = target
@@ -100,7 +100,7 @@ function QuoteTargetMenu({
 }: {
     target: QuoteTarget,
     booqId: BooqId,
-    user: AccountDisplayData | undefined,
+    user: AuthorData | undefined,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
     const { selection } = target
@@ -117,7 +117,7 @@ function NoteTargetMenu({
 }: {
     target: NoteTarget,
     booqId: BooqId,
-    user: AccountDisplayData | undefined,
+    user: AuthorData | undefined,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
     const { note } = target
@@ -152,7 +152,7 @@ function CommentTargetMenu({
 }: {
     target: CommentTarget,
     booqId: BooqId,
-    user: AccountDisplayData | undefined,
+    user: AuthorData | undefined,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
     const [comment, setComment] = useState('')
@@ -288,7 +288,7 @@ function CopilotTargetMenu({
     target: CopilotTarget,
     booqId: BooqId,
     booqMeta: BooqMetadata,
-    user: AccountDisplayData | undefined,
+    user: AuthorData | undefined,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
     const { selection, context } = target
