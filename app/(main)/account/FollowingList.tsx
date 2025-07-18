@@ -1,6 +1,8 @@
 'use client'
 import { useState } from 'react'
+import Link from 'next/link'
 import { AccountPublicData } from '@/core'
+import { userHref } from '@/core/href'
 import { followAction, unfollowAction } from '@/data/user'
 import { ProfileBadge } from '@/components/ProfilePicture'
 
@@ -163,15 +165,22 @@ export function FollowingList({ initialFollowing }: {
                     return (
                         <div key={user.id} className="flex items-center justify-between p-3 border border-dimmed rounded-lg">
                             <div className="flex items-center gap-3">
-                                <ProfileBadge 
-                                    name={user.name}
-                                    picture={user.profilePictureURL}
-                                    emoji={user.emoji ?? '👤'}
-                                    size={2.5}
-                                    border={true}
-                                />
+                                <Link href={userHref({ username: user.username })}>
+                                    <ProfileBadge 
+                                        name={user.name}
+                                        picture={user.profilePictureURL}
+                                        emoji={user.emoji ?? '👤'}
+                                        size={2.5}
+                                        border={true}
+                                    />
+                                </Link>
                                 <div>
-                                    <div className="font-medium">{user.name}</div>
+                                    <Link 
+                                        href={userHref({ username: user.username })}
+                                        className="font-medium hover:text-action transition-colors"
+                                    >
+                                        {user.name}
+                                    </Link>
                                     <div className="text-sm text-dimmed">@{user.username}</div>
                                 </div>
                             </div>
