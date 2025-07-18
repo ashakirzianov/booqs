@@ -34,10 +34,10 @@ export default async function Page() {
             <PasskeySection initialPasskeys={passkeys} />
 
             {/* Following Section */}
-            <FollowingList initialFollowing={following} />
+            <FollowingList initialFollowing={following} currentUserId={user.id} />
 
             {/* Followers Section */}
-            <FollowersList initialFollowers={followers} />
+            <FollowersList initialFollowers={followers} currentUserId={user.id} />
 
             {/* Books Section */}
             <div className="space-y-6 flex-1">
