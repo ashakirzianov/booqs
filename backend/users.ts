@@ -1,7 +1,7 @@
 import { deleteAllBooksForUserId } from './uu'
 import { deleteUserCredentials } from './passkey'
 import { sql } from './db'
-import { AccountData, getRandomAvatarEmoji } from '@/core'
+import { getRandomAvatarEmoji } from '@/core'
 import { nanoid } from 'nanoid'
 
 export type DbUser = {
@@ -12,18 +12,6 @@ export type DbUser = {
     profile_picture_url: string | null,
     joined_at: string,
     emoji: string,
-}
-
-export function accountDataFromDbUser(dbUser: DbUser): AccountData {
-    return {
-        id: dbUser.id,
-        username: dbUser.username,
-        email: dbUser.email,
-        joinedAt: dbUser.joined_at,
-        name: dbUser.name,
-        profilePictureURL: dbUser.profile_picture_url ?? undefined,
-        emoji: dbUser.emoji ?? undefined,
-    }
 }
 
 export async function userForId(id: string): Promise<DbUser | null> {
@@ -155,7 +143,7 @@ function getReasonFromError(err: any, defaultReason: string): string {
             return 'Email already exists'
         }
     }
-    
+
     return defaultReason
 }
 

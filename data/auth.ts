@@ -5,7 +5,7 @@ import {
     getUserPasskeys, deletePasskeyCredential,
 } from '@/backend/passkey'
 import { generateToken, userIdFromToken } from '@/backend/token'
-import { deleteUserForId, userForId, updateUser, accountDataFromDbUser } from '@/backend/users'
+import { deleteUserForId, userForId, updateUser, DbUser } from '@/backend/users'
 import { completeSignInRequest, completeSignUp, prevalidateSignup, initiateSignRequest } from '@/backend/sign'
 import { AccountData } from '@/core'
 import { RegistrationResponseJSON, AuthenticationResponseJSON } from '@simplewebauthn/browser'
@@ -338,12 +338,12 @@ export async function deletePasskeyActionWithUpdatedList(credentialId: string): 
     if (!userId) {
         return { success: false }
     }
-    
+
     const deleteResult = await deletePasskeyCredential(userId, credentialId)
     if (!deleteResult) {
         return { success: false }
     }
-    
+
     const updatedPasskeys = await getUserPasskeys(userId)
     return { success: true, passkeys: updatedPasskeys }
 }
@@ -366,5 +366,17 @@ async function setAuthToken(token: string | undefined) {
         })
     } else {
         cookieStore.delete('token')
+    }
+}
+
+function accountDataFromDbUser(dbUser: DbUser): AccountData {
+    return {
+        id: dbUser.id,
+        username: dbUser.username,
+        email: dbUser.email,
+        joinedAt: dbUser.joined_at,
+        name: dbUser.name,
+        profilePictureURL: dbUser.profile_picture_url ?? undefined,
+        emoji: dbUser.emoji ?? undefined,
     }
 }
