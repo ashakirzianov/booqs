@@ -99,7 +99,7 @@ export function FollowButton({ username, currentUserId }: {
                 className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 disabled:cursor-not-allowed transform ${
                     isFollowing
                         ? 'bg-gray-200 text-gray-700 hover:bg-gray-300 hover:scale-[1.02]'
-                        : 'bg-action text-white hover:bg-highlight hover:scale-[1.02]'
+                        : 'bg-action text-white hover:bg-highlight hover:text-background hover:scale-[1.02]'
                 } ${
                     isLoading 
                         ? 'opacity-90 scale-[0.98]' 
