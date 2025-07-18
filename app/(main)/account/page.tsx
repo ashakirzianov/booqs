@@ -2,22 +2,25 @@ import { redirect } from 'next/navigation'
 import { authHref } from '@/core/href'
 import { fetchAuthData, fetchPasskeyData } from '@/data/auth'
 import { booqCollection } from '@/data/booqs'
+import { getFollowingList } from '@/data/user'
 import { READING_LIST_COLLECTION } from '@/application/collections'
 import { BooqCollection } from '@/components/BooqCollection'
 import { DeleteAccountButton } from './DeleteAccountButton'
 import { SignoutButton } from './SignoutButton'
 import { ProfileData } from './ProfileData'
 import { PasskeySection } from './PasskeySection'
+import { FollowingList } from './FollowingList'
 
 export default async function Page() {
     const user = await fetchAuthData()
     if (!user) {
         redirect(authHref({}))
     }
-    const [readingList, uploads, passkeys] = await Promise.all([
+    const [readingList, uploads, passkeys, following] = await Promise.all([
         booqCollection(READING_LIST_COLLECTION, user.id), 
         booqCollection('uploads', user.id),
         fetchPasskeyData(),
+        getFollowingList(user.id),
     ])
 
     return (
@@ -27,6 +30,9 @@ export default async function Page() {
 
             {/* Passkeys Section */}
             <PasskeySection initialPasskeys={passkeys} />
+
+            {/* Following Section */}
+            <FollowingList initialFollowing={following} />
 
             {/* Books Section */}
             <div className="space-y-6 flex-1">
