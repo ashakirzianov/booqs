@@ -46,6 +46,12 @@ export type UpdateUserResult =
     | { success: true, user: DbUser }
     | { success: false, user?: undefined, reason: string }
 
+function validateUsername(username: string): boolean {
+    // Username must contain only latin letters, digits, and hyphens
+    const usernamePattern = /^[a-zA-Z0-9-]+$/
+    return usernamePattern.test(username)
+}
+
 export async function createUser({
     username, email, name, profilePictureUrl, emoji,
 }: {
@@ -56,11 +62,22 @@ export async function createUser({
     emoji?: string,
 }): Promise<CreateUserResult> {
     try {
+        // Validate username format
+        if (!validateUsername(username)) {
+            return {
+                success: false,
+                reason: 'Username must contain only latin letters, digits, and hyphens'
+            }
+        }
+
+        // Lowercase the username
+        const normalizedUsername = username.toLowerCase()
+
         const id = nanoid()
         const userEmoji = emoji ?? getRandomAvatarEmoji()
         const [user] = await sql`
           INSERT INTO users (id, username, email, name, profile_picture_url, emoji)
-          VALUES (${id}, ${username}, ${email}, ${name}, ${profilePictureUrl ?? null}, ${userEmoji})
+          VALUES (${id}, ${normalizedUsername}, ${email}, ${name}, ${profilePictureUrl ?? null}, ${userEmoji})
           RETURNING *
         `
         return { success: true, user: user as DbUser }

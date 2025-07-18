@@ -86,5 +86,5 @@ export function authorHref({ name }: { name: string }) {
 }
 
 export function userHref({ username }: { username: string }) {
-    return `/users/${encodeURIComponent(username)}`
+    return `/users/${username}`
 }
