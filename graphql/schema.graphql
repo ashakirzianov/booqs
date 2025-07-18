@@ -80,6 +80,8 @@ type User {
     name: String
     pictureUrl: String
     emoji: String
+    followersCount: Int!
+    followingCount: Int!
 }
 
 union SearchResult = Booq | Author

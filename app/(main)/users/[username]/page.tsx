@@ -3,6 +3,8 @@ import { userData } from '@/data/user'
 import { ProfileBadge } from '@/components/ProfilePicture'
 import { booqCollection } from '@/data/booqs'
 import { BooqCollection } from '@/components/BooqCollection'
+import { FollowButton } from '@/components/FollowButton'
+import { fetchAuthData } from '@/data/auth'
 
 export default async function UserPage({
     params
@@ -11,7 +13,11 @@ export default async function UserPage({
 }) {
     const { username } = await params
 
-    const user = await userData(username)
+    const [user, currentUser] = await Promise.all([
+        userData(username),
+        fetchAuthData()
+    ])
+    
     if (!user) {
         notFound()
     }
@@ -32,16 +38,27 @@ export default async function UserPage({
                         border={true}
                     />
                     <div className="flex-1">
-                        <h1 className="text-2xl font-bold text-primary">
-                            {user.name}
-                        </h1>
-                        <div className="space-y-1 text-dimmed">
-                            <p className="text-sm">
-                                <span className="font-medium">Username:</span> {user.username}
-                            </p>
-                            <p className="text-sm">
-                                <span className="font-medium">Member since:</span> {formatDate(user.joinedAt)}
-                            </p>
+                        <div className="flex items-start justify-between">
+                            <div>
+                                <h1 className="text-2xl font-bold text-primary">
+                                    {user.name}
+                                </h1>
+                                <div className="space-y-1 text-dimmed">
+                                    <p className="text-sm">
+                                        <span className="font-medium">Username:</span> {user.username}
+                                    </p>
+                                    <p className="text-sm">
+                                        <span className="font-medium">Member since:</span> {formatDate(user.joinedAt)}
+                                    </p>
+                                </div>
+                            </div>
+                            {/* Only show follow button if viewing someone else's profile */}
+                            {currentUser && currentUser.id !== user.id && (
+                                <FollowButton 
+                                    username={user.username} 
+                                    currentUserId={currentUser.id}
+                                />
+                            )}
                         </div>
                     </div>
                 </div>

@@ -131,3 +131,14 @@ CREATE TABLE IF NOT EXISTS passkey_credentials (
   created_at TIMESTAMPTZ DEFAULT now(),
   updated_at TIMESTAMPTZ DEFAULT now()
 );
+
+-- Follows (user following relationships)
+CREATE TABLE IF NOT EXISTS follows (
+  follower_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  following_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  PRIMARY KEY (follower_id, following_id),
+  CONSTRAINT no_self_follow CHECK (follower_id != following_id)
+);
+CREATE INDEX IF NOT EXISTS follows_follower_id_idx ON follows(follower_id);
+CREATE INDEX IF NOT EXISTS follows_following_id_idx ON follows(following_id);
