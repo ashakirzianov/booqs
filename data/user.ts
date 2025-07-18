@@ -1,8 +1,8 @@
 'use server'
-import { BooqId, BooqPath, AccountData } from '@/core'
+import { BooqId, BooqPath, AccountPublicData } from '@/core'
 import { fetchAuthData } from './auth'
 import { addBooqHistory } from '@/backend/history'
-import { userForUsername, accountDataFromDbUser } from '@/backend/users'
+import { userForUsername, DbUser } from '@/backend/users'
 
 export async function reportBooqHistory({
     booqId, path, source,
@@ -24,10 +24,21 @@ export async function reportBooqHistory({
     })
 }
 
-export async function userData(username: string): Promise<AccountData | null> {
+export async function userData(username: string): Promise<AccountPublicData | null> {
     const dbUser = await userForUsername(username)
     if (!dbUser) {
         return null
     }
-    return accountDataFromDbUser(dbUser)
+    return accountPublicDataFromDbUser(dbUser)
+}
+
+function accountPublicDataFromDbUser(dbUser: DbUser): AccountPublicData {
+    return {
+        id: dbUser.id,
+        username: dbUser.username,
+        name: dbUser.name,
+        profilePictureURL: dbUser.profile_picture_url ?? undefined,
+        emoji: dbUser.emoji,
+        joinedAt: dbUser.joined_at,
+    }
 }

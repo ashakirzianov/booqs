@@ -1,14 +1,17 @@
 import { BooqFragment } from './fragment'
 import { BooqId, BooqMetadata, BooqRange, TableOfContents } from './model'
 
-export type AccountData = {
+export type AccountPublicData = {
     id: string,
     username: string,
-    email: string,
     joinedAt: string,
     name: string,
     profilePictureURL?: string,
     emoji: string,
+}
+
+export type AccountData = AccountPublicData & {
+    email: string,
 }
 export type AuthorData = Pick<AccountData, 'id' | 'name' | 'profilePictureURL' | 'emoji'>
 export type NoteColor = string // TODO: rename?
