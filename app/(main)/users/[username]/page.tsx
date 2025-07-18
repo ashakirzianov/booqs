@@ -1,10 +1,10 @@
 import { notFound } from 'next/navigation'
-import { userData } from '@/data/user'
+import { userData, getFollowStatus } from '@/data/user'
 import { ProfileBadge } from '@/components/ProfilePicture'
 import { booqCollection } from '@/data/booqs'
 import { BooqCollection } from '@/components/BooqCollection'
 import { FollowButton } from '@/components/FollowButton'
-import { fetchAuthData } from '@/data/auth'
+import { getUserIdInsideRequest } from '@/data/auth'
 
 export default async function UserPage({
     params
@@ -13,10 +13,20 @@ export default async function UserPage({
 }) {
     const { username } = await params
 
-    const [user, currentUser] = await Promise.all([
+    const [user, currentUserId] = await Promise.all([
         userData(username),
-        fetchAuthData()
+        getUserIdInsideRequest()
     ])
+    
+    // Get follow status if user is authenticated and viewing someone else's profile
+    let initialFollowStatus = false
+    let shouldShowFollowButton = false
+    
+    if (currentUserId && user && currentUserId !== user.id) {
+        shouldShowFollowButton = true
+        const followStatusResult = await getFollowStatus(username)
+        initialFollowStatus = followStatusResult.isFollowing
+    }
     
     if (!user) {
         notFound()
@@ -53,10 +63,10 @@ export default async function UserPage({
                                 </div>
                             </div>
                             {/* Only show follow button if viewing someone else's profile */}
-                            {currentUser && currentUser.id !== user.id && (
+                            {shouldShowFollowButton && (
                                 <FollowButton 
                                     username={user.username} 
-                                    currentUserId={currentUser.id}
+                                    initialFollowStatus={initialFollowStatus}
                                 />
                             )}
                         </div>

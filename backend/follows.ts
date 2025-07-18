@@ -29,6 +29,7 @@ export async function unfollowUser(followerId: string, followingId: string): Pro
     const result = await sql`
       DELETE FROM follows
       WHERE follower_id = ${followerId} AND following_id = ${followingId}
+      RETURNING *
     `
     return result.length > 0
   } catch (err) {
