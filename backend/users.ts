@@ -42,6 +42,14 @@ export async function userForEmail(email: string): Promise<DbUser | null> {
     return user ? (user as DbUser) : null
 }
 
+export async function userForUsername(username: string): Promise<DbUser | null> {
+    const [user] = await sql`
+      SELECT * FROM users
+      WHERE username = ${username}
+    `
+    return user ? (user as DbUser) : null
+}
+
 export type CreateUserResult =
     | { success: true, user: DbUser }
     | { success: false, reason: string }

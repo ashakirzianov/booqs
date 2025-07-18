@@ -1,7 +1,8 @@
 'use server'
-import { BooqId, BooqPath } from '@/core'
+import { BooqId, BooqPath, AccountData } from '@/core'
 import { fetchAuthData } from './auth'
 import { addBooqHistory } from '@/backend/history'
+import { userForUsername, accountDataFromDbUser } from '@/backend/users'
 
 export async function reportBooqHistory({
     booqId, path, source,
@@ -21,4 +22,12 @@ export async function reportBooqHistory({
         booqId, path, source,
         date: Date.now(),
     })
+}
+
+export async function userData(username: string): Promise<AccountData | null> {
+    const dbUser = await userForUsername(username)
+    if (!dbUser) {
+        return null
+    }
+    return accountDataFromDbUser(dbUser)
 }
