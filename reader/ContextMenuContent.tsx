@@ -184,101 +184,36 @@ function CommentTargetMenu({
         setTarget(parent)
     }
 
-    return <div className='comment-panel'>
-        <div className='quoted-text'>
+    return <div className='flex flex-col gap-3 p-4 min-w-[300px] max-w-[400px]'>
+        <div className='italic text-dimmed text-sm leading-relaxed border-l-[3px] border-highlight pl-3 mb-2'>
             &ldquo;{selection.text}&rdquo;
         </div>
         <textarea
-            className='comment-input'
+            className='w-full px-3 py-2 border border-dimmed rounded bg-background text-primary text-sm leading-relaxed resize-y min-h-[80px] focus:outline-none focus:border-action'
+            style={{ fontFamily: 'var(--font-main)' }}
             placeholder='Add a comment...'
             value={comment}
             onChange={(e) => setComment(e.target.value)}
             rows={3}
             autoFocus
         />
-        <div className='button-row'>
+        <div className='flex gap-2 justify-end'>
             <button
-                className='cancel-button'
+                className='px-4 py-2 border-none rounded text-sm cursor-pointer transition-opacity bg-transparent text-dimmed hover:opacity-80'
+                style={{ fontFamily: 'var(--font-main)' }}
                 onClick={handleCancel}
             >
                 Cancel
             </button>
             <button
-                className='post-button'
+                className='px-4 py-2 border-none rounded text-sm cursor-pointer transition-opacity bg-action text-background hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed'
+                style={{ fontFamily: 'var(--font-main)' }}
                 onClick={handlePost}
                 disabled={!comment.trim()}
             >
                 Post
             </button>
         </div>
-        <style jsx>{`
-            .comment-panel {
-                display: flex;
-                flex-direction: column;
-                gap: 12px;
-                padding: 16px;
-                min-width: 300px;
-                max-width: 400px;
-            }
-            .quoted-text {
-                font-style: italic;
-                color: var(--theme-dimmed);
-                font-size: 14px;
-                line-height: 1.4;
-                border-left: 3px solid var(--theme-highlight);
-                padding-left: 12px;
-                margin-bottom: 8px;
-            }
-            .comment-input {
-                width: 100%;
-                padding: 8px 12px;
-                border: 1px solid var(--theme-border);
-                border-radius: 4px;
-                font-family: var(--font-main);
-                font-size: 14px;
-                line-height: 1.4;
-                resize: vertical;
-                min-height: 80px;
-                background: var(--theme-background);
-                color: var(--theme-primary);
-            }
-            .comment-input:focus {
-                outline: none;
-                border-color: var(--theme-action);
-            }
-            .button-row {
-                display: flex;
-                gap: 8px;
-                justify-content: flex-end;
-            }
-            .cancel-button, .post-button {
-                padding: 8px 16px;
-                border: none;
-                border-radius: 4px;
-                font-family: var(--font-main);
-                font-size: 14px;
-                cursor: pointer;
-                transition: opacity 0.2s;
-            }
-            .cancel-button {
-                background: transparent;
-                color: var(--theme-dimmed);
-            }
-            .cancel-button:hover {
-                opacity: 0.8;
-            }
-            .post-button {
-                background: var(--theme-action);
-                color: var(--theme-background);
-            }
-            .post-button:hover:not(:disabled) {
-                opacity: 0.9;
-            }
-            .post-button:disabled {
-                opacity: 0.5;
-                cursor: not-allowed;
-            }
-        `}</style>
     </div>
 }
 
@@ -316,20 +251,20 @@ function CopilotTargetMenu({
         />
     }
 
-    return <div className='copilot-menu'>
-        <div className='quoted-text'>
+    return <div className='flex flex-col gap-3 p-4 min-w-[300px] max-w-[400px]' style={{ fontFamily: 'var(--font-main)' }}>
+        <div className='italic text-dimmed text-sm leading-relaxed border-l-[3px] border-highlight pl-3 mb-2'>
             &ldquo;{selection.text}&rdquo;
         </div>
         {loading ? (
-            <div className='spinner-container'>
+            <div className='flex justify-center p-5'>
                 <Spinner />
             </div>
         ) : (
-            <div className='suggestions-container'>
+            <div className='flex flex-col'>
                 {suggestions.map((suggestion, i) => (
                     <div key={i}>
                         <div
-                            className='suggestion-item'
+                            className='flex cursor-pointer text-dimmed text-base font-bold p-3 transition-all duration-200 hover:underline hover:text-highlight'
                             onClick={() => setQuestion(suggestion)}
                         >
                             {`${i + 1}. ${suggestion}`}
@@ -339,49 +274,6 @@ function CopilotTargetMenu({
                 ))}
             </div>
         )}
-        <style jsx>{`
-            .copilot-menu {
-                display: flex;
-                flex-direction: column;
-                gap: 12px;
-                padding: 16px;
-                min-width: 300px;
-                max-width: 400px;
-                font-family: var(--font-main);
-            }
-            .quoted-text {
-                font-style: italic;
-                color: var(--theme-dimmed);
-                font-size: 14px;
-                line-height: 1.4;
-                border-left: 3px solid var(--theme-highlight);
-                padding-left: 12px;
-                margin-bottom: 8px;
-            }
-            .spinner-container {
-                display: flex;
-                justify-content: center;
-                padding: 20px;
-            }
-            .suggestions-container {
-                display: flex;
-                flex-direction: column;
-            }
-            .suggestion-item {
-                display: flex;
-                cursor: pointer;
-                text-decoration: dotted;
-                color: var(--theme-dimmed);
-                font-size: 16px;
-                font-weight: bold;
-                padding: 12px;
-                transition: all 0.2s;
-            }
-            .suggestion-item:hover {
-                text-decoration: underline;
-                color: var(--theme-highlight);
-            }
-        `}</style>
     </div>
 }
 
@@ -398,77 +290,36 @@ function CopilotQuestion({
 }) {
     const { loading, answer } = useCopilotAnswer(context, question)
 
-    return <div className='copilot-question'>
-        <div className='question-header'>
-            <button className='back-button' onClick={onBack}>← Back</button>
-            <button className='close-button' onClick={onClose}>×</button>
+    return <div className='flex flex-col gap-3 p-4 min-w-[300px] max-w-[400px]' style={{ fontFamily: 'var(--font-main)' }}>
+        <div className='flex justify-between items-center'>
+            <button 
+                className='bg-transparent border-none text-dimmed cursor-pointer text-sm px-2 py-1 transition-colors duration-200 hover:text-primary' 
+                onClick={onBack}
+            >
+                ← Back
+            </button>
+            <button 
+                className='bg-transparent border-none text-dimmed cursor-pointer text-lg font-bold px-2 py-1 transition-colors duration-200 hover:text-primary' 
+                onClick={onClose}
+            >
+                ×
+            </button>
         </div>
-        <div className='question-text'>
+        <div className='text-sm leading-relaxed text-primary'>
             <strong>Q: {question}</strong>
         </div>
         <ModalDivider />
-        <div className='answer-content'>
+        <div className='flex-1'>
             {loading ? (
-                <div className='spinner-container'>
+                <div className='flex justify-center p-5'>
                     <Spinner />
                 </div>
             ) : (
-                <div className='answer-text'>
+                <div className='text-sm leading-relaxed text-primary whitespace-pre-wrap'>
                     {answer}
                 </div>
             )}
         </div>
-        <style jsx>{`
-            .copilot-question {
-                display: flex;
-                flex-direction: column;
-                gap: 12px;
-                padding: 16px;
-                min-width: 300px;
-                max-width: 400px;
-                font-family: var(--font-main);
-            }
-            .question-header {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-            }
-            .back-button, .close-button {
-                background: transparent;
-                border: none;
-                color: var(--theme-dimmed);
-                cursor: pointer;
-                font-size: 14px;
-                padding: 4px 8px;
-                transition: color 0.2s;
-            }
-            .back-button:hover, .close-button:hover {
-                color: var(--theme-primary);
-            }
-            .close-button {
-                font-size: 18px;
-                font-weight: bold;
-            }
-            .question-text {
-                font-size: 14px;
-                line-height: 1.4;
-                color: var(--theme-primary);
-            }
-            .answer-content {
-                flex: 1;
-            }
-            .spinner-container {
-                display: flex;
-                justify-content: center;
-                padding: 20px;
-            }
-            .answer-text {
-                font-size: 14px;
-                line-height: 1.6;
-                color: var(--theme-primary);
-                white-space: pre-wrap;
-            }
-        `}</style>
     </div>
 }
 

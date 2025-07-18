@@ -33,10 +33,10 @@ export function AuthorItem({ name, pictureUrl, emoji }: {
     pictureUrl?: string,
     emoji: string,
 }) {
-    return <div className='container font-bold p-lg'>
+    return <div className='flex flex-1 flex-row items-center text-sm font-bold p-lg select-none' style={{ fontFamily: 'var(--font-main)' }}>
         {
             pictureUrl || emoji
-                ? <div className="picture mr-lg">
+                ? <div className="flex justify-center items-center mr-lg">
                     <ProfileBadge
                         border={false}
                         size={1.5}
@@ -47,27 +47,7 @@ export function AuthorItem({ name, pictureUrl, emoji }: {
                 </div>
                 : null
         }
-        <span className='name'>{name ?? 'Incognito'}</span>
-        <style jsx>{`
-            .container {
-                display: flex;
-                flex: 1;
-                flex-direction: row;
-                align-items: center;
-                font-size: smaller;
-                font-family: var(--font-main);
-                user-select: none;
-            }
-            .picture {
-                display: flex;
-                justify-content: center;
-                align-items: center;
-            }
-            .name {
-                display: flex;
-                flex: 1;
-            }
-            `}</style>
+        <span className='flex flex-1'>{name}</span>
     </div>
 }
 
@@ -83,7 +63,7 @@ export function AddHighlightItem({
     if (!user?.id) {
         return null
     }
-    return <div className='container'>
+    return <div className='flex flex-1 flex-row items-stretch justify-between cursor-pointer text-sm select-none'>
         {
             noteColorNames.map(
                 (color, idx) => <ColorSelectionButton
@@ -110,18 +90,6 @@ export function AddHighlightItem({
                 />,
             )
         }
-        <style jsx>{`
-            .container {
-                display: flex;
-                flex: 1;
-                flex-direction: row;
-                align-items: stretch;
-                justify-content: space-between;
-                cursor: pointer;
-                font-size: small;
-                user-select: none;
-            }
-            `}</style>
     </div>
 }
 
@@ -175,7 +143,7 @@ export function SelectNoteColorItem({
     setTarget: (target: ContextMenuTarget) => void,
 }) {
     const { updateNote } = useBooqNotes({ booqId, user })
-    return <div className='container'>
+    return <div className='flex flex-1 flex-row items-stretch justify-between cursor-pointer text-sm select-none'>
         {
             noteColorNames.map(
                 (color, idx) => <ColorSelectionButton
@@ -196,18 +164,6 @@ export function SelectNoteColorItem({
                 />,
             )
         }
-        <style jsx>{`
-            .container {
-                display: flex;
-                flex: 1;
-                flex-direction: row;
-                align-items: stretch;
-                justify-content: space-between;
-                cursor: pointer;
-                font-size: small;
-                user-select: none;
-            }
-            `}</style>
     </div>
 }
 
