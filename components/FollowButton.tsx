@@ -2,22 +2,25 @@
 import { useState, useEffect } from 'react'
 import { followAction, unfollowAction } from '@/data/user'
 
+type ButtonState = 
+    | { state: 'idle' }
+    | { state: 'loading' }
+    | { state: 'error', error: string }
+
 export function FollowButton({ username, initialFollowStatus }: {
     username: string
     initialFollowStatus: boolean
 }) {
     const [isFollowing, setIsFollowing] = useState(initialFollowStatus ?? false)
-    const [isLoading, setIsLoading] = useState(false)
-    const [error, setError] = useState<string | null>(null)
+    const [buttonState, setButtonState] = useState<ButtonState>({ state: 'idle' })
 
     const handleToggleFollow = async () => {
-        if (isLoading) return
+        if (buttonState.state === 'loading') return
 
         // Optimistic update - immediately change the UI
         const previousState = isFollowing
         setIsFollowing(!isFollowing)
-        setError(null)
-        setIsLoading(true)
+        setButtonState({ state: 'loading' })
 
         try {
             const result = previousState
@@ -27,49 +30,54 @@ export function FollowButton({ username, initialFollowStatus }: {
             if (result.success) {
                 // Update with server response
                 setIsFollowing(!previousState)
+                setButtonState({ state: 'idle' })
             } else {
                 // Rollback on error
                 setIsFollowing(previousState)
-                setError(result.error || 'Failed to update follow status')
+                setButtonState({ 
+                    state: 'error', 
+                    error: result.error || 'Failed to update follow status' 
+                })
                 console.error('Follow operation failed:', result.error)
             }
         } catch (error) {
             // Rollback on network error
             setIsFollowing(previousState)
-            setError('Network error. Please try again.')
+            setButtonState({ 
+                state: 'error', 
+                error: 'Network error. Please try again.' 
+            })
             console.error('Error toggling follow:', error)
-        } finally {
-            setIsLoading(false)
         }
     }
 
     // Clear error after a few seconds
     useEffect(() => {
-        if (error) {
-            const timer = setTimeout(() => setError(null), 3000)
+        if (buttonState.state === 'error') {
+            const timer = setTimeout(() => setButtonState({ state: 'idle' }), 3000)
             return () => clearTimeout(timer)
         }
-    }, [error])
+    }, [buttonState])
 
 
     return (
         <div className="flex flex-col items-end gap-1">
             <button
                 onClick={handleToggleFollow}
-                disabled={isLoading}
+                disabled={buttonState.state === 'loading'}
                 className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 disabled:cursor-not-allowed transform ${isFollowing
                     ? 'bg-gray-200 text-gray-700 hover:bg-gray-300 hover:scale-[1.02]'
                     : 'bg-action text-white hover:bg-highlight hover:text-background hover:scale-[1.02]'
-                    } ${isLoading
+                    } ${buttonState.state === 'loading'
                         ? 'opacity-90 scale-[0.98]'
                         : 'opacity-100 scale-100'
-                    } ${error
+                    } ${buttonState.state === 'error'
                         ? 'ring-2 ring-red-500 ring-opacity-50'
                         : ''
                     }`}
             >
                 <span className="flex items-center gap-1">
-                    {isLoading && (
+                    {buttonState.state === 'loading' && (
                         <div className="w-4 h-4 border-2 border-current border-t-transparent animate-spin rounded-full"></div>
                     )}
                     {isFollowing ? (
@@ -87,9 +95,9 @@ export function FollowButton({ username, initialFollowStatus }: {
             </button>
 
             {/* Error message */}
-            {error && (
+            {buttonState.state === 'error' && (
                 <div className="text-xs text-red-600 bg-red-50 px-2 py-1 rounded border border-red-200 max-w-48 text-right animate-fade-in">
-                    {error}
+                    {buttonState.error}
                 </div>
             )}
         </div>
