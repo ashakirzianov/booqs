@@ -1,9 +1,10 @@
 'use client'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import * as clipboard from 'clipboard-polyfill'
 import { AuthorData, BooqId, BooqNote, BooqRange } from '@/core'
 import { MenuItem } from '@/components/Menu'
-import { quoteHref } from '@/core/href'
+import { quoteHref, userHref } from '@/core/href'
 import { BooqSelection } from '@/viewer'
 import { ProfileBadge } from '@/components/ProfilePicture'
 import { resolveNoteColor, noteColorNames } from '@/application/common'
@@ -28,27 +29,34 @@ export function CopilotItem({ selection, setTarget }: {
     />
 }
 
-export function AuthorItem({ name, pictureUrl, emoji }: {
-    name?: string,
+export function AuthorItem({ name, pictureUrl, emoji, username }: {
+    name: string,
     pictureUrl?: string,
     emoji: string,
+    username: string,
 }) {
-    return <div className='flex flex-1 flex-row items-center text-sm font-bold p-lg select-none' style={{ fontFamily: 'var(--font-main)' }}>
-        {
-            pictureUrl || emoji
-                ? <div className="flex justify-center items-center mr-lg">
-                    <ProfileBadge
-                        border={false}
-                        size={1.5}
-                        name={name}
-                        picture={pictureUrl}
-                        emoji={emoji}
-                    />
-                </div>
-                : null
-        }
-        <span className='flex flex-1'>{name}</span>
-    </div>
+    return (
+        <Link
+            href={userHref({ username })}
+            className='flex flex-1 flex-row items-center text-sm font-bold p-lg select-none hover:bg-gray-50 transition-colors rounded'
+            style={{ fontFamily: 'var(--font-main)' }}
+        >
+            {
+                pictureUrl || emoji
+                    ? <div className="flex justify-center items-center mr-lg">
+                        <ProfileBadge
+                            border={false}
+                            size={1.5}
+                            name={name}
+                            picture={pictureUrl}
+                            emoji={emoji}
+                        />
+                    </div>
+                    : null
+            }
+            <span className='flex flex-1'>{name}</span>
+        </Link>
+    )
 }
 
 export function AddHighlightItem({

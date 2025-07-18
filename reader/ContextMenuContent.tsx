@@ -132,6 +132,7 @@ function NoteTargetMenu({
                 name={note.author.name}
                 pictureUrl={note.author.profilePictureURL ?? undefined}
                 emoji={note.author.emoji}
+                username={note.author.username}
             />
         }
         {!isOwnNote || !user ? null :
