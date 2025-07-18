@@ -82,6 +82,8 @@ type User {
     emoji: String
     followersCount: Int!
     followingCount: Int!
+    followers: [User!]!
+    following: [User!]!
 }
 
 union SearchResult = Booq | Author

@@ -38,6 +38,18 @@ export async function userForUsername(username: string): Promise<DbUser | null> 
     return user ? (user as DbUser) : null
 }
 
+export async function usersForIds(ids: string[]): Promise<DbUser[]> {
+    if (ids.length === 0) {
+        return []
+    }
+    
+    const users = await sql`
+      SELECT * FROM users
+      WHERE id = ANY(${ids})
+    `
+    return users as DbUser[]
+}
+
 export type CreateUserResult =
     | { success: true, user: DbUser }
     | { success: false, reason: string }
