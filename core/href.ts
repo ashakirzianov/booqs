@@ -84,3 +84,7 @@ export function myBooqsHref() {
 export function authorHref({ name }: { name: string }) {
     return `/author/${encodeURIComponent(name)}`
 }
+
+export function userHref({ username }: { username: string }) {
+    return `/users/${encodeURIComponent(username)}`
+}

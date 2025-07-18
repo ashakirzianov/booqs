@@ -1,6 +1,6 @@
 import React from 'react'
 import Link from 'next/link'
-import { BooqNote, pathToId } from '@/core'
+import { BooqNote, pathToId, userHref } from '@/core'
 import { Avatar } from '@/components/Avatar'
 
 export function CommentsPanel({ comments }: {
@@ -52,7 +52,15 @@ function CommentItem({ comment }: { comment: BooqNote }) {
 
             {/* Note metadata */}
             <div className='flex items-center justify-end gap-2 pt-1'>
-                <Avatar user={comment.author} />
+                <Link
+                    href={userHref({ username: comment.author.username })}
+                    className='flex items-center gap-2 hover:bg-gray-50 rounded px-1 py-0.5 transition-colors'
+                >
+                    <Avatar user={comment.author} />
+                    <span className='text-xs text-dimmed hover:text-primary'>
+                        {comment.author.name}
+                    </span>
+                </Link>
                 <div className='text-xs text-dimmed'>
                     {formatRelativeTime(new Date(comment.createdAt))}
                 </div>

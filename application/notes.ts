@@ -98,6 +98,7 @@ export function useBooqNotes({
             ...postBody,
             author_id: user.id,
             author_name: user.name,
+            author_username: user.username,
             author_profile_picture_url: user.profilePictureURL ?? null,
             author_emoji: user.emoji,
             created_at: now,
@@ -243,6 +244,7 @@ function noteFromJson(note: NoteJson): BooqNote {
         targetQuote: note.target_quote,
         author: {
             id: note.author_id,
+            username: note.author_username,
             name: note.author_name ?? undefined,
             profilePictureURL: note.author_profile_picture_url ?? undefined,
             emoji: note.author_emoji,

@@ -60,6 +60,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<P
         ...note,
         author_id: userId,
         author_name: author.name,
+        author_username: author.username,
         author_profile_picture_url: author.profile_picture_url,
         author_emoji: author.emoji,
     }

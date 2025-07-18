@@ -13,7 +13,7 @@ export type AccountPublicData = {
 export type AccountData = AccountPublicData & {
     email: string,
 }
-export type AuthorData = Pick<AccountData, 'id' | 'name' | 'profilePictureURL' | 'emoji'>
+export type AuthorData = Pick<AccountData, 'id' | 'username' | 'name' | 'profilePictureURL' | 'emoji'>
 export type NoteColor = string // TODO: rename?
 export type NotePrivacy = 'private' | 'public'
 
