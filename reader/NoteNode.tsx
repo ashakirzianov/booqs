@@ -42,7 +42,7 @@ export function NoteNodeComp({ booqId, note, user }: {
             <div className={clsx('mt-base', {
                 'hidden': user?.id === note.author.id,
                 'flex': user?.id !== note.author.id,
-            })} title={note.author.name ?? undefined}>
+            })} title={note.author.name}>
             </div>
         </div>
     </div>

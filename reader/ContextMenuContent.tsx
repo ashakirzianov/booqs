@@ -129,7 +129,7 @@ function NoteTargetMenu({
     return <>
         {isOwnNote ? null :
             <AuthorItem
-                name={note.author.name ?? undefined}
+                name={note.author.name}
                 pictureUrl={note.author.profilePictureURL ?? undefined}
                 emoji={note.author.emoji}
             />

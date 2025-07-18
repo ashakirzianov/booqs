@@ -97,9 +97,9 @@ export function useBooqNotes({
         const optimisticResponse: PostResponse = {
             ...postBody,
             author_id: user.id,
-            author_name: user.name ?? null,
+            author_name: user.name,
             author_profile_picture_url: user.profilePictureURL ?? null,
-            author_emoji: user.emoji ?? null,
+            author_emoji: user.emoji,
             created_at: now,
             updated_at: now,
             booq_id: booqId,

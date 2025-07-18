@@ -19,7 +19,7 @@ export type DbNote = {
 
 export type DbNoteWithAuthor = DbNote & {
   author_id: string,
-  author_name: string | null,
+  author_name: string,
   author_profile_picture_url: string | null,
   author_emoji: string,
 }

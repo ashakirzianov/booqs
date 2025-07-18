@@ -11,7 +11,7 @@ import { updateProfileServerAction } from './actions'
 export function ProfileData({ user }: { user: AccountData }) {
     const [isEditMode, setIsEditMode] = useState(false)
     const [currentEmoji, setCurrentEmoji] = useState(user.emoji ?? '👤')
-    const [currentName, setCurrentName] = useState(user.name ?? '')
+    const [currentName, setCurrentName] = useState(user.name)
     const [isUpdating, setIsUpdating] = useState(false)
     const [isEmojiSelectorOpen, setIsEmojiSelectorOpen] = useState(false)
 
@@ -40,9 +40,9 @@ export function ProfileData({ user }: { user: AccountData }) {
             const formData = new FormData()
             formData.append('emoji', currentEmoji)
             formData.append('name', currentName)
-            
+
             const result = await updateProfileServerAction(formData)
-            
+
             if (result) {
                 setIsEditMode(false)
                 // Trigger page reload by revalidating
@@ -56,15 +56,15 @@ export function ProfileData({ user }: { user: AccountData }) {
     }
 
     const handleCancel = () => {
-        setCurrentEmoji(user.emoji ?? '👤')
-        setCurrentName(user.name ?? '')
+        setCurrentEmoji(user.emoji)
+        setCurrentName(user.name)
         setIsEditMode(false)
     }
 
     return (
         <div className="bg-background border border-dimmed rounded-lg p-6 flex flex-col">
             <div className="flex items-center gap-4">
-                <div 
+                <div
                     className="relative cursor-pointer"
                     onClick={handleEmojiClick}
                 >
@@ -118,17 +118,15 @@ export function ProfileData({ user }: { user: AccountData }) {
                     ) : (
                         <>
                             <h1 className="text-2xl font-bold text-primary">
-                                {user.name || 'Anonymous User'}
+                                {user.name}
                             </h1>
                             <div className="space-y-1 text-dimmed">
                                 <p className="text-sm">
                                     <span className="font-medium">Username:</span> {user.username}
                                 </p>
-                                {user.email && (
-                                    <p className="text-sm">
-                                        <span className="font-medium">Email:</span> {user.email}
-                                    </p>
-                                )}
+                                <p className="text-sm">
+                                    <span className="font-medium">Email:</span> {user.email}
+                                </p>
                                 <p className="text-sm">
                                     <span className="font-medium">Member since:</span> {formatDate(user.joinedAt)}
                                 </p>
@@ -137,7 +135,7 @@ export function ProfileData({ user }: { user: AccountData }) {
                     )}
                 </div>
             </div>
-            
+
             {/* Edit Profile Button - Bottom Right Corner */}
             {!isEditMode && (
                 <div className="flex justify-end mt-2">
@@ -149,7 +147,7 @@ export function ProfileData({ user }: { user: AccountData }) {
                     </LightButton>
                 </div>
             )}
-            
+
             <EmojiSelector
                 isOpen={isEmojiSelectorOpen}
                 onClose={() => setIsEmojiSelectorOpen(false)}

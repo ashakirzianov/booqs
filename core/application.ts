@@ -4,9 +4,9 @@ import { BooqId, BooqMetadata, BooqRange, TableOfContents } from './model'
 export type AccountData = {
     id: string,
     username: string,
-    email?: string,
+    email: string,
     joinedAt: string,
-    name?: string,
+    name: string,
     profilePictureURL?: string,
     emoji: string,
 }
