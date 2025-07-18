@@ -2,6 +2,7 @@ import React from 'react'
 import Link from 'next/link'
 import { BooqNote, pathToId, userHref } from '@/core'
 import { Avatar } from '@/components/Avatar'
+import { TabButton } from './TabButton'
 
 export function CommentsPanel({ comments, currentUser, followingUserIds, isFollowingLoading }: {
     comments: BooqNote[],
@@ -9,10 +10,10 @@ export function CommentsPanel({ comments, currentUser, followingUserIds, isFollo
     followingUserIds?: string[],
     isFollowingLoading?: boolean,
 }) {
-    const [showFollowingOnly, setShowFollowingOnly] = React.useState(false)
+    const [commentsFilter, setCommentsFilter] = React.useState<'all' | 'following'>('all')
     
     const filteredComments = React.useMemo(() => {
-        if (!showFollowingOnly || !currentUser || !followingUserIds) {
+        if (commentsFilter === 'all' || !currentUser || !followingUserIds) {
             return comments
         }
         
@@ -20,7 +21,7 @@ export function CommentsPanel({ comments, currentUser, followingUserIds, isFollo
             comment.author.id === currentUser.id || 
             followingUserIds.includes(comment.author.id)
         )
-    }, [comments, showFollowingOnly, currentUser, followingUserIds])
+    }, [comments, commentsFilter, currentUser, followingUserIds])
     return (
         <div className='flex flex-1' style={{
             padding: '0 env(safe-area-inset-right) 0 env(safe-area-inset-left)',
@@ -31,23 +32,25 @@ export function CommentsPanel({ comments, currentUser, followingUserIds, isFollo
                         <div className='self-center tracking-widest font-bold'>COMMENTS</div>
                         {currentUser && (
                             <div className='flex items-center justify-center'>
-                                <label className='flex items-center gap-2 text-xs cursor-pointer'>
-                                    <input
-                                        type="checkbox"
-                                        checked={showFollowingOnly}
-                                        onChange={(e) => setShowFollowingOnly(e.target.checked)}
-                                        disabled={isFollowingLoading}
-                                        className='rounded'
+                                <div className='flex'>
+                                    <TabButton
+                                        text="All"
+                                        selected={commentsFilter === 'all'}
+                                        onClick={() => setCommentsFilter('all')}
                                     />
-                                    <span>Following only{isFollowingLoading ? ' (loading...)' : ''}</span>
-                                </label>
+                                    <TabButton
+                                        text={`Following${isFollowingLoading ? ' (loading...)' : ''}`}
+                                        selected={commentsFilter === 'following'}
+                                        onClick={() => !isFollowingLoading && setCommentsFilter('following')}
+                                    />
+                                </div>
                             </div>
                         )}
                     </div>
                     <div className='flex flex-col flex-1 xl:py-0 xl:px-4 space-y-6'>
                         {filteredComments.length === 0 ? (
                             <div className='text-center py-8'>
-                                {showFollowingOnly && currentUser ? 'No comments from people you follow' : 'No comments available'}
+                                {commentsFilter === 'following' && currentUser ? 'No comments from people you follow' : 'No comments available'}
                             </div>
                         ) : (
                             filteredComments.map(note => (
