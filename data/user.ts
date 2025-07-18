@@ -3,7 +3,7 @@ import { BooqId, BooqPath, AccountPublicData } from '@/core'
 import { fetchAuthData, getUserIdInsideRequest } from './auth'
 import { addBooqHistory } from '@/backend/history'
 import { userForUsername, DbUser, usersForIds } from '@/backend/users'
-import { followUser, unfollowUser, isFollowing, getFollowing } from '@/backend/follows'
+import { followUser, unfollowUser, isFollowing, getFollowing, getFollowers } from '@/backend/follows'
 
 export async function reportBooqHistory({
     booqId, path, source,
@@ -128,4 +128,11 @@ export async function getFollowingList(userId: string): Promise<AccountPublicDat
     const following = await usersForIds(followingIds)
     
     return following.map(accountPublicDataFromDbUser)
+}
+
+export async function getFollowersList(userId: string): Promise<AccountPublicData[]> {
+    const followerIds = await getFollowers(userId)
+    const followers = await usersForIds(followerIds)
+    
+    return followers.map(accountPublicDataFromDbUser)
 }
