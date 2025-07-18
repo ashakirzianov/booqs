@@ -3,25 +3,54 @@ import Link from 'next/link'
 import { BooqNote, pathToId, userHref } from '@/core'
 import { Avatar } from '@/components/Avatar'
 
-export function CommentsPanel({ comments }: {
+export function CommentsPanel({ comments, currentUser, followingUserIds, isFollowingLoading }: {
     comments: BooqNote[],
+    currentUser?: { id: string },
+    followingUserIds?: string[],
+    isFollowingLoading?: boolean,
 }) {
+    const [showFollowingOnly, setShowFollowingOnly] = React.useState(false)
+    
+    const filteredComments = React.useMemo(() => {
+        if (!showFollowingOnly || !currentUser || !followingUserIds) {
+            return comments
+        }
+        
+        return comments.filter(comment => 
+            comment.author.id === currentUser.id || 
+            followingUserIds.includes(comment.author.id)
+        )
+    }, [comments, showFollowingOnly, currentUser, followingUserIds])
     return (
         <div className='flex flex-1' style={{
             padding: '0 env(safe-area-inset-right) 0 env(safe-area-inset-left)',
         }}>
             <div className='flex flex-1 flex-col text-dimmed max-h-full text-sm'>
                 <div className='flex flex-col flex-1 overflow-auto mt-lg'>
-                    <div className='flex flex-col xl:py-0 xl:px-4'>
+                    <div className='flex flex-col xl:py-0 xl:px-4 space-y-3'>
                         <div className='self-center tracking-widest font-bold'>COMMENTS</div>
+                        {currentUser && (
+                            <div className='flex items-center justify-center'>
+                                <label className='flex items-center gap-2 text-xs cursor-pointer'>
+                                    <input
+                                        type="checkbox"
+                                        checked={showFollowingOnly}
+                                        onChange={(e) => setShowFollowingOnly(e.target.checked)}
+                                        disabled={isFollowingLoading}
+                                        className='rounded'
+                                    />
+                                    <span>Following only{isFollowingLoading ? ' (loading...)' : ''}</span>
+                                </label>
+                            </div>
+                        )}
                     </div>
                     <div className='flex flex-col flex-1 xl:py-0 xl:px-4 space-y-6'>
-                        {comments.length === 0 ? (
+                        {filteredComments.length === 0 ? (
                             <div className='text-center py-8'>
-                                No comments available
+                                {showFollowingOnly && currentUser ? 'No comments from people you follow' : 'No comments available'}
                             </div>
                         ) : (
-                            comments.map(note => (
+                            filteredComments.map(note => (
                                 <CommentItem key={note.id} comment={note} />
                             ))
                         )}

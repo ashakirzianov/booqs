@@ -64,6 +64,7 @@ export async function notesWithAuthorForBooqId(booqId: BooqId) {
       FROM notes n
       JOIN users u ON u.id = n.author_id
       WHERE booq_id = ${booqId}
+      ORDER BY n.created_at
       `
 
   return notes as DbNoteWithAuthor[]
