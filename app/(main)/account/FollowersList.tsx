@@ -10,7 +10,7 @@ type FollowerUser = AccountPublicData & {
 
 export function FollowersList({ initialFollowers, currentUserId }: {
     initialFollowers: AccountPublicData[]
-    currentUserId: string
+    currentUserId: string | null
 }) {
     const [followersList, setFollowersList] = useState<FollowerUser[]>([])
     const [loading, setLoading] = useState(true)

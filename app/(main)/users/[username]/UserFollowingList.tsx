@@ -1,11 +1,8 @@
 'use client'
 import { useState, useEffect } from 'react'
-import Link from 'next/link'
 import { AccountPublicData } from '@/core'
-import { userHref } from '@/core/href'
 import { getFollowStatus } from '@/data/user'
 import { UserList } from '@/components/UserList'
-import { ProfileBadge } from '@/components/ProfilePicture'
 
 type FollowingUser = AccountPublicData & {
     isFollowing: boolean
@@ -58,44 +55,18 @@ export function UserFollowingList({
         )
     }
 
-    // If not authenticated, don't show follow buttons
+    // If not authenticated, show UserList without buttons
     if (!currentUserId) {
+        const usersWithoutFollowStatus = following.map(user => ({ ...user, isFollowing: false }))
         return (
-            <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Following ({following.length})</h3>
-                {following.length === 0 ? (
-                    <div className="text-center py-8 text-dimmed">
-                        <p>{profileUsername} isn&apos;t following anyone yet.</p>
-                    </div>
-                ) : (
-                    <div className="space-y-3">
-                        {following.map(user => (
-                            <div key={user.id} className="flex items-center gap-3 p-3 border border-dimmed rounded-lg">
-                                <div className="flex items-center gap-3">
-                                    <Link href={userHref({ username: user.username })}>
-                                        <ProfileBadge 
-                                            name={user.name}
-                                            picture={user.profilePictureURL}
-                                            emoji={user.emoji ?? '👤'}
-                                            size={2.5}
-                                            border={true}
-                                        />
-                                    </Link>
-                                    <div>
-                                        <Link 
-                                            href={userHref({ username: user.username })}
-                                            className="font-medium hover:text-action transition-colors"
-                                        >
-                                            {user.name}
-                                        </Link>
-                                        <div className="text-sm text-dimmed">@{user.username}</div>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                )}
-            </div>
+            <UserList
+                users={usersWithoutFollowStatus}
+                currentUserId={null}
+                title="Following"
+                emptyMessage={`${profileUsername} isn't following anyone yet.`}
+                followButtonContent={<span>Follow</span>}
+                unfollowButtonContent={<span>Following</span>}
+            />
         )
     }
 

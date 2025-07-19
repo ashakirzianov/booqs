@@ -4,7 +4,7 @@ import { UserList } from '@/components/UserList'
 
 export function FollowingList({ initialFollowing, currentUserId }: {
     initialFollowing: AccountPublicData[]
-    currentUserId: string
+    currentUserId: string | null
 }) {
     // Convert to following users (all initially followed)
     const followingUsers = initialFollowing.map(user => ({ ...user, isFollowing: true }))

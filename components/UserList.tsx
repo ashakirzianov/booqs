@@ -17,7 +17,7 @@ type ButtonState =
 
 interface UserListProps {
     users: UserWithFollowStatus[]
-    currentUserId: string
+    currentUserId: string | null
     followButtonContent: ReactNode
     unfollowButtonContent: ReactNode
     title: string
@@ -202,8 +202,8 @@ export function UserList({
                                 </div>
                             </div>
                             
-                            {/* Only show follow button if not viewing own profile */}
-                            {user.id !== currentUserId && (
+                            {/* Only show follow button if user is authenticated and not viewing own profile */}
+                            {currentUserId && user.id !== currentUserId && (
                                 <div className="flex flex-col items-end gap-1">
                                     <button
                                         onClick={() => user.isFollowing ? handleUnfollow(user.username) : handleFollow(user.username)}
