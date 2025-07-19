@@ -1,17 +1,14 @@
 'use client'
-import { AccountPublicData } from '@/core'
-import { UserList } from '@/components/UserList'
+import { UserList, UserWithFollowStatus } from '@/components/UserList'
 
-export function FollowingList({ initialFollowing, currentUserId }: {
-    initialFollowing: AccountPublicData[]
+export function FollowingList({ following, currentUserId }: {
+    following: UserWithFollowStatus[]
     currentUserId: string | null
 }) {
-    // Convert to following users (all initially followed)
-    const followingUsers = initialFollowing.map(user => ({ ...user, isFollowing: true }))
 
     return (
         <UserList
-            users={followingUsers}
+            users={following}
             currentUserId={currentUserId}
             title="Following"
             emptyMessage="You're not following anyone yet."

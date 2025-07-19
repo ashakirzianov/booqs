@@ -19,27 +19,42 @@ export default async function UserPage({
         userData(username),
         getUserIdInsideRequest()
     ])
-    
+
     // Get follow status if user is authenticated and viewing someone else's profile
     let initialFollowStatus = false
     let shouldShowFollowButton = false
-    
+
     if (currentUserId && user && currentUserId !== user.id) {
         shouldShowFollowButton = true
         const followStatusResult = await getFollowStatus(username)
         initialFollowStatus = followStatusResult.isFollowing
     }
-    
+
     if (!user) {
         notFound()
     }
 
     // Get public collections and social data for this user
-    const [uploads, following, followers] = await Promise.all([
+    const [uploads, following, followers, currentUserFollowing] = await Promise.all([
         booqCollection('uploads', user.id),
         getFollowingList(user.id),
-        getFollowersList(user.id)
+        getFollowersList(user.id),
+        currentUserId ? getFollowingList(currentUserId) : Promise.resolve([])
     ])
+
+    // Create set for fast lookup of who current user follows
+    const currentUserFollowingSet = new Set(currentUserFollowing.map(u => u.id))
+
+    // Add follow status to both lists
+    const followingWithStatus = following.map(user => ({
+        ...user,
+        isFollowing: currentUserFollowingSet.has(user.id)
+    }))
+
+    const followersWithStatus = followers.map(user => ({
+        ...user,
+        isFollowing: currentUserFollowingSet.has(user.id)
+    }))
 
     return (
         <div className="max-w-4xl mx-auto px-4 py-8 space-y-8">
@@ -70,8 +85,8 @@ export default async function UserPage({
                             </div>
                             {/* Only show follow button if viewing someone else's profile */}
                             {shouldShowFollowButton && (
-                                <FollowButton 
-                                    username={user.username} 
+                                <FollowButton
+                                    username={user.username}
                                     initialFollowStatus={initialFollowStatus}
                                 />
                             )}
@@ -83,12 +98,12 @@ export default async function UserPage({
             {/* Social Connections Section */}
             <div className="space-y-6">
                 <UserFollowingList
-                    following={following}
+                    following={followingWithStatus}
                     profileUsername={user.name}
                     currentUserId={currentUserId ?? null}
                 />
                 <UserFollowersList
-                    followers={followers}
+                    followers={followersWithStatus}
                     profileUsername={user.name}
                     currentUserId={currentUserId ?? null}
                 />

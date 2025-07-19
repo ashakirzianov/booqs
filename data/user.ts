@@ -136,3 +136,4 @@ export async function getFollowersList(userId: string): Promise<AccountPublicDat
     
     return followers.map(accountPublicDataFromDbUser)
 }
+

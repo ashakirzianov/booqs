@@ -17,13 +17,29 @@ export default async function Page() {
     if (!user) {
         redirect(authHref({}))
     }
-    const [readingList, uploads, passkeys, following, followers] = await Promise.all([
-        booqCollection(READING_LIST_COLLECTION, user.id), 
+    const [readingList, uploads, passkeys, following, followers, currentUserFollowing] = await Promise.all([
+        booqCollection(READING_LIST_COLLECTION, user.id),
         booqCollection('uploads', user.id),
         fetchPasskeyData(),
         getFollowingList(user.id),
         getFollowersList(user.id),
+        getFollowingList(user.id), // Current user's following list for status checking
     ])
+
+    // Create set for fast lookup of who current user follows
+    const currentUserFollowingSet = new Set(currentUserFollowing.map(u => u.id))
+
+    // Add follow status to following list (all should be true since it's user's own following list)
+    const followingWithStatus = following.map(user => ({
+        ...user,
+        isFollowing: true // User follows everyone in their own following list
+    }))
+
+    // Add follow status to followers list
+    const followersWithStatus = followers.map(user => ({
+        ...user,
+        isFollowing: currentUserFollowingSet.has(user.id)
+    }))
 
     return (
         <div className="max-w-4xl mx-auto px-4 py-8 space-y-8 min-h-[calc(100vh-3rem)] flex flex-col">
@@ -34,10 +50,10 @@ export default async function Page() {
             <PasskeySection initialPasskeys={passkeys} />
 
             {/* Following Section */}
-            <FollowingList initialFollowing={following} currentUserId={user.id} />
+            <FollowingList following={followingWithStatus} currentUserId={user.id} />
 
             {/* Followers Section */}
-            <FollowersList initialFollowers={followers} currentUserId={user.id} />
+            <FollowersList followers={followersWithStatus} currentUserId={user.id} />
 
             {/* Books Section */}
             <div className="space-y-6 flex-1">

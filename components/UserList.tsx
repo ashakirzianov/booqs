@@ -6,7 +6,7 @@ import { userHref } from '@/core/href'
 import { followAction, unfollowAction } from '@/data/user'
 import { ProfileBadge } from '@/components/ProfilePicture'
 
-type UserWithFollowStatus = AccountPublicData & {
+export type UserWithFollowStatus = AccountPublicData & {
     isFollowing: boolean
 }
 
