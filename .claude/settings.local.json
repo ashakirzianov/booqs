@@ -12,7 +12,8 @@
       "Bash(pkill:*)",
       "Bash(node:*)",
       "Bash(npm install:*)",
-      "Bash(mkdir:*)"
+      "Bash(mkdir:*)",
+      "Bash(npx tsc:*)"
     ]
   },
   "enableAllProjectMcpServers": false

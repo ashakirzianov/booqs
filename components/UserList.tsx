@@ -28,7 +28,7 @@ interface UserListProps {
 
 export function UserList({
     users,
-    currentUserId: _currentUserId,
+    currentUserId,
     followButtonContent,
     unfollowButtonContent,
     title,
@@ -202,36 +202,39 @@ export function UserList({
                                 </div>
                             </div>
                             
-                            <div className="flex flex-col items-end gap-1">
-                                <button
-                                    onClick={() => user.isFollowing ? handleUnfollow(user.username) : handleFollow(user.username)}
-                                    disabled={buttonState.state === 'loading'}
-                                    className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 disabled:cursor-not-allowed transform ${user.isFollowing
-                                        ? 'bg-gray-200 text-gray-700 hover:bg-gray-300 hover:scale-[1.02]'
-                                        : 'bg-action text-white hover:bg-highlight hover:text-background hover:scale-[1.02]'
-                                        } ${buttonState.state === 'loading'
-                                            ? 'opacity-90 scale-[0.98]'
-                                            : 'opacity-100 scale-100'
-                                        } ${buttonState.state === 'error'
-                                            ? 'ring-2 ring-red-500 ring-opacity-50'
-                                            : ''
-                                        }`}
-                                >
-                                    <span className="flex items-center gap-1">
-                                        {buttonState.state === 'loading' && (
-                                            <div className="w-4 h-4 border-2 border-current border-t-transparent animate-spin rounded-full"></div>
-                                        )}
-                                        {user.isFollowing ? unfollowButtonContent : followButtonContent}
-                                    </span>
-                                </button>
+                            {/* Only show follow button if not viewing own profile */}
+                            {user.id !== currentUserId && (
+                                <div className="flex flex-col items-end gap-1">
+                                    <button
+                                        onClick={() => user.isFollowing ? handleUnfollow(user.username) : handleFollow(user.username)}
+                                        disabled={buttonState.state === 'loading'}
+                                        className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 disabled:cursor-not-allowed transform ${user.isFollowing
+                                            ? 'bg-gray-200 text-gray-700 hover:bg-gray-300 hover:scale-[1.02]'
+                                            : 'bg-action text-white hover:bg-highlight hover:text-background hover:scale-[1.02]'
+                                            } ${buttonState.state === 'loading'
+                                                ? 'opacity-90 scale-[0.98]'
+                                                : 'opacity-100 scale-100'
+                                            } ${buttonState.state === 'error'
+                                                ? 'ring-2 ring-red-500 ring-opacity-50'
+                                                : ''
+                                            }`}
+                                    >
+                                        <span className="flex items-center gap-1">
+                                            {buttonState.state === 'loading' && (
+                                                <div className="w-4 h-4 border-2 border-current border-t-transparent animate-spin rounded-full"></div>
+                                            )}
+                                            {user.isFollowing ? unfollowButtonContent : followButtonContent}
+                                        </span>
+                                    </button>
 
-                                {/* Error message */}
-                                {buttonState.state === 'error' && (
-                                    <div className="text-xs text-red-600 bg-red-50 px-2 py-1 rounded border border-red-200 max-w-48 text-right animate-fade-in">
-                                        {buttonState.error}
-                                    </div>
-                                )}
-                            </div>
+                                    {/* Error message */}
+                                    {buttonState.state === 'error' && (
+                                        <div className="text-xs text-red-600 bg-red-50 px-2 py-1 rounded border border-red-200 max-w-48 text-right animate-fade-in">
+                                            {buttonState.error}
+                                        </div>
+                                    )}
+                                </div>
+                            )}
                         </div>
                     )
                 })}

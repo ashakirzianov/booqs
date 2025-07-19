@@ -1,10 +1,12 @@
 import { notFound } from 'next/navigation'
-import { userData, getFollowStatus } from '@/data/user'
+import { userData, getFollowStatus, getFollowingList, getFollowersList } from '@/data/user'
 import { ProfileBadge } from '@/components/ProfilePicture'
 import { booqCollection } from '@/data/booqs'
 import { BooqCollection } from '@/components/BooqCollection'
 import { FollowButton } from '@/components/FollowButton'
 import { getUserIdInsideRequest } from '@/data/auth'
+import { UserFollowingList } from './UserFollowingList'
+import { UserFollowersList } from './UserFollowersList'
 
 export default async function UserPage({
     params
@@ -32,8 +34,12 @@ export default async function UserPage({
         notFound()
     }
 
-    // Get public collections for this user (only uploads for now)
-    const uploads = await booqCollection('uploads', user.id)
+    // Get public collections and social data for this user
+    const [uploads, following, followers] = await Promise.all([
+        booqCollection('uploads', user.id),
+        getFollowingList(user.id),
+        getFollowersList(user.id)
+    ])
 
     return (
         <div className="max-w-4xl mx-auto px-4 py-8 space-y-8">
@@ -72,6 +78,20 @@ export default async function UserPage({
                         </div>
                     </div>
                 </div>
+            </div>
+
+            {/* Social Connections Section */}
+            <div className="space-y-6">
+                <UserFollowingList
+                    following={following}
+                    profileUsername={user.name}
+                    currentUserId={currentUserId ?? null}
+                />
+                <UserFollowersList
+                    followers={followers}
+                    profileUsername={user.name}
+                    currentUserId={currentUserId ?? null}
+                />
             </div>
 
             {/* Public Books Section */}
