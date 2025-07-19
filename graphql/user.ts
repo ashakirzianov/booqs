@@ -1,4 +1,5 @@
-import { DbUser } from '@/backend/users'
+import { DbUser, usersForIds } from '@/backend/users'
+import { getFollowersCount, getFollowingCount, getFollowers, getFollowing } from '@/backend/follows'
 import { IResolvers } from '@graphql-tools/utils'
 
 export type UserParent = DbUser
@@ -12,6 +13,20 @@ export const userResolver: IResolvers<UserParent> = {
         },
         emoji(parent) {
             return parent.emoji
+        },
+        async followersCount(parent) {
+            return await getFollowersCount(parent.id)
+        },
+        async followingCount(parent) {
+            return await getFollowingCount(parent.id)
+        },
+        async followers(parent) {
+            const followerIds = await getFollowers(parent.id)
+            return await usersForIds(followerIds)
+        },
+        async following(parent) {
+            const followingIds = await getFollowing(parent.id)
+            return await usersForIds(followingIds)
         },
     },
 }

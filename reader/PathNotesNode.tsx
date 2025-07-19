@@ -3,14 +3,14 @@ import { NoteNodeComp } from './NoteNode'
 import { PathNotesNode } from './nodes'
 import { booqHref } from '@/core/href'
 import Link from 'next/link'
-import { AccountDisplayData, BooqId, TableOfContentsItem } from '@/core'
+import { AuthorData, BooqId, TableOfContentsItem } from '@/core'
 
 export function PathNotesNodeComp({
     booqId, user,
     node: { items, notes },
 }: {
     booqId: BooqId,
-    user: AccountDisplayData | undefined,
+    user: AuthorData | undefined,
     node: PathNotesNode,
 }) {
     return <div>

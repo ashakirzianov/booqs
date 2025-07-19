@@ -1,11 +1,11 @@
 import { ReactNode } from 'react'
 import { NavigationSelection } from './nodes'
-import { AccountDisplayData } from '@/core'
+import { AuthorData } from '@/core'
 
 export function NavigationFilter({
     selection, toggle,
 }: {
-    authors: AccountDisplayData[],
+    authors: AuthorData[],
     selection: NavigationSelection,
     toggle: (id: string) => void,
 }) {

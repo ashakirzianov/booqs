@@ -16,6 +16,7 @@ import { ThemerButton } from '@/components/Themer'
 import { useFontScale } from '@/application/theme'
 import { useAuth } from '@/application/auth'
 import { useNotesData } from './useNotesData'
+import { useFollowingData } from './useFollowingData'
 import { AccountButton } from '@/components/AccountButton'
 import { usePathname } from 'next/navigation'
 import { BackIcon, TocIcon, CommentIcon } from '@/components/Icons'
@@ -60,6 +61,8 @@ export function Reader({
         currentRange: range,
     })
 
+    const { followingUserIds, isLoading: isFollowingLoading } = useFollowingData({ user })
+
     const {
         navigationOpen, navigationSelection,
         toggleNavigationOpen, closeNavigation,
@@ -94,6 +97,9 @@ export function Reader({
 
     const RightPanelContent = <CommentsPanel
         comments={comments}
+        currentUser={user}
+        followingUserIds={followingUserIds}
+        isFollowingLoading={isFollowingLoading}
     />
 
     const { anchor, menuTarget, setMenuTarget, anchorRange } = useContextMenuState()

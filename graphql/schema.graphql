@@ -1,6 +1,7 @@
 type Query {
     ping: String
     me: User
+    user(username: String!): User
     booq(id: ID!): Booq
     author(name: String!): Author
     search(query: String!, limit: Int): [SearchResult!]
@@ -79,6 +80,10 @@ type User {
     name: String
     pictureUrl: String
     emoji: String
+    followersCount: Int!
+    followingCount: Int!
+    followers: [User!]!
+    following: [User!]!
 }
 
 union SearchResult = Booq | Author

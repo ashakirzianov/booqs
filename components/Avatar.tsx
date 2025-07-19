@@ -1,6 +1,6 @@
-import { AccountDisplayData } from '@/core'
+import { AuthorData } from '@/core'
 
-export function Avatar({ user }: { user?: AccountDisplayData }) {
+export function Avatar({ user }: { user?: AuthorData }) {
     const display = user?.emoji || (user?.name ? user.name.charAt(0).toUpperCase() : 'X')
 
     return (

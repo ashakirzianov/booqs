@@ -1,9 +1,10 @@
 'use client'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import * as clipboard from 'clipboard-polyfill'
-import { AccountDisplayData, BooqId, BooqNote, BooqRange } from '@/core'
+import { AuthorData, BooqId, BooqNote, BooqRange } from '@/core'
 import { MenuItem } from '@/components/Menu'
-import { quoteHref } from '@/core/href'
+import { quoteHref, userHref } from '@/core/href'
 import { BooqSelection } from '@/viewer'
 import { ProfileBadge } from '@/components/ProfilePicture'
 import { resolveNoteColor, noteColorNames } from '@/application/common'
@@ -28,47 +29,34 @@ export function CopilotItem({ selection, setTarget }: {
     />
 }
 
-export function AuthorItem({ name, pictureUrl, emoji }: {
-    name?: string,
+export function AuthorItem({ name, pictureUrl, emoji, username }: {
+    name: string,
     pictureUrl?: string,
     emoji: string,
+    username: string,
 }) {
-    return <div className='container font-bold p-lg'>
-        {
-            pictureUrl || emoji
-                ? <div className="picture mr-lg">
-                    <ProfileBadge
-                        border={false}
-                        size={1.5}
-                        name={name}
-                        picture={pictureUrl}
-                        emoji={emoji}
-                    />
-                </div>
-                : null
-        }
-        <span className='name'>{name ?? 'Incognito'}</span>
-        <style jsx>{`
-            .container {
-                display: flex;
-                flex: 1;
-                flex-direction: row;
-                align-items: center;
-                font-size: smaller;
-                font-family: var(--font-main);
-                user-select: none;
+    return (
+        <Link
+            href={userHref({ username })}
+            className='flex flex-1 flex-row items-center text-sm font-bold p-lg select-none hover:bg-gray-50 transition-colors rounded'
+            style={{ fontFamily: 'var(--font-main)' }}
+        >
+            {
+                pictureUrl || emoji
+                    ? <div className="flex justify-center items-center mr-lg">
+                        <ProfileBadge
+                            border={false}
+                            size={1.5}
+                            name={name}
+                            picture={pictureUrl}
+                            emoji={emoji}
+                        />
+                    </div>
+                    : null
             }
-            .picture {
-                display: flex;
-                justify-content: center;
-                align-items: center;
-            }
-            .name {
-                display: flex;
-                flex: 1;
-            }
-            `}</style>
-    </div>
+            <span className='flex flex-1'>{name}</span>
+        </Link>
+    )
 }
 
 export function AddHighlightItem({
@@ -76,14 +64,14 @@ export function AddHighlightItem({
 }: {
     selection: BooqSelection,
     booqId: BooqId,
-    user: AccountDisplayData | undefined,
+    user: AuthorData | undefined,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
     const { addNote } = useBooqNotes({ booqId, user })
     if (!user?.id) {
         return null
     }
-    return <div className='container'>
+    return <div className='flex flex-1 flex-row items-stretch justify-between cursor-pointer text-sm select-none'>
         {
             noteColorNames.map(
                 (color, idx) => <ColorSelectionButton
@@ -110,18 +98,6 @@ export function AddHighlightItem({
                 />,
             )
         }
-        <style jsx>{`
-            .container {
-                display: flex;
-                flex: 1;
-                flex-direction: row;
-                align-items: stretch;
-                justify-content: space-between;
-                cursor: pointer;
-                font-size: small;
-                user-select: none;
-            }
-            `}</style>
     </div>
 }
 
@@ -129,7 +105,7 @@ export function AddCommentItem({
     target, user, setTarget,
 }: {
     target: SelectionTarget | QuoteTarget | NoteTarget,
-    user: AccountDisplayData | undefined,
+    user: AuthorData | undefined,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
     if (!user?.id) {
@@ -152,7 +128,7 @@ export function RemoveNoteItem({
 }: {
     note: BooqNote,
     booqId: BooqId,
-    user: AccountDisplayData | undefined,
+    user: AuthorData | undefined,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
     const { removeNote } = useBooqNotes({ booqId, user })
@@ -171,11 +147,11 @@ export function SelectNoteColorItem({
 }: {
     note: BooqNote,
     booqId: BooqId,
-    user: AccountDisplayData | undefined,
+    user: AuthorData | undefined,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
     const { updateNote } = useBooqNotes({ booqId, user })
-    return <div className='container'>
+    return <div className='flex flex-1 flex-row items-stretch justify-between cursor-pointer text-sm select-none'>
         {
             noteColorNames.map(
                 (color, idx) => <ColorSelectionButton
@@ -196,18 +172,6 @@ export function SelectNoteColorItem({
                 />,
             )
         }
-        <style jsx>{`
-            .container {
-                display: flex;
-                flex: 1;
-                flex-direction: row;
-                align-items: stretch;
-                justify-content: space-between;
-                cursor: pointer;
-                font-size: small;
-                user-select: none;
-            }
-            `}</style>
     </div>
 }
 

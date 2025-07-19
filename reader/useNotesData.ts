@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { BooqId, AccountDisplayData, BooqRange, pathInRange, pathLessThan } from '@/core'
+import { BooqId, AuthorData, BooqRange, pathInRange, pathLessThan } from '@/core'
 import { useBooqNotes } from '@/application/notes'
 
 export function useNotesData({
@@ -8,7 +8,7 @@ export function useNotesData({
     currentRange,
 }: {
     booqId: BooqId,
-    user: AccountDisplayData | undefined,
+    user: AuthorData | undefined,
     currentRange?: BooqRange,
 }) {
     const { notes: allNotes } = useBooqNotes({ booqId, user })

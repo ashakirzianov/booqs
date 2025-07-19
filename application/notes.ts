@@ -2,7 +2,7 @@
 
 import type { GetResponse, PostBody, PostResponse } from '@/app/api/booq/[library]/[id]/notes/route'
 import type { PatchBody, PatchResponse } from '@/app/api/notes/[id]/route'
-import { AccountDisplayData, BooqId, BooqRange, BooqNote, NotePrivacy } from '@/core'
+import { AuthorData, BooqId, BooqRange, BooqNote, NotePrivacy } from '@/core'
 import { nanoid } from 'nanoid'
 import { useMemo } from 'react'
 import useSWR from 'swr'
@@ -12,7 +12,7 @@ export function useBooqNotes({
     booqId, user,
 }: {
     booqId: BooqId,
-    user: AccountDisplayData | undefined,
+    user: AuthorData | undefined,
 }) {
     const notesKey = `/api/booq/${booqId}/notes`
 
@@ -97,9 +97,10 @@ export function useBooqNotes({
         const optimisticResponse: PostResponse = {
             ...postBody,
             author_id: user.id,
-            author_name: user.name ?? null,
+            author_name: user.name,
+            author_username: user.username,
             author_profile_picture_url: user.profilePictureURL ?? null,
-            author_emoji: user.emoji ?? null,
+            author_emoji: user.emoji,
             created_at: now,
             updated_at: now,
             booq_id: booqId,
@@ -243,6 +244,7 @@ function noteFromJson(note: NoteJson): BooqNote {
         targetQuote: note.target_quote,
         author: {
             id: note.author_id,
+            username: note.author_username,
             name: note.author_name ?? undefined,
             profilePictureURL: note.author_profile_picture_url ?? undefined,
             emoji: note.author_emoji,

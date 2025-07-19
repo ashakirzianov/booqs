@@ -55,6 +55,16 @@ export function SignUpForm({
             return
         }
 
+        // Validate username format
+        const usernamePattern = /^[a-zA-Z0-9-]+$/
+        if (!usernamePattern.test(formData.username.trim())) {
+            setSignUpState({ 
+                state: 'error', 
+                error: 'Username must contain only letters, numbers, and hyphens' 
+            })
+            return
+        }
+
         setSignUpState({ state: 'loading-signup' })
 
         try {
@@ -107,6 +117,7 @@ export function SignUpForm({
                         minLength={1}
                         maxLength={50}
                     />
+                    <p className='text-xs text-secondary'>Only letters, numbers, and hyphens allowed</p>
                 </div>
 
                 {/* Name field */}

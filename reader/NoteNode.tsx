@@ -5,11 +5,11 @@ import { MoreIcon } from '@/components/Icons'
 import clsx from 'clsx'
 import { booqHref } from '@/core/href'
 import Link from 'next/link'
-import { AccountDisplayData, BooqId, BooqNote } from '@/core'
+import { AuthorData, BooqId, BooqNote } from '@/core'
 
 export function NoteNodeComp({ booqId, note, user }: {
     booqId: BooqId,
-    user: AccountDisplayData | undefined,
+    user: AuthorData | undefined,
     note: BooqNote,
 }) {
     return <div className='container flex flex-1 justify-between pl-base' style={{
@@ -42,7 +42,7 @@ export function NoteNodeComp({ booqId, note, user }: {
             <div className={clsx('mt-base', {
                 'hidden': user?.id === note.author.id,
                 'flex': user?.id !== note.author.id,
-            })} title={note.author.name ?? undefined}>
+            })} title={note.author.name}>
             </div>
         </div>
     </div>

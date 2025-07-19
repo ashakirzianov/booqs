@@ -1,7 +1,7 @@
 import { deleteAllBooksForUserId } from './uu'
 import { deleteUserCredentials } from './passkey'
 import { sql } from './db'
-import { AccountData, getRandomAvatarEmoji } from '@/core'
+import { getRandomAvatarEmoji } from '@/core'
 import { nanoid } from 'nanoid'
 
 export type DbUser = {
@@ -12,18 +12,6 @@ export type DbUser = {
     profile_picture_url: string | null,
     joined_at: string,
     emoji: string,
-}
-
-export function accountDataFromDbUser(dbUser: DbUser): AccountData {
-    return {
-        id: dbUser.id,
-        username: dbUser.username,
-        email: dbUser.email,
-        joinedAt: dbUser.joined_at,
-        name: dbUser.name,
-        profilePictureURL: dbUser.profile_picture_url ?? undefined,
-        emoji: dbUser.emoji ?? undefined,
-    }
 }
 
 export async function userForId(id: string): Promise<DbUser | null> {
@@ -42,6 +30,26 @@ export async function userForEmail(email: string): Promise<DbUser | null> {
     return user ? (user as DbUser) : null
 }
 
+export async function userForUsername(username: string): Promise<DbUser | null> {
+    const [user] = await sql`
+      SELECT * FROM users
+      WHERE username = ${username}
+    `
+    return user ? (user as DbUser) : null
+}
+
+export async function usersForIds(ids: string[]): Promise<DbUser[]> {
+    if (ids.length === 0) {
+        return []
+    }
+    
+    const users = await sql`
+      SELECT * FROM users
+      WHERE id = ANY(${ids})
+    `
+    return users as DbUser[]
+}
+
 export type CreateUserResult =
     | { success: true, user: DbUser }
     | { success: false, reason: string }
@@ -49,6 +57,12 @@ export type CreateUserResult =
 export type UpdateUserResult =
     | { success: true, user: DbUser }
     | { success: false, user?: undefined, reason: string }
+
+function validateUsername(username: string): boolean {
+    // Username must contain only latin letters, digits, and hyphens
+    const usernamePattern = /^[a-zA-Z0-9-]+$/
+    return usernamePattern.test(username)
+}
 
 export async function createUser({
     username, email, name, profilePictureUrl, emoji,
@@ -60,11 +74,22 @@ export async function createUser({
     emoji?: string,
 }): Promise<CreateUserResult> {
     try {
+        // Validate username format
+        if (!validateUsername(username)) {
+            return {
+                success: false,
+                reason: 'Username must contain only latin letters, digits, and hyphens'
+            }
+        }
+
+        // Lowercase the username
+        const normalizedUsername = username.toLowerCase()
+
         const id = nanoid()
         const userEmoji = emoji ?? getRandomAvatarEmoji()
         const [user] = await sql`
           INSERT INTO users (id, username, email, name, profile_picture_url, emoji)
-          VALUES (${id}, ${username}, ${email}, ${name}, ${profilePictureUrl ?? null}, ${userEmoji})
+          VALUES (${id}, ${normalizedUsername}, ${email}, ${name}, ${profilePictureUrl ?? null}, ${userEmoji})
           RETURNING *
         `
         return { success: true, user: user as DbUser }
@@ -147,7 +172,7 @@ function getReasonFromError(err: any, defaultReason: string): string {
             return 'Email already exists'
         }
     }
-    
+
     return defaultReason
 }
 

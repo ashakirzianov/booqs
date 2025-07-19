@@ -1,27 +1,59 @@
 import React from 'react'
 import Link from 'next/link'
-import { BooqNote, pathToId } from '@/core'
+import { BooqNote, pathToId, userHref } from '@/core'
 import { Avatar } from '@/components/Avatar'
+import { TabButton } from './TabButton'
 
-export function CommentsPanel({ comments }: {
+export function CommentsPanel({ comments, currentUser, followingUserIds, isFollowingLoading }: {
     comments: BooqNote[],
+    currentUser?: { id: string },
+    followingUserIds?: string[],
+    isFollowingLoading?: boolean,
 }) {
+    const [commentsFilter, setCommentsFilter] = React.useState<'all' | 'following'>('all')
+    
+    const filteredComments = React.useMemo(() => {
+        if (commentsFilter === 'all' || !currentUser || !followingUserIds) {
+            return comments
+        }
+        
+        return comments.filter(comment => 
+            comment.author.id === currentUser.id || 
+            followingUserIds.includes(comment.author.id)
+        )
+    }, [comments, commentsFilter, currentUser, followingUserIds])
     return (
         <div className='flex flex-1' style={{
             padding: '0 env(safe-area-inset-right) 0 env(safe-area-inset-left)',
         }}>
             <div className='flex flex-1 flex-col text-dimmed max-h-full text-sm'>
                 <div className='flex flex-col flex-1 overflow-auto mt-lg'>
-                    <div className='flex flex-col xl:py-0 xl:px-4'>
+                    <div className='flex flex-col xl:py-0 xl:px-4 space-y-3'>
                         <div className='self-center tracking-widest font-bold'>COMMENTS</div>
+                        {currentUser && (
+                            <div className='flex items-center justify-center'>
+                                <div className='flex'>
+                                    <TabButton
+                                        text="All"
+                                        selected={commentsFilter === 'all'}
+                                        onClick={() => setCommentsFilter('all')}
+                                    />
+                                    <TabButton
+                                        text={`Following${isFollowingLoading ? ' (loading...)' : ''}`}
+                                        selected={commentsFilter === 'following'}
+                                        onClick={() => !isFollowingLoading && setCommentsFilter('following')}
+                                    />
+                                </div>
+                            </div>
+                        )}
                     </div>
                     <div className='flex flex-col flex-1 xl:py-0 xl:px-4 space-y-6'>
-                        {comments.length === 0 ? (
+                        {filteredComments.length === 0 ? (
                             <div className='text-center py-8'>
-                                No comments available
+                                {commentsFilter === 'following' && currentUser ? 'No comments from people you follow' : 'No comments available'}
                             </div>
                         ) : (
-                            comments.map(note => (
+                            filteredComments.map(note => (
                                 <CommentItem key={note.id} comment={note} />
                             ))
                         )}
@@ -52,7 +84,15 @@ function CommentItem({ comment }: { comment: BooqNote }) {
 
             {/* Note metadata */}
             <div className='flex items-center justify-end gap-2 pt-1'>
-                <Avatar user={comment.author} />
+                <Link
+                    href={userHref({ username: comment.author.username })}
+                    className='flex items-center gap-2 hover:bg-gray-50 rounded px-1 py-0.5 transition-colors'
+                >
+                    <Avatar user={comment.author} />
+                    <span className='text-xs text-dimmed hover:text-primary'>
+                        {comment.author.name}
+                    </span>
+                </Link>
                 <div className='text-xs text-dimmed'>
                     {formatRelativeTime(new Date(comment.createdAt))}
                 </div>
