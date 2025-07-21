@@ -59,6 +59,27 @@ export function AuthorItem({ name, pictureUrl, emoji, username }: {
     )
 }
 
+export function NoteColorPicker({ 
+    selectedColor, 
+    onColorSelect 
+}: {
+    selectedColor?: string,
+    onColorSelect: (color: string) => void,
+}) {
+    return <div className='flex flex-1 flex-row items-stretch justify-between cursor-pointer text-sm select-none'>
+        {
+            noteColorNames.map(
+                (color, idx) => <ColorSelectionButton
+                    key={idx}
+                    selected={selectedColor === color}
+                    color={resolveNoteColor(color)}
+                    callback={() => onColorSelect(color)}
+                />,
+            )
+        }
+    </div>
+}
+
 export function AddHighlightItem({
     selection, booqId, user, setTarget,
 }: {
@@ -71,34 +92,25 @@ export function AddHighlightItem({
     if (!user?.id) {
         return null
     }
-    return <div className='flex flex-1 flex-row items-stretch justify-between cursor-pointer text-sm select-none'>
-        {
-            noteColorNames.map(
-                (color, idx) => <ColorSelectionButton
-                    key={idx}
-                    selected={false}
-                    color={resolveNoteColor(color)}
-                    callback={() => {
-                        const note = addNote({
-                            color,
-                            range: selection.range,
-                            targetQuote: selection.text,
-                        })
-                        if (note) {
-                            setTarget({
-                                kind: 'note',
-                                note: {
-                                    ...note,
-                                    range: selection.range,
-                                },
-                            })
-                            removeSelection()
-                        }
-                    }}
-                />,
-            )
-        }
-    </div>
+    return <NoteColorPicker
+        onColorSelect={(color) => {
+            const note = addNote({
+                color,
+                range: selection.range,
+                targetQuote: selection.text,
+            })
+            if (note) {
+                setTarget({
+                    kind: 'note',
+                    note: {
+                        ...note,
+                        range: selection.range,
+                    },
+                })
+                removeSelection()
+            }
+        }}
+    />
 }
 
 export function AddCommentItem({
@@ -151,28 +163,20 @@ export function SelectNoteColorItem({
     setTarget: (target: ContextMenuTarget) => void,
 }) {
     const { updateNote } = useBooqNotes({ booqId, user })
-    return <div className='flex flex-1 flex-row items-stretch justify-between cursor-pointer text-sm select-none'>
-        {
-            noteColorNames.map(
-                (color, idx) => <ColorSelectionButton
-                    key={idx}
-                    selected={color === note.color}
-                    color={resolveNoteColor(color)}
-                    callback={() => {
-                        updateNote({ noteId: note.id, color })
-                        // Note: hackie way of updating selection
-                        setTarget({
-                            kind: 'note',
-                            note: {
-                                ...note,
-                                color,
-                            },
-                        })
-                    }}
-                />,
-            )
-        }
-    </div>
+    return <NoteColorPicker
+        selectedColor={note.color}
+        onColorSelect={(color) => {
+            updateNote({ noteId: note.id, color })
+            // Note: hackie way of updating selection
+            setTarget({
+                kind: 'note',
+                note: {
+                    ...note,
+                    color,
+                },
+            })
+        }}
+    />
 }
 
 export function ColorSelectionButton({ color, selected, callback }: {

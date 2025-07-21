@@ -17,6 +17,7 @@ import {
     CopyQuoteItem,
     CopyTextItem,
     CopyLinkItem,
+    NoteColorPicker,
     generateQuote,
 } from './ContextMenuItems'
 import { useRouter } from 'next/navigation'
@@ -157,6 +158,7 @@ function CommentTargetMenu({
     setTarget: (target: ContextMenuTarget) => void,
 }) {
     const [comment, setComment] = useState('')
+    const [selectedColor, setSelectedColor] = useState(noteColorNames[0])
     const { addNote } = useBooqNotes({ booqId, user })
 
     // Extract selection from parent target
@@ -168,7 +170,7 @@ function CommentTargetMenu({
         if (!user?.id || !comment.trim()) return
 
         const note = addNote({
-            color: noteColorNames[0], // Default color for comments
+            color: selectedColor,
             range: selection.range,
             content: comment.trim(),
             privacy: 'public',
@@ -185,35 +187,41 @@ function CommentTargetMenu({
         setTarget(parent)
     }
 
-    return <div className='flex flex-col gap-3 p-4 min-w-[300px] max-w-[400px]'>
-        <div className='italic text-dimmed text-sm leading-relaxed border-l-[3px] border-highlight pl-3 mb-2'>
-            &ldquo;{selection.text}&rdquo;
-        </div>
-        <textarea
-            className='w-full px-3 py-2 border border-dimmed rounded bg-background text-primary text-sm leading-relaxed resize-y min-h-[80px] focus:outline-none focus:border-action'
-            style={{ fontFamily: 'var(--font-main)' }}
-            placeholder='Add a comment...'
-            value={comment}
-            onChange={(e) => setComment(e.target.value)}
-            rows={3}
-            autoFocus
+    return <div className='flex flex-col min-w-[300px] max-w-[400px]'>
+        <NoteColorPicker
+            selectedColor={selectedColor}
+            onColorSelect={setSelectedColor}
         />
-        <div className='flex gap-2 justify-end'>
-            <button
-                className='px-4 py-2 border-none rounded text-sm cursor-pointer transition-opacity bg-transparent text-dimmed hover:opacity-80'
+        <div className='flex flex-col gap-3 p-4'>
+            <div className='italic text-dimmed text-sm leading-relaxed border-l-[3px] border-highlight pl-3 mb-2'>
+                &ldquo;{selection.text}&rdquo;
+            </div>
+            <textarea
+                className='w-full px-3 py-2 border border-dimmed rounded bg-background text-primary text-sm leading-relaxed resize-y min-h-[80px] focus:outline-none focus:border-action'
                 style={{ fontFamily: 'var(--font-main)' }}
-                onClick={handleCancel}
-            >
-                Cancel
-            </button>
-            <button
-                className='px-4 py-2 border-none rounded text-sm cursor-pointer transition-opacity bg-action text-background hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed'
-                style={{ fontFamily: 'var(--font-main)' }}
-                onClick={handlePost}
-                disabled={!comment.trim()}
-            >
-                Post
-            </button>
+                placeholder='Add a comment...'
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+                rows={3}
+                autoFocus
+            />
+            <div className='flex gap-2 justify-end'>
+                <button
+                    className='px-4 py-2 border-none rounded text-sm cursor-pointer transition-opacity bg-transparent text-dimmed hover:opacity-80'
+                    style={{ fontFamily: 'var(--font-main)' }}
+                    onClick={handleCancel}
+                >
+                    Cancel
+                </button>
+                <button
+                    className='px-4 py-2 border-none rounded text-sm cursor-pointer transition-opacity bg-action text-background hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed'
+                    style={{ fontFamily: 'var(--font-main)' }}
+                    onClick={handlePost}
+                    disabled={!comment.trim()}
+                >
+                    Post
+                </button>
+            </div>
         </div>
     </div>
 }
