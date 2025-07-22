@@ -20,7 +20,7 @@ export function useContextMenuState() {
                 return prev
             }
             const newAnchor = getAnchorForTarget(next)
-            if (newAnchor === undefined && (next.kind === 'note' || next.kind === 'comment' || next.kind === 'copilot')) {
+            if (newAnchor === undefined && (next.kind === 'note' || next.kind === 'create-comment' || next.kind === 'copilot')) {
                 setTimeout(() => {
                     setAnchor(getAnchorForTarget(next))
                 }, 0)
@@ -32,7 +32,7 @@ export function useContextMenuState() {
     }, [setTarget])
 
     const anchorRange = useMemo<BooqRange | undefined>(() => {
-        if (target.kind === 'comment') {
+        if (target.kind === 'create-comment') {
             // Get the range from the parent target
             const parentRange = target.parent.kind === 'selection' || target.parent.kind === 'quote'
                 ? target.parent.selection.range
@@ -85,7 +85,7 @@ function getAnchorForTarget(target: ContextMenuTarget): VirtualElement | undefin
             return getAugmentationElement(augmentationId)
         }
         case 'copilot':
-        case 'comment': {
+        case 'create-comment': {
             const augmentationId = temporaryAugmentationId(MENU_ANCHOR_ID)
             return getAugmentationElement(augmentationId)
         }
