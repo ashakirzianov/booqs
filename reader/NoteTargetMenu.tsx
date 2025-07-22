@@ -14,6 +14,27 @@ function removeSelection() {
     window.getSelection()?.empty()
 }
 
+function ActionButton({
+    onClick,
+    children,
+    icon
+}: {
+    onClick: () => void,
+    children: React.ReactNode,
+    icon: React.ReactNode
+}) {
+    return (
+        <button
+            className="flex items-center gap-1 text-sm font-bold cursor-pointer text-primary hover:underline"
+            onClick={onClick}
+            onMouseDown={e => e.preventDefault()}
+        >
+            <div className="w-4 h-4">{icon}</div>
+            {children}
+        </button>
+    )
+}
+
 export function NoteTargetMenu({
     target, booqId, user, setTarget
 }: {
@@ -94,54 +115,48 @@ export function NoteTargetMenu({
                 )}
 
                 {/* Action buttons */}
-                <div className="flex flex-row gap-2 mb-3">
+                <div className="flex flex-row gap-4">
                     {isOwnNote && user && (
                         <>
-                            <button
-                                className="flex items-center gap-2 px-3 py-2 text-sm font-bold cursor-pointer hover:bg-black/10 rounded transition-colors"
+                            <ActionButton
                                 onClick={handleAddComment}
-                                onMouseDown={e => e.preventDefault()}
+                                icon={<CommentIcon />}
                             >
-                                <div className="w-4 h-4"><CommentIcon /></div>
                                 {note.content ? 'Edit' : 'Add note'}
-                            </button>
-                            <button
-                                className="flex items-center gap-2 px-3 py-2 text-sm font-bold cursor-pointer hover:bg-black/10 rounded transition-colors"
+                            </ActionButton>
+                            <ActionButton
                                 onClick={handleRemoveNote}
-                                onMouseDown={e => e.preventDefault()}
+                                icon={<RemoveIcon />}
                             >
-                                <div className="w-4 h-4"><RemoveIcon /></div>
-                                Remove note
-                            </button>
+                                Remove
+                            </ActionButton>
                         </>
                     )}
-                    <button
-                        className="flex items-center gap-2 px-3 py-2 text-sm font-bold cursor-pointer hover:bg-black/10 rounded transition-colors"
+                    <ActionButton
                         onClick={handleCopyQuote}
-                        onMouseDown={e => e.preventDefault()}
+                        icon={<ShareIcon />}
                     >
-                        <div className="w-4 h-4"><ShareIcon /></div>
-                        Copy quote
-                    </button>
+                        Copy
+                    </ActionButton>
                 </div>
 
                 {/* Author info and date */}
-                <div className="flex items-center gap-2">
-                    <Link
-                        href={userHref({ username: note.author.username })}
-                        className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity"
-                    >
-                        <ProfileBadge
-                            border={false}
-                            size={1.2}
-                            name={note.author.name}
-                            picture={note.author.profilePictureURL ?? undefined}
-                            emoji={note.author.emoji}
-                        />
-                        <span className="text-xs text-dimmed">{note.author.name}</span>
-                    </Link>
-                    <span className="text-xs text-dimmed ml-auto">
-                        {formatRelativeTime(new Date(note.createdAt))}
+                <div className="flex items-center justify-end gap-2 mt-3">
+                    <span className="text-xs text-dimmed flex items-center">
+                        <Link
+                            href={userHref({ username: note.author.username })}
+                            className="flex items-center cursor-pointer hover:opacity-80 transition-opacity"
+                        >
+                            <ProfileBadge
+                                border={false}
+                                size={1.2}
+                                name={note.author.name}
+                                picture={note.author.profilePictureURL ?? undefined}
+                                emoji={note.author.emoji}
+                            />
+                            <span className='hover:underline'>{note.author.name}</span>
+                        </Link>
+                        , {note.createdAt === note.updatedAt ? 'created' : 'edited'} {formatRelativeTime(new Date(note.updatedAt))}
                     </span>
                 </div>
             </div>
