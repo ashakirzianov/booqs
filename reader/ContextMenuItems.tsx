@@ -81,10 +81,7 @@ export function AddHighlightItem({
         if (note) {
             setTarget({
                 kind: 'note',
-                note: {
-                    ...note,
-                    range: selection.range,
-                },
+                note,
             })
             window.getSelection()?.empty()
         }

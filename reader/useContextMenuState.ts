@@ -21,7 +21,6 @@ export function useContextMenuState() {
             }
             const newAnchor = getAnchorForTarget(next)
             if (newAnchor === undefined && (next.kind === 'note' || next.kind === 'comment' || next.kind === 'copilot')) {
-                setAnchor(undefined)
                 setTimeout(() => {
                     setAnchor(getAnchorForTarget(next))
                 }, 0)
