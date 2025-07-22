@@ -1,15 +1,14 @@
 @import 'tailwindcss';
 
-/* TODO: rething use of vars and @theme */
 @theme {
   --color-transparent: transparent;
-  --color-background: var(--theme-background);
-  --color-action: var(--theme-action);
-  --color-primary: var(--theme-primary);
-  --color-dimmed: var(--theme-dimmed);
-  --color-border: var(--theme-border);
-  --color-highlight: var(--theme-highlight);
-  --color-alert: var(--theme-alert);
+  --color-background: white;
+  --color-action: #F57F17;
+  --color-primary: black;
+  --color-dimmed: #867b6c;
+  --color-border: #ddd;
+  --color-highlight: orange;
+  --color-alert: #f00;
 
   --font-main: var(--font-main), sans-serif;
   --font-book: var(--font-book), serif;
@@ -60,8 +59,8 @@
 body {
   margin: 0;
   padding: 0;
-  color: var(--theme-primary);
-  background: var(--theme-background);
+  color: var(--color-primary);
+  background: var(--color-background);
 }
 
 :root {
@@ -69,24 +68,14 @@ body {
   --panel-width: 420pt;
 }
 
-:root {
-  --theme-background: white;
-  --theme-action: #F57F17;
-  --theme-primary: black;
-  --theme-dimmed: #867b6c;
-  --theme-border: #ddd;
-  --theme-highlight: orange;
-  --theme-alert: #f00;
-}
-
 @media (prefers-color-scheme: dark) {
-  :root {
-    --theme-background: black;
-    --theme-action: #867b6c;
-    --theme-primary: #999;
-    --theme-dimmed: #888;
-    --theme-border: #333;
-    --theme-highlight: white;
+  @theme {
+    --color-background: black;
+    --color-action: #867b6c;
+    --color-primary: #999;
+    --color-dimmed: #888;
+    --color-border: #333;
+    --color-highlight: white;
   }
 }
 
@@ -103,6 +92,7 @@ body {
     opacity: 0;
     transform: translateY(-8px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);

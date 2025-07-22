@@ -149,8 +149,8 @@ function SearchResultItem({ selected, children }: {
         }
     }, [selected])
     return <li ref={ref} className='flex text-base transition-all duration-300 cursor-pointer p-base hover:bg-highlight hover:text-background' style={{
-        background: selected ? 'var(--theme-highlight)' : undefined,
-        color: selected ? 'var(--theme-background)' : undefined,
+        background: selected ? 'var(--color-highlight)' : undefined,
+        color: selected ? 'var(--color-background)' : undefined,
     }}>
         {children}
     </li>

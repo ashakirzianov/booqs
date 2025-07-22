@@ -32,7 +32,7 @@ function ProfilePicture({ picture, size, border }: {
 }) {
     return <div className='text-xl flex shrink-0 overflow-hidden hover:border-highlight' style={{
         borderRadius: '50%',
-        border: border ? `1.5px solid var(--theme-dimmed)` : 'none',
+        border: border ? `1.5px solid var(--color-dimmed)` : 'none',
         width: `${size}rem`,
         height: `${size}rem`,
         backgroundImage: `url(${picture})`,
@@ -50,7 +50,7 @@ function ProfilePicturePlaceholder({ display, size, border }: {
 }) {
     return <div className='container font-bold text-xl flex items-center justify-center p-0 shrink-0 overflow-hidden text-dimmed hover:border-highlight' style={{
         borderRadius: '50%',
-        border: border ? `1.5px solid var(--theme-dimmed)` : 'none',
+        border: border ? `1.5px solid var(--color-dimmed)` : 'none',
         width: `${size}rem`,
         height: `${size}rem`,
         transition: '250ms color, 250ms border',
