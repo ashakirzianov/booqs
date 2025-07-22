@@ -10,7 +10,7 @@ import {
 } from '@/viewer'
 import { useContextMenuFloater } from './useContextMenuFloater'
 import { ReaderLayout } from './ReaderLayout'
-import { NavigationPanel, useNavigationState } from './NavigationPanel'
+import { NavigationPanel } from './NavigationPanel'
 import { CommentsPanel } from './CommentsPanel'
 import { ThemerButton } from '@/components/Themer'
 import { useFontScale } from '@/application/theme'
@@ -28,6 +28,7 @@ import { useAugmentations } from './useAugmentations'
 import { useContextMenuState } from './useContextMenuState'
 import { ContextMenuContent } from './ContextMenuContent'
 import { usePageData } from './usePageData'
+import { useNavigationState } from './useNavigationState'
 
 export function Reader({
     booq, quote,

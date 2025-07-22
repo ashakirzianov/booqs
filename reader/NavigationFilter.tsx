@@ -1,7 +1,7 @@
 import { ReactNode } from 'react'
-import { NavigationSelection } from './nodes'
 import { AuthorData } from '@/core'
 import { ProfileBadge } from '@/components/ProfilePicture'
+import { NavigationSelection } from './useNavigationState'
 
 export function NavigationFilter({
     selection, toggle, authors, self,

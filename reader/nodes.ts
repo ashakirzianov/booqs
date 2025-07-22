@@ -1,6 +1,6 @@
 import { AuthorData, BooqNote, pathInRange, TableOfContentsItem } from '@/core'
+import { NavigationSelection } from './useNavigationState'
 
-export type NavigationSelection = Record<string, boolean>
 export type TocNode = {
     kind: 'toc',
     item: TableOfContentsItem,

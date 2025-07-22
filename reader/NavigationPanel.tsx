@@ -1,35 +1,12 @@
 'use client'
-import React, { useMemo, useState } from 'react'
+import React, { useMemo } from 'react'
 import { TocNodeComp } from './TocNode'
 import { NoteNodeComp } from './NoteNode'
 import { PathNotesNodeComp } from './PathNotesNode'
 import { NavigationFilter } from './NavigationFilter'
-import { buildNavigationNodes, NavigationNode, NavigationSelection } from './nodes'
+import { buildNavigationNodes, NavigationNode } from './nodes'
 import { AuthorData, BooqId, BooqNote, TableOfContentsItem } from '@/core'
-
-export function useNavigationState() {
-    const [navigationOpen, setNavigationOpen] = useState(false)
-    const [navigationSelection, setNavigationSelection] = useState<NavigationSelection>({
-        chapters: true,
-        notes: true,
-    })
-    return {
-        navigationOpen,
-        navigationSelection,
-        closeNavigation() {
-            setNavigationOpen(false)
-        },
-        toggleNavigationOpen() {
-            setNavigationOpen((prev) => !prev)
-        },
-        toggleNavigationSelection(item: string) {
-            setNavigationSelection(prev => ({
-                ...prev,
-                [item]: prev[item] !== true,
-            }))
-        },
-    }
-}
+import { NavigationSelection } from './useNavigationState'
 
 export function NavigationPanel({
     booqId, user, title, toc, notes,
