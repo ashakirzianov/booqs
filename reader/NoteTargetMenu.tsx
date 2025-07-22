@@ -87,9 +87,6 @@ export function NoteTargetMenu({
     return (
         <div
             className="flex flex-col"
-            style={{
-                backgroundColor: hasColor ? noteColor : 'var(--color-background)'
-            }}
         >
             {/* Color picker - shown for own notes */}
             {isOwnNote && user && (
@@ -100,7 +97,10 @@ export function NoteTargetMenu({
             )}
 
             {/* Content container with padding */}
-            <div className="p-2 flex flex-col">
+            <div className="p-2 flex flex-col"
+                style={{
+                    backgroundColor: hasColor ? noteColor : 'var(--color-background)'
+                }}>
                 {/* Note content */}
                 {note.content && (
                     <div className="mb-3 text-sm text-primary">

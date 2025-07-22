@@ -31,7 +31,7 @@ function ColorSelectionButton({ color, selected, callback }: {
         onMouseDown={e => e.preventDefault()}
         onClick={callback} className='flex flex-1 self-stretch text-transparent cursor-pointer h-10 transition-all' style={{
             background: color,
-            borderBottom: `0.5rem solid ${selected ? `${color}` : `rgba(0,0,0,0)`}`,
+            borderTop: `0.5rem solid ${selected ? `${color}` : `rgba(0,0,0,0)`}`,
         }}>
     </div>
 }
