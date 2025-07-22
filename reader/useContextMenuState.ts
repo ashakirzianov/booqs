@@ -36,20 +36,12 @@ export function useContextMenuState() {
     const contextMenuAugmentations = useMemo<TemporaryAugmentation[]>(() => {
         const augmentations: TemporaryAugmentation[] = []
         if (target.kind === 'create-comment') {
-            // Get the range from the parent target
-            const parentRange = target.parent.kind === 'selection' || target.parent.kind === 'quote'
-                ? target.parent.selection.range
-                : target.parent.kind === 'note'
-                    ? target.parent.note.range
-                    : undefined
-
-            if (parentRange) {
-                augmentations.push({
-                    range: parentRange,
-                    name: CREATE_COMMENT_ID,
-                    underline: 'dashed',
-                })
-            }
+            augmentations.push({
+                // Get the range from the parent target
+                range: target.parent.selection.range,
+                name: CREATE_COMMENT_ID,
+                underline: 'dashed',
+            })
         } else if (target.kind === 'copilot') {
             augmentations.push({
                 range: target.selection.range,
@@ -87,7 +79,7 @@ function getAnchorForTarget(target: ContextMenuTarget): VirtualElement | undefin
         case 'selection':
             return getSelectionElement()
         case 'note': {
-            const augmentationId = noteAugmentationId(target.note)
+            const augmentationId = noteAugmentationId(target.noteId)
             return getAugmentationElement(augmentationId)
         }
         case 'quote': {

@@ -1,6 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react'
-import { AuthorData, BooqId, BooqNote, BooqMetadata } from '@/core'
+import { AuthorData, BooqId, BooqMetadata } from '@/core'
 import { BooqSelection } from '@/viewer'
 import { CopilotContext, useCopilotAnswer, useCopilotSuggestions } from '@/application/copilot'
 import { getExtraMetadataValues } from '@/core/meta'
@@ -31,7 +31,8 @@ export type QuoteTarget = {
 }
 export type NoteTarget = {
     kind: 'note',
-    note: BooqNote,
+    noteId: string,
+    selection: BooqSelection,
     editMode?: boolean,
 }
 export type CreateCommentTarget = {

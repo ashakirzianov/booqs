@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import * as clipboard from 'clipboard-polyfill'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { AuthorData, BooqId, userHref } from '@/core'
 import type { ContextMenuTarget, NoteTarget } from './ContextMenuContent'
 import { ColorPicker } from './ColorPicker'
@@ -18,34 +18,29 @@ export function NoteTargetMenu({
     user: AuthorData | undefined,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
-    const { note, editMode } = target
-    const isOwnNote = user?.id === note.author?.id
-    const { updateNote, removeNote } = useBooqNotes({ booqId, user })
-    const noteColor = highlightColorForNoteKind(note.kind)
-    const textColor = textColorForNoteKind(note.kind)
-    const dimmedColor = dimmedColorForNoteKind(note.kind)
-    const hasColor = HIGHLIGHT_KINDS.includes(note.kind)
-    const [editContent, setEditContent] = useState(note.content || '')
-
-    const selection = {
-        range: note.range,
-        text: note.targetQuote,
+    const { noteId, selection, editMode } = target
+    const { notes, updateNote, removeNote } = useBooqNotes({ booqId, user })
+    const note = useMemo(() =>
+        notes.find(n => n.id === noteId), [notes, noteId])
+    const isOwnNote = user?.id === note?.author?.id
+    const noteColor = highlightColorForNoteKind(note?.kind || 'default')
+    const textColor = textColorForNoteKind(note?.kind || 'default')
+    const dimmedColor = dimmedColorForNoteKind(note?.kind || 'default')
+    const hasColor = HIGHLIGHT_KINDS.includes(note?.kind || 'default')
+    const [editContent, setEditContent] = useState(note?.content || '')
+    if (!note) {
+        return null
     }
 
     const handleColorChange = (kind: string) => {
-        updateNote({ noteId: note.id, kind })
-        setTarget({
-            kind: 'note',
-            note: {
-                ...note,
-                kind,
-            },
-        })
+        updateNote({ noteId, kind })
     }
 
     const handleRemoveNote = () => {
-        removeNote({ noteId: note.id })
-        setTarget({ kind: 'empty' })
+        if (note) {
+            removeNote({ noteId: note.id })
+            setTarget({ kind: 'empty' })
+        }
     }
 
     const handleEditNote = () => {
@@ -56,19 +51,15 @@ export function NoteTargetMenu({
     }
 
     const handleSaveNote = () => {
-        updateNote({ noteId: note.id, content: editContent })
+        updateNote({ noteId, content: editContent })
         setTarget({
-            kind: 'note',
-            note: {
-                ...note,
-                content: editContent,
-            },
+            ...target,
             editMode: false,
         })
     }
 
     const handleCancelEdit = () => {
-        setEditContent(note.content || '')
+        setEditContent(note.content ?? '')
         setTarget({
             ...target,
             editMode: false,

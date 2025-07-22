@@ -23,7 +23,7 @@ export function useAugmentations({
         const noteArray = highlights ?? []
         const noteAugmentations = noteArray.map<Augmentation>(function (note) {
             return {
-                id: noteAugmentationId(note),
+                id: noteAugmentationId(note.id),
                 range: note.range,
                 color: highlightColorForNoteKind(note.kind),
             }
@@ -46,7 +46,7 @@ export function useAugmentations({
             .filter(comment => !noteIds.has(comment.id))
             .map<Augmentation>(function (comment) {
                 return {
-                    id: noteAugmentationId(comment),
+                    id: noteAugmentationId(comment.id),
                     range: comment.range,
                     underline: 'dashed',
                 }
@@ -84,7 +84,11 @@ export function useAugmentations({
                 return note
                     ? {
                         kind: 'note',
-                        note,
+                        noteId: note.id,
+                        selection: {
+                            range: note.range,
+                            text: note.targetQuote,
+                        },
                     }
                     : undefined
             }
@@ -110,8 +114,8 @@ export function useAugmentations({
     }
 }
 
-export function noteAugmentationId(note: BooqNote): string {
-    return `note/${note.id}`
+export function noteAugmentationId(noteId: string): string {
+    return `note/${noteId}`
 }
 
 export function quoteAugmentationId(): string {

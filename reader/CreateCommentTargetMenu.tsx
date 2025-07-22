@@ -16,9 +16,7 @@ export function CreateCommentTargetMenu({
     const { addNote } = useBooqNotes({ booqId, user })
 
     // Extract selection from parent target
-    const selection: BooqSelection = parent.kind === 'note'
-        ? { range: parent.note.range, text: parent.note.targetQuote }
-        : parent.selection
+    const selection: BooqSelection = parent.selection
 
     const handlePost = () => {
         if (!user?.id || !comment.trim()) return

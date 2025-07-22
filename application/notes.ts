@@ -201,12 +201,11 @@ export function useBooqNotes({
         kind?: string,
         content?: string,
     }) {
-        if (!user || !data) return
+        if (!user || !data) return undefined
 
-        const body: PatchBody = {
-            kind,
-            content,
-        }
+        const body: PatchBody = {}
+        if (kind) body.kind = kind
+        if (content) body.content = content
 
         updateNoteTrigger({ noteId, body }, {
             optimisticData: (currentData: GetResponse | undefined): GetResponse => {

@@ -34,7 +34,11 @@ export function NoteNodeComp({ booqId, note, user }: {
                         setTarget={() => undefined}
                         target={{
                             kind: 'note',
-                            note,
+                            noteId: note.id,
+                            selection: {
+                                range: note.range,
+                                text: note.targetQuote,
+                            },
                         }}
                     />
                 </div>}

@@ -81,7 +81,8 @@ export function AddHighlightItem({
         if (note) {
             setTarget({
                 kind: 'note',
-                note,
+                noteId: note.id,
+                selection: selection,
             })
             window.getSelection()?.empty()
         }
@@ -135,37 +136,6 @@ export function RemoveNoteItem({
         }}
     />
 }
-
-export function SelectNoteColorItem({
-    note, booqId, setTarget, user,
-}: {
-    note: BooqNote,
-    booqId: BooqId,
-    user: AuthorData | undefined,
-    setTarget: (target: ContextMenuTarget) => void,
-}) {
-    const { updateNote } = useBooqNotes({ booqId, user })
-
-    const handleColorChange = (kind: string) => {
-        updateNote({ noteId: note.id, kind })
-        // Note: hackie way of updating selection
-        setTarget({
-            kind: 'note',
-            note: {
-                ...note,
-                kind,
-            },
-        })
-    }
-
-    return (
-        <ColorPicker
-            selectedKind={note.kind}
-            onColorChange={handleColorChange}
-        />
-    )
-}
-
 
 export function CopyQuoteItem({
     selection, booqId, setTarget,
