@@ -16,7 +16,7 @@ const noteKindToColorMapping: {
     forth: 'rgba(75, 0, 130, 0.6)',
     fifth: 'rgba(34, 139, 34, 0.6)',
 }
-export function resolveNoteColor(kind: string) {
+export function highlightColorForNoteKind(kind: string) {
     return noteKindToColorMapping[kind] ?? defaultColor
 }
 export const quoteColor = 'rgba(255, 165, 0, 0.6)'

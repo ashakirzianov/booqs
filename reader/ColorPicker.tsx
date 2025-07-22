@@ -1,4 +1,4 @@
-import { resolveNoteColor, noteColoredKinds } from '@/application/common'
+import { highlightColorForNoteKind, noteColoredKinds } from '@/application/common'
 
 export function ColorPicker({
     selectedKind,
@@ -13,7 +13,7 @@ export function ColorPicker({
                 <ColorSelectionButton
                     key={idx}
                     selected={kind === selectedKind}
-                    color={resolveNoteColor(kind)}
+                    color={highlightColorForNoteKind(kind)}
                     callback={() => onColorChange(kind)}
                 />
             ))}

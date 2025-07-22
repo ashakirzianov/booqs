@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { AuthorData, BooqId, userHref } from '@/core'
 import type { ContextMenuTarget, NoteTarget } from './ContextMenuContent'
 import { ColorPicker } from './ColorPicker'
-import { resolveNoteColor, noteColoredKinds, formatRelativeTime } from '@/application/common'
+import { highlightColorForNoteKind, noteColoredKinds, formatRelativeTime } from '@/application/common'
 import { useBooqNotes } from '@/application/notes'
 import { ProfileBadge } from '@/components/ProfilePicture'
 import { CommentIcon, RemoveIcon, ShareIcon } from '@/components/Icons'
@@ -47,7 +47,7 @@ export function NoteTargetMenu({
     const { note, editMode } = target
     const isOwnNote = user?.id === note.author?.id
     const { updateNote, removeNote } = useBooqNotes({ booqId, user })
-    const noteColor = resolveNoteColor(note.kind)
+    const noteColor = highlightColorForNoteKind(note.kind)
     const hasColor = noteColoredKinds.includes(note.kind)
     const [editContent, setEditContent] = useState(note.content || '')
 
@@ -160,7 +160,7 @@ export function NoteTargetMenu({
                             </div>
                         ) : (
                             <div className="mb-3 text-sm">
-                                <span 
+                                <span
                                     className="text-dimmed cursor-pointer hover:underline hover:text-primary"
                                     onClick={handleEditNote}
                                 >
