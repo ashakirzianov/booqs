@@ -50,7 +50,7 @@ export function useFloater({
             }}
             {...getFloatingProps()}
         >
-            <div className='bg-background rounded-sm drop-shadow-2xl border border-border pointer-events-auto' style={transitionStyles}>
+            <div className='bg-background rounded-sm drop-shadow-2xl border border-border pointer-events-auto overflow-clip' style={transitionStyles}>
                 {Content}
             </div>
         </div>
