@@ -35,6 +35,7 @@ export type QuoteTarget = {
 export type NoteTarget = {
     kind: 'note',
     note: BooqNote,
+    editMode?: boolean,
 }
 export type CommentTarget = {
     kind: 'comment',

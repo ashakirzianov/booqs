@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import * as clipboard from 'clipboard-polyfill'
+import { useState } from 'react'
 import { AuthorData, BooqId, userHref } from '@/core'
 import type { ContextMenuTarget, NoteTarget } from './ContextMenuContent'
 import { ColorPicker } from './ColorPicker'
@@ -43,11 +44,12 @@ export function NoteTargetMenu({
     user: AuthorData | undefined,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
-    const { note } = target
+    const { note, editMode } = target
     const isOwnNote = user?.id === note.author?.id
     const { updateNote, removeNote } = useBooqNotes({ booqId, user })
     const noteColor = resolveNoteColor(note.kind)
     const hasColor = noteColoredKinds.includes(note.kind)
+    const [editContent, setEditContent] = useState(note.content || '')
 
     const selection = {
         range: note.range,
@@ -77,6 +79,33 @@ export function NoteTargetMenu({
         })
     }
 
+    const handleEditNote = () => {
+        setTarget({
+            ...target,
+            editMode: true,
+        })
+    }
+
+    const handleSaveNote = () => {
+        updateNote({ noteId: note.id, content: editContent })
+        setTarget({
+            kind: 'note',
+            note: {
+                ...note,
+                content: editContent,
+            },
+            editMode: false,
+        })
+    }
+
+    const handleCancelEdit = () => {
+        setEditContent(note.content || '')
+        setTarget({
+            ...target,
+            editMode: false,
+        })
+    }
+
     const handleCopyQuote = () => {
         const quote = generateQuote(booqId, selection.text, selection.range)
         clipboard.writeText(quote)
@@ -101,38 +130,70 @@ export function NoteTargetMenu({
                 style={{
                     backgroundColor: hasColor ? noteColor : 'var(--color-background)'
                 }}>
-                {/* Note content */}
-                {note.content && (
-                    <div className="mb-3 text-sm text-primary">
-                        {note.content}
-                    </div>
-                )}
-
-                {/* Action buttons */}
-                <div className="flex flex-row gap-4">
-                    {isOwnNote && user && (
-                        <>
+                {editMode ? (
+                    /* Edit mode UI */
+                    <>
+                        <textarea
+                            className='w-full px-3 py-2 border border-dimmed rounded bg-background text-primary text-sm leading-relaxed resize-y min-h-[80px] focus:outline-none focus:border-action mb-3'
+                            style={{ fontFamily: 'var(--font-main)' }}
+                            placeholder='Add a note...'
+                            value={editContent}
+                            onChange={(e) => setEditContent(e.target.value)}
+                            rows={3}
+                            autoFocus
+                        />
+                        <div className="flex flex-row gap-4">
                             <ActionButton
-                                onClick={handleAddComment}
+                                onClick={handleSaveNote}
                                 icon={<CommentIcon />}
                             >
-                                {note.content ? 'Edit' : 'Add note'}
+                                Save note
                             </ActionButton>
                             <ActionButton
-                                onClick={handleRemoveNote}
+                                onClick={handleCancelEdit}
                                 icon={<RemoveIcon />}
                             >
-                                Remove
+                                Cancel
                             </ActionButton>
-                        </>
-                    )}
-                    <ActionButton
-                        onClick={handleCopyQuote}
-                        icon={<ShareIcon />}
-                    >
-                        Copy
-                    </ActionButton>
-                </div>
+                        </div>
+                    </>
+                ) : (
+                    /* Display mode UI */
+                    <>
+                        {/* Note content */}
+                        {note.content && (
+                            <div className="mb-3 text-sm text-primary">
+                                {note.content}
+                            </div>
+                        )}
+
+                        {/* Action buttons */}
+                        <div className="flex flex-row gap-4">
+                            {isOwnNote && user && (
+                                <>
+                                    <ActionButton
+                                        onClick={note.content ? handleEditNote : handleAddComment}
+                                        icon={<CommentIcon />}
+                                    >
+                                        {note.content ? 'Edit' : 'Add note'}
+                                    </ActionButton>
+                                    <ActionButton
+                                        onClick={handleRemoveNote}
+                                        icon={<RemoveIcon />}
+                                    >
+                                        Remove
+                                    </ActionButton>
+                                </>
+                            )}
+                            <ActionButton
+                                onClick={handleCopyQuote}
+                                icon={<ShareIcon />}
+                            >
+                                Copy
+                            </ActionButton>
+                        </div>
+                    </>
+                )}
 
                 {/* Author info and date */}
                 <div className="flex items-center justify-end gap-2 mt-3">
