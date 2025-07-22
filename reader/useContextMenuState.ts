@@ -1,12 +1,14 @@
 'use client'
-import { useCallback, useState, useMemo } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { getAugmentationElement, getSelectionElement, VirtualElement } from '@/viewer'
 import { ContextMenuTarget } from './ContextMenuContent'
-import { noteAugmentationId, quoteAugmentationId, temporaryAugmentationId } from './useAugmentations'
-import { BooqRange } from '@/core'
+import { noteAugmentationId, quoteAugmentationId, TemporaryAugmentation, temporaryAugmentationId } from './useAugmentations'
+import { selectionColor } from '@/application/common'
 
 export type ContextMenuTargetSetter = (setterOrValue: ContextMenuTarget | ((prev: ContextMenuTarget) => ContextMenuTarget)) => void
-export const MENU_ANCHOR_ID = 'menu-anchor'
+
+const CREATE_COMMENT_ID = 'create-comment'
+const COPILOT_ID = 'copilot'
 
 export function useContextMenuState() {
     const [anchor, setAnchor] = useState<VirtualElement | undefined>(undefined)
@@ -31,7 +33,8 @@ export function useContextMenuState() {
         })
     }, [setTarget])
 
-    const anchorRange = useMemo<BooqRange | undefined>(() => {
+    const contextMenuAugmentations = useMemo<TemporaryAugmentation[]>(() => {
+        const augmentations: TemporaryAugmentation[] = []
         if (target.kind === 'create-comment') {
             // Get the range from the parent target
             const parentRange = target.parent.kind === 'selection' || target.parent.kind === 'quote'
@@ -41,20 +44,27 @@ export function useContextMenuState() {
                     : undefined
 
             if (parentRange) {
-                return parentRange
+                augmentations.push({
+                    range: parentRange,
+                    name: CREATE_COMMENT_ID,
+                    underline: 'dashed',
+                })
             }
+        } else if (target.kind === 'copilot') {
+            augmentations.push({
+                range: target.selection.range,
+                name: COPILOT_ID,
+                color: selectionColor,
+            })
         }
-        if (target.kind === 'copilot') {
-            return target.selection.range
-        }
-        return undefined
+        return augmentations
     }, [target])
 
     return {
         menuTarget: target,
         setMenuTarget,
         anchor,
-        anchorRange,
+        contextMenuAugmentations,
     }
 }
 
@@ -84,9 +94,12 @@ function getAnchorForTarget(target: ContextMenuTarget): VirtualElement | undefin
             const augmentationId = quoteAugmentationId()
             return getAugmentationElement(augmentationId)
         }
-        case 'copilot':
+        case 'copilot': {
+            const augmentationId = temporaryAugmentationId(COPILOT_ID)
+            return getAugmentationElement(augmentationId)
+        }
         case 'create-comment': {
-            const augmentationId = temporaryAugmentationId(MENU_ANCHOR_ID)
+            const augmentationId = temporaryAugmentationId(CREATE_COMMENT_ID)
             return getAugmentationElement(augmentationId)
         }
         default:

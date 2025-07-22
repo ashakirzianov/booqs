@@ -1,5 +1,5 @@
 import { useMemo, useCallback } from 'react'
-import { highlightColorForNoteKind, quoteColor, temporaryColor } from '@/application/common'
+import { highlightColorForNoteKind, quoteColor } from '@/application/common'
 import { getAugmentationText, Augmentation } from '@/viewer'
 import { BooqNote, BooqRange } from '@/core'
 import { ContextMenuTarget } from './ContextMenuContent'
@@ -7,6 +7,8 @@ import { ContextMenuTarget } from './ContextMenuContent'
 export type TemporaryAugmentation = {
     range: BooqRange,
     name: string,
+    color?: string,
+    underline?: 'dashed' | 'solid',
 }
 
 export function useAugmentations({
@@ -31,7 +33,8 @@ export function useAugmentations({
             return {
                 id: temporaryAugmentationId(temp.name),
                 range: temp.range,
-                color: temporaryColor,
+                color: temp.color,
+                underline: temp.underline,
             }
         })
 

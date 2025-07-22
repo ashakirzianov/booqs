@@ -24,8 +24,8 @@ import Link from 'next/link'
 import { useScrollToQuote } from './useScrollToQuote'
 import { useScrollHandler } from './useScrollHandler'
 import { useControlsVisibility } from './useControlsVisibility'
-import { useAugmentations, TemporaryAugmentation } from './useAugmentations'
-import { MENU_ANCHOR_ID, useContextMenuState } from './useContextMenuState'
+import { useAugmentations } from './useAugmentations'
+import { useContextMenuState } from './useContextMenuState'
 import { ContextMenuContent } from './ContextMenuContent'
 import { usePageData } from './usePageData'
 
@@ -102,24 +102,13 @@ export function Reader({
         isFollowingLoading={isFollowingLoading}
     />
 
-    const { anchor, menuTarget, setMenuTarget, anchorRange } = useContextMenuState()
-
-    const temporaryAugmentations = useMemo<TemporaryAugmentation[]>(() => {
-        if (!anchorRange) {
-            return []
-        }
-
-        return [{
-            range: anchorRange,
-            name: MENU_ANCHOR_ID,
-        }]
-    }, [anchorRange])
+    const { anchor, menuTarget, setMenuTarget, contextMenuAugmentations } = useContextMenuState()
 
     const { augmentations, menuTargetForAugmentation } = useAugmentations({
         notes: navigationSelection.notes ? userNotes : undefined,
         comments: comments,
         quote: quote,
-        temporaryAugmentations,
+        temporaryAugmentations: contextMenuAugmentations,
     })
     const { visible } = useControlsVisibility()
 

@@ -52,7 +52,7 @@ export function dimmedColorForNoteKind(kind: string) {
     return noteKindToColorSchemeMapping[kind]?.dimmedColor ?? 'var(--color-dimmed)'
 }
 export const quoteColor = 'rgba(255, 165, 0, 0.6)'
-export const temporaryColor = 'rgba(180, 213, 255, 0.99)'
+export const selectionColor = 'rgba(180, 213, 255, 0.99)'
 export const noteColoredKinds = Object.keys(noteKindToColorSchemeMapping)
 
 function formatDateString(date: Date, currentDate: Date): string {
