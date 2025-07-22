@@ -9,11 +9,8 @@ import { Spinner } from '@/components/Icons'
 import { useBooqNotes } from '@/application/notes'
 import {
     CopilotItem,
-    AuthorItem,
     AddHighlightItem,
     AddCommentItem,
-    RemoveNoteItem,
-    SelectNoteColorItem,
     CopyQuoteItem,
     CopyTextItem,
     CopyLinkItem,
@@ -22,6 +19,7 @@ import {
 import { useRouter } from 'next/navigation'
 import { quoteHref } from '@/core/href'
 import { noteColoredKinds } from '@/application/common'
+import { NoteTargetMenu } from './NoteTargetMenu'
 
 type EmptyTarget = {
     kind: 'empty',
@@ -109,42 +107,6 @@ function QuoteTargetMenu({
         <AddCommentItem target={target} user={user} setTarget={setTarget} />
         <CopilotItem selection={selection} setTarget={setTarget} />
         <CopyTextItem selection={selection} booqId={booqId} setTarget={setTarget} />
-    </>
-}
-
-function NoteTargetMenu({
-    target, booqId, user, setTarget
-}: {
-    target: NoteTarget,
-    booqId: BooqId,
-    user: AuthorData | undefined,
-    setTarget: (target: ContextMenuTarget) => void,
-}) {
-    const { note } = target
-    const isOwnNote = user?.id === note.author?.id
-    const selection = {
-        range: note.range,
-        text: note.targetQuote,
-    }
-    return <>
-        {isOwnNote ? null :
-            <AuthorItem
-                name={note.author.name}
-                pictureUrl={note.author.profilePictureURL ?? undefined}
-                emoji={note.author.emoji}
-                username={note.author.username}
-            />
-        }
-        {!isOwnNote || !user ? null :
-            <SelectNoteColorItem booqId={booqId} user={user} setTarget={setTarget} note={note} />
-        }
-        {!isOwnNote || !user ? null :
-            <RemoveNoteItem booqId={booqId} user={user} setTarget={setTarget} note={note} />
-        }
-        <AddCommentItem target={target} user={user} setTarget={setTarget} />
-        <CopilotItem selection={selection} setTarget={setTarget} />
-        <CopyQuoteItem selection={selection} booqId={booqId} setTarget={setTarget} />
-        <CopyLinkItem selection={selection} booqId={booqId} setTarget={setTarget} />
     </>
 }
 
