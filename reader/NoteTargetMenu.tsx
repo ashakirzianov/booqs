@@ -2,7 +2,7 @@ import Link from 'next/link'
 import * as clipboard from 'clipboard-polyfill'
 import { AuthorData, BooqId, userHref } from '@/core'
 import type { ContextMenuTarget, NoteTarget } from './ContextMenuContent'
-import { ColorSelectionButton } from './ContextMenuItems'
+import { ColorPicker } from './ColorPicker'
 import { resolveNoteColor, noteColoredKinds, formatRelativeTime } from '@/application/common'
 import { useBooqNotes } from '@/application/notes'
 import { ProfileBadge } from '@/components/ProfilePicture'
@@ -93,16 +93,10 @@ export function NoteTargetMenu({
         >
             {/* Color picker - shown for own notes */}
             {isOwnNote && user && (
-                <div className="flex flex-row items-stretch justify-between">
-                    {noteColoredKinds.map((kind, idx) => (
-                        <ColorSelectionButton
-                            key={idx}
-                            selected={kind === note.kind}
-                            color={resolveNoteColor(kind)}
-                            callback={() => handleColorChange(kind)}
-                        />
-                    ))}
-                </div>
+                <ColorPicker
+                    selectedKind={note.kind}
+                    onColorChange={handleColorChange}
+                />
             )}
 
             {/* Content container with padding */}
