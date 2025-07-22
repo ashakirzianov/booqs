@@ -4,8 +4,8 @@ import { useState } from 'react'
 import { AuthorData, BooqId, userHref } from '@/core'
 import type { ContextMenuTarget, NoteTarget } from './ContextMenuContent'
 import { ColorPicker } from './ColorPicker'
-import { highlightColorForNoteKind, textColorForNoteKind, dimmedColorForNoteKind, noteColoredKinds, formatRelativeTime } from '@/application/common'
-import { useBooqNotes } from '@/application/notes'
+import { highlightColorForNoteKind, textColorForNoteKind, dimmedColorForNoteKind, formatRelativeTime } from '@/application/common'
+import { HIGHLIGHT_KINDS, useBooqNotes } from '@/application/notes'
 import { ProfileBadge } from '@/components/ProfilePicture'
 import { CommentIcon, RemoveIcon, ShareIcon } from '@/components/Icons'
 import { generateQuote } from './ContextMenuItems'
@@ -53,7 +53,7 @@ export function NoteTargetMenu({
     const noteColor = highlightColorForNoteKind(note.kind)
     const textColor = textColorForNoteKind(note.kind)
     const dimmedColor = dimmedColorForNoteKind(note.kind)
-    const hasColor = noteColoredKinds.includes(note.kind)
+    const hasColor = HIGHLIGHT_KINDS.includes(note.kind)
     const [editContent, setEditContent] = useState(note.content || '')
 
     const selection = {

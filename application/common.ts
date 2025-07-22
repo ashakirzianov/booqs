@@ -13,27 +13,27 @@ const noteKindToColorSchemeMapping: {
         dimmedColor: string
     } | undefined
 } = {
-    first: {
+    'highlight-0': {
         color: 'rgba(255, 215, 0, 0.6)',
         textColor: 'rgb(184, 134, 11)',
         dimmedColor: 'rgba(184, 134, 11, 0.7)'
     },
-    second: {
+    'highlight-1': {
         color: 'rgba(135, 206, 235, 0.6)',
         textColor: 'rgb(30, 64, 175)',
         dimmedColor: 'rgba(30, 64, 175, 0.7)'
     },
-    third: {
+    'highlight-2': {
         color: 'rgba(240, 128, 128, 0.6)',
         textColor: 'rgb(185, 28, 28)',
         dimmedColor: 'rgba(185, 28, 28, 0.7)'
     },
-    forth: {
+    'highlight-3': {
         color: 'rgba(75, 0, 130, 0.6)',
         textColor: 'rgb(55, 6, 91)',
         dimmedColor: 'rgba(55, 6, 91, 0.7)'
     },
-    fifth: {
+    'highlight-4': {
         color: 'rgba(34, 139, 34, 0.6)',
         textColor: 'rgb(22, 101, 52)',
         dimmedColor: 'rgba(22, 101, 52, 0.7)'
@@ -53,7 +53,6 @@ export function dimmedColorForNoteKind(kind: string) {
 }
 export const quoteColor = 'rgba(255, 165, 0, 0.6)'
 export const selectionColor = 'rgba(180, 213, 255, 0.99)'
-export const noteColoredKinds = Object.keys(noteKindToColorSchemeMapping)
 
 function formatDateString(date: Date, currentDate: Date): string {
     const isSameYear = date.getFullYear() === currentDate.getFullYear()

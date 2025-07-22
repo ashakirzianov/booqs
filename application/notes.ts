@@ -8,6 +8,9 @@ import { useMemo } from 'react'
 import useSWR from 'swr'
 import useSWRMutation from 'swr/mutation'
 
+export const HIGHLIGHT_KINDS = [
+    'highlight-0', 'highlight-1', 'highlight-2', 'highlight-3', 'highlight-4',
+]
 export function useBooqNotes({
     booqId, user,
 }: {

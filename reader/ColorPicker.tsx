@@ -1,4 +1,5 @@
-import { highlightColorForNoteKind, noteColoredKinds } from '@/application/common'
+import { highlightColorForNoteKind } from '@/application/common'
+import { HIGHLIGHT_KINDS } from '@/application/notes'
 
 export function ColorPicker({
     selectedKind,
@@ -9,7 +10,7 @@ export function ColorPicker({
 }) {
     return (
         <div className="flex flex-row items-stretch justify-between">
-            {noteColoredKinds.map((kind, idx) => (
+            {HIGHLIGHT_KINDS.map((kind, idx) => (
                 <ColorSelectionButton
                     key={idx}
                     selected={kind === selectedKind}
