@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { BooqNote, pathToId, userHref } from '@/core'
 import { Avatar } from '@/components/Avatar'
 import { TabButton } from './TabButton'
+import { resolveNoteKind } from '@/application/common'
 
 export function CommentsPanel({ comments, currentUser, followingUserIds, isFollowingLoading }: {
     comments: BooqNote[],
@@ -71,7 +72,7 @@ function CommentItem({ comment }: { comment: BooqNote }) {
             {/* Referenced text */}
             <Link href={`#${pathToId(comment.range.start)}`}
                 className='block p-2 rounded text-sm italic border-l-2 hover:bg-gray-50 transition-colors cursor-pointer'
-                style={{ borderLeftColor: comment.color }}>
+                style={{ borderLeftColor: resolveNoteKind(comment.kind) }}>
                 &quot;{comment.targetQuote}&quot;
             </Link>
 

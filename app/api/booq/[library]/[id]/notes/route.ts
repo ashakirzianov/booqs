@@ -26,7 +26,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Pa
     return Response.json(result)
 }
 
-export type PostBody = Pick<DbNote, 'id' | 'start_path' | 'end_path' | 'color' | 'content' | 'target_quote' | 'privacy'>
+export type PostBody = Pick<DbNote, 'id' | 'start_path' | 'end_path' | 'kind' | 'content' | 'target_quote' | 'privacy'>
 export type PostResponse = DbNoteWithAuthor
 export async function POST(request: NextRequest, { params }: { params: Promise<Params> }) {
     const { library, id: paramsId } = await params
@@ -39,8 +39,8 @@ export async function POST(request: NextRequest, { params }: { params: Promise<P
     if (!author) {
         return Response.json({ error: 'User does not exist' }, { status: 401 })
     }
-    const { id, start_path, end_path, color, content, target_quote, privacy }: PostBody = await request.json()
-    if (!id || !booqId || !start_path || !end_path || !color) {
+    const { id, start_path, end_path, kind, content, target_quote, privacy }: PostBody = await request.json()
+    if (!id || !booqId || !start_path || !end_path || !kind) {
         return Response.json({ error: 'Missing required fields' }, { status: 400 })
     }
     const note = await addNote({
@@ -51,7 +51,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<P
             start: start_path,
             end: end_path,
         },
-        color: color,
+        kind: kind,
         content: content ?? undefined,
         targetQuote: target_quote,
         privacy: privacy ?? 'private',

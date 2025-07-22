@@ -13,16 +13,16 @@ import {
     AddHighlightItem,
     AddCommentItem,
     RemoveNoteItem,
-    SelectNoteColorItem,
+    SelectNoteKindItem,
     CopyQuoteItem,
     CopyTextItem,
     CopyLinkItem,
-    NoteColorPicker,
+    NoteKindPicker,
     generateQuote,
 } from './ContextMenuItems'
 import { useRouter } from 'next/navigation'
 import { quoteHref } from '@/core/href'
-import { noteColorNames } from '@/application/common'
+import { noteKindNames } from '@/application/common'
 
 type EmptyTarget = {
     kind: 'empty',
@@ -137,7 +137,7 @@ function NoteTargetMenu({
             />
         }
         {!isOwnNote || !user ? null :
-            <SelectNoteColorItem booqId={booqId} user={user} setTarget={setTarget} note={note} />
+            <SelectNoteKindItem booqId={booqId} user={user} setTarget={setTarget} note={note} />
         }
         {!isOwnNote || !user ? null :
             <RemoveNoteItem booqId={booqId} user={user} setTarget={setTarget} note={note} />
@@ -158,7 +158,7 @@ function CommentTargetMenu({
     setTarget: (target: ContextMenuTarget) => void,
 }) {
     const [comment, setComment] = useState('')
-    const [selectedColor, setSelectedColor] = useState(noteColorNames[0])
+    const [selectedKind, setSelectedKind] = useState(noteKindNames[0])
     const { addNote } = useBooqNotes({ booqId, user })
 
     // Extract selection from parent target
@@ -170,7 +170,7 @@ function CommentTargetMenu({
         if (!user?.id || !comment.trim()) return
 
         const note = addNote({
-            color: selectedColor,
+            kind: selectedKind,
             range: selection.range,
             content: comment.trim(),
             privacy: 'public',
@@ -188,9 +188,9 @@ function CommentTargetMenu({
     }
 
     return <div className='flex flex-col min-w-[300px] max-w-[400px]'>
-        <NoteColorPicker
-            selectedColor={selectedColor}
-            onColorSelect={setSelectedColor}
+        <NoteKindPicker
+            selectedKind={selectedKind}
+            onKindSelect={setSelectedKind}
         />
         <div className='flex flex-col gap-3 p-4'>
             <div className='italic text-dimmed text-sm leading-relaxed border-l-[3px] border-highlight pl-3 mb-2'>

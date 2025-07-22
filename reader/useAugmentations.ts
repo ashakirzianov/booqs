@@ -1,5 +1,5 @@
 import { useMemo, useCallback } from 'react'
-import { resolveNoteColor, quoteColor, temporaryColor } from '@/application/common'
+import { resolveNoteKind, quoteColor, temporaryColor } from '@/application/common'
 import { getAugmentationText, Augmentation } from '@/viewer'
 import { BooqNote, BooqRange } from '@/core'
 import { ContextMenuTarget } from './ContextMenuContent'
@@ -23,7 +23,7 @@ export function useAugmentations({
             return {
                 id: noteAugmentationId(note),
                 range: note.range,
-                color: resolveNoteColor(note.color),
+                color: resolveNoteKind(note.kind),
             }
         })
 

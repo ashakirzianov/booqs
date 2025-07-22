@@ -7,7 +7,7 @@ import { MenuItem } from '@/components/Menu'
 import { quoteHref, userHref } from '@/core/href'
 import { BooqSelection } from '@/viewer'
 import { ProfileBadge } from '@/components/ProfilePicture'
-import { resolveNoteColor, noteColorNames } from '@/application/common'
+import { resolveNoteKind, noteKindNames } from '@/application/common'
 import { useBooqNotes } from '@/application/notes'
 import { CopilotIcon, CommentIcon, CopyIcon, LinkIcon, RemoveIcon, ShareIcon } from '@/components/Icons'
 import type { ContextMenuTarget, SelectionTarget, QuoteTarget, NoteTarget } from './ContextMenuContent'
@@ -59,21 +59,21 @@ export function AuthorItem({ name, pictureUrl, emoji, username }: {
     )
 }
 
-export function NoteColorPicker({ 
-    selectedColor, 
-    onColorSelect 
+export function NoteKindPicker({ 
+    selectedKind, 
+    onKindSelect 
 }: {
-    selectedColor?: string,
-    onColorSelect: (color: string) => void,
+    selectedKind?: string,
+    onKindSelect: (kind: string) => void,
 }) {
     return <div className='flex flex-1 flex-row items-stretch justify-between cursor-pointer text-sm select-none'>
         {
-            noteColorNames.map(
-                (color, idx) => <ColorSelectionButton
+            noteKindNames.map(
+                (kind, idx) => <ColorSelectionButton
                     key={idx}
-                    selected={selectedColor === color}
-                    color={resolveNoteColor(color)}
-                    callback={() => onColorSelect(color)}
+                    selected={selectedKind === kind}
+                    color={resolveNoteKind(kind)}
+                    callback={() => onKindSelect(kind)}
                 />,
             )
         }
@@ -92,10 +92,10 @@ export function AddHighlightItem({
     if (!user?.id) {
         return null
     }
-    return <NoteColorPicker
-        onColorSelect={(color) => {
+    return <NoteKindPicker
+        onKindSelect={(kind) => {
             const note = addNote({
-                color,
+                kind,
                 range: selection.range,
                 targetQuote: selection.text,
             })
@@ -154,7 +154,7 @@ export function RemoveNoteItem({
     />
 }
 
-export function SelectNoteColorItem({
+export function SelectNoteKindItem({
     note, booqId, setTarget, user,
 }: {
     note: BooqNote,
@@ -163,16 +163,16 @@ export function SelectNoteColorItem({
     setTarget: (target: ContextMenuTarget) => void,
 }) {
     const { updateNote } = useBooqNotes({ booqId, user })
-    return <NoteColorPicker
-        selectedColor={note.color}
-        onColorSelect={(color) => {
-            updateNote({ noteId: note.id, color })
+    return <NoteKindPicker
+        selectedKind={note.kind}
+        onKindSelect={(kind) => {
+            updateNote({ noteId: note.id, kind })
             // Note: hackie way of updating selection
             setTarget({
                 kind: 'note',
                 note: {
                     ...note,
-                    color,
+                    kind,
                 },
             })
         }}

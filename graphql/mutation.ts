@@ -52,7 +52,7 @@ export const mutationResolver: IResolvers<any, ResolverContext> = {
                         start: note.start,
                         end: note.end,
                     },
-                    color: note.color,
+                    kind: note.kind,
                     targetQuote: note.targetQuote,
                 })
                 return true
@@ -70,12 +70,12 @@ export const mutationResolver: IResolvers<any, ResolverContext> = {
                 return false
             }
         },
-        async updateNote(_, { id, color }, { userId }): Promise<boolean> {
+        async updateNote(_, { id, kind }, { userId }): Promise<boolean> {
             if (userId) {
                 await updateNote({
                     authorId: userId,
                     id: id,
-                    color,
+                    kind,
                 })
                 return true
             } else {
