@@ -96,7 +96,7 @@ input BookmarkInput {
 input NoteInput {
     id: ID
     booqId: ID!
-    color: String!
+    kind: String!
     start: [Int!]
     end: [Int!]
     targetQuote: String
@@ -147,7 +147,7 @@ type Note {
     id: ID
     start: [Int!]!
     end: [Int!]!
-    color: String
+    kind: String
     text: String
     targetQuote: String
     position: Int

@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { BooqNote, pathToId, userHref } from '@/core'
 import { Avatar } from '@/components/Avatar'
 import { TabButton } from './TabButton'
+import { quoteColor } from '@/application/common'
 
 export function CommentsPanel({ comments, currentUser, followingUserIds, isFollowingLoading }: {
     comments: BooqNote[],
@@ -11,14 +12,14 @@ export function CommentsPanel({ comments, currentUser, followingUserIds, isFollo
     isFollowingLoading?: boolean,
 }) {
     const [commentsFilter, setCommentsFilter] = React.useState<'all' | 'following'>('all')
-    
+
     const filteredComments = React.useMemo(() => {
         if (commentsFilter === 'all' || !currentUser || !followingUserIds) {
             return comments
         }
-        
-        return comments.filter(comment => 
-            comment.author.id === currentUser.id || 
+
+        return comments.filter(comment =>
+            comment.author.id === currentUser.id ||
             followingUserIds.includes(comment.author.id)
         )
     }, [comments, commentsFilter, currentUser, followingUserIds])
@@ -71,7 +72,7 @@ function CommentItem({ comment }: { comment: BooqNote }) {
             {/* Referenced text */}
             <Link href={`#${pathToId(comment.range.start)}`}
                 className='block p-2 rounded text-sm italic border-l-2 hover:bg-gray-50 transition-colors cursor-pointer'
-                style={{ borderLeftColor: comment.color }}>
+                style={{ borderLeftColor: quoteColor }}>
                 &quot;{comment.targetQuote}&quot;
             </Link>
 

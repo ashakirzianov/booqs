@@ -7,7 +7,7 @@ import { MenuItem } from '@/components/Menu'
 import { quoteHref, userHref } from '@/core/href'
 import { BooqSelection } from '@/viewer'
 import { ProfileBadge } from '@/components/ProfilePicture'
-import { resolveNoteColor, noteColorNames } from '@/application/common'
+import { resolveNoteColor, noteColoredKinds } from '@/application/common'
 import { useBooqNotes } from '@/application/notes'
 import { CopilotIcon, CommentIcon, CopyIcon, LinkIcon, RemoveIcon, ShareIcon } from '@/components/Icons'
 import type { ContextMenuTarget, SelectionTarget, QuoteTarget, NoteTarget } from './ContextMenuContent'
@@ -73,14 +73,14 @@ export function AddHighlightItem({
     }
     return <div className='flex flex-1 flex-row items-stretch justify-between cursor-pointer text-sm select-none'>
         {
-            noteColorNames.map(
-                (color, idx) => <ColorSelectionButton
+            noteColoredKinds.map(
+                (kind, idx) => <ColorSelectionButton
                     key={idx}
                     selected={false}
-                    color={resolveNoteColor(color)}
+                    color={resolveNoteColor(kind)}
                     callback={() => {
                         const note = addNote({
-                            color,
+                            kind,
                             range: selection.range,
                             targetQuote: selection.text,
                         })
@@ -153,19 +153,19 @@ export function SelectNoteColorItem({
     const { updateNote } = useBooqNotes({ booqId, user })
     return <div className='flex flex-1 flex-row items-stretch justify-between cursor-pointer text-sm select-none'>
         {
-            noteColorNames.map(
-                (color, idx) => <ColorSelectionButton
+            noteColoredKinds.map(
+                (kind, idx) => <ColorSelectionButton
                     key={idx}
-                    selected={color === note.color}
-                    color={resolveNoteColor(color)}
+                    selected={kind === note.kind}
+                    color={resolveNoteColor(kind)}
                     callback={() => {
-                        updateNote({ noteId: note.id, color })
+                        updateNote({ noteId: note.id, kind })
                         // Note: hackie way of updating selection
                         setTarget({
                             kind: 'note',
                             note: {
                                 ...note,
-                                color,
+                                kind,
                             },
                         })
                     }}

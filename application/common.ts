@@ -7,8 +7,8 @@ export function currentSource(): string {
 }
 
 const defaultColor = 'rgba(255, 215, 0, 0.6)'
-const noteColorMapping: {
-    [color in string]: string | undefined;
+const noteKindToColorMapping: {
+    [kind in string]: string | undefined;
 } = {
     first: defaultColor,
     second: 'rgba(135, 206, 235, 0.6)',
@@ -16,9 +16,9 @@ const noteColorMapping: {
     forth: 'rgba(75, 0, 130, 0.6)',
     fifth: 'rgba(34, 139, 34, 0.6)',
 }
-export function resolveNoteColor(color: string) {
-    return noteColorMapping[color] ?? defaultColor
+export function resolveNoteColor(kind: string) {
+    return noteKindToColorMapping[kind] ?? defaultColor
 }
 export const quoteColor = 'rgba(255, 165, 0, 0.6)'
 export const temporaryColor = 'rgba(180, 213, 255, 0.99)'
-export const noteColorNames = Object.keys(noteColorMapping)
+export const noteColoredKinds = Object.keys(noteKindToColorMapping)

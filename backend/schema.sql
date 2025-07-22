@@ -105,7 +105,7 @@ CREATE TABLE IF NOT EXISTS notes (
   booq_id TEXT NOT NULL,
   start_path INTEGER[] NOT NULL,
   end_path INTEGER[] NOT NULL,
-  color TEXT NOT NULL,
+  kind TEXT NOT NULL,
   content TEXT,
   target_quote TEXT NOT NULL,
   privacy note_privacy NOT NULL DEFAULT 'private',

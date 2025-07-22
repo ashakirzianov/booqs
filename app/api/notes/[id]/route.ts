@@ -9,19 +9,19 @@ type Params = {
     id: string,
 }
 
-export type PatchBody = Partial<Pick<DbNote, 'color' | 'content'>>
-export type PatchResponse = Pick<DbNote, 'id' | 'color' | 'content' | 'target_quote' | 'created_at' | 'updated_at'>
+export type PatchBody = Partial<Pick<DbNote, 'kind' | 'content'>>
+export type PatchResponse = Pick<DbNote, 'id' | 'kind' | 'content' | 'target_quote' | 'created_at' | 'updated_at'>
 export async function PATCH(request: NextRequest, { params }: { params: Promise<Params> }) {
     const userId = await getUserIdInsideRequest()
     if (!userId) {
         return Response.json({ error: 'Unauthorized' }, { status: 401 })
     }
     const { id } = await params
-    const { color, content }: PatchBody = await request.json()
+    const { kind, content }: PatchBody = await request.json()
     const note = await updateNote({
         id,
         authorId: userId,
-        color: color,
+        kind,
         content: content ?? undefined,
     })
     if (!note) {

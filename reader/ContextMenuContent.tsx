@@ -21,7 +21,7 @@ import {
 } from './ContextMenuItems'
 import { useRouter } from 'next/navigation'
 import { quoteHref } from '@/core/href'
-import { noteColorNames } from '@/application/common'
+import { noteColoredKinds } from '@/application/common'
 
 type EmptyTarget = {
     kind: 'empty',
@@ -168,7 +168,7 @@ function CommentTargetMenu({
         if (!user?.id || !comment.trim()) return
 
         const note = addNote({
-            color: noteColorNames[0], // Default color for comments
+            kind: noteColoredKinds[0], // Default color for comments
             range: selection.range,
             content: comment.trim(),
             privacy: 'public',
@@ -293,14 +293,14 @@ function CopilotQuestion({
 
     return <div className='flex flex-col gap-3 p-4 min-w-[300px] max-w-[400px]' style={{ fontFamily: 'var(--font-main)' }}>
         <div className='flex justify-between items-center'>
-            <button 
-                className='bg-transparent border-none text-dimmed cursor-pointer text-sm px-2 py-1 transition-colors duration-200 hover:text-primary' 
+            <button
+                className='bg-transparent border-none text-dimmed cursor-pointer text-sm px-2 py-1 transition-colors duration-200 hover:text-primary'
                 onClick={onBack}
             >
                 ← Back
             </button>
-            <button 
-                className='bg-transparent border-none text-dimmed cursor-pointer text-lg font-bold px-2 py-1 transition-colors duration-200 hover:text-primary' 
+            <button
+                className='bg-transparent border-none text-dimmed cursor-pointer text-lg font-bold px-2 py-1 transition-colors duration-200 hover:text-primary'
                 onClick={onClose}
             >
                 ×

@@ -13,7 +13,7 @@ export function NoteNodeComp({ booqId, note, user }: {
     note: BooqNote,
 }) {
     return <div className='container flex flex-1 justify-between pl-base' style={{
-        borderLeft: `3px solid ${resolveNoteColor(note.color)}`,
+        borderLeft: `3px solid ${resolveNoteColor(note.kind)}`,
     }}>
         <div className='w-full text-primary text-justify'>
             <Link href={booqHref({ booqId, path: note.range.start })} className='text-primary hover:text-highlight'>

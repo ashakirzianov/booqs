@@ -23,7 +23,7 @@ export function useAugmentations({
             return {
                 id: noteAugmentationId(note),
                 range: note.range,
-                color: resolveNoteColor(note.color),
+                color: resolveNoteColor(note.kind),
             }
         })
 
