@@ -3,7 +3,7 @@ import React, { useMemo, useState } from 'react'
 import { TocNodeComp } from './TocNode'
 import { NoteNodeComp } from './NoteNode'
 import { PathNotesNodeComp } from './PathNotesNode'
-import { NavigationFilter } from './Filter'
+import { NavigationFilter } from './NavigationFilter'
 import { buildNavigationNodes, NavigationNode, NavigationSelection } from './nodes'
 import { AuthorData, BooqId, BooqNote, TableOfContentsItem } from '@/core'
 
