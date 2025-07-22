@@ -87,9 +87,7 @@ function SelectionTargetMenu({
     return <>
         <AddHighlightItem booqId={booqId} user={user} setTarget={setTarget} selection={selection} />
         <AddCommentItem target={target} user={user} setTarget={setTarget} />
-        <CopilotItem selection={selection} setTarget={setTarget} />
         <CopyQuoteItem selection={selection} booqId={booqId} setTarget={setTarget} />
-        <CopyLinkItem selection={selection} booqId={booqId} setTarget={setTarget} />
     </>
 }
 
