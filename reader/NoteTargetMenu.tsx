@@ -153,22 +153,31 @@ export function NoteTargetMenu({
                 ) : (
                     /* Display mode UI */
                     <>
-                        {/* Note content */}
-                        {note.content && (
+                        {/* Note content or add note prompt */}
+                        {note.content ? (
                             <div className="mb-3 text-sm text-primary">
                                 {note.content}
+                            </div>
+                        ) : (
+                            <div className="mb-3 text-sm">
+                                <span 
+                                    className="text-dimmed cursor-pointer hover:underline hover:text-primary"
+                                    onClick={handleEditNote}
+                                >
+                                    Add note
+                                </span>
                             </div>
                         )}
 
                         {/* Action buttons */}
                         <div className="flex flex-row gap-4">
-                            {isOwnNote && user && (
+                            {isOwnNote && user && note.content && (
                                 <>
                                     <ActionButton
                                         onClick={handleEditNote}
                                         icon={<CommentIcon />}
                                     >
-                                        {note.content ? 'Edit' : 'Add note'}
+                                        Edit
                                     </ActionButton>
                                     <ActionButton
                                         onClick={handleRemoveNote}
