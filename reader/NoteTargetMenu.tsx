@@ -72,13 +72,6 @@ export function NoteTargetMenu({
         setTarget({ kind: 'empty' })
     }
 
-    const handleAddComment = () => {
-        setTarget({
-            kind: 'comment',
-            parent: target,
-        })
-    }
-
     const handleEditNote = () => {
         setTarget({
             ...target,
@@ -172,7 +165,7 @@ export function NoteTargetMenu({
                             {isOwnNote && user && (
                                 <>
                                     <ActionButton
-                                        onClick={note.content ? handleEditNote : handleAddComment}
+                                        onClick={handleEditNote}
                                         icon={<CommentIcon />}
                                     >
                                         {note.content ? 'Edit' : 'Add note'}
