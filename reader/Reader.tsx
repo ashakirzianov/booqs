@@ -131,7 +131,7 @@ export function Reader({
         if (menuTarget.kind === 'empty') {
             return null
         }
-        return <div><ContextMenuContent
+        return <div className='w-64'><ContextMenuContent
             booqId={booq.booqId}
             booqMeta={booq.meta}
             user={user}
