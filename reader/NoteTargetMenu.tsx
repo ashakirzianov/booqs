@@ -188,13 +188,13 @@ export function NoteTargetMenu({
                                     </ActionButton>
                                 </>
                             )}
-                            <ActionButton
+                            {isOwnNote && (<ActionButton
                                 onClick={handleRemoveNote}
                                 icon={<RemoveIcon />}
                                 color={textColor}
                             >
                                 Remove
-                            </ActionButton>
+                            </ActionButton>)}
                             <ActionButton
                                 onClick={handleCopyQuote}
                                 icon={<ShareIcon />}
