@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { BooqId, AuthorData, BooqRange, pathInRange, pathLessThan } from '@/core'
-import { useBooqNotes } from '@/application/notes'
+import { HIGHLIGHT_KINDS, COMMENT_KIND, useBooqNotes } from '@/application/notes'
 
 export function useNotesData({
     booqId,
@@ -23,18 +23,24 @@ export function useNotesData({
             })
     }, [allNotes])
 
-    const userNotes = useMemo(() => {
-        return sortedNotes.filter(note => note.author.id === user?.id)
-    }, [sortedNotes, user?.id])
+    const allHighlights = useMemo(() => {
+        return sortedNotes.filter(note => HIGHLIGHT_KINDS.includes(note.kind))
+    }, [sortedNotes])
+
+    const userHighlights = useMemo(() => {
+        return allHighlights
+            .filter(note => note.author.id === user?.id)
+    }, [allHighlights, user?.id])
 
     const comments = useMemo(() => {
         if (!currentRange) return []
         return sortedNotes.filter(note =>
-            pathInRange(note.range.start, currentRange)
+            note.kind === COMMENT_KIND
+            && pathInRange(note.range.start, currentRange)
             && note.content
             && note.content.trim()?.length > 0
         )
     }, [sortedNotes, currentRange])
 
-    return { userNotes, comments }
+    return { userHighlights, comments }
 }

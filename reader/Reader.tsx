@@ -55,7 +55,7 @@ export function Reader({
         end: booq.fragment.next?.path ?? [booq.fragment.nodes.length],
     }), [booq])
 
-    const { userNotes, comments } = useNotesData({
+    const { userHighlights, comments } = useNotesData({
         booqId: booq.booqId,
         user,
         currentRange: range,
@@ -75,7 +75,7 @@ export function Reader({
         booqId={booq.booqId}
         title={booq.meta.title ?? 'Untitled'}
         toc={booq.toc.items}
-        notes={userNotes}
+        notes={userHighlights}
         selection={navigationSelection}
         user={user}
         toggleSelection={toggleNavigationSelection}
@@ -105,7 +105,7 @@ export function Reader({
     const { anchor, menuTarget, setMenuTarget, contextMenuAugmentations } = useContextMenuState()
 
     const { augmentations, menuTargetForAugmentation } = useAugmentations({
-        notes: navigationSelection.notes ? userNotes : undefined,
+        notes: navigationSelection.notes ? userHighlights : undefined,
         comments: comments,
         quote: quote,
         temporaryAugmentations: contextMenuAugmentations,

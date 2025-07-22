@@ -11,6 +11,7 @@ import useSWRMutation from 'swr/mutation'
 export const HIGHLIGHT_KINDS = [
     'highlight-0', 'highlight-1', 'highlight-2', 'highlight-3', 'highlight-4',
 ]
+export const COMMENT_KIND = 'comment'
 export function useBooqNotes({
     booqId, user,
 }: {
