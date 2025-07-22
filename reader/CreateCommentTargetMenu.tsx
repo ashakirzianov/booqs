@@ -1,4 +1,3 @@
-import { noteColoredKinds } from '@/application/common'
 import { useBooqNotes } from '@/application/notes'
 import { BooqId, AuthorData } from '@/core'
 import { BooqSelection } from '@/viewer'
@@ -25,7 +24,7 @@ export function CreateCommentTargetMenu({
         if (!user?.id || !comment.trim()) return
 
         const note = addNote({
-            kind: noteColoredKinds[0], // Default color for comments
+            kind: 'comment',
             range: selection.range,
             content: comment.trim(),
             privacy: 'public',
