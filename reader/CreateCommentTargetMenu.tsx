@@ -43,9 +43,6 @@ export function CreateCommentTargetMenu({
     }
 
     return <div className='flex flex-col gap-3 p-4'>
-        <div className='italic text-dimmed text-sm leading-relaxed border-l-[3px] border-highlight pl-3 mb-2'>
-            &ldquo;{selection.text}&rdquo;
-        </div>
         <textarea
             className='w-full px-3 py-2 border border-dimmed rounded bg-background text-primary text-sm leading-relaxed resize-y min-h-[80px] focus:outline-none focus:border-action'
             style={{ fontFamily: 'var(--font-main)' }}
