@@ -148,7 +148,7 @@ function CommentTargetMenu({
         setTarget(parent)
     }
 
-    return <div className='flex flex-col gap-3 p-4 min-w-[300px] max-w-[400px]'>
+    return <div className='flex flex-col gap-3 p-4'>
         <div className='italic text-dimmed text-sm leading-relaxed border-l-[3px] border-highlight pl-3 mb-2'>
             &ldquo;{selection.text}&rdquo;
         </div>
@@ -215,7 +215,7 @@ function CopilotTargetMenu({
         />
     }
 
-    return <div className='flex flex-col gap-3 p-4 min-w-[300px] max-w-[400px]' style={{ fontFamily: 'var(--font-main)' }}>
+    return <div className='flex flex-col gap-3 p-4' style={{ fontFamily: 'var(--font-main)' }}>
         <div className='italic text-dimmed text-sm leading-relaxed border-l-[3px] border-highlight pl-3 mb-2'>
             &ldquo;{selection.text}&rdquo;
         </div>
@@ -254,7 +254,7 @@ function CopilotQuestion({
 }) {
     const { loading, answer } = useCopilotAnswer(context, question)
 
-    return <div className='flex flex-col gap-3 p-4 min-w-[300px] max-w-[400px]' style={{ fontFamily: 'var(--font-main)' }}>
+    return <div className='flex flex-col gap-3 p-4' style={{ fontFamily: 'var(--font-main)' }}>
         <div className='flex justify-between items-center'>
             <button
                 className='bg-transparent border-none text-dimmed cursor-pointer text-sm px-2 py-1 transition-colors duration-200 hover:text-primary'
