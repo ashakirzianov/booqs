@@ -16,8 +16,39 @@ const noteKindToColorMapping: {
     forth: 'rgba(75, 0, 130, 0.6)',
     fifth: 'rgba(34, 139, 34, 0.6)',
 }
+
+const defaultTextColor = 'rgb(184, 134, 11)' // Golden text
+const noteKindToTextColorMapping: {
+    [kind in string]: string | undefined;
+} = {
+    first: defaultTextColor,
+    second: 'rgb(30, 64, 175)', // Blue text
+    third: 'rgb(185, 28, 28)', // Red text
+    forth: 'rgb(55, 6, 91)', // Purple text
+    fifth: 'rgb(22, 101, 52)', // Green text
+}
+
+const defaultDimmedColor = 'rgba(184, 134, 11, 0.7)' // Dimmed golden
+const noteKindToDimmedColorMapping: {
+    [kind in string]: string | undefined;
+} = {
+    first: defaultDimmedColor,
+    second: 'rgba(30, 64, 175, 0.7)', // Dimmed blue
+    third: 'rgba(185, 28, 28, 0.7)', // Dimmed red
+    forth: 'rgba(55, 6, 91, 0.7)', // Dimmed purple
+    fifth: 'rgba(22, 101, 52, 0.7)', // Dimmed green
+}
+
 export function highlightColorForNoteKind(kind: string) {
     return noteKindToColorMapping[kind] ?? defaultColor
+}
+
+export function textColorForNoteKind(kind: string) {
+    return noteKindToTextColorMapping[kind] ?? defaultTextColor
+}
+
+export function dimmedColorForNoteKind(kind: string) {
+    return noteKindToDimmedColorMapping[kind] ?? defaultDimmedColor
 }
 export const quoteColor = 'rgba(255, 165, 0, 0.6)'
 export const temporaryColor = 'rgba(180, 213, 255, 0.99)'
