@@ -37,8 +37,8 @@ export type NoteTarget = {
     note: BooqNote,
     editMode?: boolean,
 }
-export type CommentTarget = {
-    kind: 'comment',
+export type CreateCommentTarget = {
+    kind: 'create-comment',
     parent: SelectionTarget | QuoteTarget | NoteTarget,
 }
 export type CopilotTarget = {
@@ -47,7 +47,7 @@ export type CopilotTarget = {
     context: string,
 }
 export type ContextMenuTarget =
-    | EmptyTarget | SelectionTarget | QuoteTarget | NoteTarget | CommentTarget | CopilotTarget
+    | EmptyTarget | SelectionTarget | QuoteTarget | NoteTarget | CreateCommentTarget | CopilotTarget
 
 export function ContextMenuContent({
     target, booqMeta, booqId, user, setTarget
@@ -66,8 +66,8 @@ export function ContextMenuContent({
             return <QuoteTargetMenu target={target} booqId={booqId} user={user} setTarget={setTarget} />
         case 'note':
             return <NoteTargetMenu target={target} booqId={booqId} user={user} setTarget={setTarget} />
-        case 'comment':
-            return <CommentTargetMenu target={target} booqId={booqId} user={user} setTarget={setTarget} />
+        case 'create-comment':
+            return <CreateCommentTargetMenu target={target} booqId={booqId} user={user} setTarget={setTarget} />
         case 'copilot':
             return booqMeta ? <CopilotTargetMenu target={target} booqMeta={booqMeta} booqId={booqId} user={user} setTarget={setTarget} /> : null
         default:
@@ -111,10 +111,10 @@ function QuoteTargetMenu({
     </>
 }
 
-function CommentTargetMenu({
+function CreateCommentTargetMenu({
     target: { parent }, booqId, user, setTarget,
 }: {
-    target: CommentTarget,
+    target: CreateCommentTarget,
     booqId: BooqId,
     user: AuthorData | undefined,
     setTarget: (target: ContextMenuTarget) => void,

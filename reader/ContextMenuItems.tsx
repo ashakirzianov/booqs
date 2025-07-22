@@ -110,7 +110,7 @@ export function AddCommentItem({
         icon={<ContextMenuIcon><CommentIcon /></ContextMenuIcon>}
         callback={() => {
             setTarget({
-                kind: 'comment',
+                kind: 'create-comment',
                 parent: target,
             })
         }}
