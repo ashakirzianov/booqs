@@ -116,7 +116,7 @@ export function NoteTargetMenu({
             className="flex flex-col"
         >
             {/* Color picker - shown for own notes */}
-            {isOwnNote && user && (
+            {isOwnNote && user && hasColor && (
                 <ColorPicker
                     selectedKind={note.kind}
                     onColorChange={handleColorChange}
@@ -126,7 +126,7 @@ export function NoteTargetMenu({
             {/* Content container with padding */}
             <div className="p-2 flex flex-col"
                 style={{
-                    backgroundColor: hasColor ? noteColor : 'var(--color-background)'
+                    backgroundColor: noteColor,
                 }}>
                 {editMode ? (
                     /* Edit mode UI */
@@ -160,14 +160,14 @@ export function NoteTargetMenu({
                     <>
                         {/* Note content or add note prompt */}
                         {note.content ? (
-                            <div className="mb-3 text-sm" style={{ color: hasColor ? textColor : 'var(--color-primary)' }}>
+                            <div className="mb-3 text-sm" style={{ color: textColor }}>
                                 {note.content}
                             </div>
                         ) : (
                             <div className="mb-3 text-sm">
                                 <span
                                     className="cursor-pointer hover:underline"
-                                    style={{ color: hasColor ? dimmedColor : 'var(--color-dimmed)' }}
+                                    style={{ color: dimmedColor }}
                                     onClick={handleEditNote}
                                 >
                                     Add note
@@ -182,23 +182,23 @@ export function NoteTargetMenu({
                                     <ActionButton
                                         onClick={handleEditNote}
                                         icon={<CommentIcon />}
-                                        color={hasColor ? textColor : undefined}
+                                        color={textColor}
                                     >
                                         Edit
-                                    </ActionButton>
-                                    <ActionButton
-                                        onClick={handleRemoveNote}
-                                        icon={<RemoveIcon />}
-                                        color={hasColor ? textColor : undefined}
-                                    >
-                                        Remove
                                     </ActionButton>
                                 </>
                             )}
                             <ActionButton
+                                onClick={handleRemoveNote}
+                                icon={<RemoveIcon />}
+                                color={textColor}
+                            >
+                                Remove
+                            </ActionButton>
+                            <ActionButton
                                 onClick={handleCopyQuote}
                                 icon={<ShareIcon />}
-                                color={hasColor ? textColor : undefined}
+                                color={textColor}
                             >
                                 Copy
                             </ActionButton>
@@ -208,7 +208,7 @@ export function NoteTargetMenu({
 
                 {/* Author info and date */}
                 <div className="flex items-center justify-end gap-2 mt-3">
-                    <span className="text-xs flex items-center" style={{ color: hasColor ? dimmedColor : 'var(--color-dimmed)' }}>
+                    <span className="text-xs flex items-center" style={{ color: dimmedColor }}>
                         <Link
                             href={userHref({ username: note.author.username })}
                             className="flex items-center cursor-pointer hover:opacity-80 transition-opacity"
@@ -220,7 +220,7 @@ export function NoteTargetMenu({
                                 picture={note.author.profilePictureURL ?? undefined}
                                 emoji={note.author.emoji}
                             />
-                            <span className='hover:underline' style={{ color: hasColor ? dimmedColor : 'var(--color-dimmed)' }}>{note.author.name}</span>
+                            <span className='hover:underline' style={{ color: dimmedColor }}>{note.author.name}</span>
                         </Link>
                         , {note.createdAt === note.updatedAt ? 'created' : 'edited'} {formatRelativeTime(new Date(note.updatedAt))}
                     </span>
