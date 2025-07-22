@@ -7,12 +7,10 @@ import { getExtraMetadataValues } from '@/core/meta'
 import { ModalDivider } from '@/components/Modal'
 import { Spinner } from '@/components/Icons'
 import {
-    CopilotItem,
     AddHighlightItem,
     AddCommentItem,
     CopyQuoteItem,
     CopyTextItem,
-    CopyLinkItem,
     generateQuote,
 } from './ContextMenuItems'
 import { useRouter } from 'next/navigation'
@@ -103,7 +101,6 @@ function QuoteTargetMenu({
     return <>
         <AddHighlightItem booqId={booqId} user={user} setTarget={setTarget} selection={selection} />
         <AddCommentItem target={target} user={user} setTarget={setTarget} />
-        <CopilotItem selection={selection} setTarget={setTarget} />
         <CopyTextItem selection={selection} booqId={booqId} setTarget={setTarget} />
     </>
 }
