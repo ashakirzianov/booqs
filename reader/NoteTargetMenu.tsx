@@ -10,35 +10,6 @@ import { ProfileBadge } from '@/components/ProfilePicture'
 import { CommentIcon, RemoveIcon, ShareIcon } from '@/components/Icons'
 import { generateQuote } from './ContextMenuItems'
 
-
-function removeSelection() {
-    window.getSelection()?.empty()
-}
-
-function ActionButton({
-    onClick,
-    children,
-    icon,
-    color
-}: {
-    onClick: () => void,
-    children: React.ReactNode,
-    icon: React.ReactNode,
-    color?: string
-}) {
-    return (
-        <button
-            className="flex items-center gap-1 text-sm font-bold cursor-pointer hover:underline"
-            style={{ color: color || 'var(--color-primary)' }}
-            onClick={onClick}
-            onMouseDown={e => e.preventDefault()}
-        >
-            <div className="w-4 h-4">{icon}</div>
-            {children}
-        </button>
-    )
-}
-
 export function NoteTargetMenu({
     target, booqId, user, setTarget
 }: {
@@ -227,5 +198,33 @@ export function NoteTargetMenu({
                 </div>
             </div>
         </div>
+    )
+}
+
+function removeSelection() {
+    window.getSelection()?.empty()
+}
+
+function ActionButton({
+    onClick,
+    children,
+    icon,
+    color
+}: {
+    onClick: () => void,
+    children: React.ReactNode,
+    icon: React.ReactNode,
+    color?: string
+}) {
+    return (
+        <button
+            className="flex items-center gap-1 text-sm font-bold cursor-pointer hover:underline"
+            style={{ color: color || 'var(--color-primary)' }}
+            onClick={onClick}
+            onMouseDown={e => e.preventDefault()}
+        >
+            <div className="w-4 h-4">{icon}</div>
+            {children}
+        </button>
     )
 }
