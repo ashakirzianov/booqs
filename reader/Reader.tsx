@@ -55,19 +55,34 @@ export function Reader({
         end: booq.fragment.next?.path ?? [booq.fragment.nodes.length],
     }), [booq])
 
-    const { userHighlights, comments } = useNotesData({
-        booqId: booq.booqId,
-        user,
-        currentRange: range,
-    })
-
-    const { followingUserIds, isLoading: isFollowingLoading } = useFollowingData({ user })
-
     const {
         navigationOpen, navigationSelection,
         toggleNavigationOpen, closeNavigation,
         toggleNavigationSelection,
     } = useNavigationState()
+
+    const highlightsAuthorIds = useMemo(() => {
+        const set = new Set<string>()
+        if (navigationSelection.notes && user?.id) {
+            set.add(user.id)
+        }
+        for (const [key, value] of Object.entries(navigationSelection)) {
+            if (key.startsWith('author:') && value) {
+                const authorId = key.split(':')[1]
+                set.add(authorId)
+            }
+        }
+        return set
+    }, [navigationSelection, user?.id])
+
+    const { filteredHighlights, allHighlightsAuthors, comments } = useNotesData({
+        booqId: booq.booqId,
+        user,
+        currentRange: range,
+        highlightsAuthorIds,
+    })
+
+    const { followingUserIds, isLoading: isFollowingLoading } = useFollowingData({ user })
 
     const [rightPanelOpen, setRightPanelOpen] = React.useState(false)
     const toggleRightPanelOpen = () => setRightPanelOpen(prev => !prev)
@@ -75,9 +90,10 @@ export function Reader({
         booqId={booq.booqId}
         title={booq.meta.title ?? 'Untitled'}
         toc={booq.toc.items}
-        notes={userHighlights}
+        notes={filteredHighlights}
         selection={navigationSelection}
         user={user}
+        highlightAuthors={allHighlightsAuthors}
         toggleSelection={toggleNavigationSelection}
         closeSelf={closeNavigation}
     />
@@ -105,7 +121,7 @@ export function Reader({
     const { anchor, menuTarget, setMenuTarget, contextMenuAugmentations } = useContextMenuState()
 
     const { augmentations, menuTargetForAugmentation } = useAugmentations({
-        notes: navigationSelection.notes ? userHighlights : undefined,
+        highlights: filteredHighlights,
         comments: comments,
         quote: quote,
         temporaryAugmentations: contextMenuAugmentations,

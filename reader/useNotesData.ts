@@ -6,10 +6,12 @@ export function useNotesData({
     booqId,
     user,
     currentRange,
+    highlightsAuthorIds,
 }: {
     booqId: BooqId,
     user: AuthorData | undefined,
     currentRange?: BooqRange,
+    highlightsAuthorIds: Set<string>,
 }) {
     const { notes: allNotes } = useBooqNotes({ booqId, user })
 
@@ -27,10 +29,22 @@ export function useNotesData({
         return sortedNotes.filter(note => HIGHLIGHT_KINDS.includes(note.kind))
     }, [sortedNotes])
 
-    const userHighlights = useMemo(() => {
+    const allHighlightsAuthors = useMemo(() => {
+        const set = new Set<string>()
+        const authors: AuthorData[] = []
+        for (const note of allHighlights) {
+            if (!set.has(note.author.id)) {
+                set.add(note.author.id)
+                authors.push(note.author)
+            }
+        }
+        return authors
+    }, [allHighlights])
+
+    const filteredHighlights = useMemo(() => {
         return allHighlights
-            .filter(note => note.author.id === user?.id)
-    }, [allHighlights, user?.id])
+            .filter(note => highlightsAuthorIds.has(note.author.id))
+    }, [allHighlights, highlightsAuthorIds])
 
     const comments = useMemo(() => {
         if (!currentRange) return []
@@ -42,5 +56,5 @@ export function useNotesData({
         )
     }, [sortedNotes, currentRange])
 
-    return { userHighlights, comments }
+    return { filteredHighlights, comments, allHighlightsAuthors }
 }

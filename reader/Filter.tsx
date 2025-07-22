@@ -1,10 +1,12 @@
 import { ReactNode } from 'react'
 import { NavigationSelection } from './nodes'
 import { AuthorData } from '@/core'
+import { ProfileBadge } from '@/components/ProfilePicture'
 
 export function NavigationFilter({
-    selection, toggle,
+    selection, toggle, authors, self,
 }: {
+    self: AuthorData | undefined,
     authors: AuthorData[],
     selection: NavigationSelection,
     toggle: (id: string) => void,
@@ -18,13 +20,36 @@ export function NavigationFilter({
                 toggle={() => toggle('chapters')}
             />
         </div>
-        <div className={itemClass}>
-            <FilterButton
-                text='Notes'
-                selected={selection.notes}
-                toggle={() => toggle('notes')}
-            />
-        </div>
+        {self && (
+            <div className={itemClass}>
+                <FilterButton
+                    text='Notes'
+                    selected={selection.notes}
+                    toggle={() => toggle('notes')}
+                />
+            </div>
+        )}
+        {
+            authors
+                .filter(author => author.id !== self?.id)
+                .map(author => {
+                    const [first] = author.name?.split(' ') ?? ['Incognito']
+                    return <div className={itemClass} key={author.id}>
+                        <FilterButton
+                            text={first ?? 'Incognito'}
+                            selected={selection[`author:${author.id}`] ?? false}
+                            toggle={() => toggle(`author:${author.id}`)}
+                            Badge={<ProfileBadge
+                                border={false}
+                                size={1.2}
+                                name={author.name}
+                                picture={author.profilePictureURL}
+                                emoji={author.emoji}
+                            />}
+                        />
+                    </div>
+                })
+        }
     </div>
 }
 

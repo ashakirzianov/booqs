@@ -33,7 +33,7 @@ export function useNavigationState() {
 
 export function NavigationPanel({
     booqId, user, title, toc, notes,
-    selection,
+    selection, highlightAuthors,
     toggleSelection, closeSelf,
 }: {
     booqId: BooqId,
@@ -42,17 +42,17 @@ export function NavigationPanel({
     notes: BooqNote[],
     selection: NavigationSelection,
     user?: AuthorData,
+    highlightAuthors: AuthorData[],
     toggleSelection: (item: string) => void,
     closeSelf: () => void,
 }) {
-    const { nodes, authors } = useMemo(() => {
+    const nodes = useMemo(() => {
         return buildNavigationNodes({
             title, toc, notes,
             selection,
             user,
         })
     }, [title, toc, notes, selection, user])
-    const exceptSelf = authors.filter(a => a.id !== user?.id)
     return useMemo(() => {
         return <div className='flex flex-1' style={{
             padding: '0 env(safe-area-inset-right) 0 env(safe-area-inset-left)',
@@ -63,7 +63,8 @@ export function NavigationPanel({
                         <div className='self-center tracking-widest font-bold'>CONTENTS</div>
                         <div className='filter'>
                             <NavigationFilter
-                                authors={exceptSelf}
+                                self={user}
+                                authors={highlightAuthors}
                                 selection={selection}
                                 toggle={toggleSelection}
                             />

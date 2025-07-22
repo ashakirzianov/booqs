@@ -12,15 +12,15 @@ export type TemporaryAugmentation = {
 }
 
 export function useAugmentations({
-    quote, notes, comments = [], temporaryAugmentations = [],
+    quote, highlights, comments = [], temporaryAugmentations = [],
 }: {
-    notes: BooqNote[] | undefined,
+    highlights: BooqNote[] | undefined,
     comments?: BooqNote[],
     quote?: BooqRange,
     temporaryAugmentations?: TemporaryAugmentation[],
 }) {
     const augmentations = useMemo(function () {
-        const noteArray = notes ?? []
+        const noteArray = highlights ?? []
         const noteAugmentations = noteArray.map<Augmentation>(function (note) {
             return {
                 id: noteAugmentationId(note),
@@ -64,7 +64,7 @@ export function useAugmentations({
         }
 
         return result
-    }, [quote, notes, comments, temporaryAugmentations])
+    }, [quote, highlights, comments, temporaryAugmentations])
     const menuTargetForAugmentation = useCallback(function (augmentationId: string): ContextMenuTarget | undefined {
         const [kind, id] = augmentationId.split('/')
         switch (kind) {
@@ -79,7 +79,7 @@ export function useAugmentations({
                     }
                     : undefined
             case 'note': {
-                const note = notes?.find(function (hl) { return hl.id === id }) ||
+                const note = highlights?.find(function (hl) { return hl.id === id }) ||
                     comments.find(function (hl) { return hl.id === id })
                 return note
                     ? {
@@ -103,7 +103,7 @@ export function useAugmentations({
             default:
                 return undefined
         }
-    }, [quote, notes, comments, temporaryAugmentations])
+    }, [quote, highlights, comments, temporaryAugmentations])
     return {
         augmentations,
         menuTargetForAugmentation,
