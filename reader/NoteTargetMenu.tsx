@@ -144,18 +144,18 @@ export function NoteTargetMenu({
                         {!isOwnNote && (<span className="text-xs text-dimmed flex flex-row items-center justify-start flex-wrap">
                             <Link
                                 href={userHref({ username: note.author.username })}
-                                className="flex items-center cursor-pointer hover:text-highlight transition-opacity"
+                                className="flex justify-start cursor-pointer hover:text-highlight transition-opacity gap-0 min-w-0 max-w-[140px]"
                             >
                                 <ProfileBadge
                                     border={false}
-                                    size={1.2}
+                                    size={1}
                                     name={note.author.name}
                                     picture={note.author.profilePictureURL ?? undefined}
                                     emoji={note.author.emoji}
-                                />&nbsp;
-                                <span className='hover:underline'>{note.author.name}</span>
+                                />
+                                <span className='hover:underline truncate' title={note.author.name}>{note.author.name}</span>
                             </Link>&nbsp;
-                            <span>{note.createdAt === note.updatedAt ? 'created' : 'edited'} {formatRelativeTime(new Date(note.updatedAt))}</span>
+                            <span className="whitespace-nowrap">{note.createdAt === note.updatedAt ? 'created' : 'edited'} {formatRelativeTime(new Date(note.updatedAt))}</span>
                         </span>)}
                     </>
                 )}

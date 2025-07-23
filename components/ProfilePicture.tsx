@@ -43,16 +43,14 @@ function ProfilePicture({ picture, size, border }: {
     </div>
 }
 
-function ProfilePicturePlaceholder({ display, size, border }: {
+function ProfilePicturePlaceholder({ display, size }: {
     display: string,
     size: number,
     border: boolean,
 }) {
-    return <div className='container font-bold text-xl flex items-center justify-start p-0 overflow-hidden text-dimmed hover:border-highlight' style={{
-        borderRadius: '50%',
-        border: border ? `1.5px solid var(--color-dimmed)` : 'none',
-        // width: `${size}rem`,
-        // height: `${size}rem`,
+    return <div className='container font-bold text-xl flex items-center justify-start p-0 overflow-hidden text-dimmed hover:border-highlight grow-0 shrink-0' style={{
+        width: `${size}rem`,
+        height: `${size}rem`,
         transition: '250ms color, 250ms border',
         fontSize: `${size / 2}rem`,
     }}>
