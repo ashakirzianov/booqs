@@ -204,8 +204,8 @@ export function useBooqNotes({
         if (!user || !data) return undefined
 
         const body: PatchBody = {}
-        if (kind) body.kind = kind
-        if (content) body.content = content
+        if (kind !== undefined) body.kind = kind
+        if (content !== undefined) body.content = content
 
         updateNoteTrigger({ noteId, body }, {
             optimisticData: (currentData: GetResponse | undefined): GetResponse => {
