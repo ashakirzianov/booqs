@@ -48,11 +48,11 @@ function ProfilePicturePlaceholder({ display, size, border }: {
     size: number,
     border: boolean,
 }) {
-    return <div className='container font-bold text-xl flex items-center justify-center p-0 shrink-0 overflow-hidden text-dimmed hover:border-highlight' style={{
+    return <div className='container font-bold text-xl flex items-center justify-start p-0 overflow-hidden text-dimmed hover:border-highlight' style={{
         borderRadius: '50%',
         border: border ? `1.5px solid var(--color-dimmed)` : 'none',
-        width: `${size}rem`,
-        height: `${size}rem`,
+        // width: `${size}rem`,
+        // height: `${size}rem`,
         transition: '250ms color, 250ms border',
         fontSize: `${size / 2}rem`,
     }}>

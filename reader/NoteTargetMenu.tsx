@@ -74,7 +74,7 @@ export function NoteTargetMenu({
             )}
 
             {/* Content container with padding */}
-            <div className="px-2 py-3 gap-3 flex flex-col bg-background">
+            <div className="px-3 py-3 gap-3 flex flex-col bg-background">
                 {editMode ? (
                     /* Edit mode UI */
                     <>
@@ -87,7 +87,7 @@ export function NoteTargetMenu({
                             rows={3}
                             autoFocus
                         />
-                        <div className="flex flex-row justify-end gap-4">
+                        <div className="flex flex-row justify-start gap-4">
                             <ActionButton
                                 onClick={handleSaveNote}
                                 icon={<CommentIcon />}
@@ -110,7 +110,7 @@ export function NoteTargetMenu({
                             <div className="text-sm text-primary">
                                 {note.content}
                             </div>
-                        ) : (
+                        ) : (isOwnNote && (
                             <div className="text-sm">
                                 <span
                                     className="cursor-pointer hover:underline text-dimmed"
@@ -119,11 +119,11 @@ export function NoteTargetMenu({
                                     Add note
                                 </span>
                             </div>
-                        )}
+                        ))}
 
                         {/* Action buttons */}
-                        <div className="flex flex-row justify-end gap-4">
-                            {isOwnNote && user && note.content && (
+                        {isOwnNote && (<div className="flex flex-row justify-start gap-4">
+                            {note.content && (
                                 <>
                                     <ActionButton
                                         onClick={handleEditNote}
@@ -132,33 +132,31 @@ export function NoteTargetMenu({
                                         Edit
                                     </ActionButton>
                                 </>
-                            )}
-                            {isOwnNote && (<ActionButton
+                            )}<ActionButton
                                 onClick={handleRemoveNote}
                                 icon={<RemoveIcon />}
                             >
                                 Remove
-                            </ActionButton>)}
-                        </div>
+                            </ActionButton>
+                        </div>)}
+
                         {/* Author info and date */}
-                        <div className="flex items-center justify-end gap-2">
-                            <span className="text-xs text-dimmed flex items-center">
-                                <Link
-                                    href={userHref({ username: note.author.username })}
-                                    className="flex items-center cursor-pointer hover:text-highlight transition-opacity"
-                                >
-                                    <ProfileBadge
-                                        border={false}
-                                        size={1.2}
-                                        name={note.author.name}
-                                        picture={note.author.profilePictureURL ?? undefined}
-                                        emoji={note.author.emoji}
-                                    />
-                                    <span className='hover:underline'>{note.author.name}</span>
-                                </Link>
-                                , {note.createdAt === note.updatedAt ? 'created' : 'edited'} {formatRelativeTime(new Date(note.updatedAt))}
-                            </span>
-                        </div>
+                        {!isOwnNote && (<span className="text-xs text-dimmed flex flex-row items-center justify-start flex-wrap">
+                            <Link
+                                href={userHref({ username: note.author.username })}
+                                className="flex items-center cursor-pointer hover:text-highlight transition-opacity"
+                            >
+                                <ProfileBadge
+                                    border={false}
+                                    size={1.2}
+                                    name={note.author.name}
+                                    picture={note.author.profilePictureURL ?? undefined}
+                                    emoji={note.author.emoji}
+                                />&nbsp;
+                                <span className='hover:underline'>{note.author.name}</span>
+                            </Link>&nbsp;
+                            <span>{note.createdAt === note.updatedAt ? 'created' : 'edited'} {formatRelativeTime(new Date(note.updatedAt))}</span>
+                        </span>)}
                     </>
                 )}
             </div>
