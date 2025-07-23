@@ -1,5 +1,4 @@
 import Link from 'next/link'
-import * as clipboard from 'clipboard-polyfill'
 import { useMemo, useState } from 'react'
 import { AuthorData, BooqId, userHref } from '@/core'
 import type { ContextMenuTarget, NoteTarget } from './ContextMenuContent'
@@ -7,8 +6,7 @@ import { ColorPicker } from './ColorPicker'
 import { formatRelativeTime } from '@/application/common'
 import { HIGHLIGHT_KINDS, useBooqNotes } from '@/application/notes'
 import { ProfileBadge } from '@/components/ProfilePicture'
-import { CommentIcon, RemoveIcon, ShareIcon } from '@/components/Icons'
-import { generateQuote } from './ContextMenuItems'
+import { CommentIcon, RemoveIcon } from '@/components/Icons'
 
 export function NoteTargetMenu({
     target, booqId, user, setTarget
@@ -18,7 +16,7 @@ export function NoteTargetMenu({
     user: AuthorData | undefined,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
-    const { noteId, selection, editMode } = target
+    const { noteId, editMode } = target
     const { notes, updateNote, removeNote } = useBooqNotes({ booqId, user })
     const note = useMemo(() =>
         notes.find(n => n.id === noteId), [notes, noteId])
@@ -61,13 +59,6 @@ export function NoteTargetMenu({
             ...target,
             editMode: false,
         })
-    }
-
-    const handleCopyQuote = () => {
-        const quote = generateQuote(booqId, selection.text, selection.range)
-        clipboard.writeText(quote)
-        removeSelection()
-        setTarget({ kind: 'empty' })
     }
 
     return (
@@ -148,12 +139,6 @@ export function NoteTargetMenu({
                             >
                                 Remove
                             </ActionButton>)}
-                            <ActionButton
-                                onClick={handleCopyQuote}
-                                icon={<ShareIcon />}
-                            >
-                                Copy
-                            </ActionButton>
                         </div>
                         {/* Author info and date */}
                         <div className="flex items-center justify-end gap-2">
@@ -179,10 +164,6 @@ export function NoteTargetMenu({
             </div>
         </div>
     )
-}
-
-function removeSelection() {
-    window.getSelection()?.empty()
 }
 
 function ActionButton({
