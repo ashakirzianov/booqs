@@ -7,6 +7,7 @@ import { formatRelativeTime } from '@/application/common'
 import { HIGHLIGHT_KINDS, useBooqNotes } from '@/application/notes'
 import { ProfileBadge } from '@/components/ProfilePicture'
 import { CommentIcon, RemoveIcon } from '@/components/Icons'
+import { MenuButton } from '@/components/Buttons'
 
 export function NoteTargetMenu({
     target, booqId, user, setTarget
@@ -88,18 +89,18 @@ export function NoteTargetMenu({
                             autoFocus
                         />
                         <div className="flex flex-row justify-start gap-4">
-                            <ActionButton
+                            <MenuButton
                                 onClick={handleSaveNote}
-                                icon={<CommentIcon />}
                             >
+                                <div className="w-4 h-4"><CommentIcon /></div>
                                 Save note
-                            </ActionButton>
-                            <ActionButton
+                            </MenuButton>
+                            <MenuButton
                                 onClick={handleCancelEdit}
-                                icon={<RemoveIcon />}
                             >
+                                <div className="w-4 h-4"><RemoveIcon /></div>
                                 Cancel
-                            </ActionButton>
+                            </MenuButton>
                         </div>
                     </>
                 ) : (
@@ -125,19 +126,19 @@ export function NoteTargetMenu({
                         {isOwnNote && (<div className="flex flex-row justify-start gap-4">
                             {note.content && (
                                 <>
-                                    <ActionButton
+                                    <MenuButton
                                         onClick={handleEditNote}
-                                        icon={<CommentIcon />}
                                     >
+                                        <div className="w-4 h-4"><CommentIcon /></div>
                                         Edit
-                                    </ActionButton>
+                                    </MenuButton>
                                 </>
-                            )}<ActionButton
+                            )}<MenuButton
                                 onClick={handleRemoveNote}
-                                icon={<RemoveIcon />}
                             >
+                                <div className="w-4 h-4"><RemoveIcon /></div>
                                 Remove
-                            </ActionButton>
+                            </MenuButton>
                         </div>)}
 
                         {/* Author info and date */}
@@ -164,24 +165,3 @@ export function NoteTargetMenu({
     )
 }
 
-function ActionButton({
-    onClick,
-    children,
-    icon,
-}: {
-    onClick: () => void,
-    children: React.ReactNode,
-    icon: React.ReactNode,
-    color?: string
-}) {
-    return (
-        <button
-            className="flex items-center gap-1 text-sm font-bold cursor-pointer text-dimmed hover:text-highlight hover:underline"
-            onClick={onClick}
-            onMouseDown={e => e.preventDefault()}
-        >
-            <div className="w-4 h-4">{icon}</div>
-            {children}
-        </button>
-    )
-}
