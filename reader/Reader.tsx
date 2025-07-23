@@ -19,7 +19,7 @@ import { useNotesData } from './useNotesData'
 import { useFollowingData } from './useFollowingData'
 import { AccountButton } from '@/components/AccountButton'
 import { usePathname } from 'next/navigation'
-import { BackIcon, TocIcon, CommentIcon } from '@/components/Icons'
+import { BackIcon, TocIcon, CommentIcon, QuestionMarkIcon } from '@/components/Icons'
 import Link from 'next/link'
 import { useScrollToQuote } from './useScrollToQuote'
 import { useScrollHandler } from './useScrollHandler'
@@ -85,13 +85,22 @@ export function Reader({
 
     const { followingUserIds, isLoading: isFollowingLoading } = useFollowingData({ user })
 
-    const [rightPanelOpen, setRightPanelOpen] = React.useState(false)
-    const toggleRightPanelOpen = () => setRightPanelOpen(prev => !prev)
-    
+    const [commentsPanelOpen, setCommentsPanelOpen] = React.useState(false)
+    const toggleCommentsPanelOpen = () => setCommentsPanelOpen(prev => !prev)
+
     const { anchor, menuTarget, setMenuTarget, contextMenuAugmentations, displayTarget } = useContextMenuState()
-    
-    // Auto-open right panel when context menu should be displayed in side panel
-    const shouldShowRightPanel = rightPanelOpen || displayTarget === 'side-panel'
+
+    const toggleAskVisibility = () => {
+        if (menuTarget.kind === 'ask') {
+            setMenuTarget({
+                ...menuTarget,
+                hidden: menuTarget.hidden === true ? false : true,
+            })
+        }
+    }
+
+    // Auto-open right panel when context menu should be displayed in side panel and not hidden
+    const shouldShowRightPanel = commentsPanelOpen || (displayTarget === 'side-panel' && menuTarget.kind === 'ask' && menuTarget.hidden !== true)
     const NavigationContent = <NavigationPanel
         booqId={booq.booqId}
         title={booq.meta.title ?? 'Untitled'}
@@ -111,13 +120,22 @@ export function Reader({
     </PanelButton>
 
     const CommentsButton = <PanelButton
-        onClick={toggleRightPanelOpen}
-        selected={shouldShowRightPanel}
+        onClick={toggleCommentsPanelOpen}
+        selected={commentsPanelOpen}
     >
         <CommentIcon />
     </PanelButton>
 
-    const RightPanelContent = displayTarget === 'side-panel' && menuTarget.kind !== 'empty' ? (
+    const AskButton = displayTarget === 'side-panel' && menuTarget.kind === 'ask' ? (
+        <PanelButton
+            onClick={toggleAskVisibility}
+            selected={menuTarget.hidden !== true}
+        >
+            <QuestionMarkIcon />
+        </PanelButton>
+    ) : null
+
+    const RightPanelContent = displayTarget === 'side-panel' && menuTarget.kind !== 'empty' && menuTarget.kind === 'ask' && menuTarget.hidden !== true ? (
         <div className='p-4'>
             <ContextMenuContent
                 booqId={booq.booqId}
@@ -187,6 +205,7 @@ export function Reader({
     </>
 
     const RightButtons = <>
+        {AskButton}
         {CommentsButton}
         <ThemerButton />
         <AccountButton
