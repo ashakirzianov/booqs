@@ -63,9 +63,28 @@ I selected excerpt "${context.text}" with context before "${context.contextBefor
 }
 
 function buildPromptForAnswer(context: ReadingContext, question: string) {
-    return `You are assisting user to read ${bookDescription(context)}. User want to ask question "${question}" about the particular part of the book. You'll be supplied with excerpt of the book and the context around it. You should answer the question. If the book is well-known and studied, you should prioritize references to scholar interpritations of the book. If the book is not well-known, you should prioritize your own interpritation of the book.
+    return `
+You are a helpful reading assistant embedded in a book reading app. A user has selected a passage in a book and asked a question. Use the selected passage, the surrounding context, and the book’s metadata to answer helpfully and concisely. If relevant, provide a brief explanation or interpretation. If the question cannot be answered from the text, politely say so.
 
-I selected excerpt "${context.text}" with context before "${context.contextBefore}" and context after "${context.contextAfter}". My question is: ${question}.`
+## Book Metadata
+Title: ${context.title || 'Unknown Title'}
+Author: ${context.author || 'Unknown Author'}
+Language: ${context.language || 'Unknown Language'}
+
+## Selected Passage
+"${context.text}"
+
+## Context Before
+${context.contextBefore}
+
+## Context After
+${context.contextAfter}
+
+## User’s Question
+${question}
+
+## Answer
+`
 }
 
 function bookDescription(context: ReadingContext) {
