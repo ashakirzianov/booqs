@@ -8,6 +8,10 @@ import { useMemo } from 'react'
 import useSWR from 'swr'
 import useSWRMutation from 'swr/mutation'
 
+export const HIGHLIGHT_KINDS = [
+    'highlight-0', 'highlight-1', 'highlight-2', 'highlight-3', 'highlight-4',
+]
+export const COMMENT_KIND = 'comment'
 export function useBooqNotes({
     booqId, user,
 }: {
@@ -70,13 +74,13 @@ export function useBooqNotes({
 
     function addNote({
         range: { start, end },
-        color,
+        kind,
         content,
         targetQuote,
         privacy = 'private', // Default to private if not specified
     }: {
         range: BooqRange,
-        color: string,
+        kind: string,
         content?: string,
         targetQuote: string,
         privacy?: NotePrivacy,
@@ -85,7 +89,7 @@ export function useBooqNotes({
 
         const postBody: PostBody = {
             id: nanoid(10),
-            color,
+            kind,
             start_path: start,
             end_path: end,
             content: content ?? null,
@@ -192,17 +196,16 @@ export function useBooqNotes({
         }
     )
 
-    function updateNote({ noteId, color, content }: {
+    function updateNote({ noteId, kind, content }: {
         noteId: string,
-        color?: string,
+        kind?: string,
         content?: string,
     }) {
-        if (!user || !data) return
+        if (!user || !data) return undefined
 
-        const body: PatchBody = {
-            color,
-            content,
-        }
+        const body: PatchBody = {}
+        if (kind !== undefined) body.kind = kind
+        if (content !== undefined) body.content = content
 
         updateNoteTrigger({ noteId, body }, {
             optimisticData: (currentData: GetResponse | undefined): GetResponse => {
@@ -239,7 +242,7 @@ function noteFromJson(note: NoteJson): BooqNote {
             start: note.start_path,
             end: note.end_path,
         },
-        color: note.color,
+        kind: note.kind,
         content: note.content ?? undefined,
         targetQuote: note.target_quote,
         author: {

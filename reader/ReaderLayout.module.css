@@ -64,7 +64,7 @@
     align-self: stretch;
     justify-self: stretch;
     transition: 250ms transform;
-    background: var(--theme-background);
+    background: var(--color-background);
 }
 
 .leftButtons,
@@ -131,7 +131,7 @@
     align-self: stretch;
     justify-self: stretch;
     transition: 250ms transform;
-    background: var(--theme-background);
+    background: var(--color-background);
     transform: translateX(100%);
 }
 
@@ -169,7 +169,7 @@
         z-index: -1;
         align-self: stretch;
         justify-self: stretch;
-        background: var(--theme-background);
+        background: var(--color-background);
         box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.1);
     }
 

@@ -9,7 +9,7 @@ export type DbNote = {
   booq_id: string,
   start_path: number[],
   end_path: number[],
-  color: string,
+  kind: string,
   content: string | null,
   target_quote: string,
   privacy: NotePrivacy,
@@ -76,7 +76,7 @@ export async function addNote({
   authorId,
   booqId,
   range,
-  color,
+  kind,
   content,
   targetQuote,
   privacy = 'private',
@@ -85,17 +85,17 @@ export async function addNote({
   authorId: string,
   booqId: BooqId,
   range: BooqRange,
-  color: string,
+  kind: string,
   content?: string,
   targetQuote?: string,
   privacy?: NotePrivacy,
 }): Promise<DbNote> {
   const [note] = await sql`
       INSERT INTO notes (
-        id, author_id, booq_id, start_path, end_path, color, content, target_quote, privacy
+        id, author_id, booq_id, start_path, end_path, kind, content, target_quote, privacy
       )
       VALUES (
-        ${id}, ${authorId}, ${booqId}, ${range.start}, ${range.end}, ${color}, ${content ?? null}, ${targetQuote ?? null}, ${privacy}
+        ${id}, ${authorId}, ${booqId}, ${range.start}, ${range.end}, ${kind}, ${content ?? null}, ${targetQuote ?? null}, ${privacy}
       )
       RETURNING *
     `
@@ -115,21 +115,21 @@ export async function removeNote({ id, authorId }: {
 }
 
 export async function updateNote({
-  id, authorId, color, content, privacy,
+  id, authorId, kind, content, privacy,
 }: {
   id: string,
   authorId: string,
-  color?: string,
+  kind?: string,
   content?: string,
   privacy?: NotePrivacy,
 }): Promise<DbNote | null> {
-  if (color === undefined && content === undefined && privacy === undefined) return null
+  if (kind === undefined && content === undefined && privacy === undefined) return null
 
   const [row] = await sql`
       UPDATE notes
       SET
         updated_at = NOW()
-        ${color !== undefined ? sql`, color = ${color}` : sql``}
+        ${kind !== undefined ? sql`, kind = ${kind}` : sql``}
         ${content !== undefined ? sql`, content = ${content}` : sql``}
         ${privacy !== undefined ? sql`, privacy = ${privacy}` : sql``}
       WHERE id = ${id} AND author_id = ${authorId}

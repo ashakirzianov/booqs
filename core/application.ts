@@ -22,7 +22,7 @@ export type BooqNote = {
     booqId: BooqId,
     author: AuthorData,
     range: BooqRange,
-    color: string,
+    kind: string,
     content?: string,
     targetQuote: string,
     privacy: NotePrivacy,

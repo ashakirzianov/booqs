@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { BooqNote, pathToId, userHref } from '@/core'
 import { Avatar } from '@/components/Avatar'
 import { TabButton } from './TabButton'
+import { formatRelativeTime } from '@/application/common'
 
 export function CommentsPanel({ comments, currentUser, followingUserIds, isFollowingLoading }: {
     comments: BooqNote[],
@@ -11,14 +12,14 @@ export function CommentsPanel({ comments, currentUser, followingUserIds, isFollo
     isFollowingLoading?: boolean,
 }) {
     const [commentsFilter, setCommentsFilter] = React.useState<'all' | 'following'>('all')
-    
+
     const filteredComments = React.useMemo(() => {
         if (commentsFilter === 'all' || !currentUser || !followingUserIds) {
             return comments
         }
-        
-        return comments.filter(comment => 
-            comment.author.id === currentUser.id || 
+
+        return comments.filter(comment =>
+            comment.author.id === currentUser.id ||
             followingUserIds.includes(comment.author.id)
         )
     }, [comments, commentsFilter, currentUser, followingUserIds])
@@ -71,7 +72,7 @@ function CommentItem({ comment }: { comment: BooqNote }) {
             {/* Referenced text */}
             <Link href={`#${pathToId(comment.range.start)}`}
                 className='block p-2 rounded text-sm italic border-l-2 hover:bg-gray-50 transition-colors cursor-pointer'
-                style={{ borderLeftColor: comment.color }}>
+                style={{ borderLeftColor: `var(--color-quote)` }}>
                 &quot;{comment.targetQuote}&quot;
             </Link>
 
@@ -101,43 +102,3 @@ function CommentItem({ comment }: { comment: BooqNote }) {
     )
 }
 
-function formatDateString(date: Date, currentDate: Date): string {
-    const isSameYear = date.getFullYear() === currentDate.getFullYear()
-
-    if (isSameYear) {
-        return date.toLocaleDateString('en-US', {
-            month: 'short',
-            day: 'numeric'
-        })
-    } else {
-        return date.toLocaleDateString('en-US', {
-            month: 'short',
-            day: 'numeric',
-            year: 'numeric'
-        })
-    }
-}
-
-function formatRelativeTime(date: Date, currentDate: Date = new Date()): string {
-    const diffMs = currentDate.getTime() - date.getTime()
-    const diffSeconds = Math.floor(diffMs / 1000)
-    const diffMinutes = Math.floor(diffSeconds / 60)
-    const diffHours = Math.floor(diffMinutes / 60)
-    const diffDays = Math.floor(diffHours / 24)
-
-    // If more than 7 days, show date
-    if (diffDays > 7) {
-        return formatDateString(date, currentDate)
-    }
-
-    // Relative time formatting
-    if (diffSeconds < 60) {
-        return `${diffSeconds} second${diffSeconds !== 1 ? 's' : ''} ago`
-    } else if (diffMinutes < 60) {
-        return `${diffMinutes} minute${diffMinutes !== 1 ? 's' : ''} ago`
-    } else if (diffHours < 24) {
-        return `${diffHours} hour${diffHours !== 1 ? 's' : ''} ago`
-    } else {
-        return `${diffDays} day${diffDays !== 1 ? 's' : ''} ago`
-    }
-}

@@ -84,7 +84,7 @@ export function Popover({
                         ref={refs.setFloating}
                         style={{
                             ...floatingStyles,
-                            filter: 'drop-shadow(0 0 2px var(--theme-border))',
+                            filter: 'drop-shadow(0 0 2px var(--color-border))',
                         }}
                         aria-labelledby={headingId}
                         {...getFloatingProps()}
@@ -96,8 +96,8 @@ export function Popover({
                             <FloatingArrow
                                 ref={arrowRef}
                                 context={context}
-                                fill='var(--theme-background)'
-                                stroke='var(--theme-border)'
+                                fill='var(--color-background)'
+                                stroke='var(--color-border)'
                                 tipRadius={4}
                             />
                             {content}

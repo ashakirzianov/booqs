@@ -7,7 +7,7 @@ import { MenuItem } from '@/components/Menu'
 import { quoteHref, userHref } from '@/core/href'
 import { BooqSelection } from '@/viewer'
 import { ProfileBadge } from '@/components/ProfilePicture'
-import { resolveNoteColor, noteColorNames } from '@/application/common'
+import { ColorPicker } from './ColorPicker'
 import { useBooqNotes } from '@/application/notes'
 import { CopilotIcon, CommentIcon, CopyIcon, LinkIcon, RemoveIcon, ShareIcon } from '@/components/Icons'
 import type { ContextMenuTarget, SelectionTarget, QuoteTarget, NoteTarget } from './ContextMenuContent'
@@ -71,34 +71,29 @@ export function AddHighlightItem({
     if (!user?.id) {
         return null
     }
-    return <div className='flex flex-1 flex-row items-stretch justify-between cursor-pointer text-sm select-none'>
-        {
-            noteColorNames.map(
-                (color, idx) => <ColorSelectionButton
-                    key={idx}
-                    selected={false}
-                    color={resolveNoteColor(color)}
-                    callback={() => {
-                        const note = addNote({
-                            color,
-                            range: selection.range,
-                            targetQuote: selection.text,
-                        })
-                        if (note) {
-                            setTarget({
-                                kind: 'note',
-                                note: {
-                                    ...note,
-                                    range: selection.range,
-                                },
-                            })
-                            removeSelection()
-                        }
-                    }}
-                />,
-            )
+
+    const handleColorChange = (kind: string) => {
+        const note = addNote({
+            kind,
+            range: selection.range,
+            targetQuote: selection.text,
+        })
+        if (note) {
+            setTarget({
+                kind: 'note',
+                noteId: note.id,
+                selection: selection,
+            })
+            window.getSelection()?.empty()
         }
-    </div>
+    }
+
+    return (
+        <ColorPicker
+            selectedKind=""
+            onColorChange={handleColorChange}
+        />
+    )
 }
 
 export function AddCommentItem({
@@ -116,7 +111,7 @@ export function AddCommentItem({
         icon={<ContextMenuIcon><CommentIcon /></ContextMenuIcon>}
         callback={() => {
             setTarget({
-                kind: 'comment',
+                kind: 'create-comment',
                 parent: target,
             })
         }}
@@ -140,54 +135,6 @@ export function RemoveNoteItem({
             setTarget({ kind: 'empty' })
         }}
     />
-}
-
-export function SelectNoteColorItem({
-    note, booqId, setTarget, user,
-}: {
-    note: BooqNote,
-    booqId: BooqId,
-    user: AuthorData | undefined,
-    setTarget: (target: ContextMenuTarget) => void,
-}) {
-    const { updateNote } = useBooqNotes({ booqId, user })
-    return <div className='flex flex-1 flex-row items-stretch justify-between cursor-pointer text-sm select-none'>
-        {
-            noteColorNames.map(
-                (color, idx) => <ColorSelectionButton
-                    key={idx}
-                    selected={color === note.color}
-                    color={resolveNoteColor(color)}
-                    callback={() => {
-                        updateNote({ noteId: note.id, color })
-                        // Note: hackie way of updating selection
-                        setTarget({
-                            kind: 'note',
-                            note: {
-                                ...note,
-                                color,
-                            },
-                        })
-                    }}
-                />,
-            )
-        }
-    </div>
-}
-
-export function ColorSelectionButton({ color, selected, callback }: {
-    selected: boolean,
-    color: string,
-    callback: () => void,
-}) {
-    return <div
-        // Note: prevent loosing selection on safari
-        onMouseDown={e => e.preventDefault()}
-        onClick={callback} className='flex flex-1 self-stretch text-transparent cursor-pointer h-10 transition-all' style={{
-            background: color,
-            borderBottom: `0.5rem solid ${selected ? `${color}` : `rgba(0,0,0,0)`}`,
-        }}>
-    </div>
 }
 
 export function CopyQuoteItem({

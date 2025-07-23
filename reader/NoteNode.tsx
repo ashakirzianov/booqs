@@ -1,6 +1,5 @@
 import { Popover } from '@/components/Popover'
 import { ContextMenuContent } from '@/reader/ContextMenuContent'
-import { resolveNoteColor } from '@/application/common'
 import { MoreIcon } from '@/components/Icons'
 import clsx from 'clsx'
 import { booqHref } from '@/core/href'
@@ -13,7 +12,7 @@ export function NoteNodeComp({ booqId, note, user }: {
     note: BooqNote,
 }) {
     return <div className='container flex flex-1 justify-between pl-base' style={{
-        borderLeft: `3px solid ${resolveNoteColor(note.color)}`,
+        borderLeft: `3px solid var(--color-${note.kind})`,
     }}>
         <div className='w-full text-primary text-justify'>
             <Link href={booqHref({ booqId, path: note.range.start })} className='text-primary hover:text-highlight'>
@@ -34,7 +33,11 @@ export function NoteNodeComp({ booqId, note, user }: {
                         setTarget={() => undefined}
                         target={{
                             kind: 'note',
-                            note,
+                            noteId: note.id,
+                            selection: {
+                                range: note.range,
+                                text: note.targetQuote,
+                            },
                         }}
                     />
                 </div>}

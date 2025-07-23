@@ -1,5 +1,4 @@
 import { useMemo, useCallback } from 'react'
-import { resolveNoteColor, quoteColor, temporaryColor } from '@/application/common'
 import { getAugmentationText, Augmentation } from '@/viewer'
 import { BooqNote, BooqRange } from '@/core'
 import { ContextMenuTarget } from './ContextMenuContent'
@@ -7,23 +6,25 @@ import { ContextMenuTarget } from './ContextMenuContent'
 export type TemporaryAugmentation = {
     range: BooqRange,
     name: string,
+    color?: string,
+    underline?: 'dashed' | 'solid',
 }
 
 export function useAugmentations({
-    quote, notes, comments = [], temporaryAugmentations = [],
+    quote, highlights, comments = [], temporaryAugmentations = [],
 }: {
-    notes: BooqNote[] | undefined,
+    highlights: BooqNote[] | undefined,
     comments?: BooqNote[],
     quote?: BooqRange,
     temporaryAugmentations?: TemporaryAugmentation[],
 }) {
     const augmentations = useMemo(function () {
-        const noteArray = notes ?? []
+        const noteArray = highlights ?? []
         const noteAugmentations = noteArray.map<Augmentation>(function (note) {
             return {
-                id: noteAugmentationId(note),
+                id: noteAugmentationId(note.id),
                 range: note.range,
-                color: resolveNoteColor(note.color),
+                color: `var(--color-${note.kind})`,
             }
         })
 
@@ -31,7 +32,8 @@ export function useAugmentations({
             return {
                 id: temporaryAugmentationId(temp.name),
                 range: temp.range,
-                color: temporaryColor,
+                color: temp.color,
+                underline: temp.underline,
             }
         })
 
@@ -43,7 +45,7 @@ export function useAugmentations({
             .filter(comment => !noteIds.has(comment.id))
             .map<Augmentation>(function (comment) {
                 return {
-                    id: noteAugmentationId(comment),
+                    id: noteAugmentationId(comment.id),
                     range: comment.range,
                     underline: 'dashed',
                 }
@@ -54,14 +56,14 @@ export function useAugmentations({
         if (quote) {
             const quoteAugmentation: Augmentation = {
                 range: quote,
-                color: quoteColor,
+                color: 'var(--color-quote)',
                 id: quoteAugmentationId(),
             }
             result = [quoteAugmentation, ...result]
         }
 
         return result
-    }, [quote, notes, comments, temporaryAugmentations])
+    }, [quote, highlights, comments, temporaryAugmentations])
     const menuTargetForAugmentation = useCallback(function (augmentationId: string): ContextMenuTarget | undefined {
         const [kind, id] = augmentationId.split('/')
         switch (kind) {
@@ -76,12 +78,16 @@ export function useAugmentations({
                     }
                     : undefined
             case 'note': {
-                const note = notes?.find(function (hl) { return hl.id === id }) ||
+                const note = highlights?.find(function (hl) { return hl.id === id }) ||
                     comments.find(function (hl) { return hl.id === id })
                 return note
                     ? {
                         kind: 'note',
-                        note,
+                        noteId: note.id,
+                        selection: {
+                            range: note.range,
+                            text: note.targetQuote,
+                        },
                     }
                     : undefined
             }
@@ -100,15 +106,15 @@ export function useAugmentations({
             default:
                 return undefined
         }
-    }, [quote, notes, comments, temporaryAugmentations])
+    }, [quote, highlights, comments, temporaryAugmentations])
     return {
         augmentations,
         menuTargetForAugmentation,
     }
 }
 
-export function noteAugmentationId(note: BooqNote): string {
-    return `note/${note.id}`
+export function noteAugmentationId(noteId: string): string {
+    return `note/${noteId}`
 }
 
 export function quoteAugmentationId(): string {

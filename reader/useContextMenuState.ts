@@ -1,12 +1,13 @@
 'use client'
-import { useCallback, useState, useMemo } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { getAugmentationElement, getSelectionElement, VirtualElement } from '@/viewer'
 import { ContextMenuTarget } from './ContextMenuContent'
-import { noteAugmentationId, quoteAugmentationId, temporaryAugmentationId } from './useAugmentations'
-import { BooqRange } from '@/core'
+import { noteAugmentationId, quoteAugmentationId, TemporaryAugmentation, temporaryAugmentationId } from './useAugmentations'
 
 export type ContextMenuTargetSetter = (setterOrValue: ContextMenuTarget | ((prev: ContextMenuTarget) => ContextMenuTarget)) => void
-export const MENU_ANCHOR_ID = 'menu-anchor'
+
+const CREATE_COMMENT_ID = 'create-comment'
+const COPILOT_ID = 'copilot'
 
 export function useContextMenuState() {
     const [anchor, setAnchor] = useState<VirtualElement | undefined>(undefined)
@@ -20,8 +21,7 @@ export function useContextMenuState() {
                 return prev
             }
             const newAnchor = getAnchorForTarget(next)
-            if (newAnchor === undefined && (next.kind === 'note' || next.kind === 'comment' || next.kind === 'copilot')) {
-                setAnchor(undefined)
+            if (newAnchor === undefined && (next.kind === 'note' || next.kind === 'create-comment' || next.kind === 'copilot')) {
                 setTimeout(() => {
                     setAnchor(getAnchorForTarget(next))
                 }, 0)
@@ -32,30 +32,30 @@ export function useContextMenuState() {
         })
     }, [setTarget])
 
-    const anchorRange = useMemo<BooqRange | undefined>(() => {
-        if (target.kind === 'comment') {
-            // Get the range from the parent target
-            const parentRange = target.parent.kind === 'selection' || target.parent.kind === 'quote'
-                ? target.parent.selection.range
-                : target.parent.kind === 'note'
-                    ? target.parent.note.range
-                    : undefined
-
-            if (parentRange) {
-                return parentRange
-            }
+    const contextMenuAugmentations = useMemo<TemporaryAugmentation[]>(() => {
+        const augmentations: TemporaryAugmentation[] = []
+        if (target.kind === 'create-comment') {
+            augmentations.push({
+                // Get the range from the parent target
+                range: target.parent.selection.range,
+                name: CREATE_COMMENT_ID,
+                underline: 'dashed',
+            })
+        } else if (target.kind === 'copilot') {
+            augmentations.push({
+                range: target.selection.range,
+                name: COPILOT_ID,
+                color: `var(--color-selection)`,
+            })
         }
-        if (target.kind === 'copilot') {
-            return target.selection.range
-        }
-        return undefined
+        return augmentations
     }, [target])
 
     return {
         menuTarget: target,
         setMenuTarget,
         anchor,
-        anchorRange,
+        contextMenuAugmentations,
     }
 }
 
@@ -78,16 +78,19 @@ function getAnchorForTarget(target: ContextMenuTarget): VirtualElement | undefin
         case 'selection':
             return getSelectionElement()
         case 'note': {
-            const augmentationId = noteAugmentationId(target.note)
+            const augmentationId = noteAugmentationId(target.noteId)
             return getAugmentationElement(augmentationId)
         }
         case 'quote': {
             const augmentationId = quoteAugmentationId()
             return getAugmentationElement(augmentationId)
         }
-        case 'copilot':
-        case 'comment': {
-            const augmentationId = temporaryAugmentationId(MENU_ANCHOR_ID)
+        case 'copilot': {
+            const augmentationId = temporaryAugmentationId(COPILOT_ID)
+            return getAugmentationElement(augmentationId)
+        }
+        case 'create-comment': {
+            const augmentationId = temporaryAugmentationId(CREATE_COMMENT_ID)
             return getAugmentationElement(augmentationId)
         }
         default:

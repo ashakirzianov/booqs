@@ -40,7 +40,7 @@ function BooqTagPill({ tag: [name, value] }: {
             />
         case 'pages':
             return <Pill
-                color='var(--theme-primary)'
+                color='var(--color-primary)'
                 label={`${value} pages`}
             />
         default:

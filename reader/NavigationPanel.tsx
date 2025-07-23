@@ -1,39 +1,16 @@
 'use client'
-import React, { useMemo, useState } from 'react'
+import React, { useMemo } from 'react'
 import { TocNodeComp } from './TocNode'
 import { NoteNodeComp } from './NoteNode'
 import { PathNotesNodeComp } from './PathNotesNode'
-import { NavigationFilter } from './Filter'
-import { buildNavigationNodes, NavigationNode, NavigationSelection } from './nodes'
+import { NavigationFilter } from './NavigationFilter'
+import { buildNavigationNodes, NavigationNode } from './nodes'
 import { AuthorData, BooqId, BooqNote, TableOfContentsItem } from '@/core'
-
-export function useNavigationState() {
-    const [navigationOpen, setNavigationOpen] = useState(false)
-    const [navigationSelection, setNavigationSelection] = useState<NavigationSelection>({
-        chapters: true,
-        notes: true,
-    })
-    return {
-        navigationOpen,
-        navigationSelection,
-        closeNavigation() {
-            setNavigationOpen(false)
-        },
-        toggleNavigationOpen() {
-            setNavigationOpen((prev) => !prev)
-        },
-        toggleNavigationSelection(item: string) {
-            setNavigationSelection(prev => ({
-                ...prev,
-                [item]: prev[item] !== true,
-            }))
-        },
-    }
-}
+import { NavigationSelection } from './useNavigationState'
 
 export function NavigationPanel({
     booqId, user, title, toc, notes,
-    selection,
+    selection, highlightAuthors,
     toggleSelection, closeSelf,
 }: {
     booqId: BooqId,
@@ -42,17 +19,17 @@ export function NavigationPanel({
     notes: BooqNote[],
     selection: NavigationSelection,
     user?: AuthorData,
+    highlightAuthors: AuthorData[],
     toggleSelection: (item: string) => void,
     closeSelf: () => void,
 }) {
-    const { nodes, authors } = useMemo(() => {
+    const nodes = useMemo(() => {
         return buildNavigationNodes({
             title, toc, notes,
             selection,
             user,
         })
     }, [title, toc, notes, selection, user])
-    const exceptSelf = authors.filter(a => a.id !== user?.id)
     return useMemo(() => {
         return <div className='flex flex-1' style={{
             padding: '0 env(safe-area-inset-right) 0 env(safe-area-inset-left)',
@@ -63,7 +40,8 @@ export function NavigationPanel({
                         <div className='self-center tracking-widest font-bold'>CONTENTS</div>
                         <div className='filter'>
                             <NavigationFilter
-                                authors={exceptSelf}
+                                self={user}
+                                authors={highlightAuthors}
                                 selection={selection}
                                 toggle={toggleSelection}
                             />
