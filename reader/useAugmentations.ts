@@ -1,5 +1,4 @@
 import { useMemo, useCallback } from 'react'
-import { highlightColorForNoteKind, quoteColor } from '@/application/common'
 import { getAugmentationText, Augmentation } from '@/viewer'
 import { BooqNote, BooqRange } from '@/core'
 import { ContextMenuTarget } from './ContextMenuContent'
@@ -25,7 +24,7 @@ export function useAugmentations({
             return {
                 id: noteAugmentationId(note.id),
                 range: note.range,
-                color: highlightColorForNoteKind(note.kind),
+                color: `var(--color-${note.kind})`,
             }
         })
 
@@ -57,7 +56,7 @@ export function useAugmentations({
         if (quote) {
             const quoteAugmentation: Augmentation = {
                 range: quote,
-                color: quoteColor,
+                color: 'var(--color-quote)',
                 id: quoteAugmentationId(),
             }
             result = [quoteAugmentation, ...result]

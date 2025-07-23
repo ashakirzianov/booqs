@@ -1,6 +1,6 @@
 @import 'tailwindcss';
 
-@theme {
+@theme static {
   --color-transparent: transparent;
   --color-background: white;
   --color-action: #F57F17;
@@ -9,6 +9,17 @@
   --color-border: #ddd;
   --color-highlight: orange;
   --color-alert: #f00;
+  --color-light: #fff;
+
+  --color-highlight-0: rgba(255, 215, 0, 0.6);
+  --color-highlight-1: rgba(135, 206, 235, 0.6);
+  --color-highlight-2: rgba(240, 128, 128, 0.6);
+  --color-highlight-3: rgba(75, 0, 130, 0.6);
+  --color-highlight-4: rgba(34, 139, 34, 0.6);
+  --color-comment: transparent;
+
+  --color-quote: rgba(255, 165, 0, 0.6);
+  --color-selection: rgba(180, 213, 255, 0.99);
 
   --font-main: var(--font-main), sans-serif;
   --font-book: var(--font-book), serif;
@@ -69,13 +80,14 @@ body {
 }
 
 @media (prefers-color-scheme: dark) {
-  @theme {
+  :root {
     --color-background: black;
     --color-action: #867b6c;
     --color-primary: #999;
-    --color-dimmed: #888;
+    --color-dimmed: #aaa;
     --color-border: #333;
     --color-highlight: white;
+    --color-light: #ddd;
   }
 }
 

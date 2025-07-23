@@ -3,7 +3,6 @@ import { useCallback, useMemo, useState } from 'react'
 import { getAugmentationElement, getSelectionElement, VirtualElement } from '@/viewer'
 import { ContextMenuTarget } from './ContextMenuContent'
 import { noteAugmentationId, quoteAugmentationId, TemporaryAugmentation, temporaryAugmentationId } from './useAugmentations'
-import { selectionColor } from '@/application/common'
 
 export type ContextMenuTargetSetter = (setterOrValue: ContextMenuTarget | ((prev: ContextMenuTarget) => ContextMenuTarget)) => void
 
@@ -46,7 +45,7 @@ export function useContextMenuState() {
             augmentations.push({
                 range: target.selection.range,
                 name: COPILOT_ID,
-                color: selectionColor,
+                color: `var(--color-selection)`,
             })
         }
         return augmentations

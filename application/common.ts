@@ -6,53 +6,16 @@ export function currentSource(): string {
     return 'default/0'
 }
 
-const noteKindToColorSchemeMapping: {
-    [kind in string]: {
-        color: string,
-        textColor: string,
-        dimmedColor: string
-    } | undefined
-} = {
-    'highlight-0': {
-        color: 'rgba(255, 215, 0, 0.6)',
-        textColor: 'rgb(184, 134, 11)',
-        dimmedColor: 'rgba(184, 134, 11, 0.7)'
-    },
-    'highlight-1': {
-        color: 'rgba(135, 206, 235, 0.6)',
-        textColor: 'rgb(30, 64, 175)',
-        dimmedColor: 'rgba(30, 64, 175, 0.7)'
-    },
-    'highlight-2': {
-        color: 'rgba(240, 128, 128, 0.6)',
-        textColor: 'rgb(185, 28, 28)',
-        dimmedColor: 'rgba(185, 28, 28, 0.7)'
-    },
-    'highlight-3': {
-        color: 'rgba(75, 0, 130, 0.6)',
-        textColor: 'rgb(55, 6, 91)',
-        dimmedColor: 'rgba(55, 6, 91, 0.7)'
-    },
-    'highlight-4': {
-        color: 'rgba(34, 139, 34, 0.6)',
-        textColor: 'rgb(22, 101, 52)',
-        dimmedColor: 'rgba(22, 101, 52, 0.7)'
+export function colorSchemeForBaseColor(baseColor: string) {
+    return {
+        backgroundColor: `hsl(from ${baseColor} h s calc(l - 5) / 90%)`,
+        // backgroundColor: baseColor,
+        selectionColor: `hsl(from ${baseColor} h calc(s - 25) calc(l - 25) / 100%)`,
+        textColor: 'var(--color-light)',
+        // textColor: '#eee',
+        dimmedColor: `hsl(from ${baseColor} h calc(s - 30) 95%)`,
     }
 }
-
-export function highlightColorForNoteKind(kind: string) {
-    return noteKindToColorSchemeMapping[kind]?.color ?? 'var(--color-background)'
-}
-
-export function textColorForNoteKind(kind: string) {
-    return noteKindToColorSchemeMapping[kind]?.textColor ?? 'var(--color-primary)'
-}
-
-export function dimmedColorForNoteKind(kind: string) {
-    return noteKindToColorSchemeMapping[kind]?.dimmedColor ?? 'var(--color-dimmed)'
-}
-export const quoteColor = 'rgba(255, 165, 0, 0.6)'
-export const selectionColor = 'rgba(180, 213, 255, 0.99)'
 
 function formatDateString(date: Date, currentDate: Date): string {
     const isSameYear = date.getFullYear() === currentDate.getFullYear()

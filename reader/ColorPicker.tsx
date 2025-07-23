@@ -1,4 +1,4 @@
-import { highlightColorForNoteKind } from '@/application/common'
+import { colorSchemeForBaseColor } from '@/application/common'
 import { HIGHLIGHT_KINDS } from '@/application/notes'
 
 export function ColorPicker({
@@ -14,7 +14,7 @@ export function ColorPicker({
                 <ColorSelectionButton
                     key={idx}
                     selected={kind === selectedKind}
-                    color={highlightColorForNoteKind(kind)}
+                    color={`var(--color-${kind})`}
                     callback={() => onColorChange(kind)}
                 />
             ))}
@@ -27,12 +27,16 @@ function ColorSelectionButton({ color, selected, callback }: {
     color: string,
     callback: () => void,
 }) {
+    const { backgroundColor, selectionColor } = colorSchemeForBaseColor(color)
+    const borderTopColor = selected
+        ? selectionColor
+        : 'rgba(0,0,0,0)'
     return <div
         // Note: prevent loosing selection on safari
         onMouseDown={e => e.preventDefault()}
         onClick={callback} className='flex flex-1 self-stretch text-transparent cursor-pointer h-10 transition-all' style={{
-            background: color,
-            borderTop: `0.5rem solid ${selected ? `${color}` : `rgba(0,0,0,0)`}`,
+            background: backgroundColor,
+            borderTop: `0.5rem solid ${borderTopColor}`,
         }}>
     </div>
 }

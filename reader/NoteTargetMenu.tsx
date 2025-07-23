@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react'
 import { AuthorData, BooqId, userHref } from '@/core'
 import type { ContextMenuTarget, NoteTarget } from './ContextMenuContent'
 import { ColorPicker } from './ColorPicker'
-import { highlightColorForNoteKind, textColorForNoteKind, dimmedColorForNoteKind, formatRelativeTime } from '@/application/common'
+import { colorSchemeForBaseColor, formatRelativeTime } from '@/application/common'
 import { HIGHLIGHT_KINDS, useBooqNotes } from '@/application/notes'
 import { ProfileBadge } from '@/components/ProfilePicture'
 import { CommentIcon, RemoveIcon, ShareIcon } from '@/components/Icons'
@@ -23,9 +23,15 @@ export function NoteTargetMenu({
     const note = useMemo(() =>
         notes.find(n => n.id === noteId), [notes, noteId])
     const isOwnNote = user?.id === note?.author?.id
-    const noteColor = highlightColorForNoteKind(note?.kind || 'default')
-    const textColor = textColorForNoteKind(note?.kind || 'default')
-    const dimmedColor = dimmedColorForNoteKind(note?.kind || 'default')
+    const isHighlight = note?.kind !== undefined && HIGHLIGHT_KINDS.includes(note.kind)
+    const baseColor = `var(--color-${note?.kind || 'primary'})`
+    const { backgroundColor, textColor, dimmedColor } = isHighlight
+        ? colorSchemeForBaseColor(baseColor)
+        : {
+            backgroundColor: `var(--color-background)`,
+            textColor: `var(--color-primary)`,
+            dimmedColor: `var(--color-dimmed)`,
+        }
     const hasColor = HIGHLIGHT_KINDS.includes(note?.kind || 'default')
     const [editContent, setEditContent] = useState(note?.content || '')
     if (!note) {
@@ -88,7 +94,7 @@ export function NoteTargetMenu({
             {/* Content container with padding */}
             <div className="p-2 flex flex-col"
                 style={{
-                    backgroundColor: noteColor,
+                    backgroundColor: backgroundColor,
                 }}>
                 {editMode ? (
                     /* Edit mode UI */
@@ -106,12 +112,14 @@ export function NoteTargetMenu({
                             <ActionButton
                                 onClick={handleSaveNote}
                                 icon={<CommentIcon />}
+                                color={textColor}
                             >
                                 Save note
                             </ActionButton>
                             <ActionButton
                                 onClick={handleCancelEdit}
                                 icon={<RemoveIcon />}
+                                color={textColor}
                             >
                                 Cancel
                             </ActionButton>
@@ -126,10 +134,10 @@ export function NoteTargetMenu({
                                 {note.content}
                             </div>
                         ) : (
-                            <div className="mb-3 text-sm">
+                            <div className="mb-3 mt-3 text-sm">
                                 <span
                                     className="cursor-pointer hover:underline"
-                                    style={{ color: dimmedColor }}
+                                    style={{ color: textColor }}
                                     onClick={handleEditNote}
                                 >
                                     Add note
