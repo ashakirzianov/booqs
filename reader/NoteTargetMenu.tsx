@@ -130,11 +130,11 @@ export function NoteTargetMenu({
                     <>
                         {/* Note content or add note prompt */}
                         {note.content ? (
-                            <div className="mb-3 text-sm" style={{ color: textColor }}>
+                            <div className="my-3 text-sm" style={{ color: textColor }}>
                                 {note.content}
                             </div>
                         ) : (
-                            <div className="mb-3 mt-3 text-sm">
+                            <div className="my-3 text-sm">
                                 <span
                                     className="cursor-pointer hover:underline"
                                     style={{ color: textColor }}
