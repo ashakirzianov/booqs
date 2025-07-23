@@ -205,12 +205,16 @@ function removeSelection() {
 }
 
 export function AskMenuItem({
-    target, booqId, setTarget,
+    target, booqId, user, setTarget,
 }: {
     target: SelectionTarget | QuoteTarget,
     booqId: BooqId,
+    user: AuthorData | undefined,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
+    if (!user?.id) {
+        return null
+    }
     return <MenuItem
         text='Ask question'
         icon={<ContextMenuIcon><QuestionMarkIcon /></ContextMenuIcon>}

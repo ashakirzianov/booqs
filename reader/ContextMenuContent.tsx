@@ -83,7 +83,7 @@ function SelectionTargetMenu({
     return <>
         <AddHighlightItem booqId={booqId} user={user} setTarget={setTarget} selection={selection} />
         <AddCommentItem target={target} user={user} setTarget={setTarget} />
-        <AskMenuItem target={target} booqId={booqId} setTarget={setTarget} />
+        <AskMenuItem target={target} booqId={booqId} user={user} setTarget={setTarget} />
         <CopyQuoteItem selection={selection} booqId={booqId} setTarget={setTarget} />
     </>
 }
@@ -100,7 +100,7 @@ function QuoteTargetMenu({
     return <>
         <AddHighlightItem booqId={booqId} user={user} setTarget={setTarget} selection={selection} />
         <AddCommentItem target={target} user={user} setTarget={setTarget} />
-        <AskMenuItem target={target} booqId={booqId} setTarget={setTarget} />
+        <AskMenuItem target={target} booqId={booqId} user={user} setTarget={setTarget} />
         <CopyTextItem selection={selection} booqId={booqId} setTarget={setTarget} />
     </>
 }
