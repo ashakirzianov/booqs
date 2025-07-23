@@ -139,12 +139,11 @@ export function Reader({
         }
         return <div className='w-64'><ContextMenuContent
             booqId={booq.booqId}
-            booqMeta={booq.meta}
             user={user}
             target={menuTarget}
             setTarget={setMenuTarget}
         /></div>
-    }, [booq.booqId, booq.meta, user, menuTarget, setMenuTarget])
+    }, [booq.booqId, user, menuTarget, setMenuTarget])
 
     const {
         ContextMenuNode
