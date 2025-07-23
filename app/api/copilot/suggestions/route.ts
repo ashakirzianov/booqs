@@ -11,6 +11,6 @@ export async function POST(request: Request) {
             },
         })
     }
-    const suggestions = await generateCopilotSuggestions(booqId as BooqId, { start, end })
+    const suggestions = await generateCopilotSuggestions({ booqId: booqId as BooqId, range: { start, end } })
     return Response.json(suggestions)
 }

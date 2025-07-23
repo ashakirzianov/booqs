@@ -11,6 +11,6 @@ export async function POST(request: Request) {
             },
         })
     }
-    const answer = await generateCopilotAnswer(booqId as BooqId, { start, end }, question)
+    const answer = await generateCopilotAnswer({ booqId: booqId as BooqId, range: { start, end }, question })
     return Response.json(answer)
 }

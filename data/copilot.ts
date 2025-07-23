@@ -1,13 +1,8 @@
-import { BooqId, BooqPath } from '@/core'
+import { BooqId, BooqRange } from '@/core'
 import { buildReadingContext } from '@/backend/booq'
 import { generateSuggestions, generateAnswer } from '@/backend/ai'
 
-export type CopilotRange = {
-    start: BooqPath,
-    end: BooqPath,
-}
-
-export async function generateCopilotSuggestions(booqId: BooqId, range: CopilotRange) {
+export async function generateCopilotSuggestions({ booqId, range }: { booqId: BooqId, range: BooqRange }) {
     const context = await buildReadingContext(booqId, range)
     if (!context) {
         return []
@@ -15,7 +10,7 @@ export async function generateCopilotSuggestions(booqId: BooqId, range: CopilotR
     return generateSuggestions(context)
 }
 
-export async function generateCopilotAnswer(booqId: BooqId, range: CopilotRange, question: string) {
+export async function generateCopilotAnswer({ booqId, range, question }: { booqId: BooqId, range: BooqRange, question: string }) {
     const context = await buildReadingContext(booqId, range)
     if (!context) {
         return undefined
