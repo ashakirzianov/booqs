@@ -16,7 +16,8 @@
       "Bash(npx tsc:*)",
       "Bash(npm update:*)",
       "WebFetch(domain:platform.openai.com)",
-      "WebFetch(domain:help.openai.com)"
+      "WebFetch(domain:help.openai.com)",
+      "Bash(grep:*)"
     ]
   },
   "enableAllProjectMcpServers": false

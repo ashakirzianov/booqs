@@ -28,6 +28,11 @@ export async function generateAnswer(context: ReadingContext, question: string) 
     return result
 }
 
+export async function generateAnswerStream(context: ReadingContext, question: string) {
+    const prompt = buildPromptForAnswer(context, question)
+    return getResponseStream(prompt)
+}
+
 function parseSuggestion(suggestion: string): string[] {
     return suggestion.split('?')
         .map(s => {
@@ -116,5 +121,22 @@ async function getResponse(input: string) {
                 code: 'INTERNAL_SERVER_ERROR',
             },
         }
+    }
+}
+
+async function getResponseStream(input: string) {
+    const openai = new OpenAI({
+        apiKey: process.env.OPENAI_API_KEY,
+    })
+    
+    const stream = await openai.responses.create({
+        model: AI_MODEL,
+        input,
+        stream: true,
+    })
+    
+    return {
+        success: true as const,
+        stream,
     }
 }

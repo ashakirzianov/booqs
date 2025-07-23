@@ -1,7 +1,7 @@
 'use client'
 import { useState } from 'react'
 import type { AskTarget, ContextMenuTarget } from './ContextMenuContent'
-import { useCopilotAnswer } from '@/application/copilot'
+import { useCopilotAnswerStream } from '@/application/copilot'
 import type { BooqId, BooqRange } from '@/core/model'
 
 export function AskTargetMenu({
@@ -68,7 +68,7 @@ function AnswerDisplay({
     range: BooqRange,
     onClose: () => void
 }) {
-    const { loading, answer } = useCopilotAnswer({
+    const { loading, answer, error } = useCopilotAnswerStream({
         booqId,
         start: range.start,
         end: range.end,
@@ -85,7 +85,18 @@ function AnswerDisplay({
             <div className="mb-md">
                 <h3 className="font-semibold text-lg mb-sm">Answer:</h3>
                 {loading ? (
-                    <div className="text-gray-500">Loading answer...</div>
+                    <div className="text-gray-500">
+                        {answer ? (
+                            <div className="space-y-sm">
+                                {answer}
+                                <div className="text-sm text-gray-400 animate-pulse">...</div>
+                            </div>
+                        ) : (
+                            <div>Loading answer...</div>
+                        )}
+                    </div>
+                ) : error ? (
+                    <div className="text-red-500">Error: {error}</div>
                 ) : answer ? (
                     <div className="space-y-sm">
                         {answer}
