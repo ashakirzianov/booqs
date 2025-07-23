@@ -8,11 +8,13 @@ import {
     CopyQuoteItem,
     CopyTextItem,
     generateQuote,
+    AskMenuItem,
 } from './ContextMenuItems'
 import { useRouter } from 'next/navigation'
 import { quoteHref } from '@/core/href'
 import { NoteTargetMenu } from './NoteTargetMenu'
 import { CreateCommentTargetMenu } from './CreateCommentTargetMenu'
+import { AskTargetMenu } from './AskTargetMenu'
 
 type EmptyTarget = {
     kind: 'empty',
@@ -35,8 +37,14 @@ export type CreateCommentTarget = {
     kind: 'create-comment',
     parent: SelectionTarget | QuoteTarget | NoteTarget,
 }
+export type AskTarget = {
+    kind: 'ask',
+    question: string | undefined,
+    selection: BooqSelection,
+    booqId: BooqId,
+}
 export type ContextMenuTarget =
-    | EmptyTarget | SelectionTarget | QuoteTarget | NoteTarget | CreateCommentTarget
+    | EmptyTarget | SelectionTarget | QuoteTarget | NoteTarget | CreateCommentTarget | AskTarget
 
 export function ContextMenuContent({
     target, booqId, user, setTarget
@@ -55,6 +63,8 @@ export function ContextMenuContent({
             return <NoteTargetMenu target={target} booqId={booqId} user={user} setTarget={setTarget} />
         case 'create-comment':
             return <CreateCommentTargetMenu target={target} booqId={booqId} user={user} setTarget={setTarget} />
+        case 'ask':
+            return <AskTargetMenu target={target} setTarget={setTarget} />
         default:
             return null
     }
@@ -73,6 +83,7 @@ function SelectionTargetMenu({
     return <>
         <AddHighlightItem booqId={booqId} user={user} setTarget={setTarget} selection={selection} />
         <AddCommentItem target={target} user={user} setTarget={setTarget} />
+        <AskMenuItem target={target} booqId={booqId} setTarget={setTarget} />
         <CopyQuoteItem selection={selection} booqId={booqId} setTarget={setTarget} />
     </>
 }
@@ -89,6 +100,7 @@ function QuoteTargetMenu({
     return <>
         <AddHighlightItem booqId={booqId} user={user} setTarget={setTarget} selection={selection} />
         <AddCommentItem target={target} user={user} setTarget={setTarget} />
+        <AskMenuItem target={target} booqId={booqId} setTarget={setTarget} />
         <CopyTextItem selection={selection} booqId={booqId} setTarget={setTarget} />
     </>
 }

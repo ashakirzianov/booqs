@@ -7,6 +7,7 @@ import { noteAugmentationId, quoteAugmentationId, TemporaryAugmentation, tempora
 export type ContextMenuTargetSetter = (setterOrValue: ContextMenuTarget | ((prev: ContextMenuTarget) => ContextMenuTarget)) => void
 
 const CREATE_COMMENT_ID = 'create-comment'
+const ASK_ID = 'ask'
 
 export function useContextMenuState() {
     const [anchor, setAnchor] = useState<VirtualElement | undefined>(undefined)
@@ -20,7 +21,7 @@ export function useContextMenuState() {
                 return prev
             }
             const newAnchor = getAnchorForTarget(next)
-            if (newAnchor === undefined && (next.kind === 'note' || next.kind === 'create-comment')) {
+            if (newAnchor === undefined && (next.kind === 'note' || next.kind === 'create-comment' || next.kind === 'ask')) {
                 setTimeout(() => {
                     setAnchor(getAnchorForTarget(next))
                 }, 0)
@@ -39,6 +40,13 @@ export function useContextMenuState() {
                 range: target.parent.selection.range,
                 name: CREATE_COMMENT_ID,
                 underline: 'dashed',
+            })
+        }
+        if (target.kind === 'ask') {
+            augmentations.push({
+                range: target.selection.range,
+                name: ASK_ID,
+                color: 'var(--color-selection)',
             })
         }
         return augmentations
@@ -80,6 +88,10 @@ function getAnchorForTarget(target: ContextMenuTarget): VirtualElement | undefin
         }
         case 'create-comment': {
             const augmentationId = temporaryAugmentationId(CREATE_COMMENT_ID)
+            return getAugmentationElement(augmentationId)
+        }
+        case 'ask': {
+            const augmentationId = temporaryAugmentationId(ASK_ID)
             return getAugmentationElement(augmentationId)
         }
         default:
