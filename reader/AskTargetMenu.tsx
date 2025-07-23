@@ -3,6 +3,8 @@ import { useState } from 'react'
 import type { AskTarget, ContextMenuTarget } from './ContextMenuContent'
 import { useCopilotAnswerStream } from '@/application/copilot'
 import type { BooqId, BooqRange } from '@/core/model'
+import { MenuButton } from '@/components/Buttons'
+import { CopilotIcon, CloseIcon, RemoveIcon } from '@/components/Icons'
 
 export function AskTargetMenu({
     target, setTarget
@@ -24,37 +26,39 @@ export function AskTargetMenu({
         )
     }
 
-    return <div className="p-lg">
-        <input
-            type="text"
-            value={question}
-            onChange={(e) => setQuestion(e.target.value)}
-            placeholder="Ask a question about this text..."
-            className="w-full p-md border border-gray-300 rounded focus:outline-none focus:border-blue-500"
-            autoFocus
-        />
-        <div className="flex gap-md mt-md">
-            <button
-                onClick={() => {
-                    // Set the question in the target to trigger answer display
-                    setTarget({
-                        ...target,
-                        question: question.trim()
-                    })
-                }}
-                className="px-md py-sm bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-                disabled={!question.trim()}
-            >
-                Ask
-            </button>
-            <button
-                onClick={() => setTarget({ kind: 'empty' })}
-                className="px-md py-sm bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition-colors"
-            >
-                Cancel
-            </button>
+    return (
+        <div className="px-3 py-3 gap-3 flex flex-col bg-background">
+            <input
+                type="text"
+                value={question}
+                onChange={(e) => setQuestion(e.target.value)}
+                placeholder="Ask a question about this text..."
+                className="w-full px-3 py-2 border border-dimmed rounded bg-background text-primary text-sm leading-relaxed focus:outline-none focus:border-action"
+                style={{ fontFamily: 'var(--font-main)' }}
+                autoFocus
+            />
+            <div className="flex flex-row justify-start gap-4">
+                <MenuButton
+                    onClick={() => {
+                        // Set the question in the target to trigger answer display
+                        setTarget({
+                            ...target,
+                            question: question.trim()
+                        })
+                    }}
+                >
+                    <div className="w-4 h-4"><CopilotIcon /></div>
+                    Ask
+                </MenuButton>
+                <MenuButton
+                    onClick={() => setTarget({ kind: 'empty' })}
+                >
+                    <div className="w-4 h-4"><RemoveIcon /></div>
+                    Cancel
+                </MenuButton>
+            </div>
         </div>
-    </div>
+    )
 }
 
 function AnswerDisplay({
@@ -76,43 +80,43 @@ function AnswerDisplay({
     })
 
     return (
-        <div className="p-lg">
-            <div className="mb-md">
-                <h3 className="font-semibold text-lg mb-sm">Question:</h3>
-                <p className="text-gray-700 italic">&ldquo;{question}&rdquo;</p>
+        <div className="px-3 py-3 gap-3 flex flex-col bg-background">
+            <div className="mb-3">
+                <div className="text-sm font-medium text-primary mb-2">Question:</div>
+                <div className="text-sm text-dimmed italic">&ldquo;{question}&rdquo;</div>
             </div>
 
-            <div className="mb-md">
-                <h3 className="font-semibold text-lg mb-sm">Answer:</h3>
-                {loading ? (
-                    <div className="text-gray-500">
-                        {answer ? (
-                            <div className="space-y-sm">
-                                {answer}
-                                <div className="text-sm text-gray-400 animate-pulse">...</div>
-                            </div>
-                        ) : (
-                            <div>Loading answer...</div>
-                        )}
-                    </div>
-                ) : error ? (
-                    <div className="text-red-500">Error: {error}</div>
-                ) : answer ? (
-                    <div className="space-y-sm">
-                        {answer}
-                    </div>
-                ) : (
-                    <div className="text-gray-500">No answer available.</div>
-                )}
+            <div className="mb-3">
+                <div className="text-sm font-medium text-primary mb-2">Answer:</div>
+                <div className="text-sm text-primary leading-relaxed" style={{ fontFamily: 'var(--font-main)' }}>
+                    {loading ? (
+                        <div className="text-dimmed">
+                            {answer ? (
+                                <div className="space-y-2">
+                                    <div>{answer}</div>
+                                    <div className="text-xs text-dimmed animate-pulse">...</div>
+                                </div>
+                            ) : (
+                                <div>Loading answer...</div>
+                            )}
+                        </div>
+                    ) : error ? (
+                        <div className="text-alert">Error: {error}</div>
+                    ) : answer ? (
+                        <div className="space-y-2">
+                            {answer}
+                        </div>
+                    ) : (
+                        <div className="text-dimmed">No answer available.</div>
+                    )}
+                </div>
             </div>
 
-            <div className="flex justify-end">
-                <button
-                    onClick={onClose}
-                    className="px-md py-sm bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition-colors"
-                >
+            <div className="flex flex-row justify-start">
+                <MenuButton onClick={onClose}>
+                    <div className="w-4 h-4"><CloseIcon /></div>
                     Close
-                </button>
+                </MenuButton>
             </div>
         </div>
     )
