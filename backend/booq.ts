@@ -1,4 +1,4 @@
-import { Booq, BooqId, BooqPath, pathToString, positionForPath, previewForPath, textForRange, contextForRange, BooqRange } from '@/core'
+import { Booq, BooqId, BooqPath, pathToString, positionForPath, previewForPath, textForRange, contextForRange, BooqRange, getQuoteAndContext } from '@/core'
 import { getExtraMetadataValues } from '@/core/meta'
 import { ReadingContext } from '@/backend/ai'
 import { redis } from './db'
@@ -81,17 +81,19 @@ export async function buildReadingContext(booqId: BooqId, range: BooqRange): Pro
         return undefined
     }
 
-    const text = textForRange(booq.nodes, range)
-    if (!text) {
+    const { quote, contextBefore, contextAfter } = getQuoteAndContext(booq.nodes, range, 2000)
+    if (!quote) {
         return undefined
     }
 
-    const context = contextForRange(booq.nodes, range, 4000) || text
+    const context = contextForRange(booq.nodes, range, 4000) || quote
     const languages = getExtraMetadataValues('language', booq.metadata.extra)
 
     return {
-        text,
+        text: quote,
         context,
+        contextBefore,
+        contextAfter,
         title: booq.metadata.title,
         author: booq.metadata.authors[0]?.name,
         language: languages[0],

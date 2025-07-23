@@ -5,6 +5,8 @@ const AI_MODEL = 'o4-mini'
 export type ReadingContext = {
     text: string,
     context: string,
+    contextBefore: string,
+    contextAfter: string,
     title?: string,
     author?: string,
     language?: string,
@@ -58,13 +60,13 @@ function buildPromptForSuggestions(context: ReadingContext) {
         - Questions about previous interactions with the character (if you know the book well and if the character is mentioned in the excerpt)
         - Questions about meaning of the excerpt if it is not obvious
         
-I selected excerpt "${context.text}" within the context "${context.context}". Please suggest questions that I might want to ask about this excerpt.`
+I selected excerpt "${context.text}" with context before "${context.contextBefore}" and context after "${context.contextAfter}". Please suggest questions that I might want to ask about this excerpt.`
 }
 
 function buildPromptForAnswer(context: ReadingContext, question: string) {
     return `You are assisting user to read ${bookDescription(context)}. User want to ask question "${question}" about the particular part of the book. You'll be supplied with excerpt of the book and the context around it. You should answer the question. If the book is well-known and studied, you should prioritize references to scholar interpritations of the book. If the book is not well-known, you should prioritize your own interpritation of the book.
 
-I selected excerpt "${context.text}" within the context "${context.context}". My question is: ${question}.`
+I selected excerpt "${context.text}" with context before "${context.contextBefore}" and context after "${context.contextAfter}". My question is: ${question}.`
 }
 
 function bookDescription(context: ReadingContext) {
