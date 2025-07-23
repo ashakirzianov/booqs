@@ -76,6 +76,36 @@ export function contextForPath(nodes: BooqNode[], path: BooqPath, length: number
 }
 
 
+export function getQuoteAndContext(nodes: BooqNode[], range: BooqRange, length: number): { quote: string, contextBefore: string, contextAfter: string } {
+    const quote = textForRange(nodes, range) ?? ''
+
+    // Get context before the range
+    const startIter = findPath(rootIterator(nodes), range.start)
+    let contextBefore = ''
+    if (startIter) {
+        let backwardIter = prevLeaf(startIter)
+        while (backwardIter && contextBefore.length < length) {
+            const nodeContent = nodeText(iteratorsNode(backwardIter))
+            contextBefore = nodeContent + contextBefore
+            backwardIter = prevLeaf(backwardIter)
+        }
+    }
+
+    // Get context after the range
+    const endIter = findPath(rootIterator(nodes), range.end)
+    let contextAfter = ''
+    if (endIter) {
+        let forwardIter = nextLeaf(endIter)
+        while (forwardIter && contextAfter.length < length) {
+            const nodeContent = nodeText(iteratorsNode(forwardIter))
+            contextAfter += nodeContent
+            forwardIter = nextLeaf(forwardIter)
+        }
+    }
+
+    return { quote, contextBefore, contextAfter }
+}
+
 export function textForRange(nodes: BooqNode[], { start, end }: BooqRange): string | undefined {
     const [startHead, ...startTail] = start
     const [endHead, ...endTail] = end
