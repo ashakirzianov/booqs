@@ -8,12 +8,8 @@ export function currentSource(): string {
 
 export function colorSchemeForBaseColor(baseColor: string) {
     return {
-        backgroundColor: `hsl(from ${baseColor} h s calc(l - 5) / 90%)`,
-        // backgroundColor: baseColor,
+        backgroundColor: `hsl(from ${baseColor} h s l / 70%)`,
         selectionColor: `hsl(from ${baseColor} h calc(s - 25) calc(l - 25) / 100%)`,
-        textColor: 'var(--color-light)',
-        // textColor: '#eee',
-        dimmedColor: `hsl(from ${baseColor} h calc(s - 30) 95%)`,
     }
 }
 
