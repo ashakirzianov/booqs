@@ -87,6 +87,11 @@ export function Reader({
 
     const [rightPanelOpen, setRightPanelOpen] = React.useState(false)
     const toggleRightPanelOpen = () => setRightPanelOpen(prev => !prev)
+    
+    const { anchor, menuTarget, setMenuTarget, contextMenuAugmentations, displayTarget } = useContextMenuState()
+    
+    // Auto-open right panel when context menu should be displayed in side panel
+    const shouldShowRightPanel = rightPanelOpen || displayTarget === 'side-panel'
     const NavigationContent = <NavigationPanel
         booqId={booq.booqId}
         title={booq.meta.title ?? 'Untitled'}
@@ -107,19 +112,28 @@ export function Reader({
 
     const CommentsButton = <PanelButton
         onClick={toggleRightPanelOpen}
-        selected={rightPanelOpen}
+        selected={shouldShowRightPanel}
     >
         <CommentIcon />
     </PanelButton>
 
-    const RightPanelContent = <CommentsPanel
-        comments={comments}
-        currentUser={user}
-        followingUserIds={followingUserIds}
-        isFollowingLoading={isFollowingLoading}
-    />
-
-    const { anchor, menuTarget, setMenuTarget, contextMenuAugmentations } = useContextMenuState()
+    const RightPanelContent = displayTarget === 'side-panel' && menuTarget.kind !== 'empty' ? (
+        <div className='p-4'>
+            <ContextMenuContent
+                booqId={booq.booqId}
+                user={user}
+                target={menuTarget}
+                setTarget={setMenuTarget}
+            />
+        </div>
+    ) : (
+        <CommentsPanel
+            comments={comments}
+            currentUser={user}
+            followingUserIds={followingUserIds}
+            isFollowingLoading={isFollowingLoading}
+        />
+    )
 
     const { augmentations, menuTargetForAugmentation } = useAugmentations({
         highlights: filteredHighlights,
@@ -134,7 +148,7 @@ export function Reader({
         : `${leftPages} pages left`
 
     const MenuContent = useMemo(() => {
-        if (menuTarget.kind === 'empty') {
+        if (menuTarget.kind === 'empty' || displayTarget === 'side-panel') {
             return null
         }
         return <div className='w-64'><ContextMenuContent
@@ -143,7 +157,7 @@ export function Reader({
             target={menuTarget}
             setTarget={setMenuTarget}
         /></div>
-    }, [booq.booqId, user, menuTarget, setMenuTarget])
+    }, [booq.booqId, user, menuTarget, displayTarget, setMenuTarget])
 
     const {
         ContextMenuNode
@@ -185,7 +199,7 @@ export function Reader({
     return <ReaderLayout
         isControlsVisible={isControlsVisible}
         isLeftPanelOpen={navigationOpen}
-        isRightPanelOpen={rightPanelOpen}
+        isRightPanelOpen={shouldShowRightPanel}
         BooqContent={<div style={{
             fontFamily: 'var(--font-book)',
             fontSize: `${fontScale}%`,
