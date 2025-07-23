@@ -2,12 +2,7 @@ import { BooqId, BooqPath } from '@/core'
 import useSWR from 'swr'
 
 export type CopilotContext = {
-    text: string,
-    context: string,
     booqId: BooqId,
-    title: string,
-    author: string,
-    language: string,
     start: BooqPath,
     end: BooqPath,
 }

@@ -1,24 +1,29 @@
-import { generateAnswer, generateSuggestions } from '@/backend/ai'
+import { buildReadingContext } from '@/backend/booq'
+import { generateSuggestions, generateAnswer } from '@/backend/ai'
+import { BooqId } from '@/core'
 import { IResolvers } from '@graphql-tools/utils'
 
 export type CopilotInput = {
-    text: string,
-    context: string,
-    start?: number[],
-    end?: number[],
-    id?: string,
-    title?: string,
-    author?: string,
-    language?: string,
+    booqId: string,
+    start: number[],
+    end: number[],
 }
 export type CopilotParent = CopilotInput
 export const copilotResolver: IResolvers<CopilotParent> = {
     Copilot: {
         async suggestions(parent) {
-            return generateSuggestions(parent)
+            const context = await buildReadingContext(parent.booqId as BooqId, { start: parent.start, end: parent.end })
+            if (!context) {
+                return []
+            }
+            return generateSuggestions(context)
         },
         async answer(parent, { question }) {
-            return generateAnswer(parent, question)
+            const context = await buildReadingContext(parent.booqId as BooqId, { start: parent.start, end: parent.end })
+            if (!context) {
+                return undefined
+            }
+            return generateAnswer(context, question)
         },
     },
 }

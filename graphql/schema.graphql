@@ -165,14 +165,9 @@ type Collection {
 }
 
 input CopilotContext {
-    text: String!
-    context: String!
-    booqId: ID
-    title: String
-    author: String
-    language: String
-    start: [Int!]
-    end: [Int!]
+    booqId: ID!
+    start: [Int!]!
+    end: [Int!]!
 }
 type Copilot {
     suggestions: [String!]

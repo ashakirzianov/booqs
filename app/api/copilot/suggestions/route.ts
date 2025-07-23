@@ -1,8 +1,9 @@
-import { generateSuggestions } from '@/backend/ai'
+import { generateCopilotSuggestions } from '@/data/copilot'
+import { BooqId } from '@/core'
 
 export async function POST(request: Request) {
-    const { text, context, title, author, language } = await request.json() ?? {}
-    if (typeof text !== 'string' || typeof context !== 'string') {
+    const { booqId, start, end } = await request.json() ?? {}
+    if (typeof booqId !== 'string' || !Array.isArray(start) || !Array.isArray(end)) {
         return new Response('Invalid request', {
             status: 400,
             headers: {
@@ -10,8 +11,6 @@ export async function POST(request: Request) {
             },
         })
     }
-    const suggestions = await generateSuggestions({
-        text, context, title, author, language,
-    })
+    const suggestions = await generateCopilotSuggestions(booqId as BooqId, { start, end })
     return Response.json(suggestions)
 }

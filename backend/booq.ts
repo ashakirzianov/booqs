@@ -1,4 +1,6 @@
-import { Booq, BooqId, BooqPath, pathToString, positionForPath, previewForPath, textForRange } from '@/core'
+import { Booq, BooqId, BooqPath, pathToString, positionForPath, previewForPath, textForRange, contextForRange, BooqRange } from '@/core'
+import { getExtraMetadataValues } from '@/core/meta'
+import { ReadingContext } from '@/backend/ai'
 import { redis } from './db'
 import { parseEpubFile } from '@/parser'
 import { fileForId } from './library'
@@ -71,4 +73,27 @@ async function parseBooqForId(booqId: BooqId) {
         console.info(inspect(diag, { depth: 5, colors: true }))
     })
     return booq
+}
+
+export async function buildReadingContext(booqId: BooqId, range: BooqRange): Promise<ReadingContext | undefined> {
+    const booq = await booqForId(booqId)
+    if (!booq) {
+        return undefined
+    }
+
+    const text = textForRange(booq.nodes, range)
+    if (!text) {
+        return undefined
+    }
+
+    const context = contextForRange(booq.nodes, range, 4000) || text
+    const languages = getExtraMetadataValues('language', booq.metadata.extra)
+
+    return {
+        text,
+        context,
+        title: booq.metadata.title,
+        author: booq.metadata.authors[0]?.name,
+        language: languages[0],
+    }
 }
