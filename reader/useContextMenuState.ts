@@ -5,6 +5,7 @@ import { ContextMenuTarget } from './ContextMenuContent'
 import { noteAugmentationId, quoteAugmentationId, TemporaryAugmentation, temporaryAugmentationId } from './useAugmentations'
 
 export type ContextMenuTargetSetter = (setterOrValue: ContextMenuTarget | ((prev: ContextMenuTarget) => ContextMenuTarget)) => void
+export type DisplayTarget = 'floater' | 'side-panel'
 
 const CREATE_COMMENT_ID = 'create-comment'
 const ASK_ID = 'ask'
@@ -52,11 +53,14 @@ export function useContextMenuState() {
         return augmentations
     }, [target])
 
+    const displayTarget = useMemo(() => displayTargetForMenuTarget(target), [target])
+
     return {
         menuTarget: target,
         setMenuTarget,
         anchor,
         contextMenuAugmentations,
+        displayTarget,
     }
 }
 
@@ -99,3 +103,9 @@ function getAnchorForTarget(target: ContextMenuTarget): VirtualElement | undefin
     }
 }
 
+function displayTargetForMenuTarget(menuTarget: ContextMenuTarget): DisplayTarget {
+    if (menuTarget.kind === 'ask' && menuTarget.question !== undefined) {
+        return 'side-panel'
+    }
+    return 'floater'
+}

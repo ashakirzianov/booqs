@@ -17,6 +17,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Put local/private utility functions after all exported/public functions
 
+- Always put private functions to the bottom of the public functions
+
 Do not access backend/* files directly from frontend code. Instead, create an indirection layer in data/* directory to abstract backend functionality.
 
 Prefer 'function name(...) { ... }' style to 'const name = (...) => { ... }' style
