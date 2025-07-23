@@ -11,20 +11,20 @@ export type ReadingContext = {
 }
 export async function generateSuggestions(context: ReadingContext) {
     const prompt = buildPromptForSuggestions(context)
-    const result = await getChatCompletions(prompt)
+    const result = await getResponse(prompt)
     if (!result) {
         return []
     }
-    return result.map(parseSuggestion).flat()
+    return parseSuggestion(result)
 }
 
 export async function generateAnswer(context: ReadingContext, question: string) {
     const prompt = buildPromptForAnswer(context, question)
-    const result = await getChatCompletions(prompt)
+    const result = await getResponse(prompt)
     if (!result) {
         return undefined
     }
-    return result.join('\n')
+    return result
 }
 
 function parseSuggestion(suggestion: string): string[] {
@@ -45,29 +45,20 @@ function trimNumberPrefix(s: string) {
 }
 
 function buildPromptForSuggestions(context: ReadingContext) {
-    return [{
-        role: 'system' as const,
-        content: `You are assisting user to read ${bookDescription(context)}. User might want to ask different questions about the particular part of the book. You'll be supplied with excerpt of the book and the context around it. You should suggest from 1 to 3 questions that user is likely to ask about the excerpt. Each question must be a single sentense and end with question mark.
+    return `You are assisting user to read ${bookDescription(context)}. User might want to ask different questions about the particular part of the book. You'll be supplied with excerpt of the book and the context around it. You should suggest from 1 to 3 questions that user is likely to ask about the excerpt. Each question must be a single sentense and end with question mark.
         Prioritize this potential questions:
         - Questions about cultural references
         - Questions about used special terms if they are not obvious
         - Questions about previous interactions with the character (if you know the book well and if the character is mentioned in the excerpt)
         - Questions about meaning of the excerpt if it is not obvious
-        `,
-    }, {
-        role: 'user' as const,
-        content: `I selected excerpt "${context.text}" within the context "${context.context}". Please suggest questions that I might want to ask about this excerpt.`,
-    }]
+        
+I selected excerpt "${context.text}" within the context "${context.context}". Please suggest questions that I might want to ask about this excerpt.`
 }
 
 function buildPromptForAnswer(context: ReadingContext, question: string) {
-    return [{
-        role: 'system' as const,
-        content: `You are assisting user to read ${bookDescription(context)}. User want to ask question "${question}" about the particular part of the book. You'll be supplied with excerpt of the book and the context around it. You should answer the question. If the book is well-known and studied, you should prioritize references to scholar interpritations of the book. If the book is not well-known, you should prioritize your own interpritation of the book.`,
-    }, {
-        role: 'user' as const,
-        content: `I selected excerpt "${context.text}" within the context "${context.context}". My question is: ${question}.`,
-    }]
+    return `You are assisting user to read ${bookDescription(context)}. User want to ask question "${question}" about the particular part of the book. You'll be supplied with excerpt of the book and the context around it. You should answer the question. If the book is well-known and studied, you should prioritize references to scholar interpritations of the book. If the book is not well-known, you should prioritize your own interpritation of the book.
+
+I selected excerpt "${context.text}" within the context "${context.context}". My question is: ${question}.`
 }
 
 function bookDescription(context: ReadingContext) {
@@ -85,26 +76,18 @@ function bookDescription(context: ReadingContext) {
 }
 
 
-async function getChatCompletions(messages: OpenAI.ChatCompletionMessageParam[], n: number = 1) {
+async function getResponse(input: string) {
     const openai = new OpenAI({
         apiKey: process.env.OPENAI_API_KEY,
     })
     try {
-        const response = await openai.chat.completions.create({
+        const response = await openai.responses.create({
             model: AI_MODEL,
-            messages,
-            n,
+            input,
         })
-        if (response) {
-            const completions = response.choices
-                .map(choice => choice.message?.content)
-                .filter((m): m is string => m !== undefined)
-            return completions
-        } else {
-            return undefined
-        }
+        return response.output_text || undefined
     } catch (e) {
-        console.error('getChatCompletions', e)
+        console.error('getResponse', e)
         return undefined
     }
 }
