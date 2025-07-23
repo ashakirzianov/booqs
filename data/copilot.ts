@@ -1,45 +1,14 @@
 import { BooqId, BooqRange } from '@/core'
-import { buildReadingContext } from '@/backend/booq'
-import { generateSuggestions, generateAnswer, generateAnswerStream } from '@/backend/ai'
+import { generateSuggestions, generateAnswer, generateAnswerStreaming } from '@/backend/copilot'
 
 export async function generateCopilotSuggestions({ booqId, range }: { booqId: BooqId, range: BooqRange }) {
-    const context = await buildReadingContext(booqId, range)
-    if (!context) {
-        return {
-            success: false as const,
-            error: {
-                message: 'Context not found',
-                code: 'CONTEXT_NOT_FOUND',
-            }
-        }
-    }
-    return generateSuggestions(context)
+    return generateSuggestions(booqId, range)
 }
 
 export async function generateCopilotAnswer({ booqId, range, question }: { booqId: BooqId, range: BooqRange, question: string }) {
-    const context = await buildReadingContext(booqId, range)
-    if (!context) {
-        return {
-            success: false as const,
-            error: {
-                message: 'Context not found',
-                code: 'CONTEXT_NOT_FOUND',
-            }
-        }
-    }
-    return generateAnswer(context, question)
+    return generateAnswer(booqId, range, question)
 }
 
 export async function generateCopilotAnswerStream({ booqId, range, question }: { booqId: BooqId, range: BooqRange, question: string }) {
-    const context = await buildReadingContext(booqId, range)
-    if (!context) {
-        return {
-            success: false as const,
-            error: {
-                message: 'Context not found',
-                code: 'CONTEXT_NOT_FOUND',
-            }
-        }
-    }
-    return generateAnswerStream(context, question)
+    return generateAnswerStreaming(booqId, range, question)
 }

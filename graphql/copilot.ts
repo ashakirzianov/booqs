@@ -1,5 +1,4 @@
-import { buildReadingContext } from '@/backend/booq'
-import { generateSuggestions, generateAnswer } from '@/backend/ai'
+import { generateSuggestions, generateAnswer } from '@/backend/copilot'
 import { BooqId } from '@/core'
 import { IResolvers } from '@graphql-tools/utils'
 
@@ -12,22 +11,14 @@ export type CopilotParent = CopilotInput
 export const copilotResolver: IResolvers<CopilotParent> = {
     Copilot: {
         async suggestions(parent) {
-            const context = await buildReadingContext(parent.booqId as BooqId, { start: parent.start, end: parent.end })
-            if (!context) {
-                return []
-            }
-            const result = await generateSuggestions(context)
+            const result = await generateSuggestions(parent.booqId as BooqId, { start: parent.start, end: parent.end })
             if (!result.success) {
                 return []
             }
             return result.suggestions
         },
         async answer(parent, { question }) {
-            const context = await buildReadingContext(parent.booqId as BooqId, { start: parent.start, end: parent.end })
-            if (!context) {
-                return undefined
-            }
-            const result = await generateAnswer(context, question)
+            const result = await generateAnswer(parent.booqId as BooqId, { start: parent.start, end: parent.end }, question)
             if (!result.success) {
                 return undefined
             }
