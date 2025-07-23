@@ -4,7 +4,6 @@ const AI_MODEL = 'o4-mini'
 
 export type ReadingContext = {
     text: string,
-    context: string,
     contextBefore: string,
     contextAfter: string,
     title?: string,
