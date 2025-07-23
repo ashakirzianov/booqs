@@ -128,13 +128,39 @@ async function getResponseStream(input: string) {
     const openai = new OpenAI({
         apiKey: process.env.OPENAI_API_KEY,
     })
-    
-    const stream = await openai.responses.create({
+
+    const response = await openai.responses.create({
         model: AI_MODEL,
         input,
         stream: true,
     })
-    
+    const encoder = new TextEncoder()
+    const stream = new ReadableStream({
+        async start(controller) {
+            try {
+                for await (const event of response) {
+                    if (event.type === 'error') {
+                        controller.close()
+                        return
+                    }
+
+                    if (event.type === 'response.failed') {
+                        controller.close()
+                        return
+                    }
+
+                    if (event.type === 'response.output_text.delta') {
+                        controller.enqueue(encoder.encode(event.delta))
+                    }
+                }
+                controller.close()
+            } catch (e) {
+                console.error('Stream error:', e)
+                controller.close()
+            }
+        }
+    })
+
     return {
         success: true as const,
         stream,

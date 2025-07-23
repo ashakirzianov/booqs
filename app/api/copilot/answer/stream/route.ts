@@ -29,34 +29,7 @@ export async function POST(request: Request) {
         return Response.json({ error: response.error }, { status: 500 })
     }
 
-    const encoder = new TextEncoder()
-    const stream = new ReadableStream({
-        async start(controller) {
-            try {
-                for await (const event of response.stream) {
-                    if (event.type === 'error') {
-                        controller.close()
-                        return
-                    }
-                    
-                    if (event.type === 'response.failed') {
-                        controller.close()
-                        return
-                    }
-                    
-                    if (event.type === 'response.output_text.delta') {
-                        controller.enqueue(encoder.encode(event.delta))
-                    }
-                }
-                controller.close()
-            } catch (e) {
-                console.error('Stream error:', e)
-                controller.close()
-            }
-        }
-    })
-
-    return new Response(stream, {
+    return new Response(response.stream, {
         headers: {
             'Content-Type': 'text/plain; charset=utf-8',
             'Cache-Control': 'no-cache',
