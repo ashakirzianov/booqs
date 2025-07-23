@@ -11,6 +11,14 @@ export async function POST(request: Request) {
             },
         })
     }
-    const suggestions = await generateCopilotSuggestions({ booqId: booqId as BooqId, range: { start, end } })
-    return Response.json(suggestions)
+    const result = await generateCopilotSuggestions({ booqId: booqId as BooqId, range: { start, end } })
+    if (!result.success) {
+        return new Response('No suggestions found', {
+            status: 404,
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        })
+    }
+    return Response.json(result.suggestions)
 }

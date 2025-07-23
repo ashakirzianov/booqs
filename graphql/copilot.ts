@@ -16,14 +16,22 @@ export const copilotResolver: IResolvers<CopilotParent> = {
             if (!context) {
                 return []
             }
-            return generateSuggestions(context)
+            const result = await generateSuggestions(context)
+            if (!result.success) {
+                return []
+            }
+            return result.suggestions
         },
         async answer(parent, { question }) {
             const context = await buildReadingContext(parent.booqId as BooqId, { start: parent.start, end: parent.end })
             if (!context) {
                 return undefined
             }
-            return generateAnswer(context, question)
+            const result = await generateAnswer(context, question)
+            if (!result.success) {
+                return undefined
+            }
+            return result.output
         },
     },
 }

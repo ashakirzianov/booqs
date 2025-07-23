@@ -12,18 +12,19 @@ export type ReadingContext = {
 export async function generateSuggestions(context: ReadingContext) {
     const prompt = buildPromptForSuggestions(context)
     const result = await getResponse(prompt)
-    if (!result) {
-        return []
+    if (!result.success) {
+        return result
     }
-    return parseSuggestion(result)
+    const suggestions = parseSuggestion(result.output)
+    return {
+        success: true as const,
+        suggestions,
+    }
 }
 
 export async function generateAnswer(context: ReadingContext, question: string) {
     const prompt = buildPromptForAnswer(context, question)
     const result = await getResponse(prompt)
-    if (!result) {
-        return undefined
-    }
     return result
 }
 
@@ -85,9 +86,35 @@ async function getResponse(input: string) {
             model: AI_MODEL,
             input,
         })
-        return response.output_text || undefined
+        if (response.error) {
+            return {
+                success: false as const,
+                error: {
+                    message: response.error.message,
+                    code: response.error.code,
+                },
+            }
+        } else if (!response.output_text) {
+            return {
+                success: false as const,
+                error: {
+                    message: 'No output text returned from AI',
+                    code: 'NO_OUTPUT_TEXT',
+                },
+            }
+        }
+        return {
+            success: true as const,
+            output: response.output_text,
+        }
     } catch (e) {
         console.error('getResponse', e)
-        return undefined
+        return {
+            success: false as const,
+            error: {
+                message: 'Internal server error',
+                code: 'INTERNAL_SERVER_ERROR',
+            },
+        }
     }
 }
