@@ -1,5 +1,7 @@
 import OpenAI from 'openai'
 
+const AI_MODEL = 'o4-mini'
+
 export type ReadingContext = {
     text: string,
     context: string,
@@ -89,7 +91,7 @@ async function getChatCompletions(messages: OpenAI.ChatCompletionMessageParam[],
     })
     try {
         const response = await openai.chat.completions.create({
-            model: 'gpt-3.5-turbo',
+            model: AI_MODEL,
             messages,
             n,
         })
