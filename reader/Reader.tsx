@@ -89,7 +89,7 @@ export function Reader({
     const toggleCommentsPanelOpen = () => setCommentsPanelOpen(prev => !prev)
 
     const { anchor, menuTarget, setMenuTarget, contextMenuAugmentations, displayTarget } = useContextMenuState()
-    const TheMenuContent = useMemo(() => {
+    const ContextMenuContentNode = useMemo(() => {
         return <ContextMenuContent
             booqId={booq.booqId}
             user={user}
@@ -102,8 +102,8 @@ export function Reader({
         if (displayTarget !== 'floater') {
             return null
         }
-        return <div className='w-64'>{TheMenuContent}</div>
-    }, [displayTarget, TheMenuContent])
+        return <div className='w-64'>{ContextMenuContentNode}</div>
+    }, [displayTarget, ContextMenuContentNode])
 
     const {
         ContextMenuNode
@@ -140,7 +140,7 @@ export function Reader({
 
     const RightPanelContent = displayTarget === 'side-panel' ? (
         <div className='p-4'>
-            {TheMenuContent}
+            {ContextMenuContentNode}
         </div>
     ) : (
         <CommentsPanel
