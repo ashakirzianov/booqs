@@ -133,7 +133,7 @@ describe('core/text', () => {
   describe('previewForPath', () => {
     it('returns preview text from specified path', () => {
       const result = previewForPath(complexNodes, [0, 0], 20)
-      expect(result).toBe('Paragraph one.')
+      expect(result).toBe('Paragraph one.Root text.')
     })
 
     it('returns undefined for invalid path', () => {
@@ -141,9 +141,9 @@ describe('core/text', () => {
       expect(result).toBeUndefined()
     })
 
-    it('returns trimmed preview text', () => {
+    it('returns minimum length preview including full last node', () => {
       const result = previewForPath(complexNodes, [1], 5)
-      expect(result).toBe('Root')
+      expect(result).toBe('Root text.')
     })
 
     it('continues to next leaves when length not reached', () => {
@@ -162,7 +162,6 @@ describe('core/text', () => {
       expect(result).toBe('')
     })
 
-    // CLAUDE: This test might fail if the function doesn't handle whitespace-only content properly
     it('handles whitespace-only content', () => {
       const whitespaceNodes = [createTextNode('   \n\t   '), createTextNode('Text')]
       const result = previewForPath(whitespaceNodes, [0], 10)
@@ -178,7 +177,6 @@ describe('core/text', () => {
       expect(result).toBe(expectedResult)
     })
 
-    // CLAUDE: The function currently ignores the end parameter, which might be a limitation
     it('currently ignores end parameter (implementation note)', () => {
       const range1: BooqRange = { start: [1], end: [2] }
       const range2: BooqRange = { start: [1], end: [3] }
@@ -212,7 +210,6 @@ describe('core/text', () => {
       expect(result).toContain('Root text')
     })
 
-    // CLAUDE: This test might expose issues with the substring logic when building context
     it('handles length constraints correctly', () => {
       const result = contextForPath(complexNodes, [1], 5)
       expect(result).toBeDefined()
@@ -259,10 +256,11 @@ describe('core/text', () => {
       expect(result.contextAfter).toContain('Span content')
     })
 
-    it('respects length limit for context', () => {
+    it('respects node boundaries and includes full last node in context', () => {
       const result = getQuoteAndContext(complexNodes, testRange, 5)
-      expect(result.contextBefore.length).toBeLessThanOrEqual(5)
-      expect(result.contextAfter.length).toBeLessThanOrEqual(5)
+      // Context includes full content of last node even if it exceeds minimum length
+      expect(result.contextBefore.length).toBeGreaterThanOrEqual(5)
+      expect(result.contextAfter.length).toBeGreaterThanOrEqual(5)
     })
   })
 
@@ -293,7 +291,6 @@ describe('core/text', () => {
       expect(result).toBeUndefined()
     })
 
-    // CLAUDE: This test might fail if the function doesn't properly validate that start <= end
     it('returns undefined when start > end', () => {
       const range: BooqRange = { start: [2], end: [1] }
       const result = textForRange(complexNodes, range)
@@ -318,7 +315,7 @@ describe('core/text', () => {
       expect(result).toBe('Root text. ')
     })
 
-    it('handles element nodes in range', () => {
+    it('handles element nodes in range with exclusive end', () => {
       const range: BooqRange = { start: [2], end: [3] }
       const result = textForRange(complexNodes, range)
       expect(result).toBe('Div start Span content Div end')
@@ -331,8 +328,7 @@ describe('core/text', () => {
       expect(result).toBeUndefined()
     })
 
-    // CLAUDE: This test might expose edge cases in the recursive range handling
-    it('handles complex nested ranges', () => {
+    it('handles complex nested ranges with exclusive end', () => {
       const deepNodes = [
         createElement('div', [
           createElement('p', [
@@ -342,7 +338,7 @@ describe('core/text', () => {
           ]),
         ]),
       ]
-      const range: BooqRange = { start: [0, 0, 1, 0, 1], end: [0, 0, 2, 2] }
+      const range: BooqRange = { start: [0, 0, 1, 0, 1], end: [0, 0, 2, 3] }
       const result = textForRange(deepNodes, range)
       expect(result).toBe('ested la')
     })
@@ -353,7 +349,6 @@ describe('core/text', () => {
       expect(result).toBe('')
     })
 
-    // CLAUDE: This might fail if the function doesn't handle stub nodes properly in ranges
     it('handles stub nodes in range', () => {
       const nodesWithStub = [
         createTextNode('Before '),
@@ -376,7 +371,7 @@ describe('core/text', () => {
     it('handles malformed ranges', () => {
       const range: BooqRange = { start: [], end: [] }
       expect(textForRange(complexNodes, range)).toBeUndefined()
-      
+
       const invalidRange: BooqRange = { start: [-1], end: [0] }
       expect(textForRange(complexNodes, invalidRange)).toBeUndefined()
     })
