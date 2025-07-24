@@ -1,6 +1,6 @@
 import { BooqNode, BooqRange, BooqPath } from './model'
 import {
-    findPath, rootIterator, firstLeaf, iteratorsNode, nextLeaf, prevLeaf, BooqNodeIterator,
+    findPath, rootIterator, firstLeaf, iteratorsNode, nextLeaf, prevLeaf,
 } from './iterator'
 import { assertNever } from './misc'
 
@@ -42,38 +42,6 @@ export function previewForPath(nodes: BooqNode[], path: BooqPath, length: number
         iter = nextLeaf(iter)
     }
     return preview.trim()
-}
-
-export function contextForRange(nodes: BooqNode[], { start }: BooqRange, length: number) {
-    // TODO: implement version that takes end into account
-    return contextForPath(nodes, start, length)
-}
-
-export function contextForPath(nodes: BooqNode[], path: BooqPath, length: number) {
-    const iter = findPath(rootIterator(nodes), path)
-    if (!iter) {
-        return undefined
-    }
-    let result = ''
-    let forwardIter: BooqNodeIterator | undefined = firstLeaf(iter)
-    let backwardIter: BooqNodeIterator | undefined = prevLeaf(iter)
-    while (forwardIter || backwardIter) {
-        if (forwardIter) {
-            result += nodeText(iteratorsNode(forwardIter))
-            if (result.length >= length) {
-                return result.substring(0, length)
-            }
-            forwardIter = nextLeaf(forwardIter)
-        }
-        if (backwardIter) {
-            result = nodeText(iteratorsNode(backwardIter)) + result
-            if (result.length >= length) {
-                return result.substring(result.length - length)
-            }
-            backwardIter = prevLeaf(backwardIter)
-        }
-    }
-    return result
 }
 
 // length is the minimum length of the contextBefore and contextAfter (provided that nodes have enough content). The getQuoteAndContext does not truncate resulting strings to the length, instead it respects the node boundaries and returns all the text content from the last node appended to the context.

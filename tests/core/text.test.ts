@@ -2,8 +2,6 @@ import {
   nodeText,
   nodesText,
   previewForPath,
-  contextForRange,
-  contextForPath,
   getQuoteAndContext,
   textForRange,
 } from '../../core/text'
@@ -166,60 +164,6 @@ describe('core/text', () => {
       const whitespaceNodes = [createTextNode('   \n\t   '), createTextNode('Text')]
       const result = previewForPath(whitespaceNodes, [0], 10)
       expect(result).toBe('Text')
-    })
-  })
-
-  describe('contextForRange', () => {
-    it('delegates to contextForPath with start path', () => {
-      const range: BooqRange = { start: [1], end: [2] }
-      const result = contextForRange(complexNodes, range, 20)
-      const expectedResult = contextForPath(complexNodes, [1], 20)
-      expect(result).toBe(expectedResult)
-    })
-
-    it('currently ignores end parameter (implementation note)', () => {
-      const range1: BooqRange = { start: [1], end: [2] }
-      const range2: BooqRange = { start: [1], end: [3] }
-      const result1 = contextForRange(complexNodes, range1, 20)
-      const result2 = contextForRange(complexNodes, range2, 20)
-      expect(result1).toBe(result2)
-    })
-  })
-
-  describe('contextForPath', () => {
-    it('returns context around specified path', () => {
-      const result = contextForPath(complexNodes, [1], 50)
-      expect(result).toContain('Root text.')
-      expect(result).toContain('Paragraph one.')
-    })
-
-    it('returns undefined for invalid path', () => {
-      const result = contextForPath(complexNodes, [10], 20)
-      expect(result).toBeUndefined()
-    })
-
-    it('limits result to specified length', () => {
-      const result = contextForPath(complexNodes, [1], 10)
-      expect(result?.length).toBeLessThanOrEqual(10)
-    })
-
-    it('builds context from both directions', () => {
-      const result = contextForPath(complexNodes, [2, 1, 0], 100)
-      expect(result).toContain('Span content')
-      expect(result).toContain('Div start')
-      expect(result).toContain('Root text')
-    })
-
-    it('handles length constraints correctly', () => {
-      const result = contextForPath(complexNodes, [1], 5)
-      expect(result).toBeDefined()
-      expect(result!.length).toBe(5)
-    })
-
-    it('returns empty string when no context available', () => {
-      const singleNode = [createTextNode('Only')]
-      const result = contextForPath(singleNode, [0], 20)
-      expect(result).toBe('Only')
     })
   })
 
@@ -431,7 +375,6 @@ describe('core/text', () => {
     it('handles empty nodes array', () => {
       expect(nodesText([])).toBe('')
       expect(previewForPath([], [0], 10)).toBeUndefined()
-      expect(contextForPath([], [0], 10)).toBeUndefined()
     })
 
     it('handles malformed ranges', () => {
