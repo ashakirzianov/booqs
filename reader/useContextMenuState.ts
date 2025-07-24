@@ -77,7 +77,7 @@ function sameTarget(a: ContextMenuTarget, b: ContextMenuTarget) {
         }
     }
     if (a.kind === 'ask' && b.kind === 'ask') {
-        if (a.booqId === b.booqId && a.selection.text === b.selection.text && a.question === b.question && a.hidden === b.hidden) {
+        if (a.selection.text === b.selection.text && a.question === b.question && a.hidden === b.hidden) {
             return true
         }
     }

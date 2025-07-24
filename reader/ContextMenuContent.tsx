@@ -41,7 +41,6 @@ export type AskTarget = {
     kind: 'ask',
     question: string | undefined,
     selection: BooqSelection,
-    booqId: BooqId,
     hidden?: boolean,
 }
 export type ContextMenuTarget =
@@ -65,7 +64,7 @@ export function ContextMenuContent({
         case 'create-comment':
             return <CreateCommentTargetMenu target={target} booqId={booqId} user={user} setTarget={setTarget} />
         case 'ask':
-            return <AskTargetMenu target={target} setTarget={setTarget} />
+            return <AskTargetMenu booqId={booqId} target={target} setTarget={setTarget} />
         default:
             return null
     }
@@ -84,7 +83,7 @@ function SelectionTargetMenu({
     return <>
         <AddHighlightItem booqId={booqId} user={user} setTarget={setTarget} selection={selection} />
         <AddCommentItem target={target} user={user} setTarget={setTarget} />
-        <AskMenuItem target={target} booqId={booqId} user={user} setTarget={setTarget} />
+        <AskMenuItem target={target} user={user} setTarget={setTarget} />
         <CopyQuoteItem selection={selection} booqId={booqId} setTarget={setTarget} />
     </>
 }
@@ -101,7 +100,7 @@ function QuoteTargetMenu({
     return <>
         <AddHighlightItem booqId={booqId} user={user} setTarget={setTarget} selection={selection} />
         <AddCommentItem target={target} user={user} setTarget={setTarget} />
-        <AskMenuItem target={target} booqId={booqId} user={user} setTarget={setTarget} />
+        <AskMenuItem target={target} user={user} setTarget={setTarget} />
         <CopyTextItem selection={selection} booqId={booqId} setTarget={setTarget} />
     </>
 }

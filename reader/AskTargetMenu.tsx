@@ -7,8 +7,9 @@ import { MenuButton } from '@/components/Buttons'
 import { CopilotIcon, CloseIcon, RemoveIcon } from '@/components/Icons'
 
 export function AskTargetMenu({
-    target, setTarget
+    target, setTarget, booqId
 }: {
+    booqId: BooqId,
     target: AskTarget,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
@@ -27,7 +28,7 @@ export function AskTargetMenu({
     if (target.question !== undefined) {
         return (
             <AnswerDisplay
-                booqId={target.booqId}
+                booqId={booqId}
                 question={target.question}
                 range={target.selection.range}
                 onClose={() => setTarget({ kind: 'empty' })}

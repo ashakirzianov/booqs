@@ -68,7 +68,6 @@ export function NoteTargetMenu({
             kind: 'ask',
             question: undefined,
             selection: target.selection,
-            booqId,
         })
     }
 

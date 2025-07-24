@@ -205,10 +205,9 @@ function removeSelection() {
 }
 
 export function AskMenuItem({
-    target, booqId, user, setTarget,
+    target, user, setTarget,
 }: {
     target: SelectionTarget | QuoteTarget,
-    booqId: BooqId,
     user: AuthorData | undefined,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
@@ -223,7 +222,6 @@ export function AskMenuItem({
                 kind: 'ask',
                 question: undefined,
                 selection: target.selection,
-                booqId,
             })
         }}
     />
