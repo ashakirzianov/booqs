@@ -14,6 +14,15 @@ export function AskTargetMenu({
 }) {
     const [question, setQuestion] = useState(target.question || '')
 
+    function handleAsk() {
+        if (question.trim()) {
+            setTarget({
+                ...target,
+                question: question.trim()
+            })
+        }
+    }
+
     // If there's already a question set, show the answer display
     if (target.question !== undefined) {
         return (
@@ -32,6 +41,12 @@ export function AskTargetMenu({
                 type="text"
                 value={question}
                 onChange={(e) => setQuestion(e.target.value)}
+                onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault()
+                        handleAsk()
+                    }
+                }}
                 placeholder="Ask a question about this text..."
                 className="w-full px-3 py-2 border border-dimmed rounded bg-background text-primary text-sm leading-relaxed focus:outline-none focus:border-action"
                 style={{ fontFamily: 'var(--font-main)' }}
@@ -39,13 +54,7 @@ export function AskTargetMenu({
             />
             <div className="flex flex-row justify-start gap-4">
                 <MenuButton
-                    onClick={() => {
-                        // Set the question in the target to trigger answer display
-                        setTarget({
-                            ...target,
-                            question: question.trim()
-                        })
-                    }}
+                    onClick={handleAsk}
                 >
                     <div className="w-4 h-4"><CopilotIcon /></div>
                     Ask
