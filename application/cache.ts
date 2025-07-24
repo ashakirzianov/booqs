@@ -1,16 +1,17 @@
 export type CacheEvent<T> = { event: 'chunk', chunk: T }
     | { event: 'error', error: string }
     | { event: 'complete' }
-export type CacheProducer<T> = (key: string) => AsyncGenerator<T>
+export type CacheProducer<In, Out> = (input: In) => AsyncGenerator<Out>
 export type CacheListener<T> = (event: CacheEvent<T>) => void
 
-export function createStreamingCache<T>(producer: CacheProducer<T>) {
+export function createStreamingCache<In, Out>(producer: CacheProducer<In, Out>) {
     type CacheValue = {
-        stored: T[],
-        listeners: Set<CacheListener<T>>,
+        stored: Out[],
+        listeners: Set<CacheListener<Out>>,
     }
     const cache = new Map<string, CacheValue>()
-    async function subscribe(key: string, listener: CacheListener<T>) {
+    async function subscribe(input: In, listener: CacheListener<Out>) {
+        const key = generateCacheKey(input)
         const existing = cache.get(key)
         if (existing) {
             for (const chunk of existing.stored) {
@@ -24,7 +25,7 @@ export function createStreamingCache<T>(producer: CacheProducer<T>) {
             listeners: new Set([listener]),
         }
         cache.set(key, newValue)
-        function broadcast(event: CacheEvent<T>) {
+        function broadcast(event: CacheEvent<Out>) {
             if (event.event === 'chunk') {
                 newValue.stored.push(event.chunk)
             }
@@ -33,7 +34,7 @@ export function createStreamingCache<T>(producer: CacheProducer<T>) {
             }
         }
         try {
-            for await (const chunk of producer(key)) {
+            for await (const chunk of producer(input)) {
                 broadcast({ event: 'chunk', chunk })
             }
         } catch (error) {
@@ -45,8 +46,8 @@ export function createStreamingCache<T>(producer: CacheProducer<T>) {
             broadcast({ event: 'complete' })
         }
     }
-    async function unsubscribe(key: string, listener: CacheListener<T>) {
-        const existing = cache.get(key)
+    async function unsubscribe(input: In, listener: CacheListener<Out>) {
+        const existing = cache.get(generateCacheKey(input))
         if (existing) {
             existing.listeners.delete(listener)
         }
@@ -55,4 +56,8 @@ export function createStreamingCache<T>(producer: CacheProducer<T>) {
         subscribe,
         unsubscribe,
     }
+}
+
+function generateCacheKey<In>(input: In): string {
+    return JSON.stringify(input)
 }

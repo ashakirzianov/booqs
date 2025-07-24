@@ -105,7 +105,7 @@ export function useCopilotAnswerStream({
         setLoading(true)
         setAnswer('')
         setError(null)
-        const cacheKey = generateCacheKey({ booqId, start, end, question, footnote })
+        const input = { booqId, start, end, question, footnote }
         function listener(event: CacheEvent<string>) {
             if (event.event === 'chunk') {
                 setAnswer(prev => prev + event.chunk)
@@ -116,9 +116,9 @@ export function useCopilotAnswerStream({
                 setLoading(false)
             }
         }
-        streamingAnswerCache.subscribe(cacheKey, listener)
+        streamingAnswerCache.subscribe(input, listener)
         return () => {
-            streamingAnswerCache.unsubscribe(cacheKey, listener)
+            streamingAnswerCache.unsubscribe(input, listener)
         }
     }, [booqId, question, start, end, footnote])
 
@@ -133,27 +133,10 @@ export function useCopilotAnswerStream({
     }
 }
 
-const KEY_SEPARATOR = '$SEPARATOR$'
-
 type CacheInput = { booqId: BooqId, start: BooqPath, end: BooqPath, question: string, footnote?: string }
-function generateCacheKey({ booqId, start, end, question, footnote }: CacheInput) {
-    return `${booqId}${KEY_SEPARATOR}${start.join(',')}${KEY_SEPARATOR}${end.join(',')}${KEY_SEPARATOR}${question}${KEY_SEPARATOR}${footnote || ''}`
-}
 
-function parseCacheKey(key: string): CacheInput {
-    const parts = key.split(KEY_SEPARATOR)
-    const booqId = parts[0]
-    const startStr = parts[1]
-    const endStr = parts[2]
-    const question = parts[3]
-    const footnote = parts[4] || undefined
-    const start = startStr.split(',').map(c => parseInt(c))
-    const end = endStr.split(',').map(c => parseInt(c))
-    return { booqId: booqId as BooqId, start, end, question, footnote }
-}
-
-const streamingAnswerCache = createStreamingCache(async function* (key: string) {
-    const { booqId, start, end, question, footnote } = parseCacheKey(key)
+const streamingAnswerCache = createStreamingCache(async function* (input: CacheInput) {
+    const { booqId, start, end, question, footnote } = input
     const body: AnswerStreamPostBody = { booqId, start, end, question, footnote }
     const res = await fetch('/api/copilot/answer/stream', {
         method: 'POST',
