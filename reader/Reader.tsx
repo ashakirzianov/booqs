@@ -141,7 +141,7 @@ export function Reader({
 
     const RightPanelContent =
         <>
-            <div className={clsx('p-4 w-full', {
+            <div className={clsx('p-4 w-full overflow-y-auto', {
                 'hidden': displayTarget !== 'side-panel',
             })}>
                 {ContextMenuContentNode}
