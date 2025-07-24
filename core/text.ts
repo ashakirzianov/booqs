@@ -1,6 +1,6 @@
 import { BooqNode, BooqRange, BooqPath } from './model'
 import {
-    findPath, rootIterator, firstLeaf, iteratorsNode, nextLeaf, prevLeaf,
+    findPath, rootIterator, firstLeafNode, iteratorsNode, nextLeafNode, prevLeafNode,
 } from './iterator'
 import { assertNever } from './misc'
 
@@ -29,7 +29,7 @@ export function previewForPath(nodes: BooqNode[], path: BooqPath, length: number
     if (!iter) {
         return undefined
     }
-    iter = firstLeaf(iter)
+    iter = firstLeafNode(iter)
     let preview = ''
     while (iter) {
         const node = iteratorsNode(iter)
@@ -39,7 +39,7 @@ export function previewForPath(nodes: BooqNode[], path: BooqPath, length: number
         if (preview.trim().length >= length) {
             return preview.trim()
         }
-        iter = nextLeaf(iter)
+        iter = nextLeafNode(iter)
     }
     return preview.trim()
 }
@@ -52,11 +52,11 @@ export function getQuoteAndContext(nodes: BooqNode[], range: BooqRange, length: 
     const startIter = findPath(rootIterator(nodes), range.start)
     let contextBefore = ''
     if (startIter) {
-        let backwardIter = prevLeaf(startIter)
+        let backwardIter = prevLeafNode(startIter)
         while (backwardIter && contextBefore.length < length) {
             const nodeContent = nodeText(iteratorsNode(backwardIter))
             contextBefore = nodeContent + contextBefore
-            backwardIter = prevLeaf(backwardIter)
+            backwardIter = prevLeafNode(backwardIter)
         }
     }
 
@@ -64,11 +64,11 @@ export function getQuoteAndContext(nodes: BooqNode[], range: BooqRange, length: 
     const endIter = findPath(rootIterator(nodes), range.end)
     let contextAfter = ''
     if (endIter) {
-        let forwardIter = nextLeaf(endIter)
+        let forwardIter = nextLeafNode(endIter)
         while (forwardIter && contextAfter.length < length) {
             const nodeContent = nodeText(iteratorsNode(forwardIter))
             contextAfter += nodeContent
-            forwardIter = nextLeaf(forwardIter)
+            forwardIter = nextLeafNode(forwardIter)
         }
     }
 

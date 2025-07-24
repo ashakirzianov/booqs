@@ -3,15 +3,15 @@ import {
   iteratorsNode,
   iteratorsPath,
   rootIterator,
-  firstLeaf,
-  lastLeaf,
+  firstLeafNode,
+  lastLeafNode,
   findPath,
   nextSibling,
   prevSibling,
-  nextNode,
-  prevNode,
-  nextLeaf,
-  prevLeaf,
+  nextIterator,
+  prevIterator,
+  nextLeafNode,
+  prevLeafNode,
 } from '../../core/iterator'
 import { BooqNode, BooqElementNode, BooqTextNode } from '../../core/model'
 
@@ -105,14 +105,14 @@ describe('core/iterator', () => {
   describe('firstLeaf', () => {
     it('returns same iterator for text node', () => {
       const iter = { ...rootIterator(flatNodes), index: 0 }
-      const leaf = firstLeaf(iter)
+      const leaf = firstLeafNode(iter)
       expect(leaf).toEqual(iter)
       expect(iteratorsNode(leaf)).toEqual(createTextNode('First'))
     })
 
     it('returns first text child for element node', () => {
       const iter = rootIterator(nestedNodes)
-      const leaf = firstLeaf(iter)
+      const leaf = firstLeafNode(iter)
       expect(iteratorsPath(leaf)).toEqual([0, 0])
       expect(iteratorsNode(leaf)).toEqual(createTextNode('Child 1'))
     })
@@ -126,7 +126,7 @@ describe('core/iterator', () => {
         ])
       ]
       const iter = rootIterator(deepNodes)
-      const leaf = firstLeaf(iter)
+      const leaf = firstLeafNode(iter)
       expect(iteratorsPath(leaf)).toEqual([0, 0, 0, 0])
       expect(iteratorsNode(leaf)).toEqual(createTextNode('Deep text'))
     })
@@ -134,7 +134,7 @@ describe('core/iterator', () => {
     it('returns element iterator if element has no children', () => {
       const emptyElement = createElement('br')
       const iter = rootIterator([emptyElement])
-      const leaf = firstLeaf(iter)
+      const leaf = firstLeafNode(iter)
       expect(leaf).toEqual(iter)
       expect(iteratorsNode(leaf)).toEqual(emptyElement)
     })
@@ -143,14 +143,14 @@ describe('core/iterator', () => {
   describe('lastLeaf', () => {
     it('returns same iterator for text node', () => {
       const iter = { ...rootIterator(flatNodes), index: 2 }
-      const leaf = lastLeaf(iter)
+      const leaf = lastLeafNode(iter)
       expect(leaf).toEqual(iter)
       expect(iteratorsNode(leaf)).toEqual(createTextNode('Third'))
     })
 
     it('returns last text child for element node', () => {
       const iter = rootIterator(nestedNodes)
-      const leaf = lastLeaf(iter)
+      const leaf = lastLeafNode(iter)
       expect(iteratorsPath(leaf)).toEqual([0, 2])
       expect(iteratorsNode(leaf)).toEqual(createTextNode('Child 2'))
     })
@@ -165,7 +165,7 @@ describe('core/iterator', () => {
         ])
       ]
       const iter = rootIterator(deepNodes)
-      const leaf = lastLeaf(iter)
+      const leaf = lastLeafNode(iter)
       expect(iteratorsPath(leaf)).toEqual([0, 1, 0, 0])
       expect(iteratorsNode(leaf)).toEqual(createTextNode('Last deep text'))
     })
@@ -198,7 +198,7 @@ describe('core/iterator', () => {
     it('returns undefined for invalid path', () => {
       const iter = rootIterator(flatNodes)
       expect(findPath(iter, [5])).toBeUndefined()
-      
+
       // For text nodes with path extension beyond 1 level, it should return undefined
       expect(findPath(iter, [0, 0, 0])).toBeUndefined()
     })
@@ -252,7 +252,7 @@ describe('core/iterator', () => {
   describe('nextNode', () => {
     it('returns next sibling when available', () => {
       const iter = rootIterator(flatNodes)
-      const next = nextNode(iter)
+      const next = nextIterator(iter)
       expect(next).toBeDefined()
       expect(next!.index).toBe(1)
     })
@@ -264,7 +264,7 @@ describe('core/iterator', () => {
         nodes: (nestedNodes[0] as BooqElementNode).children!,
         index: 2, // last child
       }
-      const next = nextNode(childIter)
+      const next = nextIterator(childIter)
       expect(next).toBeDefined()
       expect(iteratorsPath(next!)).toEqual([1])
       expect(iteratorsNode(next!)).toEqual(createTextNode('Root text'))
@@ -272,7 +272,7 @@ describe('core/iterator', () => {
 
     it('returns undefined when no next node exists', () => {
       const iter = { ...rootIterator(flatNodes), index: 2 }
-      const next = nextNode(iter)
+      const next = nextIterator(iter)
       expect(next).toBeUndefined()
     })
   })
@@ -280,7 +280,7 @@ describe('core/iterator', () => {
   describe('prevNode', () => {
     it('returns previous sibling when available', () => {
       const iter = { ...rootIterator(flatNodes), index: 1 }
-      const prev = prevNode(iter)
+      const prev = prevIterator(iter)
       expect(prev).toBeDefined()
       expect(prev!.index).toBe(0)
     })
@@ -292,14 +292,14 @@ describe('core/iterator', () => {
         nodes: (nestedNodes[2] as BooqElementNode).children!,
         index: 0,
       }
-      const prev = prevNode(childIter)
+      const prev = prevIterator(childIter)
       expect(prev).toBeDefined()
       expect(iteratorsPath(prev!)).toEqual([0])
     })
 
     it('returns undefined when no previous node exists', () => {
       const iter = rootIterator(flatNodes)
-      const prev = prevNode(iter)
+      const prev = prevIterator(iter)
       expect(prev).toBeUndefined()
     })
   })
@@ -307,7 +307,7 @@ describe('core/iterator', () => {
   describe('nextLeaf', () => {
     it('returns first leaf of next node', () => {
       const iter = { ...rootIterator(nestedNodes), index: 1 } // 'Root text'
-      const nextL = nextLeaf(iter)
+      const nextL = nextLeafNode(iter)
       expect(nextL).toBeDefined()
       expect(iteratorsPath(nextL!)).toEqual([2, 0])
       expect(iteratorsNode(nextL!)).toEqual(createTextNode('Paragraph text'))
@@ -315,7 +315,7 @@ describe('core/iterator', () => {
 
     it('returns undefined when no next leaf exists', () => {
       const iter = { ...rootIterator(flatNodes), index: 2 }
-      const nextL = nextLeaf(iter)
+      const nextL = nextLeafNode(iter)
       expect(nextL).toBeUndefined()
     })
   })
@@ -323,7 +323,7 @@ describe('core/iterator', () => {
   describe('prevLeaf', () => {
     it('returns last leaf of previous node', () => {
       const iter = { ...rootIterator(nestedNodes), index: 1 } // 'Root text'
-      const prevL = prevLeaf(iter)
+      const prevL = prevLeafNode(iter)
       expect(prevL).toBeDefined()
       expect(iteratorsPath(prevL!)).toEqual([0, 2])
       expect(iteratorsNode(prevL!)).toEqual(createTextNode('Child 2'))
@@ -331,7 +331,7 @@ describe('core/iterator', () => {
 
     it('returns undefined when no previous leaf exists', () => {
       const iter = rootIterator(flatNodes)
-      const prevL = prevLeaf(iter)
+      const prevL = prevLeafNode(iter)
       expect(prevL).toBeUndefined()
     })
   })
@@ -353,7 +353,7 @@ describe('core/iterator', () => {
       const stubNode: BooqNode = { kind: 'stub', length: 10 }
       const iter = rootIterator([stubNode])
       expect(iteratorsNode(iter)).toEqual(stubNode)
-      expect(firstLeaf(iter)).toEqual(iter)
+      expect(firstLeafNode(iter)).toEqual(iter)
     })
   })
 })

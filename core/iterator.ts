@@ -26,10 +26,10 @@ export function rootIterator(nodes: BooqNode[]) {
     }
 }
 
-export function firstLeaf(iter: BooqNodeIterator): BooqNodeIterator {
+export function firstLeafNode(iter: BooqNodeIterator): BooqNodeIterator {
     const node = iteratorsNode(iter)
     if (node?.kind === 'element' && node.children?.length) {
-        return firstLeaf({
+        return firstLeafNode({
             parent: iter,
             nodes: node.children,
             index: 0,
@@ -39,10 +39,10 @@ export function firstLeaf(iter: BooqNodeIterator): BooqNodeIterator {
     }
 }
 
-export function lastLeaf(iter: BooqNodeIterator): BooqNodeIterator {
+export function lastLeafNode(iter: BooqNodeIterator): BooqNodeIterator {
     const node = iteratorsNode(iter)
     if (node?.kind === 'element' && node.children?.length) {
-        return lastLeaf({
+        return lastLeafNode({
             parent: iter,
             nodes: node.children,
             index: node.children.length - 1,
@@ -50,6 +50,16 @@ export function lastLeaf(iter: BooqNodeIterator): BooqNodeIterator {
     } else {
         return iter
     }
+}
+
+export function nextLeafNode(iter: BooqNodeIterator): BooqNodeIterator | undefined {
+    const node = nextIterator(iter)
+    return node && firstLeafNode(node)
+}
+
+export function prevLeafNode(iter: BooqNodeIterator): BooqNodeIterator | undefined {
+    const node = prevIterator(iter)
+    return node && lastLeafNode(node)
 }
 
 export function findPath(iter: BooqNodeIterator, path: BooqPath): BooqNodeIterator | undefined {
@@ -90,34 +100,24 @@ export function prevSibling(iter: BooqNodeIterator) {
         : undefined
 }
 
-export function nextNode(iter: BooqNodeIterator): BooqNodeIterator | undefined {
+export function nextIterator(iter: BooqNodeIterator): BooqNodeIterator | undefined {
     const sibling = nextSibling(iter)
     if (sibling) {
         return sibling
     } else if (iter.parent) {
-        return nextNode(iter.parent)
+        return nextIterator(iter.parent)
     } else {
         return undefined
     }
 }
 
-export function prevNode(iter: BooqNodeIterator): BooqNodeIterator | undefined {
+export function prevIterator(iter: BooqNodeIterator): BooqNodeIterator | undefined {
     const sibling = prevSibling(iter)
     if (sibling) {
         return sibling
     } else if (iter.parent) {
-        return prevNode(iter.parent)
+        return prevIterator(iter.parent)
     } else {
         return undefined
     }
-}
-
-export function nextLeaf(iter: BooqNodeIterator): BooqNodeIterator | undefined {
-    const node = nextNode(iter)
-    return node && firstLeaf(node)
-}
-
-export function prevLeaf(iter: BooqNodeIterator): BooqNodeIterator | undefined {
-    const node = prevNode(iter)
-    return node && lastLeaf(node)
 }
