@@ -23,6 +23,7 @@ export function nodesText(nodes: BooqNode[]): string {
     return nodes.map(nodeText).join('')
 }
 
+// length is the minimum length of the preview (provided that nodes have enough content). The previewForPath does not truncate resulting string to the length, instead the returned string includes all the text content from the last node appended to the preview.
 export function previewForPath(nodes: BooqNode[], path: BooqPath, length: number) {
     let iter = findPath(rootIterator(nodes), path)
     if (!iter) {
@@ -75,7 +76,7 @@ export function contextForPath(nodes: BooqNode[], path: BooqPath, length: number
     return result
 }
 
-
+// length is the minimum length of the contextBefore and contextAfter (provided that nodes have enough content). The getQuoteAndContext does not truncate resulting strings to the length, instead it respects the node boundaries and returns all the text content from the last node appended to the context.
 export function getQuoteAndContext(nodes: BooqNode[], range: BooqRange, length: number): { quote: string, contextBefore: string, contextAfter: string } {
     const quote = textForRange(nodes, range) ?? ''
 
@@ -106,6 +107,7 @@ export function getQuoteAndContext(nodes: BooqNode[], range: BooqRange, length: 
     return { quote, contextBefore, contextAfter }
 }
 
+// Returns the text content for the given range in the nodes. The range is defined by start and end paths, which are arrays of numbers representing the path to the node in the BooqNode structure. The end path is exclusive, meaning the text content at the end path is not included in the result. If the end path points to a character within a string, that character is not included. If the range is invalid or does not correspond to any text content, it returns undefined.
 export function textForRange(nodes: BooqNode[], { start, end }: BooqRange): string | undefined {
     const [startHead, ...startTail] = start
     const [endHead, ...endTail] = end
