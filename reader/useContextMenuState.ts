@@ -65,11 +65,19 @@ export function useContextMenuState() {
 }
 
 function sameTarget(a: ContextMenuTarget, b: ContextMenuTarget) {
+    if (a === b) {
+        return true
+    }
     if (a.kind === 'empty' && b.kind === 'empty') {
         return true
     }
     if (a.kind === 'selection' && b.kind === 'selection') {
         if (a.selection.text === b.selection.text) {
+            return true
+        }
+    }
+    if (a.kind === 'ask' && b.kind === 'ask') {
+        if (a.booqId === b.booqId && a.selection.text === b.selection.text && a.question === b.question && a.hidden === b.hidden) {
             return true
         }
     }
