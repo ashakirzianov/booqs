@@ -1,4 +1,4 @@
-import { generateCopilotAnswer } from '@/data/copilot'
+import { generateCopilotAnswerStream } from '@/data/copilot'
 import { BooqId, BooqPath } from '@/core'
 import { getUserIdInsideRequest } from '@/data/auth'
 
@@ -7,9 +7,12 @@ export type PostBody = {
     start: BooqPath,
     end: BooqPath,
     question: string,
+    metadata?: any,
+    highlightedText?: string,
+    contextBefore?: string,
+    contextAfter?: string,
+    footnote?: string,
 }
-
-export type PostResponse = string
 
 export async function POST(request: Request) {
     const userId = await getUserIdInsideRequest()
@@ -17,22 +20,27 @@ export async function POST(request: Request) {
         return Response.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { booqId, start, end, question }: PostBody = await request.json()
+    const { booqId, start, end, question, footnote }: PostBody = await request.json()
 
     if (typeof booqId !== 'string' || !Array.isArray(start) || !Array.isArray(end) || typeof question !== 'string') {
         return Response.json({ error: 'Invalid request' }, { status: 400 })
     }
 
-    const result = await generateCopilotAnswer({
+    const response = await generateCopilotAnswerStream({
         booqId: booqId as BooqId,
         range: { start, end },
-        question
+        question,
+        footnote
     })
 
-    if (!result.success || !result.output) {
-        return Response.json({ error: 'No answer found' }, { status: 404 })
+    if (!response.success) {
+        return Response.json({ error: response.error }, { status: 500 })
     }
 
-    const response: PostResponse = result.output
-    return Response.json(response)
+    return new Response(response.stream, {
+        headers: {
+            'Content-Type': 'text/plain; charset=utf-8',
+            'Cache-Control': 'no-cache',
+        },
+    })
 }

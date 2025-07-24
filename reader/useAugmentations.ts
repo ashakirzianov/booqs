@@ -51,7 +51,7 @@ export function useAugmentations({
                 }
             })
 
-        let result = [...tempAugmentations, ...noteAugmentations, ...commentAugmentations]
+        let result = [...noteAugmentations, ...commentAugmentations, ...tempAugmentations]
 
         if (quote) {
             const quoteAugmentation: Augmentation = {

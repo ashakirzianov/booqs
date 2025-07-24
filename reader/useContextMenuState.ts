@@ -5,9 +5,10 @@ import { ContextMenuTarget } from './ContextMenuContent'
 import { noteAugmentationId, quoteAugmentationId, TemporaryAugmentation, temporaryAugmentationId } from './useAugmentations'
 
 export type ContextMenuTargetSetter = (setterOrValue: ContextMenuTarget | ((prev: ContextMenuTarget) => ContextMenuTarget)) => void
+export type DisplayTarget = 'floater' | 'side-panel' | 'none'
 
 const CREATE_COMMENT_ID = 'create-comment'
-const COPILOT_ID = 'copilot'
+const ASK_ID = 'ask'
 
 export function useContextMenuState() {
     const [anchor, setAnchor] = useState<VirtualElement | undefined>(undefined)
@@ -21,7 +22,7 @@ export function useContextMenuState() {
                 return prev
             }
             const newAnchor = getAnchorForTarget(next)
-            if (newAnchor === undefined && (next.kind === 'note' || next.kind === 'create-comment' || next.kind === 'copilot')) {
+            if (newAnchor === undefined && (next.kind === 'note' || next.kind === 'create-comment' || next.kind === 'ask')) {
                 setTimeout(() => {
                     setAnchor(getAnchorForTarget(next))
                 }, 0)
@@ -41,30 +42,42 @@ export function useContextMenuState() {
                 name: CREATE_COMMENT_ID,
                 underline: 'dashed',
             })
-        } else if (target.kind === 'copilot') {
+        }
+        if (target.kind === 'ask') {
             augmentations.push({
                 range: target.selection.range,
-                name: COPILOT_ID,
-                color: `var(--color-selection)`,
+                name: ASK_ID,
+                color: 'var(--color-selection)',
             })
         }
         return augmentations
     }, [target])
+
+    const displayTarget = useMemo(() => displayTargetForMenuTarget(target), [target])
 
     return {
         menuTarget: target,
         setMenuTarget,
         anchor,
         contextMenuAugmentations,
+        displayTarget,
     }
 }
 
 function sameTarget(a: ContextMenuTarget, b: ContextMenuTarget) {
+    if (a === b) {
+        return true
+    }
     if (a.kind === 'empty' && b.kind === 'empty') {
         return true
     }
     if (a.kind === 'selection' && b.kind === 'selection') {
         if (a.selection.text === b.selection.text) {
+            return true
+        }
+    }
+    if (a.kind === 'ask' && b.kind === 'ask') {
+        if (a.selection.text === b.selection.text && a.question === b.question && a.hidden === b.hidden) {
             return true
         }
     }
@@ -85,12 +98,12 @@ function getAnchorForTarget(target: ContextMenuTarget): VirtualElement | undefin
             const augmentationId = quoteAugmentationId()
             return getAugmentationElement(augmentationId)
         }
-        case 'copilot': {
-            const augmentationId = temporaryAugmentationId(COPILOT_ID)
-            return getAugmentationElement(augmentationId)
-        }
         case 'create-comment': {
             const augmentationId = temporaryAugmentationId(CREATE_COMMENT_ID)
+            return getAugmentationElement(augmentationId)
+        }
+        case 'ask': {
+            const augmentationId = temporaryAugmentationId(ASK_ID)
             return getAugmentationElement(augmentationId)
         }
         default:
@@ -98,3 +111,19 @@ function getAnchorForTarget(target: ContextMenuTarget): VirtualElement | undefin
     }
 }
 
+function displayTargetForMenuTarget(menuTarget: ContextMenuTarget): DisplayTarget {
+    switch (menuTarget.kind) {
+        case 'empty':
+            return 'none'
+        case 'ask':
+            if (menuTarget.hidden) {
+                return 'none'
+            } else if (menuTarget.question !== undefined) {
+                return 'side-panel'
+            } else {
+                return 'floater'
+            }
+        default:
+            return 'floater'
+    }
+}

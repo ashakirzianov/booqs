@@ -37,7 +37,7 @@ export function useContextMenuFloater({
     useEffect(() => {
         function handleSelectionChange() {
             setTarget(prev => {
-                if (prev.kind === 'empty' || prev.kind === 'selection') {
+                if (prev.kind === 'empty' || prev.kind === 'selection' || prev.kind === 'ask') {
                     const selection = getBooqSelection()
                     if (selection) {
                         return { kind: 'selection', selection }

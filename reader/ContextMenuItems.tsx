@@ -9,25 +9,8 @@ import { BooqSelection } from '@/viewer'
 import { ProfileBadge } from '@/components/ProfilePicture'
 import { ColorPicker } from './ColorPicker'
 import { useBooqNotes } from '@/application/notes'
-import { CopilotIcon, CommentIcon, CopyIcon, LinkIcon, RemoveIcon, ShareIcon } from '@/components/Icons'
+import { CommentIcon, CopyIcon, LinkIcon, RemoveIcon, ShareIcon, QuestionMarkIcon } from '@/components/Icons'
 import type { ContextMenuTarget, SelectionTarget, QuoteTarget, NoteTarget } from './ContextMenuContent'
-
-export function CopilotItem({ selection, setTarget }: {
-    selection: BooqSelection,
-    setTarget: (target: ContextMenuTarget) => void,
-}) {
-    return <MenuItem
-        text='Ask copilot'
-        icon={<ContextMenuIcon><CopilotIcon /></ContextMenuIcon>}
-        callback={() => {
-            setTarget({
-                kind: 'copilot',
-                selection,
-                context: 'context placeholder', // Will be set properly by the consumer
-            })
-        }}
-    />
-}
 
 export function AuthorItem({ name, pictureUrl, emoji, username }: {
     name: string,
@@ -219,6 +202,29 @@ function generateLink(booqId: BooqId, range: BooqRange) {
 
 function removeSelection() {
     window.getSelection()?.empty()
+}
+
+export function AskMenuItem({
+    target, user, setTarget,
+}: {
+    target: SelectionTarget | QuoteTarget,
+    user: AuthorData | undefined,
+    setTarget: (target: ContextMenuTarget) => void,
+}) {
+    if (!user?.id) {
+        return null
+    }
+    return <MenuItem
+        text='Ask question'
+        icon={<ContextMenuIcon><QuestionMarkIcon /></ContextMenuIcon>}
+        callback={() => {
+            setTarget({
+                kind: 'ask',
+                question: undefined,
+                selection: target.selection,
+            })
+        }}
+    />
 }
 
 function baseUrl() {

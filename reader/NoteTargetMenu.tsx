@@ -1,12 +1,15 @@
 import Link from 'next/link'
 import { useMemo, useState } from 'react'
+import * as clipboard from 'clipboard-polyfill'
 import { AuthorData, BooqId, userHref } from '@/core'
 import type { ContextMenuTarget, NoteTarget } from './ContextMenuContent'
 import { ColorPicker } from './ColorPicker'
 import { formatRelativeTime } from '@/application/common'
 import { HIGHLIGHT_KINDS, useBooqNotes } from '@/application/notes'
 import { ProfileBadge } from '@/components/ProfilePicture'
-import { CommentIcon, RemoveIcon } from '@/components/Icons'
+import { CommentIcon, RemoveIcon, QuestionMarkIcon, ShareIcon } from '@/components/Icons'
+import { MenuButton } from '@/components/Buttons'
+import { generateQuote } from './ContextMenuItems'
 
 export function NoteTargetMenu({
     target, booqId, user, setTarget
@@ -21,6 +24,7 @@ export function NoteTargetMenu({
     const note = useMemo(() =>
         notes.find(n => n.id === noteId), [notes, noteId])
     const isOwnNote = user?.id === note?.author?.id
+    const isAuthenticated = !!user?.id
     const hasColor = HIGHLIGHT_KINDS.includes(note?.kind || 'default')
     const [editContent, setEditContent] = useState(note?.content || '')
     if (!note) {
@@ -61,12 +65,27 @@ export function NoteTargetMenu({
         })
     }
 
+    const handleAskQuestion = () => {
+        setTarget({
+            kind: 'ask',
+            question: undefined,
+            selection: target.selection,
+            footnote: note.content || undefined,
+        })
+    }
+
+    const handleShareNote = () => {
+        const quote = generateQuote(booqId, target.selection.text, target.selection.range)
+        clipboard.writeText(quote)
+        setTarget({ kind: 'empty' })
+    }
+
     return (
         <div
             className="flex flex-col"
         >
             {/* Color picker - shown for own notes */}
-            {isOwnNote && user && hasColor && (
+            {isOwnNote && isAuthenticated && hasColor && (
                 <ColorPicker
                     selectedKind={note.kind}
                     onColorChange={handleColorChange}
@@ -84,22 +103,28 @@ export function NoteTargetMenu({
                             placeholder='Add a note...'
                             value={editContent}
                             onChange={(e) => setEditContent(e.target.value)}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+                                    e.preventDefault()
+                                    handleSaveNote()
+                                }
+                            }}
                             rows={3}
                             autoFocus
                         />
                         <div className="flex flex-row justify-start gap-4">
-                            <ActionButton
+                            <MenuButton
                                 onClick={handleSaveNote}
-                                icon={<CommentIcon />}
                             >
+                                <div className="w-4 h-4"><CommentIcon /></div>
                                 Save note
-                            </ActionButton>
-                            <ActionButton
+                            </MenuButton>
+                            <MenuButton
                                 onClick={handleCancelEdit}
-                                icon={<RemoveIcon />}
                             >
+                                <div className="w-4 h-4"><RemoveIcon /></div>
                                 Cancel
-                            </ActionButton>
+                            </MenuButton>
                         </div>
                     </>
                 ) : (
@@ -122,23 +147,38 @@ export function NoteTargetMenu({
                         ))}
 
                         {/* Action buttons */}
-                        {isOwnNote && (<div className="flex flex-row justify-start gap-4">
-                            {note.content && (
-                                <>
-                                    <ActionButton
-                                        onClick={handleEditNote}
-                                        icon={<CommentIcon />}
-                                    >
-                                        Edit
-                                    </ActionButton>
-                                </>
-                            )}<ActionButton
-                                onClick={handleRemoveNote}
-                                icon={<RemoveIcon />}
+                        <div className="flex flex-row flex-wrap justify-start gap-4">
+                            {isOwnNote && note.content && (
+                                <MenuButton
+                                    onClick={handleEditNote}
+                                >
+                                    <div className="w-4 h-4"><CommentIcon /></div>
+                                    Edit
+                                </MenuButton>
+                            )}
+                            {isAuthenticated && (
+                                <MenuButton
+                                    onClick={handleAskQuestion}
+                                >
+                                    <div className="w-4 h-4"><QuestionMarkIcon /></div>
+                                    Ask
+                                </MenuButton>
+                            )}
+                            <MenuButton
+                                onClick={handleShareNote}
                             >
-                                Remove
-                            </ActionButton>
-                        </div>)}
+                                <div className="w-4 h-4"><ShareIcon /></div>
+                                Share
+                            </MenuButton>
+                            {isOwnNote && (
+                                <MenuButton
+                                    onClick={handleRemoveNote}
+                                >
+                                    <div className="w-4 h-4"><RemoveIcon /></div>
+                                    Remove
+                                </MenuButton>
+                            )}
+                        </div>
 
                         {/* Author info and date */}
                         {!isOwnNote && (<span className="text-xs text-dimmed flex flex-row items-center justify-start flex-wrap">
@@ -164,24 +204,3 @@ export function NoteTargetMenu({
     )
 }
 
-function ActionButton({
-    onClick,
-    children,
-    icon,
-}: {
-    onClick: () => void,
-    children: React.ReactNode,
-    icon: React.ReactNode,
-    color?: string
-}) {
-    return (
-        <button
-            className="flex items-center gap-1 text-sm font-bold cursor-pointer text-dimmed hover:text-highlight hover:underline"
-            onClick={onClick}
-            onMouseDown={e => e.preventDefault()}
-        >
-            <div className="w-4 h-4">{icon}</div>
-            {children}
-        </button>
-    )
-}

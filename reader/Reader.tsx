@@ -19,7 +19,7 @@ import { useNotesData } from './useNotesData'
 import { useFollowingData } from './useFollowingData'
 import { AccountButton } from '@/components/AccountButton'
 import { usePathname } from 'next/navigation'
-import { BackIcon, TocIcon, CommentIcon } from '@/components/Icons'
+import { BackIcon, TocIcon, CommentIcon, QuestionMarkIcon } from '@/components/Icons'
 import Link from 'next/link'
 import { useScrollToQuote } from './useScrollToQuote'
 import { useScrollHandler } from './useScrollHandler'
@@ -29,6 +29,7 @@ import { useContextMenuState } from './useContextMenuState'
 import { ContextMenuContent } from './ContextMenuContent'
 import { usePageData } from './usePageData'
 import { useNavigationState } from './useNavigationState'
+import clsx from 'clsx'
 
 export function Reader({
     booq, quote,
@@ -85,8 +86,34 @@ export function Reader({
 
     const { followingUserIds, isLoading: isFollowingLoading } = useFollowingData({ user })
 
-    const [rightPanelOpen, setRightPanelOpen] = React.useState(false)
-    const toggleRightPanelOpen = () => setRightPanelOpen(prev => !prev)
+    const [commentsPanelOpen, setCommentsPanelOpen] = React.useState(false)
+    const toggleCommentsPanelOpen = () => setCommentsPanelOpen(prev => !prev)
+
+    const { anchor, menuTarget, setMenuTarget, contextMenuAugmentations, displayTarget } = useContextMenuState()
+    const ContextMenuContentNode = useMemo(() => {
+        return <ContextMenuContent
+            booqId={booq.booqId}
+            user={user}
+            target={menuTarget}
+            setTarget={setMenuTarget}
+        />
+    }, [booq.booqId, user, menuTarget, setMenuTarget])
+
+    const FloaterMenuContent = useMemo(() => {
+        if (displayTarget !== 'floater') {
+            return null
+        }
+        return <div className='w-64'>{ContextMenuContentNode}</div>
+    }, [displayTarget, ContextMenuContentNode])
+
+    const {
+        ContextMenuNode
+    } = useContextMenuFloater({
+        Content: FloaterMenuContent,
+        anchor: anchor,
+        setTarget: setMenuTarget,
+    })
+
     const NavigationContent = <NavigationPanel
         booqId={booq.booqId}
         title={booq.meta.title ?? 'Untitled'}
@@ -106,20 +133,31 @@ export function Reader({
     </PanelButton>
 
     const CommentsButton = <PanelButton
-        onClick={toggleRightPanelOpen}
-        selected={rightPanelOpen}
+        onClick={toggleCommentsPanelOpen}
+        selected={commentsPanelOpen}
     >
         <CommentIcon />
     </PanelButton>
 
-    const RightPanelContent = <CommentsPanel
-        comments={comments}
-        currentUser={user}
-        followingUserIds={followingUserIds}
-        isFollowingLoading={isFollowingLoading}
-    />
+    const RightPanelContent =
+        <>
+            <div className={clsx('p-4 w-full overflow-y-auto', {
+                'hidden': displayTarget !== 'side-panel',
+            })}>
+                {ContextMenuContentNode}
+            </div>
+            <div className={clsx('w-full', {
+                'hidden': displayTarget === 'side-panel',
+            })}>
+                <CommentsPanel
+                    comments={comments}
+                    currentUser={user}
+                    followingUserIds={followingUserIds}
+                    isFollowingLoading={isFollowingLoading}
+                />
+            </div>
+        </>
 
-    const { anchor, menuTarget, setMenuTarget, contextMenuAugmentations } = useContextMenuState()
 
     const { augmentations, menuTargetForAugmentation } = useAugmentations({
         highlights: filteredHighlights,
@@ -127,32 +165,11 @@ export function Reader({
         quote: quote,
         temporaryAugmentations: contextMenuAugmentations,
     })
-    const { visible } = useControlsVisibility()
 
     const pagesLabel = `${currentPage} of ${totalPages}`
     const leftLabel = leftPages <= 1 ? 'Last page'
         : `${leftPages} pages left`
 
-    const MenuContent = useMemo(() => {
-        if (menuTarget.kind === 'empty') {
-            return null
-        }
-        return <div className='w-64'><ContextMenuContent
-            booqId={booq.booqId}
-            booqMeta={booq.meta}
-            user={user}
-            target={menuTarget}
-            setTarget={setMenuTarget}
-        /></div>
-    }, [booq.booqId, booq.meta, user, menuTarget, setMenuTarget])
-
-    const {
-        ContextMenuNode
-    } = useContextMenuFloater({
-        Content: MenuContent,
-        anchor: anchor,
-        setTarget: setMenuTarget,
-    })
 
     const onAugmentationClick = useMemo(() => {
         return (id: string) => {
@@ -162,7 +179,29 @@ export function Reader({
             }
         }
     }, [menuTargetForAugmentation, setMenuTarget])
-    const isControlsVisible = (MenuContent === null) && visible
+
+    const toggleAskVisibility = useMemo(() => {
+        return () => {
+            setMenuTarget(menuTarget => {
+                if (menuTarget.kind === 'ask') {
+                    return {
+                        ...menuTarget,
+                        hidden: menuTarget.hidden === true ? false : true,
+                    }
+                }
+                return menuTarget
+            })
+        }
+    }, [setMenuTarget])
+    const showAskButton = menuTarget.kind === 'ask' && menuTarget.question !== undefined
+    const AskButton = showAskButton ? (
+        <PanelButton
+            onClick={toggleAskVisibility}
+            selected={menuTarget.hidden !== true}
+        >
+            <QuestionMarkIcon />
+        </PanelButton>
+    ) : null
 
     const LeftButtons = <>
         <Link href={feedHref()}>
@@ -174,6 +213,7 @@ export function Reader({
     </>
 
     const RightButtons = <>
+        {AskButton}
         {CommentsButton}
         <ThemerButton />
         <AccountButton
@@ -183,10 +223,15 @@ export function Reader({
         />
     </>
 
+    const { visible } = useControlsVisibility()
+    const isControlsVisible = (FloaterMenuContent === null) && visible
+    // Auto-open right panel when context menu should be displayed in side panel and not hidden
+    const shouldShowRightPanel = commentsPanelOpen || (displayTarget === 'side-panel')
+
     return <ReaderLayout
         isControlsVisible={isControlsVisible}
         isLeftPanelOpen={navigationOpen}
-        isRightPanelOpen={rightPanelOpen}
+        isRightPanelOpen={shouldShowRightPanel}
         BooqContent={<div style={{
             fontFamily: 'var(--font-book)',
             fontSize: `${fontScale}%`,

@@ -1,17 +1,36 @@
-import { generateSuggestions } from '@/backend/ai'
+import { generateCopilotSuggestions } from '@/data/copilot'
+import { BooqId, BooqPath } from '@/core'
+import { getUserIdInsideRequest } from '@/data/auth'
+
+export type PostBody = {
+    booqId: BooqId,
+    start: BooqPath,
+    end: BooqPath,
+}
+
+export type PostResponse = string[]
 
 export async function POST(request: Request) {
-    const { text, context, title, author, language } = await request.json() ?? {}
-    if (typeof text !== 'string' || typeof context !== 'string') {
-        return new Response('Invalid request', {
-            status: 400,
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        })
+    const userId = await getUserIdInsideRequest()
+    if (!userId) {
+        return Response.json({ error: 'Unauthorized' }, { status: 401 })
     }
-    const suggestions = await generateSuggestions({
-        text, context, title, author, language,
+
+    const { booqId, start, end }: PostBody = await request.json()
+    
+    if (typeof booqId !== 'string' || !Array.isArray(start) || !Array.isArray(end)) {
+        return Response.json({ error: 'Invalid request' }, { status: 400 })
+    }
+    
+    const result = await generateCopilotSuggestions({ 
+        booqId: booqId as BooqId, 
+        range: { start, end } 
     })
-    return Response.json(suggestions)
+    
+    if (!result.success) {
+        return Response.json({ error: 'No suggestions found' }, { status: 404 })
+    }
+    
+    const response: PostResponse = result.suggestions
+    return Response.json(response)
 }
