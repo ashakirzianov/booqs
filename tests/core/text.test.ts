@@ -272,6 +272,18 @@ describe('core/text', () => {
       expect(result).toBe('Hello')
     })
 
+    it('returns text for character range within nested text node', () => {
+      const range: BooqRange = { start: [0, 0, 3], end: [0, 0, 8] }
+      const result = textForRange(complexNodes, range)
+      expect(result).toBe('agrap')
+    })
+
+    it('returns text for character range within deeply nested text node', () => {
+      const range: BooqRange = { start: [2, 1, 0, 1], end: [2, 1, 0, 5] }
+      const result = textForRange(complexNodes, range)
+      expect(result).toBe('pan ')
+    })
+
     it('returns text for range spanning multiple nodes', () => {
       const range: BooqRange = { start: [0, 0], end: [2, 0] }
       const result = textForRange(complexNodes, range)
