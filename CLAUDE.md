@@ -9,6 +9,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `npm run build` - Build for production
 - `npm run start` - Start production server
 - `npm run lint` - Run ESLint
+- `npm run test` - Run tests with Jest
+- `npm run test:watch` - Run tests in watch mode
+- `npm run test:coverage` - Run tests with coverage report
 - `npm run https` - Run development server with HTTPS (requires mkcert setup)
 - `npm run analyze` - Build with bundle analyzer
 - `npm run cli` - Run CLI tools (tsx cli/index.ts)

@@ -18,7 +18,8 @@
       "WebFetch(domain:platform.openai.com)",
       "WebFetch(domain:help.openai.com)",
       "Bash(grep:*)",
-      "Bash(git checkout:*)"
+      "Bash(git checkout:*)",
+      "Bash(npm test)"
     ]
   },
   "enableAllProjectMcpServers": false
