@@ -89,18 +89,30 @@ export function Reader({
     const toggleCommentsPanelOpen = () => setCommentsPanelOpen(prev => !prev)
 
     const { anchor, menuTarget, setMenuTarget, contextMenuAugmentations, displayTarget } = useContextMenuState()
+    const TheMenuContent = useMemo(() => {
+        return <ContextMenuContent
+            booqId={booq.booqId}
+            user={user}
+            target={menuTarget}
+            setTarget={setMenuTarget}
+        />
+    }, [booq.booqId, user, menuTarget, setMenuTarget])
 
-    const toggleAskVisibility = () => {
-        if (menuTarget.kind === 'ask') {
-            setMenuTarget({
-                ...menuTarget,
-                hidden: menuTarget.hidden === true ? false : true,
-            })
+    const FloaterMenuContent = useMemo(() => {
+        if (displayTarget !== 'floater') {
+            return null
         }
-    }
+        return <div className='w-64'>{TheMenuContent}</div>
+    }, [displayTarget, TheMenuContent])
 
-    // Auto-open right panel when context menu should be displayed in side panel and not hidden
-    const shouldShowRightPanel = commentsPanelOpen || (displayTarget === 'side-panel')
+    const {
+        ContextMenuNode
+    } = useContextMenuFloater({
+        Content: FloaterMenuContent,
+        anchor: anchor,
+        setTarget: setMenuTarget,
+    })
+
     const NavigationContent = <NavigationPanel
         booqId={booq.booqId}
         title={booq.meta.title ?? 'Untitled'}
@@ -126,23 +138,9 @@ export function Reader({
         <CommentIcon />
     </PanelButton>
 
-    const AskButton = displayTarget === 'side-panel' && menuTarget.kind === 'ask' ? (
-        <PanelButton
-            onClick={toggleAskVisibility}
-            selected={menuTarget.hidden !== true}
-        >
-            <QuestionMarkIcon />
-        </PanelButton>
-    ) : null
-
     const RightPanelContent = displayTarget === 'side-panel' ? (
         <div className='p-4'>
-            <ContextMenuContent
-                booqId={booq.booqId}
-                user={user}
-                target={menuTarget}
-                setTarget={setMenuTarget}
-            />
+            {TheMenuContent}
         </div>
     ) : (
         <CommentsPanel
@@ -159,31 +157,11 @@ export function Reader({
         quote: quote,
         temporaryAugmentations: contextMenuAugmentations,
     })
-    const { visible } = useControlsVisibility()
 
     const pagesLabel = `${currentPage} of ${totalPages}`
     const leftLabel = leftPages <= 1 ? 'Last page'
         : `${leftPages} pages left`
 
-    const MenuContent = useMemo(() => {
-        if (menuTarget.kind === 'empty' || displayTarget === 'side-panel') {
-            return null
-        }
-        return <div className='w-64'><ContextMenuContent
-            booqId={booq.booqId}
-            user={user}
-            target={menuTarget}
-            setTarget={setMenuTarget}
-        /></div>
-    }, [booq.booqId, user, menuTarget, displayTarget, setMenuTarget])
-
-    const {
-        ContextMenuNode
-    } = useContextMenuFloater({
-        Content: MenuContent,
-        anchor: anchor,
-        setTarget: setMenuTarget,
-    })
 
     const onAugmentationClick = useMemo(() => {
         return (id: string) => {
@@ -193,7 +171,29 @@ export function Reader({
             }
         }
     }, [menuTargetForAugmentation, setMenuTarget])
-    const isControlsVisible = (MenuContent === null) && visible
+
+    const toggleAskVisibility = useMemo(() => {
+        return () => {
+            setMenuTarget(menuTarget => {
+                if (menuTarget.kind === 'ask') {
+                    return {
+                        ...menuTarget,
+                        hidden: menuTarget.hidden === true ? false : true,
+                    }
+                }
+                return menuTarget
+            })
+        }
+    }, [setMenuTarget])
+    const showAskButton = menuTarget.kind === 'ask' && menuTarget.question !== undefined
+    const AskButton = showAskButton ? (
+        <PanelButton
+            onClick={toggleAskVisibility}
+            selected={menuTarget.hidden !== true}
+        >
+            <QuestionMarkIcon />
+        </PanelButton>
+    ) : null
 
     const LeftButtons = <>
         <Link href={feedHref()}>
@@ -214,6 +214,11 @@ export function Reader({
             loading={isAuthLoading}
         />
     </>
+
+    const { visible } = useControlsVisibility()
+    const isControlsVisible = (FloaterMenuContent === null) && visible
+    // Auto-open right panel when context menu should be displayed in side panel and not hidden
+    const shouldShowRightPanel = commentsPanelOpen || (displayTarget === 'side-panel')
 
     return <ReaderLayout
         isControlsVisible={isControlsVisible}
