@@ -12,8 +12,8 @@ import {
   prevNode,
   nextLeaf,
   prevLeaf,
-} from '../iterator'
-import { BooqNode, BooqElementNode, BooqTextNode } from '../model'
+} from '../../core/iterator'
+import { BooqNode, BooqElementNode, BooqTextNode } from '../../core/model'
 
 describe('core/iterator', () => {
   // Test data setup

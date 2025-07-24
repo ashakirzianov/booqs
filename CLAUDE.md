@@ -96,3 +96,13 @@ EPUB files are processed through the `parser/` directory which handles:
 
 ### TypeScript Configuration
 Uses strict TypeScript with path aliases (`@/*` maps to `./`). ESLint runs on specific directories as defined in `next.config.js`.
+
+### Testing Structure
+Tests are organized in a root `tests/` directory that mirrors the project structure:
+- `tests/components/` - Component tests
+- `tests/core/` - Core logic tests  
+- `tests/backend/` - Backend tests
+- `tests/parser/` - Parser tests
+- etc.
+
+Test files use the naming convention `[ModuleName].test.ts` or `[ModuleName].test.tsx` for React components.

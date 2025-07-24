@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react'
-import { Logo } from '../Logo'
+import { Logo } from '../../components/Logo'
 
 describe('Logo', () => {
   it('renders logo with default small size', () => {
