@@ -133,13 +133,15 @@ export function useCopilotAnswerStream({
     }
 }
 
+const KEY_SEPARATOR = '$SEPARATOR$'
+
 type CacheInput = { booqId: BooqId, start: BooqPath, end: BooqPath, question: string, footnote?: string }
 function generateCacheKey({ booqId, start, end, question, footnote }: CacheInput) {
-    return `${booqId}-${start.join(',')}-${end.join(',')}-${question}-${footnote || ''}`
+    return `${booqId}${KEY_SEPARATOR}${start.join(',')}${KEY_SEPARATOR}${end.join(',')}${KEY_SEPARATOR}${question}${KEY_SEPARATOR}${footnote || ''}`
 }
 
 function parseCacheKey(key: string): CacheInput {
-    const parts = key.split('-')
+    const parts = key.split(KEY_SEPARATOR)
     const booqId = parts[0]
     const startStr = parts[1]
     const endStr = parts[2]
