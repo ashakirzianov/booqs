@@ -48,4 +48,7 @@ jest.mock('next/navigation', () => ({
 }))
 
 // Mock environment variables
-process.env.NODE_ENV = 'test'
+Object.defineProperty(process.env, 'NODE_ENV', {
+  value: 'test',
+  writable: true
+})
