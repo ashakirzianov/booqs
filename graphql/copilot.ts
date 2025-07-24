@@ -11,14 +11,21 @@ export type CopilotParent = CopilotInput
 export const copilotResolver: IResolvers<CopilotParent> = {
     Copilot: {
         async suggestions(parent) {
-            const result = await generateSuggestions(parent.booqId as BooqId, { start: parent.start, end: parent.end })
+            const result = await generateSuggestions({
+                booqId: parent.booqId as BooqId,
+                range: { start: parent.start, end: parent.end },
+            })
             if (!result.success) {
                 return []
             }
             return result.suggestions
         },
         async answer(parent, { question }) {
-            const result = await generateAnswer(parent.booqId as BooqId, { start: parent.start, end: parent.end }, question)
+            const result = await generateAnswer({
+                booqId: parent.booqId as BooqId,
+                range: { start: parent.start, end: parent.end },
+                question,
+            })
             if (!result.success) {
                 return undefined
             }
