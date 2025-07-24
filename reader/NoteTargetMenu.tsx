@@ -6,7 +6,7 @@ import { ColorPicker } from './ColorPicker'
 import { formatRelativeTime } from '@/application/common'
 import { HIGHLIGHT_KINDS, useBooqNotes } from '@/application/notes'
 import { ProfileBadge } from '@/components/ProfilePicture'
-import { CommentIcon, RemoveIcon } from '@/components/Icons'
+import { CommentIcon, RemoveIcon, QuestionMarkIcon } from '@/components/Icons'
 import { MenuButton } from '@/components/Buttons'
 
 export function NoteTargetMenu({
@@ -22,6 +22,7 @@ export function NoteTargetMenu({
     const note = useMemo(() =>
         notes.find(n => n.id === noteId), [notes, noteId])
     const isOwnNote = user?.id === note?.author?.id
+    const isAuthenticated = !!user?.id
     const hasColor = HIGHLIGHT_KINDS.includes(note?.kind || 'default')
     const [editContent, setEditContent] = useState(note?.content || '')
     if (!note) {
@@ -62,12 +63,21 @@ export function NoteTargetMenu({
         })
     }
 
+    const handleAskQuestion = () => {
+        setTarget({
+            kind: 'ask',
+            question: undefined,
+            selection: target.selection,
+            booqId,
+        })
+    }
+
     return (
         <div
             className="flex flex-col"
         >
             {/* Color picker - shown for own notes */}
-            {isOwnNote && user && hasColor && (
+            {isOwnNote && isAuthenticated && hasColor && (
                 <ColorPicker
                     selectedKind={note.kind}
                     onColorChange={handleColorChange}
@@ -129,23 +139,32 @@ export function NoteTargetMenu({
                         ))}
 
                         {/* Action buttons */}
-                        {isOwnNote && (<div className="flex flex-row justify-start gap-4">
-                            {note.content && (
-                                <>
-                                    <MenuButton
-                                        onClick={handleEditNote}
-                                    >
-                                        <div className="w-4 h-4"><CommentIcon /></div>
-                                        Edit
-                                    </MenuButton>
-                                </>
-                            )}<MenuButton
-                                onClick={handleRemoveNote}
-                            >
-                                <div className="w-4 h-4"><RemoveIcon /></div>
-                                Remove
-                            </MenuButton>
-                        </div>)}
+                        <div className="flex flex-row justify-start gap-4">
+                            {isOwnNote && note.content && (
+                                <MenuButton
+                                    onClick={handleEditNote}
+                                >
+                                    <div className="w-4 h-4"><CommentIcon /></div>
+                                    Edit
+                                </MenuButton>
+                            )}
+                            {isAuthenticated && (
+                                <MenuButton
+                                    onClick={handleAskQuestion}
+                                >
+                                    <div className="w-4 h-4"><QuestionMarkIcon /></div>
+                                    Ask
+                                </MenuButton>
+                            )}
+                            {isOwnNote && (
+                                <MenuButton
+                                    onClick={handleRemoveNote}
+                                >
+                                    <div className="w-4 h-4"><RemoveIcon /></div>
+                                    Remove
+                                </MenuButton>
+                            )}
+                        </div>
 
                         {/* Author info and date */}
                         {!isOwnNote && (<span className="text-xs text-dimmed flex flex-row items-center justify-start flex-wrap">
