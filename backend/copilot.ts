@@ -13,7 +13,7 @@ export type ReadingContext = {
     language?: string,
 }
 
-export async function generateSuggestions(booqId: BooqId, range: BooqRange) {
+export async function generateSuggestions({ booqId, range }: { booqId: BooqId, range: BooqRange }) {
     const context = await buildReadingContext(booqId, range)
     if (!context) {
         return {
@@ -37,8 +37,8 @@ export async function generateSuggestions(booqId: BooqId, range: BooqRange) {
     }
 }
 
-export async function generateAnswer(booqId: BooqId, range: BooqRange, question: string) {
-    const cacheKey = cacheKeyForAnswer(booqId, range, question)
+export async function generateAnswer({ booqId, range, question }: { booqId: BooqId, range: BooqRange, question: string }) {
+    const cacheKey = cacheKeyForAnswer({ booqId, range, question })
 
     // Check cache first
     const cachedAnswer = await getCachedValueForKey<string>(cacheKey)
@@ -71,8 +71,8 @@ export async function generateAnswer(booqId: BooqId, range: BooqRange, question:
     return result
 }
 
-export async function generateAnswerStreaming(booqId: BooqId, range: BooqRange, question: string, footnote?: string) {
-    const cacheKey = cacheKeyForAnswer(booqId, range, question, footnote)
+export async function generateAnswerStreaming({ booqId, range, question, footnote }: { booqId: BooqId, range: BooqRange, question: string, footnote?: string }) {
+    const cacheKey = cacheKeyForAnswer({ booqId, range, question, footnote })
 
     // Check cache first
     const cachedAnswer = await getCachedValueForKey<string>(cacheKey)
@@ -107,7 +107,7 @@ export async function generateAnswerStreaming(booqId: BooqId, range: BooqRange, 
     return result
 }
 
-function cacheKeyForAnswer(booqId: BooqId, range: BooqRange, question: string, footnote?: string): string {
+function cacheKeyForAnswer({ booqId, range, question, footnote }: { booqId: BooqId, range: BooqRange, question: string, footnote?: string }): string {
     const rangeKey = `${range.start.join(',')}-${range.end.join(',')}`
     const footnoteKey = footnote ? Buffer.from(footnote).toString('base64') : ''
     return `copilot:answer:${booqId}:${rangeKey}:${Buffer.from(question).toString('base64')}:${footnoteKey}`

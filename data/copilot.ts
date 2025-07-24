@@ -2,13 +2,13 @@ import { BooqId, BooqRange } from '@/core'
 import { generateSuggestions, generateAnswer, generateAnswerStreaming } from '@/backend/copilot'
 
 export async function generateCopilotSuggestions({ booqId, range }: { booqId: BooqId, range: BooqRange }) {
-    return generateSuggestions(booqId, range)
+    return generateSuggestions({ booqId, range })
 }
 
 export async function generateCopilotAnswer({ booqId, range, question }: { booqId: BooqId, range: BooqRange, question: string }) {
-    return generateAnswer(booqId, range, question)
+    return generateAnswer({ booqId, range, question })
 }
 
 export async function generateCopilotAnswerStream({ booqId, range, question, footnote }: { booqId: BooqId, range: BooqRange, question: string, footnote?: string }) {
-    return generateAnswerStreaming(booqId, range, question, footnote)
+    return generateAnswerStreaming({ booqId, range, question, footnote })
 }
