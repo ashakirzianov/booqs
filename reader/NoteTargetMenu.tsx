@@ -1,13 +1,15 @@
 import Link from 'next/link'
 import { useMemo, useState } from 'react'
+import * as clipboard from 'clipboard-polyfill'
 import { AuthorData, BooqId, userHref } from '@/core'
 import type { ContextMenuTarget, NoteTarget } from './ContextMenuContent'
 import { ColorPicker } from './ColorPicker'
 import { formatRelativeTime } from '@/application/common'
 import { HIGHLIGHT_KINDS, useBooqNotes } from '@/application/notes'
 import { ProfileBadge } from '@/components/ProfilePicture'
-import { CommentIcon, RemoveIcon, QuestionMarkIcon } from '@/components/Icons'
+import { CommentIcon, RemoveIcon, QuestionMarkIcon, ShareIcon } from '@/components/Icons'
 import { MenuButton } from '@/components/Buttons'
+import { generateQuote } from './ContextMenuItems'
 
 export function NoteTargetMenu({
     target, booqId, user, setTarget
@@ -69,6 +71,12 @@ export function NoteTargetMenu({
             question: undefined,
             selection: target.selection,
         })
+    }
+
+    const handleShareNote = () => {
+        const quote = generateQuote(booqId, target.selection.text, target.selection.range)
+        clipboard.writeText(quote)
+        setTarget({ kind: 'empty' })
     }
 
     return (
@@ -138,7 +146,7 @@ export function NoteTargetMenu({
                         ))}
 
                         {/* Action buttons */}
-                        <div className="flex flex-row justify-start gap-4">
+                        <div className="flex flex-row flex-wrap justify-start gap-4">
                             {isOwnNote && note.content && (
                                 <MenuButton
                                     onClick={handleEditNote}
@@ -155,6 +163,12 @@ export function NoteTargetMenu({
                                     Ask
                                 </MenuButton>
                             )}
+                            <MenuButton
+                                onClick={handleShareNote}
+                            >
+                                <div className="w-4 h-4"><ShareIcon /></div>
+                                Share
+                            </MenuButton>
                             {isOwnNote && (
                                 <MenuButton
                                     onClick={handleRemoveNote}
