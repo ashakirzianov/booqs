@@ -100,7 +100,7 @@ export function Reader({
     }
 
     // Auto-open right panel when context menu should be displayed in side panel and not hidden
-    const shouldShowRightPanel = commentsPanelOpen || (displayTarget === 'side-panel' && menuTarget.kind === 'ask' && menuTarget.hidden !== true)
+    const shouldShowRightPanel = commentsPanelOpen || (displayTarget === 'side-panel')
     const NavigationContent = <NavigationPanel
         booqId={booq.booqId}
         title={booq.meta.title ?? 'Untitled'}
@@ -135,7 +135,7 @@ export function Reader({
         </PanelButton>
     ) : null
 
-    const RightPanelContent = displayTarget === 'side-panel' && menuTarget.kind !== 'empty' && menuTarget.kind === 'ask' && menuTarget.hidden !== true ? (
+    const RightPanelContent = displayTarget === 'side-panel' ? (
         <div className='p-4'>
             <ContextMenuContent
                 booqId={booq.booqId}

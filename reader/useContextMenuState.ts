@@ -5,7 +5,7 @@ import { ContextMenuTarget } from './ContextMenuContent'
 import { noteAugmentationId, quoteAugmentationId, TemporaryAugmentation, temporaryAugmentationId } from './useAugmentations'
 
 export type ContextMenuTargetSetter = (setterOrValue: ContextMenuTarget | ((prev: ContextMenuTarget) => ContextMenuTarget)) => void
-export type DisplayTarget = 'floater' | 'side-panel'
+export type DisplayTarget = 'floater' | 'side-panel' | 'none'
 
 const CREATE_COMMENT_ID = 'create-comment'
 const ASK_ID = 'ask'
@@ -104,8 +104,18 @@ function getAnchorForTarget(target: ContextMenuTarget): VirtualElement | undefin
 }
 
 function displayTargetForMenuTarget(menuTarget: ContextMenuTarget): DisplayTarget {
-    if (menuTarget.kind === 'ask' && menuTarget.question !== undefined) {
-        return 'side-panel'
+    switch (menuTarget.kind) {
+        case 'empty':
+            return 'none'
+        case 'ask':
+            if (menuTarget.hidden) {
+                return 'none'
+            } else if (menuTarget.question !== undefined) {
+                return 'side-panel'
+            } else {
+                return 'floater'
+            }
+        default:
+            return 'floater'
     }
-    return 'floater'
 }
