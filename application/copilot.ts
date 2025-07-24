@@ -94,19 +94,18 @@ export function useCopilotAnswerStream({
     end: BooqPath,
     question: string,
 }) {
-    const [loading, setLoading] = useState(false)
-    const [answer, setAnswer] = useState('')
-    const [error, setError] = useState<string | null>(null)
+    const [state, setState] = useState<CacheState>({
+        answer: '',
+        loading: true,
+        error: null,
+    })
 
     useEffect(() => {
-        let cancelled = false
-        
-        async function streamAnswer() {
-            setLoading(true)
-            setAnswer('')
-            setError(null)
-
-            try {
+        const key = `${booqId}-${start.join(',')}-${end.join(',')}-${question}`
+        streamingCache.subscribe(
+            key,
+            setState,
+            async () => {
                 const body: AnswerStreamPostBody = { booqId, start, end, question }
                 const res = await fetch('/api/copilot/answer/stream', {
                     method: 'POST',
@@ -115,12 +114,64 @@ export function useCopilotAnswerStream({
                     },
                     body: JSON.stringify(body),
                 })
+                return res
+            })
 
-                if (!res.ok) {
+        return () => {
+            streamingCache.unsubscribe(key, setState)
+        }
+    }, [booqId, question, start, end])
+
+    return {
+        loading: state.loading,
+        answer: state.answer || undefined,
+        error: state.error,
+    } satisfies {
+        loading: boolean,
+        answer: string | undefined,
+        error: string | null,
+    }
+}
+
+type CacheState = {
+    answer: string,
+    loading: boolean,
+    error: string | null,
+}
+type CacheStateSetter = (setterOrValue: CacheState | ((prev: CacheState) => CacheState)) => void
+type CacheValue = {
+    current: CacheState,
+    setters: Set<CacheStateSetter>,
+}
+type CacheFetcher = () => Promise<Response>
+function createStreamingCache() {
+    const cache = new Map<string, CacheValue>()
+    function notify(value: CacheValue) {
+        for (const setter of value.setters) {
+            setter({ ...value.current })
+        }
+    }
+    return {
+        async subscribe(key: string, setter: CacheStateSetter, fetcher: CacheFetcher) {
+            let value = cache.get(key)
+            if (value) {
+                value.setters.add(setter)
+                setter({ ...value.current })
+                return
+            }
+            value = {
+                current: { answer: '', loading: true, error: null },
+                setters: new Set([setter]),
+            }
+            cache.set(key, value)
+
+            try {
+                const response = await fetcher()
+                if (!response.ok) {
                     throw new Error('Failed to fetch streaming answer')
                 }
 
-                const reader = res.body?.getReader()
+                const reader = response.body?.getReader()
                 if (!reader) {
                     throw new Error('No response body')
                 }
@@ -128,41 +179,30 @@ export function useCopilotAnswerStream({
                 const decoder = new TextDecoder()
 
                 while (true) {
-                    if (cancelled) break
-                    
-                    const { done, value } = await reader.read()
-                    if (done) {
-                        setLoading(false)
-                        break
-                    }
+                    const { done, value: chunk } = await reader.read()
+                    if (done) break
 
-                    const chunk = decoder.decode(value, { stream: true })
-                    if (chunk && !cancelled) {
-                        setAnswer(prev => prev + chunk)
-                    }
+                    const text = decoder.decode(chunk, { stream: true })
+                    value.current.answer += text
+
+                    notify(value)
                 }
-            } catch (e) {
-                if (!cancelled) {
-                    setError(e instanceof Error ? e.message : 'Unknown error')
-                    setLoading(false)
-                }
+
+                value.current.loading = false
+            } catch (error) {
+                value.current.error = error instanceof Error ? error.message : 'Unknown error'
+                value.current.loading = false
+            } finally {
+                notify(value)
             }
-        }
-
-        streamAnswer()
-
-        return () => {
-            cancelled = true
-        }
-    }, [booqId, question, start, end])
-
-    return {
-        loading,
-        answer: answer || undefined,
-        error,
-    } satisfies {
-        loading: boolean,
-        answer: string | undefined,
-        error: string | null,
+        },
+        async unsubscribe(key: string, setter: CacheStateSetter) {
+            const value = cache.get(key)
+            if (value) {
+                value.setters.delete(setter)
+            }
+        },
     }
 }
+
+const streamingCache = createStreamingCache()
