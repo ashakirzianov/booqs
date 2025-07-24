@@ -29,6 +29,7 @@ import { useContextMenuState } from './useContextMenuState'
 import { ContextMenuContent } from './ContextMenuContent'
 import { usePageData } from './usePageData'
 import { useNavigationState } from './useNavigationState'
+import clsx from 'clsx'
 
 export function Reader({
     booq, quote,
@@ -138,18 +139,25 @@ export function Reader({
         <CommentIcon />
     </PanelButton>
 
-    const RightPanelContent = displayTarget === 'side-panel' ? (
-        <div className='p-4'>
-            {ContextMenuContentNode}
-        </div>
-    ) : (
-        <CommentsPanel
-            comments={comments}
-            currentUser={user}
-            followingUserIds={followingUserIds}
-            isFollowingLoading={isFollowingLoading}
-        />
-    )
+    const RightPanelContent =
+        <>
+            <div className={clsx('p-4 w-full', {
+                'hidden': displayTarget !== 'side-panel',
+            })}>
+                {ContextMenuContentNode}
+            </div>
+            <div className={clsx('w-full', {
+                'hidden': displayTarget === 'side-panel',
+            })}>
+                <CommentsPanel
+                    comments={comments}
+                    currentUser={user}
+                    followingUserIds={followingUserIds}
+                    isFollowingLoading={isFollowingLoading}
+                />
+            </div>
+        </>
+
 
     const { augmentations, menuTargetForAugmentation } = useAugmentations({
         highlights: filteredHighlights,
