@@ -9,6 +9,6 @@ export async function generateCopilotAnswer({ booqId, range, question }: { booqI
     return generateAnswer(booqId, range, question)
 }
 
-export async function generateCopilotAnswerStream({ booqId, range, question }: { booqId: BooqId, range: BooqRange, question: string }) {
-    return generateAnswerStreaming(booqId, range, question)
+export async function generateCopilotAnswerStream({ booqId, range, question, footnote }: { booqId: BooqId, range: BooqRange, question: string, footnote?: string }) {
+    return generateAnswerStreaming(booqId, range, question, footnote)
 }

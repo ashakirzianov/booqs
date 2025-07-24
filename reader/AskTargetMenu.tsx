@@ -31,6 +31,7 @@ export function AskTargetMenu({
                 booqId={booqId}
                 question={target.question}
                 range={target.selection.range}
+                footnote={target.footnote}
                 onClose={() => setTarget({ kind: 'empty' })}
             />
         )
@@ -75,11 +76,13 @@ function AnswerDisplay({
     booqId,
     question,
     range,
+    footnote,
     onClose
 }: {
     booqId: BooqId,
     question: string,
     range: BooqRange,
+    footnote?: string,
     onClose: () => void
 }) {
     const { loading, answer, error } = useCopilotAnswerStream({
@@ -87,6 +90,7 @@ function AnswerDisplay({
         start: range.start,
         end: range.end,
         question,
+        footnote,
     })
 
     return (
@@ -95,6 +99,15 @@ function AnswerDisplay({
                 <div className="text-sm font-medium text-primary mb-2">Question:</div>
                 <div className="text-sm text-dimmed italic">&ldquo;{question}&rdquo;</div>
             </div>
+
+            {footnote && (
+                <div className="mb-3">
+                    <div className="text-sm font-medium text-primary mb-2">Note:</div>
+                    <div className="text-sm text-dimmed bg-subtle p-2 rounded border-l-2 border-action">
+                        {footnote}
+                    </div>
+                </div>
+            )}
 
             <div className="mb-3">
                 <div className="text-sm font-medium text-primary mb-2">Answer:</div>

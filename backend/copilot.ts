@@ -71,8 +71,8 @@ export async function generateAnswer(booqId: BooqId, range: BooqRange, question:
     return result
 }
 
-export async function generateAnswerStreaming(booqId: BooqId, range: BooqRange, question: string) {
-    const cacheKey = cacheKeyForAnswer(booqId, range, question)
+export async function generateAnswerStreaming(booqId: BooqId, range: BooqRange, question: string, footnote?: string) {
+    const cacheKey = cacheKeyForAnswer(booqId, range, question, footnote)
 
     // Check cache first
     const cachedAnswer = await getCachedValueForKey<string>(cacheKey)
@@ -94,7 +94,7 @@ export async function generateAnswerStreaming(booqId: BooqId, range: BooqRange, 
         }
     }
 
-    const prompt = buildPromptForAnswer(context, question)
+    const prompt = buildPromptForAnswer(context, question, footnote)
     const result = await getStreamingResponse(prompt)
 
     if (result.success) {
@@ -107,9 +107,10 @@ export async function generateAnswerStreaming(booqId: BooqId, range: BooqRange, 
     return result
 }
 
-function cacheKeyForAnswer(booqId: BooqId, range: BooqRange, question: string): string {
+function cacheKeyForAnswer(booqId: BooqId, range: BooqRange, question: string, footnote?: string): string {
     const rangeKey = `${range.start.join(',')}-${range.end.join(',')}`
-    return `copilot:answer:${booqId}:${rangeKey}:${Buffer.from(question).toString('base64')}`
+    const footnoteKey = footnote ? Buffer.from(footnote).toString('base64') : ''
+    return `copilot:answer:${booqId}:${rangeKey}:${Buffer.from(question).toString('base64')}:${footnoteKey}`
 }
 
 
@@ -175,7 +176,7 @@ function buildPromptForSuggestions(context: ReadingContext) {
 I selected excerpt "${context.text}" with context before "${context.contextBefore}" and context after "${context.contextAfter}". Please suggest questions that I might want to ask about this excerpt.`
 }
 
-function buildPromptForAnswer(context: ReadingContext, question: string) {
+function buildPromptForAnswer(context: ReadingContext, question: string, footnote?: string) {
     return `
 You are a helpful reading assistant embedded in a book reading app. A user has selected a passage in a book and asked a question. Use the selected passage, the surrounding context, and the book's metadata to answer helpfully and concisely. If relevant, provide a brief explanation or interpretation. If the question cannot be answered from the text, politely say so.
 
@@ -192,7 +193,10 @@ ${context.contextBefore}
 
 ## Context After
 ${context.contextAfter}
-
+${footnote ? `
+## Additional Note
+The user has provided this note about the selected passage: "${footnote}"
+` : ''}
 ## User's Question
 ${question}
 

@@ -11,6 +11,7 @@ export type PostBody = {
     highlightedText?: string,
     contextBefore?: string,
     contextAfter?: string,
+    footnote?: string,
 }
 
 export async function POST(request: Request) {
@@ -19,7 +20,7 @@ export async function POST(request: Request) {
         return Response.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { booqId, start, end, question }: PostBody = await request.json()
+    const { booqId, start, end, question, footnote }: PostBody = await request.json()
 
     if (typeof booqId !== 'string' || !Array.isArray(start) || !Array.isArray(end) || typeof question !== 'string') {
         return Response.json({ error: 'Invalid request' }, { status: 400 })
@@ -28,7 +29,8 @@ export async function POST(request: Request) {
     const response = await generateCopilotAnswerStream({
         booqId: booqId as BooqId,
         range: { start, end },
-        question
+        question,
+        footnote
     })
 
     if (!response.success) {

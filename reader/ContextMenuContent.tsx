@@ -42,6 +42,7 @@ export type AskTarget = {
     question: string | undefined,
     selection: BooqSelection,
     hidden?: boolean,
+    footnote?: string,
 }
 export type ContextMenuTarget =
     | EmptyTarget | SelectionTarget | QuoteTarget | NoteTarget | CreateCommentTarget | AskTarget
