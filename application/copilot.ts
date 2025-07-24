@@ -6,6 +6,7 @@ import type { PostBody as AnswerStreamPostBody } from '@/app/api/copilot/answer/
 import { BooqId, BooqPath } from '@/core'
 import useSWR from 'swr'
 import { useState, useEffect } from 'react'
+import { CacheEvent, createStreamingCache } from './cache'
 
 export function useCopilotSuggestions({
     booqId,
@@ -103,7 +104,7 @@ export function useCopilotAnswerStream({
         setAnswer('')
         setError(null)
         const cacheKey = generateCacheKey({ booqId, start, end, question })
-        function listener(event: CacheEvent) {
+        function listener(event: CacheEvent<string>) {
             if (event.event === 'chunk') {
                 setAnswer(prev => prev + event.chunk)
             } else if (event.event === 'error') {
@@ -142,7 +143,7 @@ function parseCacheKey(key: string): CacheInput {
     return { booqId: booqId as BooqId, start, end, question }
 }
 
-const streamingAnswerCache = createStreamingCache(async (key: string) => {
+const streamingAnswerCache = createStreamingCache(async function* (key: string) {
     const { booqId, start, end, question } = parseCacheKey(key)
     const body: AnswerStreamPostBody = { booqId, start, end, question }
     const res = await fetch('/api/copilot/answer/stream', {
@@ -159,76 +160,16 @@ const streamingAnswerCache = createStreamingCache(async (key: string) => {
     if (!reader) {
         throw new Error('No response body')
     }
-    return reader
+    const decoder = new TextDecoder()
+    while (true) {
+        const { done, value } = await reader.read()
+        if (done) {
+            break
+        }
+
+        const chunk = decoder.decode(value, { stream: true })
+        if (chunk) {
+            yield chunk
+        }
+    }
 })
-
-type Reader = ReadableStreamDefaultReader<Uint8Array<ArrayBufferLike>>
-type CacheFetcher = (key: string) => Promise<Reader>
-type CacheEvent = { event: 'chunk', chunk: string }
-    | { event: 'error', error: string }
-    | { event: 'complete' }
-type CacheListener = (event: CacheEvent) => void
-type CacheValue = {
-    stored: string,
-    listeners: Set<CacheListener>,
-}
-function createStreamingCache(fetcher: CacheFetcher) {
-    const cache = new Map<string, CacheValue>()
-    function broadcast(value: CacheValue, event: CacheEvent) {
-        if (event.event === 'chunk') {
-            value.stored += event.chunk
-        }
-        for (const listener of value.listeners) {
-            listener(event)
-        }
-    }
-    async function subscribe(key: string, listener: CacheListener) {
-        const existing = cache.get(key)
-        if (existing) {
-            listener({
-                event: 'chunk',
-                chunk: existing.stored,
-            })
-            existing.listeners.add(listener)
-            return
-        }
-        const newValue: CacheValue = {
-            stored: '',
-            listeners: new Set([listener]),
-        }
-        cache.set(key, newValue)
-        try {
-            const reader = await fetcher(key)
-            const decoder = new TextDecoder()
-            while (true) {
-                const { done, value } = await reader.read()
-                if (done) {
-                    break
-                }
-
-                const chunk = decoder.decode(value, { stream: true })
-                if (chunk) {
-                    broadcast(newValue, {
-                        event: 'chunk',
-                        chunk,
-                    })
-                }
-            }
-        } catch (error) {
-            broadcast(newValue, {
-                event: 'error',
-                error: error instanceof Error ? error.message : 'Unknown error',
-            })
-        }
-    }
-    async function unsubscribe(key: string, listener: CacheListener) {
-        const existing = cache.get(key)
-        if (existing) {
-            existing.listeners.delete(listener)
-        }
-    }
-    return {
-        subscribe,
-        unsubscribe,
-    }
-}
