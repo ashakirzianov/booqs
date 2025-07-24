@@ -111,23 +111,28 @@ export function getQuoteAndContext(nodes: BooqNode[], range: BooqRange, length: 
 export function textForRange(nodes: BooqNode[], { start, end }: BooqRange): string | undefined {
     const [startHead, ...startTail] = start
     const [endHead, ...endTail] = end
-    if (startHead === undefined || endHead === undefined || startHead >= nodes.length || endHead < startHead) {
+    if (startHead === undefined || endHead === undefined || startHead >= nodes.length || endHead < startHead || endHead > nodes.length) {
         return undefined
     }
 
     let result = ''
     const startNode = nodes[startHead]
     if (startNode?.kind === 'element') {
-        const startText = textForRange(startNode.children ?? [], {
-            start: startTail,
-            end: startHead === endHead
-                ? endTail
-                : [startNode.children?.length ?? 1],
-        })
-        if (startText) {
-            result += startText
+        if (startTail.length === 0) {
+            // No sub-path specified, include all content from this element
+            result += nodeText(startNode)
         } else {
-            return undefined
+            const startText = textForRange(startNode.children ?? [], {
+                start: startTail,
+                end: startHead === endHead
+                    ? endTail
+                    : [startNode.children?.length ?? 1],
+            })
+            if (startText) {
+                result += startText
+            } else {
+                return undefined
+            }
         }
     } else if (startNode?.kind === 'text') {
         if (startTail.length <= 1) {
