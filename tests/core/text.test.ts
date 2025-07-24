@@ -262,6 +262,60 @@ describe('core/text', () => {
       expect(result.contextBefore.length).toBeGreaterThanOrEqual(5)
       expect(result.contextAfter.length).toBeGreaterThanOrEqual(5)
     })
+
+    it('handles range with start pointing to character within text node', () => {
+      // Range starting at character 3 in "Paragraph one." ending at node [1] (Root text)
+      const range: BooqRange = { start: [0, 0, 3], end: [1] }
+      const result = getQuoteAndContext(complexNodes, range, 20)
+      expect(result.quote).toBe('agraph one.')
+      expect(result.contextBefore).toBe('')
+      expect(result.contextAfter).toBe('Div start Span content')
+    })
+
+    it('handles range with end pointing to character within text node', () => {
+      // Range starting at node [1] ending at character 4 in "Root text. "
+      const range: BooqRange = { start: [1], end: [1, 4] }
+      const result = getQuoteAndContext(complexNodes, range, 20)
+      expect(result.quote).toBe('Root')
+      expect(result.contextBefore).toBe('Paragraph one.')
+      expect(result.contextAfter).toBe('Div start Span content')
+    })
+
+    it('handles range with both start and end pointing to characters within same text node', () => {
+      // Range within "Paragraph one." from character 4 to 7
+      const range: BooqRange = { start: [0, 0, 4], end: [0, 0, 7] }
+      const result = getQuoteAndContext(complexNodes, range, 20)
+      expect(result.quote).toBe('gra')
+      expect(result.contextBefore).toBe('')
+      expect(result.contextAfter).toBe('Root text. Div start ')
+    })
+
+    it('handles range with both start and end pointing to characters within different text nodes', () => {
+      // Range from character 5 in "Paragraph one." to character 4 in "Root text. "
+      const range: BooqRange = { start: [0, 0, 5], end: [1, 4] }
+      const result = getQuoteAndContext(complexNodes, range, 30)
+      expect(result.quote).toBe('raph one.Root')
+      expect(result.contextBefore).toBe('')
+      expect(result.contextAfter).toBe('Div start Span content Div end')
+    })
+
+    it('handles range with start pointing to character within nested text node', () => {
+      // Range starting at character 2 in "Span content" ending at node [2, 2] (Div end)
+      const range: BooqRange = { start: [2, 1, 0, 2], end: [2, 2] }
+      const result = getQuoteAndContext(complexNodes, range, 25)
+      expect(result.quote).toBe('an content')
+      expect(result.contextBefore).toBe('Div start Sp')
+      expect(result.contextAfter).toBe(' Final text.')
+    })
+
+    it('handles range with end pointing to character within nested text node', () => {
+      // Range starting at node [2, 0] ending at character 3 in "Span content"
+      const range: BooqRange = { start: [2, 0], end: [2, 1, 0, 3] }
+      const result = getQuoteAndContext(complexNodes, range, 25)
+      expect(result.quote).toBe('Div start Spa')
+      expect(result.contextBefore).toBe('Paragraph one.Root text. ')
+      expect(result.contextAfter).toBe('n content Div end Final')
+    })
   })
 
   describe('textForRange', () => {
