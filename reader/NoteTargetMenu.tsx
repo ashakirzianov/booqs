@@ -85,6 +85,12 @@ export function NoteTargetMenu({
                             placeholder='Add a note...'
                             value={editContent}
                             onChange={(e) => setEditContent(e.target.value)}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+                                    e.preventDefault()
+                                    handleSaveNote()
+                                }
+                            }}
                             rows={3}
                             autoFocus
                         />
