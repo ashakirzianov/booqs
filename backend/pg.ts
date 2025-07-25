@@ -50,7 +50,7 @@ export async function query(query: LibraryQuery): Promise<InLibraryQueryResult> 
     case 'search':
       return search(query.query, query.limit)
     case 'author':
-      return { cards: [] } // Placeholder for author query, can be implemented later
+      return author(query.query, query.limit)
     default:
       assertNever(query.kind)
       return { cards: [] }
@@ -64,6 +64,21 @@ async function search(query: string, limit: number): Promise<InLibraryQueryResul
     FROM pg_metadata
     WHERE lower(title) LIKE ${like}
        OR lower(authors_text) LIKE ${like}
+    ORDER BY title
+    LIMIT ${limit}
+  ` as DbPgMetadata[]
+  const cards = result.map(({ id, meta }) => ({
+    id,
+    meta,
+  }))
+  return { cards }
+}
+
+async function author(authorName: string, limit: number): Promise<InLibraryQueryResult> {
+  const result = await sql`
+    SELECT *
+    FROM pg_metadata
+    WHERE ${authorName} = ANY(authors)
     ORDER BY title
     LIMIT ${limit}
   ` as DbPgMetadata[]
