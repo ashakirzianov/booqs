@@ -10,7 +10,7 @@ import { updateAccountAction } from '@/data/auth'
 
 type FormState =
     | { state: 'display' }
-    | { state: 'edit' }
+    | { state: 'edit', emojiSelectorOpen?: boolean }
     | { state: 'loading' }
     | { state: 'error', error: string, field?: string }
 
@@ -21,16 +21,14 @@ export function ProfileData({ user }: { user: AccountData }) {
         name: user.name,
         username: user.username
     })
-    const [isEmojiSelectorOpen, setIsEmojiSelectorOpen] = useState(false)
 
     const handleEmojiChange = (emoji: string) => {
         setCurrentData(prev => ({ ...prev, emoji }))
-        setFormState({ state: 'edit' })
-        setIsEmojiSelectorOpen(false)
+        setFormState({ state: 'edit', emojiSelectorOpen: false })
     }
 
     const handleEmojiClick = () => {
-        setIsEmojiSelectorOpen(true)
+        setFormState({ state: 'edit', emojiSelectorOpen: true })
     }
 
     const handleEditClick = () => {
@@ -100,6 +98,7 @@ export function ProfileData({ user }: { user: AccountData }) {
     // Derived state for cleaner JSX
     const isEditMode = formState.state === 'edit' || formState.state === 'loading' || formState.state === 'error'
     const isLoading = formState.state === 'loading'
+    const isEmojiSelectorOpen = formState.state === 'edit' && formState.emojiSelectorOpen === true
     const usernameError = formState.state === 'error' && formState.field === 'username' ? formState.error : null
     const generalError = formState.state === 'error' && formState.field !== 'username' ? formState.error : null
 
@@ -221,7 +220,7 @@ export function ProfileData({ user }: { user: AccountData }) {
 
             <EmojiSelector
                 isOpen={isEmojiSelectorOpen}
-                onClose={() => setIsEmojiSelectorOpen(false)}
+                onClose={() => setFormState({ state: 'edit', emojiSelectorOpen: false })}
                 currentEmoji={currentData.emoji}
                 onSelect={handleEmojiChange}
             />
