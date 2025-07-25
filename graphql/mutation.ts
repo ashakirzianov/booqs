@@ -196,13 +196,15 @@ export const mutationResolver: IResolvers<any, ResolverContext> = {
                 return {
                     success: true,
                     user: result.user,
-                    error: null
+                    error: null,
+                    field: null
                 }
             } else {
                 return {
                     success: false,
                     user: null,
-                    error: result.reason
+                    error: result.reason,
+                    field: result.field || null
                 }
             }
         },

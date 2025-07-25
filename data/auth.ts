@@ -167,7 +167,7 @@ export async function updateAccountAction({
     name?: string,
     emoji?: string,
     username?: string
-}): Promise<{ success: true, user: AccountData } | { success: false, error: string }> {
+}): Promise<{ success: true, user: AccountData } | { success: false, error: string, field?: string }> {
     const userId = await getUserIdInsideRequest()
     if (!userId) {
         return { success: false, error: 'Authentication required' }
@@ -181,7 +181,7 @@ export async function updateAccountAction({
     })
 
     if (!result.success) {
-        return { success: false, error: result.reason }
+        return { success: false, error: result.reason, field: result.field }
     }
 
     revalidatePath('/account')
