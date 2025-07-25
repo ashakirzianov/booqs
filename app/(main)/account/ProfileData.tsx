@@ -12,8 +12,10 @@ export function ProfileData({ user }: { user: AccountData }) {
     const [isEditMode, setIsEditMode] = useState(false)
     const [currentEmoji, setCurrentEmoji] = useState(user.emoji ?? '👤')
     const [currentName, setCurrentName] = useState(user.name)
+    const [currentUsername, setCurrentUsername] = useState(user.username)
     const [isUpdating, setIsUpdating] = useState(false)
     const [isEmojiSelectorOpen, setIsEmojiSelectorOpen] = useState(false)
+    const [usernameError, setUsernameError] = useState<string | null>(null)
 
     const handleEmojiChange = (emoji: string) => {
         setCurrentEmoji(emoji)
@@ -34,30 +36,51 @@ export function ProfileData({ user }: { user: AccountData }) {
         setIsEditMode(true)
     }
 
+    const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setCurrentUsername(e.target.value)
+        setUsernameError(null)
+    }
+
     const handleUpdateProfile = async () => {
         setIsUpdating(true)
+        setUsernameError(null)
+        
         try {
             const formData = new FormData()
             formData.append('emoji', currentEmoji)
             formData.append('name', currentName)
+            
+            // Only append username if it changed
+            if (currentUsername !== user.username) {
+                formData.append('username', currentUsername)
+            }
 
             const result = await updateProfileServerAction(formData)
 
-            if (result) {
+            if (result.success) {
                 setIsEditMode(false)
                 // Trigger page reload by revalidating
                 window.location.reload()
+            } else {
+                // Handle error from server action
+                if (result.error) {
+                    setUsernameError(result.error)
+                }
             }
         } catch (error) {
             console.error('Failed to update profile:', error)
+            setUsernameError('Failed to update profile')
         } finally {
             setIsUpdating(false)
         }
     }
 
+
     const handleCancel = () => {
         setCurrentEmoji(user.emoji)
         setCurrentName(user.name)
+        setCurrentUsername(user.username)
+        setUsernameError(null)
         setIsEditMode(false)
     }
 
@@ -94,6 +117,25 @@ export function ProfileData({ user }: { user: AccountData }) {
                                     className="w-full px-3 py-2 border border-dimmed rounded-md bg-background text-primary focus:outline-none focus:ring-2 focus:ring-action focus:border-transparent"
                                     placeholder="Enter your display name"
                                 />
+                            </div>
+                            <div>
+                                <label htmlFor="username" className="block text-sm font-medium text-primary mb-1">
+                                    Username
+                                </label>
+                                <input
+                                    id="username"
+                                    type="text"
+                                    value={currentUsername}
+                                    onChange={handleUsernameChange}
+                                    className="w-full px-3 py-2 border border-dimmed rounded-md bg-background text-primary focus:outline-none focus:ring-2 focus:ring-action focus:border-transparent"
+                                    placeholder="Enter your username"
+                                />
+                                {usernameError && (
+                                    <p className="text-sm text-red-500 mt-1">{usernameError}</p>
+                                )}
+                                <p className="text-xs text-dimmed mt-1">
+                                    Username can only contain letters, numbers, and hyphens
+                                </p>
                             </div>
                             <div className="flex gap-2">
                                 <button

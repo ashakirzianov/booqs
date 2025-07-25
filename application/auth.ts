@@ -59,13 +59,13 @@ export function useAuth() {
         }
 
         const result = await mutate(async function () {
-            const updatedUser = await updateAccountAction({ name, emoji })
-            if (updatedUser) {
+            const updateResult = await updateAccountAction({ name, emoji })
+            if (updateResult.success) {
                 return {
-                    user: updatedUser,
+                    user: updateResult.user,
                 } satisfies GetResponse
             }
-            throw new Error('Failed to update account')
+            throw new Error(updateResult.error || 'Failed to update account')
         }, {
             optimisticData: data?.user ? {
                 user: {

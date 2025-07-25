@@ -160,27 +160,30 @@ export async function fetchAuthData(): Promise<AccountData | undefined> {
 
 export async function updateAccountAction({
     name,
-    emoji
+    emoji,
+    username
 }: {
     name?: string,
-    emoji?: string
-}): Promise<AccountData | null> {
+    emoji?: string,
+    username?: string
+}): Promise<{ success: true, user: AccountData } | { success: false, error: string }> {
     const userId = await getUserIdInsideRequest()
     if (!userId) {
-        return null
+        return { success: false, error: 'Authentication required' }
     }
 
     const result = await updateUser({
         id: userId,
         name,
         emoji,
+        username,
     })
 
     if (!result.success) {
-        return null
+        return { success: false, error: result.reason }
     }
 
-    return accountDataFromDbUser(result.user)
+    return { success: true, user: accountDataFromDbUser(result.user) }
 }
 
 export async function deleteAccountAction() {
