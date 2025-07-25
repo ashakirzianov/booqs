@@ -1,10 +1,10 @@
-import { booqCard } from '@/data/booqs'
+import { booqCard, booqPart } from '@/data/booqs'
 import { BooqCover } from '@/components/BooqCover'
 import { BooqTags } from '@/components/BooqTags'
 import Link from 'next/link'
 import { booqHref, authorHref } from '@/core/href'
 import { notFound } from 'next/navigation'
-import type { BooqId } from '@/core'
+import type { BooqId, TableOfContentsItem } from '@/core'
 
 type Params = {
     library: string,
@@ -21,6 +21,9 @@ export default async function Page({ params }: {
     if (!card) {
         notFound()
     }
+    
+    const booqData = await booqPart({ booqId })
+    const toc = booqData?.toc
 
     return <main className="flex flex-row justify-center min-h-screen bg-gray-50">
         <div className="flex flex-col max-w-4xl w-full p-6 bg-white shadow-lg">
@@ -73,6 +76,40 @@ export default async function Page({ params }: {
                     </div>
                 </div>
             </div>
+            
+            {toc && toc.items.length > 0 && (
+                <div className="border-t border-gray-200 pt-8">
+                    <h2 className="text-2xl font-bold text-gray-800 mb-6">Table of Contents</h2>
+                    <div className="space-y-2">
+                        {toc.items.map((item, index) => (
+                            <TableOfContentsItem 
+                                key={index} 
+                                item={item} 
+                                booqId={booqId} 
+                            />
+                        ))}
+                    </div>
+                </div>
+            )}
         </div>
     </main>
+}
+
+function TableOfContentsItem({ item, booqId }: {
+    item: TableOfContentsItem,
+    booqId: BooqId,
+}) {
+    const paddingLeft = `${item.level * 1.5}rem`
+    
+    return (
+        <Link 
+            href={booqHref({ booqId, path: item.path })}
+            className="block py-2 px-3 rounded hover:bg-gray-50 transition-colors duration-150"
+            style={{ paddingLeft }}
+        >
+            <span className="text-gray-700 hover:text-blue-600">
+                {item.title || 'Untitled Chapter'}
+            </span>
+        </Link>
+    )
 }
