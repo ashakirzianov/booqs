@@ -1,6 +1,6 @@
 import { IResolvers } from '@graphql-tools/utils'
 import { ResolverContext } from './context'
-import { deleteUserForId, userForId } from '@/backend/users'
+import { deleteUserForId, userForId, updateUser } from '@/backend/users'
 import { addNote, removeNote, updateNote } from '@/backend/notes'
 import { initiatePasskeyLogin, initiatePasskeyRegistration, verifyPasskeyLogin, verifyPasskeyRegistration } from '@/backend/passkey'
 import { addToCollection, removeFromCollection } from '@/backend/collections'
@@ -175,6 +175,36 @@ export const mutationResolver: IResolvers<any, ResolverContext> = {
             }
 
             return undefined
+        },
+        async updateUser(_, { input }, { userId }) {
+            if (!userId) {
+                return {
+                    success: false,
+                    user: null,
+                    error: 'Authentication required'
+                }
+            }
+
+            const result = await updateUser({
+                id: userId,
+                name: input.name,
+                emoji: input.emoji,
+                username: input.username
+            })
+
+            if (result.success) {
+                return {
+                    success: true,
+                    user: result.user,
+                    error: null
+                }
+            } else {
+                return {
+                    success: false,
+                    user: null,
+                    error: result.reason
+                }
+            }
         },
     },
 }

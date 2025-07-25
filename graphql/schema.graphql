@@ -33,6 +33,7 @@ type Mutation {
 
     signout: Boolean
     deleteAccount: Boolean
+    updateUser(input: UpdateUserInput!): UpdateUserResult
 }
 
 type InitPasskeyRegistrationResponse {
@@ -172,4 +173,16 @@ input CopilotContext {
 type Copilot {
     suggestions: [String!]
     answer(question: String!): String
+}
+
+input UpdateUserInput {
+    name: String
+    emoji: String
+    username: String
+}
+
+type UpdateUserResult {
+    success: Boolean!
+    user: User
+    error: String
 }
