@@ -16,6 +16,7 @@ export function ProfileData({ user }: { user: AccountData }) {
     const [isUpdating, setIsUpdating] = useState(false)
     const [isEmojiSelectorOpen, setIsEmojiSelectorOpen] = useState(false)
     const [usernameError, setUsernameError] = useState<string | null>(null)
+    const [generalError, setGeneralError] = useState<string | null>(null)
 
     const handleEmojiChange = (emoji: string) => {
         setCurrentEmoji(emoji)
@@ -39,11 +40,13 @@ export function ProfileData({ user }: { user: AccountData }) {
     const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setCurrentUsername(e.target.value)
         setUsernameError(null)
+        setGeneralError(null)
     }
 
     const handleUpdateProfile = async () => {
         setIsUpdating(true)
         setUsernameError(null)
+        setGeneralError(null)
         
         try {
             const result = await updateAccountAction({
@@ -58,13 +61,16 @@ export function ProfileData({ user }: { user: AccountData }) {
                 window.location.reload()
             } else {
                 // Handle error from server action
-                if (result.error) {
+                if (result.error && result.field === 'username') {
                     setUsernameError(result.error)
+                } else if (result.error) {
+                    // For non-username field errors, show as general error
+                    setGeneralError(result.error)
                 }
             }
         } catch (error) {
             console.error('Failed to update profile:', error)
-            setUsernameError('Failed to update profile')
+            setGeneralError('Failed to update profile')
         } finally {
             setIsUpdating(false)
         }
@@ -76,6 +82,7 @@ export function ProfileData({ user }: { user: AccountData }) {
         setCurrentName(user.name)
         setCurrentUsername(user.username)
         setUsernameError(null)
+        setGeneralError(null)
         setIsEditMode(false)
     }
 
@@ -100,6 +107,11 @@ export function ProfileData({ user }: { user: AccountData }) {
                 <div className="flex-1">
                     {isEditMode ? (
                         <div className="space-y-4">
+                            {generalError && (
+                                <div className="bg-red-50 border border-red-200 rounded-md p-3">
+                                    <p className="text-sm text-red-600">{generalError}</p>
+                                </div>
+                            )}
                             <div>
                                 <label htmlFor="name" className="block text-sm font-medium text-primary mb-1">
                                     Display Name
