@@ -212,8 +212,8 @@ describe('core/text', () => {
       const range: BooqRange = { start: [0, 0, 3], end: [1] }
       const result = getQuoteAndContext(complexNodes, range, 20)
       expect(result.quote).toBe('agraph one.')
-      expect(result.contextBefore).toBe('')
-      expect(result.contextAfter).toBe('Div start Span content')
+      expect(result.contextBefore).toBe('Par')
+      expect(result.contextAfter).toBe('Root text. Div start ')
     })
 
     it('handles range with end pointing to character within text node', () => {
@@ -222,7 +222,7 @@ describe('core/text', () => {
       const result = getQuoteAndContext(complexNodes, range, 20)
       expect(result.quote).toBe('Root')
       expect(result.contextBefore).toBe('Paragraph one.')
-      expect(result.contextAfter).toBe('Div start Span content')
+      expect(result.contextAfter).toBe(' text. Div start Span content')
     })
 
     it('handles range with both start and end pointing to characters within same text node', () => {
@@ -230,8 +230,8 @@ describe('core/text', () => {
       const range: BooqRange = { start: [0, 0, 4], end: [0, 0, 7] }
       const result = getQuoteAndContext(complexNodes, range, 20)
       expect(result.quote).toBe('gra')
-      expect(result.contextBefore).toBe('')
-      expect(result.contextAfter).toBe('Root text. Div start ')
+      expect(result.contextBefore).toBe('Para')
+      expect(result.contextAfter).toBe('ph one.Root text. Div start ')
     })
 
     it('handles range with both start and end pointing to characters within different text nodes', () => {
@@ -239,8 +239,8 @@ describe('core/text', () => {
       const range: BooqRange = { start: [0, 0, 5], end: [1, 4] }
       const result = getQuoteAndContext(complexNodes, range, 30)
       expect(result.quote).toBe('raph one.Root')
-      expect(result.contextBefore).toBe('')
-      expect(result.contextAfter).toBe('Div start Span content Div end')
+      expect(result.contextBefore).toBe('Parag')
+      expect(result.contextAfter).toBe(' text. Div start Span content Div end')
     })
 
     it('handles range with start pointing to character within nested text node', () => {
@@ -248,8 +248,8 @@ describe('core/text', () => {
       const range: BooqRange = { start: [2, 1, 0, 2], end: [2, 2] }
       const result = getQuoteAndContext(complexNodes, range, 25)
       expect(result.quote).toBe('an content')
-      expect(result.contextBefore).toBe('Div start Sp')
-      expect(result.contextAfter).toBe(' Final text.')
+      expect(result.contextBefore).toBe('Paragraph one.Root text. Div start Sp')
+      expect(result.contextAfter).toBe(' Div end Final text.')
     })
 
     it('handles range with end pointing to character within nested text node', () => {
@@ -258,7 +258,7 @@ describe('core/text', () => {
       const result = getQuoteAndContext(complexNodes, range, 25)
       expect(result.quote).toBe('Div start Spa')
       expect(result.contextBefore).toBe('Paragraph one.Root text. ')
-      expect(result.contextAfter).toBe('n content Div end Final')
+      expect(result.contextAfter).toBe('n content Div end Final text.')
     })
   })
 

@@ -1,6 +1,15 @@
 import { BooqNode, BooqRange, BooqPath } from './model'
 import {
-    findPath, rootIterator, firstLeafNode, iteratorsNode, nextLeafNode, prevLeafNode,
+    iteratorAtPath,
+    firstLeafNode,
+    nextLeafNode,
+    prevLeafNode,
+    textBefore,
+    textStartingAt,
+    BooqNodeIterator,
+    isNodeIterator,
+    isTextIterator,
+    iteratorsNode,
 } from './iterator'
 import { assertNever } from './misc'
 
@@ -25,19 +34,23 @@ export function nodesText(nodes: BooqNode[]): string {
 
 // length is the minimum length of the preview (provided that nodes have enough content). The previewForPath does not truncate resulting string to the length, instead the returned string includes all the text content from the last node appended to the preview.
 export function previewForPath(nodes: BooqNode[], path: BooqPath, length: number) {
-    let iter = findPath(rootIterator(nodes), path)
-    if (!iter) {
+    const found = iteratorAtPath(nodes, path)
+    if (!found) {
         return undefined
     }
-    iter = firstLeafNode(iter)
+    let iter: BooqNodeIterator | undefined = isNodeIterator(found)
+        ? firstLeafNode(found)
+        : found.parent
     let preview = ''
     while (iter) {
-        const node = iteratorsNode(iter)
-        preview += node?.kind === 'text'
-            ? node.content
-            : ''
-        if (preview.trim().length >= length) {
-            return preview.trim()
+        const node = iteratorsNode(iter) ?? null
+        const text = nodeText(node)
+        preview += text
+        if (preview.length >= length) {
+            const trimmed = preview.trim()
+            if (trimmed.length >= length) {
+                return trimmed
+            }
         }
         iter = nextLeafNode(iter)
     }
@@ -49,27 +62,39 @@ export function getQuoteAndContext(nodes: BooqNode[], range: BooqRange, length: 
     const quote = textForRange(nodes, range) ?? ''
 
     // Get context before the range
-    const startIter = findPath(rootIterator(nodes), range.start)
+    const startIter = iteratorAtPath(nodes, range.start)
     let contextBefore = ''
-    if (startIter) {
-        let backwardIter = prevLeafNode(startIter)
-        while (backwardIter && contextBefore.length < length) {
-            const nodeContent = nodeText(iteratorsNode(backwardIter))
-            contextBefore = nodeContent + contextBefore
-            backwardIter = prevLeafNode(backwardIter)
+    let iter: BooqNodeIterator | undefined = undefined
+    if (startIter && isTextIterator(startIter)) {
+        contextBefore = textBefore(startIter) + contextBefore
+        iter = startIter.parent
+    } else {
+        iter = startIter
+    }
+    iter = iter && prevLeafNode(iter)
+    while (iter) {
+        if (contextBefore.length >= length) {
+            break
         }
+        contextBefore = nodeText(iteratorsNode(iter) ?? null) + contextBefore
+        iter = prevLeafNode(iter)
     }
 
     // Get context after the range
-    const endIter = findPath(rootIterator(nodes), range.end)
+    const endIter = iteratorAtPath(nodes, range.end)
     let contextAfter = ''
-    if (endIter) {
-        let forwardIter = nextLeafNode(endIter)
-        while (forwardIter && contextAfter.length < length) {
-            const nodeContent = nodeText(iteratorsNode(forwardIter))
-            contextAfter += nodeContent
-            forwardIter = nextLeafNode(forwardIter)
+    if (endIter && isTextIterator(endIter)) {
+        contextAfter += textStartingAt(endIter)
+        iter = nextLeafNode(endIter.parent)
+    } else {
+        iter = endIter
+    }
+    while (iter) {
+        if (contextAfter.length >= length) {
+            break
         }
+        contextAfter += nodeText(iteratorsNode(iter) ?? null)
+        iter = nextLeafNode(iter)
     }
 
     return { quote, contextBefore, contextAfter }
