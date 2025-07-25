@@ -14,6 +14,60 @@ function isValidKind(kind: string): kind is ValidKind {
     return validKinds.includes(kind as ValidKind)
 }
 
+function getLanguageDisplayName(languageCode: string): string {
+    const languageNames: Record<string, string> = {
+        'en': 'English',
+        'fr': 'French',
+        'de': 'German',
+        'es': 'Spanish',
+        'it': 'Italian',
+        'pt': 'Portuguese',
+        'ru': 'Russian',
+        'ja': 'Japanese',
+        'zh': 'Chinese',
+        'ar': 'Arabic',
+        'hi': 'Hindi',
+        'ko': 'Korean',
+        'nl': 'Dutch',
+        'sv': 'Swedish',
+        'da': 'Danish',
+        'no': 'Norwegian',
+        'fi': 'Finnish',
+        'pl': 'Polish',
+        'cs': 'Czech',
+        'hu': 'Hungarian',
+        'tr': 'Turkish',
+        'he': 'Hebrew',
+        'th': 'Thai',
+        'vi': 'Vietnamese',
+        'id': 'Indonesian',
+        'ms': 'Malay',
+        'tl': 'Filipino',
+        'uk': 'Ukrainian',
+        'bg': 'Bulgarian',
+        'hr': 'Croatian',
+        'sk': 'Slovak',
+        'sl': 'Slovenian',
+        'ro': 'Romanian',
+        'et': 'Estonian',
+        'lv': 'Latvian',
+        'lt': 'Lithuanian',
+        'mt': 'Maltese',
+        'ga': 'Irish',
+        'cy': 'Welsh',
+        'is': 'Icelandic',
+        'mk': 'Macedonian',
+        'sq': 'Albanian',
+        'sr': 'Serbian',
+        'bs': 'Bosnian',
+        'me': 'Montenegrin',
+        'la': 'Latin',
+        'eo': 'Esperanto',
+    }
+    
+    return languageNames[languageCode.toLowerCase()] || languageCode
+}
+
 export default async function LibraryQuery({
     params,
     searchParams,
@@ -61,7 +115,7 @@ export default async function LibraryQuery({
                 limit: PAGE_SIZE, 
                 offset 
             })
-            title = `Books in ${decoded}`
+            title = `Books in ${getLanguageDisplayName(decoded)}`
             break
         default:
             notFound()
