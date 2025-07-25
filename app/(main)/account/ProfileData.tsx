@@ -6,7 +6,7 @@ import { EmojiSelector } from './EmojiSelector'
 import { PencilIcon } from '@/components/Icons'
 import { LightButton } from '@/components/Buttons'
 import { AccountData } from '@/core'
-import { updateProfileServerAction } from './actions'
+import { updateAccountAction } from '@/data/auth'
 
 export function ProfileData({ user }: { user: AccountData }) {
     const [isEditMode, setIsEditMode] = useState(false)
@@ -46,16 +46,11 @@ export function ProfileData({ user }: { user: AccountData }) {
         setUsernameError(null)
         
         try {
-            const formData = new FormData()
-            formData.append('emoji', currentEmoji)
-            formData.append('name', currentName)
-            
-            // Only append username if it changed
-            if (currentUsername !== user.username) {
-                formData.append('username', currentUsername)
-            }
-
-            const result = await updateProfileServerAction(formData)
+            const result = await updateAccountAction({
+                emoji: currentEmoji,
+                name: currentName,
+                username: currentUsername !== user.username ? currentUsername : undefined
+            })
 
             if (result.success) {
                 setIsEditMode(false)

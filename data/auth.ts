@@ -10,6 +10,7 @@ import { completeSignInRequest, completeSignUp, prevalidateSignup, initiateSignR
 import { AccountData } from '@/core'
 import { RegistrationResponseJSON, AuthenticationResponseJSON } from '@simplewebauthn/browser'
 import { cookies, headers } from 'next/headers'
+import { revalidatePath } from 'next/cache'
 
 export async function initPasskeyRegistrationAcion() {
     try {
@@ -183,6 +184,7 @@ export async function updateAccountAction({
         return { success: false, error: result.reason }
     }
 
+    revalidatePath('/account')
     return { success: true, user: accountDataFromDbUser(result.user) }
 }
 
