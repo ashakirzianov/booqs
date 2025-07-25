@@ -7,6 +7,7 @@ import { booqHref, authorHref } from '@/core/href'
 import { notFound } from 'next/navigation'
 import { getUserIdInsideRequest } from '@/data/auth'
 import { READING_LIST_COLLECTION } from '@/application/collections'
+import { fetchBooqHistory } from '@/data/history'
 import type { BooqId, TableOfContentsItem } from '@/core'
 
 type Params = {
@@ -28,6 +29,7 @@ export default async function Page({ params }: {
     const toc = detailed?.toc
     const userId = await getUserIdInsideRequest()
     const isSignedIn = Boolean(userId)
+    const history = await fetchBooqHistory(booqId)
 
     return <main className="flex flex-row justify-center min-h-screen bg-gray-50">
         <div className="flex flex-col max-w-4xl w-full p-6 bg-background shadow-lg">
@@ -73,10 +75,10 @@ export default async function Page({ params }: {
 
                     <div className="flex gap-4 items-center">
                         <Link
-                            href={booqHref({ booqId, path: [0] })}
+                            href={history ? booqHref({ booqId, path: history.path }) : booqHref({ booqId, path: [0] })}
                             className="bg-action hover:bg-highlight text-light px-6 py-3 rounded-lg font-semibold text-lg transition-colors duration-200 shadow-md hover:shadow-lg"
                         >
-                            Start Reading
+                            {history ? 'Continue Reading' : 'Start Reading'}
                         </Link>
 
                         {isSignedIn && (
