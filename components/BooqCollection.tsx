@@ -35,6 +35,8 @@ export function BooqCollection({
                                         <CollectionButton
                                             booqId={card.booqId}
                                             collection={collection}
+                                            AddButtonContent={<span>Add</span>}
+                                            RemoveButtonContent={<span>Remove</span>}
                                         />
                                         : null}
                                 </>}
