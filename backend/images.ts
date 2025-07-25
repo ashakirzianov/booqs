@@ -1,15 +1,7 @@
 import sharp from 'sharp'
 import { uploadAsset } from './blob'
 import { Booq, BooqId } from '@/core'
-
-const bucket = 'booqs-images'
-const coverSizes = [60, 120, 210] as const
-export type CoverSize = typeof coverSizes[number]
-
-export function booqImageUrl(booqId: BooqId, src: string, size?: CoverSize) {
-    const base = `https://${bucket}.s3.amazonaws.com/${booqId}/${src}`
-    return size ? `${base}@${size}` : base
-}
+import { coverSizes, imageBucket } from '@/common'
 
 export async function uploadBooqImages(booqId: BooqId, booq: Booq) {
     const allImages = Object.entries(booq.images).map(
@@ -36,7 +28,7 @@ async function uploadImage(base64: string, booqId: BooqId, src: string, size?: n
     const toUpload = size
         ? await resizeImage(buffer, size)
         : buffer
-    const result = await uploadAsset(bucket, id, toUpload)
+    const result = await uploadAsset(imageBucket, id, toUpload)
     return result.$metadata
         ? { success: true, id }
         : { success: false, id }

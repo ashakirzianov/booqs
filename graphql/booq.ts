@@ -1,7 +1,6 @@
 import { IResolvers } from '@graphql-tools/utils'
 import { BookmarkParent } from './bookmark'
 import { NoteParent } from './note'
-import { booqImageUrl } from '@/backend/images'
 import {
     BooqId,
     BooqMetadata,
@@ -19,11 +18,6 @@ export type BooqParent = {
 }
 export const booqResolver: IResolvers<BooqParent> = {
     Booq: {
-        coverUrl(parent, { size }) {
-            return parent.coverSrc
-                ? booqImageUrl(parent.booqId, parent.coverSrc, size)
-                : undefined
-        },
         async tags(parent) {
             const card = await libraryCardForId(parent.booqId)
             if (!card) {

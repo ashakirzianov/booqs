@@ -2,7 +2,6 @@
 
 import { uploadEpubForUser } from '@/backend/uu'
 import { fetchAuthData } from './auth'
-import { booqImageUrl } from '@/backend/images'
 import { BooqId } from '@/core'
 import { addUpload } from '@/backend/collections'
 
@@ -24,7 +23,7 @@ export async function uploadEpubAction(file: File) {
             success: true,
             booqId,
             title: result.meta.title ?? undefined,
-            coverUrl: result.meta.coverSrc ? booqImageUrl(booqId, result.meta.coverSrc) : undefined,
+            coverSrc: result.meta.coverSrc,
         } as const
     } else {
         return {

@@ -35,9 +35,10 @@ export default async function Page({ params }: {
             <div className="flex flex-col lg:flex-row gap-8 mb-8">
                 <div className="flex justify-center lg:justify-start">
                     <BooqCover
+                        booqId={booqId}
+                        coverSrc={card.coverSrc}
                         title={card.title}
                         author={card.authors.join(', ')}
-                        coverUrl={card.coverUrl}
                         size={120}
                     />
                 </div>

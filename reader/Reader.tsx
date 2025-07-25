@@ -30,7 +30,7 @@ import { ContextMenuContent } from './ContextMenuContent'
 import { usePageData } from './usePageData'
 import { useNavigationState } from './useNavigationState'
 import clsx from 'clsx'
-import { resolveImageSrc } from '@/data/images'
+import { resolveImageSrc } from '@/common'
 
 export function Reader({
     booq, quote,

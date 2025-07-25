@@ -1,14 +1,19 @@
+import { coverSizeForSize, resolveImageSrc } from '@/common'
+import { BooqId } from '@/core'
 import React from 'react'
 
-const defaultSize = 70
+const defaultSize = 60
 
-export function BooqCover({ coverUrl, title, author, size }: {
-    coverUrl: string | undefined,
+export function BooqCover({ booqId, coverSrc, title, author, size }: {
+    booqId: BooqId,
+    coverSrc: string | undefined,
     title: string | undefined,
     author: string | undefined,
     size?: number,
 }) {
     size = size ?? defaultSize
+    const coverSize = coverSizeForSize(size)
+    const coverUrl = coverSrc ? resolveImageSrc(booqId, coverSrc, coverSize) : undefined
     return <div className='flex shrink-0 items-stretch rounded-sm overflow-hidden' style={{
         height: size * 3,
         minWidth: size,
