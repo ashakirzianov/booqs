@@ -3,12 +3,12 @@ import Link from 'next/link'
 import { booqHref } from '../core/href'
 import { CollectionButton } from './CollectionButton'
 import type { BooqId } from '@/core'
-import { BooqDetails } from '@/data/booqs'
+import { BooqCardData } from '@/data/booqs'
 export function BooqCollection({
     cards, title, collection, signed,
 }: {
     title?: string,
-    cards: BooqDetails[],
+    cards: BooqCardData[],
     collection?: string,
     signed: boolean,
 }) {

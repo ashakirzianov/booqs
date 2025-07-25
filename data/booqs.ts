@@ -9,7 +9,7 @@ import { userForId } from '@/backend/users'
 import { booqIdsInCollections } from '@/backend/collections'
 import { booqForId, booqPreview } from '@/backend/booq'
 
-export type BooqDetails = {
+export type BooqCardData = {
     booqId: BooqId,
     title: string,
     authors: string[],
@@ -21,7 +21,7 @@ export async function featuredIds() {
     return featuredBooqIds()
 }
 
-export async function featuredBooqCards(): Promise<BooqDetails[]> {
+export async function featuredBooqCards(): Promise<BooqCardData[]> {
     const ids = await featuredIds()
     const cards = (await libraryCardsForIds(ids))
         .filter(card => card !== undefined)
@@ -29,12 +29,12 @@ export async function featuredBooqCards(): Promise<BooqDetails[]> {
     return cards
 }
 
-export async function booqCardsForAuthor(author: string): Promise<BooqDetails[]> {
+export async function booqCardsForAuthor(author: string): Promise<BooqCardData[]> {
     const cards = await booqsForAuthor(author)
     return cards.map(card => buildBooqCardData(card.booqId, card.meta))
 }
 
-export async function booqCollection(collection: string, userId: string | undefined): Promise<BooqDetails[]> {
+export async function booqCollection(collection: string, userId: string | undefined): Promise<BooqCardData[]> {
     if (!userId) {
         return []
     }
@@ -49,7 +49,7 @@ export async function booqCollection(collection: string, userId: string | undefi
     return cards
 }
 
-export async function booqCard(booqId: BooqId): Promise<BooqDetails | undefined> {
+export async function booqCard(booqId: BooqId): Promise<BooqCardData | undefined> {
     const [card] = await libraryCardsForIds([booqId])
     if (undefined === card) {
         return undefined
@@ -87,7 +87,7 @@ export async function booqPart({
     } satisfies PartialBooqData
 }
 
-function buildBooqCardData(booqId: BooqId, meta: BooqMetadata): BooqDetails {
+function buildBooqCardData(booqId: BooqId, meta: BooqMetadata): BooqCardData {
     return {
         booqId,
         title: meta.title,
