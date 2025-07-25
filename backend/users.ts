@@ -42,7 +42,7 @@ export async function usersForIds(ids: string[]): Promise<DbUser[]> {
     if (ids.length === 0) {
         return []
     }
-    
+
     const users = await sql`
       SELECT * FROM users
       WHERE id = ANY(${ids})
@@ -130,25 +130,53 @@ export async function updateUser({
     id,
     name,
     emoji,
+    username,
 }: {
     id: string,
     name?: string,
     emoji?: string,
+    username?: string,
 }): Promise<UpdateUserResult> {
     try {
-        if (name === undefined && emoji === undefined) {
+        if (name === undefined && emoji === undefined && username === undefined) {
             return { success: false, reason: 'No fields provided to update' }
         }
 
-        const [user] = await sql`
+        if (username !== undefined && !validateUsername(username)) {
+            return {
+                success: false,
+                reason: 'Username must contain only latin letters, digits, and hyphens',
+            }
+        }
+
+        const updates: string[] = []
+        const values: any[] = []
+        let i = 1
+
+        if (name !== undefined) {
+            updates.push(`name = $${i++}`)
+            values.push(name)
+        }
+
+        if (emoji !== undefined) {
+            updates.push(`emoji = $${i++}`)
+            values.push(emoji)
+        }
+
+        if (username !== undefined) {
+            updates.push(`username = $${i++}`)
+            values.push(username.toLowerCase())
+        }
+
+        const query = `
             UPDATE users
-            SET
-                ${name !== undefined ? sql`name = ${name}` : sql``}
-                ${name !== undefined && emoji !== undefined ? sql`,` : sql``}
-                ${emoji !== undefined ? sql`emoji = ${emoji}` : sql``}
-            WHERE id = ${id}
+            SET ${updates.join(', ')}
+            WHERE id = $${i}
             RETURNING *
         `
+        values.push(id)
+
+        const [user] = await sql.query(query, values)
 
         if (!user) {
             return { success: false, reason: 'User not found' }
@@ -162,6 +190,7 @@ export async function updateUser({
     }
 }
 
+
 function getReasonFromError(err: any, defaultReason: string): string {
     // Handle specific database errors
     if (err.code === '23505') { // unique_violation
@@ -171,6 +200,8 @@ function getReasonFromError(err: any, defaultReason: string): string {
         if (err.constraint === 'users_email_key') {
             return 'Email already exists'
         }
+        // Generic unique constraint violation
+        return 'This value is already taken'
     }
 
     return defaultReason
