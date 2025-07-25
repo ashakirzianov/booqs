@@ -1,5 +1,5 @@
 import { authorHref, booqHref } from '@/core/href'
-import { AuthorSearchResultData, BooqSearchResultData, fetchSearchQuery, SearchResultData } from '@/data/search'
+import { AuthorSearchResultData, BooqSearchResultData, booqSearch, SearchResultData } from '@/data/booqs'
 import Link from 'next/link'
 
 export async function generateMetadata({
@@ -19,7 +19,7 @@ export default async function SearchPage({
     searchParams: Promise<{ query: string }>
 }) {
     const { query } = await searchParams
-    const results = await fetchSearchQuery(query)
+    const results = await booqSearch({ query, libraryId: 'pg' })
     return (
         <div>
             <h1>Search results for &quot;{query}&quot;</h1>

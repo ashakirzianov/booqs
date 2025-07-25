@@ -8,7 +8,7 @@ import { ReactNode, useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Spinner } from './Icons'
 import { useDebouncedValue } from '@/application/utils'
-import { AuthorSearchResultData, BooqSearchResultData } from '@/data/search'
+import { AuthorSearchResultData, BooqSearchResultData } from '@/data/booqs'
 
 export function Search() {
     const { isOpen, openModal, closeModal } = useModalState()

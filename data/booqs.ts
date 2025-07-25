@@ -138,3 +138,34 @@ function buildBooqCardData(booqId: BooqId, meta: BooqMetadata): BooqCardData {
         coverSrc: meta.coverSrc,
     }
 }
+
+// Search types and utilities
+export type SearchResultData = AuthorSearchResultData | BooqSearchResultData
+export type AuthorSearchResultData = {
+    kind: 'author',
+    name: string,
+}
+export type BooqSearchResultData = {
+    kind: 'booq',
+    booqId: BooqId,
+    title: string,
+    authors?: string[],
+    coverSrc: string | undefined,
+}
+
+export async function booqSearch({ query, libraryId, limit = 20 }: { query: string, libraryId: string, limit?: number }): Promise<SearchResultData[]> {
+    const results = await queryLibrary(libraryId, {
+        kind: 'search',
+        query,
+        limit,
+    })
+    return results.cards.map(result => {
+        return {
+            kind: 'booq',
+            booqId: result.booqId,
+            title: result.meta.title,
+            authors: result.meta.authors.map(author => author.name),
+            coverSrc: result.meta.coverSrc,
+        }
+    })
+}
