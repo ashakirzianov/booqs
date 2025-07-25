@@ -1,5 +1,4 @@
-import { searchBooqs } from '@/backend/library'
-import { SearchResultData, toClientSearchResult } from '@/data/search'
+import { fetchSearchQuery, SearchResultData } from '@/data/search'
 import { NextRequest } from 'next/server'
 
 export type GetResponse = {
@@ -13,10 +12,10 @@ export async function GET(request: NextRequest) {
     if (!query) {
         return new Response('Query is required', { status: 400 })
     }
-    const results = await searchBooqs(query, limit)
+    const results = await fetchSearchQuery(query, limit)
     const response: GetResponse = {
         query,
-        results: results.map(toClientSearchResult),
+        results,
     }
     return Response.json(response)
 }

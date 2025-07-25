@@ -12,8 +12,7 @@ import { uploadBooqImages } from './images'
 export const userUploadsLibrary: Library = {
     cards, fileForId,
     // TODO: implement
-    async search() { return [] },
-    async forAuthor() { return [] },
+    async query() { return { cards: [] } },
 }
 
 export const userUploadedEpubsBucket = 'uu-epubs'

@@ -5,7 +5,7 @@ import {
     BooqMetadata,
     TableOfContents,
 } from '@/core'
-import { libraryCardsForIds, featuredBooqIds, booqsForAuthor } from '@/backend/library'
+import { libraryCardsForIds, featuredBooqIds } from '@/backend/library'
 import { userForId } from '@/backend/users'
 import { booqIdsInCollections } from '@/backend/collections'
 import { booqForId, booqPreview, booqToc } from '@/backend/booq'
@@ -34,9 +34,11 @@ export async function featuredBooqCards(): Promise<BooqCardData[]> {
     return cards
 }
 
-export async function booqCardsForAuthor(author: string): Promise<BooqCardData[]> {
-    const cards = await booqsForAuthor(author)
-    return cards.map(card => buildBooqCardData(card.booqId, card.meta))
+export async function booqCardsForAuthor(_author: string): Promise<BooqCardData[]> {
+    // TODO: implement author query
+    // const cards = await booqsForAuthor(author)
+    // return cards.map(card => buildBooqCardData(card.booqId, card.meta))
+    return []
 }
 
 export async function booqCollection(collection: string, userId: string | undefined): Promise<BooqCardData[]> {

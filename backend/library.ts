@@ -9,21 +9,6 @@ export type LibraryCard = {
     meta: BooqMetadata,
 }
 
-export type LibrarySearchResult =
-    | AuthorSearchResult
-    | BooqSearchResult
-
-export type AuthorSearchResult = {
-    kind: 'author',
-    name: string,
-}
-
-export type BooqSearchResult = {
-    kind: 'booq',
-    booqId: BooqId,
-    meta: BooqMetadata,
-}
-
 export type InLibraryCard = {
     id: InLibraryId,
     meta: BooqMetadata,
@@ -33,10 +18,19 @@ export type BooqFile = {
     file: Buffer,
 }
 
+export type LibraryQuery = {
+    kind: 'search',
+    query: string,
+    limit: number,
+    offset?: number,
+}
+export type InLibraryQueryResult = {
+    cards: InLibraryCard[],
+}
+
 export type Library = {
-    search(query: string, limit: number): Promise<InLibraryCard[]>,
+    query(query: LibraryQuery): Promise<InLibraryQueryResult>,
     cards(ids: InLibraryId[]): Promise<InLibraryCard[]>,
-    forAuthor(author: string, limit?: number, offset?: number): Promise<InLibraryCard[]>,
     fileForId(id: string): Promise<BooqFile | undefined>,
 }
 
@@ -86,41 +80,21 @@ export async function libraryCardsForIds(ids: string[]): Promise<Array<LibraryCa
     )
 }
 
-export async function booqsForAuthor(author: string, limit?: number, offset?: number): Promise<LibraryCard[]> {
-    const supported: Array<keyof typeof libraries> = ['pg']
-    const results = await Promise.all(
-        supported.map(
-            library => libraries[library]!.forAuthor(author, limit, offset)
-                .then(cards => cards.map(card => ({
-                    booqId: makeId(library, card.id),
-                    meta: card.meta,
-                }))),
-        ),
-    )
-    return results.flat()
-}
-
-export async function searchBooqs(query: string, limit: number): Promise<LibrarySearchResult[]> {
-    if (!query) {
-        return []
+export async function queryLibrary(libraryId: string, query: LibraryQuery): Promise<{
+    cards: LibraryCard[],
+}> {
+    const library = libraries[libraryId]
+    if (!library) {
+        throw new Error(`Library with id ${libraryId} not found`)
     }
-    const cards = Object.entries(libraries).map(
-        async ([prefix, library]): Promise<LibrarySearchResult[]> => {
-            if (library) {
-                const results = await library.search(query, limit)
-                return results.map(result => ({
-                    kind: 'booq',
-                    booqId: makeId(prefix, result.id),
-                    meta: result.meta,
-                }))
-            } else {
-                return []
-            }
-        },
-    )
-
-    const all = await Promise.all(cards)
-    return all.flat()
+    const results = await library.query(query)
+    const cards = results.cards.map(card => ({
+        booqId: makeId(libraryId, card.id),
+        meta: card.meta,
+    }))
+    return {
+        cards,
+    }
 }
 
 export async function fileForId(booqId: BooqId) {

@@ -1,4 +1,4 @@
-import { searchBooqs, LibrarySearchResult } from '@/backend/library'
+import { queryLibrary } from '@/backend/library'
 import { BooqId } from '@/core'
 
 export type SearchResultData = AuthorSearchResultData | BooqSearchResultData
@@ -13,13 +13,14 @@ export type BooqSearchResultData = {
     authors?: string[],
     coverSrc: string | undefined,
 }
+// TODO: rename
 export async function fetchSearchQuery(query: string, limit: number = 20): Promise<SearchResultData[]> {
-    const results = await searchBooqs(query, limit)
-    return results.map(toClientSearchResult)
-}
-
-export function toClientSearchResult(result: LibrarySearchResult): SearchResultData {
-    if (result.kind === 'booq') {
+    const results = await queryLibrary('pg', {
+        kind: 'search',
+        query,
+        limit,
+    })
+    return results.cards.map(result => {
         return {
             kind: 'booq',
             booqId: result.booqId,
@@ -27,7 +28,5 @@ export function toClientSearchResult(result: LibrarySearchResult): SearchResultD
             authors: result.meta.authors.map(author => author.name),
             coverSrc: result.meta.coverSrc,
         }
-    } else {
-        return result
-    }
+    })
 }

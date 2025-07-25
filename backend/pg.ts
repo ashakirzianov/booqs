@@ -1,14 +1,13 @@
-import type { InLibraryCard, Library } from './library'
+import type { InLibraryCard, InLibraryQueryResult, Library, LibraryQuery } from './library'
 import { downloadAsset } from './blob'
 import { sql } from './db'
-import { Booq, BooqMetadata } from '@/core'
+import { assertNever, Booq, BooqMetadata } from '@/core'
 import { getExtraMetadataValues } from '@/core/meta'
 
 export const pgLibrary: Library = {
-  search,
+  query,
   cards,
   fileForId,
-  forAuthor,
 }
 
 export const pgEpubsBucket = 'pg-epubs'
@@ -46,7 +45,17 @@ type DbPgMetadata = {
   meta: BooqMetadata,
 }
 
-export async function search(query: string, limit: number): Promise<InLibraryCard[]> {
+export async function query(query: LibraryQuery): Promise<InLibraryQueryResult> {
+  switch (query.kind) {
+    case 'search':
+      return search(query.query, query.limit)
+    default:
+      assertNever(query.kind)
+      return { cards: [] }
+  }
+}
+
+async function search(query: string, limit: number): Promise<InLibraryQueryResult> {
   const like = `%${query.toLowerCase()}%`
   const result = await sql`
     SELECT *
@@ -56,10 +65,11 @@ export async function search(query: string, limit: number): Promise<InLibraryCar
     ORDER BY title
     LIMIT ${limit}
   ` as DbPgMetadata[]
-  return result.map(({ id, meta }) => ({
+  const cards = result.map(({ id, meta }) => ({
     id,
     meta,
   }))
+  return { cards }
 }
 
 export async function addToSearchIndex({
