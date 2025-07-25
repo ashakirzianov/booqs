@@ -10,23 +10,27 @@ export function BooqCover({ coverUrl, title, author, size }: {
 }) {
     size = size ?? defaultSize
     return <div className='flex shrink-0 items-stretch rounded-sm overflow-hidden' style={{
-        width: size * 2,
         height: size * 3,
+        minWidth: size,
     }}>
         {
             coverUrl
-                ? <BooqImageCover cover={coverUrl} title={title} />
+                ? <BooqImageCover cover={coverUrl} title={title} size={size} />
                 : <BooqDefaultCover title={title} author={author} size={size} />
         }
     </div>
 }
 
-function BooqImageCover({ cover, title }: {
+function BooqImageCover({ cover, title, size }: {
     cover: string,
     title: string | undefined,
+    size: number,
 }) {
-    return <div title={title ?? undefined} className='flex w-full h-full bg-cover bg-no-repeat' style={{
+    return <div title={title ?? undefined} className='flex h-full bg-contain bg-no-repeat bg-center' style={{
         backgroundImage: `url(${cover})`,
+        width: 'auto',
+        minWidth: size,
+        maxWidth: size * 4,
     }} />
 }
 
@@ -36,7 +40,9 @@ function BooqDefaultCover({ title, author, size }: {
     size: number,
 }) {
     const { back, text } = colorForString(title ?? 'no-title' + author)
-    return <div title={title ?? undefined} className='flex flex-row grow items-stretch'>
+    return <div title={title ?? undefined} className='flex flex-row items-stretch' style={{
+        width: size * 2,
+    }}>
         <div className='flex flex-col grow items-center justify-center overflow-hidden text-ellipsis text-center p-[10%]' style={{
             fontSize: calcFontSize(title ?? 'no-title', size),
             background: back,
