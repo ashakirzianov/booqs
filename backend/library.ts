@@ -4,7 +4,7 @@ import { pgLibrary } from './pg'
 import { userUploadsLibrary } from './uu'
 import { localLibrary } from './lo'
 
-export type BooqCard = {
+export type LibraryCard = {
     booqId: BooqId,
     meta: BooqMetadata,
 }
@@ -28,7 +28,7 @@ export type InLibraryCard = {
     id: InLibraryId,
     meta: BooqMetadata,
 }
-export type BookFile = {
+export type BooqFile = {
     kind: 'epub',
     file: Buffer,
 }
@@ -37,7 +37,7 @@ export type Library = {
     search(query: string, limit: number): Promise<InLibraryCard[]>,
     cards(ids: InLibraryId[]): Promise<InLibraryCard[]>,
     forAuthor(author: string, limit?: number, offset?: number): Promise<InLibraryCard[]>,
-    fileForId(id: string): Promise<BookFile | undefined>,
+    fileForId(id: string): Promise<BooqFile | undefined>,
 }
 
 const libraries: {
@@ -53,7 +53,7 @@ export async function libraryCardForId(id: string) {
     return result
 }
 
-export async function libraryCardsForIds(ids: string[]): Promise<Array<BooqCard | undefined>> {
+export async function libraryCardsForIds(ids: string[]): Promise<Array<LibraryCard | undefined>> {
     const parsed = ids
         .map(idString => {
             const [library, id] = parseId(idString)
@@ -86,7 +86,7 @@ export async function libraryCardsForIds(ids: string[]): Promise<Array<BooqCard 
     )
 }
 
-export async function booqsForAuthor(author: string, limit?: number, offset?: number): Promise<BooqCard[]> {
+export async function booqsForAuthor(author: string, limit?: number, offset?: number): Promise<LibraryCard[]> {
     const supported: Array<keyof typeof libraries> = ['pg']
     const results = await Promise.all(
         supported.map(
