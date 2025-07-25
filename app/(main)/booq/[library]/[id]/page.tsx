@@ -26,7 +26,7 @@ export default async function Page({ params }: {
     const toc = booqData?.toc
 
     return <main className="flex flex-row justify-center min-h-screen bg-gray-50">
-        <div className="flex flex-col max-w-4xl w-full p-6 bg-white shadow-lg">
+        <div className="flex flex-col max-w-4xl w-full p-6 bg-background shadow-lg">
             <div className="flex flex-col lg:flex-row gap-8 mb-8">
                 <div className="flex justify-center lg:justify-start">
                     <BooqCover
@@ -39,17 +39,17 @@ export default async function Page({ params }: {
                 
                 <div className="flex flex-col flex-1 justify-between">
                     <div className="mb-6">
-                        <h1 className="text-4xl font-bold text-gray-800 mb-4 leading-tight">
+                        <h1 className="text-4xl font-bold text-primary mb-4 leading-tight">
                             {card.title}
                         </h1>
                         
                         {card.authors.length > 0 && (
-                            <div className="text-xl text-gray-600 mb-4">
+                            <div className="text-xl text-dimmed mb-4">
                                 by {card.authors.map((author, index) => (
                                     <span key={author}>
                                         <Link 
                                             href={authorHref({ name: author })}
-                                            className="hover:underline text-blue-600 hover:text-blue-800"
+                                            className="hover:underline text-action hover:text-highlight"
                                         >
                                             {author}
                                         </Link>
@@ -69,7 +69,7 @@ export default async function Page({ params }: {
                     <div className="flex gap-4">
                         <Link 
                             href={booqHref({ booqId, path: [0] })}
-                            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold text-lg transition-colors duration-200 shadow-md hover:shadow-lg"
+                            className="bg-action hover:bg-highlight text-light px-6 py-3 rounded-lg font-semibold text-lg transition-colors duration-200 shadow-md hover:shadow-lg"
                         >
                             Start Reading
                         </Link>
@@ -78,8 +78,8 @@ export default async function Page({ params }: {
             </div>
             
             {toc && toc.items.length > 0 && (
-                <div className="border-t border-gray-200 pt-8">
-                    <h2 className="text-2xl font-bold text-gray-800 mb-6">Table of Contents</h2>
+                <div className="border-t border-border pt-8">
+                    <h2 className="text-2xl font-bold text-primary mb-6">Table of Contents</h2>
                     <div className="space-y-2">
                         {toc.items.map((item, index) => (
                             <TableOfContentsItem 
@@ -107,7 +107,7 @@ function TableOfContentsItem({ item, booqId }: {
             className="block py-2 px-3 rounded hover:bg-gray-50 transition-colors duration-150"
             style={{ paddingLeft }}
         >
-            <span className="text-gray-700 hover:text-blue-600">
+            <span className="text-dimmed hover:text-action">
                 {item.title || 'Untitled Chapter'}
             </span>
         </Link>
