@@ -44,11 +44,12 @@ export function AskTargetMenu({
                 onChange={(e) => setQuestion(e.target.value)}
                 onKeyDown={(e) => {
                     if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+                        // Cmd/Ctrl+Enter submits the form
                         e.preventDefault()
                         handleAsk()
                     }
                 }}
-                placeholder="Ask a question about this text... (Ctrl/Cmd+Enter to submit)"
+                placeholder="Ask a question about this quote..."
                 className="w-full px-3 py-2 border border-dimmed rounded bg-background text-primary text-sm leading-relaxed focus:outline-none focus:border-action resize-none"
                 style={{ fontFamily: 'var(--font-main)', minHeight: '80px' }}
                 rows={3}
