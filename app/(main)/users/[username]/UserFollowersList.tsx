@@ -24,8 +24,7 @@ export function UserFollowersList({
             }
             unfollowButtonContent={
                 <>
-                    <span>✓</span>
-                    <span>Following</span>
+                    <span>Unfollow</span>
                 </>
             }
         />
