@@ -2,7 +2,7 @@ import { coverSizeForSize, resolveImageSrc } from '@/common'
 import { BooqId } from '@/core'
 import React from 'react'
 
-const defaultSize = 60
+const defaultSize = 70
 
 export function BooqCover({ booqId, coverSrc, title, author, size }: {
     booqId: BooqId,
@@ -12,30 +12,27 @@ export function BooqCover({ booqId, coverSrc, title, author, size }: {
     size?: number,
 }) {
     size = size ?? defaultSize
-    const coverSize = coverSizeForSize(size)
+    const height = size * 3
+    const coverSize = coverSizeForSize(height)
     const coverUrl = coverSrc ? resolveImageSrc(booqId, coverSrc, coverSize) : undefined
     return <div className='flex shrink-0 items-stretch rounded-sm overflow-hidden' style={{
-        height: size * 3,
-        minWidth: size,
+        height: height,
+        width: size * 2, // cover is twice as wide as it is tall
     }}>
         {
             coverUrl
-                ? <BooqImageCover cover={coverUrl} title={title} size={size} />
+                ? <BooqImageCover cover={coverUrl} title={title} />
                 : <BooqDefaultCover title={title} author={author} size={size} />
         }
     </div>
 }
 
-function BooqImageCover({ cover, title, size }: {
+function BooqImageCover({ cover, title }: {
     cover: string,
     title: string | undefined,
-    size: number,
 }) {
-    return <div title={title ?? undefined} className='flex h-full bg-contain bg-no-repeat bg-center' style={{
+    return <div title={title ?? undefined} className='flex w-full h-full bg-contain bg-no-repeat bg-center' style={{
         backgroundImage: `url(${cover})`,
-        width: 'auto',
-        minWidth: size,
-        maxWidth: size * 4,
     }} />
 }
 
