@@ -54,7 +54,7 @@ export default async function Page({ params }: {
                                     <span key={author}>
                                         <Link
                                             href={authorHref({ name: author })}
-                                            className="hover:underline text-action hover:text-highlight"
+                                            className="hover:underline  hover:text-highlight"
                                         >
                                             {author}
                                         </Link>
