@@ -1,4 +1,4 @@
-import { booqCard, booqPart } from '@/data/booqs'
+import { booqDetailedData } from '@/data/booqs'
 import { BooqCover } from '@/components/BooqCover'
 import { BooqTags } from '@/components/BooqTags'
 import { CollectionButton } from '@/components/CollectionButton'
@@ -19,14 +19,13 @@ export default async function Page({ params }: {
 }) {
     const { library, id } = await params
     const booqId: BooqId = `${library}/${id}`
-    const card = await booqCard(booqId)
 
-    if (!card) {
+    const detailed = await booqDetailedData(booqId)
+    if (!detailed) {
         notFound()
     }
 
-    const booqData = await booqPart({ booqId })
-    const toc = booqData?.toc
+    const toc = detailed?.toc
     const userId = await getUserIdInsideRequest()
     const isSignedIn = Boolean(userId)
 
@@ -36,9 +35,9 @@ export default async function Page({ params }: {
                 <div className="flex justify-center lg:justify-start">
                     <BooqCover
                         booqId={booqId}
-                        coverSrc={card.coverSrc}
-                        title={card.title}
-                        author={card.authors.join(', ')}
+                        coverSrc={detailed.coverSrc}
+                        title={detailed.title}
+                        author={detailed.authors.join(', ')}
                         size={120}
                     />
                 </div>
@@ -46,12 +45,12 @@ export default async function Page({ params }: {
                 <div className="flex flex-col flex-1 justify-between">
                     <div className="mb-6">
                         <h1 className="text-4xl font-bold text-primary mb-4 leading-tight">
-                            {card.title}
+                            {detailed.title}
                         </h1>
 
-                        {card.authors.length > 0 && (
+                        {detailed.authors.length > 0 && (
                             <div className="text-xl text-dimmed mb-4">
-                                by {card.authors.map((author, index) => (
+                                by {detailed.authors.map((author, index) => (
                                     <span key={author}>
                                         <Link
                                             href={authorHref({ name: author })}
@@ -59,15 +58,15 @@ export default async function Page({ params }: {
                                         >
                                             {author}
                                         </Link>
-                                        {index < card.authors.length - 1 && ', '}
+                                        {index < detailed.authors.length - 1 && ', '}
                                     </span>
                                 ))}
                             </div>
                         )}
 
-                        {card.tags.length > 0 && (
+                        {detailed.tags.length > 0 && (
                             <div className="mb-6">
-                                <BooqTags tags={card.tags} />
+                                <BooqTags tags={detailed.tags} />
                             </div>
                         )}
                     </div>

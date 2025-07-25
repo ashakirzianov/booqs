@@ -3,11 +3,12 @@ import {
     PartialBooqData,
     BooqId,
     BooqMetadata,
+    TableOfContents,
 } from '@/core'
 import { libraryCardsForIds, featuredBooqIds, booqsForAuthor } from '@/backend/library'
 import { userForId } from '@/backend/users'
 import { booqIdsInCollections } from '@/backend/collections'
-import { booqForId, booqPreview } from '@/backend/booq'
+import { booqForId, booqPreview, booqToc } from '@/backend/booq'
 
 export type BooqCardData = {
     booqId: BooqId,
@@ -15,6 +16,10 @@ export type BooqCardData = {
     authors: string[],
     tags: Array<[string, string?]>,
     coverSrc?: string
+}
+
+export type BooqDetailedData = BooqCardData & {
+    toc: TableOfContents,
 }
 
 export async function featuredIds() {
@@ -56,6 +61,21 @@ export async function booqCard(booqId: BooqId): Promise<BooqCardData | undefined
     }
 
     return buildBooqCardData(card.booqId, card.meta)
+}
+
+export async function booqDetailedData(booqId: BooqId): Promise<BooqDetailedData | undefined> {
+    const card = await booqCard(booqId)
+    if (!card) {
+        return undefined
+    }
+    const toc = await booqToc(booqId)
+    if (!toc) {
+        return undefined
+    }
+    return {
+        ...card,
+        toc,
+    }
 }
 
 export async function fetchBooqPreview(booqId: BooqId, path: BooqPath, end?: BooqPath) {
