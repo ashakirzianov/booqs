@@ -49,6 +49,8 @@ export async function query(query: LibraryQuery): Promise<InLibraryQueryResult> 
   switch (query.kind) {
     case 'search':
       return search(query.query, query.limit)
+    case 'author':
+      return { cards: [] } // Placeholder for author query, can be implemented later
     default:
       assertNever(query.kind)
       return { cards: [] }
@@ -131,11 +133,6 @@ export async function fileForId(id: string) {
       ? { kind: 'epub', file: asset } as const
       : undefined
   }
-}
-
-export async function forAuthor(_name: string, _limit?: number, _offset?: number): Promise<InLibraryCard[]> {
-  // TODO: implement this
-  return []
 }
 
 async function assetIdForId(id: string): Promise<string | undefined> {

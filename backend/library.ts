@@ -19,7 +19,7 @@ export type BooqFile = {
 }
 
 export type LibraryQuery = {
-    kind: 'search',
+    kind: 'search' | 'author',
     query: string,
     limit: number,
     offset?: number,
