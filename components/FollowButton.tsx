@@ -82,12 +82,12 @@ export function FollowButton({ username, initialFollowStatus }: {
                     )}
                     {isFollowing ? (
                         <>
-                            <span>✓</span>
-                            <span>Following</span>
+                            <span>Unfollow</span>
                         </>
                     ) : (
                         <>
-                            <span>Unfollow</span>
+                            <span>+</span>
+                            <span>Follow</span>
                         </>
                     )}
                 </span>
