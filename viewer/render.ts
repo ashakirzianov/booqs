@@ -22,6 +22,7 @@ type RenderContext = {
     augmentations: Augmentation[],
     onAugmentationClick?: (id: string) => void,
     hrefForPath?: (booqId: BooqId, path: BooqPath) => string,
+    resolveSrc?: (booqId: BooqId, src: string) => string,
 }
 export function renderNodes(nodes: BooqNode[], ctx: RenderContext): ReactNode[] {
     const result = nodes.map(
@@ -109,7 +110,9 @@ function renderTextNode(text: string, {
     )
 }
 
-function getProps(node: BooqElementNode, { path, booqId, range, hrefForPath }: RenderContext) {
+function getProps(node: BooqElementNode, {
+    path, booqId, range, hrefForPath, resolveSrc,
+}: RenderContext) {
     return {
         ...node.attrs,
         id: pathToId(path),
@@ -127,35 +130,13 @@ function getProps(node: BooqElementNode, { path, booqId, range, hrefForPath }: R
                         : node.attrs?.href
             )
             : node.attrs?.href,
-        src: node.attrs?.src
-            ? (
-                isExternalSrc(node.attrs.src)
-                    ? node.attrs.src
-                    : imageFullSrc(booqId, node.attrs.src)
-            )
-            : undefined,
-        xlinkHref: node.attrs?.xlinkHref
-            ? (isImageLink(node.attrs?.xlinkHref)
-                ? imageFullSrc(booqId, node.attrs?.xlinkHref)
-                : node.attrs.xlinkHref)
-            : undefined,
+        src: node.attrs?.src && resolveSrc
+            ? resolveSrc(booqId, node.attrs?.src)
+            : node.attrs?.src,
+        xlinkHref: node.attrs?.xlinkHref && resolveSrc
+            ? resolveSrc(booqId, node.attrs?.xlinkHref)
+            : node.attrs?.xlinkHref,
     }
-}
-
-function isImageLink(link: string) {
-    return link.endsWith('.png') || link.endsWith('.jpg') || link.endsWith('.jpeg') || link.endsWith('.gif')
-}
-
-function isExternalSrc(src: string) {
-    return src.startsWith('http://') || src.startsWith('https://') || src.startsWith('www.')
-}
-
-function imageFullSrc(booqId: BooqId, src: string) {
-    // TODO: investigate why we need this hack for certain epubs
-    if (src.startsWith('../')) {
-        src = src.substring('../'.length)
-    }
-    return `https://booqs-images.s3.amazonaws.com/${booqId}/${src}`
 }
 
 function getChildren(node: BooqElementNode, ctx: RenderContext) {

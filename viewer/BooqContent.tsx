@@ -5,7 +5,7 @@ import { BooqId, BooqNode, BooqPath, BooqRange } from '@/core'
 export const BooqContentID = 'booq-root'
 export function BooqContent({
     booqId, nodes, range, augmentations,
-    onAugmentationClick, hrefForPath,
+    onAugmentationClick, hrefForPath, resolveSrc,
 }: {
     booqId: BooqId,
     nodes: BooqNode[],
@@ -13,6 +13,7 @@ export function BooqContent({
     augmentations: Augmentation[],
     onAugmentationClick?: (id: string) => void,
     hrefForPath?: (booqId: BooqId, path: BooqPath) => string,
+    resolveSrc?: (booqId: BooqId, src: string) => string,
 }) {
     return useMemo(function () {
         return <div id={BooqContentID} className='container'>
@@ -20,9 +21,9 @@ export function BooqContent({
                 renderNodes(nodes, {
                     path: [],
                     booqId, range, augmentations, onAugmentationClick,
-                    hrefForPath,
+                    hrefForPath, resolveSrc,
                 })
             }
         </div>
-    }, [nodes, booqId, range, augmentations, onAugmentationClick, hrefForPath])
+    }, [nodes, booqId, range, augmentations, onAugmentationClick, hrefForPath, resolveSrc])
 }
