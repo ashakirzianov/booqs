@@ -70,7 +70,7 @@ function AuthorSearchResultItem({
 }) {
     return (
         <div>
-            <h2><Link href={authorHref({ name: result.name })}>
+            <h2><Link href={authorHref({ name: result.name, libraryId: 'pg' })}>
                 {result.name}
             </Link></h2>
         </div>

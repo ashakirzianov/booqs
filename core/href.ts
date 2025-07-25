@@ -81,8 +81,16 @@ export function myBooqsHref() {
     return `/account/collection`
 }
 
-export function authorHref({ name }: { name: string }) {
-    return `/author/${encodeURIComponent(name)}`
+export function authorHref({ name, libraryId }: { name: string, libraryId: string }) {
+    return `/library/${libraryId}/author/${encodeURIComponent(name)}`
+}
+
+export function subjectHref({ subject, libraryId }: { subject: string, libraryId: string }) {
+    return `/library/${libraryId}/subject/${encodeURIComponent(subject)}`
+}
+
+export function languageHref({ language, libraryId }: { language: string, libraryId: string }) {
+    return `/library/${libraryId}/language/${encodeURIComponent(language)}`
 }
 
 export function userHref({ username }: { username: string }) {

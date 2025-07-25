@@ -1,20 +1,20 @@
 import { READING_LIST_COLLECTION } from '@/application/collections'
 import { BooqCollection } from '@/components/BooqCollection'
 import { getUserIdInsideRequest } from '@/data/auth'
-import { booqCardsForSubject } from '@/data/booqs'
+import { booqCardsForLanguage } from '@/data/booqs'
 
-export default async function Subject({
+export default async function Language({
     params,
 }: {
-    params: Promise<{ subject: string }>,
+    params: Promise<{ library: string, language: string }>,
 }) {
-    const { subject } = await params
-    const decoded = decodeURIComponent(subject)
-    const booqs = await booqCardsForSubject(decoded)
+    const { library, language } = await params
+    const decoded = decodeURIComponent(language)
+    const booqs = await booqCardsForLanguage({ language: decoded, libraryId: library })
     const userId = await getUserIdInsideRequest()
     const signed = userId ? true : false
     return <BooqCollection
-        title={`Books on ${decoded}`}
+        title={`Books in ${decoded}`}
         cards={booqs}
         collection={READING_LIST_COLLECTION}
         signed={signed}

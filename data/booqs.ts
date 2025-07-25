@@ -34,8 +34,8 @@ export async function featuredBooqCards(): Promise<BooqCardData[]> {
     return cards
 }
 
-export async function booqCardsForAuthor(author: string): Promise<BooqCardData[]> {
-    const { cards } = await queryLibrary('pg', {
+export async function booqCardsForAuthor({ author, libraryId }: { author: string, libraryId: string }): Promise<BooqCardData[]> {
+    const { cards } = await queryLibrary(libraryId, {
         kind: 'author',
         query: author,
         limit: 100, // Arbitrary limit, can be adjusted
@@ -43,8 +43,8 @@ export async function booqCardsForAuthor(author: string): Promise<BooqCardData[]
     return cards.map(card => buildBooqCardData(card.booqId, card.meta))
 }
 
-export async function booqCardsForSubject(subject: string): Promise<BooqCardData[]> {
-    const { cards } = await queryLibrary('pg', {
+export async function booqCardsForSubject({ subject, libraryId }: { subject: string, libraryId: string }): Promise<BooqCardData[]> {
+    const { cards } = await queryLibrary(libraryId, {
         kind: 'subject',
         query: subject,
         limit: 100, // Arbitrary limit, can be adjusted
@@ -52,8 +52,8 @@ export async function booqCardsForSubject(subject: string): Promise<BooqCardData
     return cards.map(card => buildBooqCardData(card.booqId, card.meta))
 }
 
-export async function booqCardsForLanguage(language: string): Promise<BooqCardData[]> {
-    const { cards } = await queryLibrary('pg', {
+export async function booqCardsForLanguage({ language, libraryId }: { language: string, libraryId: string }): Promise<BooqCardData[]> {
+    const { cards } = await queryLibrary(libraryId, {
         kind: 'language',
         query: language,
         limit: 100, // Arbitrary limit, can be adjusted

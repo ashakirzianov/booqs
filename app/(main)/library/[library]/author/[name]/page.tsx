@@ -6,11 +6,11 @@ import { booqCardsForAuthor } from '@/data/booqs'
 export default async function Author({
     params,
 }: {
-    params: Promise<{ name: string }>,
+    params: Promise<{ library: string, name: string }>,
 }) {
-    const { name } = await params
+    const { library, name } = await params
     const decoded = decodeURIComponent(name)
-    const booqs = await booqCardsForAuthor(decoded)
+    const booqs = await booqCardsForAuthor({ author: decoded, libraryId: library })
     const userId = await getUserIdInsideRequest()
     const signed = userId ? true : false
     return <BooqCollection

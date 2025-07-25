@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { BooqCover } from '@/components/BooqCover'
 import { BooqTags } from '@/components/BooqTags'
 import { authorHref, booqHref } from '@/core/href'
+import { parseId } from '@/core'
 import { ReactNode } from 'react'
 import { BooqCardData } from '@/data/booqs'
 
@@ -14,6 +15,7 @@ export function BooqCard({
 }) {
     const author = authors?.join(', ')
     const bookUrl = booqHref({ booqId })
+    const libraryId = parseId(booqId)[0] || 'pg'
     return <div className="flex flex-col grow gap-4 items-center sm:flex-row sm:flex-wrap sm:items-stretch h-full">
         <Link href={bookUrl}>
             <BooqCover
@@ -25,10 +27,10 @@ export function BooqCard({
         </Link>
         <div className="flex flex-col flex-1 justify-between">
             <div className='header'>
-                <Header title={title} author={author} bookUrl={bookUrl} />
+                <Header title={title} author={author} bookUrl={bookUrl} libraryId={libraryId} />
             </div>
             <div className='mt-4'>
-                <BooqTags tags={tags ?? []} />
+                <BooqTags tags={tags ?? []} booqId={booqId} />
             </div>
             <div className='mt-4 flex gap-2 self-stretch justify-end ml-xl'>
                 {actions}
@@ -37,10 +39,11 @@ export function BooqCard({
     </div>
 }
 
-function Header({ title, author, bookUrl }: {
+function Header({ title, author, bookUrl, libraryId }: {
     title: string | undefined,
     author: string | undefined,
     bookUrl: string,
+    libraryId: string,
 }) {
     return <div className='flex flex-col items-baseline'>
         <Link href={bookUrl} className="text-xl font-bold hover:underline">
@@ -48,7 +51,7 @@ function Header({ title, author, bookUrl }: {
         </Link>
         {
             author &&
-            <span className="text-lg">by <Link href={authorHref({ name: author })}
+            <span className="text-lg">by <Link href={authorHref({ name: author, libraryId })}
                 className='hover:underline'
             >
                 {author}

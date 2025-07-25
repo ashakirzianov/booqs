@@ -61,7 +61,7 @@ function SearchModal({
                     if (selected !== null && results.length > 0) {
                         if (selected < authors.length) {
                             const author = authors[selected]
-                            push(authorHref({ name: author.name }))
+                            push(authorHref({ name: author.name, libraryId: 'pg' }))
                         } else {
                             const booq = booqs[selected - authors.length]
                             push(booqHref({ booqId: booq.booqId, path: [0] }))
@@ -183,7 +183,7 @@ function AuthorSearchResultContent({ result, query }: {
     query: string,
     selected?: boolean,
 }) {
-    return <Link href={authorHref({ name: result.name })}>
+    return <Link href={authorHref({ name: result.name, libraryId: 'pg' })}>
         <EmphasizedSpan
             text={result.name}
             emphasis={query}
