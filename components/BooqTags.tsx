@@ -1,4 +1,5 @@
 import React from 'react'
+import Link from 'next/link'
 
 type BooqMetaTag = readonly [tag: string, value?: string]
 export function BooqTags({ tags }: {
@@ -28,10 +29,13 @@ function BooqTagPill({ tag: [name, value] }: {
                 />
                 : null
         case 'subject':
-            return <Pill
-                color="#673AB7"
-                label={value ?? 'subject'}
-            />
+            return value 
+                ? <SubjectPill
+                    color="#673AB7"
+                    label={value}
+                    subject={value}
+                />
+                : null
         case 'pg-index':
             return <Pill
                 color="pink"
@@ -58,4 +62,18 @@ function Pill({ color, label, title }: {
     }}>
         {label}
     </div>
+}
+
+function SubjectPill({ color, label, subject }: {
+    color: string,
+    label: string,
+    subject: string
+}) {
+    return <Link href={`/subject/${encodeURIComponent(subject)}`}>
+        <div className='pr-lg mt-sm mr-sm text-sm cursor-pointer hover:underline' style={{
+            color,
+        }}>
+            {label}
+        </div>
+    </Link>
 }

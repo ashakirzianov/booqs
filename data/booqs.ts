@@ -43,6 +43,15 @@ export async function booqCardsForAuthor(author: string): Promise<BooqCardData[]
     return cards.map(card => buildBooqCardData(card.booqId, card.meta))
 }
 
+export async function booqCardsForSubject(subject: string): Promise<BooqCardData[]> {
+    const { cards } = await queryLibrary('pg', {
+        kind: 'subject',
+        query: subject,
+        limit: 100, // Arbitrary limit, can be adjusted
+    })
+    return cards.map(card => buildBooqCardData(card.booqId, card.meta))
+}
+
 export async function booqCollection(collection: string, userId: string | undefined): Promise<BooqCardData[]> {
     if (!userId) {
         return []
