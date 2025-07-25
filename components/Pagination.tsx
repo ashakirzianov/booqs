@@ -13,38 +13,34 @@ export function Pagination({ currentPage, hasMore, total, baseUrl, pageSize }: P
     const totalPages = total ? Math.ceil(total / pageSize) : undefined
     
     return (
-        <div className="flex items-center justify-between mt-8 px-4">
-            <div className="flex items-center space-x-4">
-                {hasPrevious && (
+        <div className="flex items-center justify-center mt-8 px-4">
+            <div className="flex items-center space-x-6">
+                {hasPrevious ? (
                     <Link 
                         href={`${baseUrl}?page=${currentPage - 1}`}
-                        className="px-4 py-2 bg-primary text-primary-foreground rounded hover:bg-primary/80 transition-colors"
+                        className="px-4 py-2 bg-primary text-white rounded hover:bg-primary/80 transition-colors"
                     >
                         Previous
                     </Link>
+                ) : (
+                    <div className="px-4 py-2 text-dimmed cursor-not-allowed">Previous</div>
                 )}
-                {!hasPrevious && (
-                    <div className="px-4 py-2 text-dimmed">Previous</div>
-                )}
-            </div>
-            
-            <div className="flex items-center space-x-2 text-sm text-dimmed">
-                <span>Page {currentPage}</span>
-                {totalPages && <span>of {totalPages}</span>}
-                {total && <span>({total} total)</span>}
-            </div>
-            
-            <div className="flex items-center space-x-4">
-                {hasMore && (
+                
+                <div className="flex items-center space-x-2 text-sm">
+                    <span>Page {currentPage}</span>
+                    {totalPages && <span className="text-dimmed">of {totalPages}</span>}
+                    {total && <span className="text-dimmed">({total} total)</span>}
+                </div>
+                
+                {hasMore ? (
                     <Link 
                         href={`${baseUrl}?page=${currentPage + 1}`}
-                        className="px-4 py-2 bg-primary text-primary-foreground rounded hover:bg-primary/80 transition-colors"
+                        className="px-4 py-2 bg-primary text-white rounded hover:bg-primary/80 transition-colors"
                     >
                         Next
                     </Link>
-                )}
-                {!hasMore && (
-                    <div className="px-4 py-2 text-dimmed">Next</div>
+                ) : (
+                    <div className="px-4 py-2 text-dimmed cursor-not-allowed">Next</div>
                 )}
             </div>
         </div>
