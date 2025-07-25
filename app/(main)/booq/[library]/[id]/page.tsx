@@ -31,8 +31,8 @@ export default async function Page({ params }: {
     const isSignedIn = Boolean(userId)
     const history = await fetchBooqHistory(booqId)
 
-    return <main className="flex flex-row justify-center min-h-screen bg-gray-50">
-        <div className="flex flex-col max-w-4xl w-full p-6 bg-background shadow-lg">
+    return <main className="flex flex-row justify-center min-h-screen bg-background">
+        <div className="flex flex-col max-w-4xl w-full p-6">
             <div className="flex flex-col lg:flex-row gap-8 mb-8">
                 <div className="flex justify-center lg:justify-start">
                     <BooqCover
@@ -94,8 +94,10 @@ export default async function Page({ params }: {
             </div>
 
             {toc && toc.items.length > 0 && (
-                <div className="border-t border-border pt-8">
-                    <h2 className="text-2xl font-bold text-primary mb-6">Table of Contents</h2>
+                <div className="pt-8">
+                    <div className="flex justify-center mb-6">
+                        <h2 className="tracking-widest font-bold text-dimmed">CONTENTS</h2>
+                    </div>
                     <div className="space-y-2">
                         {toc.items.map((item, index) => (
                             <TableOfContentsItem
