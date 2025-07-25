@@ -17,7 +17,7 @@ type FormState =
 export function ProfileData({ user }: { user: AccountData }) {
     const [formState, setFormState] = useState<FormState>({ state: 'display' })
     const [currentData, setCurrentData] = useState({
-        emoji: user.emoji ?? '👤',
+        emoji: user.emoji,
         name: user.name,
         username: user.username
     })
@@ -50,12 +50,21 @@ export function ProfileData({ user }: { user: AccountData }) {
     const handleUpdateProfile = async () => {
         setFormState({ state: 'loading' })
 
+        // Only include fields that have actually changed
+        const updates: { name?: string, emoji?: string, username?: string } = {}
+
+        if (currentData.name !== user.name) {
+            updates.name = currentData.name
+        }
+        if (currentData.emoji !== user.emoji) {
+            updates.emoji = currentData.emoji
+        }
+        if (currentData.username !== user.username) {
+            updates.username = currentData.username
+        }
+
         try {
-            const result = await updateAccountAction({
-                emoji: currentData.emoji,
-                name: currentData.name,
-                username: currentData.username !== user.username ? currentData.username : undefined
-            })
+            const result = await updateAccountAction(updates)
 
             if (result.success) {
                 setFormState({ state: 'display' })
@@ -93,6 +102,11 @@ export function ProfileData({ user }: { user: AccountData }) {
     const isLoading = formState.state === 'loading'
     const usernameError = formState.state === 'error' && formState.field === 'username' ? formState.error : null
     const generalError = formState.state === 'error' && formState.field !== 'username' ? formState.error : null
+
+    // Check for changes to determine if update should be enabled
+    const hasChanges = currentData.name !== user.name ||
+        currentData.emoji !== user.emoji ||
+        currentData.username !== user.username
 
     return (
         <div className="bg-background border border-dimmed rounded-lg p-6 flex flex-col">
@@ -155,7 +169,7 @@ export function ProfileData({ user }: { user: AccountData }) {
                             <div className="flex gap-2">
                                 <button
                                     onClick={handleUpdateProfile}
-                                    disabled={isLoading}
+                                    disabled={isLoading || !hasChanges}
                                     className="px-4 py-2 bg-action text-white rounded-md hover:bg-highlight disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                                 >
                                     {isLoading && (
