@@ -23,9 +23,10 @@ function BooqTagPill({ tag: [name, value] }: {
     switch (name.toLowerCase()) {
         case 'language':
             return value
-                ? <Pill
+                ? <LanguagePill
                     color="#4CAF50"
                     label={value.toUpperCase()}
+                    language={value}
                 />
                 : null
         case 'subject':
@@ -70,6 +71,20 @@ function SubjectPill({ color, label, subject }: {
     subject: string
 }) {
     return <Link href={`/subject/${encodeURIComponent(subject)}`}>
+        <div className='pr-lg mt-sm mr-sm text-sm cursor-pointer hover:underline' style={{
+            color,
+        }}>
+            {label}
+        </div>
+    </Link>
+}
+
+function LanguagePill({ color, label, language }: {
+    color: string,
+    label: string,
+    language: string
+}) {
+    return <Link href={`/language/${encodeURIComponent(language)}`}>
         <div className='pr-lg mt-sm mr-sm text-sm cursor-pointer hover:underline' style={{
             color,
         }}>
