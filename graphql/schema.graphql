@@ -59,7 +59,7 @@ type Booq {
     subjects: [String]
     description: String
     length: Int
-    coverUrl(size: Int): String
+    coverSrc: String
     tags: [Tag]!
     bookmarks: [Bookmark]
     notes: [Note]

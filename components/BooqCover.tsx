@@ -1,17 +1,23 @@
+import { coverSizeForSize, resolveImageSrc } from '@/common'
+import { BooqId } from '@/core'
 import React from 'react'
 
 const defaultSize = 70
 
-export function BooqCover({ coverUrl, title, author, size }: {
-    coverUrl: string | undefined,
+export function BooqCover({ booqId, coverSrc, title, author, size }: {
+    booqId: BooqId,
+    coverSrc: string | undefined,
     title: string | undefined,
     author: string | undefined,
     size?: number,
 }) {
     size = size ?? defaultSize
+    const height = size * 3
+    const coverSize = coverSizeForSize(height)
+    const coverUrl = coverSrc ? resolveImageSrc(booqId, coverSrc, coverSize) : undefined
     return <div className='flex shrink-0 items-stretch rounded-sm overflow-hidden' style={{
-        width: size * 2,
-        height: size * 3,
+        height: height,
+        width: size * 2, // cover is twice as wide as it is tall
     }}>
         {
             coverUrl
@@ -25,7 +31,7 @@ function BooqImageCover({ cover, title }: {
     cover: string,
     title: string | undefined,
 }) {
-    return <div title={title ?? undefined} className='flex w-full h-full bg-cover bg-no-repeat' style={{
+    return <div title={title ?? undefined} className='flex w-full h-full bg-contain bg-no-repeat bg-center' style={{
         backgroundImage: `url(${cover})`,
     }} />
 }
@@ -36,7 +42,9 @@ function BooqDefaultCover({ title, author, size }: {
     size: number,
 }) {
     const { back, text } = colorForString(title ?? 'no-title' + author)
-    return <div title={title ?? undefined} className='flex flex-row grow items-stretch'>
+    return <div title={title ?? undefined} className='flex flex-row items-stretch' style={{
+        width: size * 2,
+    }}>
         <div className='flex flex-col grow items-center justify-center overflow-hidden text-ellipsis text-center p-[10%]' style={{
             fontSize: calcFontSize(title ?? 'no-title', size),
             background: back,

@@ -3,39 +3,43 @@ import {
     PartialBooqData,
     BooqId,
     BooqMetadata,
+    TableOfContents,
 } from '@/core'
-import { booqImageUrl, CoverSize } from '@/backend/images'
 import { libraryCardsForIds, featuredBooqIds, booqsForAuthor } from '@/backend/library'
 import { userForId } from '@/backend/users'
 import { booqIdsInCollections } from '@/backend/collections'
-import { booqForId, booqPreview } from '@/backend/booq'
+import { booqForId, booqPreview, booqToc } from '@/backend/booq'
 
-export type BooqDetails = {
+export type BooqCardData = {
     booqId: BooqId,
     title: string,
     authors: string[],
     tags: Array<[string, string?]>,
-    coverUrl?: string
+    coverSrc?: string
+}
+
+export type BooqDetailedData = BooqCardData & {
+    toc: TableOfContents,
 }
 
 export async function featuredIds() {
     return featuredBooqIds()
 }
 
-export async function featuredBooqCards(coverSize: CoverSize = 210): Promise<BooqDetails[]> {
+export async function featuredBooqCards(): Promise<BooqCardData[]> {
     const ids = await featuredIds()
     const cards = (await libraryCardsForIds(ids))
         .filter(card => card !== undefined)
-        .map(card => buildBooqCardData(card.booqId, card.meta, coverSize))
+        .map(card => buildBooqCardData(card.booqId, card.meta))
     return cards
 }
 
-export async function booqCardsForAuthor(author: string): Promise<BooqDetails[]> {
+export async function booqCardsForAuthor(author: string): Promise<BooqCardData[]> {
     const cards = await booqsForAuthor(author)
-    return cards.map(card => buildBooqCardData(card.booqId, card.meta, 210))
+    return cards.map(card => buildBooqCardData(card.booqId, card.meta))
 }
 
-export async function booqCollection(collection: string, userId: string | undefined): Promise<BooqDetails[]> {
+export async function booqCollection(collection: string, userId: string | undefined): Promise<BooqCardData[]> {
     if (!userId) {
         return []
     }
@@ -46,17 +50,32 @@ export async function booqCollection(collection: string, userId: string | undefi
     const ids = await booqIdsInCollections(user.id, collection)
     const cards = (await libraryCardsForIds(ids))
         .filter(card => card !== undefined)
-        .map(card => buildBooqCardData(card.booqId, card.meta, 210))
+        .map(card => buildBooqCardData(card.booqId, card.meta))
     return cards
 }
 
-export async function booqCard(booqId: BooqId): Promise<BooqDetails | undefined> {
+export async function booqCard(booqId: BooqId): Promise<BooqCardData | undefined> {
     const [card] = await libraryCardsForIds([booqId])
     if (undefined === card) {
         return undefined
     }
 
-    return buildBooqCardData(card.booqId, card.meta, 210)
+    return buildBooqCardData(card.booqId, card.meta)
+}
+
+export async function booqDetailedData(booqId: BooqId): Promise<BooqDetailedData | undefined> {
+    const card = await booqCard(booqId)
+    if (!card) {
+        return undefined
+    }
+    const toc = await booqToc(booqId)
+    if (!toc) {
+        return undefined
+    }
+    return {
+        ...card,
+        toc,
+    }
 }
 
 export async function fetchBooqPreview(booqId: BooqId, path: BooqPath, end?: BooqPath) {
@@ -88,14 +107,12 @@ export async function booqPart({
     } satisfies PartialBooqData
 }
 
-function buildBooqCardData(booqId: BooqId, meta: BooqMetadata, coverSize: CoverSize): BooqDetails {
+function buildBooqCardData(booqId: BooqId, meta: BooqMetadata): BooqCardData {
     return {
         booqId,
         title: meta.title,
         authors: meta.authors.map(author => author.name),
         tags: meta.extra.map(e => [e.name, e.value]),
-        coverUrl: meta.coverSrc
-            ? booqImageUrl(booqId, meta.coverSrc, coverSize)
-            : undefined,
+        coverSrc: meta.coverSrc,
     }
 }

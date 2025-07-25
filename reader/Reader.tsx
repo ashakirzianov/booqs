@@ -30,6 +30,7 @@ import { ContextMenuContent } from './ContextMenuContent'
 import { usePageData } from './usePageData'
 import { useNavigationState } from './useNavigationState'
 import clsx from 'clsx'
+import { resolveImageSrc } from '@/common'
 
 export function Reader({
     booq, quote,
@@ -247,6 +248,7 @@ export function Reader({
                 augmentations={augmentations}
                 onAugmentationClick={onAugmentationClick}
                 hrefForPath={(id, path) => booqHref({ booqId: id, path })}
+                resolveSrc={(id, src) => resolveSrc(id, src)}
             />
         </div>}
         PrevButton={<AnchorButton
@@ -291,4 +293,19 @@ function PageLabel({ text }: {
     return <span className='text-sm text-dimmed font-bold'>
         {text}
     </span>
+}
+
+function resolveSrc(booqId: BooqId, src: string): string {
+    if (isExternalSrc(src)) {
+        return src
+    }
+    // TODO: investigate why we need this hack for certain epubs
+    if (src.startsWith('../')) {
+        src = src.substring('../'.length)
+    }
+    return resolveImageSrc(booqId, src)
+}
+
+function isExternalSrc(src: string) {
+    return src.startsWith('http://') || src.startsWith('https://') || src.startsWith('www.')
 }

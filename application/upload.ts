@@ -17,7 +17,7 @@ export function useUpload() {
         data: {
             booqId: BooqId,
             title: string | undefined,
-            coverUrl: string | undefined,
+            coverSrc: string | undefined,
         },
     }
     const [state, setState] = useState<UploadState>({
@@ -34,7 +34,7 @@ export function useUpload() {
                 data: {
                     booqId: result.booqId,
                     title: result.title,
-                    coverUrl: result.coverUrl,
+                    coverSrc: result.coverSrc,
                 }
             })
         } else {

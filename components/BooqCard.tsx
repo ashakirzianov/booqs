@@ -1,27 +1,31 @@
 import Link from 'next/link'
 import { BooqCover } from '@/components/BooqCover'
 import { BooqTags } from '@/components/BooqTags'
-import { authorHref } from '@/core/href'
+import { authorHref, booqHref } from '@/core/href'
 import { ReactNode } from 'react'
-import { BooqDetails } from '@/data/booqs'
+import { BooqCardData } from '@/data/booqs'
 
 export function BooqCard({
-    card: { title, authors, coverUrl, tags },
+    card: { booqId, title, authors, coverSrc, tags },
     actions,
 }: {
-    card: BooqDetails,
+    card: BooqCardData,
     actions?: ReactNode,
 }) {
     const author = authors?.join(', ')
+    const bookUrl = booqHref({ booqId })
     return <div className="flex flex-col grow gap-4 items-center sm:flex-row sm:flex-wrap sm:items-stretch h-full">
-        <BooqCover
-            title={title ?? undefined}
-            author={author}
-            coverUrl={coverUrl}
-        />
+        <Link href={bookUrl}>
+            <BooqCover
+                booqId={booqId}
+                title={title ?? undefined}
+                author={author}
+                coverSrc={coverSrc}
+            />
+        </Link>
         <div className="flex flex-col flex-1 justify-between">
             <div className='header'>
-                <Header title={title} author={author} />
+                <Header title={title} author={author} bookUrl={bookUrl} />
             </div>
             <div className='mt-4'>
                 <BooqTags tags={tags ?? []} />
@@ -33,12 +37,15 @@ export function BooqCard({
     </div>
 }
 
-function Header({ title, author }: {
+function Header({ title, author, bookUrl }: {
     title: string | undefined,
     author: string | undefined,
+    bookUrl: string,
 }) {
     return <div className='flex flex-col items-baseline'>
-        <span className="text-xl font-bold">{title}</span>
+        <Link href={bookUrl} className="text-xl font-bold hover:underline">
+            {title}
+        </Link>
         {
             author &&
             <span className="text-lg">by <Link href={authorHref({ name: author })}

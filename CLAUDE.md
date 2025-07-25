@@ -28,6 +28,10 @@ Prefer 'function name(...) { ... }' style to 'const name = (...) => { ... }' sty
 
 - When there's multiple mutually exclusive state of the component (such as isLoading and error -- when error is not null, isLoading should be false and vice versa) try to combine them into one state object with discriminating field (such as { state: 'loading' } and { state: 'error', error })
 
+## CSS and Styling
+
+- In css (and tailwind classes), only use colors defined in globals.css (like --color-primary or --color-dimmed). They can be used in tailwindcss just like any other color (so "text-dimmed" is a valid class). If you believe it is necessary, define new theme colors in globals.css and use them
+
 ## Architecture Overview
 
 ### Core Structure

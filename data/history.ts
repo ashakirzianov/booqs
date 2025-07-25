@@ -15,3 +15,13 @@ export async function fetchReadingHistory() {
     const resolved = await Promise.all(promises)
     return resolved.filter(entry => entry !== undefined)
 }
+
+export async function fetchBooqHistory(booqId: BooqId) {
+    const userId = await getUserIdInsideRequest()
+    if (!userId) {
+        return undefined
+    }
+    const history = await booqHistoryForUser(userId)
+    const booqHistory = history.find(entry => entry.booqId === booqId)
+    return booqHistory
+}

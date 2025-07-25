@@ -1,10 +1,18 @@
 'use client'
+import React from 'react'
 import { useCollection } from '@/application/collections'
 import { BooqId } from '@/core'
 
-export function CollectionButton({ booqId, collection }: {
+export function CollectionButton({ 
+    booqId, 
+    collection, 
+    AddButtonContent, 
+    RemoveButtonContent 
+}: {
     booqId: BooqId,
     collection: string,
+    AddButtonContent: React.ReactNode,
+    RemoveButtonContent: React.ReactNode,
 }) {
     const {
         ids, isLoading,
@@ -23,7 +31,7 @@ export function CollectionButton({ booqId, collection }: {
     }
     return <span className='text-action underline text-lg cursor-pointer transition duration-300 hover:text-highlight' onClick={toggle}>
         {inCollection
-            ? 'Remove'
-            : 'Add'}
+            ? RemoveButtonContent
+            : AddButtonContent}
     </span>
 }
