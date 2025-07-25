@@ -5,7 +5,7 @@ import { InLibraryCard, Library } from './library'
 
 const epubsRoot = join('public', 'epubs')
 export const localLibrary: Library = {
-    async query() { return { cards: [] } },
+    async query() { return { cards: [], hasMore: false } },
     async cards(ids: string[]) {
         return ids.map(function (id): InLibraryCard {
             return {

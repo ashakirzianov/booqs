@@ -58,7 +58,7 @@ export async function query(query: LibraryQuery): Promise<InLibraryQueryResult> 
       return language(query.query, query.limit, offset)
     default:
       assertNever(query.kind)
-      return { cards: [] }
+      return { cards: [], hasMore: false }
   }
 }
 
@@ -70,14 +70,15 @@ async function search(query: string, limit: number, offset: number): Promise<InL
     WHERE lower(title) LIKE ${like}
        OR lower(authors_text) LIKE ${like}
     ORDER BY title
-    LIMIT ${limit}
+    LIMIT ${limit + 1}
     OFFSET ${offset}
   ` as DbPgMetadata[]
-  const cards = result.map(({ id, meta }) => ({
+  const hasMore = result.length > limit
+  const cards = result.slice(0, limit).map(({ id, meta }) => ({
     id,
     meta,
   }))
-  return { cards }
+  return { cards, hasMore }
 }
 
 async function author(authorName: string, limit: number, offset: number): Promise<InLibraryQueryResult> {
@@ -86,14 +87,15 @@ async function author(authorName: string, limit: number, offset: number): Promis
     FROM pg_metadata
     WHERE ${authorName} = ANY(authors)
     ORDER BY title
-    LIMIT ${limit}
+    LIMIT ${limit + 1}
     OFFSET ${offset}
   ` as DbPgMetadata[]
-  const cards = result.map(({ id, meta }) => ({
+  const hasMore = result.length > limit
+  const cards = result.slice(0, limit).map(({ id, meta }) => ({
     id,
     meta,
   }))
-  return { cards }
+  return { cards, hasMore }
 }
 
 async function subject(subjectName: string, limit: number, offset: number): Promise<InLibraryQueryResult> {
@@ -102,14 +104,15 @@ async function subject(subjectName: string, limit: number, offset: number): Prom
     FROM pg_metadata
     WHERE ${subjectName} = ANY(subjects)
     ORDER BY title
-    LIMIT ${limit}
+    LIMIT ${limit + 1}
     OFFSET ${offset}
   ` as DbPgMetadata[]
-  const cards = result.map(({ id, meta }) => ({
+  const hasMore = result.length > limit
+  const cards = result.slice(0, limit).map(({ id, meta }) => ({
     id,
     meta,
   }))
-  return { cards }
+  return { cards, hasMore }
 }
 
 async function language(languageName: string, limit: number, offset: number): Promise<InLibraryQueryResult> {
@@ -118,14 +121,15 @@ async function language(languageName: string, limit: number, offset: number): Pr
     FROM pg_metadata
     WHERE ${languageName} = ANY(languages)
     ORDER BY title
-    LIMIT ${limit}
+    LIMIT ${limit + 1}
     OFFSET ${offset}
   ` as DbPgMetadata[]
-  const cards = result.map(({ id, meta }) => ({
+  const hasMore = result.length > limit
+  const cards = result.slice(0, limit).map(({ id, meta }) => ({
     id,
     meta,
   }))
-  return { cards }
+  return { cards, hasMore }
 }
 
 export async function addToSearchIndex({

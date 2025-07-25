@@ -26,6 +26,8 @@ export type LibraryQuery = {
 }
 export type InLibraryQueryResult = {
     cards: InLibraryCard[],
+    hasMore: boolean,
+    total?: number,
 }
 
 export type Library = {
@@ -82,6 +84,8 @@ export async function libraryCardsForIds(ids: string[]): Promise<Array<LibraryCa
 
 export async function queryLibrary(libraryId: string, query: LibraryQuery): Promise<{
     cards: LibraryCard[],
+    hasMore: boolean,
+    total?: number,
 }> {
     const library = libraries[libraryId]
     if (!library) {
@@ -94,6 +98,8 @@ export async function queryLibrary(libraryId: string, query: LibraryQuery): Prom
     }))
     return {
         cards,
+        hasMore: results.hasMore,
+        total: results.total,
     }
 }
 

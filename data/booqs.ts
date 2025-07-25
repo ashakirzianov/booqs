@@ -34,34 +34,46 @@ export async function featuredBooqCards(): Promise<BooqCardData[]> {
     return cards
 }
 
-export async function booqCardsForAuthor({ author, libraryId, limit = 100, offset }: { author: string, libraryId: string, limit?: number, offset?: number }): Promise<BooqCardData[]> {
-    const { cards } = await queryLibrary(libraryId, {
+export async function booqCardsForAuthor({ author, libraryId, limit = 100, offset }: { author: string, libraryId: string, limit?: number, offset?: number }): Promise<{ cards: BooqCardData[], hasMore: boolean, total?: number }> {
+    const { cards, hasMore, total } = await queryLibrary(libraryId, {
         kind: 'author',
         query: author,
         limit,
         offset,
     })
-    return cards.map(card => buildBooqCardData(card.booqId, card.meta))
+    return {
+        cards: cards.map(card => buildBooqCardData(card.booqId, card.meta)),
+        hasMore,
+        total,
+    }
 }
 
-export async function booqCardsForSubject({ subject, libraryId, limit = 100, offset }: { subject: string, libraryId: string, limit?: number, offset?: number }): Promise<BooqCardData[]> {
-    const { cards } = await queryLibrary(libraryId, {
+export async function booqCardsForSubject({ subject, libraryId, limit = 100, offset }: { subject: string, libraryId: string, limit?: number, offset?: number }): Promise<{ cards: BooqCardData[], hasMore: boolean, total?: number }> {
+    const { cards, hasMore, total } = await queryLibrary(libraryId, {
         kind: 'subject',
         query: subject,
         limit,
         offset,
     })
-    return cards.map(card => buildBooqCardData(card.booqId, card.meta))
+    return {
+        cards: cards.map(card => buildBooqCardData(card.booqId, card.meta)),
+        hasMore,
+        total,
+    }
 }
 
-export async function booqCardsForLanguage({ language, libraryId, limit = 100, offset }: { language: string, libraryId: string, limit?: number, offset?: number }): Promise<BooqCardData[]> {
-    const { cards } = await queryLibrary(libraryId, {
+export async function booqCardsForLanguage({ language, libraryId, limit = 100, offset }: { language: string, libraryId: string, limit?: number, offset?: number }): Promise<{ cards: BooqCardData[], hasMore: boolean, total?: number }> {
+    const { cards, hasMore, total } = await queryLibrary(libraryId, {
         kind: 'language',
         query: language,
         limit,
         offset,
     })
-    return cards.map(card => buildBooqCardData(card.booqId, card.meta))
+    return {
+        cards: cards.map(card => buildBooqCardData(card.booqId, card.meta)),
+        hasMore,
+        total,
+    }
 }
 
 export async function booqCollection(collection: string, userId: string | undefined): Promise<BooqCardData[]> {
