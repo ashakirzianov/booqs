@@ -77,7 +77,10 @@ export function Reader({
         return set
     }, [navigationSelection, user?.id])
 
-    const { filteredHighlights, allHighlightsAuthors, comments } = useNotesData({
+    const {
+        filteredHighlights, allHighlightsAuthors, comments,
+        notesAreLoading,
+    } = useNotesData({
         booqId: booq.booqId,
         user,
         currentRange: range,
@@ -180,6 +183,12 @@ export function Reader({
         }
     }, [menuTargetForAugmentation, setMenuTarget])
 
+    const { visible } = useControlsVisibility()
+    const isControlsVisible = (FloaterMenuContent === null) && visible
+    // Auto-open right panel when context menu should be displayed in side panel and not hidden
+    const shouldShowRightPanel = commentsPanelOpen || (displayTarget === 'side-panel')
+    const showLoadingIndicator = notesAreLoading || isAuthLoading
+
     const toggleAskVisibility = useMemo(() => {
         return () => {
             setMenuTarget(menuTarget => {
@@ -219,14 +228,9 @@ export function Reader({
         <AccountButton
             user={user}
             from={pathname}
-            loading={isAuthLoading}
+            loading={showLoadingIndicator}
         />
     </>
-
-    const { visible } = useControlsVisibility()
-    const isControlsVisible = (FloaterMenuContent === null) && visible
-    // Auto-open right panel when context menu should be displayed in side panel and not hidden
-    const shouldShowRightPanel = commentsPanelOpen || (displayTarget === 'side-panel')
 
     return <ReaderLayout
         isControlsVisible={isControlsVisible}

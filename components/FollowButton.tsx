@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react'
 import { followAction, unfollowAction } from '@/data/user'
 
-type ButtonState = 
+type ButtonState =
     | { state: 'idle' }
     | { state: 'loading' }
     | { state: 'error', error: string }
@@ -34,18 +34,18 @@ export function FollowButton({ username, initialFollowStatus }: {
             } else {
                 // Rollback on error
                 setIsFollowing(previousState)
-                setButtonState({ 
-                    state: 'error', 
-                    error: result.error || 'Failed to update follow status' 
+                setButtonState({
+                    state: 'error',
+                    error: result.error || 'Failed to update follow status'
                 })
                 console.error('Follow operation failed:', result.error)
             }
         } catch (error) {
             // Rollback on network error
             setIsFollowing(previousState)
-            setButtonState({ 
-                state: 'error', 
-                error: 'Network error. Please try again.' 
+            setButtonState({
+                state: 'error',
+                error: 'Network error. Please try again.'
             })
             console.error('Error toggling follow:', error)
         }
@@ -82,8 +82,7 @@ export function FollowButton({ username, initialFollowStatus }: {
                     )}
                     {isFollowing ? (
                         <>
-                            <span>✓</span>
-                            <span>Following</span>
+                            <span>Unfollow</span>
                         </>
                     ) : (
                         <>

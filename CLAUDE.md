@@ -18,13 +18,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Coding preferences
 
-Put local/private utility functions after all exported/public functions
-
 - Always put private functions to the bottom of the public functions
 
-Do not access backend/* files directly from frontend code. Instead, create an indirection layer in data/* directory to abstract backend functionality.
+- Do not access backend/* files directly from frontend code. Instead, create an indirection layer in data/* directory to abstract backend functionality.
 
 Prefer 'function name(...) { ... }' style to 'const name = (...) => { ... }' style
+
+## State Management
+
+- When there's multiple mutually exclusive state of the component (such as isLoading and error -- when error is not null, isLoading should be false and vice versa) try to combine them into one state object with discriminating field (such as { state: 'loading' } and { state: 'error', error })
 
 ## Architecture Overview
 

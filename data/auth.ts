@@ -10,6 +10,7 @@ import { completeSignInRequest, completeSignUp, prevalidateSignup, initiateSignR
 import { AccountData } from '@/core'
 import { RegistrationResponseJSON, AuthenticationResponseJSON } from '@simplewebauthn/browser'
 import { cookies, headers } from 'next/headers'
+import { revalidatePath } from 'next/cache'
 
 export async function initPasskeyRegistrationAcion() {
     try {
@@ -160,27 +161,31 @@ export async function fetchAuthData(): Promise<AccountData | undefined> {
 
 export async function updateAccountAction({
     name,
-    emoji
+    emoji,
+    username
 }: {
     name?: string,
-    emoji?: string
-}): Promise<AccountData | null> {
+    emoji?: string,
+    username?: string
+}): Promise<{ success: true, user: AccountData } | { success: false, error: string, field?: string }> {
     const userId = await getUserIdInsideRequest()
     if (!userId) {
-        return null
+        return { success: false, error: 'Authentication required' }
     }
 
     const result = await updateUser({
         id: userId,
         name,
         emoji,
+        username,
     })
 
     if (!result.success) {
-        return null
+        return { success: false, error: result.reason, field: result.field }
     }
 
-    return accountDataFromDbUser(result.user)
+    revalidatePath('/account')
+    return { success: true, user: accountDataFromDbUser(result.user) }
 }
 
 export async function deleteAccountAction() {

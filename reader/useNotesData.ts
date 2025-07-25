@@ -13,7 +13,7 @@ export function useNotesData({
     currentRange?: BooqRange,
     highlightsAuthorIds: Set<string>,
 }) {
-    const { notes: allNotes } = useBooqNotes({ booqId, user })
+    const { notes: allNotes, isLoading } = useBooqNotes({ booqId, user })
 
     const sortedNotes = useMemo(() => {
         return allNotes
@@ -56,5 +56,10 @@ export function useNotesData({
         )
     }, [sortedNotes, currentRange])
 
-    return { filteredHighlights, comments, allHighlightsAuthors }
+    return {
+        filteredHighlights,
+        comments,
+        allHighlightsAuthors,
+        notesAreLoading: isLoading
+    }
 }

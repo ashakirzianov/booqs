@@ -6,60 +6,106 @@ import { EmojiSelector } from './EmojiSelector'
 import { PencilIcon } from '@/components/Icons'
 import { LightButton } from '@/components/Buttons'
 import { AccountData } from '@/core'
-import { updateProfileServerAction } from './actions'
+import { updateAccountAction } from '@/data/auth'
+
+type FormState =
+    | { state: 'display' }
+    | { state: 'edit', emojiSelectorOpen?: boolean }
+    | { state: 'loading' }
+    | { state: 'error', error: string, field?: string }
 
 export function ProfileData({ user }: { user: AccountData }) {
-    const [isEditMode, setIsEditMode] = useState(false)
-    const [currentEmoji, setCurrentEmoji] = useState(user.emoji ?? '👤')
-    const [currentName, setCurrentName] = useState(user.name)
-    const [isUpdating, setIsUpdating] = useState(false)
-    const [isEmojiSelectorOpen, setIsEmojiSelectorOpen] = useState(false)
+    const [formState, setFormState] = useState<FormState>({ state: 'display' })
+    const [currentData, setCurrentData] = useState({
+        emoji: user.emoji,
+        name: user.name,
+        username: user.username
+    })
 
     const handleEmojiChange = (emoji: string) => {
-        setCurrentEmoji(emoji)
-        setIsEditMode(true)
-        setIsEmojiSelectorOpen(false)
+        setCurrentData(prev => ({ ...prev, emoji }))
+        setFormState({ state: 'edit', emojiSelectorOpen: false })
     }
 
     const handleEmojiClick = () => {
-        setIsEmojiSelectorOpen(true)
+        setFormState({ state: 'edit', emojiSelectorOpen: true })
     }
 
     const handleEditClick = () => {
-        setIsEditMode(true)
+        setFormState({ state: 'edit' })
     }
 
     const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setCurrentName(e.target.value)
-        setIsEditMode(true)
+        setCurrentData(prev => ({ ...prev, name: e.target.value }))
+        setFormState({ state: 'edit' })
+    }
+
+    const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setCurrentData(prev => ({ ...prev, username: e.target.value }))
+        setFormState({ state: 'edit' })
     }
 
     const handleUpdateProfile = async () => {
-        setIsUpdating(true)
+        setFormState({ state: 'loading' })
+
+        // Only include fields that have actually changed
+        const updates: { name?: string, emoji?: string, username?: string } = {}
+
+        if (currentData.name !== user.name) {
+            updates.name = currentData.name
+        }
+        if (currentData.emoji !== user.emoji) {
+            updates.emoji = currentData.emoji
+        }
+        if (currentData.username !== user.username) {
+            updates.username = currentData.username
+        }
+
         try {
-            const formData = new FormData()
-            formData.append('emoji', currentEmoji)
-            formData.append('name', currentName)
+            const result = await updateAccountAction(updates)
 
-            const result = await updateProfileServerAction(formData)
-
-            if (result) {
-                setIsEditMode(false)
+            if (result.success) {
+                setFormState({ state: 'display' })
                 // Trigger page reload by revalidating
                 window.location.reload()
+            } else {
+                // Handle error from server action
+                setFormState({
+                    state: 'error',
+                    error: result.error,
+                    field: result.field
+                })
             }
         } catch (error) {
             console.error('Failed to update profile:', error)
-        } finally {
-            setIsUpdating(false)
+            setFormState({
+                state: 'error',
+                error: 'Failed to update profile'
+            })
         }
     }
 
+
     const handleCancel = () => {
-        setCurrentEmoji(user.emoji)
-        setCurrentName(user.name)
-        setIsEditMode(false)
+        setCurrentData({
+            emoji: user.emoji ?? '👤',
+            name: user.name,
+            username: user.username
+        })
+        setFormState({ state: 'display' })
     }
+
+    // Derived state for cleaner JSX
+    const isEditMode = formState.state === 'edit' || formState.state === 'loading' || formState.state === 'error'
+    const isLoading = formState.state === 'loading'
+    const isEmojiSelectorOpen = formState.state === 'edit' && formState.emojiSelectorOpen === true
+    const usernameError = formState.state === 'error' && formState.field === 'username' ? formState.error : null
+    const generalError = formState.state === 'error' && formState.field !== 'username' ? formState.error : null
+
+    // Check for changes to determine if update should be enabled
+    const hasChanges = currentData.name !== user.name ||
+        currentData.emoji !== user.emoji ||
+        currentData.username !== user.username
 
     return (
         <div className="bg-background border border-dimmed rounded-lg p-6 flex flex-col">
@@ -69,9 +115,9 @@ export function ProfileData({ user }: { user: AccountData }) {
                     onClick={handleEmojiClick}
                 >
                     <ProfileBadge
-                        name={currentName}
+                        name={currentData.name}
                         picture={user.profilePictureURL ?? undefined}
-                        emoji={currentEmoji}
+                        emoji={currentData.emoji}
                         size={4}
                         border={true}
                     />
@@ -82,6 +128,11 @@ export function ProfileData({ user }: { user: AccountData }) {
                 <div className="flex-1">
                     {isEditMode ? (
                         <div className="space-y-4">
+                            {generalError && (
+                                <div className="bg-red-50 border border-red-200 rounded-md p-3">
+                                    <p className="text-sm text-red-600">{generalError}</p>
+                                </div>
+                            )}
                             <div>
                                 <label htmlFor="name" className="block text-sm font-medium text-primary mb-1">
                                     Display Name
@@ -89,26 +140,45 @@ export function ProfileData({ user }: { user: AccountData }) {
                                 <input
                                     id="name"
                                     type="text"
-                                    value={currentName}
+                                    value={currentData.name}
                                     onChange={handleNameChange}
                                     className="w-full px-3 py-2 border border-dimmed rounded-md bg-background text-primary focus:outline-none focus:ring-2 focus:ring-action focus:border-transparent"
                                     placeholder="Enter your display name"
                                 />
                             </div>
+                            <div>
+                                <label htmlFor="username" className="block text-sm font-medium text-primary mb-1">
+                                    Username
+                                </label>
+                                <input
+                                    id="username"
+                                    type="text"
+                                    value={currentData.username}
+                                    onChange={handleUsernameChange}
+                                    className="w-full px-3 py-2 border border-dimmed rounded-md bg-background text-primary focus:outline-none focus:ring-2 focus:ring-action focus:border-transparent"
+                                    placeholder="Enter your username"
+                                />
+                                {usernameError && (
+                                    <p className="text-sm text-red-500 mt-1">{usernameError}</p>
+                                )}
+                                <p className="text-xs text-dimmed mt-1">
+                                    Username can only contain letters, numbers, and hyphens
+                                </p>
+                            </div>
                             <div className="flex gap-2">
                                 <button
                                     onClick={handleUpdateProfile}
-                                    disabled={isUpdating}
+                                    disabled={isLoading || !hasChanges}
                                     className="px-4 py-2 bg-action text-white rounded-md hover:bg-highlight disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                                 >
-                                    {isUpdating && (
+                                    {isLoading && (
                                         <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
                                     )}
                                     Update Profile
                                 </button>
                                 <button
                                     onClick={handleCancel}
-                                    disabled={isUpdating}
+                                    disabled={isLoading}
                                     className="px-4 py-2 border border-dimmed text-primary rounded-md hover:bg-background-hover disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                     Cancel
@@ -150,8 +220,8 @@ export function ProfileData({ user }: { user: AccountData }) {
 
             <EmojiSelector
                 isOpen={isEmojiSelectorOpen}
-                onClose={() => setIsEmojiSelectorOpen(false)}
-                currentEmoji={currentEmoji}
+                onClose={() => setFormState({ state: 'edit', emojiSelectorOpen: false })}
+                currentEmoji={currentData.emoji}
                 onSelect={handleEmojiChange}
             />
         </div>

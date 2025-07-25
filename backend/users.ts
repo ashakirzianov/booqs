@@ -42,7 +42,7 @@ export async function usersForIds(ids: string[]): Promise<DbUser[]> {
     if (ids.length === 0) {
         return []
     }
-    
+
     const users = await sql`
       SELECT * FROM users
       WHERE id = ANY(${ids})
@@ -56,7 +56,7 @@ export type CreateUserResult =
 
 export type UpdateUserResult =
     | { success: true, user: DbUser }
-    | { success: false, user?: undefined, reason: string }
+    | { success: false, user?: undefined, reason: string, field?: string }
 
 function validateUsername(username: string): boolean {
     // Username must contain only latin letters, digits, and hyphens
@@ -95,8 +95,8 @@ export async function createUser({
         return { success: true, user: user as DbUser }
     } catch (err: any) {
         console.error('Error creating user:', err)
-        const reason = getReasonFromError(err, 'Failed to create user')
-        return { success: false, reason }
+        const errorResult = getReasonFromError(err, 'Failed to create user')
+        return { success: false, reason: errorResult.reason }
     }
 }
 
@@ -130,25 +130,54 @@ export async function updateUser({
     id,
     name,
     emoji,
+    username,
 }: {
     id: string,
     name?: string,
     emoji?: string,
+    username?: string,
 }): Promise<UpdateUserResult> {
     try {
-        if (name === undefined && emoji === undefined) {
+        if (name === undefined && emoji === undefined && username === undefined) {
             return { success: false, reason: 'No fields provided to update' }
         }
 
-        const [user] = await sql`
+        if (username !== undefined && !validateUsername(username)) {
+            return {
+                success: false,
+                reason: 'Username must contain only latin letters, digits, and hyphens',
+                field: 'username'
+            }
+        }
+
+        const updates: string[] = []
+        const values: any[] = []
+        let i = 1
+
+        if (name !== undefined) {
+            updates.push(`name = $${i++}`)
+            values.push(name)
+        }
+
+        if (emoji !== undefined) {
+            updates.push(`emoji = $${i++}`)
+            values.push(emoji)
+        }
+
+        if (username !== undefined) {
+            updates.push(`username = $${i++}`)
+            values.push(username.toLowerCase())
+        }
+
+        const query = `
             UPDATE users
-            SET
-                ${name !== undefined ? sql`name = ${name}` : sql``}
-                ${name !== undefined && emoji !== undefined ? sql`,` : sql``}
-                ${emoji !== undefined ? sql`emoji = ${emoji}` : sql``}
-            WHERE id = ${id}
+            SET ${updates.join(', ')}
+            WHERE id = $${i}
             RETURNING *
         `
+        values.push(id)
+
+        const [user] = await sql.query(query, values)
 
         if (!user) {
             return { success: false, reason: 'User not found' }
@@ -157,22 +186,25 @@ export async function updateUser({
         return { success: true, user: user as DbUser }
     } catch (err: any) {
         console.error('Error updating user:', err)
-        const reason = getReasonFromError(err, 'Failed to update user')
-        return { success: false, reason }
+        const errorResult = getReasonFromError(err, 'Failed to update user')
+        return { success: false, reason: errorResult.reason, field: errorResult.field }
     }
 }
 
-function getReasonFromError(err: any, defaultReason: string): string {
+
+function getReasonFromError(err: any, defaultReason: string): { reason: string, field?: string } {
     // Handle specific database errors
     if (err.code === '23505') { // unique_violation
         if (err.constraint === 'users_username_key') {
-            return 'Username already exists'
+            return { reason: 'Username already exists', field: 'username' }
         }
         if (err.constraint === 'users_email_key') {
-            return 'Email already exists'
+            return { reason: 'Email already exists', field: 'email' }
         }
+        // Generic unique constraint violation
+        return { reason: 'This value is already taken' }
     }
 
-    return defaultReason
+    return { reason: defaultReason }
 }
 
