@@ -51,6 +51,10 @@ export async function query(query: LibraryQuery): Promise<InLibraryQueryResult> 
       return search(query.query, query.limit)
     case 'author':
       return author(query.query, query.limit)
+    case 'subject':
+      return subject(query.query, query.limit)
+    case 'language':
+      return language(query.query, query.limit)
     default:
       assertNever(query.kind)
       return { cards: [] }
@@ -79,6 +83,36 @@ async function author(authorName: string, limit: number): Promise<InLibraryQuery
     SELECT *
     FROM pg_metadata
     WHERE ${authorName} = ANY(authors)
+    ORDER BY title
+    LIMIT ${limit}
+  ` as DbPgMetadata[]
+  const cards = result.map(({ id, meta }) => ({
+    id,
+    meta,
+  }))
+  return { cards }
+}
+
+async function subject(subjectName: string, limit: number): Promise<InLibraryQueryResult> {
+  const result = await sql`
+    SELECT *
+    FROM pg_metadata
+    WHERE ${subjectName} = ANY(subjects)
+    ORDER BY title
+    LIMIT ${limit}
+  ` as DbPgMetadata[]
+  const cards = result.map(({ id, meta }) => ({
+    id,
+    meta,
+  }))
+  return { cards }
+}
+
+async function language(languageName: string, limit: number): Promise<InLibraryQueryResult> {
+  const result = await sql`
+    SELECT *
+    FROM pg_metadata
+    WHERE ${languageName} = ANY(languages)
     ORDER BY title
     LIMIT ${limit}
   ` as DbPgMetadata[]
