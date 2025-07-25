@@ -46,22 +46,23 @@ type DbPgMetadata = {
 }
 
 export async function query(query: LibraryQuery): Promise<InLibraryQueryResult> {
+  const offset = query.offset || 0
   switch (query.kind) {
     case 'search':
-      return search(query.query, query.limit)
+      return search(query.query, query.limit, offset)
     case 'author':
-      return author(query.query, query.limit)
+      return author(query.query, query.limit, offset)
     case 'subject':
-      return subject(query.query, query.limit)
+      return subject(query.query, query.limit, offset)
     case 'language':
-      return language(query.query, query.limit)
+      return language(query.query, query.limit, offset)
     default:
       assertNever(query.kind)
       return { cards: [] }
   }
 }
 
-async function search(query: string, limit: number): Promise<InLibraryQueryResult> {
+async function search(query: string, limit: number, offset: number): Promise<InLibraryQueryResult> {
   const like = `%${query.toLowerCase()}%`
   const result = await sql`
     SELECT *
@@ -70,6 +71,7 @@ async function search(query: string, limit: number): Promise<InLibraryQueryResul
        OR lower(authors_text) LIKE ${like}
     ORDER BY title
     LIMIT ${limit}
+    OFFSET ${offset}
   ` as DbPgMetadata[]
   const cards = result.map(({ id, meta }) => ({
     id,
@@ -78,13 +80,14 @@ async function search(query: string, limit: number): Promise<InLibraryQueryResul
   return { cards }
 }
 
-async function author(authorName: string, limit: number): Promise<InLibraryQueryResult> {
+async function author(authorName: string, limit: number, offset: number): Promise<InLibraryQueryResult> {
   const result = await sql`
     SELECT *
     FROM pg_metadata
     WHERE ${authorName} = ANY(authors)
     ORDER BY title
     LIMIT ${limit}
+    OFFSET ${offset}
   ` as DbPgMetadata[]
   const cards = result.map(({ id, meta }) => ({
     id,
@@ -93,13 +96,14 @@ async function author(authorName: string, limit: number): Promise<InLibraryQuery
   return { cards }
 }
 
-async function subject(subjectName: string, limit: number): Promise<InLibraryQueryResult> {
+async function subject(subjectName: string, limit: number, offset: number): Promise<InLibraryQueryResult> {
   const result = await sql`
     SELECT *
     FROM pg_metadata
     WHERE ${subjectName} = ANY(subjects)
     ORDER BY title
     LIMIT ${limit}
+    OFFSET ${offset}
   ` as DbPgMetadata[]
   const cards = result.map(({ id, meta }) => ({
     id,
@@ -108,13 +112,14 @@ async function subject(subjectName: string, limit: number): Promise<InLibraryQue
   return { cards }
 }
 
-async function language(languageName: string, limit: number): Promise<InLibraryQueryResult> {
+async function language(languageName: string, limit: number, offset: number): Promise<InLibraryQueryResult> {
   const result = await sql`
     SELECT *
     FROM pg_metadata
     WHERE ${languageName} = ANY(languages)
     ORDER BY title
     LIMIT ${limit}
+    OFFSET ${offset}
   ` as DbPgMetadata[]
   const cards = result.map(({ id, meta }) => ({
     id,

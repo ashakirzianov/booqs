@@ -34,29 +34,32 @@ export async function featuredBooqCards(): Promise<BooqCardData[]> {
     return cards
 }
 
-export async function booqCardsForAuthor({ author, libraryId }: { author: string, libraryId: string }): Promise<BooqCardData[]> {
+export async function booqCardsForAuthor({ author, libraryId, limit = 100, offset }: { author: string, libraryId: string, limit?: number, offset?: number }): Promise<BooqCardData[]> {
     const { cards } = await queryLibrary(libraryId, {
         kind: 'author',
         query: author,
-        limit: 100, // Arbitrary limit, can be adjusted
+        limit,
+        offset,
     })
     return cards.map(card => buildBooqCardData(card.booqId, card.meta))
 }
 
-export async function booqCardsForSubject({ subject, libraryId }: { subject: string, libraryId: string }): Promise<BooqCardData[]> {
+export async function booqCardsForSubject({ subject, libraryId, limit = 100, offset }: { subject: string, libraryId: string, limit?: number, offset?: number }): Promise<BooqCardData[]> {
     const { cards } = await queryLibrary(libraryId, {
         kind: 'subject',
         query: subject,
-        limit: 100, // Arbitrary limit, can be adjusted
+        limit,
+        offset,
     })
     return cards.map(card => buildBooqCardData(card.booqId, card.meta))
 }
 
-export async function booqCardsForLanguage({ language, libraryId }: { language: string, libraryId: string }): Promise<BooqCardData[]> {
+export async function booqCardsForLanguage({ language, libraryId, limit = 100, offset }: { language: string, libraryId: string, limit?: number, offset?: number }): Promise<BooqCardData[]> {
     const { cards } = await queryLibrary(libraryId, {
         kind: 'language',
         query: language,
-        limit: 100, // Arbitrary limit, can be adjusted
+        limit,
+        offset,
     })
     return cards.map(card => buildBooqCardData(card.booqId, card.meta))
 }
@@ -153,11 +156,12 @@ export type BooqSearchResultData = {
     coverSrc: string | undefined,
 }
 
-export async function booqSearch({ query, libraryId, limit = 20 }: { query: string, libraryId: string, limit?: number }): Promise<SearchResultData[]> {
+export async function booqSearch({ query, libraryId, limit = 20, offset }: { query: string, libraryId: string, limit?: number, offset?: number }): Promise<SearchResultData[]> {
     const results = await queryLibrary(libraryId, {
         kind: 'search',
         query,
         limit,
+        offset,
     })
     return results.cards.map(result => {
         return {
