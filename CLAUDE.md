@@ -121,4 +121,5 @@ Test files use the naming convention `[ModuleName].test.ts` or `[ModuleName].tes
 - The layer hierarchy is strictly defined as: 
   - core > parser > viewer > common > backend > graphql > data > app/api > application > components > reader > app > cli
 - **Special Exception**: `/app/api` is treated as its own layer between `data` and `application`, despite being physically located within the `/app` directory. This exception exists because Next.js requires API routes to live inside the `/app` directory.
-- Any violation of this layer access rule is considered a significant architectural mistake and should be avoided.
+- **Direct Access Restriction**: Layers below `data`, except for `cli` layer (app/api, application, components, reader, app) should NEVER directly access `parser` or `backend` or `graphql` layers. All access to these layers should be routed through the `data` layer as an abstraction.
+- Any violation of these layer access rules is considered a significant architectural mistake and should be avoided.
