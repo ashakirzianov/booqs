@@ -66,9 +66,13 @@ export default async function Page({ params }: {
                             </div>
                         )}
 
-                        {detailed.tags.length > 0 && (
+                        {(detailed.subjects.length > 0 || detailed.languages.length > 0) && (
                             <div className="mb-6">
-                                <BooqTags tags={detailed.tags} booqId={booqId} />
+                                <BooqTags 
+                                    subjects={detailed.subjects} 
+                                    languages={detailed.languages} 
+                                    booqId={booqId} 
+                                />
                             </div>
                         )}
                     </div>

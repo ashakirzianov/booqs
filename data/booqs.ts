@@ -9,14 +9,22 @@ import { libraryCardsForIds, featuredBooqIds, queryLibrary } from '@/backend/lib
 import { userForId } from '@/backend/users'
 import { booqIdsInCollections } from '@/backend/collections'
 import { booqForId, booqPreview, booqToc } from '@/backend/booq'
+import { getExtraMetadataValues } from '@/core/meta'
+
+export type LanguageInfo = {
+    code: string,
+    name: string,
+}
 
 export type BooqCardData = {
     booqId: BooqId,
     title: string,
     authors: string[],
-    tags: Array<[string, string?]>,
+    subjects: string[],
+    languages: LanguageInfo[],
     coverSrc?: string
 }
+
 
 export type BooqDetailedData = BooqCardData & {
     toc: TableOfContents,
@@ -144,15 +152,6 @@ export async function booqPart({
     } satisfies PartialBooqData
 }
 
-function buildBooqCardData(booqId: BooqId, meta: BooqMetadata): BooqCardData {
-    return {
-        booqId,
-        title: meta.title,
-        authors: meta.authors.map(author => author.name),
-        tags: meta.extra.map(e => [e.name, e.value]),
-        coverSrc: meta.coverSrc,
-    }
-}
 
 // Search types and utilities
 export type SearchResultData = AuthorSearchResultData | BooqSearchResultData
@@ -184,4 +183,76 @@ export async function booqSearch({ query, libraryId, limit = 20, offset }: { que
             coverSrc: result.meta.coverSrc,
         }
     })
+}
+
+export function getLanguageDisplayName(languageCode: string): string {
+    const languageNames: Record<string, string> = {
+        'en': 'English',
+        'fr': 'French',
+        'de': 'German',
+        'es': 'Spanish',
+        'it': 'Italian',
+        'pt': 'Portuguese',
+        'ru': 'Russian',
+        'ja': 'Japanese',
+        'zh': 'Chinese',
+        'ar': 'Arabic',
+        'hi': 'Hindi',
+        'ko': 'Korean',
+        'nl': 'Dutch',
+        'sv': 'Swedish',
+        'da': 'Danish',
+        'no': 'Norwegian',
+        'fi': 'Finnish',
+        'pl': 'Polish',
+        'cs': 'Czech',
+        'hu': 'Hungarian',
+        'tr': 'Turkish',
+        'he': 'Hebrew',
+        'th': 'Thai',
+        'vi': 'Vietnamese',
+        'id': 'Indonesian',
+        'ms': 'Malay',
+        'tl': 'Filipino',
+        'uk': 'Ukrainian',
+        'bg': 'Bulgarian',
+        'hr': 'Croatian',
+        'sk': 'Slovak',
+        'sl': 'Slovenian',
+        'ro': 'Romanian',
+        'et': 'Estonian',
+        'lv': 'Latvian',
+        'lt': 'Lithuanian',
+        'mt': 'Maltese',
+        'ga': 'Irish',
+        'cy': 'Welsh',
+        'is': 'Icelandic',
+        'mk': 'Macedonian',
+        'sq': 'Albanian',
+        'sr': 'Serbian',
+        'bs': 'Bosnian',
+        'me': 'Montenegrin',
+        'la': 'Latin',
+        'eo': 'Esperanto',
+    }
+
+    return languageNames[languageCode.toLowerCase()] || languageCode
+}
+
+function buildBooqCardData(booqId: BooqId, meta: BooqMetadata): BooqCardData {
+    const subjects = getExtraMetadataValues('subject', meta.extra)
+    const languageCodes = getExtraMetadataValues('language', meta.extra)
+    const languages: LanguageInfo[] = languageCodes.map(code => ({
+        code,
+        name: getLanguageDisplayName(code),
+    }))
+
+    return {
+        booqId,
+        title: meta.title,
+        authors: meta.authors.map(author => author.name),
+        subjects,
+        languages,
+        coverSrc: meta.coverSrc,
+    }
 }

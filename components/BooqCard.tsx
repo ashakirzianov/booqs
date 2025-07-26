@@ -7,7 +7,7 @@ import { ReactNode } from 'react'
 import { BooqCardData } from '@/data/booqs'
 
 export function BooqCard({
-    card: { booqId, title, authors, coverSrc, tags },
+    card: { booqId, title, authors, coverSrc, subjects, languages },
     actions,
 }: {
     card: BooqCardData,
@@ -30,7 +30,11 @@ export function BooqCard({
                 <Header title={title} author={author} bookUrl={bookUrl} libraryId={libraryId} />
             </div>
             <div className='mt-4'>
-                <BooqTags tags={tags ?? []} booqId={booqId} />
+                <BooqTags 
+                    subjects={subjects ?? []} 
+                    languages={languages ?? []} 
+                    booqId={booqId} 
+                />
             </div>
             <div className='mt-4 flex gap-2 self-stretch justify-end ml-xl'>
                 {actions}
