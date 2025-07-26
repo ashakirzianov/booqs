@@ -1,4 +1,4 @@
-import { getRandomAvatarEmoji } from '@/core/emoji'
+import { getRandomAvatarEmoji } from '@/common/emoji'
 import { prevalidateSignupAction, fetchAuthData } from '@/data/auth'
 import { SignUpForm } from './SignUpForm'
 import { generateRandomName } from './name'

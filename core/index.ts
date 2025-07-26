@@ -1,4 +1,3 @@
-export * from './emoji'
 export * from './fragment'
 export * from '../common/href'
 export * from './misc'
