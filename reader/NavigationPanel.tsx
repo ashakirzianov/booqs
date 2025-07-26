@@ -7,8 +7,8 @@ import { NavigationFilter } from './NavigationFilter'
 import { buildNavigationNodes, NavigationNode } from './nodes'
 import { BooqId, TableOfContentsItem } from '@/core'
 import { NavigationSelection } from './useNavigationState'
-import { BooqNote } from '@/application/notes'
 import { AuthorData } from '@/data/user'
+import { BooqNote } from '@/data/notes'
 
 export function NavigationPanel({
     booqId, user, title, toc, notes,

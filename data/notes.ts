@@ -6,13 +6,31 @@ import {
     notesWithAuthorForBooqId,
     DbNote,
     DbNoteWithAuthor,
-    NotePrivacy,
 } from '@/backend/notes'
+import { AuthorData } from './user'
 
-export type { DbNote, DbNoteWithAuthor, NotePrivacy }
+export type NotePrivacy = 'private' | 'public'
 
-export async function getNotesWithAuthorForBooq(booqId: BooqId): Promise<DbNoteWithAuthor[]> {
-    return notesWithAuthorForBooqId(booqId)
+export type BooqNote = {
+    id: string,
+    booqId: BooqId,
+    author: AuthorData,
+    range: BooqRange,
+    kind: string,
+    content?: string,
+    targetQuote: string,
+    privacy: NotePrivacy,
+    createdAt: string,
+    updatedAt: string,
+}
+
+export type UnresolvedBooqNote = Omit<BooqNote, 'author'> & {
+    authorId: string,
+}
+
+export async function getNotesWithAuthorForBooq(booqId: BooqId): Promise<BooqNote[]> {
+    const dbNotes = await notesWithAuthorForBooqId(booqId)
+    return dbNotes.map(noteFromDbNoteWithAuthor)
 }
 
 export async function createNote({
@@ -33,8 +51,8 @@ export async function createNote({
     content?: string,
     targetQuote: string,
     privacy?: NotePrivacy,
-}): Promise<DbNote> {
-    return addNote({
+}): Promise<UnresolvedBooqNote> {
+    const dbNote = await addNote({
         id,
         authorId,
         booqId,
@@ -44,6 +62,7 @@ export async function createNote({
         targetQuote,
         privacy,
     })
+    return unresolvedBooqNote(dbNote)
 }
 
 export async function deleteNote({
@@ -66,6 +85,52 @@ export async function modifyNote({
     authorId: string,
     kind?: string,
     content?: string,
-}): Promise<DbNote | null> {
-    return updateNote({ id, authorId, kind, content })
+}): Promise<UnresolvedBooqNote | null> {
+    const result = await updateNote({ id, authorId, kind, content })
+    if (result === null) {
+        return null
+    }
+    return unresolvedBooqNote(result)
+}
+
+function unresolvedBooqNote(note: DbNote): UnresolvedBooqNote {
+    return {
+        id: note.id,
+        booqId: note.booq_id as BooqId,
+        authorId: note.author_id,
+        range: {
+            start: note.start_path,
+            end: note.end_path,
+        },
+        kind: note.kind,
+        content: note.content ?? undefined,
+        targetQuote: note.target_quote,
+        privacy: note.privacy,
+        createdAt: note.created_at,
+        updatedAt: note.updated_at,
+    }
+}
+
+function noteFromDbNoteWithAuthor(dbNote: DbNoteWithAuthor): BooqNote {
+    return {
+        id: dbNote.id,
+        booqId: dbNote.booq_id as BooqId,
+        author: {
+            id: dbNote.author_id,
+            name: dbNote.author_name,
+            username: dbNote.author_username,
+            profilePictureURL: dbNote.author_profile_picture_url ?? undefined,
+            emoji: dbNote.author_emoji,
+        },
+        range: {
+            start: dbNote.start_path,
+            end: dbNote.end_path,
+        },
+        kind: dbNote.kind,
+        content: dbNote.content ?? undefined,
+        targetQuote: dbNote.target_quote,
+        privacy: dbNote.privacy,
+        createdAt: dbNote.created_at,
+        updatedAt: dbNote.updated_at,
+    }
 }

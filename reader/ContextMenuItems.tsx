@@ -8,10 +8,11 @@ import { quoteHref, userHref } from '@/common/href'
 import { BooqSelection } from '@/viewer'
 import { ProfileBadge } from '@/components/ProfilePicture'
 import { ColorPicker } from './ColorPicker'
-import { BooqNote, useBooqNotes } from '@/application/notes'
+import { useBooqNotes } from '@/application/notes'
 import { CommentIcon, CopyIcon, LinkIcon, RemoveIcon, ShareIcon, QuestionMarkIcon } from '@/components/Icons'
 import type { ContextMenuTarget, SelectionTarget, QuoteTarget, NoteTarget } from './ContextMenuContent'
 import { AuthorData } from '@/data/user'
+import { BooqNote } from '@/data/notes'
 
 export function AuthorItem({ name, pictureUrl, emoji, username }: {
     name: string,

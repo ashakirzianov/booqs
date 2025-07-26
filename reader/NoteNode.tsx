@@ -5,8 +5,8 @@ import clsx from 'clsx'
 import { booqHref } from '@/common/href'
 import Link from 'next/link'
 import { BooqId } from '@/core'
-import { BooqNote } from '@/application/notes'
 import { AuthorData } from '@/data/user'
+import { BooqNote } from '@/data/notes'
 
 export function NoteNodeComp({ booqId, note, user }: {
     booqId: BooqId,

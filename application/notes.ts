@@ -3,6 +3,7 @@
 import type { GetResponse, PostBody, PostResponse } from '@/app/api/booq/[library]/[id]/notes/route'
 import type { PatchBody, PatchResponse } from '@/app/api/notes/[id]/route'
 import { BooqId, BooqRange } from '@/core'
+import { BooqNote, NotePrivacy } from '@/data/notes'
 import { AuthorData } from '@/data/user'
 import { nanoid } from 'nanoid'
 import { useMemo } from 'react'
@@ -13,22 +14,6 @@ export const HIGHLIGHT_KINDS = [
     'highlight-0', 'highlight-1', 'highlight-2', 'highlight-3', 'highlight-4',
 ]
 export const COMMENT_KIND = 'comment'
-
-export type NoteColor = string // TODO: rename?
-export type NotePrivacy = 'private' | 'public'
-
-export type BooqNote = {
-    id: string,
-    booqId: BooqId,
-    author: AuthorData,
-    range: BooqRange,
-    kind: string,
-    content?: string,
-    targetQuote: string,
-    privacy: NotePrivacy,
-    createdAt: string,
-    updatedAt: string,
-}
 
 export function useBooqNotes({
     booqId, user,
@@ -91,7 +76,7 @@ export function useBooqNotes({
     )
 
     function addNote({
-        range: { start, end },
+        range,
         kind,
         content,
         targetQuote,
@@ -108,24 +93,19 @@ export function useBooqNotes({
         const postBody: PostBody = {
             id: nanoid(10),
             kind,
-            start_path: start,
-            end_path: end,
-            content: content ?? null,
-            target_quote: targetQuote,
+            range,
+            content,
+            targetQuote,
             privacy,
         }
 
         const now = new Date().toISOString()
         const optimisticResponse: PostResponse = {
             ...postBody,
-            author_id: user.id,
-            author_name: user.name,
-            author_username: user.username,
-            author_profile_picture_url: user.profilePictureURL ?? null,
-            author_emoji: user.emoji,
-            created_at: now,
-            updated_at: now,
-            booq_id: booqId,
+            author: user,
+            createdAt: now,
+            updatedAt: now,
+            booqId,
             privacy,
         }
 
@@ -253,25 +233,5 @@ export function useBooqNotes({
 
 type NoteJson = GetResponse['notes'][number]
 function noteFromJson(note: NoteJson): BooqNote {
-    return {
-        id: note.id,
-        booqId: note.booq_id as BooqId,
-        range: {
-            start: note.start_path,
-            end: note.end_path,
-        },
-        kind: note.kind,
-        content: note.content ?? undefined,
-        targetQuote: note.target_quote,
-        author: {
-            id: note.author_id,
-            username: note.author_username,
-            name: note.author_name ?? undefined,
-            profilePictureURL: note.author_profile_picture_url ?? undefined,
-            emoji: note.author_emoji,
-        },
-        privacy: note.privacy,
-        createdAt: note.created_at,
-        updatedAt: note.updated_at,
-    }
+    return note
 }

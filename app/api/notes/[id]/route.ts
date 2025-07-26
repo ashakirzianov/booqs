@@ -1,6 +1,5 @@
 import {
     modifyNote, deleteNote,
-    DbNote,
 } from '@/data/notes'
 import { getUserIdInsideRequest } from '@/data/auth'
 import { NextRequest } from 'next/server'
@@ -9,8 +8,18 @@ type Params = {
     id: string,
 }
 
-export type PatchBody = Partial<Pick<DbNote, 'kind' | 'content'>>
-export type PatchResponse = Pick<DbNote, 'id' | 'kind' | 'content' | 'target_quote' | 'created_at' | 'updated_at'>
+export type PatchBody = {
+    kind?: string,
+    content?: string,
+}
+export type PatchResponse = {
+    id: string,
+    kind: string,
+    content?: string,
+    targetQuote: string,
+    createdAt: string,
+    updatedAt: string,
+}
 export async function PATCH(request: NextRequest, { params }: { params: Promise<Params> }) {
     const userId = await getUserIdInsideRequest()
     if (!userId) {
