@@ -38,7 +38,7 @@ Prefer 'function name(...) { ... }' style to 'const name = (...) => { ... }' sty
 This is a Next.js application for reading and managing ebooks (called "booqs"). The architecture follows a layered approach:
 
 - **Frontend**: Next.js App Router with React components
-- **Backend**: GraphQL API with Apollo Server
+- **Backend**: /api routes for certain operation and GraphQL API with graphql-yoga
 - **Database**: PostgreSQL with Neon serverless
 - **Storage**: AWS S3 for file storage
 - **Authentication**: Passkey-based auth with WebAuthn
@@ -83,7 +83,7 @@ PostgreSQL database with main tables:
 - `history` - Reading history
 
 ### GraphQL API
-The API uses Apollo Server with GraphQL schema defined in `graphql/schema.graphql`. Main operations:
+The API uses graphql-yoga with GraphQL schema defined in `graphql/schema.graphql`. Main operations:
 - Query books, authors, search results
 - Manage bookmarks and notes
 - Handle user authentication
