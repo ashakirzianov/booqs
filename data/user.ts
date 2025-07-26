@@ -46,7 +46,7 @@ export async function getUserByUsername(username: string): Promise<AccountPublic
 }
 
 export async function getUserById(userId: string): Promise<AccountPublicData | null> {
-    const dbUser = await userForUsername(userId)
+    const dbUser = await userForId(userId)
     if (!dbUser) {
         return null
     }

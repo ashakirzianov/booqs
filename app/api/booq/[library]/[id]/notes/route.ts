@@ -72,6 +72,9 @@ export async function POST(request: NextRequest, { params }: { params: Promise<P
         targetQuote,
         privacy,
     })
+    if (!note) {
+        return Response.json({ error: 'Failed to create note' }, { status: 500 })
+    }
     const result: PostResponse = {
         ...note,
         author,

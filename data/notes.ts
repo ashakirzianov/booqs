@@ -59,18 +59,24 @@ export async function createNote({
     content?: string,
     targetQuote: string,
     privacy?: NotePrivacy,
-}): Promise<UnresolvedBooqNote> {
-    const dbNote = await addNote({
-        id,
-        authorId,
-        booqId,
-        range,
-        kind,
-        content,
-        targetQuote,
-        privacy,
-    })
-    return unresolvedBooqNote(dbNote)
+}): Promise<UnresolvedBooqNote | undefined> {
+    try {
+        const dbNote = await addNote({
+            id,
+            authorId,
+            booqId,
+            range,
+            kind,
+            content,
+            targetQuote,
+            privacy,
+        })
+        return unresolvedBooqNote(dbNote)
+    } catch (error) {
+        console.error('Error creating note:', error)
+        return undefined
+    }
+
 }
 
 export async function deleteNote({
