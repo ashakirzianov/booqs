@@ -1,4 +1,4 @@
-import { coverSizeForSize, resolveImageSrc } from '@/common'
+import { coverSizeForSize, resolveImageSrc } from '@/common/images'
 import { BooqId } from '@/core'
 import React from 'react'
 

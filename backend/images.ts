@@ -1,7 +1,7 @@
 import sharp from 'sharp'
 import { uploadAsset } from './blob'
 import { Booq, BooqId } from '@/core'
-import { coverSizes, imageBucket } from '@/common'
+import { coverSizes, imageBucket } from '@/common/images'
 
 export async function uploadBooqImages(booqId: BooqId, booq: Booq) {
     const allImages = Object.entries(booq.images).map(
