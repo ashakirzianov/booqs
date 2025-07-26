@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 import { fetchAuthData } from '@/data/auth'
-import { accountHref } from '@/core/href'
+import { accountHref } from '@/common/href'
 import { ProfileIcon, UsersIcon, CollectionIcon } from '@/components/Icons'
 import { AccountLink } from './AccountLink'
 import styles from './AccountLayout.module.css'

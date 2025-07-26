@@ -3,7 +3,7 @@ import { BooqCover } from '@/components/BooqCover'
 import { BooqTags } from '@/components/BooqTags'
 import { CollectionButton } from '@/components/CollectionButton'
 import Link from 'next/link'
-import { booqHref, authorHref } from '@/core/href'
+import { booqHref, authorHref } from '@/common/href'
 import { notFound } from 'next/navigation'
 import { getUserIdInsideRequest } from '@/data/auth'
 import { READING_LIST_COLLECTION } from '@/application/collections'
@@ -68,10 +68,10 @@ export default async function Page({ params }: {
 
                         {(detailed.subjects.length > 0 || detailed.languages.length > 0) && (
                             <div className="mb-6">
-                                <BooqTags 
-                                    subjects={detailed.subjects} 
-                                    languages={detailed.languages} 
-                                    booqId={booqId} 
+                                <BooqTags
+                                    subjects={detailed.subjects}
+                                    languages={detailed.languages}
+                                    booqId={booqId}
                                 />
                             </div>
                         )}

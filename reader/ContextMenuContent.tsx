@@ -11,7 +11,7 @@ import {
     AskMenuItem,
 } from './ContextMenuItems'
 import { useRouter } from 'next/navigation'
-import { quoteHref } from '@/core/href'
+import { quoteHref } from '@/common/href'
 import { NoteTargetMenu } from './NoteTargetMenu'
 import { CreateCommentTargetMenu } from './CreateCommentTargetMenu'
 import { AskTargetMenu } from './AskTargetMenu'

@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation'
-import { authHref } from '@/core/href'
+import { authHref } from '@/common/href'
 import { fetchAuthData, fetchPasskeyData } from '@/data/auth'
 import { DeleteAccountButton } from '../DeleteAccountButton'
 import { SignoutButton } from '../SignoutButton'

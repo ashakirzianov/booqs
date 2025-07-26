@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation'
-import { authHref } from '@/core/href'
+import { authHref } from '@/common/href'
 import { fetchAuthData } from '@/data/auth'
 import { booqCollection } from '@/data/booqs'
 import { READING_LIST_COLLECTION } from '@/application/collections'

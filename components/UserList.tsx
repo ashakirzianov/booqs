@@ -2,7 +2,7 @@
 import { useState, ReactNode } from 'react'
 import Link from 'next/link'
 import { AccountPublicData } from '@/core'
-import { userHref } from '@/core/href'
+import { userHref } from '@/common/href'
 import { followAction, unfollowAction } from '@/data/user'
 import { ProfileBadge } from '@/components/ProfilePicture'
 
@@ -10,7 +10,7 @@ export type UserWithFollowStatus = AccountPublicData & {
     isFollowing: boolean
 }
 
-type ButtonState = 
+type ButtonState =
     | { state: 'idle' }
     | { state: 'loading' }
     | { state: 'error', error: string }
@@ -49,8 +49,8 @@ export function UserList({
         if (currentState.state === 'loading') return
 
         // Optimistic update - immediately change the UI
-        const newUsers = usersList.map(user => 
-            user.username === username 
+        const newUsers = usersList.map(user =>
+            user.username === username
                 ? { ...user, isFollowing: true }
                 : user
         )
@@ -70,33 +70,33 @@ export function UserList({
                 }))
             } else {
                 // Rollback on error
-                const rolledBackUsers = usersList.map(user => 
-                    user.username === username 
+                const rolledBackUsers = usersList.map(user =>
+                    user.username === username
                         ? { ...user, isFollowing: false }
                         : user
                 )
                 updateUsersList(rolledBackUsers)
                 setButtonStates(prev => ({
                     ...prev,
-                    [username]: { 
-                        state: 'error', 
-                        error: result.error || 'Failed to follow user' 
+                    [username]: {
+                        state: 'error',
+                        error: result.error || 'Failed to follow user'
                     }
                 }))
             }
         } catch {
             // Rollback on network error
-            const rolledBackUsers = usersList.map(user => 
-                user.username === username 
+            const rolledBackUsers = usersList.map(user =>
+                user.username === username
                     ? { ...user, isFollowing: false }
                     : user
             )
             updateUsersList(rolledBackUsers)
             setButtonStates(prev => ({
                 ...prev,
-                [username]: { 
-                    state: 'error', 
-                    error: 'Network error. Please try again.' 
+                [username]: {
+                    state: 'error',
+                    error: 'Network error. Please try again.'
                 }
             }))
         }
@@ -107,8 +107,8 @@ export function UserList({
         if (currentState.state === 'loading') return
 
         // Optimistic update - immediately change the UI
-        const newUsers = usersList.map(user => 
-            user.username === username 
+        const newUsers = usersList.map(user =>
+            user.username === username
                 ? { ...user, isFollowing: false }
                 : user
         )
@@ -128,33 +128,33 @@ export function UserList({
                 }))
             } else {
                 // Rollback on error
-                const rolledBackUsers = usersList.map(user => 
-                    user.username === username 
+                const rolledBackUsers = usersList.map(user =>
+                    user.username === username
                         ? { ...user, isFollowing: true }
                         : user
                 )
                 updateUsersList(rolledBackUsers)
                 setButtonStates(prev => ({
                     ...prev,
-                    [username]: { 
-                        state: 'error', 
-                        error: result.error || 'Failed to unfollow user' 
+                    [username]: {
+                        state: 'error',
+                        error: result.error || 'Failed to unfollow user'
                     }
                 }))
             }
         } catch {
             // Rollback on network error
-            const rolledBackUsers = usersList.map(user => 
-                user.username === username 
+            const rolledBackUsers = usersList.map(user =>
+                user.username === username
                     ? { ...user, isFollowing: true }
                     : user
             )
             updateUsersList(rolledBackUsers)
             setButtonStates(prev => ({
                 ...prev,
-                [username]: { 
-                    state: 'error', 
-                    error: 'Network error. Please try again.' 
+                [username]: {
+                    state: 'error',
+                    error: 'Network error. Please try again.'
                 }
             }))
         }
@@ -178,12 +178,12 @@ export function UserList({
             <div className="space-y-3">
                 {usersList.map(user => {
                     const buttonState = buttonStates[user.username] || { state: 'idle' }
-                    
+
                     return (
                         <div key={user.id} className="flex items-center justify-between p-3 border border-dimmed rounded-lg">
                             <div className="flex items-center gap-3">
                                 <Link href={userHref({ username: user.username })}>
-                                    <ProfileBadge 
+                                    <ProfileBadge
                                         name={user.name}
                                         picture={user.profilePictureURL}
                                         emoji={user.emoji ?? '👤'}
@@ -192,7 +192,7 @@ export function UserList({
                                     />
                                 </Link>
                                 <div>
-                                    <Link 
+                                    <Link
                                         href={userHref({ username: user.username })}
                                         className="font-medium hover:text-action transition-colors"
                                     >
@@ -201,7 +201,7 @@ export function UserList({
                                     <div className="text-sm text-dimmed">@{user.username}</div>
                                 </div>
                             </div>
-                            
+
                             {/* Only show follow button if user is authenticated and not viewing own profile */}
                             {currentUserId && user.id !== currentUserId && (
                                 <div className="flex flex-col items-end gap-1">

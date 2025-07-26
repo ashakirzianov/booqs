@@ -2,7 +2,7 @@ import { Popover } from '@/components/Popover'
 import { ContextMenuContent } from '@/reader/ContextMenuContent'
 import { MoreIcon } from '@/components/Icons'
 import clsx from 'clsx'
-import { booqHref } from '@/core/href'
+import { booqHref } from '@/common/href'
 import Link from 'next/link'
 import { AuthorData, BooqId, BooqNote } from '@/core'
 

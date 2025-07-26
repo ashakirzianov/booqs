@@ -1,4 +1,4 @@
-import { signInLinkHref, signUpLinkHref } from '@/core/href'
+import { signInLinkHref, signUpLinkHref } from '@/common/href'
 import { Resend } from 'resend'
 
 export async function sendSignInLink({

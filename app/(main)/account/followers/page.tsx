@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation'
-import { authHref } from '@/core/href'
+import { authHref } from '@/common/href'
 import { fetchAuthData } from '@/data/auth'
 import { getFollowingList, getFollowersList } from '@/data/user'
 import { FollowingList } from '../FollowingList'

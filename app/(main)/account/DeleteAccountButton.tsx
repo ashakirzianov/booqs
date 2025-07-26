@@ -1,6 +1,6 @@
 'use client'
 
-import { feedHref } from '@/core/href'
+import { feedHref } from '@/common/href'
 import { Modal } from '@/components/Modal'
 import { BorderButton } from '@/components/Buttons'
 import { deleteAccountAction } from '@/data/auth'

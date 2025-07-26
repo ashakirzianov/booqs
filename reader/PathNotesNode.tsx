@@ -1,7 +1,7 @@
 import { Fragment } from 'react'
 import { NoteNodeComp } from './NoteNode'
 import { PathNotesNode } from './nodes'
-import { booqHref } from '@/core/href'
+import { booqHref } from '@/common/href'
 import Link from 'next/link'
 import { AuthorData, BooqId, TableOfContentsItem } from '@/core'
 
