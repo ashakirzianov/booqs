@@ -1,3 +1,4 @@
+'use server'
 import { BooqId, BooqRange } from '@/core'
 import {
     addNote,

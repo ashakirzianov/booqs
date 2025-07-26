@@ -1,3 +1,4 @@
+'use server'
 import { BooqId } from '@/core'
 import { addToCollection, booqIdsInCollections, removeFromCollection } from '@/backend/collections'
 
