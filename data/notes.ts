@@ -8,14 +8,21 @@ import {
     DbNote,
     DbNoteWithAuthor,
 } from '@/backend/notes'
-import { AuthorData } from './user'
 
 export type NotePrivacy = 'private' | 'public'
+
+export type NoteAuthorData = {
+    id: string,
+    username: string,
+    name: string,
+    emoji: string,
+    profilePictureURL?: string,
+}
 
 export type BooqNote = {
     id: string,
     booqId: BooqId,
-    author: AuthorData,
+    author: NoteAuthorData,
     range: BooqRange,
     kind: string,
     content?: string,

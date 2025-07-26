@@ -1,7 +1,6 @@
 import { pathInRange, TableOfContentsItem } from '@/core'
 import { NavigationSelection } from './useNavigationState'
-import { AuthorData } from '@/data/user'
-import { BooqNote } from '@/data/notes'
+import { NoteAuthorData, BooqNote } from '@/data/notes'
 
 export type TocNode = {
     kind: 'toc',
@@ -25,7 +24,7 @@ export function buildNavigationNodes({
     toc: TableOfContentsItem[],
     notes: BooqNote[],
     selection: NavigationSelection,
-    user?: AuthorData,
+    user?: NoteAuthorData,
 }) {
     const showChapters = selection.chapters
     const showNotes = selection.notes
@@ -49,7 +48,7 @@ export function filterNotes({
 }: {
     notes: BooqNote[],
     selection: NavigationSelection,
-    user: AuthorData | undefined,
+    user: NoteAuthorData | undefined,
 }) {
     const showNotes = selection.notes
     const showAuthors = Object.entries(selection)

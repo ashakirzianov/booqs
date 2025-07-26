@@ -17,8 +17,6 @@ export type AccountPublicData = {
 export type AccountData = AccountPublicData & {
     email: string,
 }
-// TODO: remove this type, use AccountData instead
-export type AuthorData = Pick<AccountData, 'id' | 'username' | 'name' | 'profilePictureURL' | 'emoji'>
 
 export async function getCurrentUser(): Promise<AccountData | undefined> {
     const userId = await getUserIdInsideRequest()

@@ -5,12 +5,11 @@ import clsx from 'clsx'
 import { booqHref } from '@/common/href'
 import Link from 'next/link'
 import { BooqId } from '@/core'
-import { AuthorData } from '@/data/user'
-import { BooqNote } from '@/data/notes'
+import { NoteAuthorData, BooqNote } from '@/data/notes'
 
 export function NoteNodeComp({ booqId, note, user }: {
     booqId: BooqId,
-    user: AuthorData | undefined,
+    user: NoteAuthorData | undefined,
     note: BooqNote,
 }) {
     return <div className='container flex flex-1 justify-between pl-base' style={{

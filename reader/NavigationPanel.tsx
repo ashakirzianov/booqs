@@ -7,8 +7,7 @@ import { NavigationFilter } from './NavigationFilter'
 import { buildNavigationNodes, NavigationNode } from './nodes'
 import { BooqId, TableOfContentsItem } from '@/core'
 import { NavigationSelection } from './useNavigationState'
-import { AuthorData } from '@/data/user'
-import { BooqNote } from '@/data/notes'
+import { NoteAuthorData, BooqNote } from '@/data/notes'
 
 export function NavigationPanel({
     booqId, user, title, toc, notes,
@@ -20,8 +19,8 @@ export function NavigationPanel({
     toc: TableOfContentsItem[],
     notes: BooqNote[],
     selection: NavigationSelection,
-    user?: AuthorData,
-    highlightAuthors: AuthorData[],
+    user?: NoteAuthorData,
+    highlightAuthors: NoteAuthorData[],
     toggleSelection: (item: string) => void,
     closeSelf: () => void,
 }) {
@@ -74,7 +73,7 @@ export function NavigationPanel({
 
 function NavigationNodeComp({ booqId, user, node }: {
     booqId: BooqId,
-    user: AuthorData | undefined,
+    user: NoteAuthorData | undefined,
     node: NavigationNode,
 }) {
     switch (node.kind) {

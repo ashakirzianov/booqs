@@ -1,7 +1,6 @@
-import { AuthorData } from '@/data/user'
+import { NoteAuthorData } from '@/data/notes'
 
-
-export function Avatar({ user }: { user?: AuthorData }) {
+export function Avatar({ user }: { user?: NoteAuthorData }) {
     const display = user?.emoji || (user?.name ? user.name.charAt(0).toUpperCase() : 'X')
 
     return (

@@ -10,7 +10,7 @@ import { ProfileBadge } from '@/components/ProfilePicture'
 import { CommentIcon, RemoveIcon, QuestionMarkIcon, ShareIcon } from '@/components/Icons'
 import { MenuButton } from '@/components/Buttons'
 import { generateQuote } from './ContextMenuItems'
-import { AuthorData } from '@/data/user'
+import { NoteAuthorData } from '@/data/notes'
 import { userHref } from '@/common/href'
 
 export function NoteTargetMenu({
@@ -18,7 +18,7 @@ export function NoteTargetMenu({
 }: {
     target: NoteTarget,
     booqId: BooqId,
-    user: AuthorData | undefined,
+    user: NoteAuthorData | undefined,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
     const { noteId, editMode } = target

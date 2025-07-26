@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { BooqId, BooqRange, pathInRange, pathLessThan } from '@/core'
 import { HIGHLIGHT_KINDS, COMMENT_KIND, useBooqNotes } from '@/application/notes'
-import { AuthorData } from '@/data/user'
+import { NoteAuthorData } from '@/data/notes'
 
 export function useNotesData({
     booqId,
@@ -10,7 +10,7 @@ export function useNotesData({
     highlightsAuthorIds,
 }: {
     booqId: BooqId,
-    user: AuthorData | undefined,
+    user: NoteAuthorData | undefined,
     currentRange?: BooqRange,
     highlightsAuthorIds: Set<string>,
 }) {
@@ -32,7 +32,7 @@ export function useNotesData({
 
     const allHighlightsAuthors = useMemo(() => {
         const set = new Set<string>()
-        const authors: AuthorData[] = []
+        const authors: NoteAuthorData[] = []
         for (const note of allHighlights) {
             if (!set.has(note.author.id)) {
                 set.add(note.author.id)

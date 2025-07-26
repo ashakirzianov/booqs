@@ -11,8 +11,7 @@ import { ColorPicker } from './ColorPicker'
 import { useBooqNotes } from '@/application/notes'
 import { CommentIcon, CopyIcon, LinkIcon, RemoveIcon, ShareIcon, QuestionMarkIcon } from '@/components/Icons'
 import type { ContextMenuTarget, SelectionTarget, QuoteTarget, NoteTarget } from './ContextMenuContent'
-import { AuthorData } from '@/data/user'
-import { BooqNote } from '@/data/notes'
+import { BooqNote, NoteAuthorData } from '@/data/notes'
 
 export function AuthorItem({ name, pictureUrl, emoji, username }: {
     name: string,
@@ -49,7 +48,7 @@ export function AddHighlightItem({
 }: {
     selection: BooqSelection,
     booqId: BooqId,
-    user: AuthorData | undefined,
+    user: NoteAuthorData | undefined,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
     const { addNote } = useBooqNotes({ booqId, user })
@@ -85,7 +84,7 @@ export function AddCommentItem({
     target, user, setTarget,
 }: {
     target: SelectionTarget | QuoteTarget | NoteTarget,
-    user: AuthorData | undefined,
+    user: NoteAuthorData | undefined,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
     if (!user?.id) {
@@ -108,7 +107,7 @@ export function RemoveNoteItem({
 }: {
     note: BooqNote,
     booqId: BooqId,
-    user: AuthorData | undefined,
+    user: NoteAuthorData | undefined,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
     const { removeNote } = useBooqNotes({ booqId, user })
@@ -210,7 +209,7 @@ export function AskMenuItem({
     target, user, setTarget,
 }: {
     target: SelectionTarget | QuoteTarget,
-    user: AuthorData | undefined,
+    user: NoteAuthorData | undefined,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
     if (!user?.id) {

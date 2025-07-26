@@ -4,14 +4,14 @@ import { PathNotesNode } from './nodes'
 import { booqHref } from '@/common/href'
 import Link from 'next/link'
 import { BooqId, TableOfContentsItem } from '@/core'
-import { AuthorData } from '@/data/user'
+import { NoteAuthorData } from '@/data/notes'
 
 export function PathNotesNodeComp({
     booqId, user,
     node: { items, notes },
 }: {
     booqId: BooqId,
-    user: AuthorData | undefined,
+    user: NoteAuthorData | undefined,
     node: PathNotesNode,
 }) {
     return <div>

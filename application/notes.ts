@@ -3,8 +3,7 @@
 import type { GetResponse, PostBody, PostResponse } from '@/app/api/booq/[library]/[id]/notes/route'
 import type { PatchBody, PatchResponse } from '@/app/api/notes/[id]/route'
 import { BooqId, BooqRange } from '@/core'
-import { BooqNote, NotePrivacy } from '@/data/notes'
-import { AuthorData } from '@/data/user'
+import { NoteAuthorData, BooqNote, NotePrivacy } from '@/data/notes'
 import { nanoid } from 'nanoid'
 import { useMemo } from 'react'
 import useSWR from 'swr'
@@ -19,7 +18,7 @@ export function useBooqNotes({
     booqId, user,
 }: {
     booqId: BooqId,
-    user: AuthorData | undefined,
+    user: NoteAuthorData | undefined,
 }) {
     const notesKey = `/api/booq/${booqId}/notes`
 

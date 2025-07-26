@@ -1,9 +1,10 @@
 import {
+    NoteAuthorData,
     createNote,
     getNotesWithAuthorForBooq,
     NotePrivacy,
 } from '@/data/notes'
-import { AuthorData, getUserById } from '@/data/user'
+import { getUserById } from '@/data/user'
 import { BooqId, BooqRange, makeId } from '@/core'
 import { NextRequest } from 'next/server'
 import { getUserIdInsideRequest } from '@/data/request'
@@ -15,7 +16,7 @@ type Params = {
 type ResolvedNote = {
     id: string,
     booqId: BooqId,
-    author: AuthorData,
+    author: NoteAuthorData,
     range: BooqRange,
     kind: string,
     content?: string,
