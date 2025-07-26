@@ -2,7 +2,7 @@
 // import '@/app/wdyr'
 
 import React, { useMemo } from 'react'
-import { BooqAnchor, BooqId, BooqRange } from '@/core'
+import { BooqAnchor, BooqId, BooqPath, BooqRange } from '@/core'
 import { BorderButton, PanelButton } from '@/components/Buttons'
 import { booqHref, feedHref } from '@/common/href'
 import {
@@ -234,6 +234,13 @@ export function Reader({
         />
     </>
 
+    const hrefForPath = useMemo(() => {
+        return (path: BooqPath) => booqHref({ booqId: booq.booqId, path })
+    }, [booq.booqId])
+    const resolveSrc = useMemo(() => {
+        return (src: string) => resolveSrcForBooqId(booq.booqId, src)
+    }, [booq.booqId])
+
     return <ReaderLayout
         isControlsVisible={isControlsVisible}
         isLeftPanelOpen={navigationOpen}
@@ -243,13 +250,12 @@ export function Reader({
             fontSize: `${fontScale}%`,
         }}>
             <BooqContent
-                booqId={booq.booqId}
                 nodes={booq.fragment.nodes}
                 range={range}
                 augmentations={augmentations}
                 onAugmentationClick={onAugmentationClick}
-                hrefForPath={(id, path) => booqHref({ booqId: id, path })}
-                resolveSrc={(id, src) => resolveSrc(id, src)}
+                hrefForPath={hrefForPath}
+                resolveSrc={resolveSrc}
             />
         </div>}
         PrevButton={<AnchorButton
@@ -296,7 +302,7 @@ function PageLabel({ text }: {
     </span>
 }
 
-function resolveSrc(booqId: BooqId, src: string): string {
+function resolveSrcForBooqId(booqId: BooqId, src: string): string {
     if (isExternalSrc(src)) {
         return src
     }
