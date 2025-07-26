@@ -1,5 +1,4 @@
-import { userForUsername, usersForIds } from '@/backend/users'
-import { getFollowing } from '@/backend/follows'
+import { getUserByUsername, getUsersByIds, getFollowingList } from '@/data/followers'
 import { NextRequest } from 'next/server'
 
 type Params = {
@@ -19,13 +18,13 @@ export type GetResponse = {
 export async function GET(request: NextRequest, { params }: { params: Promise<Params> }) {
     const { username } = await params
     
-    const user = await userForUsername(username)
+    const user = await getUserByUsername(username)
     if (!user) {
         return Response.json({ error: 'User not found' }, { status: 404 })
     }
     
-    const followingIds = await getFollowing(user.id)
-    const following = await usersForIds(followingIds)
+    const followingIds = await getFollowingList(user.id)
+    const following = await getUsersByIds(followingIds)
     
     const result: GetResponse = {
         following: following.map(u => ({

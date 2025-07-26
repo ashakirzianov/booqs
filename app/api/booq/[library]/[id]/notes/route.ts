@@ -1,10 +1,10 @@
 import {
-    addNote,
+    createNote,
+    getNotesWithAuthorForBooq,
     DbNote,
     DbNoteWithAuthor,
-    notesWithAuthorForBooqId,
-} from '@/backend/notes'
-import { userForId } from '@/backend/users'
+} from '@/data/notes'
+import { getUserById } from '@/data/followers'
 import { makeId } from '@/core'
 import { getUserIdInsideRequest } from '@/data/auth'
 import { NextRequest } from 'next/server'
@@ -19,7 +19,7 @@ export type GetResponse = {
 export async function GET(request: NextRequest, { params }: { params: Promise<Params> }) {
     const { library, id } = await params
     const booqId = makeId(library, id)
-    const notes = await notesWithAuthorForBooqId(booqId)
+    const notes = await getNotesWithAuthorForBooq(booqId)
     const result: GetResponse = {
         notes,
     }
@@ -35,7 +35,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<P
     if (!userId) {
         return Response.json({ error: 'Unauthorized' }, { status: 401 })
     }
-    const author = await userForId(userId)
+    const author = await getUserById(userId)
     if (!author) {
         return Response.json({ error: 'User does not exist' }, { status: 401 })
     }
@@ -43,7 +43,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<P
     if (!id || !booqId || !start_path || !end_path || !kind) {
         return Response.json({ error: 'Missing required fields' }, { status: 400 })
     }
-    const note = await addNote({
+    const note = await createNote({
         id,
         authorId: userId,
         booqId,

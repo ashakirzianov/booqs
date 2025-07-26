@@ -1,7 +1,7 @@
 import {
-    updateNote, removeNote,
+    modifyNote, deleteNote,
     DbNote,
-} from '@/backend/notes'
+} from '@/data/notes'
 import { getUserIdInsideRequest } from '@/data/auth'
 import { NextRequest } from 'next/server'
 
@@ -18,7 +18,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     }
     const { id } = await params
     const { kind, content }: PatchBody = await request.json()
-    const note = await updateNote({
+    const note = await modifyNote({
         id,
         authorId: userId,
         kind,
@@ -37,7 +37,7 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
         return Response.json({ error: 'Unauthorized' }, { status: 401 })
     }
     const { id } = await params
-    const success = await removeNote({
+    const success = await deleteNote({
         id, authorId: userId,
     })
     if (success) {

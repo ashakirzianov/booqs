@@ -1,4 +1,4 @@
-import { addToCollection, booqIdsInCollections, removeFromCollection } from '@/backend/collections'
+import { addBooqToCollection, getBooqIdsInCollection, removeBooqFromCollection } from '@/data/collections'
 import { BooqId } from '@/core'
 import { getUserIdInsideRequest } from '@/data/auth'
 
@@ -15,7 +15,7 @@ export async function GET(request: Request, { params }: {
         return new Response('Unauthorized', { status: 401 })
     }
     const { name } = await params
-    const booqIds = await booqIdsInCollections(userId, name)
+    const booqIds = await getBooqIdsInCollection(userId, name)
     const result: GetResponse = {
         booqIds,
     }
@@ -38,8 +38,8 @@ export async function POST(request: Request, { params }: {
     if (!booqId) {
         return new Response('Bad Request', { status: 400 })
     }
-    await addToCollection({ userId, booqId, name })
-    const booqIds = await booqIdsInCollections(userId, name)
+    await addBooqToCollection({ userId, booqId, name })
+    const booqIds = await getBooqIdsInCollection(userId, name)
     const result: PostResponse = {
         booqIds,
     }
@@ -62,8 +62,8 @@ export async function DELETE(request: Request, { params }: {
     if (!booqId) {
         return new Response('Bad Request', { status: 400 })
     }
-    await removeFromCollection({ userId, booqId, name })
-    const booqIds = await booqIdsInCollections(userId, name)
+    await removeBooqFromCollection({ userId, booqId, name })
+    const booqIds = await getBooqIdsInCollection(userId, name)
     const result: DeleteResponse = {
         booqIds,
     }
