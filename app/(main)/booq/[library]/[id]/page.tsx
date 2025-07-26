@@ -7,7 +7,7 @@ import { booqHref, authorHref } from '@/common/href'
 import { notFound } from 'next/navigation'
 import { getUserIdInsideRequest } from '@/data/auth'
 import { READING_LIST_COLLECTION } from '@/application/collections'
-import { fetchBooqHistory } from '@/data/history'
+import { getBooqHistory } from '@/data/history'
 import type { BooqId, TableOfContentsItem } from '@/core'
 
 type Params = {
@@ -29,7 +29,7 @@ export default async function Page({ params }: {
     const toc = detailed?.toc
     const userId = await getUserIdInsideRequest()
     const isSignedIn = Boolean(userId)
-    const history = await fetchBooqHistory(booqId)
+    const history = await getBooqHistory(booqId)
 
     return <main className="flex flex-row justify-center min-h-screen bg-background">
         <div className="flex flex-col max-w-4xl w-full p-6">

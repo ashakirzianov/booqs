@@ -4,7 +4,7 @@ import { getUserIdInsideRequest } from './auth'
 import { booqPreview } from '@/backend/booq'
 import { BooqId, BooqPath } from '@/core'
 
-export async function reportBooqHistory({
+export async function reportBooqHistoryAction({
     booqId, path, source,
 }: {
     booqId: BooqId,
@@ -24,7 +24,7 @@ export async function reportBooqHistory({
     })
 }
 
-export async function fetchReadingHistory() {
+export async function getReadingHistory() {
     const userId = await getUserIdInsideRequest()
     if (!userId) {
         return undefined
@@ -37,7 +37,7 @@ export async function fetchReadingHistory() {
     return resolved.filter(entry => entry !== undefined)
 }
 
-export async function fetchBooqHistory(booqId: BooqId) {
+export async function getBooqHistory(booqId: BooqId) {
     const userId = await getUserIdInsideRequest()
     if (!userId) {
         return undefined
