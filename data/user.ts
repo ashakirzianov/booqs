@@ -3,8 +3,6 @@ import { userForUsername, DbUser, usersForIds, userForId } from '@/backend/users
 import { followUser, unfollowUser, isFollowing, getFollowing, getFollowers } from '@/backend/follows'
 import { getUserIdInsideRequest } from './request'
 
-export type { DbUser }
-
 export type AccountPublicData = {
     id: string,
     username: string,
