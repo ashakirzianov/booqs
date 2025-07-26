@@ -4,13 +4,21 @@ import {
     initiatePasskeyLogin, verifyPasskeyLogin,
     getUserPasskeys, deletePasskeyCredential,
 } from '@/backend/passkey'
-import { generateToken, userIdFromToken } from '@/backend/token'
 import { deleteUserForId, userForId, updateUser, DbUser } from '@/backend/users'
 import { completeSignInRequest, completeSignUp, prevalidateSignup, initiateSignRequest } from '@/backend/sign'
 import { RegistrationResponseJSON, AuthenticationResponseJSON } from '@simplewebauthn/browser'
-import { cookies, headers } from 'next/headers'
+import { headers } from 'next/headers'
 import { revalidatePath } from 'next/cache'
 import { AccountData } from './user'
+import { getUserIdInsideRequest, setUserIdInsideRequest } from './request'
+
+export type PasskeyData = {
+    id: string
+    label: string | null
+    ipAddress: string | null
+    createdAt: string
+    updatedAt: string
+}
 
 export async function initPasskeyRegistrationAcion() {
     try {
@@ -60,8 +68,7 @@ export async function verifyPasskeyRegistrationAction({ id, response, label }: {
             ipAddress,
         })
         if (result.user?.id) {
-            const token = generateToken(result.user.id)
-            await setAuthToken(token)
+            await setUserIdInsideRequest(result.user.id)
             const updatedPasskeys = await getUserPasskeys(result.user.id)
             return {
                 success: true,
@@ -116,8 +123,7 @@ export async function verifyPasskeySigninAction({ id, response }: {
             ipAddress,
         })
         if (result.user?.id) {
-            const token = generateToken(result.user.id)
-            await setAuthToken(token)
+            await setUserIdInsideRequest(result.user.id)
             return {
                 success: true,
                 user: accountDataFromDbUser(result.user),
@@ -135,16 +141,8 @@ export async function verifyPasskeySigninAction({ id, response }: {
 }
 
 export async function signOutAction() {
-    await setAuthToken(undefined)
+    await setUserIdInsideRequest(undefined)
     return true
-}
-
-export async function getUserIdInsideRequest() {
-    const token = await getAuthToken()
-    if (!token) {
-        return undefined
-    }
-    return userIdFromToken(token)
 }
 
 export async function updateAccountAction({
@@ -183,7 +181,7 @@ export async function deleteAccountAction() {
     }
     const result = await deleteUserForId(userId)
     if (result) {
-        setAuthToken(undefined)
+        await setUserIdInsideRequest(undefined)
     }
     return result
 }
@@ -202,7 +200,7 @@ export async function completeSignInAction({
             return { success: false, reason: result.reason }
         }
 
-        await setAuthToken(result.token)
+        await setUserIdInsideRequest(result.user.id)
 
         return {
             success: true,
@@ -240,7 +238,7 @@ export async function completeSignUpAction({
             return { success: false, reason: result.reason }
         }
 
-        await setAuthToken(result.token)
+        await setUserIdInsideRequest(result.user.id)
 
         return {
             success: true,
@@ -299,12 +297,6 @@ async function getOrigin() {
     return hs.get('origin')
 }
 
-async function getAuthToken() {
-    const cookieStore = await cookies()
-    const token = cookieStore.get('token')
-    return token?.value
-}
-
 async function getClientIpAddress(): Promise<string | undefined> {
     const hs = await headers()
     return hs.get('x-forwarded-for') || hs.get('x-real-ip') || undefined
@@ -341,28 +333,6 @@ export async function deletePasskeyActionWithUpdatedList(credentialId: string): 
     return { success: true, passkeys: updatedPasskeys }
 }
 
-export type PasskeyData = {
-    id: string
-    label: string | null
-    ipAddress: string | null
-    createdAt: string
-    updatedAt: string
-}
-
-async function setAuthToken(token: string | undefined) {
-    const cookieStore = await cookies()
-    if (token) {
-        cookieStore.set('token', token, {
-            httpOnly: true,
-            secure: true,
-            maxAge: 60 * 60 * 24 * 30,
-        })
-    } else {
-        cookieStore.delete('token')
-    }
-}
-
-// TODO: remove
 function accountDataFromDbUser(dbUser: DbUser): AccountData {
     return {
         id: dbUser.id,

@@ -1,6 +1,6 @@
 import { addBooqToCollection, getBooqIdsInCollection, removeBooqFromCollection } from '@/data/collections'
 import { BooqId } from '@/core'
-import { getUserIdInsideRequest } from '@/data/auth'
+import { getUserIdInsideRequest } from '@/data/request'
 
 type Params = { name: string }
 type CollectionResponse = {

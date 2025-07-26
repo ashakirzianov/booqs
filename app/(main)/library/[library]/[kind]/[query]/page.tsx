@@ -1,8 +1,8 @@
 import { READING_LIST_COLLECTION } from '@/application/collections'
 import { BooqCollection } from '@/components/BooqCollection'
 import { Pagination } from '@/components/Pagination'
-import { getUserIdInsideRequest } from '@/data/auth'
 import { booqCardsForQuery, fetchLanguageDisplayName } from '@/data/booqs'
+import { getUserIdInsideRequest } from '@/data/request'
 import { notFound } from 'next/navigation'
 
 type ValidKind = 'author' | 'subject' | 'language'

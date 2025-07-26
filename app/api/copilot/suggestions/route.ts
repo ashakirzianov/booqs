@@ -1,6 +1,6 @@
 import { generateCopilotSuggestions } from '@/data/copilot'
 import { BooqId, BooqPath } from '@/core'
-import { getUserIdInsideRequest } from '@/data/auth'
+import { getUserIdInsideRequest } from '@/data/request'
 
 export type PostBody = {
     booqId: BooqId,
@@ -17,20 +17,20 @@ export async function POST(request: Request) {
     }
 
     const { booqId, start, end }: PostBody = await request.json()
-    
+
     if (typeof booqId !== 'string' || !Array.isArray(start) || !Array.isArray(end)) {
         return Response.json({ error: 'Invalid request' }, { status: 400 })
     }
-    
-    const result = await generateCopilotSuggestions({ 
-        booqId: booqId as BooqId, 
-        range: { start, end } 
+
+    const result = await generateCopilotSuggestions({
+        booqId: booqId as BooqId,
+        range: { start, end }
     })
-    
+
     if (!result.success) {
         return Response.json({ error: 'No suggestions found' }, { status: 404 })
     }
-    
+
     const response: PostResponse = result.suggestions
     return Response.json(response)
 }

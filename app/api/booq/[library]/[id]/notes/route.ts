@@ -5,8 +5,8 @@ import {
 } from '@/data/notes'
 import { AuthorData, getUserById } from '@/data/user'
 import { BooqId, BooqRange, makeId } from '@/core'
-import { getUserIdInsideRequest } from '@/data/auth'
 import { NextRequest } from 'next/server'
+import { getUserIdInsideRequest } from '@/data/request'
 
 type Params = {
     library: string,

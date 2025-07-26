@@ -1,7 +1,7 @@
 'use server'
-import { getUserIdInsideRequest } from './auth'
 import { userForUsername, DbUser, usersForIds, userForId } from '@/backend/users'
 import { followUser, unfollowUser, isFollowing, getFollowing, getFollowers } from '@/backend/follows'
+import { getUserIdInsideRequest } from './request'
 
 export type { DbUser }
 
@@ -29,7 +29,15 @@ export async function getCurrentUser(): Promise<AccountData | undefined> {
     if (!user) {
         return undefined
     }
-    return accountDataFromDbUser(user)
+    return {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        joinedAt: user.joined_at,
+        name: user.name,
+        profilePictureURL: user.profile_picture_url ?? undefined,
+        emoji: user.emoji ?? undefined,
+    }
 }
 
 // TODO: rename to `getUserByUsername`
@@ -150,17 +158,5 @@ function accountPublicDataFromDbUser(dbUser: DbUser): AccountPublicData {
         profilePictureURL: dbUser.profile_picture_url ?? undefined,
         emoji: dbUser.emoji,
         joinedAt: dbUser.joined_at,
-    }
-}
-
-function accountDataFromDbUser(dbUser: DbUser): AccountData {
-    return {
-        id: dbUser.id,
-        username: dbUser.username,
-        email: dbUser.email,
-        joinedAt: dbUser.joined_at,
-        name: dbUser.name,
-        profilePictureURL: dbUser.profile_picture_url ?? undefined,
-        emoji: dbUser.emoji ?? undefined,
     }
 }

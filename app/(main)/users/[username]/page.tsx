@@ -4,9 +4,9 @@ import { ProfileBadge } from '@/components/ProfilePicture'
 import { booqCollection } from '@/data/booqs'
 import { BooqCollection } from '@/components/BooqCollection'
 import { FollowButton } from '@/components/FollowButton'
-import { getUserIdInsideRequest } from '@/data/auth'
 import { UserFollowingList } from './UserFollowingList'
 import { UserFollowersList } from './UserFollowersList'
+import { getUserIdInsideRequest } from '@/data/request'
 
 export default async function UserPage({
     params

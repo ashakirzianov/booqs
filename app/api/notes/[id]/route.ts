@@ -1,7 +1,7 @@
 import {
     modifyNote, deleteNote,
 } from '@/data/notes'
-import { getUserIdInsideRequest } from '@/data/auth'
+import { getUserIdInsideRequest } from '@/data/request'
 import { NextRequest } from 'next/server'
 
 type Params = {

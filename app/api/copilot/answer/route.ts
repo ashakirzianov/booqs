@@ -1,6 +1,6 @@
 import { generateCopilotAnswer } from '@/data/copilot'
 import { BooqId, BooqPath } from '@/core'
-import { getUserIdInsideRequest } from '@/data/auth'
+import { getUserIdInsideRequest } from '@/data/request'
 
 export type PostBody = {
     booqId: BooqId,

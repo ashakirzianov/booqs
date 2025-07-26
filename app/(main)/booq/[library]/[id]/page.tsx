@@ -5,10 +5,10 @@ import { CollectionButton } from '@/components/CollectionButton'
 import Link from 'next/link'
 import { booqHref, authorHref } from '@/common/href'
 import { notFound } from 'next/navigation'
-import { getUserIdInsideRequest } from '@/data/auth'
 import { READING_LIST_COLLECTION } from '@/application/collections'
 import { getBooqHistory } from '@/data/history'
 import type { BooqId, TableOfContentsItem } from '@/core'
+import { getUserIdInsideRequest } from '@/data/request'
 
 type Params = {
     library: string,

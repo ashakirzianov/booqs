@@ -1,8 +1,8 @@
 'use server'
 import { addBooqHistory, booqHistoryForUser } from '@/backend/history'
-import { getUserIdInsideRequest } from './auth'
 import { booqPreview } from '@/backend/booq'
 import { BooqId, BooqPath } from '@/core'
+import { getUserIdInsideRequest } from './request'
 
 export async function reportBooqHistoryAction({
     booqId, path, source,
