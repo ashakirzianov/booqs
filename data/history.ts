@@ -1,3 +1,4 @@
+'use server'
 import { addBooqHistory, booqHistoryForUser } from '@/backend/history'
 import { getUserIdInsideRequest } from './auth'
 import { booqPreview } from '@/backend/booq'
