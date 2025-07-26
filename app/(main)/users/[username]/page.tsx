@@ -109,7 +109,7 @@ export default async function UserPage({
                 />
             </div>
 
-            {/* Public Books Section */}
+            {/* Public Booqs Section */}
             <div className="space-y-6">
                 <BooqCollection
                     title={`${user.name}'s Books`}

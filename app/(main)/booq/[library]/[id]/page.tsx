@@ -55,7 +55,7 @@ export default async function Page({ params }: {
                                 by {detailed.authors.map((author, index) => (
                                     <span key={author}>
                                         <Link
-                                            href={authorHref({ name: author })}
+                                            href={authorHref({ name: author, libraryId: library })}
                                             className="hover:underline  hover:text-highlight"
                                         >
                                             {author}
@@ -66,9 +66,13 @@ export default async function Page({ params }: {
                             </div>
                         )}
 
-                        {detailed.tags.length > 0 && (
+                        {(detailed.subjects.length > 0 || detailed.languages.length > 0) && (
                             <div className="mb-6">
-                                <BooqTags tags={detailed.tags} />
+                                <BooqTags 
+                                    subjects={detailed.subjects} 
+                                    languages={detailed.languages} 
+                                    booqId={booqId} 
+                                />
                             </div>
                         )}
                     </div>

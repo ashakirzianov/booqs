@@ -1,4 +1,4 @@
-import { deleteAllBooksForUserId } from './uu'
+import { deleteAllBooqsForUserId } from './uu'
 import { deleteUserCredentials } from './passkey'
 import { sql } from './db'
 import { getRandomAvatarEmoji } from '@/core'
@@ -102,19 +102,19 @@ export async function createUser({
 
 export async function deleteUserForId(id: string): Promise<boolean> {
     const deleteUserPromise = await deleteDbUserForId(id)
-    const deleteBooksPromise = deleteAllBooksForUserId(id)
+    const deleteBooqsPromise = deleteAllBooqsForUserId(id)
     const deleteCredentialsPromise = deleteUserCredentials(id)
 
     const [
         deleteUserResult,
-        deleteBooksResult,
+        deleteBooqsResult,
         _deleteCredentialsResult,
     ] = await Promise.all([
         deleteUserPromise,
-        deleteBooksPromise,
+        deleteBooqsPromise,
         deleteCredentialsPromise,
     ])
-    return deleteUserResult && deleteBooksResult
+    return deleteUserResult && deleteBooqsResult
 }
 
 async function deleteDbUserForId(id: string) {

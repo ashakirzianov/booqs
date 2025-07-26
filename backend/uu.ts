@@ -12,8 +12,7 @@ import { uploadBooqImages } from './images'
 export const userUploadsLibrary: Library = {
     cards, fileForId,
     // TODO: implement
-    async search() { return [] },
-    async forAuthor() { return [] },
+    async query() { return { cards: [], hasMore: false } },
 }
 
 export const userUploadedEpubsBucket = 'uu-epubs'
@@ -198,22 +197,22 @@ function report(label: string, data?: any) {
     }
 }
 
-export async function deleteAllBooksForUserId(userId: string) {
+export async function deleteAllBooqsForUserId(userId: string) {
     await deleteAllUploadRecordsForUserId(userId)
-    await deleteAllBooksWithoutUsers()
+    await deleteAllBooqsWithoutUsers()
     return true
 }
 
-async function deleteAllBooksWithoutUsers() {
-    const cards = await getAllBooksWithoutUploadUsers()
-    const results = await Promise.all(cards.map(card => deleteBook({
+async function deleteAllBooqsWithoutUsers() {
+    const cards = await getAllBooqsWithoutUploadUsers()
+    const results = await Promise.all(cards.map(card => deleteBooq({
         id: card.id,
         assetId: card.asset_id,
     })))
     return results.every(result => result)
 }
 
-async function deleteBook({ id, assetId }: {
+async function deleteBooq({ id, assetId }: {
     id: string,
     assetId: string,
 }) {
@@ -241,7 +240,7 @@ async function deleteCards(ids: string[]): Promise<boolean> {
     return true
 }
 
-async function getAllBooksWithoutUploadUsers(): Promise<DbUuCard[]> {
+async function getAllBooqsWithoutUploadUsers(): Promise<DbUuCard[]> {
     const rows = await sql`
       SELECT * FROM uu_assets
       WHERE id NOT IN (

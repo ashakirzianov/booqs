@@ -1,61 +1,69 @@
 import React from 'react'
+import Link from 'next/link'
+import { parseId, BooqId } from '@/core'
+import { subjectHref, languageHref } from '@/core/href'
+import { LanguageInfo } from '@/data/booqs'
 
-type BooqMetaTag = readonly [tag: string, value?: string]
-export function BooqTags({ tags }: {
-    tags: BooqMetaTag[],
+export function BooqTags({ subjects, languages, booqId }: {
+    subjects: string[],
+    languages: LanguageInfo[],
+    booqId?: BooqId,
 }) {
+    const libraryId = booqId ? parseId(booqId)[0] || 'pg' : 'pg'
     return <div style={{
         display: 'flex',
         flexFlow: 'row wrap',
     }}>
         {
-            tags.map(
-                (tag, idx) => <BooqTagPill key={idx} tag={tag} />
+            subjects.map(
+                (subject, idx) => <SubjectPill
+                    key={`subject-${idx}`}
+                    color="#673AB7"
+                    label={subject}
+                    subject={subject}
+                    libraryId={libraryId}
+                />
+            )
+        }
+        {
+            languages.map(
+                (language, idx) => <LanguagePill
+                    key={`language-${idx}`}
+                    color="#4CAF50"
+                    language={language}
+                    libraryId={libraryId}
+                />
             )
         }
     </div>
 }
 
-function BooqTagPill({ tag: [name, value] }: {
-    tag: BooqMetaTag,
-}) {
-    switch (name.toLowerCase()) {
-        case 'language':
-            return value
-                ? <Pill
-                    color="#4CAF50"
-                    label={value.toUpperCase()}
-                />
-                : null
-        case 'subject':
-            return <Pill
-                color="#673AB7"
-                label={value ?? 'subject'}
-            />
-        case 'pg-index':
-            return <Pill
-                color="pink"
-                label="Project Gutenberg"
-                title={value ?? undefined}
-            />
-        case 'pages':
-            return <Pill
-                color='var(--color-primary)'
-                label={`${value} pages`}
-            />
-        default:
-            return null
-    }
-}
 
-function Pill({ color, label, title }: {
+function SubjectPill({ color, label, subject, libraryId }: {
     color: string,
     label: string,
-    title?: string
+    subject: string,
+    libraryId: string
 }) {
-    return <div title={title} className='pr-lg mt-sm mr-sm text-sm' style={{
-        color,
-    }}>
-        {label}
-    </div>
+    return <Link href={subjectHref({ subject, libraryId })}>
+        <div className='pr-lg mt-sm mr-sm text-sm cursor-pointer hover:underline' style={{
+            color,
+        }}>
+            {label}
+        </div>
+    </Link>
+}
+
+function LanguagePill({ color, language, libraryId }: {
+    color: string,
+    language: LanguageInfo,
+    libraryId: string
+}) {
+    return <Link href={languageHref({ language: language.code, libraryId })}>
+        <div className='pr-lg mt-sm mr-sm text-sm cursor-pointer hover:underline' style={{
+            color,
+        }}>
+            {language.name}
+        </div>
+    </Link>
 }

@@ -4,7 +4,7 @@ import { BooqParent } from './booq'
 import { BooqHistoryParent } from './history'
 import { CopilotInput, CopilotParent } from './copilot'
 import { AuthorParent } from './author'
-import { featuredBooqIds, libraryCardForId, libraryCardsForIds, searchBooqs } from '@/backend/library'
+import { featuredBooqIds, libraryCardForId, libraryCardsForIds, queryLibrary } from '@/backend/library'
 import { booqHistoryForUser } from '@/backend/history'
 import { booqIdsInCollections } from '@/backend/collections'
 import { userForId, userForUsername } from '@/backend/users'
@@ -35,8 +35,16 @@ export const queryResolver: IResolvers<unknown, ResolverContext> = {
             query: string,
             limit?: number,
         }): Promise<SearchResultParent[]> {
-            const results = await searchBooqs(query, limit ?? 100)
-            return results
+            const results = await queryLibrary('pg', { kind: 'search', query, limit: limit ?? 100 })
+            return results.cards.map(card => {
+                return {
+                    kind: 'booq',
+                    booqId: card.booqId,
+                    title: card.meta.title,
+                    authors: card.meta.authors.map(author => author.name),
+                    coverSrc: card.meta.coverSrc,
+                }
+            })
         },
         async me(_, __, { userId }) {
             if (userId) {

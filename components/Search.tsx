@@ -8,7 +8,7 @@ import { ReactNode, useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Spinner } from './Icons'
 import { useDebouncedValue } from '@/application/utils'
-import { AuthorSearchResultData, BooqSearchResultData } from '@/data/search'
+import { AuthorSearchResultData, BooqSearchResultData } from '@/data/booqs'
 
 export function Search() {
     const { isOpen, openModal, closeModal } = useModalState()
@@ -61,7 +61,7 @@ function SearchModal({
                     if (selected !== null && results.length > 0) {
                         if (selected < authors.length) {
                             const author = authors[selected]
-                            push(authorHref({ name: author.name }))
+                            push(authorHref({ name: author.name, libraryId: 'pg' }))
                         } else {
                             const booq = booqs[selected - authors.length]
                             push(booqHref({ booqId: booq.booqId, path: [0] }))
@@ -106,7 +106,7 @@ function SearchModal({
                     : null}
                 {booqs.length > 0
                     ? <div>
-                        <h1 className='font-bold p-2 text-xl'>Books</h1>
+                        <h1 className='font-bold p-2 text-xl'>Booqs</h1>
                         <ul>
                             {booqs.map((result, idx) => <SearchResultItem
                                 key={idx}
@@ -183,7 +183,7 @@ function AuthorSearchResultContent({ result, query }: {
     query: string,
     selected?: boolean,
 }) {
-    return <Link href={authorHref({ name: result.name })}>
+    return <Link href={authorHref({ name: result.name, libraryId: 'pg' })}>
         <EmphasizedSpan
             text={result.name}
             emphasis={query}

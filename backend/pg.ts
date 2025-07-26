@@ -1,14 +1,13 @@
-import type { InLibraryCard, Library } from './library'
+import type { InLibraryCard, InLibraryQueryResult, Library, LibraryQuery } from './library'
 import { downloadAsset } from './blob'
 import { sql } from './db'
-import { Booq, BooqMetadata } from '@/core'
+import { assertNever, Booq, BooqMetadata } from '@/core'
 import { getExtraMetadataValues } from '@/core/meta'
 
 export const pgLibrary: Library = {
-  search,
+  query,
   cards,
   fileForId,
-  forAuthor,
 }
 
 export const pgEpubsBucket = 'pg-epubs'
@@ -46,7 +45,24 @@ type DbPgMetadata = {
   meta: BooqMetadata,
 }
 
-export async function search(query: string, limit: number): Promise<InLibraryCard[]> {
+export async function query(query: LibraryQuery): Promise<InLibraryQueryResult> {
+  const offset = query.offset || 0
+  switch (query.kind) {
+    case 'search':
+      return search(query.query, query.limit, offset)
+    case 'author':
+      return exactMatchInArrayField({ field: 'authors', query: query.query, limit: query.limit, offset })
+    case 'subject':
+      return exactMatchInArrayField({ field: 'subjects', query: query.query, limit: query.limit, offset })
+    case 'language':
+      return exactMatchInArrayField({ field: 'languages', query: query.query, limit: query.limit, offset })
+    default:
+      assertNever(query.kind)
+      return { cards: [], hasMore: false }
+  }
+}
+
+async function search(query: string, limit: number, offset: number): Promise<InLibraryQueryResult> {
   const like = `%${query.toLowerCase()}%`
   const result = await sql`
     SELECT *
@@ -54,12 +70,37 @@ export async function search(query: string, limit: number): Promise<InLibraryCar
     WHERE lower(title) LIKE ${like}
        OR lower(authors_text) LIKE ${like}
     ORDER BY title
-    LIMIT ${limit}
+    LIMIT ${limit + 1}
+    OFFSET ${offset}
   ` as DbPgMetadata[]
-  return result.map(({ id, meta }) => ({
+  const hasMore = result.length > limit
+  const cards = result.slice(0, limit).map(({ id, meta }) => ({
     id,
     meta,
   }))
+  return { cards, hasMore }
+}
+
+async function exactMatchInArrayField({ field, query, limit, offset }: {
+  field: 'authors' | 'subjects' | 'languages',
+  query: string,
+  limit: number,
+  offset: number,
+}): Promise<InLibraryQueryResult> {
+  const result = await sql`
+    SELECT *
+    FROM pg_metadata
+    WHERE ${query} = ANY(${sql.unsafe(field)})
+    ORDER BY title
+    LIMIT ${limit + 1}
+    OFFSET ${offset}
+  ` as DbPgMetadata[]
+  const hasMore = result.length > limit
+  const cards = result.slice(0, limit).map(({ id, meta }) => ({
+    id,
+    meta,
+  }))
+  return { cards, hasMore }
 }
 
 export async function addToSearchIndex({
@@ -121,11 +162,6 @@ export async function fileForId(id: string) {
       ? { kind: 'epub', file: asset } as const
       : undefined
   }
-}
-
-export async function forAuthor(_name: string, _limit?: number, _offset?: number): Promise<InLibraryCard[]> {
-  // TODO: implement this
-  return []
 }
 
 async function assetIdForId(id: string): Promise<string | undefined> {
