@@ -1,9 +1,10 @@
 import { getRandomAvatarEmoji } from '@/common/emoji'
-import { prevalidateSignupAction, fetchAuthData } from '@/data/auth'
+import { prevalidateSignupAction } from '@/data/auth'
 import { SignUpForm } from './SignUpForm'
 import { generateRandomName } from './name'
 import { AddPasskeyPage } from './AddPasskeyPage'
 import { SignUpErrorPage } from './SignUpErrorPage'
+import { getCurrentUser } from '@/data/user'
 
 export default async function SignUpPage({ searchParams }: {
     searchParams: Promise<{
@@ -27,7 +28,7 @@ export default async function SignUpPage({ searchParams }: {
     }
 
     // Check if user is already authenticated (sign-up completed)
-    const authData = await fetchAuthData()
+    const authData = await getCurrentUser()
 
     // Only pre-validate if user is not authenticated yet
     if (authData) {

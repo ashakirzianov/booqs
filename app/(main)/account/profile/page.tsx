@@ -1,13 +1,14 @@
 import { redirect } from 'next/navigation'
 import { authHref } from '@/common/href'
-import { fetchAuthData, fetchPasskeyData } from '@/data/auth'
+import { fetchPasskeyData } from '@/data/auth'
 import { DeleteAccountButton } from '../DeleteAccountButton'
 import { SignoutButton } from '../SignoutButton'
 import { ProfileData } from '../ProfileData'
 import { PasskeySection } from '../PasskeySection'
+import { getCurrentUser } from '@/data/user'
 
 export default async function ProfilePage() {
-    const user = await fetchAuthData()
+    const user = await getCurrentUser()
     if (!user) {
         redirect(authHref({}))
     }

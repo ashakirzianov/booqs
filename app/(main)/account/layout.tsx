@@ -1,16 +1,16 @@
 import { redirect } from 'next/navigation'
-import { fetchAuthData } from '@/data/auth'
 import { accountHref } from '@/common/href'
 import { ProfileIcon, UsersIcon, CollectionIcon } from '@/components/Icons'
 import { AccountLink } from './AccountLink'
 import styles from './AccountLayout.module.css'
+import { getCurrentUser } from '@/data/user'
 
 export default async function AccountLayout({
     children,
 }: {
     children: React.ReactNode
 }) {
-    const user = await fetchAuthData()
+    const user = await getCurrentUser()
     if (!user) {
         redirect('/auth')
     }

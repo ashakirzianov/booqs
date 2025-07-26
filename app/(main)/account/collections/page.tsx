@@ -1,12 +1,12 @@
 import { redirect } from 'next/navigation'
 import { authHref } from '@/common/href'
-import { fetchAuthData } from '@/data/auth'
 import { booqCollection } from '@/data/booqs'
 import { READING_LIST_COLLECTION } from '@/application/collections'
 import { BooqCollection } from '@/components/BooqCollection'
+import { getCurrentUser } from '@/data/user'
 
 export default async function CollectionPage() {
-    const user = await fetchAuthData()
+    const user = await getCurrentUser()
     if (!user) {
         redirect(authHref({}))
     }

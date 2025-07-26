@@ -1,8 +1,8 @@
 'use server'
 import { BooqId, BooqPath } from '@/core'
-import { fetchAuthData, getUserIdInsideRequest } from './auth'
+import { getUserIdInsideRequest } from './auth'
 import { addBooqHistory } from '@/backend/history'
-import { userForUsername, DbUser, usersForIds } from '@/backend/users'
+import { userForUsername, DbUser, usersForIds, userForId } from '@/backend/users'
 import { followUser, unfollowUser, isFollowing, getFollowing, getFollowers } from '@/backend/follows'
 
 export type { DbUser }
@@ -28,7 +28,7 @@ export async function reportBooqHistory({
     path: BooqPath,
     source: string,
 }) {
-    const user = await fetchAuthData()
+    const user = await getCurrentUser()
     if (!user) {
         return {
             success: false,
@@ -39,6 +39,18 @@ export async function reportBooqHistory({
         booqId, path, source,
         date: Date.now(),
     })
+}
+
+export async function getCurrentUser(): Promise<AccountData | undefined> {
+    const userId = await getUserIdInsideRequest()
+    if (!userId) {
+        return undefined
+    }
+    const user = await userForId(userId)
+    if (!user) {
+        return undefined
+    }
+    return accountDataFromDbUser(user)
 }
 
 // TODO: rename to `getUserByUsername`
@@ -159,5 +171,17 @@ function accountPublicDataFromDbUser(dbUser: DbUser): AccountPublicData {
         profilePictureURL: dbUser.profile_picture_url ?? undefined,
         emoji: dbUser.emoji,
         joinedAt: dbUser.joined_at,
+    }
+}
+
+function accountDataFromDbUser(dbUser: DbUser): AccountData {
+    return {
+        id: dbUser.id,
+        username: dbUser.username,
+        email: dbUser.email,
+        joinedAt: dbUser.joined_at,
+        name: dbUser.name,
+        profilePictureURL: dbUser.profile_picture_url ?? undefined,
+        emoji: dbUser.emoji ?? undefined,
     }
 }

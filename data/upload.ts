@@ -1,12 +1,12 @@
 'use server'
 
 import { uploadEpubForUser } from '@/backend/uu'
-import { fetchAuthData } from './auth'
 import { BooqId } from '@/core'
 import { addUpload } from '@/backend/collections'
+import { getCurrentUser } from './user'
 
 export async function uploadEpubAction(file: File) {
-    const auth = await fetchAuthData()
+    const auth = await getCurrentUser()
     if (!auth) {
         return {
             success: false,

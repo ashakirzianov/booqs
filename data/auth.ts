@@ -147,18 +147,6 @@ export async function getUserIdInsideRequest() {
     return userIdFromToken(token)
 }
 
-export async function fetchAuthData(): Promise<AccountData | undefined> {
-    const userId = await getUserIdInsideRequest()
-    if (!userId) {
-        return undefined
-    }
-    const user = await userForId(userId)
-    if (!user) {
-        return undefined
-    }
-    return accountDataFromDbUser(user)
-}
-
 export async function updateAccountAction({
     name,
     emoji,
@@ -374,6 +362,7 @@ async function setAuthToken(token: string | undefined) {
     }
 }
 
+// TODO: remove
 function accountDataFromDbUser(dbUser: DbUser): AccountData {
     return {
         id: dbUser.id,
