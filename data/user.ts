@@ -5,6 +5,8 @@ import { addBooqHistory } from '@/backend/history'
 import { userForUsername, DbUser, usersForIds } from '@/backend/users'
 import { followUser, unfollowUser, isFollowing, getFollowing, getFollowers } from '@/backend/follows'
 
+export type { DbUser }
+
 export type AccountPublicData = {
     id: string,
     username: string,
@@ -39,7 +41,8 @@ export async function reportBooqHistory({
     })
 }
 
-export async function userData(username: string): Promise<AccountPublicData | null> {
+// TODO: rename to `getUserByUsername`
+export async function getUserByUsername(username: string): Promise<AccountPublicData | null> {
     const dbUser = await userForUsername(username)
     if (!dbUser) {
         return null
@@ -47,15 +50,12 @@ export async function userData(username: string): Promise<AccountPublicData | nu
     return accountPublicDataFromDbUser(dbUser)
 }
 
-function accountPublicDataFromDbUser(dbUser: DbUser): AccountPublicData {
-    return {
-        id: dbUser.id,
-        username: dbUser.username,
-        name: dbUser.name,
-        profilePictureURL: dbUser.profile_picture_url ?? undefined,
-        emoji: dbUser.emoji,
-        joinedAt: dbUser.joined_at,
+export async function getUserById(userId: string): Promise<AccountPublicData | null> {
+    const dbUser = await userForUsername(userId)
+    if (!dbUser) {
+        return null
     }
+    return accountPublicDataFromDbUser(dbUser)
 }
 
 export async function followAction(username: string): Promise<{ success: boolean; error?: string }> {
@@ -151,3 +151,13 @@ export async function getFollowersList(userId: string): Promise<AccountPublicDat
     return followers.map(accountPublicDataFromDbUser)
 }
 
+function accountPublicDataFromDbUser(dbUser: DbUser): AccountPublicData {
+    return {
+        id: dbUser.id,
+        username: dbUser.username,
+        name: dbUser.name,
+        profilePictureURL: dbUser.profile_picture_url ?? undefined,
+        emoji: dbUser.emoji,
+        joinedAt: dbUser.joined_at,
+    }
+}

@@ -4,7 +4,7 @@ import {
     DbNote,
     DbNoteWithAuthor,
 } from '@/data/notes'
-import { getUserById } from '@/data/followers'
+import { getUserById } from '@/data/user'
 import { makeId } from '@/core'
 import { getUserIdInsideRequest } from '@/data/auth'
 import { NextRequest } from 'next/server'
@@ -61,7 +61,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<P
         author_id: userId,
         author_name: author.name,
         author_username: author.username,
-        author_profile_picture_url: author.profile_picture_url,
+        author_profile_picture_url: author.profilePictureURL ?? null,
         author_emoji: author.emoji,
     }
     return Response.json(result)

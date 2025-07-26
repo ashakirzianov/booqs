@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation'
-import { userData, getFollowStatus, getFollowingList, getFollowersList } from '@/data/user'
+import { getUserByUsername, getFollowStatus, getFollowingList, getFollowersList } from '@/data/user'
 import { ProfileBadge } from '@/components/ProfilePicture'
 import { booqCollection } from '@/data/booqs'
 import { BooqCollection } from '@/components/BooqCollection'
@@ -16,7 +16,7 @@ export default async function UserPage({
     const { username } = await params
 
     const [user, currentUserId] = await Promise.all([
-        userData(username),
+        getUserByUsername(username),
         getUserIdInsideRequest()
     ])
 
