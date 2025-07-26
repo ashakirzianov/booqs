@@ -2,7 +2,6 @@ import { ReactNode, createElement } from 'react'
 import {
     BooqElementNode, BooqNode, pathToString,
     pathInRange, samePath, pathLessThan, BooqPath, BooqRange, pathToId,
-    BooqId,
     assertNever,
 } from '@/core'
 
@@ -14,15 +13,14 @@ export type Augmentation = {
 }
 
 type RenderContext = {
-    booqId: BooqId,
     path: BooqPath,
     range: BooqRange,
     parent?: BooqElementNode,
     withinAnchor?: boolean,
     augmentations: Augmentation[],
     onAugmentationClick?: (id: string) => void,
-    hrefForPath?: (booqId: BooqId, path: BooqPath) => string,
-    resolveSrc?: (booqId: BooqId, src: string) => string,
+    hrefForPath?: (path: BooqPath) => string,
+    resolveSrc?: (src: string) => string,
 }
 export function renderNodes(nodes: BooqNode[], ctx: RenderContext): ReactNode[] {
     const result = nodes.map(
@@ -111,7 +109,7 @@ function renderTextNode(text: string, {
 }
 
 function getProps(node: BooqElementNode, {
-    path, booqId, range, hrefForPath, resolveSrc,
+    path, range, hrefForPath, resolveSrc,
 }: RenderContext) {
     return {
         ...node.attrs,
@@ -126,15 +124,15 @@ function getProps(node: BooqElementNode, {
                 pathInRange(node.ref, range)
                     ? `#${pathToId(node.ref)}`
                     : hrefForPath ?
-                        hrefForPath(booqId, node.ref)
+                        hrefForPath(node.ref)
                         : node.attrs?.href
             )
             : node.attrs?.href,
         src: node.attrs?.src && resolveSrc
-            ? resolveSrc(booqId, node.attrs?.src)
+            ? resolveSrc(node.attrs?.src)
             : node.attrs?.src,
         xlinkHref: node.attrs?.xlinkHref && resolveSrc
-            ? resolveSrc(booqId, node.attrs?.xlinkHref)
+            ? resolveSrc(node.attrs?.xlinkHref)
             : node.attrs?.xlinkHref,
     }
 }

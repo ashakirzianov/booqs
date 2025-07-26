@@ -1,4 +1,4 @@
-import { authorHref, booqHref } from '@/core/href'
+import { authorHref, booqHref } from '@/common/href'
 import { AuthorSearchResultData, BooqSearchResultData, booqSearch, SearchResultData } from '@/data/booqs'
 import Link from 'next/link'
 

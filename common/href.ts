@@ -73,12 +73,14 @@ export function signUpLinkHref({ email, secret, returnTo }: {
     return `/auth/signup?${params.toString()}`
 }
 
-export function accountHref() {
-    return '/account'
+export function accountHref({ section }: { section?: 'profile' | 'followers' | 'collections' } = {}) {
+    const defaultSection = 'profile'
+    const targetSection = section || defaultSection
+    return `/account/${targetSection}`
 }
 
 export function myBooqsHref() {
-    return `/account/collection`
+    return accountHref({ section: 'collections' })
 }
 
 export function authorHref({ name, libraryId }: { name: string, libraryId: string }) {

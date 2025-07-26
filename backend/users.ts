@@ -1,8 +1,8 @@
 import { deleteAllBooqsForUserId } from './uu'
 import { deleteUserCredentials } from './passkey'
 import { sql } from './db'
-import { getRandomAvatarEmoji } from '@/core'
 import { nanoid } from 'nanoid'
+import { getRandomAvatarEmoji } from '@/common/emoji'
 
 export type DbUser = {
     id: string,

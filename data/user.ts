@@ -1,31 +1,43 @@
 'use server'
-import { BooqId, BooqPath, AccountPublicData } from '@/core'
-import { fetchAuthData, getUserIdInsideRequest } from './auth'
-import { addBooqHistory } from '@/backend/history'
-import { userForUsername, DbUser, usersForIds } from '@/backend/users'
+import { userForUsername, DbUser, usersForIds, userForId } from '@/backend/users'
 import { followUser, unfollowUser, isFollowing, getFollowing, getFollowers } from '@/backend/follows'
+import { getUserIdInsideRequest } from './request'
 
-export async function reportBooqHistory({
-    booqId, path, source,
-}: {
-    booqId: BooqId,
-    path: BooqPath,
-    source: string,
-}) {
-    const user = await fetchAuthData()
-    if (!user) {
-        return {
-            success: false,
-            error: 'Not authenticated',
-        } as const
-    }
-    addBooqHistory(user.id, {
-        booqId, path, source,
-        date: Date.now(),
-    })
+export type AccountPublicData = {
+    id: string,
+    username: string,
+    joinedAt: string,
+    name: string,
+    profilePictureURL?: string,
+    emoji: string,
 }
 
-export async function userData(username: string): Promise<AccountPublicData | null> {
+export type AccountData = AccountPublicData & {
+    email: string,
+}
+
+export async function getCurrentUser(): Promise<AccountData | undefined> {
+    const userId = await getUserIdInsideRequest()
+    if (!userId) {
+        return undefined
+    }
+    const user = await userForId(userId)
+    if (!user) {
+        return undefined
+    }
+    return {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        joinedAt: user.joined_at,
+        name: user.name,
+        profilePictureURL: user.profile_picture_url ?? undefined,
+        emoji: user.emoji ?? undefined,
+    }
+}
+
+// TODO: rename to `getUserByUsername`
+export async function getUserByUsername(username: string): Promise<AccountPublicData | null> {
     const dbUser = await userForUsername(username)
     if (!dbUser) {
         return null
@@ -33,15 +45,12 @@ export async function userData(username: string): Promise<AccountPublicData | nu
     return accountPublicDataFromDbUser(dbUser)
 }
 
-function accountPublicDataFromDbUser(dbUser: DbUser): AccountPublicData {
-    return {
-        id: dbUser.id,
-        username: dbUser.username,
-        name: dbUser.name,
-        profilePictureURL: dbUser.profile_picture_url ?? undefined,
-        emoji: dbUser.emoji,
-        joinedAt: dbUser.joined_at,
+export async function getUserById(userId: string): Promise<AccountPublicData | null> {
+    const dbUser = await userForId(userId)
+    if (!dbUser) {
+        return null
     }
+    return accountPublicDataFromDbUser(dbUser)
 }
 
 export async function followAction(username: string): Promise<{ success: boolean; error?: string }> {
@@ -126,14 +135,24 @@ export async function getFollowStatus(username: string): Promise<{ isFollowing: 
 export async function getFollowingList(userId: string): Promise<AccountPublicData[]> {
     const followingIds = await getFollowing(userId)
     const following = await usersForIds(followingIds)
-    
+
     return following.map(accountPublicDataFromDbUser)
 }
 
 export async function getFollowersList(userId: string): Promise<AccountPublicData[]> {
     const followerIds = await getFollowers(userId)
     const followers = await usersForIds(followerIds)
-    
+
     return followers.map(accountPublicDataFromDbUser)
 }
 
+function accountPublicDataFromDbUser(dbUser: DbUser): AccountPublicData {
+    return {
+        id: dbUser.id,
+        username: dbUser.username,
+        name: dbUser.name,
+        profilePictureURL: dbUser.profile_picture_url ?? undefined,
+        emoji: dbUser.emoji,
+        joinedAt: dbUser.joined_at,
+    }
+}

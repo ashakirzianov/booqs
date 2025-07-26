@@ -1,4 +1,4 @@
-import { signInLinkHref, signUpLinkHref } from '@/core/href'
+import { signInLinkHref, signUpLinkHref } from '@/common/href'
 import { Resend } from 'resend'
 
 export async function sendSignInLink({
@@ -134,7 +134,7 @@ async function sendEmail({
             return false
         }
 
-        console.log('Email sent successfully:', data?.id)
+        console.info('Email sent successfully:', data?.id)
         return true
     } catch (error) {
         console.error('Error sending email:', error)

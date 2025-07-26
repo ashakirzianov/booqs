@@ -1,15 +1,16 @@
 import { useBooqNotes } from '@/application/notes'
-import { BooqId, AuthorData } from '@/core'
+import { BooqId } from '@/core'
 import { BooqSelection } from '@/viewer'
 import { useState } from 'react'
 import type { CreateCommentTarget, ContextMenuTarget } from './ContextMenuContent'
+import { NoteAuthorData } from '@/data/notes'
 
 export function CreateCommentTargetMenu({
     target: { parent }, booqId, user, setTarget,
 }: {
     target: CreateCommentTarget,
     booqId: BooqId,
-    user: AuthorData | undefined,
+    user: NoteAuthorData | undefined,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
     const [comment, setComment] = useState('')

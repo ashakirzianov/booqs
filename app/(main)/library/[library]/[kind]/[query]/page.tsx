@@ -1,8 +1,8 @@
 import { READING_LIST_COLLECTION } from '@/application/collections'
 import { BooqCollection } from '@/components/BooqCollection'
 import { Pagination } from '@/components/Pagination'
-import { getUserIdInsideRequest } from '@/data/auth'
-import { booqCardsForAuthor, booqCardsForSubject, booqCardsForLanguage, getLanguageDisplayName } from '@/data/booqs'
+import { booqCardsForQuery, fetchLanguageDisplayName } from '@/data/booqs'
+import { getUserIdInsideRequest } from '@/data/request'
 import { notFound } from 'next/navigation'
 
 type ValidKind = 'author' | 'subject' | 'language'
@@ -38,8 +38,9 @@ export default async function LibraryQuery({
 
     switch (kind) {
         case 'author':
-            result = await booqCardsForAuthor({
-                author: decoded,
+            result = await booqCardsForQuery({
+                kind: 'author',
+                query: decoded,
                 libraryId: library,
                 limit: PAGE_SIZE,
                 offset
@@ -47,8 +48,9 @@ export default async function LibraryQuery({
             title = `Booqs by ${decoded}`
             break
         case 'subject':
-            result = await booqCardsForSubject({
-                subject: decoded,
+            result = await booqCardsForQuery({
+                kind: 'subject',
+                query: decoded,
                 libraryId: library,
                 limit: PAGE_SIZE,
                 offset
@@ -56,13 +58,14 @@ export default async function LibraryQuery({
             title = `Booqs on ${decoded}`
             break
         case 'language':
-            result = await booqCardsForLanguage({
-                language: decoded,
+            result = await booqCardsForQuery({
+                kind: 'language',
+                query: decoded,
                 libraryId: library,
                 limit: PAGE_SIZE,
                 offset
             })
-            const displayName = getLanguageDisplayName(decoded)
+            const displayName = await fetchLanguageDisplayName(decoded)
             title = `Booqs in ${displayName}`
             break
         default:

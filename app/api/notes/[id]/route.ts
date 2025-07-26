@@ -1,16 +1,25 @@
 import {
-    updateNote, removeNote,
-    DbNote,
-} from '@/backend/notes'
-import { getUserIdInsideRequest } from '@/data/auth'
+    modifyNote, deleteNote,
+} from '@/data/notes'
+import { getUserIdInsideRequest } from '@/data/request'
 import { NextRequest } from 'next/server'
 
 type Params = {
     id: string,
 }
 
-export type PatchBody = Partial<Pick<DbNote, 'kind' | 'content'>>
-export type PatchResponse = Pick<DbNote, 'id' | 'kind' | 'content' | 'target_quote' | 'created_at' | 'updated_at'>
+export type PatchBody = {
+    kind?: string,
+    content?: string,
+}
+export type PatchResponse = {
+    id: string,
+    kind: string,
+    content?: string,
+    targetQuote: string,
+    createdAt: string,
+    updatedAt: string,
+}
 export async function PATCH(request: NextRequest, { params }: { params: Promise<Params> }) {
     const userId = await getUserIdInsideRequest()
     if (!userId) {
@@ -18,7 +27,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     }
     const { id } = await params
     const { kind, content }: PatchBody = await request.json()
-    const note = await updateNote({
+    const note = await modifyNote({
         id,
         authorId: userId,
         kind,
@@ -37,7 +46,7 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
         return Response.json({ error: 'Unauthorized' }, { status: 401 })
     }
     const { id } = await params
-    const success = await removeNote({
+    const success = await deleteNote({
         id, authorId: userId,
     })
     if (success) {

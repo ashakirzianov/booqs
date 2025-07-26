@@ -2,13 +2,14 @@ import { Popover } from '@/components/Popover'
 import { ContextMenuContent } from '@/reader/ContextMenuContent'
 import { MoreIcon } from '@/components/Icons'
 import clsx from 'clsx'
-import { booqHref } from '@/core/href'
+import { booqHref } from '@/common/href'
 import Link from 'next/link'
-import { AuthorData, BooqId, BooqNote } from '@/core'
+import { BooqId } from '@/core'
+import { NoteAuthorData, BooqNote } from '@/data/notes'
 
 export function NoteNodeComp({ booqId, note, user }: {
     booqId: BooqId,
-    user: AuthorData | undefined,
+    user: NoteAuthorData | undefined,
     note: BooqNote,
 }) {
     return <div className='container flex flex-1 justify-between pl-base' style={{

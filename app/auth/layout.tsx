@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { Logo } from '@/components/Logo'
-import { feedHref } from '@/core/href'
+import { feedHref } from '@/common/href'
 
 export default function AuthLayout({ children }: {
     children: React.ReactNode;

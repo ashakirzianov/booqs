@@ -3,12 +3,12 @@ import { BooqCover } from '@/components/BooqCover'
 import { BooqTags } from '@/components/BooqTags'
 import { CollectionButton } from '@/components/CollectionButton'
 import Link from 'next/link'
-import { booqHref, authorHref } from '@/core/href'
+import { booqHref, authorHref } from '@/common/href'
 import { notFound } from 'next/navigation'
-import { getUserIdInsideRequest } from '@/data/auth'
 import { READING_LIST_COLLECTION } from '@/application/collections'
-import { fetchBooqHistory } from '@/data/history'
+import { getBooqHistory } from '@/data/history'
 import type { BooqId, TableOfContentsItem } from '@/core'
+import { getUserIdInsideRequest } from '@/data/request'
 
 type Params = {
     library: string,
@@ -29,7 +29,7 @@ export default async function Page({ params }: {
     const toc = detailed?.toc
     const userId = await getUserIdInsideRequest()
     const isSignedIn = Boolean(userId)
-    const history = await fetchBooqHistory(booqId)
+    const history = await getBooqHistory(booqId)
 
     return <main className="flex flex-row justify-center min-h-screen bg-background">
         <div className="flex flex-col max-w-4xl w-full p-6">
@@ -68,10 +68,10 @@ export default async function Page({ params }: {
 
                         {(detailed.subjects.length > 0 || detailed.languages.length > 0) && (
                             <div className="mb-6">
-                                <BooqTags 
-                                    subjects={detailed.subjects} 
-                                    languages={detailed.languages} 
-                                    booqId={booqId} 
+                                <BooqTags
+                                    subjects={detailed.subjects}
+                                    languages={detailed.languages}
+                                    booqId={booqId}
                                 />
                             </div>
                         )}

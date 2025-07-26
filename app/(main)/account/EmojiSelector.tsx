@@ -1,7 +1,7 @@
 'use client'
 
 import { Modal } from '@/components/Modal'
-import { AVAILABLE_EMOJIS } from '@/core/emoji'
+import { AVAILABLE_EMOJIS } from '@/common/emoji'
 
 export function EmojiSelector({ isOpen, onClose, currentEmoji, onSelect }: {
     isOpen: boolean
@@ -26,8 +26,8 @@ export function EmojiSelector({ isOpen, onClose, currentEmoji, onSelect }: {
                         <button
                             key={index}
                             className={`p-3 text-2xl rounded-md hover:bg-dimmed/20 transition-colors duration-200 min-h-[3rem] flex items-center justify-center ${emoji === currentEmoji
-                                    ? 'bg-primary/20 ring-2 ring-primary'
-                                    : 'hover:bg-highlight/10'
+                                ? 'bg-primary/20 ring-2 ring-primary'
+                                : 'hover:bg-highlight/10'
                                 }`}
                             onClick={() => {
                                 onSelect(emoji)

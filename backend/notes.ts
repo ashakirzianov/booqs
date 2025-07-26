@@ -1,7 +1,7 @@
 import { BooqId, BooqRange } from '@/core'
 import { sql } from './db'
 
-export type NotePrivacy = 'private' | 'public'
+export type DbNotePrivacy = 'private' | 'public'
 
 export type DbNote = {
   id: string,
@@ -12,7 +12,7 @@ export type DbNote = {
   kind: string,
   content: string | null,
   target_quote: string,
-  privacy: NotePrivacy,
+  privacy: DbNotePrivacy,
   created_at: string,
   updated_at: string,
 }
@@ -42,7 +42,7 @@ export async function notesFor({
 }: {
   booqId?: string,
   authorId?: string,
-  privacy?: NotePrivacy,
+  privacy?: DbNotePrivacy,
   offset?: number,
   limit?: number,
 }): Promise<DbNote[]> {
@@ -88,7 +88,7 @@ export async function addNote({
   kind: string,
   content?: string,
   targetQuote?: string,
-  privacy?: NotePrivacy,
+  privacy?: DbNotePrivacy,
 }): Promise<DbNote> {
   const [note] = await sql`
       INSERT INTO notes (
@@ -121,7 +121,7 @@ export async function updateNote({
   authorId: string,
   kind?: string,
   content?: string,
-  privacy?: NotePrivacy,
+  privacy?: DbNotePrivacy,
 }): Promise<DbNote | null> {
   if (kind === undefined && content === undefined && privacy === undefined) return null
 

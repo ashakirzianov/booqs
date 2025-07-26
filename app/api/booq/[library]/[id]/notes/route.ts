@@ -1,33 +1,52 @@
 import {
-    addNote,
-    DbNote,
-    DbNoteWithAuthor,
-    notesWithAuthorForBooqId,
-} from '@/backend/notes'
-import { userForId } from '@/backend/users'
-import { makeId } from '@/core'
-import { getUserIdInsideRequest } from '@/data/auth'
+    NoteAuthorData,
+    createNote,
+    getNotesWithAuthorForBooq,
+    NotePrivacy,
+} from '@/data/notes'
+import { getUserById } from '@/data/user'
+import { BooqId, BooqRange, makeId } from '@/core'
 import { NextRequest } from 'next/server'
+import { getUserIdInsideRequest } from '@/data/request'
 
 type Params = {
     library: string,
     id: string,
 }
+type ResolvedNote = {
+    id: string,
+    booqId: BooqId,
+    author: NoteAuthorData,
+    range: BooqRange,
+    kind: string,
+    content?: string,
+    targetQuote: string,
+    privacy: NotePrivacy,
+    createdAt: string,
+    updatedAt: string,
+}
 export type GetResponse = {
-    notes: DbNoteWithAuthor[],
+    notes: ResolvedNote[],
 }
 export async function GET(request: NextRequest, { params }: { params: Promise<Params> }) {
     const { library, id } = await params
     const booqId = makeId(library, id)
-    const notes = await notesWithAuthorForBooqId(booqId)
+    const notes = await getNotesWithAuthorForBooq(booqId)
     const result: GetResponse = {
         notes,
     }
     return Response.json(result)
 }
 
-export type PostBody = Pick<DbNote, 'id' | 'start_path' | 'end_path' | 'kind' | 'content' | 'target_quote' | 'privacy'>
-export type PostResponse = DbNoteWithAuthor
+export type PostBody = {
+    id: string,
+    range: BooqRange,
+    kind: string,
+    content?: string,
+    targetQuote: string,
+    privacy: NotePrivacy,
+}
+export type PostResponse = ResolvedNote
 export async function POST(request: NextRequest, { params }: { params: Promise<Params> }) {
     const { library, id: paramsId } = await params
     const booqId = makeId(library, paramsId)
@@ -35,34 +54,30 @@ export async function POST(request: NextRequest, { params }: { params: Promise<P
     if (!userId) {
         return Response.json({ error: 'Unauthorized' }, { status: 401 })
     }
-    const author = await userForId(userId)
+    const author = await getUserById(userId)
     if (!author) {
         return Response.json({ error: 'User does not exist' }, { status: 401 })
     }
-    const { id, start_path, end_path, kind, content, target_quote, privacy }: PostBody = await request.json()
-    if (!id || !booqId || !start_path || !end_path || !kind) {
+    const { id, range, kind, content, targetQuote, privacy }: PostBody = await request.json()
+    if (!id || !booqId || !range || !kind) {
         return Response.json({ error: 'Missing required fields' }, { status: 400 })
     }
-    const note = await addNote({
+    const note = await createNote({
         id,
         authorId: userId,
         booqId,
-        range: {
-            start: start_path,
-            end: end_path,
-        },
+        range,
         kind,
-        content: content ?? undefined,
-        targetQuote: target_quote,
-        privacy: privacy ?? 'private',
+        content,
+        targetQuote,
+        privacy,
     })
+    if (!note) {
+        return Response.json({ error: 'Failed to create note' }, { status: 500 })
+    }
     const result: PostResponse = {
         ...note,
-        author_id: userId,
-        author_name: author.name,
-        author_username: author.username,
-        author_profile_picture_url: author.profile_picture_url,
-        author_emoji: author.emoji,
+        author,
     }
     return Response.json(result)
 }

@@ -1,9 +1,11 @@
 import React from 'react'
 import Link from 'next/link'
-import { BooqNote, pathToId, userHref } from '@/core'
+import { pathToId } from '@/core'
 import { Avatar } from '@/components/Avatar'
 import { TabButton } from './TabButton'
 import { formatRelativeTime } from '@/application/common'
+import { userHref } from '@/common/href'
+import { BooqNote } from '@/data/notes'
 
 export function CommentsPanel({ comments, currentUser, followingUserIds, isFollowingLoading }: {
     comments: BooqNote[],

@@ -2,7 +2,6 @@ import { redis } from './db'
 import { nanoid } from 'nanoid'
 import { userForEmail, createUser, DbUser } from './users'
 import { sendSignInLink, sendSignUpLink } from './send'
-import { generateToken } from './token'
 
 const SECRET_EXPIRE_SECONDS = 3600 // 1 hour
 
@@ -21,11 +20,11 @@ export type InitiateSignRequestResult =
     | { kind: 'error', error: string }
 
 export type CompleteSignInRequestResult =
-    | { success: true, user: DbUser, token: string }
+    | { success: true, user: DbUser }
     | { success: false, user?: undefined, reason: string }
 
 export type CompleteSignUpResult =
-    | { success: true, token: string, user: DbUser }
+    | { success: true, user: DbUser }
     | { success: false, reason: string }
 
 export type PrevalidateSignupResult =
@@ -203,9 +202,7 @@ export async function completeSignInRequest({
             return { success: false, reason: 'User not found' }
         }
 
-        const token = generateToken(user.id)
-
-        return { success: true, user, token }
+        return { success: true, user }
     } catch (err) {
         console.error('Error completing sign-in request:', err)
         return { success: false, reason: 'An error occurred while processing the request' }
@@ -258,9 +255,7 @@ export async function completeSignUp({
 
         const user = userResult.user
 
-        const token = generateToken(user.id)
-
-        return { success: true, token, user }
+        return { success: true, user }
     } catch (err) {
         console.error('Error completing sign-up:', err)
         return { success: false, reason: 'An error occurred while processing the request' }

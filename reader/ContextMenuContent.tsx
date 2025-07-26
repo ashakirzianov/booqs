@@ -1,6 +1,6 @@
 'use client'
 import { useEffect } from 'react'
-import { AuthorData, BooqId } from '@/core'
+import { BooqId } from '@/core'
 import { BooqSelection } from '@/viewer'
 import {
     AddHighlightItem,
@@ -11,10 +11,11 @@ import {
     AskMenuItem,
 } from './ContextMenuItems'
 import { useRouter } from 'next/navigation'
-import { quoteHref } from '@/core/href'
+import { quoteHref } from '@/common/href'
 import { NoteTargetMenu } from './NoteTargetMenu'
 import { CreateCommentTargetMenu } from './CreateCommentTargetMenu'
 import { AskTargetMenu } from './AskTargetMenu'
+import { NoteAuthorData } from '@/data/notes'
 
 type EmptyTarget = {
     kind: 'empty',
@@ -52,7 +53,7 @@ export function ContextMenuContent({
 }: {
     target: ContextMenuTarget,
     booqId: BooqId,
-    user: AuthorData | undefined,
+    user: NoteAuthorData | undefined,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
     switch (target.kind) {
@@ -76,7 +77,7 @@ function SelectionTargetMenu({
 }: {
     target: SelectionTarget,
     booqId: BooqId,
-    user: AuthorData | undefined,
+    user: NoteAuthorData | undefined,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
     const { selection } = target
@@ -94,7 +95,7 @@ function QuoteTargetMenu({
 }: {
     target: QuoteTarget,
     booqId: BooqId,
-    user: AuthorData | undefined,
+    user: NoteAuthorData | undefined,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
     const { selection } = target

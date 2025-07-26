@@ -1,7 +1,7 @@
 import React from 'react'
 import Link from 'next/link'
 import { parseId, BooqId } from '@/core'
-import { subjectHref, languageHref } from '@/core/href'
+import { subjectHref, languageHref } from '@/common/href'
 import { LanguageInfo } from '@/data/booqs'
 
 export function BooqTags({ subjects, languages, booqId }: {

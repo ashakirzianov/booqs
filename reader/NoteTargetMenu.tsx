@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { useMemo, useState } from 'react'
 import * as clipboard from 'clipboard-polyfill'
-import { AuthorData, BooqId, userHref } from '@/core'
+import { BooqId } from '@/core'
 import type { ContextMenuTarget, NoteTarget } from './ContextMenuContent'
 import { ColorPicker } from './ColorPicker'
 import { formatRelativeTime } from '@/application/common'
@@ -10,13 +10,15 @@ import { ProfileBadge } from '@/components/ProfilePicture'
 import { CommentIcon, RemoveIcon, QuestionMarkIcon, ShareIcon } from '@/components/Icons'
 import { MenuButton } from '@/components/Buttons'
 import { generateQuote } from './ContextMenuItems'
+import { NoteAuthorData } from '@/data/notes'
+import { userHref } from '@/common/href'
 
 export function NoteTargetMenu({
     target, booqId, user, setTarget
 }: {
     target: NoteTarget,
     booqId: BooqId,
-    user: AuthorData | undefined,
+    user: NoteAuthorData | undefined,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
     const { noteId, editMode } = target

@@ -1,4 +1,4 @@
-import { feedHref } from '@/core/href'
+import { feedHref } from '@/common/href'
 import Link from 'next/link'
 
 

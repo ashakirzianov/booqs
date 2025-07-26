@@ -1,3 +1,4 @@
+'use server'
 import { BooqId, BooqRange } from '@/core'
 import { generateSuggestions, generateAnswer, generateAnswerStreaming } from '@/backend/copilot'
 

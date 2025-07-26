@@ -1,6 +1,6 @@
+import { signInErrorHref } from '@/common/href'
 import { completeSignInAction } from '@/data/auth'
 import { NextRequest, NextResponse } from 'next/server'
-import { signInErrorHref } from '@/core'
 
 export async function GET(request: NextRequest) {
     // const { email, secret, return_to } = await searchParams

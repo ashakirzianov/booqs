@@ -1,6 +1,6 @@
 import { BooqCard } from '@/components/BooqCard'
 import Link from 'next/link'
-import { booqHref } from '../core/href'
+import { booqHref } from '../common/href'
 import { CollectionButton } from './CollectionButton'
 import type { BooqId } from '@/core'
 import { BooqCardData } from '@/data/booqs'

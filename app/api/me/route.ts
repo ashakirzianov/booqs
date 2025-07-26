@@ -1,11 +1,10 @@
-import { fetchAuthData } from '@/data/auth'
-import { AccountData } from '@/core'
+import { AccountData, getCurrentUser } from '@/data/user'
 
 export type GetResponse = {
     user: AccountData | null,
 }
 export async function GET(_request: Request) {
-    const user = await fetchAuthData()
+    const user = await getCurrentUser()
     if (!user) {
         return Response.json({
             user: null,

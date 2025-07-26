@@ -2,15 +2,16 @@
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import * as clipboard from 'clipboard-polyfill'
-import { AuthorData, BooqId, BooqNote, BooqRange } from '@/core'
+import { BooqId, BooqRange } from '@/core'
 import { MenuItem } from '@/components/Menu'
-import { quoteHref, userHref } from '@/core/href'
+import { quoteHref, userHref } from '@/common/href'
 import { BooqSelection } from '@/viewer'
 import { ProfileBadge } from '@/components/ProfilePicture'
 import { ColorPicker } from './ColorPicker'
 import { useBooqNotes } from '@/application/notes'
 import { CommentIcon, CopyIcon, LinkIcon, RemoveIcon, ShareIcon, QuestionMarkIcon } from '@/components/Icons'
 import type { ContextMenuTarget, SelectionTarget, QuoteTarget, NoteTarget } from './ContextMenuContent'
+import { BooqNote, NoteAuthorData } from '@/data/notes'
 
 export function AuthorItem({ name, pictureUrl, emoji, username }: {
     name: string,
@@ -47,7 +48,7 @@ export function AddHighlightItem({
 }: {
     selection: BooqSelection,
     booqId: BooqId,
-    user: AuthorData | undefined,
+    user: NoteAuthorData | undefined,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
     const { addNote } = useBooqNotes({ booqId, user })
@@ -83,7 +84,7 @@ export function AddCommentItem({
     target, user, setTarget,
 }: {
     target: SelectionTarget | QuoteTarget | NoteTarget,
-    user: AuthorData | undefined,
+    user: NoteAuthorData | undefined,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
     if (!user?.id) {
@@ -106,7 +107,7 @@ export function RemoveNoteItem({
 }: {
     note: BooqNote,
     booqId: BooqId,
-    user: AuthorData | undefined,
+    user: NoteAuthorData | undefined,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
     const { removeNote } = useBooqNotes({ booqId, user })
@@ -208,7 +209,7 @@ export function AskMenuItem({
     target, user, setTarget,
 }: {
     target: SelectionTarget | QuoteTarget,
-    user: AuthorData | undefined,
+    user: NoteAuthorData | undefined,
     setTarget: (target: ContextMenuTarget) => void,
 }) {
     if (!user?.id) {

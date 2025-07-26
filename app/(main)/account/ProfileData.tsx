@@ -5,8 +5,8 @@ import { ProfileBadge } from '@/components/ProfilePicture'
 import { EmojiSelector } from './EmojiSelector'
 import { PencilIcon } from '@/components/Icons'
 import { LightButton } from '@/components/Buttons'
-import { AccountData } from '@/core'
 import { updateAccountAction } from '@/data/auth'
+import { AccountData } from '@/data/user'
 
 type FormState =
     | { state: 'display' }
