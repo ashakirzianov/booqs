@@ -184,7 +184,7 @@ export async function updateAccountAction({
         return { success: false, error: result.reason, field: result.field }
     }
 
-    revalidatePath('/account')
+    revalidatePath('/account', 'layout')
     return { success: true, user: accountDataFromDbUser(result.user) }
 }
 
