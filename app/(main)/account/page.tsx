@@ -55,7 +55,7 @@ export default async function Page() {
             {/* Followers Section */}
             <FollowersList followers={followersWithStatus} currentUserId={user.id} />
 
-            {/* Books Section */}
+            {/* Booqs Section */}
             <div className="space-y-6 flex-1">
                 <BooqCollection
                     title='My Uploads'

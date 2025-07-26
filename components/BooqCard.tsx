@@ -14,10 +14,10 @@ export function BooqCard({
     actions?: ReactNode,
 }) {
     const author = authors?.join(', ')
-    const bookUrl = booqHref({ booqId })
+    const booqUrl = booqHref({ booqId })
     const libraryId = parseId(booqId)[0] || 'pg'
     return <div className="flex flex-col grow gap-4 items-center sm:flex-row sm:flex-wrap sm:items-stretch h-full">
-        <Link href={bookUrl}>
+        <Link href={booqUrl}>
             <BooqCover
                 booqId={booqId}
                 title={title ?? undefined}
@@ -27,13 +27,13 @@ export function BooqCard({
         </Link>
         <div className="flex flex-col flex-1 justify-between">
             <div className='header'>
-                <Header title={title} author={author} bookUrl={bookUrl} libraryId={libraryId} />
+                <Header title={title} author={author} booqUrl={booqUrl} libraryId={libraryId} />
             </div>
             <div className='mt-4'>
-                <BooqTags 
-                    subjects={subjects ?? []} 
-                    languages={languages ?? []} 
-                    booqId={booqId} 
+                <BooqTags
+                    subjects={subjects ?? []}
+                    languages={languages ?? []}
+                    booqId={booqId}
                 />
             </div>
             <div className='mt-4 flex gap-2 self-stretch justify-end ml-xl'>
@@ -43,14 +43,14 @@ export function BooqCard({
     </div>
 }
 
-function Header({ title, author, bookUrl, libraryId }: {
+function Header({ title, author, booqUrl, libraryId }: {
     title: string | undefined,
     author: string | undefined,
-    bookUrl: string,
+    booqUrl: string,
     libraryId: string,
 }) {
     return <div className='flex flex-col items-baseline'>
-        <Link href={bookUrl} className="text-xl font-bold hover:underline">
+        <Link href={booqUrl} className="text-xl font-bold hover:underline">
             {title}
         </Link>
         {

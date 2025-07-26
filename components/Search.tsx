@@ -106,7 +106,7 @@ function SearchModal({
                     : null}
                 {booqs.length > 0
                     ? <div>
-                        <h1 className='font-bold p-2 text-xl'>Books</h1>
+                        <h1 className='font-bold p-2 text-xl'>Booqs</h1>
                         <ul>
                             {booqs.map((result, idx) => <SearchResultItem
                                 key={idx}

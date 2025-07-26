@@ -44,7 +44,7 @@ export default async function LibraryQuery({
                 limit: PAGE_SIZE,
                 offset
             })
-            title = `Books by ${decoded}`
+            title = `Booqs by ${decoded}`
             break
         case 'subject':
             result = await booqCardsForSubject({
@@ -53,7 +53,7 @@ export default async function LibraryQuery({
                 limit: PAGE_SIZE,
                 offset
             })
-            title = `Books on ${decoded}`
+            title = `Booqs on ${decoded}`
             break
         case 'language':
             result = await booqCardsForLanguage({
@@ -62,9 +62,8 @@ export default async function LibraryQuery({
                 limit: PAGE_SIZE,
                 offset
             })
-            // Get display name from the first book's language data, or fallback to code
             const displayName = getLanguageDisplayName(decoded)
-            title = `Books in ${displayName}`
+            title = `Booqs in ${displayName}`
             break
         default:
             notFound()

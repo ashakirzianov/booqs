@@ -18,7 +18,7 @@ export default async function Home() {
             : null}
         <BooqCollection
             cards={featured}
-            title='Featured Books'
+            title='Featured Booqs'
             collection={READING_LIST_COLLECTION}
             signed={userId ? true : false}
         />
