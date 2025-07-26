@@ -134,7 +134,7 @@ async function sendEmail({
             return false
         }
 
-        console.log('Email sent successfully:', data?.id)
+        console.info('Email sent successfully:', data?.id)
         return true
     } catch (error) {
         console.error('Error sending email:', error)
