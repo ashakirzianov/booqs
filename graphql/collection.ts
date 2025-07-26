@@ -1,9 +1,12 @@
 import { IResolvers } from '@graphql-tools/utils'
 import { BooqParent } from './booq'
 import { libraryCardsForIds } from '@/backend/library'
-import { BooqCollection } from '@/core'
+import { BooqId } from '@/core'
 
-export type CollectionParent = BooqCollection
+export type CollectionParent = {
+    name: string,
+    booqIds: BooqId[],
+}
 export const collectionResolver: IResolvers<CollectionParent> = {
     Collection: {
         name(parent): string {

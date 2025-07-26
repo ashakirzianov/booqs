@@ -1,4 +1,5 @@
-import { AuthorData } from '@/core'
+import { AuthorData } from '@/data/user'
+
 
 export function Avatar({ user }: { user?: AuthorData }) {
     const display = user?.emoji || (user?.name ? user.name.charAt(0).toUpperCase() : 'X')

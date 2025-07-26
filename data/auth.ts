@@ -7,10 +7,10 @@ import {
 import { generateToken, userIdFromToken } from '@/backend/token'
 import { deleteUserForId, userForId, updateUser, DbUser } from '@/backend/users'
 import { completeSignInRequest, completeSignUp, prevalidateSignup, initiateSignRequest } from '@/backend/sign'
-import { AccountData } from '@/core'
 import { RegistrationResponseJSON, AuthenticationResponseJSON } from '@simplewebauthn/browser'
 import { cookies, headers } from 'next/headers'
 import { revalidatePath } from 'next/cache'
+import { AccountData } from './user'
 
 export async function initPasskeyRegistrationAcion() {
     try {

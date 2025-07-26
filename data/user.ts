@@ -1,9 +1,23 @@
 'use server'
-import { BooqId, BooqPath, AccountPublicData } from '@/core'
+import { BooqId, BooqPath } from '@/core'
 import { fetchAuthData, getUserIdInsideRequest } from './auth'
 import { addBooqHistory } from '@/backend/history'
 import { userForUsername, DbUser, usersForIds } from '@/backend/users'
 import { followUser, unfollowUser, isFollowing, getFollowing, getFollowers } from '@/backend/follows'
+
+export type AccountPublicData = {
+    id: string,
+    username: string,
+    joinedAt: string,
+    name: string,
+    profilePictureURL?: string,
+    emoji: string,
+}
+
+export type AccountData = AccountPublicData & {
+    email: string,
+}
+export type AuthorData = Pick<AccountData, 'id' | 'username' | 'name' | 'profilePictureURL' | 'emoji'>
 
 export async function reportBooqHistory({
     booqId, path, source,
@@ -126,14 +140,14 @@ export async function getFollowStatus(username: string): Promise<{ isFollowing: 
 export async function getFollowingList(userId: string): Promise<AccountPublicData[]> {
     const followingIds = await getFollowing(userId)
     const following = await usersForIds(followingIds)
-    
+
     return following.map(accountPublicDataFromDbUser)
 }
 
 export async function getFollowersList(userId: string): Promise<AccountPublicData[]> {
     const followerIds = await getFollowers(userId)
     const followers = await usersForIds(followerIds)
-    
+
     return followers.map(accountPublicDataFromDbUser)
 }
 

@@ -1,8 +1,9 @@
 import { useBooqNotes } from '@/application/notes'
-import { BooqId, AuthorData } from '@/core'
+import { BooqId } from '@/core'
 import { BooqSelection } from '@/viewer'
 import { useState } from 'react'
 import type { CreateCommentTarget, ContextMenuTarget } from './ContextMenuContent'
+import { AuthorData } from '@/data/user'
 
 export function CreateCommentTargetMenu({
     target: { parent }, booqId, user, setTarget,

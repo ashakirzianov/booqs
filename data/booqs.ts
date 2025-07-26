@@ -1,15 +1,22 @@
 import {
     BooqPath, buildFragment,
-    PartialBooqData,
     BooqId,
     BooqMetadata,
     TableOfContents,
+    BooqFragment,
 } from '@/core'
 import { libraryCardsForIds, featuredBooqIds, queryLibrary } from '@/backend/library'
 import { userForId } from '@/backend/users'
 import { booqIdsInCollections } from '@/backend/collections'
 import { booqForId, booqPreview, booqToc } from '@/backend/booq'
 import { getExtraMetadataValues } from '@/core/meta'
+
+export type PartialBooqData = {
+    booqId: BooqId,
+    fragment: BooqFragment,
+    meta: BooqMetadata,
+    toc: TableOfContents,
+}
 
 export type LanguageInfo = {
     code: string,

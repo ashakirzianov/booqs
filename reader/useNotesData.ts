@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
-import { BooqId, AuthorData, BooqRange, pathInRange, pathLessThan } from '@/core'
+import { BooqId, BooqRange, pathInRange, pathLessThan } from '@/core'
 import { HIGHLIGHT_KINDS, COMMENT_KIND, useBooqNotes } from '@/application/notes'
+import { AuthorData } from '@/data/user'
 
 export function useNotesData({
     booqId,

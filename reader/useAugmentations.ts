@@ -1,7 +1,8 @@
 import { useMemo, useCallback } from 'react'
 import { getAugmentationText, Augmentation } from '@/viewer'
-import { BooqNote, BooqRange } from '@/core'
+import { BooqRange } from '@/core'
 import { ContextMenuTarget } from './ContextMenuContent'
+import { BooqNote } from '@/application/notes'
 
 export type TemporaryAugmentation = {
     range: BooqRange,

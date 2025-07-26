@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
-import { BooqPath, PartialBooqData, positionForPath } from '@/core'
+import { BooqPath, positionForPath } from '@/core'
 import { pageForPosition } from '@/application/common'
+import { PartialBooqData } from '@/data/booqs'
 
 export function usePageData({
     booq, currentPath,

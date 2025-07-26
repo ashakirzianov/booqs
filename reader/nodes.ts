@@ -1,5 +1,7 @@
-import { AuthorData, BooqNote, pathInRange, TableOfContentsItem } from '@/core'
+import { pathInRange, TableOfContentsItem } from '@/core'
 import { NavigationSelection } from './useNavigationState'
+import { BooqNote } from '@/application/notes'
+import { AuthorData } from '@/data/user'
 
 export type TocNode = {
     kind: 'toc',

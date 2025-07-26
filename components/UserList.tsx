@@ -1,9 +1,8 @@
 'use client'
 import { useState, ReactNode } from 'react'
 import Link from 'next/link'
-import { AccountPublicData } from '@/core'
 import { userHref } from '@/common/href'
-import { followAction, unfollowAction } from '@/data/user'
+import { AccountPublicData, followAction, unfollowAction } from '@/data/user'
 import { ProfileBadge } from '@/components/ProfilePicture'
 
 export type UserWithFollowStatus = AccountPublicData & {

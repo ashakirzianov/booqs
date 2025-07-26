@@ -5,8 +5,10 @@ import { NoteNodeComp } from './NoteNode'
 import { PathNotesNodeComp } from './PathNotesNode'
 import { NavigationFilter } from './NavigationFilter'
 import { buildNavigationNodes, NavigationNode } from './nodes'
-import { AuthorData, BooqId, BooqNote, TableOfContentsItem } from '@/core'
+import { BooqId, TableOfContentsItem } from '@/core'
 import { NavigationSelection } from './useNavigationState'
+import { BooqNote } from '@/application/notes'
+import { AuthorData } from '@/data/user'
 
 export function NavigationPanel({
     booqId, user, title, toc, notes,

@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { useMemo, useState } from 'react'
 import * as clipboard from 'clipboard-polyfill'
-import { AuthorData, BooqId, userHref } from '@/core'
+import { BooqId, userHref } from '@/core'
 import type { ContextMenuTarget, NoteTarget } from './ContextMenuContent'
 import { ColorPicker } from './ColorPicker'
 import { formatRelativeTime } from '@/application/common'
@@ -10,6 +10,7 @@ import { ProfileBadge } from '@/components/ProfilePicture'
 import { CommentIcon, RemoveIcon, QuestionMarkIcon, ShareIcon } from '@/components/Icons'
 import { MenuButton } from '@/components/Buttons'
 import { generateQuote } from './ContextMenuItems'
+import { AuthorData } from '@/data/user'
 
 export function NoteTargetMenu({
     target, booqId, user, setTarget

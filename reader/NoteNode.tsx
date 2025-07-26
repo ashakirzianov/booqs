@@ -4,7 +4,9 @@ import { MoreIcon } from '@/components/Icons'
 import clsx from 'clsx'
 import { booqHref } from '@/common/href'
 import Link from 'next/link'
-import { AuthorData, BooqId, BooqNote } from '@/core'
+import { BooqId } from '@/core'
+import { BooqNote } from '@/application/notes'
+import { AuthorData } from '@/data/user'
 
 export function NoteNodeComp({ booqId, note, user }: {
     booqId: BooqId,

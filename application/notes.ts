@@ -2,7 +2,8 @@
 
 import type { GetResponse, PostBody, PostResponse } from '@/app/api/booq/[library]/[id]/notes/route'
 import type { PatchBody, PatchResponse } from '@/app/api/notes/[id]/route'
-import { AuthorData, BooqId, BooqRange, BooqNote, NotePrivacy } from '@/core'
+import { BooqId, BooqRange } from '@/core'
+import { AuthorData } from '@/data/user'
 import { nanoid } from 'nanoid'
 import { useMemo } from 'react'
 import useSWR from 'swr'
@@ -12,6 +13,23 @@ export const HIGHLIGHT_KINDS = [
     'highlight-0', 'highlight-1', 'highlight-2', 'highlight-3', 'highlight-4',
 ]
 export const COMMENT_KIND = 'comment'
+
+export type NoteColor = string // TODO: rename?
+export type NotePrivacy = 'private' | 'public'
+
+export type BooqNote = {
+    id: string,
+    booqId: BooqId,
+    author: AuthorData,
+    range: BooqRange,
+    kind: string,
+    content?: string,
+    targetQuote: string,
+    privacy: NotePrivacy,
+    createdAt: string,
+    updatedAt: string,
+}
+
 export function useBooqNotes({
     booqId, user,
 }: {

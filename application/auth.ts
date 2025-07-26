@@ -6,7 +6,7 @@ import {
 } from '@/data/auth'
 import useSWR from 'swr'
 import { GetResponse } from '@/app/api/me/route'
-import { AccountData } from '@/core'
+import { AccountData } from '@/data/user'
 
 export function useAuth() {
     const { data, isLoading, error, mutate } = useSWR(

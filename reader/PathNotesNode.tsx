@@ -3,7 +3,8 @@ import { NoteNodeComp } from './NoteNode'
 import { PathNotesNode } from './nodes'
 import { booqHref } from '@/common/href'
 import Link from 'next/link'
-import { AuthorData, BooqId, TableOfContentsItem } from '@/core'
+import { BooqId, TableOfContentsItem } from '@/core'
+import { AuthorData } from '@/data/user'
 
 export function PathNotesNodeComp({
     booqId, user,

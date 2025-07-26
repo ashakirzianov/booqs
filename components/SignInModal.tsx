@@ -12,7 +12,7 @@ import { usePasskeys } from '@/application/passkeys'
 import {
     BookIcon, NewItemIcon, PasskeyIcon, SettingsIcon, SignInIcon, SignOutIcon, Spinner,
 } from '@/components/Icons'
-import { AccountData } from '@/core'
+import { AccountData } from '@/data/user'
 
 export function SignInModal({ isOpen, closeModal }: {
     isOpen: boolean,

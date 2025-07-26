@@ -1,5 +1,5 @@
 import { fetchAuthData } from '@/data/auth'
-import { AccountData } from '@/core'
+import { AccountData } from '@/data/user'
 
 export type GetResponse = {
     user: AccountData | null,

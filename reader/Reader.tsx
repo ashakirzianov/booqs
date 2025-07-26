@@ -2,7 +2,7 @@
 // import '@/app/wdyr'
 
 import React, { useMemo } from 'react'
-import { BooqAnchor, BooqId, BooqRange, PartialBooqData } from '@/core'
+import { BooqAnchor, BooqId, BooqRange } from '@/core'
 import { BorderButton, PanelButton } from '@/components/Buttons'
 import { booqHref, feedHref } from '@/common/href'
 import {
@@ -31,6 +31,7 @@ import { usePageData } from './usePageData'
 import { useNavigationState } from './useNavigationState'
 import clsx from 'clsx'
 import { resolveImageSrc } from '@/common/images'
+import { PartialBooqData } from '@/data/booqs'
 
 export function Reader({
     booq, quote,

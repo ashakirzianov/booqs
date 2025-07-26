@@ -2,15 +2,16 @@
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import * as clipboard from 'clipboard-polyfill'
-import { AuthorData, BooqId, BooqNote, BooqRange } from '@/core'
+import { BooqId, BooqRange } from '@/core'
 import { MenuItem } from '@/components/Menu'
 import { quoteHref, userHref } from '@/common/href'
 import { BooqSelection } from '@/viewer'
 import { ProfileBadge } from '@/components/ProfilePicture'
 import { ColorPicker } from './ColorPicker'
-import { useBooqNotes } from '@/application/notes'
+import { BooqNote, useBooqNotes } from '@/application/notes'
 import { CommentIcon, CopyIcon, LinkIcon, RemoveIcon, ShareIcon, QuestionMarkIcon } from '@/components/Icons'
 import type { ContextMenuTarget, SelectionTarget, QuoteTarget, NoteTarget } from './ContextMenuContent'
+import { AuthorData } from '@/data/user'
 
 export function AuthorItem({ name, pictureUrl, emoji, username }: {
     name: string,

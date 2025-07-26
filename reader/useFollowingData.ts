@@ -1,7 +1,7 @@
 'use client'
 
-import { AuthorData } from '@/core'
 import type { GetResponse } from '@/app/api/users/[username]/following/route'
+import { AuthorData } from '@/data/user'
 import useSWR from 'swr'
 
 export function useFollowingData({ user }: { user: AuthorData | undefined }) {
