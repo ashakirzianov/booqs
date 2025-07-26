@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { BooqId, BooqPath, samePath } from '@/core'
 import { useOnBooqScroll } from '@/viewer'
-import { reportBooqHistory } from '@/data/user'
+import { reportBooqHistory } from '@/data/history'
 import { currentSource } from '@/application/common'
 
 export function useScrollHandler({

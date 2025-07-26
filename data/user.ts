@@ -1,7 +1,5 @@
 'use server'
-import { BooqId, BooqPath } from '@/core'
 import { getUserIdInsideRequest } from './auth'
-import { addBooqHistory } from '@/backend/history'
 import { userForUsername, DbUser, usersForIds, userForId } from '@/backend/users'
 import { followUser, unfollowUser, isFollowing, getFollowing, getFollowers } from '@/backend/follows'
 
@@ -20,26 +18,6 @@ export type AccountData = AccountPublicData & {
     email: string,
 }
 export type AuthorData = Pick<AccountData, 'id' | 'username' | 'name' | 'profilePictureURL' | 'emoji'>
-
-export async function reportBooqHistory({
-    booqId, path, source,
-}: {
-    booqId: BooqId,
-    path: BooqPath,
-    source: string,
-}) {
-    const user = await getCurrentUser()
-    if (!user) {
-        return {
-            success: false,
-            error: 'Not authenticated',
-        } as const
-    }
-    addBooqHistory(user.id, {
-        booqId, path, source,
-        date: Date.now(),
-    })
-}
 
 export async function getCurrentUser(): Promise<AccountData | undefined> {
     const userId = await getUserIdInsideRequest()

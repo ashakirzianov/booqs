@@ -1,7 +1,27 @@
-import { booqHistoryForUser } from '@/backend/history'
+import { addBooqHistory, booqHistoryForUser } from '@/backend/history'
 import { getUserIdInsideRequest } from './auth'
 import { booqPreview } from '@/backend/booq'
-import { BooqId } from '@/core'
+import { BooqId, BooqPath } from '@/core'
+
+export async function reportBooqHistory({
+    booqId, path, source,
+}: {
+    booqId: BooqId,
+    path: BooqPath,
+    source: string,
+}) {
+    const userId = await getUserIdInsideRequest()
+    if (!userId) {
+        return {
+            success: false,
+            error: 'Not authenticated',
+        } as const
+    }
+    addBooqHistory(userId, {
+        booqId, path, source,
+        date: Date.now(),
+    })
+}
 
 export async function fetchReadingHistory() {
     const userId = await getUserIdInsideRequest()
