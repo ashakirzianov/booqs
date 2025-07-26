@@ -51,11 +51,11 @@ export async function query(query: LibraryQuery): Promise<InLibraryQueryResult> 
     case 'search':
       return search(query.query, query.limit, offset)
     case 'author':
-      return author(query.query, query.limit, offset)
+      return exactMatchInArrayField({ field: 'authors', query: query.query, limit: query.limit, offset })
     case 'subject':
-      return subject(query.query, query.limit, offset)
+      return exactMatchInArrayField({ field: 'subjects', query: query.query, limit: query.limit, offset })
     case 'language':
-      return language(query.query, query.limit, offset)
+      return exactMatchInArrayField({ field: 'languages', query: query.query, limit: query.limit, offset })
     default:
       assertNever(query.kind)
       return { cards: [], hasMore: false }
@@ -81,45 +81,16 @@ async function search(query: string, limit: number, offset: number): Promise<InL
   return { cards, hasMore }
 }
 
-async function author(authorName: string, limit: number, offset: number): Promise<InLibraryQueryResult> {
+async function exactMatchInArrayField({ field, query, limit, offset }: {
+  field: 'authors' | 'subjects' | 'languages',
+  query: string,
+  limit: number,
+  offset: number,
+}): Promise<InLibraryQueryResult> {
   const result = await sql`
     SELECT *
     FROM pg_metadata
-    WHERE ${authorName} = ANY(authors)
-    ORDER BY title
-    LIMIT ${limit + 1}
-    OFFSET ${offset}
-  ` as DbPgMetadata[]
-  const hasMore = result.length > limit
-  const cards = result.slice(0, limit).map(({ id, meta }) => ({
-    id,
-    meta,
-  }))
-  return { cards, hasMore }
-}
-
-async function subject(subjectName: string, limit: number, offset: number): Promise<InLibraryQueryResult> {
-  const result = await sql`
-    SELECT *
-    FROM pg_metadata
-    WHERE ${subjectName} = ANY(subjects)
-    ORDER BY title
-    LIMIT ${limit + 1}
-    OFFSET ${offset}
-  ` as DbPgMetadata[]
-  const hasMore = result.length > limit
-  const cards = result.slice(0, limit).map(({ id, meta }) => ({
-    id,
-    meta,
-  }))
-  return { cards, hasMore }
-}
-
-async function language(languageName: string, limit: number, offset: number): Promise<InLibraryQueryResult> {
-  const result = await sql`
-    SELECT *
-    FROM pg_metadata
-    WHERE ${languageName} = ANY(languages)
+    WHERE ${query} = ANY(${sql.unsafe(field)})
     ORDER BY title
     LIMIT ${limit + 1}
     OFFSET ${offset}
