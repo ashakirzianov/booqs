@@ -1,19 +1,10 @@
 import React from 'react'
 import { BooqPreview } from '@/components/BooqPreview'
 import { pageForPosition } from '@/application/common'
-import { BooqId, BooqPath } from '@/core'
 import Link from 'next/link'
 import { booqHref } from '../common/href'
+import { ReadingHistoryEntry } from '@/data/history'
 
-
-export type ReadingHistoryEntry = {
-    booqId: BooqId,
-    title?: string,
-    path: BooqPath,
-    text: string,
-    position: number,
-    length: number,
-}
 export function ReadingHistory({ history }: {
     history: ReadingHistoryEntry[],
 }) {
@@ -30,7 +21,7 @@ export function ReadingHistory({ history }: {
                                 text={entry.text}
                                 title={entry.title ?? ''}
                                 page={pageForPosition(entry.position)}
-                                total={pageForPosition(entry.length)}
+                                total={pageForPosition(entry.booqLength)}
                             />
                         </Link>
                     </div>

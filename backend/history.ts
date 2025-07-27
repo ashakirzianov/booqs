@@ -7,12 +7,7 @@ export type DbReadingHistoryEvent = {
     path: BooqPath,
     date: number,
 }
-type DbReadingHistory = Array<{
-    booqId: string,
-    source: string,
-    path: BooqPath,
-    date: number,
-}>
+type DbReadingHistory = DbReadingHistoryEvent[]
 type RedisHashValue = Omit<DbReadingHistoryEvent, 'booqId' | 'source'>
 export async function booqHistoryForUser(userId: string): Promise<DbReadingHistory> {
     const record = await redis.hgetall<Record<string, RedisHashValue>>(`user:${userId}:history`) ?? {}
