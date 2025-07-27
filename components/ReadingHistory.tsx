@@ -5,8 +5,9 @@ import Link from 'next/link'
 import { booqHref } from '../common/href'
 import { DetailedReadingHistoryEntry } from '@/data/history'
 
-export function ReadingHistory({ history }: {
+export function ReadingHistory({ history, showFullHistoryLink }: {
     history: DetailedReadingHistoryEntry[],
+    showFullHistoryLink?: React.ReactNode,
 }) {
     return <div className='flex gap-3 overflow-auto snap-x snap-mandatory py-xl px-4 h-80' style={{
         scrollbarWidth: 'none',
@@ -27,5 +28,10 @@ export function ReadingHistory({ history }: {
                     </div>
             )
         }
+        {showFullHistoryLink && (
+            <div className='flex snap-center items-center justify-center px-4'>
+                {showFullHistoryLink}
+            </div>
+        )}
     </div>
 }
