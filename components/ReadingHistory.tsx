@@ -3,10 +3,10 @@ import { BooqPreview } from '@/components/BooqPreview'
 import { pageForPosition } from '@/application/common'
 import Link from 'next/link'
 import { booqHref } from '../common/href'
-import { ReadingHistoryEntry } from '@/data/history'
+import { DetailedReadingHistoryEntry } from '@/data/history'
 
 export function ReadingHistory({ history }: {
-    history: ReadingHistoryEntry[],
+    history: DetailedReadingHistoryEntry[],
 }) {
     return <div className='flex gap-3 overflow-auto snap-x snap-mandatory py-xl px-4 h-80' style={{
         scrollbarWidth: 'none',

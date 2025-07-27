@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 import { authHref } from '@/common/href'
-import { getReadingHistory } from '@/data/history'
+import { getReadingHistoryWithBriefEntries } from '@/data/history'
 import { Pagination } from '@/components/Pagination'
 import { HistoryEntry } from './HistoryEntry'
 
@@ -15,7 +15,7 @@ export default async function HistoryPage({
     const currentPage = Math.max(1, parseInt(pageParam || '1', 10))
     const offset = (currentPage - 1) * PAGE_SIZE
 
-    const result = await getReadingHistory({
+    const result = await getReadingHistoryWithBriefEntries({
         limit: PAGE_SIZE,
         offset,
     })

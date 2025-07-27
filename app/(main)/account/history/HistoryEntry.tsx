@@ -4,12 +4,12 @@ import { useState } from 'react'
 import { booqHref } from '@/common/href'
 import { BooqCover } from '@/components/BooqCover'
 import { TrashIcon } from '@/components/Icons'
-import { removeHistoryEntryAction, ReadingHistoryEntry } from '@/data/history'
+import { removeHistoryEntryAction, BriefReadingHistoryEntry } from '@/data/history'
 
 export function HistoryEntry({ 
     entry
 }: { 
-    entry: ReadingHistoryEntry
+    entry: BriefReadingHistoryEntry
 }) {
     const [isRemoving, setIsRemoving] = useState(false)
     const [isRemoved, setIsRemoved] = useState(false)

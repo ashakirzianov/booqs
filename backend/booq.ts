@@ -1,7 +1,7 @@
-import { Booq, BooqId, BooqPath, pathToString, positionForPath, previewForPath, TableOfContents, textForRange } from '@/core'
+import { Booq, BooqId, BooqMetadata, BooqPath, pathToString, positionForPath, previewForPath, TableOfContents, textForRange } from '@/core'
 import { getCachedValueForKey, cacheValueForKey } from './cache'
 import { parseEpubFile } from '@/parser'
-import { fileForId } from './library'
+import { fileForId, libraryCardForId } from './library'
 import { inspect } from 'util'
 
 export async function booqForId(booqId: BooqId, bypassCache = false): Promise<Booq | undefined> {
@@ -56,6 +56,14 @@ export async function booqPreview(booqId: BooqId, path: BooqPath, end?: BooqPath
     }
     await cacheValueForKey(key, preview, 60 * 60) // Cache for 1 hour
     return preview
+}
+
+export async function booqMetadata(booqId: BooqId): Promise<BooqMetadata | undefined> {
+    const card = await libraryCardForId(booqId)
+    if (!card) {
+        return undefined
+    }
+    return card.meta
 }
 
 export async function booqToc(booqId: BooqId): Promise<TableOfContents | undefined> {
