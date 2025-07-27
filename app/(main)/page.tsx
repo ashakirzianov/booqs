@@ -10,11 +10,11 @@ export const fetchCache = 'force-no-store'
 
 export default async function Home() {
     const featured = await featuredBooqCards()
-    const history = await getReadingHistory()
+    const historyResult = await getReadingHistory({ limit: 10 })
     const userId = await getUserIdInsideRequest()
     return <>
-        {history && history.length > 0
-            ? <ReadingHistory history={history} />
+        {historyResult && historyResult.entries.length > 0
+            ? <ReadingHistory history={historyResult.entries} />
             : null}
         <BooqCollection
             cards={featured}

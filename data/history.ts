@@ -37,14 +37,30 @@ export async function reportBooqHistoryAction({
 }
 
 const PREVIEW_LENGTH = 500
-export async function getReadingHistory() {
+
+export type ReadingHistoryResult = {
+    entries: ReadingHistoryEntry[]
+    total: number
+    hasMore: boolean
+}
+
+export async function getReadingHistory({
+    limit = 20,
+    offset = 0,
+}: {
+    limit?: number
+    offset?: number
+} = {}): Promise<ReadingHistoryResult | undefined> {
     const userId = await getUserIdInsideRequest()
     if (!userId) {
         return undefined
     }
     const history = await booqHistoryForUser(userId)
+    const total = history.length
+    const paginatedHistory = history.slice(offset, offset + limit)
+    const hasMore = offset + limit < total
 
-    const promises = history.map(async ({ booqId, path, date }) => {
+    const promises = paginatedHistory.map(async ({ booqId, path, date }) => {
         const booq = await booqForId(booqId as BooqId)
         if (!booq) {
             console.warn(`Booq not found for ID: ${booqId} while fetching history for: ${userId}`)
@@ -68,7 +84,13 @@ export async function getReadingHistory() {
         return historyEntry
     })
     const resolved = await Promise.all(promises)
-    return resolved.filter(entry => entry !== undefined)
+    const entries = resolved.filter(entry => entry !== undefined)
+
+    return {
+        entries,
+        total,
+        hasMore,
+    }
 }
 
 export async function getBooqHistory(booqId: BooqId) {
