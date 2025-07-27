@@ -1,5 +1,5 @@
 export function pageForPosition(position: number): number {
-    return Math.ceil(position / 2500)
+    return Math.ceil((position + 1) / 2500)
 }
 
 export function colorSchemeForBaseColor(baseColor: string) {
