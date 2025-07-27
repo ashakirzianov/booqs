@@ -15,9 +15,9 @@ export function BooqCover({ booqId, coverSrc, title, author, size }: {
     const height = size * 3
     const coverSize = coverSizeForSize(height)
     const coverUrl = coverSrc ? resolveImageSrc(booqId, coverSrc, coverSize) : undefined
-    return <div className='flex shrink-0 items-stretch rounded-sm overflow-hidden' style={{
+    return <div className='flex shrink-0 items-stretch rounded-sm overflow-clip' style={{
+        width: size * 2,
         height: height,
-        width: size * 2, // cover is twice as wide as it is tall
     }}>
         {
             coverUrl

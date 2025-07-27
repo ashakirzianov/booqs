@@ -1,15 +1,38 @@
 'use server'
-import { addBooqHistory, booqHistoryForUser } from '@/backend/history'
-import { booqPreview } from '@/backend/booq'
+import { addBooqHistory, booqHistoryForUser, removeBooqHistory, DbReadingHistoryEvent } from '@/backend/history'
+import { booqPreview, booqMetadata } from '@/backend/booq'
 import { BooqId, BooqPath } from '@/core'
 import { getUserIdInsideRequest } from './request'
 
+export type ReadingHistoryEntry = BriefReadingHistoryEntry | DetailedReadingHistoryEntry
+// Brief entry for history page - just book info and read time
+export type BriefReadingHistoryEntry = {
+    booqId: BooqId,
+    path: BooqPath,
+    lastRead: number,
+    title: string,
+    authors: string[],
+    coverSrc?: string,
+}
+
+// Detailed entry for main page - includes reading position and preview
+export type DetailedReadingHistoryEntry = BriefReadingHistoryEntry & {
+    text: string,
+    position: number,
+    booqLength: number,
+}
+
+export type ReadingHistoryResult = {
+    entries: ReadingHistoryEntry[]
+    total: number
+    hasMore: boolean
+}
+
 export async function reportBooqHistoryAction({
-    booqId, path, source,
+    booqId, path,
 }: {
     booqId: BooqId,
     path: BooqPath,
-    source: string,
 }) {
     const userId = await getUserIdInsideRequest()
     if (!userId) {
@@ -19,22 +42,101 @@ export async function reportBooqHistoryAction({
         } as const
     }
     addBooqHistory(userId, {
-        booqId, path, source,
+        booqId, path,
         date: Date.now(),
     })
 }
 
-export async function getReadingHistory() {
+export async function getReadingHistoryForMainPage({
+    limit = 5,
+    offset = 0,
+}: {
+    limit?: number
+    offset?: number
+} = {}): Promise<ReadingHistoryResult | undefined> {
     const userId = await getUserIdInsideRequest()
     if (!userId) {
         return undefined
     }
     const history = await booqHistoryForUser(userId)
-    const promises = history.map(async entry => {
-        return booqPreview(entry.booqId as BooqId, entry.path)
-    })
+    const total = history.length
+    const paginatedHistory = history.slice(offset, offset + limit)
+    const hasMore = offset + limit < total
+
+    if (paginatedHistory.length === 0) {
+        return {
+            entries: [],
+            total,
+            hasMore,
+        }
+    }
+
+    // Get detailed entry for first item
+    const firstEntry = paginatedHistory[0]
+    const detailedFirstEntry = await resolveDetailedHistoryEvent(firstEntry, userId)
+
+    // Get brief entries for remaining items
+    const remainingEntries = paginatedHistory.slice(1)
+    const briefPromises = remainingEntries.map(event => resolveBriefHistoryEvent(event, userId))
+    const resolvedBrief = await Promise.all(briefPromises)
+
+    const entries: ReadingHistoryEntry[] = [
+        detailedFirstEntry,
+        ...resolvedBrief
+    ].filter(entry => entry !== undefined)
+
+    return {
+        entries,
+        total,
+        hasMore,
+    }
+}
+
+export async function getReadingHistoryForHistoryList({
+    limit = 20,
+    offset = 0,
+}: {
+    limit?: number
+    offset?: number
+} = {}): Promise<ReadingHistoryResult | undefined> {
+    const userId = await getUserIdInsideRequest()
+    if (!userId) {
+        return undefined
+    }
+    const history = await booqHistoryForUser(userId)
+    const total = history.length
+    const paginatedHistory = history.slice(offset, offset + limit)
+    const hasMore = offset + limit < total
+
+    const promises = paginatedHistory.map(event => resolveBriefHistoryEvent(event, userId))
     const resolved = await Promise.all(promises)
-    return resolved.filter(entry => entry !== undefined)
+    const entries = resolved.filter(entry => entry !== undefined)
+
+    return {
+        entries,
+        total,
+        hasMore,
+    }
+}
+
+export async function removeHistoryEntryAction({
+    booqId,
+}: {
+    booqId: BooqId,
+}) {
+    const userId = await getUserIdInsideRequest()
+    if (!userId) {
+        return {
+            success: false,
+            error: 'Not authenticated',
+        } as const
+    }
+
+    const success = await removeBooqHistory(userId, booqId as string)
+    return {
+        success,
+        error: success ? null : 'Failed to remove history entry',
+    } as const
 }
 
 export async function getBooqHistory(booqId: BooqId) {
@@ -45,4 +147,41 @@ export async function getBooqHistory(booqId: BooqId) {
     const history = await booqHistoryForUser(userId)
     const booqHistory = history.find(entry => entry.booqId === booqId)
     return booqHistory
+}
+
+async function resolveBriefHistoryEvent(event: DbReadingHistoryEvent, userId: string): Promise<BriefReadingHistoryEntry | undefined> {
+    const { booqId, path, date } = event
+    const meta = await booqMetadata(booqId as BooqId)
+    if (!meta) {
+        console.warn(`Booq metadata not found for ID: ${booqId} while fetching history for: ${userId}`)
+        return undefined
+    }
+    return {
+        booqId: booqId as BooqId,
+        path,
+        lastRead: date,
+        title: meta.title,
+        authors: meta.authors.map(author => author.name),
+        coverSrc: meta.coverSrc,
+    }
+}
+
+async function resolveDetailedHistoryEvent(event: DbReadingHistoryEvent, userId: string): Promise<DetailedReadingHistoryEntry | undefined> {
+    const { booqId, path, date } = event
+    const preview = await booqPreview(booqId as BooqId, path)
+    if (!preview) {
+        console.warn(`Booq preview not found for ID: ${booqId} while fetching history for: ${userId}`)
+        return undefined
+    }
+    return {
+        booqId: booqId as BooqId,
+        path,
+        lastRead: date,
+        text: preview.text,
+        position: preview.position,
+        booqLength: preview.booqLength,
+        title: preview.title ?? '',
+        authors: preview.authors ?? [],
+        coverSrc: preview.coverSrc,
+    }
 }

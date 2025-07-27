@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 import { accountHref } from '@/common/href'
-import { ProfileIcon, UsersIcon, CollectionIcon } from '@/components/Icons'
+import { ProfileIcon, UsersIcon, CollectionIcon, HistoryIcon } from '@/components/Icons'
 import { AccountLink } from './AccountLink'
 import styles from './AccountLayout.module.css'
 import { getCurrentUser } from '@/data/user'
@@ -37,6 +37,11 @@ export default async function AccountLayout({
                                 <li className={styles.navItem}>
                                     <AccountLink href={accountHref({ section: 'collections' })} icon={<CollectionIcon />}>
                                         Collections
+                                    </AccountLink>
+                                </li>
+                                <li className={styles.navItem}>
+                                    <AccountLink href={'/account/history'} icon={<HistoryIcon />}>
+                                        History
                                     </AccountLink>
                                 </li>
                             </ul>

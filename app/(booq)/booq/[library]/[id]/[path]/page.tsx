@@ -1,5 +1,6 @@
 import { pathFromString } from '@/core'
 import { booqPart, fetchBooqPreview } from '@/data/booqs'
+import { reportBooqHistoryAction } from '@/data/history'
 import { Reader } from '@/reader/Reader'
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
@@ -56,5 +57,14 @@ export default async function BooqPathPage({
     })
     if (!booq)
         return notFound()
+
+    // Report history event before rendering the page
+    if (booqPath) {
+        await reportBooqHistoryAction({
+            booqId: `${library}/${id}`,
+            path: booqPath,
+        })
+    }
+
     return <Reader booq={booq} quote={quoteRange} />
 }

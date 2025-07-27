@@ -3,24 +3,16 @@ import { redis } from './db'
 
 export type DbReadingHistoryEvent = {
     booqId: string,
-    source: string,
     path: BooqPath,
     date: number,
 }
-type DbReadingHistory = Array<{
-    booqId: string,
-    source: string,
-    path: BooqPath,
-    date: number,
-}>
-type RedisHashValue = Omit<DbReadingHistoryEvent, 'booqId' | 'source'>
+type DbReadingHistory = DbReadingHistoryEvent[]
+type RedisHashValue = Omit<DbReadingHistoryEvent, 'booqId'>
 export async function booqHistoryForUser(userId: string): Promise<DbReadingHistory> {
     const record = await redis.hgetall<Record<string, RedisHashValue>>(`user:${userId}:history`) ?? {}
-    const history: DbReadingHistory = Object.entries(record).map(([key, value]) => {
-        const [booqId, source] = key.split(':')
+    const history: DbReadingHistory = Object.entries(record).map(([booqId, value]) => {
         return {
             booqId,
-            source,
             ...value,
         }
     })
@@ -30,14 +22,21 @@ export async function booqHistoryForUser(userId: string): Promise<DbReadingHisto
 
 export async function addBooqHistory(
     userId: string,
-    { booqId, source, ...data }: DbReadingHistoryEvent,
+    { booqId, ...data }: DbReadingHistoryEvent,
 ) {
     const result = await redis.hset(`user:${userId}:history`, {
-        [`${booqId}:${source}`]: JSON.stringify(data),
+        [booqId]: JSON.stringify(data),
     })
     return result > 0 ? {
         booqId,
-        source,
         ...data,
     } : null
+}
+
+export async function removeBooqHistory(
+    userId: string,
+    booqId: string,
+) {
+    const result = await redis.hdel(`user:${userId}:history`, booqId)
+    return result > 0
 }

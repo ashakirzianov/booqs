@@ -1,9 +1,5 @@
 export function pageForPosition(position: number): number {
-    return Math.ceil(position / 2500)
-}
-
-export function currentSource(): string {
-    return 'default/0'
+    return Math.ceil((position + 1) / 2500)
 }
 
 export function colorSchemeForBaseColor(baseColor: string) {

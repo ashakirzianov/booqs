@@ -1,7 +1,7 @@
-import { Booq, BooqId, BooqPath, pathToString, positionForPath, previewForPath, TableOfContents, textForRange } from '@/core'
+import { Booq, BooqId, BooqMetadata, BooqPath, pathToString, positionForPath, previewForPath, TableOfContents, textForRange } from '@/core'
 import { getCachedValueForKey, cacheValueForKey } from './cache'
 import { parseEpubFile } from '@/parser'
-import { fileForId } from './library'
+import { fileForId, libraryCardForId } from './library'
 import { inspect } from 'util'
 
 export async function booqForId(booqId: BooqId, bypassCache = false): Promise<Booq | undefined> {
@@ -21,12 +21,12 @@ export async function booqForId(booqId: BooqId, bypassCache = false): Promise<Bo
 }
 
 export type BooqPreview = {
-    booqId: BooqId,
-    path: BooqPath,
-    title?: string,
-    text: string,
-    length: number,
     position: number,
+    text: string,
+    title?: string,
+    authors?: string[],
+    coverSrc?: string,
+    booqLength: number,
 }
 const PREVIEW_LENGTH = 500
 export async function booqPreview(booqId: BooqId, path: BooqPath, end?: BooqPath): Promise<BooqPreview | undefined> {
@@ -44,17 +44,26 @@ export async function booqPreview(booqId: BooqId, path: BooqPath, end?: BooqPath
         : previewForPath(booq.nodes, path, PREVIEW_LENGTH)
     const text = full?.trim()?.substring(0, PREVIEW_LENGTH) ?? ''
     const position = positionForPath(booq.nodes, path)
-    const length = booq.metadata.length
+    const authors = booq.metadata.authors.map(author => author.name)
+    const booqLength = booq.metadata.length
     const preview = {
-        booqId,
-        path,
-        title: booq.metadata.title,
-        text,
         position,
-        length,
+        text,
+        title: booq.metadata.title,
+        authors,
+        coverSrc: booq.metadata.coverSrc,
+        booqLength,
     }
-    await cacheValueForKey(key, preview)
+    await cacheValueForKey(key, preview, 60 * 60) // Cache for 1 hour
     return preview
+}
+
+export async function booqMetadata(booqId: BooqId): Promise<BooqMetadata | undefined> {
+    const card = await libraryCardForId(booqId)
+    if (!card) {
+        return undefined
+    }
+    return card.meta
 }
 
 export async function booqToc(booqId: BooqId): Promise<TableOfContents | undefined> {
