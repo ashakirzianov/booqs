@@ -1,6 +1,6 @@
 import { ReadingHistory } from '@/components/ReadingHistory'
 import { featuredBooqCards } from '@/data/booqs'
-import { getReadingHistoryWithDetailedEntries } from '@/data/history'
+import { getReadingHistoryForMainPage } from '@/data/history'
 import { READING_LIST_COLLECTION } from '@/application/collections'
 import { BooqCollection } from '@/components/BooqCollection'
 import { getUserIdInsideRequest } from '@/data/request'
@@ -13,7 +13,7 @@ const READING_HISTORY_LIMIT = 5 // Limit number of reading history entries on th
 
 export default async function Home() {
     const featured = await featuredBooqCards()
-    const historyResult = await getReadingHistoryWithDetailedEntries({ limit: READING_HISTORY_LIMIT })
+    const historyResult = await getReadingHistoryForMainPage({ limit: READING_HISTORY_LIMIT })
     const userId = await getUserIdInsideRequest()
     return <>
         {historyResult && historyResult.entries.length > 0 && (
