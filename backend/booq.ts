@@ -21,12 +21,12 @@ export async function booqForId(booqId: BooqId, bypassCache = false): Promise<Bo
 }
 
 export type BooqPreview = {
-    booqId: BooqId,
-    path: BooqPath,
-    title?: string,
-    text: string,
-    length: number,
     position: number,
+    text: string,
+    title?: string,
+    authors?: string[],
+    coverSrc?: string,
+    booqLength: number,
 }
 const PREVIEW_LENGTH = 500
 export async function booqPreview(booqId: BooqId, path: BooqPath, end?: BooqPath): Promise<BooqPreview | undefined> {
@@ -44,14 +44,15 @@ export async function booqPreview(booqId: BooqId, path: BooqPath, end?: BooqPath
         : previewForPath(booq.nodes, path, PREVIEW_LENGTH)
     const text = full?.trim()?.substring(0, PREVIEW_LENGTH) ?? ''
     const position = positionForPath(booq.nodes, path)
-    const length = booq.metadata.length
+    const authors = booq.metadata.authors.map(author => author.name)
+    const booqLength = booq.metadata.length
     const preview = {
-        booqId,
-        path,
-        title: booq.metadata.title,
-        text,
         position,
-        length,
+        text,
+        title: booq.metadata.title,
+        authors,
+        coverSrc: booq.metadata.coverSrc,
+        booqLength,
     }
     await cacheValueForKey(key, preview)
     return preview

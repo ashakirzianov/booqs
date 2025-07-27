@@ -1,15 +1,16 @@
 'use server'
 import { addBooqHistory, booqHistoryForUser, removeBooqHistory } from '@/backend/history'
-import { booqForId } from '@/backend/booq'
-import { BooqId, BooqPath, positionForPath, previewForPath } from '@/core'
+import { booqPreview } from '@/backend/booq'
+import { BooqId, BooqPath } from '@/core'
 import { getUserIdInsideRequest } from './request'
 
 export type ReadingHistoryEntry = {
     booqId: BooqId,
+    source: string,
     path: BooqPath,
     text: string,
-    booqLength: number,
     position: number,
+    booqLength: number,
     lastRead: number,
     title?: string,
     authors?: string[],
@@ -36,8 +37,6 @@ export async function reportBooqHistoryAction({
     })
 }
 
-const PREVIEW_LENGTH = 500
-
 export type ReadingHistoryResult = {
     entries: ReadingHistoryEntry[]
     total: number
@@ -60,26 +59,23 @@ export async function getReadingHistory({
     const paginatedHistory = history.slice(offset, offset + limit)
     const hasMore = offset + limit < total
 
-    const promises = paginatedHistory.map(async ({ booqId, path, date }) => {
-        const booq = await booqForId(booqId as BooqId)
-        if (!booq) {
-            console.warn(`Booq not found for ID: ${booqId} while fetching history for: ${userId}`)
+    const promises = paginatedHistory.map(async ({ booqId, source, path, date }) => {
+        const preview = await booqPreview(booqId as BooqId, path)
+        if (!preview) {
+            console.warn(`Booq preview not found for ID: ${booqId} while fetching history for: ${userId}`)
             return undefined
         }
-        const text = previewForPath(booq.nodes, path, PREVIEW_LENGTH)?.trim()?.substring(0, PREVIEW_LENGTH) ?? ''
-        const position = positionForPath(booq.nodes, path)
-        const authors = booq.metadata.authors.map(author => author.name)
-        const length = booq.metadata.length
         const historyEntry: ReadingHistoryEntry = {
             booqId: booqId as BooqId,
-            booqLength: length,
-            text,
-            position,
+            source,
             path,
             lastRead: date,
-            authors,
-            title: booq.metadata.title,
-            coverSrc: booq.metadata.coverSrc,
+            text: preview.text,
+            position: preview.position,
+            booqLength: preview.booqLength,
+            title: preview.title,
+            authors: preview.authors,
+            coverSrc: preview.coverSrc,
         }
         return historyEntry
     })
