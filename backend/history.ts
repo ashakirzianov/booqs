@@ -36,3 +36,22 @@ export async function addBooqHistory(
         ...data,
     } : null
 }
+
+export async function removeBooqHistory(
+    userId: string,
+    booqId: string,
+) {
+    // Get all history entries for the user
+    const record = await redis.hgetall<Record<string, RedisHashValue>>(`user:${userId}:history`) ?? {}
+    
+    // Find all keys that start with the booqId
+    const keysToDelete = Object.keys(record).filter(key => key.startsWith(`${booqId}:`))
+    
+    if (keysToDelete.length === 0) {
+        return false
+    }
+    
+    // Delete all matching entries
+    const result = await redis.hdel(`user:${userId}:history`, ...keysToDelete)
+    return result > 0
+}

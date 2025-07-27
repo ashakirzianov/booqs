@@ -1,5 +1,5 @@
 'use server'
-import { addBooqHistory, booqHistoryForUser } from '@/backend/history'
+import { addBooqHistory, booqHistoryForUser, removeBooqHistory } from '@/backend/history'
 import { booqForId } from '@/backend/booq'
 import { BooqId, BooqPath, positionForPath, previewForPath } from '@/core'
 import { getUserIdInsideRequest } from './request'
@@ -91,6 +91,26 @@ export async function getReadingHistory({
         total,
         hasMore,
     }
+}
+
+export async function removeHistoryEntryAction({
+    booqId,
+}: {
+    booqId: BooqId,
+}) {
+    const userId = await getUserIdInsideRequest()
+    if (!userId) {
+        return {
+            success: false,
+            error: 'Not authenticated',
+        } as const
+    }
+
+    const success = await removeBooqHistory(userId, booqId)
+    return {
+        success,
+        error: success ? null : 'Failed to remove history entry',
+    } as const
 }
 
 export async function getBooqHistory(booqId: BooqId) {
