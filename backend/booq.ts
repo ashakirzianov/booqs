@@ -54,7 +54,7 @@ export async function booqPreview(booqId: BooqId, path: BooqPath, end?: BooqPath
         coverSrc: booq.metadata.coverSrc,
         booqLength,
     }
-    await cacheValueForKey(key, preview)
+    await cacheValueForKey(key, preview, 60 * 60) // Cache for 1 hour
     return preview
 }
 
