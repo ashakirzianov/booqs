@@ -40,7 +40,7 @@ export default async function HistoryPage({
             <div className="space-y-3">
                 {result.entries.map((entry, index) => (
                     <HistoryEntry
-                        key={`${entry.booqId}:${entry.source}:${index}`}
+                        key={`${entry.booqId}:${index}`}
                         entry={entry}
                     />
                 ))}

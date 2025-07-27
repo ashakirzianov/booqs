@@ -87,7 +87,6 @@ export const mutationResolver: IResolvers<any, ResolverContext> = {
                 await addBooqHistory(userId, {
                     booqId: event.booqId,
                     path: event.path,
-                    source: event.source,
                     date: Date.now(),
                 })
                 return true

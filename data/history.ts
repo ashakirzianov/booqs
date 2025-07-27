@@ -6,7 +6,6 @@ import { getUserIdInsideRequest } from './request'
 
 export type ReadingHistoryEntry = {
     booqId: BooqId,
-    source: string,
     path: BooqPath,
     text: string,
     position: number,
@@ -18,11 +17,10 @@ export type ReadingHistoryEntry = {
 }
 
 export async function reportBooqHistoryAction({
-    booqId, path, source,
+    booqId, path,
 }: {
     booqId: BooqId,
     path: BooqPath,
-    source: string,
 }) {
     const userId = await getUserIdInsideRequest()
     if (!userId) {
@@ -32,7 +30,7 @@ export async function reportBooqHistoryAction({
         } as const
     }
     addBooqHistory(userId, {
-        booqId, path, source,
+        booqId, path,
         date: Date.now(),
     })
 }
@@ -59,7 +57,7 @@ export async function getReadingHistory({
     const paginatedHistory = history.slice(offset, offset + limit)
     const hasMore = offset + limit < total
 
-    const promises = paginatedHistory.map(async ({ booqId, source, path, date }) => {
+    const promises = paginatedHistory.map(async ({ booqId, path, date }) => {
         const preview = await booqPreview(booqId as BooqId, path)
         if (!preview) {
             console.warn(`Booq preview not found for ID: ${booqId} while fetching history for: ${userId}`)
@@ -67,7 +65,6 @@ export async function getReadingHistory({
         }
         const historyEntry: ReadingHistoryEntry = {
             booqId: booqId as BooqId,
-            source,
             path,
             lastRead: date,
             text: preview.text,

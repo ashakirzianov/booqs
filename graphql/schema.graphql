@@ -104,7 +104,6 @@ input NoteInput {
 }
 input BooqHistoryInput {
     booqId: ID!
-    source: ID!
     path: [Int!]!
 }
 
@@ -156,7 +155,6 @@ type Note {
 type BooqHistory {
     booq: Booq!
     path: [Int!]!
-    source: String
     preview(length: Int = 500): String
     position: Int!
 }
