@@ -1,4 +1,4 @@
-import { ReadingHistory } from '@/components/ReadingHistory'
+import { ReadingHistory } from './ReadingHistory'
 import { featuredBooqCards } from '@/data/booqs'
 import { getReadingHistoryForMainPage } from '@/data/history'
 import { READING_LIST_COLLECTION } from '@/application/collections'

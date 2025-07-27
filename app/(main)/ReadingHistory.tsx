@@ -3,7 +3,7 @@ import { BooqPreview } from '@/components/BooqPreview'
 import { BooqCover } from '@/components/BooqCover'
 import { pageForPosition } from '@/application/common'
 import Link from 'next/link'
-import { booqHref } from '../common/href'
+import { booqHref } from '../../common/href'
 import { DetailedReadingHistoryEntry, BriefReadingHistoryEntry, ReadingHistoryEntry } from '@/data/history'
 
 export function ReadingHistory({ history, showFullHistoryLink }: {
