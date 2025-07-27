@@ -132,7 +132,7 @@ export async function removeHistoryEntryAction({
         } as const
     }
 
-    const success = await removeBooqHistory(userId, booqId)
+    const success = await removeBooqHistory(userId, booqId as string)
     return {
         success,
         error: success ? null : 'Failed to remove history entry',

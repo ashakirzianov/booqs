@@ -1,10 +1,6 @@
 import React from 'react'
-import { BooqPreview } from '@/components/BooqPreview'
-import { BooqCover } from '@/components/BooqCover'
-import { pageForPosition } from '@/application/common'
-import Link from 'next/link'
-import { booqHref } from '../../common/href'
-import { DetailedReadingHistoryEntry, BriefReadingHistoryEntry, ReadingHistoryEntry } from '@/data/history'
+import { HistoryEntry } from './HistoryEntry'
+import { ReadingHistoryEntry } from '@/data/history'
 
 export function ReadingHistory({ history, showFullHistoryLink }: {
     history: ReadingHistoryEntry[],
@@ -26,45 +22,4 @@ export function ReadingHistory({ history, showFullHistoryLink }: {
             </div>
         )}
     </div>
-}
-
-function HistoryEntry({ entry }: {
-    entry: DetailedReadingHistoryEntry | BriefReadingHistoryEntry
-}) {
-    if ('text' in entry) {
-        return <DetailedEntry entry={entry} />
-    } else {
-        return <BriefEntry entry={entry} />
-    }
-}
-
-function DetailedEntry({ entry }: { entry: DetailedReadingHistoryEntry }) {
-    return (
-        <div className='flex snap-center'>
-            <Link href={booqHref({ booqId: entry.booqId, path: entry.path })}>
-                <BooqPreview
-                    path={entry.path}
-                    text={entry.text}
-                    title={entry.title ?? ''}
-                    page={pageForPosition(entry.position)}
-                    total={pageForPosition(entry.booqLength)}
-                />
-            </Link>
-        </div>
-    )
-}
-
-function BriefEntry({ entry }: { entry: BriefReadingHistoryEntry }) {
-    return (
-        <div className='flex snap-center'>
-            <Link href={booqHref({ booqId: entry.booqId, path: entry.path })}>
-                <BooqCover
-                    booqId={entry.booqId}
-                    coverSrc={entry.coverSrc}
-                    title={entry.title}
-                    author={entry.authors[0]}
-                />
-            </Link>
-        </div>
-    )
 }
