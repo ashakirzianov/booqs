@@ -10,7 +10,7 @@ export function ReadingHistory({ history, showFullHistoryLink }: {
     history: ReadingHistoryEntry[],
     showFullHistoryLink?: React.ReactNode,
 }) {
-    return <div className='flex gap-3 overflow-auto snap-x snap-mandatory py-xl px-4 h-80' style={{
+    return <div className='flex gap-3 overflow-auto snap-x snap-mandatory py-xl px-4 h-80 items-center' style={{
         scrollbarWidth: 'none',
     }}>
         {
@@ -63,7 +63,6 @@ function BriefEntry({ entry }: { entry: BriefReadingHistoryEntry }) {
                     coverSrc={entry.coverSrc}
                     title={entry.title}
                     author={entry.authors[0]}
-                    size={90}
                 />
             </Link>
         </div>
