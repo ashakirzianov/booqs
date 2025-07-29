@@ -1,18 +1,17 @@
 import { Booq, BooqId, BooqMetadata, BooqPath, pathToString, positionForPath, previewForPath, TableOfContents, textForRange } from '@/core'
 import { getCachedValueForKey, cacheValueForKey } from './cache'
-import { parseEpubFile } from '@/parser'
-import { fileForId, libraryCardForId } from './library'
-import { inspect } from 'util'
+import { libraryCardForId } from './library'
+import { loadBooqForId } from './load'
 
 export async function booqForId(booqId: BooqId, bypassCache = false): Promise<Booq | undefined> {
     if (bypassCache) {
-        return parseBooqForId(booqId)
+        return loadBooqForId(booqId)
     }
     const cached = await getCachedValueForKey<Booq>(`booq:${booqId}`)
     if (cached) {
         return cached
     } else {
-        const booq = await parseBooqForId(booqId)
+        const booq = await loadBooqForId(booqId)
         if (booq) {
             await cacheValueForKey(`booq:${booqId}`, booq)
         }
@@ -72,19 +71,5 @@ export async function booqToc(booqId: BooqId): Promise<TableOfContents | undefin
         return undefined
     }
     return booq.toc
-}
-
-async function parseBooqForId(booqId: BooqId) {
-    const file = await fileForId(booqId)
-    if (!file) {
-        return undefined
-    }
-    const { value: booq, diags } = await parseEpubFile({
-        fileBuffer: file.file,
-    })
-    diags.forEach(diag => {
-        console.info(inspect(diag, { depth: 5, colors: true }))
-    })
-    return booq
 }
 

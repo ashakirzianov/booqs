@@ -66,12 +66,8 @@ export type BooqMetadata = {
     coverSrc: string | undefined,
     length: number,
 }
-export type BooqImages = {
-    [src: string]: string,
-}
 export type Booq = {
     nodes: BooqNode[],
     metadata: BooqMetadata,
     toc: TableOfContents,
-    images: BooqImages,
 }

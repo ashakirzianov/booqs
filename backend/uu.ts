@@ -7,7 +7,6 @@ import { Booq, BooqMetadata } from '@/core'
 import { nanoid } from 'nanoid'
 import { deleteAsset, downloadAsset, uploadAsset } from './blob'
 import { sql } from './db'
-import { uploadBooqImages } from './images'
 
 export const userUploadsLibrary: Library = {
     cards, fileForId,
@@ -99,7 +98,6 @@ async function uploadNewEpub({ buffer, hash }: File, userId: string) {
         return undefined
     }
     await addToRegistry({ uploadId: insertResult.id, userId })
-    await uploadBooqImages(`uu/${insertResult.id}`, booq)
     return convertToLibraryCard(insertResult)
 }
 
