@@ -1,8 +1,9 @@
 'use server'
 import { addBooqHistory, booqHistoryForUser, removeBooqHistory, DbReadingHistoryEvent } from '@/backend/history'
-import { booqPreview, booqMetadata } from '@/backend/access'
+import { booqDataForIds, booqPreview } from '@/backend/library'
 import { BooqId, BooqPath } from '@/core'
 import { getUserIdInsideRequest } from './request'
+import { BooqCoverData } from './booqs'
 
 export type ReadingHistoryEntry = BriefReadingHistoryEntry | DetailedReadingHistoryEntry
 // Brief entry for history page - just book info and read time
@@ -12,7 +13,7 @@ export type BriefReadingHistoryEntry = {
     lastRead: number,
     title: string,
     authors: string[],
-    coverSrc?: string,
+    cover?: BooqCoverData,
 }
 
 // Detailed entry for main page - includes reading position and preview
@@ -151,7 +152,7 @@ export async function getBooqHistory(booqId: BooqId) {
 
 async function resolveBriefHistoryEvent(event: DbReadingHistoryEvent, userId: string): Promise<BriefReadingHistoryEntry | undefined> {
     const { booqId, path, date } = event
-    const meta = await booqMetadata(booqId as BooqId)
+    const [meta] = await booqDataForIds([booqId as BooqId])
     if (!meta) {
         console.warn(`Booq metadata not found for ID: ${booqId} while fetching history for: ${userId}`)
         return undefined
@@ -161,8 +162,12 @@ async function resolveBriefHistoryEvent(event: DbReadingHistoryEvent, userId: st
         path,
         lastRead: date,
         title: meta.title,
-        authors: meta.authors.map(author => author.name),
-        coverSrc: meta.coverSrc,
+        authors: meta.authors,
+        cover: meta.cover ? {
+            url: meta.cover.url,
+            width: meta.cover.width,
+            height: meta.cover.height,
+        } : undefined,
     }
 }
 
@@ -182,6 +187,10 @@ async function resolveDetailedHistoryEvent(event: DbReadingHistoryEvent, userId:
         booqLength: preview.booqLength,
         title: preview.title ?? '',
         authors: preview.authors ?? [],
-        coverSrc: preview.coverSrc,
+        cover: preview.cover ? {
+            url: preview.cover.url,
+            width: preview.cover.width,
+            height: preview.cover.height,
+        } : undefined,
     }
 }

@@ -3,12 +3,11 @@ import { parseEpub } from '@/parser'
 import { Epub, openEpubFile } from '@/parser/epub'
 import { Diagnoser } from 'booqs-epub'
 import { inspect } from 'util'
-import { fileForId } from './pg'
-import { getImagesDataForBooq, Images, ImagesData, uploadImagesForBooq } from './images'
+import { getOrLoadImagesData, BooqImages, BooqImagesData } from './images'
+import { BooqFile } from './library'
 
-export async function loadBooqForId(booqId: BooqId) {
-    const file = await fileForId(booqId)
-    if (!file || file.kind !== 'epub') {
+export async function loadBooqForId(booqId: BooqId, file: BooqFile) {
+    if (file.kind !== 'epub') {
         return undefined
     }
     const diags: Diagnoser = []
@@ -23,14 +22,12 @@ export async function loadBooqForId(booqId: BooqId) {
         console.error(`Failed to parse booq for id ${booqId}`)
         return undefined
     }
-    let imagesData = await getImagesDataForBooq({ booqId })
+    const imagesData = await getOrLoadImagesData({
+        booqId,
+        loadImages: () => loadImages(booq, epub),
+    })
     if (!imagesData) {
-        const images = await loadImages(booq, epub)
-        imagesData = await uploadImagesForBooq({
-            booqId,
-            coverSrc: booq.metadata.coverSrc,
-            images,
-        })
+        return booq
     }
     const nodes = preprocessNodes(booq.nodes, { imagesData })
     return {
@@ -39,9 +36,28 @@ export async function loadBooqForId(booqId: BooqId) {
     }
 }
 
+export async function loadImagesForBooqId(booqId: BooqId, file: BooqFile) {
+    if (file.kind !== 'epub') {
+        return undefined
+    }
+    const diags: Diagnoser = []
+    const epub = await openEpubFile({ fileBuffer: file.file, diags })
+    const { value: booq } = await parseEpub({
+        epub, diags,
+    })
+    diags.forEach(diag => {
+        console.info(inspect(diag, { depth: 5, colors: true }))
+    })
+    if (!booq) {
+        console.error(`Failed to parse booq for id ${booqId}`)
+        return undefined
+    }
+    return loadImages(booq, epub)
+}
+
 async function loadImages(booq: Booq, epub: Epub) {
     const srcs = collectUniqueSrcsFromBooq(booq)
-    const images: Images = {}
+    const images: BooqImages = {}
     for (const src of srcs) {
         const image = await epub.loadBinaryFile(src)
         if (image) {
@@ -72,7 +88,7 @@ function collectUniqueSrcsFromBooq(booq: Booq): string[] {
 }
 
 type PreprocessEnv = {
-    imagesData: ImagesData,
+    imagesData: BooqImagesData,
 }
 function preprocessNodes(nodes: BooqNode[], env: PreprocessEnv): BooqNode[] {
     return nodes.map(node => preprocessNode(node, env))

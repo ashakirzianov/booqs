@@ -6,18 +6,18 @@ import { BooqCover } from '@/components/BooqCover'
 import { TrashIcon } from '@/components/Icons'
 import { removeHistoryEntryAction, BriefReadingHistoryEntry } from '@/data/history'
 
-export function HistoryEntry({ 
+export function HistoryEntry({
     entry
-}: { 
+}: {
     entry: BriefReadingHistoryEntry
 }) {
     const [isRemoving, setIsRemoving] = useState(false)
     const [isRemoved, setIsRemoved] = useState(false)
-    const { booqId, coverSrc, title, authors, lastRead } = entry
+    const { booqId, cover, title, authors, lastRead } = entry
 
     async function handleRemove() {
         if (isRemoving || isRemoved) return
-        
+
         setIsRemoving(true)
         try {
             const result = await removeHistoryEntryAction({ booqId })
@@ -47,8 +47,7 @@ export function HistoryEntry({
         <div className="border border-dimmed rounded-lg p-4 hover:bg-secondary transition-colors">
             <div className="flex items-start gap-4">
                 <BooqCover
-                    booqId={booqId}
-                    coverSrc={coverSrc}
+                    cover={cover}
                     title={title}
                     author={authors?.join(', ')}
                     size={50}

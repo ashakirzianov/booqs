@@ -7,29 +7,52 @@ export const imageBucket = 'booqs-images'
 export const coverSizes = [60, 120, 210] as const
 export type CoverSize = typeof coverSizes[number]
 
-export type ImageData = {
+export type BooqImageData = {
     width: number,
     height: number,
     url: string,
-    sizes?: Partial<Record<CoverSize, ImageData>>,
+    sizes?: Partial<Record<CoverSize, BooqImageData>>,
 }
-export type ImagesData = Record<string, ImageData | undefined>
-export async function getImagesDataForBooq({ booqId }: {
+export type BooqImagesData = Record<string, BooqImageData>
+export type BooqImages = Record<string, Buffer>
+
+export async function resolveBooqImage({
+    booqId, src,
+}: {
     booqId: BooqId,
-}): Promise<ImagesData | undefined> {
-    const data = await redis.hgetall<ImagesData>(`images:booq:${booqId}`)
-    return data ?? undefined
+    src: string,
+}): Promise<BooqImageData | undefined> {
+    const imageData = await redis.hget<BooqImageData>(`images:booq:${booqId}`, src)
+    return imageData ?? undefined
 }
 
-export type Images = Record<string, Buffer>
-export async function uploadImagesForBooq({
+export async function getOrLoadImagesData({
+    booqId,
+    loadImages,
+}: {
+    booqId: BooqId,
+    loadImages: () => Promise<BooqImages | undefined>,
+}) {
+    const cached = await redis.hgetall<BooqImagesData>(`images:booq:${booqId}`)
+    if (cached) {
+        return cached
+    }
+    const images = await loadImages()
+    if (images) {
+        const uploaded = await uploadImagesForBooq({ booqId, images })
+        await redis.hmset<BooqImageData>(`images:booq:${booqId}`, uploaded)
+        return uploaded
+    }
+}
+
+async function uploadImagesForBooq({
     booqId, coverSrc, images,
 }: {
     booqId: BooqId,
     coverSrc?: string,
-    images: Images,
+    images: BooqImages,
 }) {
-    const data: ImagesData = {}
+    const data: BooqImagesData = {}
     for (const [src, buffer] of Object.entries(images)) {
         const uploadResult = await uploadImage(buffer, booqId, src)
         if (!uploadResult.success) {
@@ -37,7 +60,7 @@ export async function uploadImagesForBooq({
             continue
 
         }
-        const imageData: ImageData = {
+        const imageData: BooqImageData = {
             width: uploadResult.width,
             height: uploadResult.height,
             url: uploadResult.url,
@@ -57,7 +80,6 @@ export async function uploadImagesForBooq({
         }
         data[src] = imageData
     }
-    await redis.hmset(`images:booq:${booqId}`, data)
     return data
 }
 
