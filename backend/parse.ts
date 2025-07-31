@@ -22,7 +22,7 @@ export async function parseAndPreprocessBooq(booqId: BooqId, file: BooqFile): Pr
         console.error(`Failed to parse booq for id ${booqId}`)
         return undefined
     }
-    const imagesData = await getOrLoadImagesData({
+    const { data: imagesData } = await getOrLoadImagesData({
         booqId,
         loadImages: () => loadImages(booq, epub),
     })

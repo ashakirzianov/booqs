@@ -38,26 +38,43 @@ export async function getOrLoadImagesData({
 }: {
     booqId: BooqId,
     loadImages: () => Promise<BooqImages | undefined>,
-}) {
+}): Promise<{
+    data: BooqImagesData,
+    fromCache: boolean,
+}> {
     type RedisBooqImagesData = BooqImagesData & {
         '!empty'?: true,
     }
     const cached = await redis.hgetall<RedisBooqImagesData>(`images:booq:${booqId}`)
     if (cached) {
-        return cached['!empty'] ? {} : cached as BooqImagesData
+        return cached['!empty']
+            ? {
+                data: {},
+                fromCache: true,
+            }
+            : {
+                data: cached,
+                fromCache: true,
+            }
     }
     const images = await loadImages()
     if (images) {
         const uploaded = await uploadImagesForBooq({ booqId, images })
         if (Object.keys(uploaded).length > 0) {
             await redis.hset<BooqImageData>(`images:booq:${booqId}`, uploaded)
-            return uploaded
+            return {
+                data: uploaded,
+                fromCache: false,
+            }
         }
     }
     await redis.hset(`images:booq:${booqId}`, {
         '!empty': true,
     })
-    return {}
+    return {
+        data: {},
+        fromCache: false,
+    }
 }
 
 async function uploadImagesForBooq({

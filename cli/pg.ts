@@ -1,11 +1,13 @@
 import { inspect } from 'util'
 import { deleteAsset, downloadAsset, listObjects, uploadAsset } from '@/backend/blob'
 import {
-    existingAssetIds, pgEpubsBucket, insertPgRecord,
+    existingIds, existingAssetIds, pgEpubsBucket, insertPgRecord,
 } from '@/backend/pg'
 import { parseEpubFile } from '@/parser'
 import { redis } from '@/backend/db'
 import { CliOptions } from './main'
+import { uploadImagesForBooqId } from '@/backend/library'
+import { BooqId } from '@/core/model'
 
 type AssetRecord = {
     assetId: string,
@@ -32,6 +34,9 @@ export async function pg(options: CliOptions) {
                 case 'blob2db':
                     await syncBlobToDB(options)
                     return
+                case 'images':
+                    await syncImages(options)
+                    return
                 default:
                     console.info('Unknown sync subcommand: ', subSubcommand)
                     console.info('Available sync subcommands: web2blob, blob2db')
@@ -51,6 +56,30 @@ export async function pg(options: CliOptions) {
             console.info('Unknown pg subcommand: ', subcommand)
             console.info('Available pg subcommands: sync, cleanup')
             return
+    }
+}
+
+async function syncImages(options: CliOptions) {
+    const verbosity = parseVerbosity(options)
+    basic(verbosity, 'Syncing images...')
+    const ids = await existingIds()
+    const batchSize = parseInt(options.switches['batch'] || '25')
+    for (const batch of makeBatches(ids, batchSize)) {
+        const promises = batch.map(async (id) => {
+            try {
+                const booqId: BooqId = `pg:${id}`
+                const { data: imagesData, fromCache } = await uploadImagesForBooqId(booqId)
+                if (fromCache) {
+                    basic(verbosity, `Images for ${id} already in cache`)
+                } else {
+                    basic(verbosity, `Uploaded images for ${id}:`, imagesData)
+                }
+                verbose(verbosity, `Finished syncing images for ${id}: ${imagesData}`)
+            } catch (err) {
+                warn(verbosity, `Error syncing images for ${id}`, err)
+            }
+        })
+        await Promise.all(promises)
     }
 }
 
@@ -153,7 +182,7 @@ async function syncBlobToDB(options: CliOptions) {
         return true
     })
     let count = 0
-    for await (const batch of makeBatches(filteredAssetIds, batchSize)) {
+    for await (const batch of makeAsyncBatches(filteredAssetIds, batchSize)) {
         info(verbosity, `Processing batch ${count++} with ${batch.length} assets...`)
         const promises = batch.map(async (assetId) => {
             try {
@@ -282,7 +311,21 @@ async function* existingBlobAssetIds() {
     }
 }
 
-async function* makeBatches<T>(generator: AsyncGenerator<T>, batchSize: number) {
+function* makeBatches<T>(iterable: Iterable<T>, batchSize: number) {
+    let batch: T[] = []
+    for (const item of iterable) {
+        batch.push(item)
+        if (batch.length >= batchSize) {
+            yield batch
+            batch = []
+        }
+    }
+    if (batch.length > 0) {
+        yield batch
+    }
+}
+
+async function* makeAsyncBatches<T>(generator: AsyncIterable<T>, batchSize: number) {
     let batch: T[] = []
     for await (const item of generator) {
         batch.push(item)

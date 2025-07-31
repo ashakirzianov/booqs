@@ -54,7 +54,7 @@ const libraries: {
     lo: localLibrary,
 }
 
-export async function uploadImagesForBooqId(booqId: BooqId): Promise<Record<string, BooqImageData>> {
+export async function uploadImagesForBooqId(booqId: BooqId) {
     return getOrLoadImagesData({
         booqId,
         loadImages: async () => {
@@ -233,7 +233,7 @@ async function buildBooqData({
 }): Promise<BooqData> {
     let cover: BooqImageData | undefined
     if (coverSrc) {
-        const data = await getOrLoadImagesData({
+        const { data } = await getOrLoadImagesData({
             booqId,
             loadImages: async () => {
                 const file = await fileForId(booqId)
