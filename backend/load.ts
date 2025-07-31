@@ -118,6 +118,13 @@ function preprocessNode(node: BooqNode, env: PreprocessEnv): BooqNode {
                     result.attrs.width = resolved.width.toString()
                     result.attrs.height = resolved.height.toString()
                 }
+            } else if (result.attrs?.xlinkHref) {
+                const resolved = env.imagesData[result.attrs.xlinkHref]
+                if (resolved) {
+                    result.attrs.xlinkHref = resolved.url
+                    result.attrs.width = resolved.width.toString()
+                    result.attrs.height = resolved.height.toString()
+                }
             }
             return result
         }
