@@ -77,6 +77,9 @@ function collectUniqueSrcsFromBooq(booq: Booq): string[] {
                 if (node.attrs?.src) {
                     srcs.add(node.attrs.src)
                 }
+                if (node.attrs?.xlinkHref) {
+                    srcs.add(node.attrs.xlinkHref)
+                }
                 if (node.children) {
                     collectSrcsFromNodes(node.children)
                 }
@@ -84,6 +87,9 @@ function collectUniqueSrcsFromBooq(booq: Booq): string[] {
         }
     }
     collectSrcsFromNodes(booq.nodes)
+    if (booq.metadata.coverSrc) {
+        srcs.add(booq.metadata.coverSrc)
+    }
     return Array.from(srcs)
 }
 
