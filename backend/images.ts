@@ -10,11 +10,15 @@ export type CoverSize = typeof coverSizes[number]
 export type BooqImageData = {
     width: number,
     height: number,
-    url: string,
+    id: string,
     sizes?: Partial<Record<CoverSize, BooqImageData>>,
 }
 export type BooqImagesData = Record<string, BooqImageData>
 export type BooqImages = Record<string, Buffer>
+
+export function urlForBooqImageId(id: string) {
+    return `https://${imageBucket}.s3.amazonaws.com/${id}`
+}
 
 export async function resolveBooqImage({
     booqId, src,
@@ -72,7 +76,7 @@ async function uploadImagesForBooq({
         const imageData: BooqImageData = {
             width: uploadResult.width,
             height: uploadResult.height,
-            url: uploadResult.url,
+            id: uploadResult.id,
         }
         if (src === coverSrc) {
             for (const size of coverSizes) {
@@ -82,7 +86,7 @@ async function uploadImagesForBooq({
                     imageData.sizes[size] = {
                         width: resized.width,
                         height: resized.height,
-                        url: resized.url,
+                        id: resized.id,
                     }
                 }
             }
@@ -119,7 +123,7 @@ async function uploadImage(buffer: Buffer, booqId: BooqId, src: string, size?: n
     } else {
         return {
             success: true as const,
-            url: `https://${imageBucket}.s3.amazonaws.com/${id}`,
+            id,
             width,
             height,
         }

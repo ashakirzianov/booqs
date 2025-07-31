@@ -9,6 +9,7 @@ import {
 import { userForId } from '@/backend/users'
 import { booqIdsInCollections } from '@/backend/collections'
 import { BooqData, booqDataForIds, booqForId, booqPreview, booqQuery, booqToc, featuredBooqIds } from '@/backend/library'
+import { urlForBooqImageId } from '@/backend/images'
 
 export type PartialBooqData = {
     booqId: BooqId,
@@ -176,7 +177,7 @@ export async function booqSearch({ query, libraryId, limit = 20, offset }: { que
             title: result.title,
             authors: result.authors,
             cover: result.cover ? {
-                url: result.cover.url,
+                url: urlForBooqImageId(result.cover.id),
                 width: result.cover.width,
                 height: result.cover.height,
             } : undefined,
@@ -254,7 +255,7 @@ function buildBooqCardData(data: BooqData): BooqCardData {
         subjects: data.subjects ?? [],
         languages,
         cover: data.cover ? {
-            url: data.cover.url,
+            url: urlForBooqImageId(data.cover.id),
             width: data.cover.width,
             height: data.cover.height,
         } : undefined,
