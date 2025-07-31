@@ -1,4 +1,4 @@
-import { pathFromString } from '@/core'
+import { BooqId, parseId, pathFromString } from '@/core'
 import { booqPart, fetchBooqPreview } from '@/data/booqs'
 import { reportBooqHistoryAction } from '@/data/history'
 import { Reader } from '@/reader/Reader'
@@ -6,8 +6,7 @@ import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 
 type Params = {
-    library: string,
-    id: string,
+    booq_id: string,
     path: string,
 }
 type SearchParams = {
@@ -21,14 +20,19 @@ export async function generateMetadata({
     params: Promise<Params>,
     searchParams: Promise<SearchParams>,
 }): Promise<Metadata> {
-    const { library, id, path } = await params
+    const { booq_id, path } = await params
+    const [library, id] = parseId(booq_id as BooqId)
+    if (!library || !id) {
+        return notFound()
+    }
+    const booqId: BooqId = `${library}:${id}`
     const { start, end } = await searchParams
     const startPath = start && pathFromString(start)
     const endPath = end && pathFromString(end)
     const booqPath = pathFromString(path)
     const meta = startPath && endPath
-        ? await fetchBooqPreview(`${library}:${id}`, startPath, endPath)
-        : await fetchBooqPreview(`${library}:${id}`, booqPath ?? [])
+        ? await fetchBooqPreview(booqId, startPath, endPath)
+        : await fetchBooqPreview(booqId, booqPath ?? [])
 
     return {
         title: meta?.title ?? 'Booq',
@@ -42,7 +46,12 @@ export default async function BooqPathPage({
     params: Promise<Params>,
     searchParams: Promise<SearchParams>,
 }) {
-    const { library, id, path } = await params
+    const { booq_id, path } = await params
+    const [library, id] = parseId(booq_id as BooqId)
+    if (!library || !id) {
+        return notFound()
+    }
+    const booqId: BooqId = `${library}:${id}`
     const { start, end } = await searchParams
     const startPath = start && pathFromString(start)
     const endPath = end && pathFromString(end)
@@ -51,7 +60,7 @@ export default async function BooqPathPage({
         ? { start: startPath, end: endPath }
         : undefined
     const booq = await booqPart({
-        booqId: `${library}:${id}`,
+        booqId,
         path: booqPath,
         bypassCache: library === 'lo',
     })
