@@ -151,7 +151,7 @@ export async function booqDataForIds(ids: BooqId[]): Promise<Array<BooqData | un
             const forLibrary = await library.cards(pids.map(p => p.id))
             const cards = await Promise.all(forLibrary.map(async card => {
                 return buildBooqData({
-                    booqId: `${libraryPrefix}:${card.id}`,
+                    booqId: `${libraryPrefix}-${card.id}`,
                     meta: card.meta,
                 })
             }))
@@ -193,7 +193,7 @@ export async function booqQuery(libraryId: string, query: LibraryQuery): Promise
     const result = await library.query(query)
     const cards = await Promise.all(result.cards.map(card => {
         return buildBooqData({
-            booqId: `${libraryId}:${card.id}`,
+            booqId: `${libraryId}-${card.id}`,
             meta: card.meta,
         })
     }))
@@ -206,21 +206,21 @@ export async function booqQuery(libraryId: string, query: LibraryQuery): Promise
 
 export async function featuredBooqIds(_limit?: number): Promise<BooqId[]> {
     return [
-        'pg:55201',
-        'pg:1635',
-        'pg:3207',
-        'pg:2680',
-        'pg:11',
-        'pg:1661',
-        'pg:98',
-        'pg:174',
-        'pg:844',
-        'pg:203',
-        'pg:28054',
-        'pg:5740',
-        'pg:135',
-        'pg:1727',
-        'pg:4363',
+        'pg-55201',
+        'pg-1635',
+        'pg-3207',
+        'pg-2680',
+        'pg-11',
+        'pg-1661',
+        'pg-98',
+        'pg-174',
+        'pg-844',
+        'pg-203',
+        'pg-28054',
+        'pg-5740',
+        'pg-135',
+        'pg-1727',
+        'pg-4363',
     ]
 }
 

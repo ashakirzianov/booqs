@@ -1,6 +1,6 @@
 export type LibraryId = string
 export type InLibraryId = string
-export type BooqId = `${LibraryId}:${InLibraryId}`
+export type BooqId = `${LibraryId}-${InLibraryId}`
 
 export type BooqPath = number[]
 export type BooqRange = {

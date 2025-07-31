@@ -67,7 +67,7 @@ async function syncImages(options: CliOptions) {
     for (const batch of makeBatches(ids, batchSize)) {
         const promises = batch.map(async (id) => {
             try {
-                const booqId: BooqId = `pg:${id}`
+                const booqId: BooqId = `pg-${id}`
                 const { data: imagesData, fromCache } = await uploadImagesForBooqId(booqId)
                 if (fromCache) {
                     basic(verbosity, `Images for ${id} already in cache`)

@@ -30,7 +30,7 @@ export type GetResponse = {
 }
 export async function GET(request: NextRequest, { params }: { params: Promise<Params> }) {
     const { library, id } = await params
-    const booqId: BooqId = `${library}:${id}`
+    const booqId: BooqId = `${library}-${id}`
     const notes = await getNotesWithAuthorForBooq(booqId)
     const result: GetResponse = {
         notes,
@@ -49,7 +49,7 @@ export type PostBody = {
 export type PostResponse = ResolvedNote
 export async function POST(request: NextRequest, { params }: { params: Promise<Params> }) {
     const { library, id: paramsId } = await params
-    const booqId: BooqId = `${library}:${paramsId}`
+    const booqId: BooqId = `${library}-${paramsId}`
     const userId = await getUserIdInsideRequest()
     if (!userId) {
         return Response.json({ error: 'Unauthorized' }, { status: 401 })

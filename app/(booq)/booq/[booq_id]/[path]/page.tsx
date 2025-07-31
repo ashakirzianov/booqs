@@ -25,7 +25,7 @@ export async function generateMetadata({
     if (!library || !id) {
         return notFound()
     }
-    const booqId: BooqId = `${library}:${id}`
+    const booqId: BooqId = `${library}-${id}`
     const { start, end } = await searchParams
     const startPath = start && pathFromString(start)
     const endPath = end && pathFromString(end)
@@ -51,7 +51,7 @@ export default async function BooqPathPage({
     if (!library || !id) {
         return notFound()
     }
-    const booqId: BooqId = `${library}:${id}`
+    const booqId: BooqId = `${library}-${id}`
     const { start, end } = await searchParams
     const startPath = start && pathFromString(start)
     const endPath = end && pathFromString(end)
@@ -70,7 +70,7 @@ export default async function BooqPathPage({
     // Report history event before rendering the page
     if (booqPath) {
         await reportBooqHistoryAction({
-            booqId: `${library}:${id}`,
+            booqId: `${library}-${id}`,
             path: booqPath,
         })
     }

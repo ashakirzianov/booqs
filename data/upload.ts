@@ -19,7 +19,7 @@ export async function uploadEpubAction(file: File) {
     const buffer = Buffer.from(bytes)
     const result = await uploadEpubForUser(buffer, auth.id)
     if (result) {
-        const booqId: BooqId = `uu:${result.id}`
+        const booqId: BooqId = `uu-${result.id}`
         addUpload(auth.id, booqId)
         const [data] = await booqDataForIds([booqId])
         if (data) {

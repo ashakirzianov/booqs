@@ -22,7 +22,7 @@ export default async function Page({ params }: {
     if (!library || !id) {
         notFound()
     }
-    const booqId: BooqId = `${library}:${id}`
+    const booqId: BooqId = `${library}-${id}`
 
     const detailed = await booqDetailedData(booqId)
     if (!detailed) {
