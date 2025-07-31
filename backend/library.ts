@@ -2,7 +2,7 @@ import {
     Booq, BooqId, BooqMetadata, BooqPath, InLibraryId, LibraryId, makeId, parseId, pathToString, positionForPath, previewForPath, TableOfContents, textForRange,
 } from '@/core'
 import { getCachedValueForKey, cacheValueForKey } from './cache'
-import { parseBooqForId, loadImagesFromFile } from './load'
+import { parseAndPreprocessBooq, parseAndLoadImagesFromFile } from './parse'
 import groupBy from 'lodash-es/groupBy'
 import { pgLibrary } from './pg'
 import { userUploadsLibrary } from './uu'
@@ -62,7 +62,7 @@ export async function uploadImagesForBooqId(booqId: BooqId): Promise<Record<stri
             if (!file) {
                 return undefined
             }
-            return loadImagesFromFile(file)
+            return parseAndLoadImagesFromFile(file)
         },
     })
 }
@@ -73,7 +73,7 @@ export async function booqForId(booqId: BooqId, bypassCache = false): Promise<Bo
         if (!file) {
             return undefined
         }
-        return parseBooqForId(booqId, file)
+        return parseAndPreprocessBooq(booqId, file)
     }
     const cached = await getCachedValueForKey<Booq>(`booq:${booqId}`)
     if (cached) {
@@ -83,7 +83,7 @@ export async function booqForId(booqId: BooqId, bypassCache = false): Promise<Bo
         if (!file) {
             return undefined
         }
-        const booq = await parseBooqForId(booqId, file)
+        const booq = await parseAndPreprocessBooq(booqId, file)
         if (booq) {
             await cacheValueForKey(`booq:${booqId}`, booq)
         }
@@ -240,7 +240,7 @@ async function buildBooqData({
                 if (!file) {
                     return undefined
                 }
-                return loadImagesFromFile(file)
+                return parseAndLoadImagesFromFile(file)
             },
         })
         cover = data?.[coverSrc]

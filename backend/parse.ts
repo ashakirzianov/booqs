@@ -6,7 +6,7 @@ import { inspect } from 'util'
 import { getOrLoadImagesData, BooqImages, BooqImagesData, urlForBooqImageId } from './images'
 import { BooqFile } from './library'
 
-export async function parseBooqForId(booqId: BooqId, file: BooqFile) {
+export async function parseAndPreprocessBooq(booqId: BooqId, file: BooqFile): Promise<Booq | undefined> {
     if (file.kind !== 'epub') {
         return undefined
     }
@@ -33,7 +33,7 @@ export async function parseBooqForId(booqId: BooqId, file: BooqFile) {
     }
 }
 
-export async function loadImagesFromFile(file: BooqFile) {
+export async function parseAndLoadImagesFromFile(file: BooqFile) {
     if (file.kind !== 'epub') {
         return undefined
     }
