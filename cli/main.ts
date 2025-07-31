@@ -1,3 +1,4 @@
+import { cleanup } from './cleanup'
 import { parseEpubs } from './parse'
 import { pg } from './pg'
 import { temp } from './temp'
@@ -18,6 +19,9 @@ async function main() {
             return
         case 'pg':
             await pg(updatedOptions)
+            return
+        case 'cleanup':
+            await cleanup(updatedOptions)
             return
         case 'temp':
             await temp(updatedOptions)

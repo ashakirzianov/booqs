@@ -2,7 +2,6 @@ import { assertNever, Booq, BooqId, BooqNode } from '@/core'
 import { parseEpub } from '@/parser'
 import { Epub, openEpubFile } from '@/parser/epub'
 import { Diagnoser } from 'booqs-epub'
-import { inspect } from 'util'
 import { getOrLoadImagesData, BooqImages, BooqImagesData, urlForBooqImageId } from './images'
 import { BooqFile } from './library'
 
@@ -15,21 +14,18 @@ export async function parseAndPreprocessBooq(booqId: BooqId, file: BooqFile): Pr
     const { value: booq } = await parseEpub({
         epub, diags,
     })
-    diags.forEach(diag => {
-        console.info(inspect(diag, { depth: 5, colors: true }))
-    })
     if (!booq) {
         console.error(`Failed to parse booq for id ${booqId}`)
         return undefined
     }
-    const imagesData = await getOrLoadImagesData({
+    const { data: imagesData } = await getOrLoadImagesData({
         booqId,
         loadImages: () => loadImages(booq, epub),
     })
     if (!imagesData) {
         return booq
     } else {
-        return preprocessBooq(booq, imagesData)
+        return preprocessBooq(booq, booqId, imagesData)
     }
 }
 
@@ -42,11 +38,8 @@ export async function parseAndLoadImagesFromFile(file: BooqFile) {
     const { value: booq } = await parseEpub({
         epub, diags,
     })
-    diags.forEach(diag => {
-        console.info(inspect(diag, { depth: 5, colors: true }))
-    })
     if (!booq) {
-        console.error(`Failed to parse booq for`)
+        console.error(`Failed to parse booq from file`)
         return undefined
     }
     return loadImages(booq, epub)
@@ -94,8 +87,8 @@ function collectUniqueSrcsFromBooq(booq: Booq): string[] {
     return Array.from(srcs)
 }
 
-function preprocessBooq(booq: Booq, imagesData: BooqImagesData): Booq {
-    const nodes = preprocessNodes(booq.nodes, { imagesData })
+function preprocessBooq(booq: Booq, booqId: BooqId, imagesData: BooqImagesData): Booq {
+    const nodes = preprocessNodes(booq.nodes, { booqId, imagesData })
     return {
         ...booq,
         nodes,
@@ -103,6 +96,7 @@ function preprocessBooq(booq: Booq, imagesData: BooqImagesData): Booq {
 }
 
 type PreprocessEnv = {
+    booqId: BooqId,
     imagesData: BooqImagesData,
 }
 function preprocessNodes(nodes: BooqNode[], env: PreprocessEnv): BooqNode[] {
@@ -119,14 +113,14 @@ function preprocessNode(node: BooqNode, env: PreprocessEnv): BooqNode {
             if (result.attrs?.src) {
                 const resolved = env.imagesData[result.attrs.src]
                 if (resolved) {
-                    result.attrs.src = urlForBooqImageId(resolved.id)
+                    result.attrs.src = urlForBooqImageId(env.booqId, resolved.id)
                     result.attrs.width = resolved.width.toString()
                     result.attrs.height = resolved.height.toString()
                 }
             } else if (result.attrs?.xlinkHref) {
                 const resolved = env.imagesData[result.attrs.xlinkHref]
                 if (resolved) {
-                    result.attrs.xlinkHref = urlForBooqImageId(resolved.id)
+                    result.attrs.xlinkHref = urlForBooqImageId(env.booqId, resolved.id)
                     result.attrs.width = resolved.width.toString()
                     result.attrs.height = resolved.height.toString()
                 }

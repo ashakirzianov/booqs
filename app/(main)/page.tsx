@@ -9,7 +9,7 @@ import Link from 'next/link'
 export const dynamic = 'force-dynamic'
 export const fetchCache = 'force-no-store'
 
-const READING_HISTORY_LIMIT = 5 // Limit number of reading history entries on the main page
+const READING_HISTORY_LIMIT = 3 // Limit number of reading history entries on the main page
 
 export default async function Home() {
     const featured = await featuredBooqCards()

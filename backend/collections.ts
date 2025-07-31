@@ -9,7 +9,7 @@ export type DbCollection = {
     updated_at: string,
 }
 
-export async function booqIdsInCollections(userId: string, ...names: string[]): Promise<string[]> {
+export async function booqIdsInCollections(userId: string, ...names: string[]): Promise<BooqId[]> {
     const result = await sql`
       SELECT ucb.booq_id
       FROM user_collections_booqs ucb

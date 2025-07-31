@@ -177,7 +177,7 @@ export async function booqSearch({ query, libraryId, limit = 20, offset }: { que
             title: result.title,
             authors: result.authors,
             cover: result.cover ? {
-                url: urlForBooqImageId(result.cover.id),
+                url: urlForBooqImageId(result.booqId, result.cover.id),
                 width: result.cover.width,
                 height: result.cover.height,
             } : undefined,
@@ -255,7 +255,7 @@ function buildBooqCardData(data: BooqData): BooqCardData {
         subjects: data.subjects ?? [],
         languages,
         cover: data.cover ? {
-            url: urlForBooqImageId(data.cover.id),
+            url: urlForBooqImageId(data.booqId, data.cover.id),
             width: data.cover.width,
             height: data.cover.height,
         } : undefined,

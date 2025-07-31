@@ -56,7 +56,7 @@ function DetailedEntry({ entry, onRemove }: {
                     total={pageForPosition(entry.booqLength)}
                 />
             </Link>
-            <button
+            {false && <button
                 onClick={onRemove}
                 className='absolute top-2 right-2 w-6 h-6 bg-background/80 hover:bg-background rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-sm border border-border'
                 title='Remove from history'
@@ -64,7 +64,7 @@ function DetailedEntry({ entry, onRemove }: {
                 <div className='w-3 h-3 text-alert'>
                     <CloseIcon />
                 </div>
-            </button>
+            </button>}
         </div>
     )
 }

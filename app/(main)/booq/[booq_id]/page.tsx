@@ -7,19 +7,22 @@ import { booqHref, authorHref } from '@/common/href'
 import { notFound } from 'next/navigation'
 import { READING_LIST_COLLECTION } from '@/application/collections'
 import { getBooqHistory } from '@/data/history'
-import type { BooqId, TableOfContentsItem } from '@/core'
+import { parseId, type BooqId, type TableOfContentsItem } from '@/core'
 import { getUserIdInsideRequest } from '@/data/request'
 
 type Params = {
-    library: string,
-    id: string,
+    booq_id: string,
 }
 
 export default async function Page({ params }: {
     params: Promise<Params>,
 }) {
-    const { library, id } = await params
-    const booqId: BooqId = `${library}/${id}`
+    const { booq_id } = await params
+    const [library, id] = parseId(booq_id as BooqId)
+    if (!library || !id) {
+        notFound()
+    }
+    const booqId: BooqId = `${library}-${id}`
 
     const detailed = await booqDetailedData(booqId)
     if (!detailed) {
