@@ -3,10 +3,10 @@ import { parseEpub } from '@/parser'
 import { Epub, openEpubFile } from '@/parser/epub'
 import { Diagnoser } from 'booqs-epub'
 import { inspect } from 'util'
-import { getOrLoadImagesData, BooqImages, BooqImagesData } from './images'
+import { getOrLoadImagesData, BooqImages, BooqImagesData, urlForBooqImageId } from './images'
 import { BooqFile } from './library'
 
-export async function loadBooqForId(booqId: BooqId, file: BooqFile) {
+export async function parseBooqForId(booqId: BooqId, file: BooqFile) {
     if (file.kind !== 'epub') {
         return undefined
     }
@@ -28,15 +28,12 @@ export async function loadBooqForId(booqId: BooqId, file: BooqFile) {
     })
     if (!imagesData) {
         return booq
-    }
-    const nodes = preprocessNodes(booq.nodes, { imagesData })
-    return {
-        ...booq,
-        nodes,
+    } else {
+        return preprocessBooq(booq, imagesData)
     }
 }
 
-export async function loadImagesForBooqId(booqId: BooqId, file: BooqFile) {
+export async function loadImagesFromFile(file: BooqFile) {
     if (file.kind !== 'epub') {
         return undefined
     }
@@ -49,7 +46,7 @@ export async function loadImagesForBooqId(booqId: BooqId, file: BooqFile) {
         console.info(inspect(diag, { depth: 5, colors: true }))
     })
     if (!booq) {
-        console.error(`Failed to parse booq for id ${booqId}`)
+        console.error(`Failed to parse booq for`)
         return undefined
     }
     return loadImages(booq, epub)
@@ -97,6 +94,14 @@ function collectUniqueSrcsFromBooq(booq: Booq): string[] {
     return Array.from(srcs)
 }
 
+function preprocessBooq(booq: Booq, imagesData: BooqImagesData): Booq {
+    const nodes = preprocessNodes(booq.nodes, { imagesData })
+    return {
+        ...booq,
+        nodes,
+    }
+}
+
 type PreprocessEnv = {
     imagesData: BooqImagesData,
 }
@@ -114,14 +119,14 @@ function preprocessNode(node: BooqNode, env: PreprocessEnv): BooqNode {
             if (result.attrs?.src) {
                 const resolved = env.imagesData[result.attrs.src]
                 if (resolved) {
-                    result.attrs.src = resolved.url
+                    result.attrs.src = urlForBooqImageId(resolved.id)
                     result.attrs.width = resolved.width.toString()
                     result.attrs.height = resolved.height.toString()
                 }
             } else if (result.attrs?.xlinkHref) {
                 const resolved = env.imagesData[result.attrs.xlinkHref]
                 if (resolved) {
-                    result.attrs.xlinkHref = resolved.url
+                    result.attrs.xlinkHref = urlForBooqImageId(resolved.id)
                     result.attrs.width = resolved.width.toString()
                     result.attrs.height = resolved.height.toString()
                 }

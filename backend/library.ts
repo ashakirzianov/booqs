@@ -2,7 +2,7 @@ import {
     Booq, BooqId, BooqMetadata, BooqPath, InLibraryId, LibraryId, makeId, parseId, pathToString, positionForPath, previewForPath, TableOfContents, textForRange,
 } from '@/core'
 import { getCachedValueForKey, cacheValueForKey } from './cache'
-import { loadBooqForId, loadImagesForBooqId } from './load'
+import { parseBooqForId, loadImagesFromFile } from './load'
 import groupBy from 'lodash-es/groupBy'
 import { pgLibrary } from './pg'
 import { userUploadsLibrary } from './uu'
@@ -54,13 +54,26 @@ const libraries: {
     lo: localLibrary,
 }
 
+export async function uploadImagesForBooqId(booqId: BooqId): Promise<Record<string, BooqImageData>> {
+    return getOrLoadImagesData({
+        booqId,
+        loadImages: async () => {
+            const file = await fileForId(booqId)
+            if (!file) {
+                return undefined
+            }
+            return loadImagesFromFile(file)
+        },
+    })
+}
+
 export async function booqForId(booqId: BooqId, bypassCache = false): Promise<Booq | undefined> {
     if (bypassCache) {
         const file = await fileForId(booqId)
         if (!file) {
             return undefined
         }
-        return loadBooqForId(booqId, file)
+        return parseBooqForId(booqId, file)
     }
     const cached = await getCachedValueForKey<Booq>(`booq:${booqId}`)
     if (cached) {
@@ -70,7 +83,7 @@ export async function booqForId(booqId: BooqId, bypassCache = false): Promise<Bo
         if (!file) {
             return undefined
         }
-        const booq = await loadBooqForId(booqId, file)
+        const booq = await parseBooqForId(booqId, file)
         if (booq) {
             await cacheValueForKey(`booq:${booqId}`, booq)
         }
@@ -227,7 +240,7 @@ async function buildBooqData({
                 if (!file) {
                     return undefined
                 }
-                return loadImagesForBooqId(booqId, file)
+                return loadImagesFromFile(file)
             },
         })
         cover = data?.[coverSrc]
