@@ -9,7 +9,7 @@ import {
 import { libraryCardsForIds, featuredBooqIds, queryLibrary } from '@/backend/library'
 import { userForId } from '@/backend/users'
 import { booqIdsInCollections } from '@/backend/collections'
-import { booqForId, booqPreview, booqToc } from '@/backend/booq'
+import { booqForId, booqPreview, booqToc } from '@/backend/access'
 import { getExtraMetadataValues } from '@/core/meta'
 
 export type PartialBooqData = {

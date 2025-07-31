@@ -1,6 +1,6 @@
 'use server'
 import { addBooqHistory, booqHistoryForUser, removeBooqHistory, DbReadingHistoryEvent } from '@/backend/history'
-import { booqPreview, booqMetadata } from '@/backend/booq'
+import { booqPreview, booqMetadata } from '@/backend/access'
 import { BooqId, BooqPath } from '@/core'
 import { getUserIdInsideRequest } from './request'
 

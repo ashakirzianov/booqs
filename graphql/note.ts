@@ -4,7 +4,7 @@ import { DbNote } from '@/backend/notes'
 import { DbUser, userForId } from '@/backend/users'
 import { libraryCardForId } from '@/backend/library'
 import { BooqId, positionForPath, textForRange } from '@/core'
-import { booqForId } from '@/backend/booq'
+import { booqForId } from '@/backend/access'
 
 export type NoteParent = DbNote
 export const noteResolver: IResolvers<NoteParent> = {

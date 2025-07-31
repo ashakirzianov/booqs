@@ -3,7 +3,7 @@ import { BooqParent } from './booq'
 import { libraryCardForId } from '@/backend/library'
 import { BooqId, positionForPath, previewForPath } from '@/core'
 import { DbReadingHistoryEvent } from '@/backend/history'
-import { booqForId } from '@/backend/booq'
+import { booqForId } from '@/backend/access'
 
 export type BooqHistoryParent = DbReadingHistoryEvent
 export const booqHistoryResolver: IResolvers<BooqHistoryParent> = {

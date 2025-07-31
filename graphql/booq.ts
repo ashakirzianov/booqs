@@ -8,7 +8,7 @@ import {
 } from '@/core'
 import { getBookmarks } from '@/backend/bookmarks'
 import { notesFor } from '@/backend/notes'
-import { booqForId } from '@/backend/booq'
+import { booqForId } from '@/backend/access'
 import { libraryCardForId } from '@/backend/library'
 
 export type BooqParent = {
