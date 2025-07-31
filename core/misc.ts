@@ -1,11 +1,7 @@
 import { BooqId, InLibraryId, LibraryId } from './model'
 
-export function makeId(libraryId: LibraryId, inLibraryId: InLibraryId): BooqId {
-    return `${libraryId}/${inLibraryId}`
-}
-
-export function parseId(id: string): string[] {
-    return id.split('/')
+export function parseId(booqId: BooqId): [libraryId: LibraryId, id: InLibraryId] {
+    return booqId.split(':') as [LibraryId, InLibraryId]
 }
 
 export function assertNever(x: never) {

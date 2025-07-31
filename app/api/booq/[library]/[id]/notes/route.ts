@@ -5,7 +5,7 @@ import {
     NotePrivacy,
 } from '@/data/notes'
 import { getUserById } from '@/data/user'
-import { BooqId, BooqRange, makeId } from '@/core'
+import { BooqId, BooqRange } from '@/core'
 import { NextRequest } from 'next/server'
 import { getUserIdInsideRequest } from '@/data/request'
 
@@ -30,7 +30,7 @@ export type GetResponse = {
 }
 export async function GET(request: NextRequest, { params }: { params: Promise<Params> }) {
     const { library, id } = await params
-    const booqId = makeId(library, id)
+    const booqId: BooqId = `${library}:${id}`
     const notes = await getNotesWithAuthorForBooq(booqId)
     const result: GetResponse = {
         notes,
@@ -49,7 +49,7 @@ export type PostBody = {
 export type PostResponse = ResolvedNote
 export async function POST(request: NextRequest, { params }: { params: Promise<Params> }) {
     const { library, id: paramsId } = await params
-    const booqId = makeId(library, paramsId)
+    const booqId: BooqId = `${library}:${paramsId}`
     const userId = await getUserIdInsideRequest()
     if (!userId) {
         return Response.json({ error: 'Unauthorized' }, { status: 401 })

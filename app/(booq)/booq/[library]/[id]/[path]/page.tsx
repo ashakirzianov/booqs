@@ -27,8 +27,8 @@ export async function generateMetadata({
     const endPath = end && pathFromString(end)
     const booqPath = pathFromString(path)
     const meta = startPath && endPath
-        ? await fetchBooqPreview(`${library}/${id}`, startPath, endPath)
-        : await fetchBooqPreview(`${library}/${id}`, booqPath ?? [])
+        ? await fetchBooqPreview(`${library}:${id}`, startPath, endPath)
+        : await fetchBooqPreview(`${library}:${id}`, booqPath ?? [])
 
     return {
         title: meta?.title ?? 'Booq',
@@ -51,7 +51,7 @@ export default async function BooqPathPage({
         ? { start: startPath, end: endPath }
         : undefined
     const booq = await booqPart({
-        booqId: `${library}/${id}`,
+        booqId: `${library}:${id}`,
         path: booqPath,
         bypassCache: library === 'lo',
     })
@@ -61,7 +61,7 @@ export default async function BooqPathPage({
     // Report history event before rendering the page
     if (booqPath) {
         await reportBooqHistoryAction({
-            booqId: `${library}/${id}`,
+            booqId: `${library}:${id}`,
             path: booqPath,
         })
     }

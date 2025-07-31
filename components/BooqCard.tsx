@@ -15,7 +15,7 @@ export function BooqCard({
 }) {
     const author = authors?.join(', ')
     const booqUrl = booqHref({ booqId })
-    const libraryId = parseId(booqId)[0] || 'pg'
+    const [libraryId] = parseId(booqId)
     return <div className="flex flex-col grow gap-4 items-center sm:flex-row sm:flex-wrap sm:items-stretch h-full">
         <Link href={booqUrl}>
             <BooqCover

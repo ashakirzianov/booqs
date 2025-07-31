@@ -19,7 +19,7 @@ export default async function Page({ params }: {
     params: Promise<Params>,
 }) {
     const { library, id } = await params
-    const booqId: BooqId = `${library}/${id}`
+    const booqId: BooqId = `${library}:${id}`
 
     const detailed = await booqDetailedData(booqId)
     if (!detailed) {

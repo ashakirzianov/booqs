@@ -7,9 +7,9 @@ import { LanguageInfo } from '@/data/booqs'
 export function BooqTags({ subjects, languages, booqId }: {
     subjects: string[],
     languages: LanguageInfo[],
-    booqId?: BooqId,
+    booqId: BooqId,
 }) {
-    const libraryId = booqId ? parseId(booqId)[0] || 'pg' : 'pg'
+    const [libraryId] = parseId(booqId)
     return <div style={{
         display: 'flex',
         flexFlow: 'row wrap',
