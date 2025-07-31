@@ -165,7 +165,7 @@ async function resolveBriefHistoryEvent(event: DbReadingHistoryEvent, userId: st
         title: meta.title,
         authors: meta.authors,
         cover: meta.cover ? {
-            url: urlForBooqImageId(meta.cover.id),
+            url: urlForBooqImageId(booqId as BooqId, meta.cover.id),
             width: meta.cover.width,
             height: meta.cover.height,
         } : undefined,
@@ -189,7 +189,7 @@ async function resolveDetailedHistoryEvent(event: DbReadingHistoryEvent, userId:
         title: preview.title ?? '',
         authors: preview.authors ?? [],
         cover: preview.cover ? {
-            url: urlForBooqImageId(preview.cover.id),
+            url: urlForBooqImageId(booqId as BooqId, preview.cover.id),
             width: preview.cover.width,
             height: preview.cover.height,
         } : undefined,

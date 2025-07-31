@@ -28,7 +28,7 @@ export async function uploadEpubAction(file: File) {
                 booqId,
                 title: data.title ?? undefined,
                 cover: data.cover ? {
-                    url: urlForBooqImageId(data.cover.id),
+                    url: urlForBooqImageId(data.booqId, data.cover.id),
                     width: data.cover.width,
                     height: data.cover.height,
                 } : undefined,

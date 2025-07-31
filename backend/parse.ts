@@ -29,7 +29,7 @@ export async function parseAndPreprocessBooq(booqId: BooqId, file: BooqFile): Pr
     if (!imagesData) {
         return booq
     } else {
-        return preprocessBooq(booq, imagesData)
+        return preprocessBooq(booq, booqId, imagesData)
     }
 }
 
@@ -94,8 +94,8 @@ function collectUniqueSrcsFromBooq(booq: Booq): string[] {
     return Array.from(srcs)
 }
 
-function preprocessBooq(booq: Booq, imagesData: BooqImagesData): Booq {
-    const nodes = preprocessNodes(booq.nodes, { imagesData })
+function preprocessBooq(booq: Booq, booqId: BooqId, imagesData: BooqImagesData): Booq {
+    const nodes = preprocessNodes(booq.nodes, { booqId, imagesData })
     return {
         ...booq,
         nodes,
@@ -103,6 +103,7 @@ function preprocessBooq(booq: Booq, imagesData: BooqImagesData): Booq {
 }
 
 type PreprocessEnv = {
+    booqId: BooqId,
     imagesData: BooqImagesData,
 }
 function preprocessNodes(nodes: BooqNode[], env: PreprocessEnv): BooqNode[] {
@@ -119,14 +120,14 @@ function preprocessNode(node: BooqNode, env: PreprocessEnv): BooqNode {
             if (result.attrs?.src) {
                 const resolved = env.imagesData[result.attrs.src]
                 if (resolved) {
-                    result.attrs.src = urlForBooqImageId(resolved.id)
+                    result.attrs.src = urlForBooqImageId(env.booqId, resolved.id)
                     result.attrs.width = resolved.width.toString()
                     result.attrs.height = resolved.height.toString()
                 }
             } else if (result.attrs?.xlinkHref) {
                 const resolved = env.imagesData[result.attrs.xlinkHref]
                 if (resolved) {
-                    result.attrs.xlinkHref = urlForBooqImageId(resolved.id)
+                    result.attrs.xlinkHref = urlForBooqImageId(env.booqId, resolved.id)
                     result.attrs.width = resolved.width.toString()
                     result.attrs.height = resolved.height.toString()
                 }

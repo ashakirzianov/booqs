@@ -1,6 +1,6 @@
 import sharp from 'sharp'
 import { uploadAsset } from './blob'
-import { BooqId } from '@/core'
+import { BooqId, parseId } from '@/core'
 import { redis } from './db'
 
 export const imageBucket = 'booqs-images'
@@ -16,8 +16,10 @@ export type BooqImageData = {
 export type BooqImagesData = Record<string, BooqImageData>
 export type BooqImages = Record<string, Buffer>
 
-export function urlForBooqImageId(id: string) {
-    return `https://${imageBucket}.s3.amazonaws.com/${id}`
+export function urlForBooqImageId(booqId: BooqId, imageId: string) {
+    const [libraryId, id] = parseId(booqId)
+    const assetId = `${libraryId}/${id}/${imageId}`
+    return `https://${imageBucket}.s3.amazonaws.com/${assetId}`
 }
 
 export async function resolveBooqImage({
@@ -115,7 +117,9 @@ async function uploadImage(buffer: Buffer, booqId: BooqId, src: string, size?: n
         bufferToUpload = buffer
     }
 
-    const uploadResult = await uploadAsset(imageBucket, id, bufferToUpload)
+    const [libraryId, inLibraryId] = parseId(booqId)
+    const assetId = `${libraryId}/${inLibraryId}/${id}`
+    const uploadResult = await uploadAsset(imageBucket, assetId, bufferToUpload)
     if (!uploadResult.$metadata) {
         return {
             success: false as const,
