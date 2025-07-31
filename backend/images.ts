@@ -1,5 +1,5 @@
 import sharp from 'sharp'
-import { uploadAsset } from './blob'
+import { assetExists, uploadAsset } from './blob'
 import { BooqId, parseId } from '@/core'
 import { redis } from './db'
 
@@ -136,6 +136,16 @@ async function uploadImage(buffer: Buffer, booqId: BooqId, src: string, size?: n
 
     const [libraryId, inLibraryId] = parseId(booqId)
     const assetId = `${libraryId}/${inLibraryId}/${id}`
+    const alreadyExists = await assetExists(imageBucket, assetId)
+    if (alreadyExists) {
+        return {
+            success: true,
+            alreadyExists: true,
+            id,
+            width,
+            height,
+        } as const
+    }
     const uploadResult = await uploadAsset(imageBucket, assetId, bufferToUpload)
     if (!uploadResult.$metadata) {
         return {
