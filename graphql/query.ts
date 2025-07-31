@@ -4,12 +4,12 @@ import { BooqParent } from './booq'
 import { BooqHistoryParent } from './history'
 import { CopilotInput, CopilotParent } from './copilot'
 import { AuthorParent } from './author'
-import { featuredBooqIds, libraryCardForId, libraryCardsForIds, queryLibrary } from '@/backend/library'
 import { booqHistoryForUser } from '@/backend/history'
 import { booqIdsInCollections } from '@/backend/collections'
 import { userForId, userForUsername } from '@/backend/users'
 import { CollectionParent } from './collection'
 import { BooqId } from '@/core'
+import { booqDataForId, booqDataForIds, booqQuery, featuredBooqIds } from '@/backend/library'
 
 type SearchResultParent = BooqParent | AuthorParent
 
@@ -26,7 +26,7 @@ export const queryResolver: IResolvers<unknown, ResolverContext> = {
             return 'pong'
         },
         async booq(_, { id }): Promise<BooqParent | undefined> {
-            return libraryCardForId(id)
+            return booqDataForId(id)
         },
         author(_, { name }): AuthorParent {
             return { name, kind: 'author' }
@@ -35,16 +35,8 @@ export const queryResolver: IResolvers<unknown, ResolverContext> = {
             query: string,
             limit?: number,
         }): Promise<SearchResultParent[]> {
-            const results = await queryLibrary('pg', { kind: 'search', query, limit: limit ?? 100 })
-            return results.cards.map(card => {
-                return {
-                    kind: 'booq',
-                    booqId: card.booqId,
-                    title: card.meta.title,
-                    authors: card.meta.authors.map(author => author.name),
-                    coverSrc: card.meta.coverSrc,
-                }
-            })
+            const results = await booqQuery('pg', { kind: 'search', query, limit: limit ?? 100 })
+            return results.cards
         },
         async me(_, __, { userId }) {
             if (userId) {
@@ -73,7 +65,7 @@ export const queryResolver: IResolvers<unknown, ResolverContext> = {
         },
         async featured(_, { limit }): Promise<Array<BooqParent | undefined>> {
             const ids = await featuredBooqIds(limit)
-            return libraryCardsForIds(ids)
+            return booqDataForIds(ids)
         },
         copilot(_, { context }: { context: CopilotInput }): CopilotParent {
             return context

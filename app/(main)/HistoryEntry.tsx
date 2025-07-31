@@ -16,7 +16,7 @@ export function HistoryEntry({ entry }: {
 
     async function handleRemove() {
         if (isRemoved) return
-        
+
         setIsRemoved(true)
         try {
             const result = await removeHistoryEntryAction({ booqId: entry.booqId })
@@ -41,7 +41,7 @@ export function HistoryEntry({ entry }: {
     }
 }
 
-function DetailedEntry({ entry, onRemove }: { 
+function DetailedEntry({ entry, onRemove }: {
     entry: DetailedReadingHistoryEntry,
     onRemove: () => void
 }) {
@@ -69,7 +69,7 @@ function DetailedEntry({ entry, onRemove }: {
     )
 }
 
-function BriefEntry({ entry, onRemove }: { 
+function BriefEntry({ entry, onRemove }: {
     entry: BriefReadingHistoryEntry,
     onRemove: () => void
 }) {
@@ -77,8 +77,7 @@ function BriefEntry({ entry, onRemove }: {
         <div className='flex snap-center relative group'>
             <Link href={booqHref({ booqId: entry.booqId, path: entry.path })}>
                 <BooqCover
-                    booqId={entry.booqId}
-                    coverSrc={entry.coverSrc}
+                    cover={entry.cover}
                     title={entry.title}
                     author={entry.authors[0]}
                 />

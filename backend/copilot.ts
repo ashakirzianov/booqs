@@ -1,7 +1,7 @@
 import { BooqId, BooqRange, getQuoteAndContext } from '@/core'
 import { getExtraMetadataValues } from '@/core/meta'
 import { getResponse, getStreamingResponse } from './ai'
-import { booqForId } from './booq'
+import { booqForId } from './library'
 import { getCachedValueForKey, cacheValueForKey, createCachingStream } from './cache'
 
 export type ReadingContext = {

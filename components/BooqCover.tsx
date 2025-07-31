@@ -1,38 +1,34 @@
-import { coverSizeForSize, resolveImageSrc } from '@/common/images'
-import { BooqId } from '@/core'
+import { BooqCoverData } from '@/data/booqs'
 import React from 'react'
 
 const defaultSize = 70
 
-export function BooqCover({ booqId, coverSrc, title, author, size }: {
-    booqId: BooqId,
-    coverSrc: string | undefined,
+export function BooqCover({ cover, title, author, size }: {
+    cover: BooqCoverData | undefined,
     title: string | undefined,
     author: string | undefined,
     size?: number,
 }) {
     size = size ?? defaultSize
     const height = size * 3
-    const coverSize = coverSizeForSize(height)
-    const coverUrl = coverSrc ? resolveImageSrc(booqId, coverSrc, coverSize) : undefined
     return <div className='flex shrink-0 items-stretch rounded-sm overflow-clip' style={{
         width: size * 2,
         height: height,
     }}>
         {
-            coverUrl
-                ? <BooqImageCover cover={coverUrl} title={title} />
+            cover
+                ? <BooqImageCover cover={cover} title={title} />
                 : <BooqDefaultCover title={title} author={author} size={size} />
         }
     </div>
 }
 
 function BooqImageCover({ cover, title }: {
-    cover: string,
+    cover: BooqCoverData,
     title: string | undefined,
 }) {
     return <div title={title ?? undefined} className='flex w-full h-full bg-contain bg-no-repeat bg-center' style={{
-        backgroundImage: `url(${cover})`,
+        backgroundImage: `url(${cover.url})`,
     }} />
 }
 

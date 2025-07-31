@@ -2,29 +2,18 @@ import { IResolvers } from '@graphql-tools/utils'
 import { BookmarkParent } from './bookmark'
 import { NoteParent } from './note'
 import {
-    BooqId,
-    BooqMetadata,
-    buildFragment, previewForPath, textForRange,
+    BooqId, buildFragment, previewForPath, textForRange,
 } from '@/core'
 import { getBookmarks } from '@/backend/bookmarks'
 import { notesFor } from '@/backend/notes'
-import { booqForId } from '@/backend/booq'
-import { libraryCardForId } from '@/backend/library'
+import { booqForId } from '@/backend/library'
 
 export type BooqParent = {
     kind?: 'booq' | undefined,
     booqId: BooqId,
-    coverSrc?: string | undefined,
 }
 export const booqResolver: IResolvers<BooqParent> = {
     Booq: {
-        async tags(parent) {
-            const card = await libraryCardForId(parent.booqId)
-            if (!card) {
-                return undefined
-            }
-            return buildTags(card.meta)
-        },
         async bookmarks(parent, _, { user }): Promise<BookmarkParent[]> {
             return user
                 ? getBookmarks({
@@ -76,21 +65,4 @@ export const booqResolver: IResolvers<BooqParent> = {
                 : undefined
         },
     },
-}
-
-type Tag = {
-    tag: string,
-    value?: string | null,
-}
-function buildTags(card: BooqMetadata): Tag[] {
-    return [
-        {
-            tag: 'pages',
-            value: Math.floor(card.length / 1500).toString(),
-        },
-        ...(card.extra ?? []).map((extra) => ({
-            tag: extra.name,
-            value: extra.value ?? null,
-        }))
-    ].filter(tag => tag !== undefined)
 }

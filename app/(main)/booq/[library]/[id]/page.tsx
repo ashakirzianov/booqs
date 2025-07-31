@@ -36,8 +36,7 @@ export default async function Page({ params }: {
             <div className="flex flex-col lg:flex-row gap-8 mb-8">
                 <div className="flex justify-center lg:justify-start">
                     <BooqCover
-                        booqId={booqId}
-                        coverSrc={detailed.coverSrc}
+                        cover={detailed.cover}
                         title={detailed.title}
                         author={detailed.authors.join(', ')}
                         size={120}

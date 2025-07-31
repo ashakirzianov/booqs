@@ -7,7 +7,7 @@ import { ReactNode } from 'react'
 import { BooqCardData } from '@/data/booqs'
 
 export function BooqCard({
-    card: { booqId, title, authors, coverSrc, subjects, languages },
+    card: { booqId, title, authors, cover, subjects, languages },
     actions,
 }: {
     card: BooqCardData,
@@ -19,10 +19,9 @@ export function BooqCard({
     return <div className="flex flex-col grow gap-4 items-center sm:flex-row sm:flex-wrap sm:items-stretch h-full">
         <Link href={booqUrl}>
             <BooqCover
-                booqId={booqId}
                 title={title ?? undefined}
                 author={author}
-                coverSrc={coverSrc}
+                cover={cover}
             />
         </Link>
         <div className="flex flex-col flex-1 justify-between">

@@ -20,7 +20,6 @@ type RenderContext = {
     augmentations: Augmentation[],
     onAugmentationClick?: (id: string) => void,
     hrefForPath?: (path: BooqPath) => string,
-    resolveSrc?: (src: string) => string,
 }
 export function renderNodes(nodes: BooqNode[], ctx: RenderContext): ReactNode[] {
     const result = nodes.map(
@@ -109,7 +108,7 @@ function renderTextNode(text: string, {
 }
 
 function getProps(node: BooqElementNode, {
-    path, range, hrefForPath, resolveSrc,
+    path, range, hrefForPath,
 }: RenderContext) {
     return {
         ...node.attrs,
@@ -128,12 +127,6 @@ function getProps(node: BooqElementNode, {
                         : node.attrs?.href
             )
             : node.attrs?.href,
-        src: node.attrs?.src && resolveSrc
-            ? resolveSrc(node.attrs?.src)
-            : node.attrs?.src,
-        xlinkHref: node.attrs?.xlinkHref && resolveSrc
-            ? resolveSrc(node.attrs?.xlinkHref)
-            : node.attrs?.xlinkHref,
     }
 }
 

@@ -4,7 +4,6 @@ import {
     existingAssetIds, pgEpubsBucket, insertPgRecord,
 } from '@/backend/pg'
 import { parseEpubFile } from '@/parser'
-import { uploadBooqImages } from '@/backend/images'
 import { redis } from '@/backend/db'
 import { CliOptions } from './main'
 
@@ -131,7 +130,6 @@ async function syncBlobToDB(options: CliOptions) {
     basic(verbosity, 'Syncing Blob to DB...')
     const batchSize = parseInt(options.switches['batch'] || '25')
     const retryProblems = options.switches['retry-problems'] === 'true'
-    const skipImages = options.switches['skip-images'] === 'true'
     const all = options.switches['all'] === 'true'
     const assetIdsInDb = await existingAssetIds()
     const existingAssetIdsSet = new Set(assetIdsInDb)
@@ -174,7 +172,6 @@ async function syncBlobToDB(options: CliOptions) {
                     record: {
                         asset, assetId,
                     },
-                    needToUploadImages: !skipImages,
                     verbosity,
                 })
                 if (!parseResult) {
@@ -308,11 +305,10 @@ function idFromAssetId(assetId: string) {
 }
 
 async function parseAndInsert({
-    id, record: { assetId, asset }, needToUploadImages, verbosity,
+    id, record: { assetId, asset }, verbosity,
 }: {
     id: string,
     record: AssetRecord,
-    needToUploadImages: boolean,
     verbosity: number,
 }) {
     verbose(verbosity, `Processing ${assetId}`)
@@ -323,23 +319,6 @@ async function parseAndInsert({
         info(verbosity, `Couldn't parse epub: ${assetId}`)
         await reportProblem(assetId, 'parsing', 'Parsing errors', diags)
         return
-    }
-
-    // Upload images after parsing but before database insert
-    if (needToUploadImages) {
-        verbose(verbosity, `Uploading images for ${assetId}`)
-        const imagesResults = await uploadBooqImages(`pg/${id}`, booq)
-        let hasImageErrors = false
-        for (const imageResult of imagesResults) {
-            if (!imageResult.success) {
-                await reportProblem(assetId, 'parsing', `Image upload error: Failed to upload image: ${imageResult.id}`)
-                hasImageErrors = true
-            }
-        }
-        // If there were image errors, don't proceed with database insert
-        if (hasImageErrors) {
-            return
-        }
     }
 
     const insertResult = await insertPgRecord({ booq, assetId, id })

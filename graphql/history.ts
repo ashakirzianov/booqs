@@ -1,15 +1,14 @@
 import { IResolvers } from '@graphql-tools/utils'
 import { BooqParent } from './booq'
-import { libraryCardForId } from '@/backend/library'
 import { BooqId, positionForPath, previewForPath } from '@/core'
 import { DbReadingHistoryEvent } from '@/backend/history'
-import { booqForId } from '@/backend/booq'
+import { booqDataForId, booqForId } from '@/backend/library'
 
 export type BooqHistoryParent = DbReadingHistoryEvent
 export const booqHistoryResolver: IResolvers<BooqHistoryParent> = {
     BooqHistory: {
         async booq(parent): Promise<BooqParent | undefined> {
-            return libraryCardForId(parent.booqId)
+            return booqDataForId(parent.booqId as BooqId)
         },
         async preview(parent, { length }) {
             const booq = await booqForId(parent.booqId as BooqId)

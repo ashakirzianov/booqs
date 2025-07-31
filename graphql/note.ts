@@ -2,9 +2,8 @@ import { IResolvers } from '@graphql-tools/utils'
 import { BooqParent } from './booq'
 import { DbNote } from '@/backend/notes'
 import { DbUser, userForId } from '@/backend/users'
-import { libraryCardForId } from '@/backend/library'
 import { BooqId, positionForPath, textForRange } from '@/core'
-import { booqForId } from '@/backend/booq'
+import { booqDataForId, booqForId } from '@/backend/library'
 
 export type NoteParent = DbNote
 export const noteResolver: IResolvers<NoteParent> = {
@@ -13,7 +12,7 @@ export const noteResolver: IResolvers<NoteParent> = {
             return userForId(parent.author_id)
         },
         async booq(parent): Promise<BooqParent | undefined> {
-            return libraryCardForId(parent.booq_id)
+            return booqDataForId(parent.booq_id as BooqId)
         },
         async text(parent) {
             const booq = await booqForId(parent.booq_id as BooqId)

@@ -1,21 +1,31 @@
-import { BooqId, BooqMetadata, InLibraryId, LibraryId, makeId, parseId } from '@/core'
+import {
+    Booq, BooqId, BooqMetadata, BooqPath, InLibraryId, LibraryId, makeId, parseId, pathToString, positionForPath, previewForPath, TableOfContents, textForRange,
+} from '@/core'
+import { getCachedValueForKey, cacheValueForKey } from './cache'
+import { parseAndPreprocessBooq, parseAndLoadImagesFromFile } from './parse'
 import groupBy from 'lodash-es/groupBy'
 import { pgLibrary } from './pg'
 import { userUploadsLibrary } from './uu'
 import { localLibrary } from './lo'
+import { getOrLoadImagesData, BooqImageData, resolveBooqImage } from './images'
+import { getExtraMetadataValues } from '@/core/meta'
 
-export type LibraryCard = {
+export type BooqData = {
     booqId: BooqId,
-    meta: BooqMetadata,
+    title: string,
+    authors: string[],
+    subjects: string[] | undefined,
+    languages: string[] | undefined,
+    cover: BooqImageData | undefined,
 }
 
-export type InLibraryCard = {
-    id: InLibraryId,
-    meta: BooqMetadata,
-}
 export type BooqFile = {
     kind: 'epub',
     file: Buffer,
+}
+export type InLibraryCard = {
+    id: InLibraryId,
+    meta: BooqMetadata,
 }
 
 export type LibraryQuery = {
@@ -44,12 +54,85 @@ const libraries: {
     lo: localLibrary,
 }
 
-export async function libraryCardForId(id: string) {
-    const [result] = await libraryCardsForIds([id])
-    return result
+export async function uploadImagesForBooqId(booqId: BooqId): Promise<Record<string, BooqImageData>> {
+    return getOrLoadImagesData({
+        booqId,
+        loadImages: async () => {
+            const file = await fileForId(booqId)
+            if (!file) {
+                return undefined
+            }
+            return parseAndLoadImagesFromFile(file)
+        },
+    })
 }
 
-export async function libraryCardsForIds(ids: string[]): Promise<Array<LibraryCard | undefined>> {
+export async function booqForId(booqId: BooqId, bypassCache = false): Promise<Booq | undefined> {
+    if (bypassCache) {
+        const file = await fileForId(booqId)
+        if (!file) {
+            return undefined
+        }
+        return parseAndPreprocessBooq(booqId, file)
+    }
+    const cached = await getCachedValueForKey<Booq>(`booq:${booqId}`)
+    if (cached) {
+        return cached
+    } else {
+        const file = await fileForId(booqId)
+        if (!file) {
+            return undefined
+        }
+        const booq = await parseAndPreprocessBooq(booqId, file)
+        if (booq) {
+            await cacheValueForKey(`booq:${booqId}`, booq)
+        }
+        return booq
+    }
+}
+
+export type BooqPreview = {
+    position: number,
+    text: string,
+    title?: string,
+    authors?: string[],
+    cover?: BooqImageData,
+    booqLength: number,
+}
+const PREVIEW_LENGTH = 500
+export async function booqPreview(booqId: BooqId, path: BooqPath, end?: BooqPath): Promise<BooqPreview | undefined> {
+    const key = `booq:${booqId}:preview:${pathToString(path)}${end ? `:${pathToString(end)}` : ''}`
+    const cached = await getCachedValueForKey<BooqPreview>(key)
+    if (cached) {
+        return cached
+    }
+    const booq = await booqForId(booqId)
+    if (!booq) {
+        return undefined
+    }
+    const full = end
+        ? textForRange(booq.nodes, { start: path, end })
+        : previewForPath(booq.nodes, path, PREVIEW_LENGTH)
+    const text = full?.trim()?.substring(0, PREVIEW_LENGTH) ?? ''
+    const position = positionForPath(booq.nodes, path)
+    const authors = booq.metadata.authors.map(author => author.name)
+    const booqLength = booq.metadata.length
+    const cover = booq.metadata.coverSrc
+        ? await resolveBooqImage({ booqId, src: booq.metadata.coverSrc })
+        : undefined
+    const preview = {
+        position,
+        text,
+        title: booq.metadata.title,
+        authors,
+        cover,
+        booqLength,
+    }
+    await cacheValueForKey(key, preview, 60 * 60) // Cache for 1 hour
+    return preview
+}
+
+export async function booqDataForIds(ids: string[]): Promise<Array<BooqData | undefined>> {
     const parsed = ids
         .map(idString => {
             const [library, id] = parseId(idString)
@@ -66,10 +149,13 @@ export async function libraryCardsForIds(ids: string[]): Promise<Array<LibraryCa
         const library = libraries[libraryPrefix]
         if (library) {
             const forLibrary = await library.cards(pids.map(p => p.id))
-            return forLibrary.map(card => ({
-                booqId: makeId(libraryPrefix, card.id),
-                meta: card.meta,
+            const cards = await Promise.all(forLibrary.map(async card => {
+                return buildBooqData({
+                    booqId: makeId(libraryPrefix, card.id),
+                    meta: card.meta,
+                })
             }))
+            return cards
         } else {
             return undefined
         }
@@ -82,8 +168,21 @@ export async function libraryCardsForIds(ids: string[]): Promise<Array<LibraryCa
     )
 }
 
-export async function queryLibrary(libraryId: string, query: LibraryQuery): Promise<{
-    cards: LibraryCard[],
+export async function booqDataForId(booqId: BooqId): Promise<BooqData | undefined> {
+    const [card] = await booqDataForIds([booqId])
+    return card
+}
+
+export async function booqToc(booqId: BooqId): Promise<TableOfContents | undefined> {
+    const booq = await booqForId(booqId)
+    if (!booq) {
+        return undefined
+    }
+    return booq.toc
+}
+
+export async function booqQuery(libraryId: string, query: LibraryQuery): Promise<{
+    cards: BooqData[],
     hasMore: boolean,
     total?: number,
 }> {
@@ -91,24 +190,18 @@ export async function queryLibrary(libraryId: string, query: LibraryQuery): Prom
     if (!library) {
         throw new Error(`Library with id ${libraryId} not found`)
     }
-    const results = await library.query(query)
-    const cards = results.cards.map(card => ({
-        booqId: makeId(libraryId, card.id),
-        meta: card.meta,
+    const result = await library.query(query)
+    const cards = await Promise.all(result.cards.map(card => {
+        return buildBooqData({
+            booqId: makeId(libraryId, card.id),
+            meta: card.meta,
+        })
     }))
     return {
         cards,
-        hasMore: results.hasMore,
-        total: results.total,
+        hasMore: result.hasMore,
+        total: result.total,
     }
-}
-
-export async function fileForId(booqId: BooqId) {
-    const [prefix, id] = parseId(booqId)
-    const library = libraries[prefix]
-    return library && id
-        ? library.fileForId(id)
-        : undefined
 }
 
 export async function featuredBooqIds(_limit?: number) {
@@ -130,3 +223,43 @@ export async function featuredBooqIds(_limit?: number) {
         'pg/4363',
     ]
 }
+
+async function buildBooqData({
+    booqId,
+    meta: { coverSrc, title, authors, extra },
+}: {
+    booqId: BooqId,
+    meta: BooqMetadata,
+}): Promise<BooqData> {
+    let cover: BooqImageData | undefined
+    if (coverSrc) {
+        const data = await getOrLoadImagesData({
+            booqId,
+            loadImages: async () => {
+                const file = await fileForId(booqId)
+                if (!file) {
+                    return undefined
+                }
+                return parseAndLoadImagesFromFile(file)
+            },
+        })
+        cover = data?.[coverSrc]
+    }
+    return {
+        booqId,
+        title,
+        authors: authors.map(author => author.name),
+        subjects: getExtraMetadataValues('subject', extra),
+        languages: getExtraMetadataValues('language', extra),
+        cover,
+    }
+}
+
+async function fileForId(booqId: BooqId) {
+    const [prefix, id] = parseId(booqId)
+    const library = libraries[prefix]
+    return library && id
+        ? library.fileForId(id)
+        : undefined
+}
+

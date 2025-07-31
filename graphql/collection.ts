@@ -1,7 +1,7 @@
 import { IResolvers } from '@graphql-tools/utils'
 import { BooqParent } from './booq'
-import { libraryCardsForIds } from '@/backend/library'
 import { BooqId } from '@/core'
+import { booqDataForIds } from '@/backend/library'
 
 export type CollectionParent = {
     name: string,
@@ -13,7 +13,7 @@ export const collectionResolver: IResolvers<CollectionParent> = {
             return parent.name
         },
         async booqs(parent): Promise<BooqParent[]> {
-            return libraryCardsForIds(parent.booqIds)
+            return booqDataForIds(parent.booqIds)
                 .then(cards => cards.filter(card => card !== undefined))
         },
     },

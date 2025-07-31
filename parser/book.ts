@@ -1,7 +1,6 @@
 import { BooqNode, Booq, nodesLength } from '../core'
 import { Epub } from './epub'
 import { EpubSection, parseSection } from './section'
-import { buildImages } from './images'
 import { buildToc } from './toc'
 import { preprocess } from './preprocess'
 import { extactBooqMeta } from './metadata'
@@ -38,7 +37,6 @@ export async function processEpub(epub: Epub, diags: Diagnoser): Promise<Booq | 
         ...metaFromMetadata,
         length,
     }
-    const images = await buildImages(nodes, meta, epub, diags)
     const toc = await buildToc(nodes, epub, diags)
 
     const prepocessed = preprocess(nodes)
@@ -50,6 +48,5 @@ export async function processEpub(epub: Epub, diags: Diagnoser): Promise<Booq | 
             title: undefined,
             items: [],
         },
-        images: images ?? {},
     }
 }
