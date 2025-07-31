@@ -2,7 +2,6 @@ import { assertNever, Booq, BooqId, BooqNode } from '@/core'
 import { parseEpub } from '@/parser'
 import { Epub, openEpubFile } from '@/parser/epub'
 import { Diagnoser } from 'booqs-epub'
-import { inspect } from 'util'
 import { getOrLoadImagesData, BooqImages, BooqImagesData, urlForBooqImageId } from './images'
 import { BooqFile } from './library'
 
@@ -14,9 +13,6 @@ export async function parseAndPreprocessBooq(booqId: BooqId, file: BooqFile): Pr
     const epub = await openEpubFile({ fileBuffer: file.file, diags })
     const { value: booq } = await parseEpub({
         epub, diags,
-    })
-    diags.forEach(diag => {
-        console.info(inspect(diag, { depth: 5, colors: true }))
     })
     if (!booq) {
         console.error(`Failed to parse booq for id ${booqId}`)
@@ -42,11 +38,8 @@ export async function parseAndLoadImagesFromFile(file: BooqFile) {
     const { value: booq } = await parseEpub({
         epub, diags,
     })
-    diags.forEach(diag => {
-        console.info(inspect(diag, { depth: 5, colors: true }))
-    })
     if (!booq) {
-        console.error(`Failed to parse booq for`)
+        console.error(`Failed to parse booq from file`)
         return undefined
     }
     return loadImages(booq, epub)

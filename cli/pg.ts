@@ -72,7 +72,7 @@ async function syncImages(options: CliOptions) {
                 if (fromCache) {
                     basic(verbosity, `Images for ${id} already in cache`)
                 } else {
-                    basic(verbosity, `Uploaded images for ${id}:`, imagesData)
+                    basic(verbosity, `Uploaded images for ${id}`)
                 }
                 verbose(verbosity, `Finished syncing images for ${id}: ${imagesData}`)
             } catch (err) {
