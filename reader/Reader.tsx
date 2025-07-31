@@ -30,7 +30,6 @@ import { ContextMenuContent } from './ContextMenuContent'
 import { usePageData } from './usePageData'
 import { useNavigationState } from './useNavigationState'
 import clsx from 'clsx'
-import { resolveImageSrc } from '@/common/images'
 import { PartialBooqData } from '@/data/booqs'
 
 export function Reader({
@@ -237,9 +236,6 @@ export function Reader({
     const hrefForPath = useMemo(() => {
         return (path: BooqPath) => booqHref({ booqId: booq.booqId, path })
     }, [booq.booqId])
-    const resolveSrc = useMemo(() => {
-        return (src: string) => resolveSrcForBooqId(booq.booqId, src)
-    }, [booq.booqId])
 
     return <ReaderLayout
         isControlsVisible={isControlsVisible}
@@ -255,7 +251,6 @@ export function Reader({
                 augmentations={augmentations}
                 onAugmentationClick={onAugmentationClick}
                 hrefForPath={hrefForPath}
-                resolveSrc={resolveSrc}
             />
         </div>}
         PrevButton={<AnchorButton
@@ -300,19 +295,4 @@ function PageLabel({ text }: {
     return <span className='text-sm text-dimmed font-bold'>
         {text}
     </span>
-}
-
-function resolveSrcForBooqId(booqId: BooqId, src: string): string {
-    if (isExternalSrc(src)) {
-        return src
-    }
-    // TODO: investigate why we need this hack for certain epubs
-    if (src.startsWith('../')) {
-        src = src.substring('../'.length)
-    }
-    return resolveImageSrc(booqId, src)
-}
-
-function isExternalSrc(src: string) {
-    return src.startsWith('http://') || src.startsWith('https://') || src.startsWith('www.')
 }

@@ -58,7 +58,11 @@ export async function loadImagesForBooqId(booqId: BooqId, file: BooqFile) {
 async function loadImages(booq: Booq, epub: Epub) {
     const srcs = collectUniqueSrcsFromBooq(booq)
     const images: BooqImages = {}
-    for (const src of srcs) {
+    for (let src of srcs) {
+        // TODO: investigate why we need this hack for certain epubs
+        if (src.startsWith('../')) {
+            src = src.substring('../'.length)
+        }
         const image = await epub.loadBinaryFile(src)
         if (image) {
             images[src] = image
