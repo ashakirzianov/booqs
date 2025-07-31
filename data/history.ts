@@ -74,17 +74,19 @@ export async function getReadingHistoryForMainPage({
     }
 
     // Get detailed entry for first item
-    const firstEntry = paginatedHistory[0]
-    const detailedFirstEntry = await resolveDetailedHistoryEvent(firstEntry, userId)
+    // const firstEntry = paginatedHistory[0]
+    // const detailedFirstEntry = await resolveDetailedHistoryEvent(firstEntry, userId)
 
-    // Get brief entries for remaining items
-    const remainingEntries = paginatedHistory.slice(1)
-    const briefPromises = remainingEntries.map(event => resolveBriefHistoryEvent(event, userId))
-    const resolvedBrief = await Promise.all(briefPromises)
+    // // Get brief entries for remaining items
+    // const remainingEntries = paginatedHistory.slice(1)
+    // const briefPromises = remainingEntries.map(event => resolveBriefHistoryEvent(event, userId))
+    // const resolvedBrief = await Promise.all(briefPromises)
+    const resolved = await Promise.all(paginatedHistory.map(event => resolveDetailedHistoryEvent(event, userId)))
 
     const entries: ReadingHistoryEntry[] = [
-        detailedFirstEntry,
-        ...resolvedBrief
+        // detailedFirstEntry,
+        // ...resolvedBrief
+        ...resolved,
     ].filter(entry => entry !== undefined)
 
     return {
