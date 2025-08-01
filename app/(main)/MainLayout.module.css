@@ -1,0 +1,168 @@
+.layout {
+    --content-width: 720px;
+    --header-height: 4rem;
+    --panel-width: 300px;
+    --spacing-regular: 0.5rem;
+    --spacing-large: 1rem;
+}
+
+.layout {
+    display: grid;
+    grid-template-columns: var(--panel-width) 1fr var(--panel-width);
+    grid-template-rows: var(--header-height) auto;
+    grid-template-areas:
+        "left-header  main-content  right-header"
+        "left-panel   main-content  right-panel";
+    min-height: 100vh;
+    width: 100vw;
+    overflow-x: hidden;
+}
+
+.leftHeader {
+    grid-area: left-header;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: var(--panel-width);
+    height: var(--header-height);
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 0 var(--spacing-large);
+    gap: var(--spacing-large);
+    background: var(--color-background);
+    z-index: 10;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.rightHeader {
+    grid-area: right-header;
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: var(--panel-width);
+    height: var(--header-height);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 0 var(--spacing-large);
+    gap: var(--spacing-regular);
+    background: var(--color-background);
+    z-index: 10;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.mainContent {
+    grid-area: main-content;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: var(--color-background);
+    padding-top: var(--header-height);
+    box-sizing: border-box;
+    overflow-x: hidden;
+}
+
+.contentInner {
+    width: 100%;
+    max-width: var(--content-width);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    overflow-x: hidden;
+}
+
+.leftPanel {
+    grid-area: left-panel;
+    position: fixed;
+    top: var(--header-height);
+    left: 0;
+    width: var(--panel-width);
+    bottom: 0;
+    background: var(--color-background);
+    padding: var(--spacing-regular);
+    overflow-y: auto;
+    overflow-x: hidden;
+    box-sizing: border-box;
+}
+
+.rightPanel {
+    grid-area: right-panel;
+    position: fixed;
+    top: var(--header-height);
+    right: 0;
+    width: var(--panel-width);
+    bottom: 0;
+    background: var(--color-background);
+    padding: var(--spacing-regular);
+    overflow-y: auto;
+    overflow-x: hidden;
+    box-sizing: border-box;
+}
+
+/* Mobile responsive breakpoint */
+@media (max-width: 1024px) {
+    .layout {
+        grid-template-columns: 1fr;
+        grid-template-rows: var(--header-height) auto;
+        grid-template-areas:
+            "header"
+            "main-content";
+        min-height: 100vh;
+    }
+
+    .leftHeader {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        display: flex;
+        justify-content: space-between;
+        padding: 0 var(--spacing-large);
+    }
+
+    .rightHeader {
+        position: fixed;
+        top: 0;
+        right: 0;
+        width: auto;
+        height: var(--header-height);
+        background: transparent;
+        justify-content: flex-end;
+        z-index: 11;
+    }
+
+    .mainContent {
+        margin-left: 0;
+        margin-right: 0;
+        padding-top: var(--header-height);
+        width: 100vw;
+        box-sizing: border-box;
+        overflow-x: hidden;
+    }
+
+    .leftPanel,
+    .rightPanel {
+        display: none;
+    }
+
+    .contentInner {
+        padding: 0 var(--spacing-large);
+        box-sizing: border-box;
+        overflow-x: hidden;
+    }
+}
+
+/* Tablet breakpoint */
+@media (max-width: 1280px) and (min-width: 1025px) {
+    .layout {
+        grid-template-columns: 250px 1fr 250px;
+    }
+    
+    .layout {
+        --panel-width: 250px;
+    }
+}
