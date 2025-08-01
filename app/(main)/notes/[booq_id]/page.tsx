@@ -1,4 +1,4 @@
-import { getNotesWithAuthorForBooq } from '@/data/notes'
+import { fetchNotes } from '@/data/notes'
 import { BooqNote } from '@/data/notes'
 import { parseId, type BooqId } from '@/core'
 import { notFound } from 'next/navigation'
@@ -25,8 +25,7 @@ export default async function NotesPage({ params }: {
         notFound()
     }
 
-    const notes = await getNotesWithAuthorForBooq(booqId)
-    const userNotes = notes.filter(note => note.author.id === userId)
+    const userNotes = await fetchNotes({ booqId, authorId: userId })
 
     return (
         <main className="flex flex-row justify-center min-h-screen bg-background">
@@ -82,7 +81,7 @@ function NoteCard({ note, booqId }: { note: BooqNote, booqId: BooqId }) {
                     </div>
                 )}
             </div>
-            
+
             <div className="flex items-center justify-between text-sm text-dimmed">
                 <div className="flex items-center gap-4">
                     <span className="bg-gray-100 px-2 py-1 rounded text-xs font-medium">
@@ -92,7 +91,7 @@ function NoteCard({ note, booqId }: { note: BooqNote, booqId: BooqId }) {
                         {note.privacy}
                     </span>
                 </div>
-                
+
                 <div className="flex items-center gap-4">
                     <Link
                         href={booqHref({ booqId, path: note.range.start })}

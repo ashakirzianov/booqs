@@ -4,7 +4,7 @@ import {
     addNote,
     removeNote,
     updateNote,
-    notesWithAuthorForBooqId,
+    getNotesWithAuthor,
     DbNote,
     DbNoteWithAuthor,
 } from '@/backend/notes'
@@ -36,8 +36,11 @@ export type UnresolvedBooqNote = Omit<BooqNote, 'author'> & {
     authorId: string,
 }
 
-export async function getNotesWithAuthorForBooq(booqId: BooqId): Promise<BooqNote[]> {
-    const dbNotes = await notesWithAuthorForBooqId(booqId)
+export async function fetchNotes({ booqId, authorId }: {
+    booqId?: BooqId,
+    authorId?: string,
+}): Promise<BooqNote[]> {
+    const dbNotes = await getNotesWithAuthor({ booqId, authorId })
     return dbNotes.map(noteFromDbNoteWithAuthor)
 }
 

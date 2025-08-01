@@ -58,17 +58,26 @@ export async function notesFor({
     `
   return result as DbNote[]
 }
-export async function notesWithAuthorForBooqId(booqId: BooqId) {
+export async function getNotesWithAuthor({
+  booqId,
+  authorId,
+}: {
+  booqId?: BooqId,
+  authorId?: string,
+}): Promise<DbNoteWithAuthor[]> {
   const notes = await sql`
       SELECT n.*, u.name AS author_name, u.username AS author_username, u.profile_picture_url AS author_profile_picture_url, u.emoji AS author_emoji
       FROM notes n
       JOIN users u ON u.id = n.author_id
-      WHERE booq_id = ${booqId}
+      WHERE TRUE
+      ${booqId !== undefined ? sql`AND booq_id = ${booqId}` : sql``}
+      ${authorId !== undefined ? sql`AND n.author_id = ${authorId}` : sql``}
       ORDER BY n.created_at
       `
 
   return notes as DbNoteWithAuthor[]
 }
+
 
 
 export async function addNote({
