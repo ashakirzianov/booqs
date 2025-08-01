@@ -12,7 +12,6 @@ type ControlsProps = {
     LeftPanelContent?: ReactNode,
     RightPanelContent?: ReactNode,
     ContextMenu?: ReactNode,
-    Copilot?: ReactNode,
 }
 
 type LayoutProps = ControlsProps & {
@@ -40,7 +39,7 @@ function BooqControls({
     LeftButtons, RightButtons,
     LeftFooter, RightFooter,
     LeftPanelContent, RightPanelContent,
-    ContextMenu, Copilot,
+    ContextMenu,
 }: ControlsProps) {
     const showControls = isControlsVisible || isLeftPanelOpen || isRightPanelOpen
     const showCtrlClass = showControls ? styles.showCtr : ''
@@ -54,7 +53,7 @@ function BooqControls({
         <div className={`${styles.content} ${showCtrlClass}`} />
         <div className={`${styles.backTop} ${showCtrlClass}`} />
         <div className={`${styles.backBottom} ${showCtrlClass}`} />
-        <div className={`${styles.ctx} ${showCtrlClass}`}>{ContextMenu}{Copilot}</div>
+        <div className={`${styles.ctx} ${showCtrlClass}`}>{ContextMenu}</div>
         <div className={`${styles.leftPanelc} ${leftPanelOpenClass}`}>{LeftPanelContent}</div>
         <div className={`${styles.rightPanelc} ${rightPanelOpenClass}`}>{RightPanelContent}</div>
     </div>

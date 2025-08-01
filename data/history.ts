@@ -49,6 +49,14 @@ export async function reportBooqHistoryAction({
     })
 }
 
+export async function hasReadingHistory(userId?: string): Promise<boolean> {
+    if (!userId) {
+        return false
+    }
+    const history = await booqHistoryForUser(userId)
+    return history.length > 0
+}
+
 export async function getReadingHistoryForMainPage({
     limit = 5,
     offset = 0,

@@ -264,7 +264,6 @@ export function Reader({
             title='Next'
         />}
         ContextMenu={ContextMenuNode}
-        Copilot={null}
         LeftButtons={LeftButtons}
         RightButtons={RightButtons}
         LeftFooter={<PageLabel text={pagesLabel} />}
