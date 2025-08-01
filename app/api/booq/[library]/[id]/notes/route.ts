@@ -1,7 +1,7 @@
 import {
     NoteAuthorData,
     createNote,
-    getNotesWithAuthorForBooq,
+    fetchNotes,
     NotePrivacy,
 } from '@/data/notes'
 import { getUserById } from '@/data/user'
@@ -31,7 +31,7 @@ export type GetResponse = {
 export async function GET(request: NextRequest, { params }: { params: Promise<Params> }) {
     const { library, id } = await params
     const booqId: BooqId = `${library}-${id}`
-    const notes = await getNotesWithAuthorForBooq(booqId)
+    const notes = await fetchNotes({ booqId })
     const result: GetResponse = {
         notes,
     }
