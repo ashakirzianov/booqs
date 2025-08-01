@@ -36,7 +36,7 @@ export default async function MainLayout({
         </main>
 
         <aside className={styles.leftPanel}>
-            <MainMenu />
+            {user && <MainMenu />}
         </aside>
 
         <aside className={styles.rightPanel}>
