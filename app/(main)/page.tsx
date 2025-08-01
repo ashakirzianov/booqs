@@ -1,6 +1,6 @@
+import { ExploreSearch } from './ExploreSearch'
 import { HistoryEntry } from './HistoryEntry'
 import { getReadingHistoryForMainPage } from '@/data/history'
-import { ExploreSearch } from '@/components/ExploreSearch'
 
 export const dynamic = 'force-dynamic'
 export const fetchCache = 'force-no-store'

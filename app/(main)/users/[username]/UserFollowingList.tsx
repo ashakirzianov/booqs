@@ -1,5 +1,5 @@
 'use client'
-import { UserList, UserWithFollowStatus } from '@/components/UserList'
+import { UserList, UserWithFollowStatus } from '@/app/(main)/UserList'
 
 export function UserFollowingList({
     following,

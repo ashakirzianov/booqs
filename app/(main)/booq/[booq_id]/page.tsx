@@ -1,7 +1,7 @@
 import { booqDetailedData } from '@/data/booqs'
 import { BooqCover } from '@/components/BooqCover'
 import { BooqTags } from '@/components/BooqTags'
-import { CollectionButton } from '@/components/CollectionButton'
+import { CollectionButton } from '@/app/(main)/CollectionButton'
 import Link from 'next/link'
 import { booqHref, authorHref } from '@/common/href'
 import { notFound } from 'next/navigation'

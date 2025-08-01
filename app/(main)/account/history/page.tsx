@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation'
 import { authHref } from '@/common/href'
 import { getReadingHistoryForHistoryList } from '@/data/history'
-import { Pagination } from '@/components/Pagination'
+import { Pagination } from '@/app/(main)/Pagination'
 import { HistoryEntry } from './HistoryEntry'
 
 const PAGE_SIZE = 20

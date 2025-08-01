@@ -1,11 +1,10 @@
 import React from 'react'
 import Link from 'next/link'
 import { pathToId } from '@/core'
-import { Avatar } from '@/components/Avatar'
 import { TabButton } from './TabButton'
 import { formatRelativeTime } from '@/application/common'
 import { userHref } from '@/common/href'
-import { BooqNote } from '@/data/notes'
+import { BooqNote, NoteAuthorData } from '@/data/notes'
 
 export function CommentsPanel({ comments, currentUser, followingUserIds, isFollowingLoading }: {
     comments: BooqNote[],
@@ -104,3 +103,12 @@ function CommentItem({ comment }: { comment: BooqNote }) {
     )
 }
 
+function Avatar({ user }: { user?: NoteAuthorData }) {
+    const display = user?.emoji || (user?.name ? user.name.charAt(0).toUpperCase() : 'X')
+
+    return (
+        <div className="w-3 h-3 rounded-full flex items-center justify-center text-[0.5rem] font-semibold flex-shrink-0 leading-none">
+            {display}
+        </div>
+    )
+}

@@ -1,14 +1,18 @@
 'use client'
-import { Modal } from './Modal'
 import { useSearch } from '@/application/search'
 import Link from 'next/link'
 import { ReactNode, useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Spinner } from './Icons'
 import { useDebouncedValue } from '@/application/utils'
 import { AuthorSearchResultData, BooqSearchResultData } from '@/data/booqs'
 import { authorHref, booqHref, searchHref } from '@/common/href'
 import { BooqCover } from '@/components/BooqCover'
+import { Modal, useModalState } from '@/components/Modal'
+import { Spinner } from '@/components/Icons'
+
+export function useSearchModalState() {
+    return useModalState()
+}
 
 export function SearchModal({
     isOpen, closeModal,

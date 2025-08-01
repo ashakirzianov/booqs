@@ -1,13 +1,13 @@
 'use client'
 
 import React, { useState } from 'react'
-import { BooqPreview } from '@/components/BooqPreview'
 import { BooqCover } from '@/components/BooqCover'
 import { CloseIcon } from '@/components/Icons'
 import { pageForPosition } from '@/application/common'
 import Link from 'next/link'
-import { booqHref } from '../../common/href'
 import { DetailedReadingHistoryEntry, BriefReadingHistoryEntry, ReadingHistoryEntry, removeHistoryEntryAction } from '@/data/history'
+import { BooqPath } from '@/core'
+import { booqHref } from '@/common/href'
 
 export function HistoryEntry({ entry }: {
     entry: ReadingHistoryEntry
@@ -104,6 +104,26 @@ function RemovedEntryPlaceholder() {
                     <div>reading history</div>
                 </div>
             </div>
+        </div>
+    )
+}
+
+function BooqPreview({
+    text,
+    title,
+    page,
+}: {
+    path: BooqPath,
+    text: string,
+    title: string,
+    page: number,
+    total: number,
+}) {
+    return (
+        <div className="flex flex-col grow shrink-0 basis-auto w-[90vw] rounded-sm items-center font-book text-lg cursor-pointer px-8 p-4 max-w-[400px] border border-gray-300 shadow-md transition-shadow hover:shadow-lg">
+            <span className="truncate text-dimmed dark:text-dark-dimmed text-center w-full p-1">{title}</span>
+            <div className="text-justify text-gray-700 text-sm my-4 line-clamp-6">{text}</div>
+            <div className="text-dimmed dark:text-dark-dimmed">{page}</div>
         </div>
     )
 }

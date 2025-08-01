@@ -1,12 +1,11 @@
 'use client'
 import { PanelButton } from '@/components/Buttons'
-import { useSelectFileDialog } from '@/components/SelectFileDialog'
-import { Modal, ModalButton, ModalDivider, ModalLabel } from '@/components/Modal'
 import { BooqCover } from '@/components/BooqCover'
 import { booqHref } from '@/common/href'
 import { useUpload } from '@/application/upload'
-import { useCallback, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import { Spinner, UploadIcon } from '@/components/Icons'
+import { Modal, ModalButton, ModalDivider, ModalLabel } from '@/components/Modal'
 
 export function UploadButton() {
     const [isOpen, setIsOpen] = useState(false)
@@ -120,5 +119,27 @@ function UploadModalContent({ closeModal }: {
                 onClick={closeAndClear}
             />
         </>
+    }
+}
+
+function useSelectFileDialog({ accept }: {
+    accept?: string,
+}) {
+    const [file, setFile] = useState<File | undefined>(undefined)
+    const ref = useRef<HTMLInputElement>(null)
+    return {
+        openDialog: () => ref.current?.click(),
+        dialogContent: <input
+            accept={accept}
+            style={{ display: 'none' }}
+            ref={ref}
+            type='file'
+            onChange={e => {
+                const file = e.target.files && e.target.files[0]
+                setFile(file ?? undefined)
+            }}
+        />,
+        file,
+        clearFile: () => setFile(undefined),
     }
 }
