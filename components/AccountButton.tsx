@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { PanelButton } from './Buttons'
-import { accountHref, authHref } from '../common/href'
+import { profileHref, authHref } from '../common/href'
 import { ProfileBadge } from './ProfilePicture'
 import { SignInIcon, Spinner } from './Icons'
 import { AccountData } from '@/data/user'
@@ -28,7 +28,7 @@ export function LoadingAccountButton() {
 }
 
 export function SignedAccountButton({ name, profilePictureURL, emoji }: Pick<AccountData, 'name' | 'profilePictureURL' | 'emoji'>) {
-    return <Link href={accountHref()}>
+    return <Link href={profileHref()}>
         <ProfileBadge
             name={name ?? undefined}
             picture={profilePictureURL ?? undefined}

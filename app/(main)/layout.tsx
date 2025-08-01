@@ -2,6 +2,7 @@ import { AccountButton } from '@/components/AccountButton'
 import { Search } from '@/components/Search'
 import { UploadButton } from '@/components/Upload'
 import { Logo } from '@/components/Logo'
+import { MainMenu } from '@/components/MainMenu'
 import { getCurrentUser } from '@/data/user'
 import Link from 'next/link'
 import { feedHref } from '@/common/href'
@@ -20,26 +21,23 @@ export default async function MainLayout({
             </Link>
             <Search />
         </header>
-        
+
         <header className={styles.rightHeader}>
             {user ? <UploadButton /> : null}
             <AccountButton user={user} />
         </header>
-        
+
         <main className={styles.mainContent}>
             <div className={styles.contentInner}>
                 {children}
             </div>
         </main>
-        
+
         <aside className={styles.leftPanel}>
-            <h3 className="text-lg font-bold mb-4">Navigation</h3>
-            <p className="text-dimmed">Left panel content will go here</p>
+            <MainMenu />
         </aside>
-        
+
         <aside className={styles.rightPanel}>
-            <h3 className="text-lg font-bold mb-4">Quick Actions</h3>
-            <p className="text-dimmed">Right panel content will go here</p>
         </aside>
     </div>
 }

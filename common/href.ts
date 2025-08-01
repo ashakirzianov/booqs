@@ -73,14 +73,36 @@ export function signUpLinkHref({ email, secret, returnTo }: {
     return `/auth/signup?${params.toString()}`
 }
 
-export function accountHref({ section }: { section?: 'profile' | 'followers' | 'collections' } = {}) {
-    const defaultSection = 'profile'
-    const targetSection = section || defaultSection
-    return `/account/${targetSection}`
+export function profileHref() {
+    return '/profile'
+}
+
+export function collectionsHref() {
+    return '/collections'
+}
+
+export function followersHref() {
+    return '/followers'
+}
+
+export function historyHref() {
+    return '/history'
 }
 
 export function myBooqsHref() {
-    return accountHref({ section: 'collections' })
+    return collectionsHref()
+}
+
+// Legacy function - deprecated, use specific href functions instead
+export function accountHref({ section }: { section?: 'profile' | 'followers' | 'collections' } = {}) {
+    const defaultSection = 'profile'
+    const targetSection = section || defaultSection
+    switch (targetSection) {
+        case 'profile': return profileHref()
+        case 'followers': return followersHref()
+        case 'collections': return collectionsHref()
+        default: return profileHref()
+    }
 }
 
 export function authorHref({ name, libraryId }: { name: string, libraryId: string }) {
