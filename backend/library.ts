@@ -261,7 +261,7 @@ export async function booqFragmentForRange(booqId: BooqId, range: BooqRange): Pr
         return undefined
     }
 
-    const nodes = nodesForRange(booq.nodes, range)
+    const nodes = nodesForRange(booq.nodes, range, true)
 
     return { nodes }
 }
