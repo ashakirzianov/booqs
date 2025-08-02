@@ -59,7 +59,7 @@ export function Modal({
   dark:shadow-slate-800 dark:shadow
   backdrop:backdrop-blur-xs
   opacity-0 open:opacity-100 p-0
-  fixed left-1/2 top-0 -translate-x-1/2'
+  fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2'
     >
         {children}
     </dialog>
