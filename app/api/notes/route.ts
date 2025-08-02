@@ -9,9 +9,6 @@ import { BooqId, BooqRange } from '@/core'
 import { NextRequest } from 'next/server'
 import { getUserIdInsideRequest } from '@/data/request'
 
-type Params = {
-    booq_id: string,
-}
 type ResolvedNote = {
     id: string,
     booqId: BooqId,
@@ -27,8 +24,12 @@ type ResolvedNote = {
 export type GetResponse = {
     notes: ResolvedNote[],
 }
-export async function GET(request: NextRequest, { params }: { params: Promise<Params> }) {
-    const { booq_id } = await params
+export async function GET(request: NextRequest) {
+    const searchParams = request.nextUrl.searchParams
+    const booq_id = searchParams.get('booq_id')
+    if (!booq_id) {
+        return Response.json({ error: 'Missing booq_id' }, { status: 400 })
+    }
     const booqId: BooqId = booq_id as BooqId
     const notes = await fetchNotes({ booqId })
     const result: GetResponse = {
@@ -46,8 +47,12 @@ export type PostBody = {
     privacy: NotePrivacy,
 }
 export type PostResponse = ResolvedNote
-export async function POST(request: NextRequest, { params }: { params: Promise<Params> }) {
-    const { booq_id } = await params
+export async function POST(request: NextRequest) {
+    const searchParams = request.nextUrl.searchParams
+    const booq_id = searchParams.get('booq_id')
+    if (!booq_id) {
+        return Response.json({ error: 'Missing booq_id' }, { status: 400 })
+    }
     const booqId: BooqId = booq_id as BooqId
     const userId = await getUserIdInsideRequest()
     if (!userId) {

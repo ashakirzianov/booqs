@@ -1,6 +1,6 @@
 'use client'
 
-import { GetResponse, PostBody, PostResponse } from '@/app/api/booq/[booq_id]/notes/route'
+import { GetResponse, PostBody, PostResponse } from '@/app/api/notes/route'
 import type { PatchBody, PatchResponse } from '@/app/api/notes/[id]/route'
 import { BooqId, BooqRange } from '@/core'
 import { NoteAuthorData, BooqNote, NotePrivacy } from '@/data/notes'
@@ -20,7 +20,7 @@ export function useBooqNotes({
     booqId: BooqId,
     user: NoteAuthorData | undefined,
 }) {
-    const notesKey = `/api/booq/${booqId}/notes`
+    const notesKey = `/api/notes?booq_id=${booqId}`
 
     const { data, isLoading } = useSWR(
         notesKey,
