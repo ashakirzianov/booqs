@@ -1,14 +1,10 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import Link from 'next/link'
 import { BooqNote, NoteAuthorData } from '@/data/notes'
-import { booqHref } from '@/common/href'
 import { BooqId } from '@/core'
 import { useBooqNotes } from '@/application/notes'
 import { ActionButton, LightButton } from '@/components/Buttons'
-import { TrashIcon, BrushIcon } from '@/components/Icons'
-import { ColorPicker } from '@/components/ColorPicker'
 import { NoteFragment } from './NoteFragment'
 
 type NoteCardProps = {
@@ -19,7 +15,6 @@ type NoteCardProps = {
 
 export function NoteCard({ note: initialNote, booqId, user }: NoteCardProps) {
     const [isEditing, setIsEditing] = useState(false)
-    const [showColorPicker, setShowColorPicker] = useState(false)
     const [editContent, setEditContent] = useState(initialNote.content || '')
     const [removedNote, setRemovedNote] = useState<BooqNote | null>(null)
     const { notes, updateNote, removeNote, addNote } = useBooqNotes({ booqId, user })
@@ -73,7 +68,6 @@ export function NoteCard({ note: initialNote, booqId, user }: NoteCardProps) {
             noteId: note.id,
             kind: kind
         })
-        setShowColorPicker(false)
     }
 
     // Show removal message if note was removed
@@ -100,6 +94,7 @@ export function NoteCard({ note: initialNote, booqId, user }: NoteCardProps) {
                     targetQuote={note.targetQuote}
                     noteKind={note.kind}
                     onColorChange={handleColorChange}
+                    onRemove={handleRemove}
                 />
 
                 {isEditing ? (
@@ -123,7 +118,7 @@ export function NoteCard({ note: initialNote, booqId, user }: NoteCardProps) {
                         </div>
                     </div>
                 ) : (
-                    <div 
+                    <div
                         className="text-primary px-3 cursor-pointer hover:opacity-80 transition-opacity italic"
                         onClick={handleEditToggle}
                     >
@@ -131,41 +126,6 @@ export function NoteCard({ note: initialNote, booqId, user }: NoteCardProps) {
                     </div>
                 )}
             </div>
-
-            {!isEditing && <div className="flex flex-col gap-3">
-                <div className="flex items-center justify-between text-sm">
-                    <div className="flex gap-4">
-                        <LightButton
-                            text="Remove"
-                            icon={<TrashIcon />}
-                            onClick={handleRemove}
-                        />
-                        <LightButton
-                            text={showColorPicker ? 'Hide colors' : 'Change color'}
-                            icon={<BrushIcon />}
-                            onClick={() => setShowColorPicker(!showColorPicker)}
-                        />
-                    </div>
-
-                    <Link
-                        href={booqHref({ booqId, path: note.range.start })}
-                    >
-                        <LightButton
-                            text='Show in booq'
-                        />
-                    </Link>
-                </div>
-
-                {showColorPicker && (
-                    <div className="rounded overflow-clip">
-                        <ColorPicker
-                            selectedKind={note.kind}
-                            onColorChange={handleColorChange}
-                        />
-                    </div>
-                )}
-
-            </div>}
         </div>
     )
 }

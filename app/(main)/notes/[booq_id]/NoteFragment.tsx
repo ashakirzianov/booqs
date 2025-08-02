@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react'
 import { BooqId, BooqNode, BooqRange } from '@/core'
 import { SmallSpinner, CollapseIcon } from '@/components/Icons'
 import { BooqContent, Augmentation } from '@/viewer'
-import { LightButton } from '@/components/Buttons'
+import { LightButton, RemoveButton } from '@/components/Buttons'
 import { ColorPicker } from '@/components/ColorPicker'
 
 type NoteFragmentProps = {
@@ -13,9 +13,10 @@ type NoteFragmentProps = {
     targetQuote: string
     noteKind: string
     onColorChange: (kind: string) => void
+    onRemove?: () => void
 }
 
-export function NoteFragment({ booqId, range, targetQuote, noteKind, onColorChange }: NoteFragmentProps) {
+export function NoteFragment({ booqId, range, targetQuote, noteKind, onColorChange, onRemove }: NoteFragmentProps) {
     const [isExpanded, setIsExpanded] = useState(false)
     const [expandedFragment, setExpandedFragment] = useState<{ nodes: BooqNode[], range: BooqRange } | null>(null)
     const [isLoadingExpanded, setIsLoadingExpanded] = useState(false)
@@ -86,14 +87,23 @@ export function NoteFragment({ booqId, range, targetQuote, noteKind, onColorChan
                         />
                     )}
                 </div>
-                <div>
+                <div className="flex items-center gap-2">
                     {isExpanded && (
-                        <div className='w-32 h-6 shadow-md rounded overflow-clip'>
-                            <ColorPicker
-                                selectedKind={noteKind}
-                                onColorChange={onColorChange}
-                            />
-                        </div>
+                        <>
+                            {onRemove && (
+                                <RemoveButton
+                                    onClick={onRemove}
+                                    title="Remove note"
+                                    isRemoving={false}
+                                />
+                            )}
+                            <div className='w-32 h-6 shadow-md rounded overflow-clip'>
+                                <ColorPicker
+                                    selectedKind={noteKind}
+                                    onColorChange={onColorChange}
+                                />
+                            </div>
+                        </>
                     )}
                 </div>
             </div>
