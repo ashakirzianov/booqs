@@ -1,3 +1,5 @@
+import Link from 'next/link'
+
 export function SignUpErrorPage({
     title,
     message,
@@ -17,18 +19,18 @@ export function SignUpErrorPage({
                 </p>
             </div>
             <div className='flex gap-4 p-4'>
-                <a
+                <Link
                     href="/auth"
                     className='px-6 py-3 bg-action text-white rounded-lg hover:bg-highlight transition-colors'
                 >
                     Request New Link
-                </a>
-                <a
+                </Link>
+                <Link
                     href="/auth"
                     className='px-6 py-3 border border-action text-action rounded-lg hover:bg-action hover:text-white transition-colors'
                 >
                     Sign In Instead
-                </a>
+                </Link>
             </div>
         </div>
     )

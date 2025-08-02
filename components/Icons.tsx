@@ -20,6 +20,12 @@ export function BackIcon() {
     </svg>
 }
 
+export function ForwardIcon() {
+    return <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={STROKE_WIDTH} stroke="currentColor" className="size-full">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 19.5 15.75 12 8.25 4.5" />
+    </svg>
+}
+
 export function CloseIcon() {
     return <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={STROKE_WIDTH} stroke="currentColor" className="size-full">
         <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />

@@ -1,3 +1,5 @@
+import { ActionButton } from '@/components/Buttons'
+import { BackIcon, ForwardIcon } from '@/components/Icons'
 import Link from 'next/link'
 
 type PaginationProps = {
@@ -11,36 +13,52 @@ type PaginationProps = {
 export function Pagination({ currentPage, hasMore, total, baseUrl, pageSize }: PaginationProps) {
     const hasPrevious = currentPage > 1
     const totalPages = total ? Math.ceil(total / pageSize) : undefined
-    
+
     return (
         <div className="flex items-center justify-center mt-8 px-4">
             <div className="flex items-center space-x-6">
                 {hasPrevious ? (
-                    <Link 
+                    <Link
                         href={`${baseUrl}?page=${currentPage - 1}`}
-                        className="px-4 py-2 bg-primary text-white rounded hover:bg-primary/80 transition-colors"
                     >
-                        Previous
+                        <ActionButton
+                            text="Previous"
+                            icon={<BackIcon />}
+                            variant="secondary"
+                        />
                     </Link>
                 ) : (
-                    <div className="px-4 py-2 text-dimmed cursor-not-allowed">Previous</div>
+                    <ActionButton
+                        text="Previous"
+                        icon={<BackIcon />}
+                        variant="secondary"
+                        disabled
+                    />
                 )}
-                
+
                 <div className="flex items-center space-x-2 text-sm">
                     <span>Page {currentPage}</span>
                     {totalPages && <span className="text-dimmed">of {totalPages}</span>}
                     {total && <span className="text-dimmed">({total} total)</span>}
                 </div>
-                
+
                 {hasMore ? (
-                    <Link 
+                    <Link
                         href={`${baseUrl}?page=${currentPage + 1}`}
-                        className="px-4 py-2 bg-primary text-white rounded hover:bg-primary/80 transition-colors"
                     >
-                        Next
+                        <ActionButton
+                            text="Next"
+                            icon={<ForwardIcon />}
+                            variant="secondary"
+                        />
                     </Link>
                 ) : (
-                    <div className="px-4 py-2 text-dimmed cursor-not-allowed">Next</div>
+                    <ActionButton
+                        text="Next"
+                        icon={<ForwardIcon />}
+                        variant="secondary"
+                        disabled
+                    />
                 )}
             </div>
         </div>

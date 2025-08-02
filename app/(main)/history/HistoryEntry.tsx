@@ -5,6 +5,7 @@ import { booqHref } from '@/common/href'
 import { BooqCover } from '@/components/BooqCover'
 import { RemoveButton } from '@/components/Buttons'
 import { removeHistoryEntryAction, BriefReadingHistoryEntry } from '@/data/history'
+import Link from 'next/link'
 
 export function HistoryEntry({
     entry
@@ -63,9 +64,9 @@ export function HistoryEntry({
                         <div className="text-dimmed text-sm">
                             by {authors?.map((author, idx) => (
                                 <span key={idx}>
-                                    <a href={booqHref({ booqId })} className="hover:text-action transition-colors">
+                                    <Link href={booqHref({ booqId })} className="hover:text-action transition-colors">
                                         {author}
-                                    </a>
+                                    </Link>
                                     {idx < (authors?.length ?? 0) - 1 && ', '}
                                 </span>
                             ))}
