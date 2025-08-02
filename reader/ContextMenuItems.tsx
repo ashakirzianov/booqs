@@ -3,15 +3,15 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import * as clipboard from 'clipboard-polyfill'
 import { BooqId, BooqRange } from '@/core'
-import { MenuItem } from '@/components/Menu'
 import { quoteHref, userHref } from '@/common/href'
 import { BooqSelection } from '@/viewer'
 import { ProfileBadge } from '@/components/ProfilePicture'
 import { ColorPicker } from './ColorPicker'
 import { useBooqNotes } from '@/application/notes'
-import { CommentIcon, CopyIcon, LinkIcon, RemoveIcon, ShareIcon, QuestionMarkIcon } from '@/components/Icons'
+import { CommentIcon, CopyIcon, LinkIcon, RemoveIcon, ShareIcon, QuestionMarkIcon, Spinner } from '@/components/Icons'
 import type { ContextMenuTarget, SelectionTarget, QuoteTarget, NoteTarget } from './ContextMenuContent'
 import { BooqNote, NoteAuthorData } from '@/data/notes'
+import { ReactNode } from 'react'
 
 export function AuthorItem({ name, pictureUrl, emoji, username }: {
     name: string,
@@ -144,6 +144,11 @@ export function CopyQuoteItem({
     />
 }
 
+export function generateQuote(booqId: BooqId, text: string, range: BooqRange) {
+    const link = generateLink(booqId, range)
+    return `"${text}"\n${link}`
+}
+
 export function CopyTextItem({
     selection, setTarget,
 }: {
@@ -192,19 +197,6 @@ function ContextMenuIcon({ children }: {
     return <div className='w-6 h-6'>{children}</div>
 }
 
-export function generateQuote(booqId: BooqId, text: string, range: BooqRange) {
-    const link = generateLink(booqId, range)
-    return `"${text}"\n${link}`
-}
-
-function generateLink(booqId: BooqId, range: BooqRange) {
-    return `${baseUrl()}${quoteHref({ id: booqId, range })}`
-}
-
-function removeSelection() {
-    window.getSelection()?.empty()
-}
-
 export function AskMenuItem({
     target, user, setTarget,
 }: {
@@ -226,6 +218,46 @@ export function AskMenuItem({
             })
         }}
     />
+}
+
+export function MenuItem({
+    icon, text, callback, spinner, href,
+}: {
+    text: string,
+    icon?: ReactNode,
+    callback?: () => void,
+    spinner?: boolean,
+    href?: string,
+}) {
+    const content = <div
+        className='container flex flex-row grow items-center cursor-pointer font-main select-none transition font-bold p-lg hover:bg-highlight hover:text-background'
+        // Note: prevent loosing selection on safari
+        onMouseDown={e => e.preventDefault()}
+        onClick={callback}
+    >
+        {
+            icon
+                ? <div className="flex justify-center items-center mr-lg">{icon}</div>
+                : null
+        }
+        <span className='flex grow'>{text}</span>
+        {
+            spinner
+                ? <div className='flex grow-0'><Spinner /></div>
+                : null
+        }
+    </div>
+    return href
+        ? <Link href={href}>{content}</Link>
+        : content
+}
+
+function generateLink(booqId: BooqId, range: BooqRange) {
+    return `${baseUrl()}${quoteHref({ id: booqId, range })}`
+}
+
+function removeSelection() {
+    window.getSelection()?.empty()
 }
 
 function baseUrl() {
