@@ -42,7 +42,7 @@ export async function notesForBooqId(booqId: string, _userId?: string): Promise<
     `
   return result as DbNote[]
 }
-export async function notesWithAuthorFor({booqId, authorId, userId: _userId}: {
+export async function notesWithAuthorFor({ booqId, authorId, userId: _userId }: {
   booqId?: BooqId,
   authorId?: string,
   userId?: string,
@@ -112,7 +112,7 @@ export async function updateNote({
   id: string,
   authorId: string,
   kind?: string,
-  content?: string,
+  content?: string | null,
   privacy?: DbNotePrivacy,
 }): Promise<DbNote | null> {
   if (kind === undefined && content === undefined && privacy === undefined) return null

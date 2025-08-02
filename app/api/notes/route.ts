@@ -15,7 +15,7 @@ type ResolvedNote = {
     author: NoteAuthorData,
     range: BooqRange,
     kind: string,
-    content?: string,
+    content?: string | null,
     targetQuote: string,
     privacy: NotePrivacy,
     createdAt: string,

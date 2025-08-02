@@ -28,7 +28,7 @@ export function NoteTargetMenu({
     const isOwnNote = user?.id === note?.author?.id
     const isAuthenticated = !!user?.id
     const hasColor = HIGHLIGHT_KINDS.includes(note?.kind || 'default')
-    const [editContent, setEditContent] = useState(note?.content || '')
+    const [editContent, setEditContent] = useState(note?.content || null)
     if (!note) {
         return null
     }
@@ -103,8 +103,8 @@ export function NoteTargetMenu({
                             className='w-full px-3 border border-dimmed rounded bg-background text-primary text-sm leading-relaxed resize-y min-h-[80px] focus:outline-none focus:border-action mb-3'
                             style={{ fontFamily: 'var(--font-main)' }}
                             placeholder='Add a note...'
-                            value={editContent}
-                            onChange={(e) => setEditContent(e.target.value)}
+                            value={editContent ?? ''}
+                            onChange={(e) => setEditContent(e.target.value || null)}
                             onKeyDown={(e) => {
                                 if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
                                     e.preventDefault()

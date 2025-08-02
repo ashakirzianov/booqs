@@ -35,7 +35,7 @@ export function NoteCard({ note: initialNote, booqId, user }: NoteCardProps) {
             // Save the changes
             updateNote({
                 noteId: note.id,
-                content: editContent.trim() || undefined
+                content: editContent.trim() || null
             })
         }
         setIsEditing(!isEditing)

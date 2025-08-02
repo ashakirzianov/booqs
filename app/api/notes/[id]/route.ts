@@ -10,12 +10,12 @@ type Params = {
 
 export type PatchBody = {
     kind?: string,
-    content?: string,
+    content?: string | null,
 }
 export type PatchResponse = {
     id: string,
     kind: string,
-    content?: string,
+    content?: string | null,
     targetQuote: string,
     createdAt: string,
     updatedAt: string,
@@ -31,7 +31,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
         id,
         authorId: userId,
         kind,
-        content: content ?? undefined,
+        content,
     })
     if (!note) {
         return Response.json({ error: 'Note not found' }, { status: 404 })

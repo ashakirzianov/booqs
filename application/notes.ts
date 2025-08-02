@@ -196,7 +196,7 @@ export function useBooqNotes({
     function updateNote({ noteId, kind, content }: {
         noteId: string,
         kind?: string,
-        content?: string,
+        content?: string | null,
     }) {
         if (!user || !data) return undefined
 
