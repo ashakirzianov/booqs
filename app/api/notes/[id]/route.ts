@@ -1,11 +1,59 @@
+import { BooqId, BooqRange } from '@/core'
 import {
     modifyNote, deleteNote,
+    NotePrivacy,
+    createNote,
 } from '@/data/notes'
 import { getUserIdInsideRequest } from '@/data/request'
 import { NextRequest } from 'next/server'
+import { ResolvedNote } from '../route'
+import { getUserById } from '@/data/user'
 
 type Params = {
     id: string,
+}
+
+export type PostBody = {
+    booqId: BooqId,
+    range: BooqRange,
+    kind: string,
+    content?: string,
+    targetQuote: string,
+    privacy: NotePrivacy,
+}
+export type PostResponse = ResolvedNote
+export async function POST(request: NextRequest, { params }: { params: Promise<Params> }) {
+    const userId = await getUserIdInsideRequest()
+    if (!userId) {
+        return Response.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+    const { id } = await params
+    const author = await getUserById(userId)
+    if (!author) {
+        return Response.json({ error: 'User does not exist' }, { status: 401 })
+    }
+    const { booqId, range, kind, content, targetQuote, privacy }: PostBody = await request.json()
+    if (!id || !booqId || !range || !kind) {
+        return Response.json({ error: 'Missing required fields' }, { status: 400 })
+    }
+    const note = await createNote({
+        id,
+        authorId: userId,
+        booqId,
+        range,
+        kind,
+        content,
+        targetQuote,
+        privacy,
+    })
+    if (!note) {
+        return Response.json({ error: 'Failed to create note' }, { status: 500 })
+    }
+    const result: PostResponse = {
+        ...note,
+        author,
+    }
+    return Response.json(result)
 }
 
 export type PatchBody = {

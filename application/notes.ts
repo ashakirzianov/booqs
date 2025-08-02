@@ -1,7 +1,7 @@
 'use client'
 
-import { GetResponse, PostBody, PostResponse } from '@/app/api/notes/route'
-import type { PatchBody, PatchResponse } from '@/app/api/notes/[id]/route'
+import type { GetResponse } from '@/app/api/notes/route'
+import type { PostBody, PostResponse, PatchBody, PatchResponse } from '@/app/api/notes/[id]/route'
 import { BooqId, BooqRange } from '@/core'
 import { NoteAuthorData, BooqNote, NotePrivacy } from '@/data/notes'
 import { nanoid } from 'nanoid'
@@ -46,8 +46,13 @@ export function useBooqNotes({
 
     const { trigger: postNoteTrigger } = useSWRMutation(
         notesKey,
-        async (url, { arg: body }: { arg: PostBody }) => {
-            const res = await fetch(url, {
+        async (_url, { arg: { body, noteId } }: {
+            arg: {
+                body: PostBody,
+                noteId: string,
+            }
+        }) => {
+            const res = await fetch(`/api/notes/${noteId}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -89,8 +94,9 @@ export function useBooqNotes({
     }) {
         if (!user) return undefined
 
+        const noteId = nanoid(10)
         const postBody: PostBody = {
-            id: nanoid(10),
+            booqId,
             kind,
             range,
             content,
@@ -101,6 +107,7 @@ export function useBooqNotes({
         const now = new Date().toISOString()
         const optimisticResponse: PostResponse = {
             ...postBody,
+            id: noteId,
             author: user,
             createdAt: now,
             updatedAt: now,
@@ -108,7 +115,10 @@ export function useBooqNotes({
             privacy,
         }
 
-        postNoteTrigger(postBody, {
+        postNoteTrigger({
+            body: postBody,
+            noteId,
+        }, {
             optimisticData: (currentData: GetResponse | undefined): GetResponse =>
                 currentData
                     ? { notes: [...currentData.notes, optimisticResponse] }
