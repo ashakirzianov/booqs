@@ -5,10 +5,13 @@ import {
     BooqMetadata,
     TableOfContents,
     BooqFragment,
+    BooqRange,
+    BooqNode,
+    getExpandedRange,
 } from '@/core'
 import { userForId } from '@/backend/users'
 import { booqIdsInCollections } from '@/backend/collections'
-import { BooqData, booqDataForIds, booqForId, booqPreview, booqQuery, booqToc, featuredBooqIds } from '@/backend/library'
+import { BooqData, booqDataForIds, booqForId, booqPreview, booqQuery, booqToc, featuredBooqIds, booqFragmentForRange } from '@/backend/library'
 import { urlForBooqImageId } from '@/backend/images'
 
 export type PartialBooqData = {
@@ -241,6 +244,25 @@ function getLanguageDisplayName(languageCode: string): string {
     }
 
     return languageNames[languageCode.toLowerCase()] || languageCode
+}
+
+export async function fetchExpandedFragmentForRange(booqId: BooqId, range: BooqRange): Promise<{ nodes: BooqNode[], range: BooqRange } | undefined> {
+    const booq = await booqForId(booqId)
+    if (!booq) {
+        return undefined
+    }
+
+    const expandedRange = getExpandedRange(booq.nodes, range)
+    const result = await booqFragmentForRange(booqId, expandedRange)
+
+    if (!result) {
+        return undefined
+    }
+
+    return {
+        nodes: result.nodes,
+        range: expandedRange,
+    }
 }
 
 function buildBooqCardData(data: BooqData): BooqCardData {
