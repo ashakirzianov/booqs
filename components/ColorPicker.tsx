@@ -9,7 +9,7 @@ export function ColorPicker({
     onColorChange: (kind: string) => void,
 }) {
     return (
-        <div className="flex flex-row items-stretch justify-between">
+        <div className="flex flex-row h-full items-stretch justify-between">
             {HIGHLIGHT_KINDS.map((kind, idx) => (
                 <ColorSelectionButton
                     key={idx}
@@ -34,7 +34,7 @@ function ColorSelectionButton({ color, selected, callback }: {
     return <div
         // Note: prevent loosing selection on safari
         onMouseDown={e => e.preventDefault()}
-        onClick={callback} className='flex flex-1 self-stretch text-transparent cursor-pointer h-10 transition-all' style={{
+        onClick={callback} className='flex flex-1 h-full self-stretch text-transparent cursor-pointer transition-all' style={{
             background: backgroundColor,
             borderTop: `0.5rem solid ${borderTopColor}`,
         }}>

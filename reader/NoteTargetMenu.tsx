@@ -88,10 +88,12 @@ export function NoteTargetMenu({
         >
             {/* Color picker - shown for own notes */}
             {isOwnNote && isAuthenticated && hasColor && (
-                <ColorPicker
-                    selectedKind={note.kind}
-                    onColorChange={handleColorChange}
-                />
+                <div className='h-10'>
+                    <ColorPicker
+                        selectedKind={note.kind}
+                        onColorChange={handleColorChange}
+                    />
+                </div>
             )}
 
             {/* Content container with padding */}

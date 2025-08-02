@@ -88,7 +88,7 @@ export function NoteFragment({ booqId, range, targetQuote, noteKind, onColorChan
                 </div>
                 <div>
                     {isExpanded && (
-                        <div className='w-32 shadow-md rounded overflow-clip'>
+                        <div className='w-32 h-6 shadow-md rounded overflow-clip'>
                             <ColorPicker
                                 selectedKind={noteKind}
                                 onColorChange={onColorChange}

@@ -73,10 +73,12 @@ export function AddHighlightItem({
     }
 
     return (
-        <ColorPicker
-            selectedKind=""
-            onColorChange={handleColorChange}
-        />
+        <div className='h-10'>
+            <ColorPicker
+                selectedKind=""
+                onColorChange={handleColorChange}
+            />
+        </div>
     )
 }
 
