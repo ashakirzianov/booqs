@@ -2,24 +2,6 @@ import clsx from 'clsx'
 import React from 'react'
 import { TrashIcon } from './Icons'
 
-export function PanelButton({
-    children, onClick, selected,
-}: {
-    children?: React.ReactNode,
-    onClick?: () => void,
-    selected?: boolean,
-}) {
-    return <button
-        className={clsx('button flex text-dimmed text-2xl cursor-pointer transition duration-150 bg-transparent hover:text-highlight focus:outline-hidden w-8 h-8 justify-center items-center', {
-            'text-highlight': selected,
-            'text-dimmed': !selected,
-        })}
-        onClick={onClick}
-    >
-        {children}
-    </button>
-}
-
 export function LightButton({
     icon, text,
     onClick,
@@ -42,7 +24,7 @@ export function LightButton({
         onClick={onClick}
         disabled={disabled}
         className={clsx(
-            'flex items-center text-action hover:text-highlight transition-colors disabled:opacity-50 disabled:cursor-not-allowed',
+            'flex items-center text-action hover:text-highlight transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer',
             sizeClasses[size]
         )}
     >
@@ -50,31 +32,6 @@ export function LightButton({
             {icon}
         </div>
         {text}
-    </button>
-}
-
-export function RemoveButton({
-    isRemoving, onClick, title,
-}: {
-    onClick: () => void,
-    title: string,
-    isRemoving: boolean,
-}) {
-    return <button
-        onClick={onClick}
-        disabled={isRemoving}
-        title={title}
-        className={clsx(
-            'p-2 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-alert hover:bg-alert/10'
-        )}
-    >
-        <div className="w-4 h-4">
-            {isRemoving ? (
-                <div className="animate-spin border-b-2 border-alert"></div>
-            ) : (
-                <TrashIcon />
-            )}
-        </div>
     </button>
 }
 
@@ -102,7 +59,7 @@ export function ActionButton({
         onClick={onClick}
         disabled={disabled}
         className={clsx(
-            'rounded-md font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center content-center',
+            'rounded-md font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center content-center cursor-pointer',
             {
                 'bg-action text-white hover:bg-highlight': variant === 'primary',
                 'border border-dimmed text-dimmed hover:bg-dimmed/10': variant === 'secondary',
@@ -124,5 +81,48 @@ export function ActionButton({
             </div>
         )}
         {text}
+    </button>
+}
+
+export function PanelButton({
+    children, onClick, selected,
+}: {
+    children?: React.ReactNode,
+    onClick?: () => void,
+    selected?: boolean,
+}) {
+    return <button
+        className={clsx('button flex text-dimmed text-2xl cursor-pointer transition duration-150 bg-transparent hover:text-highlight focus:outline-hidden w-8 h-8 justify-center items-center', {
+            'text-highlight': selected,
+            'text-dimmed': !selected,
+        })}
+        onClick={onClick}
+    >
+        {children}
+    </button>
+}
+
+export function RemoveButton({
+    isRemoving, onClick, title,
+}: {
+    onClick: () => void,
+    title: string,
+    isRemoving: boolean,
+}) {
+    return <button
+        onClick={onClick}
+        disabled={isRemoving}
+        title={title}
+        className={clsx(
+            'p-2 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-alert hover:bg-alert/10 cursor-pointer'
+        )}
+    >
+        <div className="w-4 h-4">
+            {isRemoving ? (
+                <div className="animate-spin border-b-2 border-alert"></div>
+            ) : (
+                <TrashIcon />
+            )}
+        </div>
     </button>
 }
