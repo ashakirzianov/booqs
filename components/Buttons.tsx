@@ -14,18 +14,16 @@ export function LightButton({
     disabled?: boolean,
     size?: 'small' | 'normal' | 'large',
 }) {
-    const sizeClasses = {
-        small: 'gap-1 text-sm',
-        normal: 'gap-2',
-        large: 'gap-3 text-lg'
-    }
-
     return <button
         onClick={onClick}
         disabled={disabled}
         className={clsx(
             'flex items-center text-action hover:text-highlight transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer',
-            sizeClasses[size]
+            {
+                'gap-1 text-sm': size === 'small',
+                'gap-1': size === 'normal',
+                'gap-3 text-lg': size === 'large',
+            },
         )}
     >
         {icon && <div className="w-4 h-4">

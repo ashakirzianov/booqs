@@ -7,7 +7,7 @@ import { booqHref } from '@/common/href'
 import { BooqId } from '@/core'
 import { useBooqNotes } from '@/application/notes'
 import { ActionButton, LightButton } from '@/components/Buttons'
-import { PencilIcon } from '@/components/Icons'
+import { PencilIcon, TrashIcon } from '@/components/Icons'
 
 type NoteCardProps = {
     note: BooqNote
@@ -18,10 +18,12 @@ type NoteCardProps = {
 export function NoteCard({ note: initialNote, booqId, user }: NoteCardProps) {
     const [isEditing, setIsEditing] = useState(false)
     const [editContent, setEditContent] = useState(initialNote.content || '')
-    const { notes, updateNote } = useBooqNotes({ booqId, user })
+    const [removedNote, setRemovedNote] = useState<BooqNote | null>(null)
+    const { notes, updateNote, removeNote, addNote } = useBooqNotes({ booqId, user })
 
     // Use the updated note from the hook, fall back to initial note if not found
     const note = notes.find(n => n.id === initialNote.id) || initialNote
+    const isNoteRemoved = !notes.find(n => n.id === initialNote.id) && removedNote !== null
 
     // Update editContent when note content changes (but not when editing)
     useEffect(() => {
@@ -44,6 +46,38 @@ export function NoteCard({ note: initialNote, booqId, user }: NoteCardProps) {
     function handleCancel() {
         setEditContent(note.content || '')
         setIsEditing(false)
+    }
+
+    function handleRemove() {
+        setRemovedNote(note)
+        removeNote({ noteId: note.id })
+    }
+
+    function handleRestore() {
+        if (!removedNote) return
+        addNote({
+            range: removedNote.range,
+            kind: removedNote.kind,
+            content: removedNote.content || undefined,
+            targetQuote: removedNote.targetQuote,
+            privacy: removedNote.privacy || 'private'
+        })
+        setRemovedNote(null)
+    }
+
+    // Show removal message if note was removed
+    if (isNoteRemoved) {
+        return (
+            <div className="bg-white p-6 transition-shadow duration-200">
+                <div className="mb-4">
+                    <div className="text-dimmed mb-4">Note was removed</div>
+                    <LightButton
+                        text="Restore"
+                        onClick={handleRestore}
+                    />
+                </div>
+            </div>
+        )
     }
 
     return (
@@ -88,13 +122,19 @@ export function NoteCard({ note: initialNote, booqId, user }: NoteCardProps) {
                 )}
             </div>
 
-            <div className="flex items-center justify-between text-sm pt-4">
-                <LightButton
-                    text={note.content ? 'Edit note' : 'Add note'}
-                    icon={<PencilIcon />}
-                    onClick={handleEditToggle}
-                />
-
+            <div className="flex items-center justify-between text-sm">
+                <div className="flex gap-4">
+                    <LightButton
+                        text={note.content ? 'Edit note' : 'Add note'}
+                        icon={<PencilIcon />}
+                        onClick={handleEditToggle}
+                    />
+                    <LightButton
+                        text="Remove"
+                        icon={<TrashIcon />}
+                        onClick={handleRemove}
+                    />
+                </div>
 
                 <Link
                     href={booqHref({ booqId, path: note.range.start })}
