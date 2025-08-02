@@ -7,7 +7,8 @@ import { booqHref } from '@/common/href'
 import { BooqId } from '@/core'
 import { useBooqNotes } from '@/application/notes'
 import { ActionButton, LightButton } from '@/components/Buttons'
-import { PencilIcon, TrashIcon } from '@/components/Icons'
+import { PencilIcon, TrashIcon, BrushIcon } from '@/components/Icons'
+import { ColorPicker } from '@/reader/ColorPicker'
 
 type NoteCardProps = {
     note: BooqNote
@@ -17,6 +18,7 @@ type NoteCardProps = {
 
 export function NoteCard({ note: initialNote, booqId, user }: NoteCardProps) {
     const [isEditing, setIsEditing] = useState(false)
+    const [showColorPicker, setShowColorPicker] = useState(false)
     const [editContent, setEditContent] = useState(initialNote.content || '')
     const [removedNote, setRemovedNote] = useState<BooqNote | null>(null)
     const { notes, updateNote, removeNote, addNote } = useBooqNotes({ booqId, user })
@@ -63,6 +65,14 @@ export function NoteCard({ note: initialNote, booqId, user }: NoteCardProps) {
             privacy: removedNote.privacy || 'private'
         })
         setRemovedNote(null)
+    }
+
+    function handleColorChange(kind: string) {
+        updateNote({
+            noteId: note.id,
+            kind: kind
+        })
+        setShowColorPicker(false)
     }
 
     // Show removal message if note was removed
@@ -122,27 +132,43 @@ export function NoteCard({ note: initialNote, booqId, user }: NoteCardProps) {
                 )}
             </div>
 
-            {!isEditing && <div className="flex items-center justify-between text-sm">
-                <div className="flex gap-4">
-                    <LightButton
-                        text={note.content ? 'Edit note' : 'Add note'}
-                        icon={<PencilIcon />}
-                        onClick={handleEditToggle}
-                    />
-                    <LightButton
-                        text="Remove"
-                        icon={<TrashIcon />}
-                        onClick={handleRemove}
-                    />
+            {!isEditing && <div className="flex flex-col gap-3">
+                <div className="flex items-center justify-between text-sm">
+                    <div className="flex gap-4">
+                        <LightButton
+                            text={note.content ? 'Edit note' : 'Add note'}
+                            icon={<PencilIcon />}
+                            onClick={handleEditToggle}
+                        />
+                        <LightButton
+                            text="Remove"
+                            icon={<TrashIcon />}
+                            onClick={handleRemove}
+                        />
+                        <LightButton
+                            text={showColorPicker ? 'Hide colors' : 'Change color'}
+                            icon={<BrushIcon />}
+                            onClick={() => setShowColorPicker(!showColorPicker)}
+                        />
+                    </div>
+
+                    <Link
+                        href={booqHref({ booqId, path: note.range.start })}
+                    >
+                        <LightButton
+                            text='Show in booq'
+                        />
+                    </Link>
                 </div>
 
-                <Link
-                    href={booqHref({ booqId, path: note.range.start })}
-                >
-                    <LightButton
-                        text='Show in booq'
-                    />
-                </Link>
+                {showColorPicker && (
+                    <div className="border border-gray-200 rounded p-3">
+                        <ColorPicker
+                            selectedKind={note.kind}
+                            onColorChange={handleColorChange}
+                        />
+                    </div>
+                )}
             </div>}
         </div>
     )
