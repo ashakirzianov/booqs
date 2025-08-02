@@ -1,11 +1,13 @@
 'use client'
 
 import { useState, useMemo } from 'react'
+import { useRouter } from 'next/navigation'
 import { BooqId, BooqNode, BooqRange } from '@/core'
 import { SmallSpinner, CollapseIcon } from '@/components/Icons'
 import { BooqContent, Augmentation } from '@/viewer'
 import { LightButton, RemoveButton } from '@/components/Buttons'
 import { ColorPicker } from '@/components/ColorPicker'
+import { booqHref } from '@/common/href'
 
 type NoteFragmentProps = {
     booqId: BooqId
@@ -20,6 +22,7 @@ export function NoteFragment({ booqId, range, targetQuote, noteKind, onColorChan
     const [isExpanded, setIsExpanded] = useState(false)
     const [expandedFragment, setExpandedFragment] = useState<{ nodes: BooqNode[], range: BooqRange } | null>(null)
     const [isLoadingExpanded, setIsLoadingExpanded] = useState(false)
+    const router = useRouter()
 
     const augmentationColor = `hsl(from var(--color-${noteKind}) h s l / 40%)`
 
@@ -66,6 +69,12 @@ export function NoteFragment({ booqId, range, targetQuote, noteKind, onColorChan
         } finally {
             setIsLoadingExpanded(false)
         }
+    }
+
+    function handleAugmentationClick(_id: string) {
+        // Navigate to the note's range start position in the booq
+        const href = booqHref({ booqId, path: range.start })
+        router.push(href)
     }
 
     return (
@@ -115,6 +124,7 @@ export function NoteFragment({ booqId, range, targetQuote, noteKind, onColorChan
                         nodes={expandedFragment.nodes}
                         range={expandedFragment.range}
                         augmentations={noteAugmentation}
+                        onAugmentationClick={handleAugmentationClick}
                     />
                 </div>
             ) : (
