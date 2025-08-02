@@ -4,6 +4,7 @@ import { Pagination } from '@/app/(main)/Pagination'
 import { booqCardsForQuery, fetchLanguageDisplayName } from '@/data/booqs'
 import { getUserIdInsideRequest } from '@/data/request'
 import { notFound } from 'next/navigation'
+import styles from '@/app/(main)/MainLayout.module.css'
 
 type ValidKind = 'author' | 'subject' | 'language'
 
@@ -78,7 +79,7 @@ export default async function LibraryQuery({
     const baseUrl = `/library/${library}/${kind}/${query}`
 
     return (
-        <div>
+        <main className={styles.mainContent}>
             <BooqCollection
                 title={title}
                 cards={result.cards}
@@ -92,6 +93,6 @@ export default async function LibraryQuery({
                 baseUrl={baseUrl}
                 pageSize={PAGE_SIZE}
             />
-        </div>
+        </main>
     )
 }

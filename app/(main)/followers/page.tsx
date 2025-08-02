@@ -3,6 +3,7 @@ import { authHref } from '@/common/href'
 import { getFollowingList, getFollowersList, getCurrentUser } from '@/data/user'
 import { FollowingList } from './FollowingList'
 import { FollowersList } from './FollowersList'
+import styles from '@/app/(main)/MainLayout.module.css'
 
 export default async function FollowersPage() {
     const user = await getCurrentUser()
@@ -32,12 +33,14 @@ export default async function FollowersPage() {
     }))
 
     return (
-        <div className="space-y-8">
-            {/* Following Section */}
-            <FollowingList following={followingWithStatus} currentUserId={user.id} />
+        <main className={styles.mainContent}>
+            <div className="space-y-8">
+                {/* Following Section */}
+                <FollowingList following={followingWithStatus} currentUserId={user.id} />
 
-            {/* Followers Section */}
-            <FollowersList followers={followersWithStatus} currentUserId={user.id} />
-        </div>
+                {/* Followers Section */}
+                <FollowersList followers={followersWithStatus} currentUserId={user.id} />
+            </div>
+        </main>
     )
 }

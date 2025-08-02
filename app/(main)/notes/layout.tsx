@@ -3,11 +3,26 @@ import { booqCard } from '@/data/booqs'
 import { getUserIdInsideRequest } from '@/data/request'
 import Link from 'next/link'
 import { BooqId } from '@/core'
+import styles from '@/app/(main)/MainLayout.module.css'
 
-export default async function NotesRightLayout({
+export default async function NotesLayout({
+    children,
 }: {
     children: React.ReactNode,
 }) {
+    return (
+        <>
+            <main className={styles.mainContent}>
+                {children}
+            </main>
+            <aside className={styles.rightPanel}>
+                <NotesRightPanel />
+            </aside>
+        </>
+    )
+}
+
+async function NotesRightPanel() {
     const userId = await getUserIdInsideRequest()
     if (!userId) {
         return null
