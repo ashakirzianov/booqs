@@ -1,5 +1,5 @@
 import {
-    Booq, BooqId, BooqMetadata, BooqPath, InLibraryId, LibraryId, parseId, pathToString, positionForPath, previewForPath, TableOfContents, textForRange,
+    Booq, BooqId, BooqMetadata, BooqPath, InLibraryId, LibraryId, parseId, pathToString, positionForPath, previewForPath, TableOfContents, textForRange, BooqRange, nodesForRange, BooqNode,
 } from '@/core'
 import { getCachedValueForKey, cacheValueForKey } from './cache'
 import { parseAndPreprocessBooq, parseAndLoadImagesFromFile } from './parse'
@@ -253,6 +253,17 @@ async function buildBooqData({
         languages: getExtraMetadataValues('language', extra),
         cover,
     }
+}
+
+export async function booqFragmentForRange(booqId: BooqId, range: BooqRange): Promise<{ nodes: BooqNode[] } | undefined> {
+    const booq = await booqForId(booqId)
+    if (!booq) {
+        return undefined
+    }
+
+    const nodes = nodesForRange(booq.nodes, range)
+
+    return { nodes }
 }
 
 async function fileForId(booqId: BooqId) {
