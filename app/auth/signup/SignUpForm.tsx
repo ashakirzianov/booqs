@@ -2,7 +2,7 @@
 import { useState } from 'react'
 import { completeSignUpAction } from '@/data/auth'
 import { Spinner } from '@/components/Icons'
-import { EmojiSelector } from '@/app/(main)/account/EmojiSelector'
+import { EmojiSelector } from '@/components/EmojiSelector'
 
 type FormDataState = {
     username: string
@@ -58,9 +58,9 @@ export function SignUpForm({
         // Validate username format
         const usernamePattern = /^[a-zA-Z0-9-]+$/
         if (!usernamePattern.test(formData.username.trim())) {
-            setSignUpState({ 
-                state: 'error', 
-                error: 'Username must contain only letters, numbers, and hyphens' 
+            setSignUpState({
+                state: 'error',
+                error: 'Username must contain only letters, numbers, and hyphens'
             })
             return
         }
