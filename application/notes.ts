@@ -1,6 +1,6 @@
 'use client'
 
-import type { GetResponse, PostBody, PostResponse } from '@/app/api/booq/[library]/[id]/notes/route'
+import { GetResponse, PostBody, PostResponse } from '@/app/api/booq/[booq_id]/notes/route'
 import type { PatchBody, PatchResponse } from '@/app/api/notes/[id]/route'
 import { BooqId, BooqRange } from '@/core'
 import { NoteAuthorData, BooqNote, NotePrivacy } from '@/data/notes'

@@ -11,8 +11,10 @@ import styles from './MainLayout.module.css'
 
 export default async function MainLayout({
     children,
+    right,
 }: {
     children: React.ReactNode,
+    right?: React.ReactNode,
 }) {
     const user = await getCurrentUser()
     const showHeaderSearch = await hasReadingHistory(user?.id)
@@ -38,6 +40,7 @@ export default async function MainLayout({
         </aside>
 
         <aside className={styles.rightPanel}>
+            {right}
         </aside>
     </div>
 }
