@@ -82,17 +82,17 @@ export function NoteCard({ note: initialNote, booqId, user }: NoteCardProps) {
 
     return (
         <div className="bg-white p-6 transition-shadow duration-200">
-            <div className="mb-4">
+            <div className="mb-4 flex flex-col gap-3">
                 <div className='rounded shadow-sm p-3'>
-                    <span className="italic text-primary m-0" style={{
-                        backgroundColor: `var(--color-${note.kind})`,
+                    <span className="font-book text-primary m-0" style={{
+                        backgroundColor: `hsl(from var(--color-${note.kind}) h s l / 40%)`,
                     }}>
                         {note.targetQuote}
                     </span>
                 </div>
 
                 {isEditing ? (
-                    <div className="mt-4">
+                    <div className="flex flex-col gap-2">
                         <textarea
                             value={editContent}
                             onChange={(e) => setEditContent(e.target.value)}
@@ -100,7 +100,7 @@ export function NoteCard({ note: initialNote, booqId, user }: NoteCardProps) {
                             className="w-full p-3 border border-gray-300 rounded resize-none focus:outline-none focus:ring-2 focus:ring-action"
                             rows={3}
                         />
-                        <div className="flex gap-2 mt-2">
+                        <div className="flex gap-2">
                             <ActionButton
                                 onClick={handleEditToggle} variant="primary"
                                 text="Save"
@@ -114,7 +114,7 @@ export function NoteCard({ note: initialNote, booqId, user }: NoteCardProps) {
                 ) : (
                     <>
                         {note.content && (
-                            <div className="text-primary mt-4 p-3">
+                            <div className="text-primary px-3">
                                 {note.content}
                             </div>
                         )}
@@ -122,7 +122,7 @@ export function NoteCard({ note: initialNote, booqId, user }: NoteCardProps) {
                 )}
             </div>
 
-            <div className="flex items-center justify-between text-sm">
+            {!isEditing && <div className="flex items-center justify-between text-sm">
                 <div className="flex gap-4">
                     <LightButton
                         text={note.content ? 'Edit note' : 'Add note'}
@@ -143,7 +143,7 @@ export function NoteCard({ note: initialNote, booqId, user }: NoteCardProps) {
                         text='Show in booq'
                     />
                 </Link>
-            </div>
+            </div>}
         </div>
     )
 }
