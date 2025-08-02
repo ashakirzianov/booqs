@@ -65,45 +65,31 @@ export default async function NotesPage({ params }: {
 }
 
 function NoteCard({ note, booqId }: { note: BooqNote, booqId: BooqId }) {
-    const createdDate = new Date(note.createdAt).toLocaleDateString()
-    const updatedDate = new Date(note.updatedAt).toLocaleDateString()
-    const isUpdated = note.createdAt !== note.updatedAt
-
     return (
-        <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow duration-200">
+        <div className="bg-white p-6 transition-shadow duration-200">
             <div className="mb-4">
-                <blockquote className="border-l-4 border-gray-300 pl-4 italic text-dimmed mb-3">
-                    &ldquo;{note.targetQuote}&rdquo;
-                </blockquote>
+                <div className='rounded shadow-sm p-3'>
+                    <span className="italic text-primary m-0" style={{
+                        backgroundColor: `var(--color-${note.kind})`,
+                    }}>
+                        {note.targetQuote}
+                    </span>
+                </div>
                 {note.content && (
-                    <div className="text-primary">
+                    <div className="text-primary mt-4 p-3">
                         {note.content}
                     </div>
                 )}
             </div>
 
-            <div className="flex items-center justify-between text-sm text-dimmed">
-                <div className="flex items-center gap-4">
-                    <span className="bg-gray-100 px-2 py-1 rounded text-xs font-medium">
-                        {note.kind}
-                    </span>
-                    <span className="bg-gray-100 px-2 py-1 rounded text-xs font-medium capitalize">
-                        {note.privacy}
-                    </span>
-                </div>
+            <div className="flex items-center justify-between text-sm pt-4">
 
-                <div className="flex items-center gap-4">
-                    <Link
-                        href={booqHref({ booqId, path: note.range.start })}
-                        className="text-action hover:text-highlight hover:underline"
-                    >
-                        Go to location
-                    </Link>
-                    <span>
-                        Created {createdDate}
-                        {isUpdated && ` • Updated ${updatedDate}`}
-                    </span>
-                </div>
+                <Link
+                    href={booqHref({ booqId, path: note.range.start })}
+                    className=" hover:text-highlight hover:underline text-action px-4 py-2 rounded font-medium transition-colors duration-200"
+                >
+                    Show in booq
+                </Link>
             </div>
         </div>
     )
