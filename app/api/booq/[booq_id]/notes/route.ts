@@ -10,8 +10,7 @@ import { NextRequest } from 'next/server'
 import { getUserIdInsideRequest } from '@/data/request'
 
 type Params = {
-    library: string,
-    id: string,
+    booq_id: string,
 }
 type ResolvedNote = {
     id: string,
@@ -29,8 +28,8 @@ export type GetResponse = {
     notes: ResolvedNote[],
 }
 export async function GET(request: NextRequest, { params }: { params: Promise<Params> }) {
-    const { library, id } = await params
-    const booqId: BooqId = `${library}-${id}`
+    const { booq_id } = await params
+    const booqId: BooqId = booq_id as BooqId
     const notes = await fetchNotes({ booqId })
     const result: GetResponse = {
         notes,
@@ -48,8 +47,8 @@ export type PostBody = {
 }
 export type PostResponse = ResolvedNote
 export async function POST(request: NextRequest, { params }: { params: Promise<Params> }) {
-    const { library, id: paramsId } = await params
-    const booqId: BooqId = `${library}-${paramsId}`
+    const { booq_id } = await params
+    const booqId: BooqId = booq_id as BooqId
     const userId = await getUserIdInsideRequest()
     if (!userId) {
         return Response.json({ error: 'Unauthorized' }, { status: 401 })
