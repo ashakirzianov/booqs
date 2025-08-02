@@ -4,11 +4,12 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { BooqNote, NoteAuthorData } from '@/data/notes'
 import { booqHref } from '@/common/href'
-import { BooqId } from '@/core'
+import { BooqId, BooqNode, BooqRange } from '@/core'
 import { useBooqNotes } from '@/application/notes'
 import { ActionButton, LightButton } from '@/components/Buttons'
-import { PencilIcon, TrashIcon, BrushIcon } from '@/components/Icons'
+import { PencilIcon, TrashIcon, BrushIcon, SmallSpinner } from '@/components/Icons'
 import { ColorPicker } from '@/components/ColorPicker'
+import { BooqContent } from '@/viewer'
 
 type NoteCardProps = {
     note: BooqNote
@@ -21,6 +22,9 @@ export function NoteCard({ note: initialNote, booqId, user }: NoteCardProps) {
     const [showColorPicker, setShowColorPicker] = useState(false)
     const [editContent, setEditContent] = useState(initialNote.content || '')
     const [removedNote, setRemovedNote] = useState<BooqNote | null>(null)
+    const [isExpanded, setIsExpanded] = useState(false)
+    const [expandedFragment, setExpandedFragment] = useState<{ nodes: BooqNode[], range: BooqRange } | null>(null)
+    const [isLoadingExpanded, setIsLoadingExpanded] = useState(false)
     const { notes, updateNote, removeNote, addNote } = useBooqNotes({ booqId, user })
 
     // Use the updated note from the hook, fall back to initial note if not found
@@ -75,6 +79,31 @@ export function NoteCard({ note: initialNote, booqId, user }: NoteCardProps) {
         setShowColorPicker(false)
     }
 
+    async function handleExpand() {
+        if (isExpanded) {
+            setIsExpanded(false)
+            return
+        }
+
+        setIsLoadingExpanded(true)
+        try {
+            const rangeParam = encodeURIComponent(JSON.stringify(note.range))
+            const response = await fetch(`/api/booq/${booqId}/expanded-fragment?range=${rangeParam}`)
+            
+            if (!response.ok) {
+                throw new Error('Failed to fetch expanded fragment')
+            }
+            
+            const data = await response.json()
+            setExpandedFragment({ nodes: data.nodes, range: data.range })
+            setIsExpanded(true)
+        } catch (error) {
+            console.error('Error fetching expanded fragment:', error)
+        } finally {
+            setIsLoadingExpanded(false)
+        }
+    }
+
     // Show removal message if note was removed
     if (isNoteRemoved) {
         return (
@@ -93,13 +122,38 @@ export function NoteCard({ note: initialNote, booqId, user }: NoteCardProps) {
     return (
         <div className="bg-white p-6 transition-shadow duration-200">
             <div className="mb-4 flex flex-col gap-3">
-                <div className='rounded shadow-sm p-3'>
-                    <span className="font-book text-primary m-0" style={{
-                        backgroundColor: `hsl(from var(--color-${note.kind}) h s l / 40%)`,
-                    }}>
-                        {note.targetQuote}
-                    </span>
-                </div>
+                {isExpanded && expandedFragment ? (
+                    <div 
+                        className="rounded shadow-sm p-3 bg-gray-50 max-h-96 overflow-y-auto cursor-pointer hover:bg-gray-100 transition-colors"
+                        onClick={handleExpand}
+                        title='Click to collapse'
+                    >
+                        <BooqContent
+                            nodes={expandedFragment.nodes}
+                            range={expandedFragment.range}
+                            augmentations={[]}
+                        />
+                    </div>
+                ) : (
+                    <div 
+                        className={`rounded shadow-sm p-3 cursor-pointer hover:opacity-80 transition-opacity ${isLoadingExpanded ? 'opacity-50' : ''}`}
+                        onClick={handleExpand}
+                        title={isLoadingExpanded ? 'Loading...' : 'Click to expand'}
+                    >
+                        {isLoadingExpanded ? (
+                            <div className="flex items-center gap-2">
+                                <SmallSpinner />
+                                <span className="font-book text-primary m-0">Loading expanded content...</span>
+                            </div>
+                        ) : (
+                            <span className="font-book text-primary m-0" style={{
+                                backgroundColor: `hsl(from var(--color-${note.kind}) h s l / 40%)`,
+                            }}>
+                                {note.targetQuote}
+                            </span>
+                        )}
+                    </div>
+                )}
 
                 {isEditing ? (
                     <div className="flex flex-col gap-2">
@@ -169,6 +223,7 @@ export function NoteCard({ note: initialNote, booqId, user }: NoteCardProps) {
                         />
                     </div>
                 )}
+
             </div>}
         </div>
     )
