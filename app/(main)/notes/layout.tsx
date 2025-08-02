@@ -1,6 +1,5 @@
-import { fetchNotes } from '@/data/notes'
+import { fetchBooqsWithOwnNotes } from '@/data/notes'
 import { booqCard } from '@/data/booqs'
-import { getUserIdInsideRequest } from '@/data/request'
 import Link from 'next/link'
 import { BooqId } from '@/core'
 import styles from '@/app/(main)/MainLayout.module.css'
@@ -23,14 +22,7 @@ export default async function NotesLayout({
 }
 
 async function NotesRightPanel() {
-    const userId = await getUserIdInsideRequest()
-    if (!userId) {
-        return null
-    }
-
-    const userNotes = await fetchNotes({ authorId: userId })
-
-    const uniqueBooqIds = Array.from(new Set(userNotes.map(note => note.booqId)))
+    const uniqueBooqIds = await fetchBooqsWithOwnNotes()
 
     const booqsWithNotes = await Promise.all(
         uniqueBooqIds.map(async (booqId) => {

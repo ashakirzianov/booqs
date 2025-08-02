@@ -5,6 +5,7 @@ import {
     removeNote,
     updateNote,
     notesWithAuthorFor,
+    getBooqsWithOwnNotes,
     DbNote,
     DbNoteWithAuthor,
 } from '@/backend/notes'
@@ -128,6 +129,15 @@ function unresolvedBooqNote(note: DbNote): UnresolvedBooqNote {
         createdAt: note.created_at,
         updatedAt: note.updated_at,
     }
+}
+
+export async function fetchBooqsWithOwnNotes(): Promise<BooqId[]> {
+    const userId = await getUserIdInsideRequest()
+    if (!userId) {
+        return []
+    }
+    const booqIds = await getBooqsWithOwnNotes(userId)
+    return booqIds as BooqId[]
 }
 
 function noteFromDbNoteWithAuthor(dbNote: DbNoteWithAuthor): BooqNote {

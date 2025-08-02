@@ -129,3 +129,13 @@ export async function updateNote({
     `
   return (row as DbNote) ?? null
 }
+
+export async function getBooqsWithOwnNotes(userId: string): Promise<string[]> {
+  const result = await sql`
+      SELECT DISTINCT booq_id
+      FROM notes
+      WHERE author_id = ${userId}
+      ORDER BY booq_id
+    `
+  return result.map(row => row.booq_id as string)
+}
