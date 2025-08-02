@@ -8,8 +8,8 @@ export function LightButton({
     disabled = false,
     size = 'normal',
 }: {
-    icon: React.ReactNode,
     text: string,
+    icon?: React.ReactNode,
     onClick?: () => void,
     disabled?: boolean,
     size?: 'small' | 'normal' | 'large',
@@ -28,9 +28,10 @@ export function LightButton({
             sizeClasses[size]
         )}
     >
-        <div className="w-4 h-4">
+        {icon && <div className="w-4 h-4">
             {icon}
-        </div>
+        </div>}
+
         {text}
     </button>
 }

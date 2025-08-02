@@ -98,9 +98,10 @@ export function NoteCard({ note: initialNote, booqId, user }: NoteCardProps) {
 
                 <Link
                     href={booqHref({ booqId, path: note.range.start })}
-                    className="text-action hover:text-highlight hover:underline transition-colors duration-200"
                 >
-                    Show in booq
+                    <LightButton
+                        text='Show in booq'
+                    />
                 </Link>
             </div>
         </div>
