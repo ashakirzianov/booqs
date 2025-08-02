@@ -8,7 +8,7 @@ import { BooqId } from '@/core'
 import { useBooqNotes } from '@/application/notes'
 import { ActionButton, LightButton } from '@/components/Buttons'
 import { PencilIcon, TrashIcon, BrushIcon } from '@/components/Icons'
-import { ColorPicker } from '@/reader/ColorPicker'
+import { ColorPicker } from '@/components/ColorPicker'
 
 type NoteCardProps = {
     note: BooqNote
