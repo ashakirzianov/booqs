@@ -4,6 +4,7 @@ import {
   previewForPath,
   getQuoteAndContext,
   textForRange,
+  getExpandedRange,
 } from '../../core/text'
 import { BooqNode, BooqElementNode, BooqTextNode, BooqRange } from '../../core/model'
 
@@ -18,6 +19,13 @@ describe('core/text', () => {
     kind: 'element',
     name,
     children,
+  })
+
+  const createParagraph = (name: string, children?: BooqNode[]): BooqElementNode => ({
+    kind: 'element',
+    name,
+    children,
+    pph: true,
   })
 
   // Test data structures
@@ -368,6 +376,160 @@ describe('core/text', () => {
       const range: BooqRange = { start: [0], end: [2] }
       const result = textForRange(nodesWithStub, range)
       expect(result).toBe('Before ')
+    })
+  })
+
+  describe('getExpandedRange', () => {
+    // Test data for paragraph expansion
+    const pphNodes: BooqNode[] = [
+      createElement('div', [
+        createParagraph('p', [
+          createTextNode('Paragraph 1 '),
+          createElement('em', [createTextNode('emphasis')]),
+          createTextNode(' end.'),
+        ]), // pph=true
+      ]),
+      createElement('div', [
+        createTextNode('Non-paragraph text.'),
+      ]),
+      createElement('div', [
+        createParagraph('p', [
+          createTextNode('Paragraph 2 content.'),
+        ]), // pph=true
+        createElement('span', [
+          createTextNode('After paragraph.'),
+        ]),
+      ]),
+      createElement('div', [
+        createParagraph('p', [
+          createTextNode('Paragraph 3 content.'),
+        ]), // pph=true
+      ]),
+    ]
+
+    it('returns original range when start element has pph=true', () => {
+      const range: BooqRange = { start: [0, 0], end: [0, 0, 2] }
+      const result = getExpandedRange(pphNodes, range)
+      console.log('Expanded range:', result)
+      expect(result.start).toEqual([0, 0])
+      expect(result.end).toEqual([0, 1])
+    })
+
+    it('expands start to first parent with pph=true', () => {
+      const range: BooqRange = { start: [0, 0, 1], end: [0, 0, 2] }
+      const result = getExpandedRange(pphNodes, range)
+      expect(result.start).toEqual([0, 0]) // expanded to paragraph
+      expect(result.end).toEqual([0, 1]) // next sibling of paragraph's parent
+    })
+
+    it('expands end to next sibling of first parent with pph=true', () => {
+      const range: BooqRange = { start: [2, 0], end: [2, 0, 0] }
+      const result = getExpandedRange(pphNodes, range)
+      expect(result.start).toEqual([2, 0]) // paragraph already has pph=true
+      expect(result.end).toEqual([2, 1]) // next sibling within same parent
+    })
+
+    it('handles range spanning multiple paragraphs', () => {
+      const range: BooqRange = { start: [0, 0, 1], end: [2, 0, 0] }
+      const result = getExpandedRange(pphNodes, range)
+      expect(result.start).toEqual([0, 0]) // expanded to first paragraph
+      expect(result.end).toEqual([2, 1]) // next sibling of second paragraph
+    })
+
+    it('handles range with no parent having pph=true', () => {
+      const nodesWithoutPph: BooqNode[] = [
+        createElement('div', [
+          createElement('span', [createTextNode('No pph here')]),
+        ]),
+        createElement('div', [createTextNode('More content')]),
+      ]
+      const range: BooqRange = { start: [0, 0, 0], end: [1, 0] }
+      const result = getExpandedRange(nodesWithoutPph, range)
+      expect(result.start).toEqual([0, 0, 0]) // unchanged
+      expect(result.end).toEqual([1]) // incremented start[0]
+    })
+
+    it('handles range with missing end path', () => {
+      const range: BooqRange = { start: [0, 0, 1], end: [] }
+      const result = getExpandedRange(pphNodes, range)
+      expect(result.start).toEqual([0, 0]) // expanded to paragraph
+      expect(result.end).toEqual([1]) // next sibling of expanded start
+    })
+
+    it('handles range when end has no parent with pph=true', () => {
+      const mixedNodes: BooqNode[] = [
+        createElement('div', [
+          createParagraph('p', [createTextNode('Paragraph.')]),
+        ]),
+        createElement('div', [
+          createElement('span', [createTextNode('No pph span')]),
+        ]),
+      ]
+      const range: BooqRange = { start: [0, 0, 0], end: [1, 0, 0] }
+      const result = getExpandedRange(mixedNodes, range)
+      expect(result.start).toEqual([0, 0]) // expanded to paragraph
+      expect(result.end).toEqual([1]) // fallback to incremented start
+    })
+
+    it('handles nested paragraphs with pph=true', () => {
+      const nestedPphNodes: BooqNode[] = [
+        createElement('article', [
+          createElement('section', [
+            createParagraph('p', [
+              createTextNode('Nested paragraph '),
+              createElement('strong', [createTextNode('bold')]),
+            ]),
+          ]),
+        ]),
+        createElement('div', [createTextNode('After article')]),
+      ]
+      const range: BooqRange = { start: [0, 0, 0, 1], end: [0, 0, 0, 1, 0] }
+      const result = getExpandedRange(nestedPphNodes, range)
+      expect(result.start).toEqual([0, 0, 0]) // expanded to paragraph
+      expect(result.end).toEqual([0, 0, 1]) // next sibling of article
+    })
+
+    it('handles single node range', () => {
+      const range: BooqRange = { start: [2, 0], end: [2, 0] }
+      const result = getExpandedRange(pphNodes, range)
+      expect(result.start).toEqual([2, 0]) // paragraph already has pph=true
+      expect(result.end).toEqual([2, 1]) // next sibling
+    })
+
+    it('handles empty nodes array', () => {
+      const range: BooqRange = { start: [0], end: [1] }
+      const result = getExpandedRange([], range)
+      expect(result.start).toEqual([0]) // unchanged
+      expect(result.end).toEqual([1]) // incremented start[0]
+    })
+
+    it('handles range at root level with pph element', () => {
+      const rootPphNodes: BooqNode[] = [
+        createParagraph('p', [createTextNode('Root paragraph')]),
+        createElement('div', [createTextNode('After paragraph')]),
+      ]
+      const range: BooqRange = { start: [0, 0], end: [0, 0] }
+      const result = getExpandedRange(rootPphNodes, range)
+      expect(result.start).toEqual([0]) // expanded to root paragraph
+      expect(result.end).toEqual([1]) // next sibling
+    })
+
+    it('handles complex nested structure with multiple pph elements', () => {
+      const complexPphNodes: BooqNode[] = [
+        createElement('article', [
+          createParagraph('p', [createTextNode('First paragraph')]),
+          createElement('div', [
+            createParagraph('p', [createTextNode('Nested paragraph')]),
+            createTextNode('Between paragraphs'),
+            createParagraph('p', [createTextNode('Another nested paragraph')]),
+          ]),
+          createParagraph('p', [createTextNode('Last paragraph')]),
+        ]),
+      ]
+      const range: BooqRange = { start: [0, 1, 0, 0], end: [0, 1, 2, 0] }
+      const result = getExpandedRange(complexPphNodes, range)
+      expect(result.start).toEqual([0, 1, 0]) // expanded to nested paragraph
+      expect(result.end).toEqual([0, 1, 3]) // next sibling after last nested paragraph
     })
   })
 

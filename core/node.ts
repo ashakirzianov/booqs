@@ -3,7 +3,7 @@ import { nodeLength } from './position'
 
 export function nodeForPath(nodes: BooqNode[], path: BooqPath): BooqNode | undefined {
     const [head, ...tail] = path
-    if (!head || head >= nodes.length) {
+    if (head === undefined || head >= nodes.length || head < 0) {
         return undefined
     }
     const node = nodes[head]

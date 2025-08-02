@@ -166,6 +166,7 @@ export function textForRange(nodes: BooqNode[], { start, end }: BooqRange): stri
 }
 
 export function getExpandedRange(nodes: BooqNode[], range: BooqRange): BooqRange {
+    console.log('Expanding range:', range)
     const expandedStart = getExpandedStartPath(nodes, range.start)
     const expandedEnd = getExpandedEndPath(nodes, range.end, expandedStart)
 
@@ -179,10 +180,12 @@ function getExpandedStartPath(nodes: BooqNode[], startPath: BooqPath): BooqPath 
     // Check if the start element itself has pph=true
     const startNode = nodeForPath(nodes, startPath)
     if (startNode?.kind === 'element' && startNode.pph === true) {
+        console.log('Start node is a paragraph element with pph=true:', startNode)
+        console.log('Returning start path:', startPath)
         return startPath
     }
 
-    // Find the first parent with pph=true
+    // Find the first parent with pph=true (going up the tree)
     for (let depth = startPath.length - 1; depth > 0; depth--) {
         const parentPath = startPath.slice(0, depth)
         const parentNode = nodeForPath(nodes, parentPath)
@@ -199,6 +202,15 @@ function getExpandedEndPath(nodes: BooqNode[], endPath: BooqPath, expandedStart:
     if (!endPath || endPath.length === 0) {
         // If no end path, create one based on expanded start
         return [expandedStart[0] + 1]
+    }
+
+    // Check if the end element itself has pph=true
+    const endNode = nodeForPath(nodes, endPath)
+    if (endNode?.kind === 'element' && endNode.pph === true) {
+        // Return next sibling of the end element
+        const nextSiblingPath = [...endPath]
+        nextSiblingPath[nextSiblingPath.length - 1] += 1
+        return nextSiblingPath
     }
 
     // Find the first parent with pph=true of the end element
@@ -218,7 +230,7 @@ function getExpandedEndPath(nodes: BooqNode[], endPath: BooqPath, expandedStart:
         nextSiblingPath[nextSiblingPath.length - 1] += 1
         return nextSiblingPath
     } else {
-        // If no parent with pph=true, use next sibling of expanded start or increment start[0]
+        // If no parent with pph=true, use next sibling of expanded start
         return [expandedStart[0] + 1]
     }
 }
