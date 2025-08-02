@@ -3,8 +3,8 @@ import { useState } from 'react'
 import type { AskTarget, ContextMenuTarget } from './ContextMenuContent'
 import { useCopilotAnswerStream } from '@/application/copilot'
 import type { BooqId, BooqRange } from '@/core/model'
-import { MenuButton } from '@/components/Buttons'
 import { CopilotIcon, CloseIcon, RemoveIcon } from '@/components/Icons'
+import { MenuButton } from './MenuButton'
 
 export function AskTargetMenu({
     target, setTarget, booqId

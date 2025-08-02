@@ -31,8 +31,8 @@ export function BorderButton({ text, onClick, color = 'primary', disabled = fals
         primary: 'text-primary border-primary hover:bg-primary hover:text-background',
         alert: 'text-alert border-alert hover:bg-alert hover:text-background'
     }
-    
-    return <button 
+
+    return <button
         className={`px-4 py-2 font-medium border rounded-md transition-colors duration-200 ${colorClasses[color]} ${disabled ? 'disabled:opacity-50' : ''} ${className}`}
         onClick={onClick}
         disabled={disabled}
@@ -54,22 +54,4 @@ export function LightButton({ children, onClick, className = '', disabled = fals
     >
         {children}
     </button>
-}
-
-export function MenuButton({
-    onClick,
-    children,
-}: {
-    onClick: () => void,
-    children: React.ReactNode,
-}) {
-    return (
-        <button
-            className="flex items-center gap-1 text-sm font-bold cursor-pointer text-dimmed hover:text-highlight hover:underline"
-            onClick={onClick}
-            onMouseDown={e => e.preventDefault()}
-        >
-            {children}
-        </button>
-    )
 }
