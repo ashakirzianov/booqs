@@ -4,10 +4,11 @@ import {
     addNote,
     removeNote,
     updateNote,
-    getNotesWithAuthor,
+    notesWithAuthorFor,
     DbNote,
     DbNoteWithAuthor,
 } from '@/backend/notes'
+import { getUserIdInsideRequest } from './request'
 
 export type NotePrivacy = 'private' | 'public'
 
@@ -40,7 +41,8 @@ export async function fetchNotes({ booqId, authorId }: {
     booqId?: BooqId,
     authorId?: string,
 }): Promise<BooqNote[]> {
-    const dbNotes = await getNotesWithAuthor({ booqId, authorId })
+    const userId = await getUserIdInsideRequest()
+    const dbNotes = await notesWithAuthorFor({ booqId, authorId, userId })
     return dbNotes.map(noteFromDbNoteWithAuthor)
 }
 

@@ -33,38 +33,21 @@ export async function noteForId(id: string): Promise<DbNote | null> {
   return note ? (note as DbNote) : null
 }
 
-export async function notesFor({
-  booqId,
-  authorId,
-  privacy,
-  offset,
-  limit,
-}: {
-  booqId?: string,
-  authorId?: string,
-  privacy?: DbNotePrivacy,
-  offset?: number,
-  limit?: number,
-}): Promise<DbNote[]> {
+export async function notesForBooqId(booqId: string, _userId?: string): Promise<DbNote[]> {
+  // TODO: userId parameter will be used in the future to support privacy filtering
   const result = await sql`
       SELECT * FROM notes
-      WHERE TRUE
-      ${booqId !== undefined ? sql`AND booq_id = ${booqId}` : sql``}
-      ${authorId !== undefined ? sql`AND author_id = ${authorId}` : sql``}
-      ${privacy !== undefined ? sql`AND privacy = ${privacy}` : sql``}
+      WHERE booq_id = ${booqId}
       ORDER BY created_at
-      ${offset !== undefined ? sql`OFFSET ${offset}` : sql``}
-      ${limit !== undefined ? sql`LIMIT ${limit}` : sql``}
     `
   return result as DbNote[]
 }
-export async function getNotesWithAuthor({
-  booqId,
-  authorId,
-}: {
+export async function notesWithAuthorFor({booqId, authorId, userId: _userId}: {
   booqId?: BooqId,
   authorId?: string,
+  userId?: string,
 }): Promise<DbNoteWithAuthor[]> {
+  // TODO: userId parameter will be used in the future to support privacy filtering
   const notes = await sql`
       SELECT n.*, u.name AS author_name, u.username AS author_username, u.profile_picture_url AS author_profile_picture_url, u.emoji AS author_emoji
       FROM notes n
