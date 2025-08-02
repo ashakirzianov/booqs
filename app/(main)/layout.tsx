@@ -30,9 +30,7 @@ export default async function MainLayout({
         </header>
 
         <main className={styles.mainContent}>
-            <div className={styles.contentInner}>
-                {children}
-            </div>
+            {children}
         </main>
 
         <aside className={styles.leftPanel}>
