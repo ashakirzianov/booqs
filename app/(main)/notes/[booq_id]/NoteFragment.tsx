@@ -2,8 +2,9 @@
 
 import { useState } from 'react'
 import { BooqId, BooqNode, BooqRange } from '@/core'
-import { SmallSpinner } from '@/components/Icons'
+import { SmallSpinner, CollapseIcon } from '@/components/Icons'
 import { BooqContent } from '@/viewer'
+import { LightButton } from '@/components/Buttons'
 
 type NoteFragmentProps = {
     booqId: BooqId
@@ -44,12 +45,26 @@ export function NoteFragment({ booqId, range, targetQuote, noteKind }: NoteFragm
 
     return (
         <>
+            {/* Control row - shows loading or collapse button */}
+            <div className="flex justify-end min-h-[24px]">
+                {isLoadingExpanded && (
+                    <div className="flex items-center gap-1 text-dimmed">
+                        <SmallSpinner />
+                        <span className="text-sm">Loading...</span>
+                    </div>
+                )}
+                {isExpanded && expandedFragment && (
+                    <LightButton
+                        text="Collapse"
+                        icon={<CollapseIcon />}
+                        onClick={handleExpand}
+                    />
+                )}
+            </div>
+
+            {/* Fragment content */}
             {isExpanded && expandedFragment ? (
-                <div 
-                    className="rounded shadow-sm p-3 bg-gray-50 max-h-96 overflow-y-auto cursor-pointer hover:bg-gray-100 transition-colors"
-                    onClick={handleExpand}
-                    title='Click to collapse'
-                >
+                <div className="rounded shadow-sm p-3 bg-gray-50 max-h-96 overflow-y-auto">
                     <BooqContent
                         nodes={expandedFragment.nodes}
                         range={expandedFragment.range}
@@ -58,22 +73,15 @@ export function NoteFragment({ booqId, range, targetQuote, noteKind }: NoteFragm
                 </div>
             ) : (
                 <div 
-                    className={`rounded shadow-sm p-3 cursor-pointer hover:opacity-80 transition-opacity ${isLoadingExpanded ? 'opacity-50' : ''}`}
+                    className="rounded shadow-sm p-3 cursor-pointer hover:opacity-80 transition-opacity"
                     onClick={handleExpand}
-                    title={isLoadingExpanded ? 'Loading...' : 'Click to expand'}
+                    title='Click to expand'
                 >
-                    {isLoadingExpanded ? (
-                        <div className="flex items-center gap-2">
-                            <SmallSpinner />
-                            <span className="font-book text-primary m-0">Loading expanded content...</span>
-                        </div>
-                    ) : (
-                        <span className="font-book text-primary m-0" style={{
-                            backgroundColor: `hsl(from var(--color-${noteKind}) h s l / 40%)`,
-                        }}>
-                            {targetQuote}
-                        </span>
-                    )}
+                    <span className="font-book text-primary m-0" style={{
+                        backgroundColor: `hsl(from var(--color-${noteKind}) h s l / 40%)`,
+                    }}>
+                        {targetQuote}
+                    </span>
                 </div>
             )}
         </>
