@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { BooqNote, NoteAuthorData } from '@/data/notes'
-import { BooqId } from '@/core'
+import { BooqId, BooqNode, BooqRange } from '@/core'
 import { useBooqNotes } from '@/application/notes'
 import { ActionButton, LightButton } from '@/components/Buttons'
 import { NoteFragment } from './NoteFragment'
@@ -11,9 +11,10 @@ type NoteCardProps = {
     note: BooqNote
     booqId: BooqId
     user: NoteAuthorData | undefined
+    expandedFragment?: { nodes: BooqNode[], range: BooqRange } | undefined
 }
 
-export function NoteCard({ note: initialNote, booqId, user }: NoteCardProps) {
+export function NoteCard({ note: initialNote, booqId, user, expandedFragment }: NoteCardProps) {
     const [isEditing, setIsEditing] = useState(false)
     const [editContent, setEditContent] = useState(initialNote.content || '')
     const [removedNote, setRemovedNote] = useState<BooqNote | null>(null)
@@ -95,6 +96,7 @@ export function NoteCard({ note: initialNote, booqId, user }: NoteCardProps) {
                     noteKind={note.kind}
                     onColorChange={handleColorChange}
                     onRemove={handleRemove}
+                    expandedFragment={expandedFragment}
                 />
 
                 {isEditing ? (

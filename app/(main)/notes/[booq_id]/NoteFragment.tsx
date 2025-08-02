@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { BooqId, BooqNode, BooqRange } from '@/core'
-import { SmallSpinner, CollapseIcon } from '@/components/Icons'
+import { CollapseIcon } from '@/components/Icons'
 import { BooqContent, Augmentation } from '@/viewer'
 import { LightButton, RemoveButton } from '@/components/Buttons'
 import { ColorPicker } from '@/components/ColorPicker'
@@ -16,19 +16,22 @@ type NoteFragmentProps = {
     noteKind: string
     onColorChange: (kind: string) => void
     onRemove?: () => void
+    expandedFragment?: { nodes: BooqNode[], range: BooqRange } | undefined
 }
 
-export function NoteFragment({ booqId, range, targetQuote, noteKind, onColorChange, onRemove }: NoteFragmentProps) {
+export function NoteFragment({
+    booqId, range, targetQuote, noteKind,
+    expandedFragment: preloadedFragment,
+    onColorChange, onRemove,
+}: NoteFragmentProps) {
     const [isExpanded, setIsExpanded] = useState(false)
-    const [expandedFragment, setExpandedFragment] = useState<{ nodes: BooqNode[], range: BooqRange } | null>(null)
-    const [isLoadingExpanded, setIsLoadingExpanded] = useState(false)
     const router = useRouter()
 
     const augmentationColor = `hsl(from var(--color-${noteKind}) h s l / 40%)`
 
     // Create augmentation for the current note to highlight it in the expanded content
     const noteAugmentation = useMemo<Augmentation[]>(() => {
-        if (!expandedFragment) {
+        if (!preloadedFragment) {
             return []
         }
 
@@ -37,38 +40,10 @@ export function NoteFragment({ booqId, range, targetQuote, noteKind, onColorChan
             range: range,
             color: augmentationColor,
         }]
-    }, [expandedFragment, booqId, range, augmentationColor])
+    }, [preloadedFragment, booqId, range, augmentationColor])
 
-    async function handleExpand() {
-        if (isExpanded) {
-            setIsExpanded(false)
-            return
-        }
-
-        // If we already have the expanded fragment cached, just show it
-        if (expandedFragment) {
-            setIsExpanded(true)
-            return
-        }
-
-        // Otherwise, fetch it for the first time
-        setIsLoadingExpanded(true)
-        try {
-            const rangeParam = encodeURIComponent(JSON.stringify(range))
-            const response = await fetch(`/api/booq/${booqId}/expanded-fragment?range=${rangeParam}`)
-
-            if (!response.ok) {
-                throw new Error('Failed to fetch expanded fragment')
-            }
-
-            const data = await response.json()
-            setExpandedFragment({ nodes: data.nodes, range: data.range })
-            setIsExpanded(true)
-        } catch (error) {
-            console.error('Error fetching expanded fragment:', error)
-        } finally {
-            setIsLoadingExpanded(false)
-        }
+    function handleExpand() {
+        setIsExpanded(!isExpanded)
     }
 
     function handleAugmentationClick(_id: string) {
@@ -79,16 +54,10 @@ export function NoteFragment({ booqId, range, targetQuote, noteKind, onColorChan
 
     return (
         <>
-            {/* Control row - shows loading or collapse button */}
+            {/* Control row - shows collapse button and controls when expanded */}
             <div className="flex justify-between items-center min-h-[24px] gap-4">
                 <div>
-                    {isLoadingExpanded && (
-                        <div className="flex items-center gap-2 text-dimmed">
-                            <SmallSpinner />
-                            <span className="text-sm">Loading...</span>
-                        </div>
-                    )}
-                    {isExpanded && expandedFragment && (
+                    {isExpanded && preloadedFragment && (
                         <LightButton
                             text="Collapse"
                             icon={<CollapseIcon />}
@@ -118,11 +87,11 @@ export function NoteFragment({ booqId, range, targetQuote, noteKind, onColorChan
             </div>
 
             {/* Fragment content */}
-            {isExpanded && expandedFragment ? (
+            {isExpanded && preloadedFragment ? (
                 <div className="rounded shadow-sm p-3 bg-background max-h-96 overflow-y-auto font-book text-primary">
                     <BooqContent
-                        nodes={expandedFragment.nodes}
-                        range={expandedFragment.range}
+                        nodes={preloadedFragment.nodes}
+                        range={preloadedFragment.range}
                         augmentations={noteAugmentation}
                         onAugmentationClick={handleAugmentationClick}
                     />

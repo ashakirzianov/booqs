@@ -8,6 +8,7 @@ import {
     BooqRange,
     BooqNode,
     getExpandedRange,
+    nodesForRange,
 } from '@/core'
 import { userForId } from '@/backend/users'
 import { booqIdsInCollections } from '@/backend/collections'
@@ -263,6 +264,23 @@ export async function fetchExpandedFragmentForRange(booqId: BooqId, range: BooqR
         nodes: result.nodes,
         range: expandedRange,
     }
+}
+
+export async function getExpandedFragments(booqId: BooqId, ranges: BooqRange[]): Promise<Array<{ nodes: BooqNode[], range: BooqRange } | undefined>> {
+    const booq = await booqForId(booqId)
+    if (!booq) {
+        return ranges.map(() => undefined)
+    }
+
+    return ranges.map(range => {
+        const expandedRange = getExpandedRange(booq.nodes, range)
+        const nodes = nodesForRange(booq.nodes, expandedRange)
+        
+        return {
+            nodes,
+            range: expandedRange,
+        }
+    })
 }
 
 function buildBooqCardData(data: BooqData): BooqCardData {

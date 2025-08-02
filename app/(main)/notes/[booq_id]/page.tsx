@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { booqHref, authorHref } from '@/common/href'
 import { getUserIdInsideRequest } from '@/data/request'
 import { getCurrentUser } from '@/data/user'
-import { booqCard } from '@/data/booqs'
+import { booqCard, getExpandedFragments } from '@/data/booqs'
 import { NoteCard } from './NoteCard'
 
 type Params = {
@@ -31,6 +31,10 @@ export default async function NotesPage({ params }: {
     const sortedNotes = userNotes.sort((a, b) => comparePaths(a.range.start, b.range.start))
     const currentUser = await getCurrentUser()
     const bookData = await booqCard(booqId)
+
+    // Pre-load expanded fragments for all notes
+    const noteRanges = sortedNotes.map(note => note.range)
+    const expandedFragments = await getExpandedFragments(booqId, noteRanges)
 
     if (!bookData) {
         notFound()
@@ -76,7 +80,7 @@ export default async function NotesPage({ params }: {
                     </div>
                 ) : (
                     <div className="space-y-6">
-                        {sortedNotes.map((note) => (
+                        {sortedNotes.map((note, index) => (
                             <NoteCard
                                 key={note.id}
                                 note={note}
@@ -88,6 +92,7 @@ export default async function NotesPage({ params }: {
                                     emoji: currentUser.emoji,
                                     profilePictureURL: currentUser.profilePictureURL,
                                 } : undefined}
+                                expandedFragment={expandedFragments[index]}
                             />
                         ))}
                     </div>
