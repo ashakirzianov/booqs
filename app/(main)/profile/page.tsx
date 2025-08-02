@@ -24,7 +24,7 @@ export default async function ProfilePage() {
             <PasskeySection initialPasskeys={passkeys} />
 
             {/* Account Actions - At Bottom */}
-            <div className="border-t border-dimmed pt-6 mt-8">
+            <div className="pt-6 mt-8">
                 <div className="flex gap-3 justify-center">
                     <SignoutButton />
                     <DeleteAccountButton account={{
