@@ -88,7 +88,7 @@ export function NoteFragment({
 
             {/* Fragment content */}
             {isExpanded && preloadedFragment ? (
-                <div className="rounded shadow-sm p-3 bg-background max-h-96 overflow-y-auto font-book text-primary">
+                <div className="rounded shadow-sm p-3 bg-background overflow-y-auto font-book text-primary">
                     <BooqContent
                         nodes={preloadedFragment.nodes}
                         range={preloadedFragment.range}
