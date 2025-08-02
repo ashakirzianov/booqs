@@ -35,11 +35,11 @@ export function NoteFragment({ booqId, range, targetQuote, noteKind }: NoteFragm
         try {
             const rangeParam = encodeURIComponent(JSON.stringify(range))
             const response = await fetch(`/api/booq/${booqId}/expanded-fragment?range=${rangeParam}`)
-            
+
             if (!response.ok) {
                 throw new Error('Failed to fetch expanded fragment')
             }
-            
+
             const data = await response.json()
             setExpandedFragment({ nodes: data.nodes, range: data.range })
             setIsExpanded(true)
@@ -71,7 +71,7 @@ export function NoteFragment({ booqId, range, targetQuote, noteKind }: NoteFragm
 
             {/* Fragment content */}
             {isExpanded && expandedFragment ? (
-                <div className="rounded shadow-sm p-3 bg-gray-50 max-h-96 overflow-y-auto">
+                <div className="rounded shadow-sm p-3 bg-background max-h-96 overflow-y-auto font-book text-primary">
                     <BooqContent
                         nodes={expandedFragment.nodes}
                         range={expandedFragment.range}
@@ -79,8 +79,8 @@ export function NoteFragment({ booqId, range, targetQuote, noteKind }: NoteFragm
                     />
                 </div>
             ) : (
-                <div 
-                    className="rounded shadow-sm p-3 cursor-pointer hover:opacity-80 transition-opacity"
+                <div
+                    className="rounded shadow-sm py-3 px-12 cursor-pointer hover:opacity-80 transition-opacity bg-background"
                     onClick={handleExpand}
                     title='Click to expand'
                 >
