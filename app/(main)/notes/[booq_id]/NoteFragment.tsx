@@ -1,9 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { BooqId, BooqNode, BooqRange } from '@/core'
 import { SmallSpinner, CollapseIcon } from '@/components/Icons'
-import { BooqContent } from '@/viewer'
+import { BooqContent, Augmentation } from '@/viewer'
 import { LightButton } from '@/components/Buttons'
 
 type NoteFragmentProps = {
@@ -17,6 +17,21 @@ export function NoteFragment({ booqId, range, targetQuote, noteKind }: NoteFragm
     const [isExpanded, setIsExpanded] = useState(false)
     const [expandedFragment, setExpandedFragment] = useState<{ nodes: BooqNode[], range: BooqRange } | null>(null)
     const [isLoadingExpanded, setIsLoadingExpanded] = useState(false)
+
+    const augmentationColor = `hsl(from var(--color-${noteKind}) h s l / 40%)`
+
+    // Create augmentation for the current note to highlight it in the expanded content
+    const noteAugmentation = useMemo<Augmentation[]>(() => {
+        if (!expandedFragment) {
+            return []
+        }
+
+        return [{
+            id: `note-${booqId}-${JSON.stringify(range)}`,
+            range: range,
+            color: augmentationColor,
+        }]
+    }, [expandedFragment, booqId, range, augmentationColor])
 
     async function handleExpand() {
         if (isExpanded) {
@@ -75,7 +90,7 @@ export function NoteFragment({ booqId, range, targetQuote, noteKind }: NoteFragm
                     <BooqContent
                         nodes={expandedFragment.nodes}
                         range={expandedFragment.range}
-                        augmentations={[]}
+                        augmentations={noteAugmentation}
                     />
                 </div>
             ) : (
@@ -85,7 +100,7 @@ export function NoteFragment({ booqId, range, targetQuote, noteKind }: NoteFragm
                     title='Click to expand'
                 >
                     <span className="font-book text-primary m-0" style={{
-                        backgroundColor: `hsl(from var(--color-${noteKind}) h s l / 40%)`,
+                        backgroundColor: augmentationColor,
                     }}>
                         {targetQuote}
                     </span>
