@@ -2,9 +2,10 @@ import { fetchNotes } from '@/data/notes'
 import { parseId, type BooqId, comparePaths } from '@/core'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import { booqHref } from '@/common/href'
+import { booqHref, authorHref } from '@/common/href'
 import { getUserIdInsideRequest } from '@/data/request'
 import { getCurrentUser } from '@/data/user'
+import { booqCard } from '@/data/booqs'
 import { NoteCard } from './NoteCard'
 
 type Params = {
@@ -29,19 +30,37 @@ export default async function NotesPage({ params }: {
     const userNotes = await fetchNotes({ booqId, authorId: userId })
     const sortedNotes = userNotes.sort((a, b) => comparePaths(a.range.start, b.range.start))
     const currentUser = await getCurrentUser()
+    const bookData = await booqCard(booqId)
+
+    if (!bookData) {
+        notFound()
+    }
 
     return (
         <main className="flex flex-row justify-center min-h-screen bg-background">
             <div className="flex flex-col max-w-4xl w-full p-6">
                 <div className="mb-6">
-                    <Link
-                        href={booqHref({ booqId, path: [0] })}
-                        className="text-action hover:text-highlight hover:underline mb-4 inline-block"
-                    >
-                        ← Back to Book
-                    </Link>
-                    <h1 className="text-3xl font-bold text-primary mb-2">My Notes</h1>
-                    <p className="text-dimmed">Your notes for this book</p>
+                    <h1 className="text-3xl font-bold text-primary mb-2">
+                        Notes for{' '}
+                        <Link
+                            href={booqHref({ booqId, path: [0] })}
+                            className="hover:text-highlight hover:underline"
+                        >
+                            {bookData.title}
+                        </Link>
+                        {' '}by{' '}
+                        {bookData.authors.map((author, index) => (
+                            <span key={author}>
+                                <Link
+                                    href={authorHref({ name: author, libraryId: library })}
+                                    className="hover:text-highlight hover:underline"
+                                >
+                                    {author}
+                                </Link>
+                                {index < bookData.authors.length - 1 && ', '}
+                            </span>
+                        ))}
+                    </h1>
                 </div>
 
                 {userNotes.length === 0 ? (
@@ -58,10 +77,10 @@ export default async function NotesPage({ params }: {
                 ) : (
                     <div className="space-y-6">
                         {sortedNotes.map((note) => (
-                            <NoteCard 
-                                key={note.id} 
-                                note={note} 
-                                booqId={booqId} 
+                            <NoteCard
+                                key={note.id}
+                                note={note}
+                                booqId={booqId}
                                 user={currentUser ? {
                                     id: currentUser.id,
                                     username: currentUser.username,
