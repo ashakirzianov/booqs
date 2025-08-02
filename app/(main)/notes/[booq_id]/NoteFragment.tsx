@@ -24,6 +24,13 @@ export function NoteFragment({ booqId, range, targetQuote, noteKind }: NoteFragm
             return
         }
 
+        // If we already have the expanded fragment cached, just show it
+        if (expandedFragment) {
+            setIsExpanded(true)
+            return
+        }
+
+        // Otherwise, fetch it for the first time
         setIsLoadingExpanded(true)
         try {
             const rangeParam = encodeURIComponent(JSON.stringify(range))
