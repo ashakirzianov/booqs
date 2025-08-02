@@ -2,8 +2,8 @@
 
 import { useState } from 'react'
 import { ProfileBadge } from '@/components/ProfilePicture'
-import { PencilIcon } from '@/components/Icons'
-import { LightButton, ActionButton, IconButton } from '@/components/Buttons'
+import { PencilIcon, SmallSpinner } from '@/components/Icons'
+import { LightButton, ActionButton } from '@/components/Buttons'
 import { updateAccountAction } from '@/data/auth'
 import { AccountData } from '@/data/user'
 import { AVAILABLE_EMOJIS } from '@/common/emoji'
@@ -170,18 +170,16 @@ export function ProfileData({ user }: { user: AccountData }) {
                                 <ActionButton
                                     onClick={handleUpdateProfile}
                                     disabled={isLoading || !hasChanges}
-                                    loading={isLoading}
                                     variant="primary"
-                                >
-                                    Update Profile
-                                </ActionButton>
+                                    text="Update Profile"
+                                    icon={isLoading && <SmallSpinner />}
+                                />
                                 <ActionButton
                                     onClick={handleCancel}
                                     disabled={isLoading}
                                     variant="secondary"
-                                >
-                                    Cancel
-                                </ActionButton>
+                                    text="Cancel"
+                                />
                             </div>
                         </div>
                     ) : (
@@ -208,12 +206,11 @@ export function ProfileData({ user }: { user: AccountData }) {
             {/* Edit Profile Button - Bottom Right Corner */}
             {!isEditMode && (
                 <div className="flex justify-end mt-2">
-                    <LightButton onClick={handleEditClick}>
-                        <div className="w-4 h-4">
-                            <PencilIcon />
-                        </div>
-                        Edit Profile
-                    </LightButton>
+                    <LightButton
+                        onClick={handleEditClick}
+                        icon={<PencilIcon />}
+                        text='Edit Profile'
+                    />
                 </div>
             )}
 
@@ -247,9 +244,9 @@ function EmojiSelector({ isOpen, onClose, currentEmoji, onSelect }: {
 
                 <div className="grid grid-cols-8 gap-3 max-h-80 overflow-y-auto p-2">
                     {AVAILABLE_EMOJIS.map((emoji, index) => (
-                        <IconButton
+                        <button
                             key={index}
-                            className={`p-3 text-2xl min-h-[3rem] flex items-center justify-center ${emoji === currentEmoji
+                            className={`p-3 text-2xl min-h-[3rem] flex items-center justify-center rounded-lg transition-colors ${emoji === currentEmoji
                                 ? 'bg-primary/20 ring-2 ring-primary'
                                 : 'hover:bg-highlight/10'
                                 }`}
@@ -259,18 +256,17 @@ function EmojiSelector({ isOpen, onClose, currentEmoji, onSelect }: {
                             }}
                         >
                             {emoji}
-                        </IconButton>
+                        </button>
                     ))}
                 </div>
 
                 <div className="flex gap-3 pt-4 mt-4 border-t border-dimmed">
                     <ActionButton
-                        className="flex-1"
                         onClick={onClose}
                         variant="secondary"
-                    >
-                        Cancel
-                    </ActionButton>
+                        text="Cancel"
+                        full
+                    />
                 </div>
             </div>
         </Modal>

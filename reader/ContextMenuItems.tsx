@@ -8,7 +8,7 @@ import { BooqSelection } from '@/viewer'
 import { ProfileBadge } from '@/components/ProfilePicture'
 import { ColorPicker } from './ColorPicker'
 import { useBooqNotes } from '@/application/notes'
-import { CommentIcon, CopyIcon, LinkIcon, RemoveIcon, ShareIcon, QuestionMarkIcon, Spinner } from '@/components/Icons'
+import { CommentIcon, CopyIcon, LinkIcon, RemoveIcon, ShareIcon, QuestionMarkIcon, SmallSpinner } from '@/components/Icons'
 import type { ContextMenuTarget, SelectionTarget, QuoteTarget, NoteTarget } from './ContextMenuContent'
 import { BooqNote, NoteAuthorData } from '@/data/notes'
 import { ReactNode } from 'react'
@@ -243,7 +243,7 @@ export function MenuItem({
         <span className='flex grow'>{text}</span>
         {
             spinner
-                ? <div className='flex grow-0'><Spinner /></div>
+                ? <div className='flex grow-0'><SmallSpinner /></div>
                 : null
         }
     </div>

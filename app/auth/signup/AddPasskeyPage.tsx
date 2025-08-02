@@ -1,7 +1,7 @@
 'use client'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { PasskeyIcon } from '@/components/Icons'
+import { PasskeyIcon, SmallSpinner } from '@/components/Icons'
 import { ActionButton } from '@/components/Buttons'
 import { usePasskeys } from '@/application/passkeys'
 import { browserSupportsWebAuthn } from '@simplewebauthn/browser'
@@ -67,30 +67,25 @@ export function AddPasskeyPage({ returnTo }: { returnTo: string }) {
                 <ActionButton
                     onClick={passkeyState.state === 'error' ? handleRetryPasskey : handleAddPasskey}
                     disabled={passkeyState.state === 'loading'}
-                    loading={passkeyState.state === 'loading'}
-                    className='w-full px-6 py-3'
-                >
-                    <div className='w-5 h-5'>
-                        <PasskeyIcon />
-                    </div>
-                    <span>
-                        {passkeyState.state === 'loading'
-                            ? 'Adding Passkey...'
-                            : passkeyState.state === 'error'
-                                ? 'Try Again'
-                                : 'Add Passkey'
-                        }
-                    </span>
-                </ActionButton>
+                    variant='primary'
+                    icon={
+                        passkeyState.state === 'loading'
+                            ? <SmallSpinner />
+                            : <PasskeyIcon />}
+                    text={passkeyState.state === 'loading'
+                        ? 'Adding Passkey...'
+                        : passkeyState.state === 'error'
+                            ? 'Try Again'
+                            : 'Add Passkey'
+                    }
+                />
 
                 <ActionButton
                     onClick={handleSkipPasskey}
                     disabled={passkeyState.state === 'loading'}
                     variant="secondary"
-                    className='w-full px-6 py-3'
-                >
-                    I&apos;ll use sign-in links
-                </ActionButton>
+                    text="I&apos;ll use sign-in links"
+                />
             </div>
         </div>
     )

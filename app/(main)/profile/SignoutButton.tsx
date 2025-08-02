@@ -2,7 +2,7 @@
 import { useRouter } from 'next/navigation'
 import { signOutAction } from '@/data/auth'
 import { feedHref } from '@/common/href'
-import { BorderButton } from '@/components/Buttons'
+import { ActionButton } from '@/components/Buttons'
 
 export function SignoutButton() {
     const router = useRouter()
@@ -12,5 +12,9 @@ export function SignoutButton() {
             router.push(feedHref())
         }
     }
-    return <BorderButton text="Sign Out" onClick={signout} />
+    return <ActionButton
+        text="Sign Out"
+        onClick={signout}
+        variant='secondary'
+    />
 }

@@ -7,6 +7,7 @@ import { booqHref } from '@/common/href'
 import { BooqId } from '@/core'
 import { useBooqNotes } from '@/application/notes'
 import { ActionButton, LightButton } from '@/components/Buttons'
+import { PencilIcon } from '@/components/Icons'
 
 type NoteCardProps = {
     note: BooqNote
@@ -18,7 +19,7 @@ export function NoteCard({ note: initialNote, booqId, user }: NoteCardProps) {
     const [isEditing, setIsEditing] = useState(false)
     const [editContent, setEditContent] = useState(initialNote.content || '')
     const { notes, updateNote } = useBooqNotes({ booqId, user })
-    
+
     // Use the updated note from the hook, fall back to initial note if not found
     const note = notes.find(n => n.id === initialNote.id) || initialNote
 
@@ -55,7 +56,7 @@ export function NoteCard({ note: initialNote, booqId, user }: NoteCardProps) {
                         {note.targetQuote}
                     </span>
                 </div>
-                
+
                 {isEditing ? (
                     <div className="mt-4">
                         <textarea
@@ -66,12 +67,14 @@ export function NoteCard({ note: initialNote, booqId, user }: NoteCardProps) {
                             rows={3}
                         />
                         <div className="flex gap-2 mt-2">
-                            <ActionButton onClick={handleEditToggle} variant="primary">
-                                Save
-                            </ActionButton>
-                            <ActionButton onClick={handleCancel} variant="secondary">
-                                Cancel
-                            </ActionButton>
+                            <ActionButton
+                                onClick={handleEditToggle} variant="primary"
+                                text="Save"
+                            />
+                            <ActionButton
+                                onClick={handleCancel} variant="secondary"
+                                text="Cancel"
+                            />
                         </div>
                     </div>
                 ) : (
@@ -86,10 +89,13 @@ export function NoteCard({ note: initialNote, booqId, user }: NoteCardProps) {
             </div>
 
             <div className="flex items-center justify-between text-sm pt-4">
-                <LightButton onClick={handleEditToggle}>
-                    {note.content ? 'Edit note' : 'Add note'}
-                </LightButton>
-                
+                <LightButton
+                    text={note.content ? 'Edit note' : 'Add note'}
+                    icon={<PencilIcon />}
+                    onClick={handleEditToggle}
+                />
+
+
                 <Link
                     href={booqHref({ booqId, path: note.range.start })}
                     className="text-action hover:text-highlight hover:underline transition-colors duration-200"

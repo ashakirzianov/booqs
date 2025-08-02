@@ -2,8 +2,8 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { usePasskeys } from '@/application/passkeys'
-import { PasskeyIcon } from '@/components/Icons'
-import { SubmitButton, ActionButton, LightButton } from '@/components/Buttons'
+import { PasskeyIcon, RetryIcon, SmallSpinner } from '@/components/Icons'
+import { ActionButton, LightButton } from '@/components/Buttons'
 import { initiateSignAction } from '@/data/auth'
 
 export function AuthForm({ returnTo }: {
@@ -104,10 +104,10 @@ export function AuthForm({ returnTo }: {
                         setEmailState({ state: 'idle' })
                         setEmail('')
                     }}
-                    className='text-action hover:text-highlight text-sm'
-                >
-                    Try a different email
-                </LightButton>
+                    size='small'
+                    text='Try a different email'
+                    icon={<RetryIcon />}
+                />
             </div>
         )
     }
@@ -146,13 +146,13 @@ export function AuthForm({ returnTo }: {
                         </div>
                     )}
 
-                    <SubmitButton
+                    <ActionButton
                         disabled={emailState.state === 'loading' || !email.trim()}
-                        loading={emailState.state === 'loading'}
-                        className='w-full'
-                    >
-                        {emailState.state === 'loading' ? 'Sending...' : 'Send Link'}
-                    </SubmitButton>
+                        text={emailState.state === 'loading' ? 'Sending...' : 'Send Link'}
+                        variant='primary'
+                        icon={emailState.state === 'loading' ? <SmallSpinner /> : null}
+                        full
+                    />
                 </form>
             </div>
 
@@ -165,21 +165,18 @@ export function AuthForm({ returnTo }: {
 
             {/* Passkey Authentication */}
             <div className='w-full space-y-4'>
-                <h2 className='text-center text-lg font-medium text-secondary'>Sign in with Passkey</h2>
-
                 <div className='flex flex-col gap-3'>
                     <ActionButton
                         onClick={handlePasskeySignIn}
                         disabled={passkeyState.state === 'loading'}
-                        loading={passkeyState.state === 'loading'}
+                        icon={
+                            passkeyState.state === 'loading'
+                                ? <SmallSpinner />
+                                : <PasskeyIcon />}
                         variant="secondary"
-                        className='w-full px-6 py-3 border-action text-action hover:bg-action hover:text-white'
-                    >
-                        <div className='w-5 h-5'>
-                            <PasskeyIcon />
-                        </div>
-                        <span>Sign in with Passkey</span>
-                    </ActionButton>
+                        text="Sign in with Passkey"
+                        full
+                    />
                 </div>
 
                 {passkeyState.state === 'error' && (

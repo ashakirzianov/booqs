@@ -2,8 +2,8 @@
 
 import { useState } from 'react'
 import { PasskeyData } from '@/data/auth'
-import { PasskeyIcon, TrashIcon } from '@/components/Icons'
-import { LightButton, IconButton } from '@/components/Buttons'
+import { PasskeyIcon } from '@/components/Icons'
+import { LightButton, RemoveButton } from '@/components/Buttons'
 import { usePasskeys } from '@/application/passkeys'
 
 export function PasskeySection({ initialPasskeys }: { initialPasskeys: PasskeyData[] }) {
@@ -80,31 +80,21 @@ export function PasskeySection({ initialPasskeys }: { initialPasskeys: PasskeyDa
                                     </p>
                                 </div>
                             </div>
-                            <IconButton
+                            <RemoveButton
                                 onClick={() => handleDeletePasskey(passkey.id)}
-                                disabled={isDeleting === passkey.id}
-                                variant="danger"
+                                isRemoving={isDeleting === passkey.id}
                                 title="Delete passkey"
-                            >
-                                <div className="w-4 h-4">
-                                    {isDeleting === passkey.id ? (
-                                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-alert"></div>
-                                    ) : (
-                                        <TrashIcon />
-                                    )}
-                                </div>
-                            </IconButton>
+                            />
                         </div>
                     ))}
                 </div>
             )}
             <div className='flex justify-end pt-4'>
-                <LightButton onClick={handleAddPasskey} disabled={isAddingPasskey}>
-                    <div className="w-4 h-4">
-                        <PasskeyIcon />
-                    </div>
-                    {isAddingPasskey ? 'Adding...' : 'Add Passkey'}
-                </LightButton>
+                <LightButton
+                    onClick={handleAddPasskey} disabled={isAddingPasskey}
+                    icon={<PasskeyIcon />}
+                    text={isAddingPasskey ? 'Adding...' : 'Add Passkey'}
+                />
             </div>
         </div>
     )

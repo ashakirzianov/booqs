@@ -3,8 +3,7 @@
 import { useState } from 'react'
 import { booqHref } from '@/common/href'
 import { BooqCover } from '@/components/BooqCover'
-import { TrashIcon } from '@/components/Icons'
-import { IconButton } from '@/components/Buttons'
+import { RemoveButton } from '@/components/Buttons'
 import { removeHistoryEntryAction, BriefReadingHistoryEntry } from '@/data/history'
 
 export function HistoryEntry({
@@ -82,21 +81,11 @@ export function HistoryEntry({
                         Continue Reading
                     </a>
                 </div>
-                <IconButton
+                <RemoveButton
                     onClick={handleRemove}
-                    disabled={isRemoving}
-                    variant="danger"
+                    isRemoving={false}
                     title="Remove from history"
-                    className="flex-shrink-0"
-                >
-                    <div className="w-4 h-4">
-                        {isRemoving ? (
-                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-alert"></div>
-                        ) : (
-                            <TrashIcon />
-                        )}
-                    </div>
-                </IconButton>
+                />
             </div>
         </div>
     )
