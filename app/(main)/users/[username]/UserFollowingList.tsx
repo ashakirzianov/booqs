@@ -1,5 +1,5 @@
 'use client'
-import { UserList, UserWithFollowStatus } from '@/components/UserList'
+import { UserList, UserWithFollowStatus } from '@/app/(main)/UserList'
 
 export function UserFollowingList({
     following,
@@ -16,17 +16,6 @@ export function UserFollowingList({
             currentUserId={currentUserId}
             title="Following"
             emptyMessage={`${profileUsername} isn't following anyone yet.`}
-            followButtonContent={
-                <>
-                    <span>+</span>
-                    <span>Follow</span>
-                </>
-            }
-            unfollowButtonContent={
-                <>
-                    <span>Unfollow</span>
-                </>
-            }
         />
     )
 }

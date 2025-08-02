@@ -1,11 +1,11 @@
 import { redirect } from 'next/navigation'
 import { authHref } from '@/common/href'
 import { fetchPasskeyData } from '@/data/auth'
-import { DeleteAccountButton } from '@/components/DeleteAccountButton'
-import { SignoutButton } from '@/components/SignoutButton'
-import { ProfileData } from '@/components/ProfileData'
-import { PasskeySection } from '@/components/PasskeySection'
+import { ProfileData } from '@/app/(main)/profile/ProfileData'
 import { getCurrentUser } from '@/data/user'
+import { DeleteAccountButton } from './DeleteAccountButton'
+import { PasskeySection } from './PasskeySection'
+import { SignoutButton } from './SignoutButton'
 
 export default async function ProfilePage() {
     const user = await getCurrentUser()
@@ -24,7 +24,7 @@ export default async function ProfilePage() {
             <PasskeySection initialPasskeys={passkeys} />
 
             {/* Account Actions - At Bottom */}
-            <div className="border-t border-dimmed pt-6 mt-8">
+            <div className="pt-6 mt-8">
                 <div className="flex gap-3 justify-center">
                     <SignoutButton />
                     <DeleteAccountButton account={{

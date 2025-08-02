@@ -1,8 +1,8 @@
 import { redirect } from 'next/navigation'
 import { authHref } from '@/common/href'
 import { getFollowingList, getFollowersList, getCurrentUser } from '@/data/user'
-import { FollowingList } from '@/components/FollowingList'
-import { FollowersList } from '@/components/FollowersList'
+import { FollowingList } from './FollowingList'
+import { FollowersList } from './FollowersList'
 
 export default async function FollowersPage() {
     const user = await getCurrentUser()

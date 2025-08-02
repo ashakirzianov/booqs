@@ -2,7 +2,8 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { usePasskeys } from '@/application/passkeys'
-import { PasskeyIcon, Spinner } from '@/components/Icons'
+import { PasskeyIcon } from '@/components/Icons'
+import { SubmitButton, ActionButton, LightButton } from '@/components/Buttons'
 import { initiateSignAction } from '@/data/auth'
 
 export function AuthForm({ returnTo }: {
@@ -98,7 +99,7 @@ export function AuthForm({ returnTo }: {
                     </div>
                 </div>
 
-                <button
+                <LightButton
                     onClick={() => {
                         setEmailState({ state: 'idle' })
                         setEmail('')
@@ -106,7 +107,7 @@ export function AuthForm({ returnTo }: {
                     className='text-action hover:text-highlight text-sm'
                 >
                     Try a different email
-                </button>
+                </LightButton>
             </div>
         )
     }
@@ -145,22 +146,13 @@ export function AuthForm({ returnTo }: {
                         </div>
                     )}
 
-                    <button
-                        type='submit'
+                    <SubmitButton
                         disabled={emailState.state === 'loading' || !email.trim()}
-                        className='w-full px-6 py-3 bg-action text-white rounded-lg hover:bg-highlight transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2'
+                        loading={emailState.state === 'loading'}
+                        className='w-full'
                     >
-                        {emailState.state === 'loading' ? (
-                            <>
-                                <div className='w-5 h-5'>
-                                    <Spinner />
-                                </div>
-                                <span>Sending...</span>
-                            </>
-                        ) : (
-                            'Send Link'
-                        )}
-                    </button>
+                        {emailState.state === 'loading' ? 'Sending...' : 'Send Link'}
+                    </SubmitButton>
                 </form>
             </div>
 
@@ -176,20 +168,18 @@ export function AuthForm({ returnTo }: {
                 <h2 className='text-center text-lg font-medium text-secondary'>Sign in with Passkey</h2>
 
                 <div className='flex flex-col gap-3'>
-                    <button
+                    <ActionButton
                         onClick={handlePasskeySignIn}
                         disabled={passkeyState.state === 'loading'}
-                        className='w-full px-6 py-3 border border-action text-action rounded-lg hover:bg-action hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3'
+                        loading={passkeyState.state === 'loading'}
+                        variant="secondary"
+                        className='w-full px-6 py-3 border-action text-action hover:bg-action hover:text-white'
                     >
                         <div className='w-5 h-5'>
-                            {passkeyState.state === 'loading' ? (
-                                <Spinner />
-                            ) : (
-                                <PasskeyIcon />
-                            )}
+                            <PasskeyIcon />
                         </div>
                         <span>Sign in with Passkey</span>
-                    </button>
+                    </ActionButton>
                 </div>
 
                 {passkeyState.state === 'error' && (

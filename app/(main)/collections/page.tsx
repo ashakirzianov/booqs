@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation'
 import { authHref } from '@/common/href'
 import { booqCollection } from '@/data/booqs'
 import { READING_LIST_COLLECTION } from '@/application/collections'
-import { BooqCollection } from '@/components/BooqCollection'
+import { BooqCollection } from '@/app/(main)/BooqCollection'
 import { getCurrentUser } from '@/data/user'
 
 export default async function CollectionPage() {

@@ -1,9 +1,9 @@
 'use client'
-import { useModalState } from './Modal'
-import { SearchModal } from './SearchModal'
+
+import { SearchModal, useSearchModalState } from './SearchModal'
 
 export function ExploreSearch() {
-    const { isOpen, openModal, closeModal } = useModalState()
+    const { isOpen, openModal, closeModal } = useSearchModalState()
     return <>
         <input
             className='font-normal border-none text-2xl shadow-lg rounded-lg p-6 w-96 max-w-[90vw] bg-background cursor-pointer

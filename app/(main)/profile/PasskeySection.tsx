@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { PasskeyData } from '@/data/auth'
 import { PasskeyIcon, TrashIcon } from '@/components/Icons'
-import { LightButton } from '@/components/Buttons'
+import { LightButton, IconButton } from '@/components/Buttons'
 import { usePasskeys } from '@/application/passkeys'
 
 export function PasskeySection({ initialPasskeys }: { initialPasskeys: PasskeyData[] }) {
@@ -43,15 +43,9 @@ export function PasskeySection({ initialPasskeys }: { initialPasskeys: PasskeyDa
     }
 
     return (
-        <div className="bg-background border border-dimmed rounded-lg p-6">
+        <div className="bg-background shadow-lg rounded-lg p-6">
             <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl font-semibold text-primary">Passkeys</h2>
-                <LightButton onClick={handleAddPasskey} disabled={isAddingPasskey}>
-                    <div className="w-4 h-4">
-                        <PasskeyIcon />
-                    </div>
-                    {isAddingPasskey ? 'Adding...' : 'Add Passkey'}
-                </LightButton>
             </div>
 
             <p className="text-sm text-dimmed mb-4">
@@ -69,7 +63,7 @@ export function PasskeySection({ initialPasskeys }: { initialPasskeys: PasskeyDa
             ) : (
                 <div className="space-y-3">
                     {passkeys.map((passkey) => (
-                        <div key={passkey.id} className="flex items-center justify-between p-3 border border-dimmed rounded-lg">
+                        <div key={passkey.id} className="flex items-center justify-between p-3 border-[0.5px] border-dimmed rounded-lg">
                             <div className="flex items-center gap-3">
                                 <div className="w-6 h-6 text-action">
                                     <PasskeyIcon />
@@ -86,10 +80,10 @@ export function PasskeySection({ initialPasskeys }: { initialPasskeys: PasskeyDa
                                     </p>
                                 </div>
                             </div>
-                            <button
+                            <IconButton
                                 onClick={() => handleDeletePasskey(passkey.id)}
                                 disabled={isDeleting === passkey.id}
-                                className="p-2 text-alert hover:bg-alert/10 rounded-lg transition-colors disabled:opacity-50"
+                                variant="danger"
                                 title="Delete passkey"
                             >
                                 <div className="w-4 h-4">
@@ -99,11 +93,19 @@ export function PasskeySection({ initialPasskeys }: { initialPasskeys: PasskeyDa
                                         <TrashIcon />
                                     )}
                                 </div>
-                            </button>
+                            </IconButton>
                         </div>
                     ))}
                 </div>
             )}
+            <div className='flex justify-end pt-4'>
+                <LightButton onClick={handleAddPasskey} disabled={isAddingPasskey}>
+                    <div className="w-4 h-4">
+                        <PasskeyIcon />
+                    </div>
+                    {isAddingPasskey ? 'Adding...' : 'Add Passkey'}
+                </LightButton>
+            </div>
         </div>
     )
 }

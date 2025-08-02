@@ -1,9 +1,10 @@
 'use client'
-import { useState, ReactNode } from 'react'
+import { useState } from 'react'
 import Link from 'next/link'
 import { userHref } from '@/common/href'
 import { AccountPublicData, followAction, unfollowAction } from '@/data/user'
 import { ProfileBadge } from '@/components/ProfilePicture'
+import { FollowButton } from '@/components/Buttons'
 
 export type UserWithFollowStatus = AccountPublicData & {
     isFollowing: boolean
@@ -17,8 +18,6 @@ type ButtonState =
 interface UserListProps {
     users: UserWithFollowStatus[]
     currentUserId: string | null
-    followButtonContent: ReactNode
-    unfollowButtonContent: ReactNode
     title: string
     emptyMessage: string
     emptySubMessage?: string
@@ -28,8 +27,6 @@ interface UserListProps {
 export function UserList({
     users,
     currentUserId,
-    followButtonContent,
-    unfollowButtonContent,
     title,
     emptyMessage,
     emptySubMessage,
@@ -179,7 +176,7 @@ export function UserList({
                     const buttonState = buttonStates[user.username] || { state: 'idle' }
 
                     return (
-                        <div key={user.id} className="flex items-center justify-between p-3 border border-dimmed rounded-lg">
+                        <div key={user.id} className="flex items-center justify-between p-3 shadow-sm rounded-lg">
                             <div className="flex items-center gap-3">
                                 <Link href={userHref({ username: user.username })}>
                                     <ProfileBadge
@@ -204,27 +201,13 @@ export function UserList({
                             {/* Only show follow button if user is authenticated and not viewing own profile */}
                             {currentUserId && user.id !== currentUserId && (
                                 <div className="flex flex-col items-end gap-1">
-                                    <button
+                                    <FollowButton
+                                        isFollowing={user.isFollowing}
                                         onClick={() => user.isFollowing ? handleUnfollow(user.username) : handleFollow(user.username)}
                                         disabled={buttonState.state === 'loading'}
-                                        className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 disabled:cursor-not-allowed transform ${user.isFollowing
-                                            ? 'bg-gray-200 text-gray-700 hover:bg-gray-300 hover:scale-[1.02]'
-                                            : 'bg-action text-white hover:bg-highlight hover:text-background hover:scale-[1.02]'
-                                            } ${buttonState.state === 'loading'
-                                                ? 'opacity-90 scale-[0.98]'
-                                                : 'opacity-100 scale-100'
-                                            } ${buttonState.state === 'error'
-                                                ? 'ring-2 ring-red-500 ring-opacity-50'
-                                                : ''
-                                            }`}
-                                    >
-                                        <span className="flex items-center gap-1">
-                                            {buttonState.state === 'loading' && (
-                                                <div className="w-4 h-4 border-2 border-current border-t-transparent animate-spin rounded-full"></div>
-                                            )}
-                                            {user.isFollowing ? unfollowButtonContent : followButtonContent}
-                                        </span>
-                                    </button>
+                                        loading={buttonState.state === 'loading'}
+                                        className={buttonState.state === 'error' ? 'ring-2 ring-red-500 ring-opacity-50' : ''}
+                                    />
 
                                     {/* Error message */}
                                     {buttonState.state === 'error' && (

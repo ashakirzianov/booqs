@@ -8,10 +8,10 @@ import { formatRelativeTime } from '@/application/common'
 import { HIGHLIGHT_KINDS, useBooqNotes } from '@/application/notes'
 import { ProfileBadge } from '@/components/ProfilePicture'
 import { CommentIcon, RemoveIcon, QuestionMarkIcon, ShareIcon } from '@/components/Icons'
-import { MenuButton } from '@/components/Buttons'
 import { generateQuote } from './ContextMenuItems'
 import { NoteAuthorData } from '@/data/notes'
 import { userHref } from '@/common/href'
+import { MenuButton } from './MenuButton'
 
 export function NoteTargetMenu({
     target, booqId, user, setTarget

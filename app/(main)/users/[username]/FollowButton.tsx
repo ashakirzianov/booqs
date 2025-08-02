@@ -1,6 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { followAction, unfollowAction } from '@/data/user'
+import { FollowButton as FollowButtonComponent } from '@/components/Buttons'
 
 type ButtonState =
     | { state: 'idle' }
@@ -62,36 +63,13 @@ export function FollowButton({ username, initialFollowStatus }: {
 
     return (
         <div className="flex flex-col items-end gap-1">
-            <button
+            <FollowButtonComponent
+                isFollowing={isFollowing}
                 onClick={handleToggleFollow}
                 disabled={buttonState.state === 'loading'}
-                className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 disabled:cursor-not-allowed transform ${isFollowing
-                    ? 'bg-gray-200 text-gray-700 hover:bg-gray-300 hover:scale-[1.02]'
-                    : 'bg-action text-white hover:bg-highlight hover:text-background hover:scale-[1.02]'
-                    } ${buttonState.state === 'loading'
-                        ? 'opacity-90 scale-[0.98]'
-                        : 'opacity-100 scale-100'
-                    } ${buttonState.state === 'error'
-                        ? 'ring-2 ring-red-500 ring-opacity-50'
-                        : ''
-                    }`}
-            >
-                <span className="flex items-center gap-1">
-                    {buttonState.state === 'loading' && (
-                        <div className="w-4 h-4 border-2 border-current border-t-transparent animate-spin rounded-full"></div>
-                    )}
-                    {isFollowing ? (
-                        <>
-                            <span>Unfollow</span>
-                        </>
-                    ) : (
-                        <>
-                            <span>+</span>
-                            <span>Follow</span>
-                        </>
-                    )}
-                </span>
-            </button>
+                loading={buttonState.state === 'loading'}
+                className={buttonState.state === 'error' ? 'ring-2 ring-red-500 ring-opacity-50' : ''}
+            />
 
             {/* Error message */}
             {buttonState.state === 'error' && (

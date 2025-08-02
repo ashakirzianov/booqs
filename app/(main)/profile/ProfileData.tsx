@@ -2,11 +2,12 @@
 
 import { useState } from 'react'
 import { ProfileBadge } from '@/components/ProfilePicture'
-import { EmojiSelector } from './EmojiSelector'
 import { PencilIcon } from '@/components/Icons'
-import { LightButton } from '@/components/Buttons'
+import { LightButton, ActionButton, IconButton } from '@/components/Buttons'
 import { updateAccountAction } from '@/data/auth'
 import { AccountData } from '@/data/user'
+import { AVAILABLE_EMOJIS } from '@/common/emoji'
+import { Modal } from '@/components/Modal'
 
 type FormState =
     | { state: 'display' }
@@ -108,7 +109,7 @@ export function ProfileData({ user }: { user: AccountData }) {
         currentData.username !== user.username
 
     return (
-        <div className="bg-background border border-dimmed rounded-lg p-6 flex flex-col">
+        <div className="bg-background shadow-lg rounded-lg p-6 flex flex-col">
             <div className="flex items-center gap-4">
                 <div
                     className="relative cursor-pointer"
@@ -166,23 +167,21 @@ export function ProfileData({ user }: { user: AccountData }) {
                                 </p>
                             </div>
                             <div className="flex gap-2">
-                                <button
+                                <ActionButton
                                     onClick={handleUpdateProfile}
                                     disabled={isLoading || !hasChanges}
-                                    className="px-4 py-2 bg-action text-white rounded-md hover:bg-highlight disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                                    loading={isLoading}
+                                    variant="primary"
                                 >
-                                    {isLoading && (
-                                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                                    )}
                                     Update Profile
-                                </button>
-                                <button
+                                </ActionButton>
+                                <ActionButton
                                     onClick={handleCancel}
                                     disabled={isLoading}
-                                    className="px-4 py-2 border border-dimmed text-primary rounded-md hover:bg-background-hover disabled:opacity-50 disabled:cursor-not-allowed"
+                                    variant="secondary"
                                 >
                                     Cancel
-                                </button>
+                                </ActionButton>
                             </div>
                         </div>
                     ) : (
@@ -225,6 +224,56 @@ export function ProfileData({ user }: { user: AccountData }) {
                 onSelect={handleEmojiChange}
             />
         </div>
+    )
+}
+
+function EmojiSelector({ isOpen, onClose, currentEmoji, onSelect }: {
+    isOpen: boolean
+    onClose: () => void
+    currentEmoji?: string
+    onSelect: (emoji: string) => void
+}) {
+    return (
+        <Modal isOpen={isOpen} closeModal={onClose}>
+            <div className="w-96 max-w-[90vw] mx-auto p-6">
+                <div className="text-center mb-6">
+                    <h2 className="text-xl font-bold text-primary mb-2">
+                        Choose Your Emoji
+                    </h2>
+                    <p className="text-dimmed text-sm">
+                        Select an emoji to represent your profile
+                    </p>
+                </div>
+
+                <div className="grid grid-cols-8 gap-3 max-h-80 overflow-y-auto p-2">
+                    {AVAILABLE_EMOJIS.map((emoji, index) => (
+                        <IconButton
+                            key={index}
+                            className={`p-3 text-2xl min-h-[3rem] flex items-center justify-center ${emoji === currentEmoji
+                                ? 'bg-primary/20 ring-2 ring-primary'
+                                : 'hover:bg-highlight/10'
+                                }`}
+                            onClick={() => {
+                                onSelect(emoji)
+                                onClose()
+                            }}
+                        >
+                            {emoji}
+                        </IconButton>
+                    ))}
+                </div>
+
+                <div className="flex gap-3 pt-4 mt-4 border-t border-dimmed">
+                    <ActionButton
+                        className="flex-1"
+                        onClick={onClose}
+                        variant="secondary"
+                    >
+                        Cancel
+                    </ActionButton>
+                </div>
+            </div>
+        </Modal>
     )
 }
 

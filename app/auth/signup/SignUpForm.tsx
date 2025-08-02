@@ -1,8 +1,8 @@
 'use client'
 import { useState } from 'react'
 import { completeSignUpAction } from '@/data/auth'
-import { Spinner } from '@/components/Icons'
-import { EmojiSelector } from '@/app/(main)/account/EmojiSelector'
+import { EmojiSelector } from '@/components/EmojiSelector'
+import { SubmitButton, IconButton } from '@/components/Buttons'
 
 type FormDataState = {
     username: string
@@ -58,9 +58,9 @@ export function SignUpForm({
         // Validate username format
         const usernamePattern = /^[a-zA-Z0-9-]+$/
         if (!usernamePattern.test(formData.username.trim())) {
-            setSignUpState({ 
-                state: 'error', 
-                error: 'Username must contain only letters, numbers, and hyphens' 
+            setSignUpState({
+                state: 'error',
+                error: 'Username must contain only letters, numbers, and hyphens'
             })
             return
         }
@@ -146,14 +146,12 @@ export function SignUpForm({
                 <div className='flex flex-col gap-2'>
                     <label className='text-sm font-medium text-secondary'>Profile Emoji</label>
                     <div className='flex items-center gap-3'>
-                        <button
-                            type='button'
+                        <IconButton
                             onClick={() => setFormData(prev => ({ ...prev, showEmojiSelector: true }))}
-                            className='w-16 h-16 text-3xl border border-dimmed rounded-lg hover:bg-dimmed/20 transition-colors flex items-center justify-center'
-                            aria-label='Change profile emoji'
+                            className='w-16 h-16 text-3xl border border-dimmed'
                         >
                             {formData.selectedEmoji}
-                        </button>
+                        </IconButton>
                         <span className='text-sm text-secondary'>Click to change</span>
                     </div>
                 </div>
@@ -164,22 +162,13 @@ export function SignUpForm({
                     </div>
                 )}
 
-                <button
-                    type='submit'
+                <SubmitButton
                     disabled={signUpState.state === 'loading-signup' || !formData.name.trim() || !formData.username.trim()}
-                    className='px-6 py-3 bg-action text-white rounded-lg hover:bg-highlight transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2'
+                    loading={signUpState.state === 'loading-signup'}
+                    className='w-full'
                 >
-                    {signUpState.state === 'loading-signup' ? (
-                        <>
-                            <div className='w-5 h-5'>
-                                <Spinner />
-                            </div>
-                            <span>Completing Sign Up...</span>
-                        </>
-                    ) : (
-                        'Complete Sign Up'
-                    )}
-                </button>
+                    {signUpState.state === 'loading-signup' ? 'Completing Sign Up...' : 'Complete Sign Up'}
+                </SubmitButton>
             </form>
 
             <EmojiSelector
