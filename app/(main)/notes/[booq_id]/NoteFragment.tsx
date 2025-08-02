@@ -5,15 +5,17 @@ import { BooqId, BooqNode, BooqRange } from '@/core'
 import { SmallSpinner, CollapseIcon } from '@/components/Icons'
 import { BooqContent, Augmentation } from '@/viewer'
 import { LightButton } from '@/components/Buttons'
+import { ColorPicker } from '@/components/ColorPicker'
 
 type NoteFragmentProps = {
     booqId: BooqId
     range: BooqRange
     targetQuote: string
     noteKind: string
+    onColorChange: (kind: string) => void
 }
 
-export function NoteFragment({ booqId, range, targetQuote, noteKind }: NoteFragmentProps) {
+export function NoteFragment({ booqId, range, targetQuote, noteKind, onColorChange }: NoteFragmentProps) {
     const [isExpanded, setIsExpanded] = useState(false)
     const [expandedFragment, setExpandedFragment] = useState<{ nodes: BooqNode[], range: BooqRange } | null>(null)
     const [isLoadingExpanded, setIsLoadingExpanded] = useState(false)
@@ -68,20 +70,32 @@ export function NoteFragment({ booqId, range, targetQuote, noteKind }: NoteFragm
     return (
         <>
             {/* Control row - shows loading or collapse button */}
-            <div className="flex justify-end min-h-[24px]">
-                {isLoadingExpanded && (
-                    <div className="flex items-center gap-1 text-dimmed">
-                        <SmallSpinner />
-                        <span className="text-sm">Loading...</span>
-                    </div>
-                )}
-                {isExpanded && expandedFragment && (
-                    <LightButton
-                        text="Collapse"
-                        icon={<CollapseIcon />}
-                        onClick={handleExpand}
-                    />
-                )}
+            <div className="flex justify-between items-center min-h-[24px] gap-4">
+                <div>
+                    {isLoadingExpanded && (
+                        <div className="flex items-center gap-2 text-dimmed">
+                            <SmallSpinner />
+                            <span className="text-sm">Loading...</span>
+                        </div>
+                    )}
+                    {isExpanded && expandedFragment && (
+                        <LightButton
+                            text="Collapse"
+                            icon={<CollapseIcon />}
+                            onClick={handleExpand}
+                        />
+                    )}
+                </div>
+                <div>
+                    {isExpanded && (
+                        <div className='w-32 shadow-md rounded overflow-clip'>
+                            <ColorPicker
+                                selectedKind={noteKind}
+                                onColorChange={onColorChange}
+                            />
+                        </div>
+                    )}
+                </div>
             </div>
 
             {/* Fragment content */}

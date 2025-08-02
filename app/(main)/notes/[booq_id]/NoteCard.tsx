@@ -99,6 +99,7 @@ export function NoteCard({ note: initialNote, booqId, user }: NoteCardProps) {
                     range={note.range}
                     targetQuote={note.targetQuote}
                     noteKind={note.kind}
+                    onColorChange={handleColorChange}
                 />
 
                 {isEditing ? (
