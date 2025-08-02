@@ -7,7 +7,7 @@ import { booqHref } from '@/common/href'
 import { BooqId } from '@/core'
 import { useBooqNotes } from '@/application/notes'
 import { ActionButton, LightButton } from '@/components/Buttons'
-import { PencilIcon, TrashIcon, BrushIcon } from '@/components/Icons'
+import { TrashIcon, BrushIcon } from '@/components/Icons'
 import { ColorPicker } from '@/components/ColorPicker'
 import { NoteFragment } from './NoteFragment'
 
@@ -123,24 +123,18 @@ export function NoteCard({ note: initialNote, booqId, user }: NoteCardProps) {
                         </div>
                     </div>
                 ) : (
-                    <>
-                        {note.content && (
-                            <div className="text-primary px-3">
-                                {note.content}
-                            </div>
-                        )}
-                    </>
+                    <div 
+                        className="text-primary px-3 cursor-pointer hover:opacity-80 transition-opacity italic"
+                        onClick={handleEditToggle}
+                    >
+                        {note.content || <span className="text-dimmed">Add note…</span>}
+                    </div>
                 )}
             </div>
 
             {!isEditing && <div className="flex flex-col gap-3">
                 <div className="flex items-center justify-between text-sm">
                     <div className="flex gap-4">
-                        <LightButton
-                            text={note.content ? 'Edit note' : 'Add note'}
-                            icon={<PencilIcon />}
-                            onClick={handleEditToggle}
-                        />
                         <LightButton
                             text="Remove"
                             icon={<TrashIcon />}
