@@ -6,6 +6,7 @@ import { BooqNote, NoteAuthorData } from '@/data/notes'
 import { booqHref } from '@/common/href'
 import { BooqId } from '@/core'
 import { useBooqNotes } from '@/application/notes'
+import { ActionButton, LightButton } from '@/components/Buttons'
 
 type NoteCardProps = {
     note: BooqNote
@@ -65,18 +66,12 @@ export function NoteCard({ note: initialNote, booqId, user }: NoteCardProps) {
                             rows={3}
                         />
                         <div className="flex gap-2 mt-2">
-                            <button
-                                onClick={handleEditToggle}
-                                className="bg-action hover:bg-highlight text-light px-3 py-1 rounded text-sm font-medium transition-colors duration-200"
-                            >
+                            <ActionButton onClick={handleEditToggle} variant="primary">
                                 Save
-                            </button>
-                            <button
-                                onClick={handleCancel}
-                                className="bg-gray-300 hover:bg-gray-400 text-primary px-3 py-1 rounded text-sm font-medium transition-colors duration-200"
-                            >
+                            </ActionButton>
+                            <ActionButton onClick={handleCancel} variant="secondary">
                                 Cancel
-                            </button>
+                            </ActionButton>
                         </div>
                     </div>
                 ) : (
@@ -86,22 +81,18 @@ export function NoteCard({ note: initialNote, booqId, user }: NoteCardProps) {
                                 {note.content}
                             </div>
                         )}
-                        <div className="mt-3">
-                            <button
-                                onClick={handleEditToggle}
-                                className="text-action hover:text-highlight hover:underline text-sm font-medium transition-colors duration-200"
-                            >
-                                {note.content ? 'Edit note' : 'Add note'}
-                            </button>
-                        </div>
                     </>
                 )}
             </div>
 
             <div className="flex items-center justify-between text-sm pt-4">
+                <LightButton onClick={handleEditToggle}>
+                    {note.content ? 'Edit note' : 'Add note'}
+                </LightButton>
+                
                 <Link
                     href={booqHref({ booqId, path: note.range.start })}
-                    className="hover:text-highlight hover:underline text-action px-4 py-2 rounded font-medium transition-colors duration-200"
+                    className="text-action hover:text-highlight hover:underline transition-colors duration-200"
                 >
                     Show in booq
                 </Link>
