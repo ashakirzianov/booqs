@@ -12,6 +12,7 @@ import {
     iteratorsNode,
 } from './iterator'
 import { assertNever } from './misc'
+import { nodeForPath } from './node'
 
 export function nodeText(node: BooqNode): string {
     switch (node?.kind) {
@@ -162,4 +163,62 @@ export function textForRange(nodes: BooqNode[], { start, end }: BooqRange): stri
     }
 
     return result
+}
+
+export function getExpandedRange(nodes: BooqNode[], range: BooqRange): BooqRange {
+    const expandedStart = getExpandedStartPath(nodes, range.start)
+    const expandedEnd = getExpandedEndPath(nodes, range.end, expandedStart)
+
+    return {
+        start: expandedStart,
+        end: expandedEnd,
+    }
+}
+
+function getExpandedStartPath(nodes: BooqNode[], startPath: BooqPath): BooqPath {
+    // Check if the start element itself has pph=true
+    const startNode = nodeForPath(nodes, startPath)
+    if (startNode?.kind === 'element' && startNode.pph === true) {
+        return startPath
+    }
+
+    // Find the first parent with pph=true
+    for (let depth = startPath.length - 1; depth > 0; depth--) {
+        const parentPath = startPath.slice(0, depth)
+        const parentNode = nodeForPath(nodes, parentPath)
+        if (parentNode?.kind === 'element' && parentNode.pph === true) {
+            return parentPath
+        }
+    }
+
+    // If no parent with pph=true is found, return the original start path
+    return startPath
+}
+
+function getExpandedEndPath(nodes: BooqNode[], endPath: BooqPath, expandedStart: BooqPath): BooqPath {
+    if (!endPath || endPath.length === 0) {
+        // If no end path, create one based on expanded start
+        return [expandedStart[0] + 1]
+    }
+
+    // Find the first parent with pph=true of the end element
+    let parentWithPph: BooqPath | undefined
+    for (let depth = endPath.length - 1; depth > 0; depth--) {
+        const parentPath = endPath.slice(0, depth)
+        const parentNode = nodeForPath(nodes, parentPath)
+        if (parentNode?.kind === 'element' && parentNode.pph === true) {
+            parentWithPph = parentPath
+            break
+        }
+    }
+
+    if (parentWithPph) {
+        // Get the next sibling of the parent with pph=true
+        const nextSiblingPath = [...parentWithPph]
+        nextSiblingPath[nextSiblingPath.length - 1] += 1
+        return nextSiblingPath
+    } else {
+        // If no parent with pph=true, use next sibling of expanded start or increment start[0]
+        return [expandedStart[0] + 1]
+    }
 }
