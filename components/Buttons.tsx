@@ -50,7 +50,7 @@ export function LightButton({ children, onClick, className = '', disabled = fals
     return <button
         onClick={onClick}
         disabled={disabled}
-        className={`flex items-center gap-2 px-3 py-2 text-action hover:text-highlight transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
+        className={`flex items-center gap-2 text-action hover:text-highlight transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
     >
         {children}
     </button>

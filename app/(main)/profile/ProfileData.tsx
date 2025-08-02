@@ -109,7 +109,7 @@ export function ProfileData({ user }: { user: AccountData }) {
         currentData.username !== user.username
 
     return (
-        <div className="bg-background border border-dimmed rounded-lg p-6 flex flex-col">
+        <div className="bg-background shadow-lg rounded-lg p-6 flex flex-col">
             <div className="flex items-center gap-4">
                 <div
                     className="relative cursor-pointer"

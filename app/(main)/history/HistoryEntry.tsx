@@ -45,7 +45,7 @@ export function HistoryEntry({
     }
 
     return (
-        <div className="border border-dimmed rounded-lg p-4 hover:bg-secondary transition-colors">
+        <div className="border shadow-sm rounded-lg p-4 hover:bg-secondary transition-colors">
             <div className="flex items-start gap-4">
                 <BooqCover
                     cover={cover}

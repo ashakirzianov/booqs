@@ -1,5 +1,5 @@
 .layout {
-    --content-width: 720px;
+    --content-width: 780px;
     --header-height: 4rem;
     --panel-width: 300px;
     --spacing-regular: 0.5rem;
@@ -59,7 +59,7 @@
     display: flex;
     flex-direction: column;
     background: var(--color-background);
-    padding-top: var(--header-height);
+    padding: var(--header-height) var(--spacing-regular) var(--spacing-regular) var(--spacing-regular);
     box-sizing: border-box;
     overflow-x: hidden;
     width: var(--content-width);
