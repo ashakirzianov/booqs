@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { booqHref } from '@/common/href'
 import { BooqCover } from '@/components/BooqCover'
 import { TrashIcon } from '@/components/Icons'
+import { IconButton } from '@/components/Buttons'
 import { removeHistoryEntryAction, BriefReadingHistoryEntry } from '@/data/history'
 
 export function HistoryEntry({
@@ -81,11 +82,12 @@ export function HistoryEntry({
                         Continue Reading
                     </a>
                 </div>
-                <button
+                <IconButton
                     onClick={handleRemove}
                     disabled={isRemoving}
-                    className="p-2 text-alert hover:bg-alert/10 rounded-lg transition-colors disabled:opacity-50 flex-shrink-0"
+                    variant="danger"
                     title="Remove from history"
+                    className="flex-shrink-0"
                 >
                     <div className="w-4 h-4">
                         {isRemoving ? (
@@ -94,7 +96,7 @@ export function HistoryEntry({
                             <TrashIcon />
                         )}
                     </div>
-                </button>
+                </IconButton>
             </div>
         </div>
     )

@@ -13,17 +13,6 @@ export function FollowingList({ following, currentUserId }: {
             title="Following"
             emptyMessage="You're not following anyone yet."
             emptySubMessage="Find users to follow by browsing their profiles."
-            followButtonContent={
-                <>
-                    <span>+</span>
-                    <span>Follow</span>
-                </>
-            }
-            unfollowButtonContent={
-                <>
-                    <span>Unfollow</span>
-                </>
-            }
         />
     )
 }

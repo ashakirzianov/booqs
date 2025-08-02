@@ -16,17 +16,6 @@ export function UserFollowersList({
             currentUserId={currentUserId}
             title="Followers"
             emptyMessage={`${profileUsername} doesn't have any followers yet.`}
-            followButtonContent={
-                <>
-                    <span>+</span>
-                    <span>Follow</span>
-                </>
-            }
-            unfollowButtonContent={
-                <>
-                    <span>Unfollow</span>
-                </>
-            }
         />
     )
 }

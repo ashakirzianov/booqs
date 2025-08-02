@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { PasskeyData } from '@/data/auth'
 import { PasskeyIcon, TrashIcon } from '@/components/Icons'
-import { LightButton } from '@/components/Buttons'
+import { LightButton, IconButton } from '@/components/Buttons'
 import { usePasskeys } from '@/application/passkeys'
 
 export function PasskeySection({ initialPasskeys }: { initialPasskeys: PasskeyData[] }) {
@@ -86,10 +86,10 @@ export function PasskeySection({ initialPasskeys }: { initialPasskeys: PasskeyDa
                                     </p>
                                 </div>
                             </div>
-                            <button
+                            <IconButton
                                 onClick={() => handleDeletePasskey(passkey.id)}
                                 disabled={isDeleting === passkey.id}
-                                className="p-2 text-alert hover:bg-alert/10 rounded-lg transition-colors disabled:opacity-50"
+                                variant="danger"
                                 title="Delete passkey"
                             >
                                 <div className="w-4 h-4">
@@ -99,7 +99,7 @@ export function PasskeySection({ initialPasskeys }: { initialPasskeys: PasskeyDa
                                         <TrashIcon />
                                     )}
                                 </div>
-                            </button>
+                            </IconButton>
                         </div>
                     ))}
                 </div>

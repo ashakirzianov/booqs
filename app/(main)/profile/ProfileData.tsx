@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { ProfileBadge } from '@/components/ProfilePicture'
 import { PencilIcon } from '@/components/Icons'
-import { LightButton } from '@/components/Buttons'
+import { LightButton, ActionButton, IconButton } from '@/components/Buttons'
 import { updateAccountAction } from '@/data/auth'
 import { AccountData } from '@/data/user'
 import { AVAILABLE_EMOJIS } from '@/common/emoji'
@@ -167,23 +167,21 @@ export function ProfileData({ user }: { user: AccountData }) {
                                 </p>
                             </div>
                             <div className="flex gap-2">
-                                <button
+                                <ActionButton
                                     onClick={handleUpdateProfile}
                                     disabled={isLoading || !hasChanges}
-                                    className="px-4 py-2 bg-action text-white rounded-md hover:bg-highlight disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                                    loading={isLoading}
+                                    variant="primary"
                                 >
-                                    {isLoading && (
-                                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                                    )}
                                     Update Profile
-                                </button>
-                                <button
+                                </ActionButton>
+                                <ActionButton
                                     onClick={handleCancel}
                                     disabled={isLoading}
-                                    className="px-4 py-2 border border-dimmed text-primary rounded-md hover:bg-background-hover disabled:opacity-50 disabled:cursor-not-allowed"
+                                    variant="secondary"
                                 >
                                     Cancel
-                                </button>
+                                </ActionButton>
                             </div>
                         </div>
                     ) : (
@@ -249,9 +247,9 @@ function EmojiSelector({ isOpen, onClose, currentEmoji, onSelect }: {
 
                 <div className="grid grid-cols-8 gap-3 max-h-80 overflow-y-auto p-2">
                     {AVAILABLE_EMOJIS.map((emoji, index) => (
-                        <button
+                        <IconButton
                             key={index}
-                            className={`p-3 text-2xl rounded-md hover:bg-dimmed/20 transition-colors duration-200 min-h-[3rem] flex items-center justify-center ${emoji === currentEmoji
+                            className={`p-3 text-2xl min-h-[3rem] flex items-center justify-center ${emoji === currentEmoji
                                 ? 'bg-primary/20 ring-2 ring-primary'
                                 : 'hover:bg-highlight/10'
                                 }`}
@@ -261,17 +259,18 @@ function EmojiSelector({ isOpen, onClose, currentEmoji, onSelect }: {
                             }}
                         >
                             {emoji}
-                        </button>
+                        </IconButton>
                     ))}
                 </div>
 
                 <div className="flex gap-3 pt-4 mt-4 border-t border-dimmed">
-                    <button
-                        className="flex-1 px-4 py-2 text-dimmed font-medium border border-dimmed rounded-md hover:bg-dimmed/10 transition-colors duration-200"
+                    <ActionButton
+                        className="flex-1"
                         onClick={onClose}
+                        variant="secondary"
                     >
                         Cancel
-                    </button>
+                    </ActionButton>
                 </div>
             </div>
         </Modal>

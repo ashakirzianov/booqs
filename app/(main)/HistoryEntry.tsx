@@ -3,6 +3,7 @@
 import React, { useState } from 'react'
 import { BooqCover } from '@/components/BooqCover'
 import { CloseIcon } from '@/components/Icons'
+import { IconButton } from '@/components/Buttons'
 import { pageForPosition } from '@/application/common'
 import Link from 'next/link'
 import { DetailedReadingHistoryEntry, BriefReadingHistoryEntry, ReadingHistoryEntry, removeHistoryEntryAction } from '@/data/history'
@@ -56,15 +57,16 @@ function DetailedEntry({ entry, onRemove }: {
                     total={pageForPosition(entry.booqLength)}
                 />
             </Link>
-            {false && <button
+            {false && <IconButton
                 onClick={onRemove}
-                className='absolute top-2 right-2 w-6 h-6 bg-background/80 hover:bg-background rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-sm border border-border'
+                variant="danger"
                 title='Remove from history'
+                className='absolute top-2 right-2 w-6 h-6 bg-background/80 hover:bg-background rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-sm border border-border'
             >
-                <div className='w-3 h-3 text-alert'>
+                <div className='w-3 h-3'>
                     <CloseIcon />
                 </div>
-            </button>}
+            </IconButton>}
         </div>
     )
 }
@@ -82,15 +84,16 @@ function BriefEntry({ entry, onRemove }: {
                     author={entry.authors[0]}
                 />
             </Link>
-            <button
+            <IconButton
                 onClick={onRemove}
-                className='absolute top-2 right-2 w-6 h-6 bg-background/80 hover:bg-background rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-sm border border-border'
+                variant="danger"
                 title='Remove from history'
+                className='absolute top-2 right-2 w-6 h-6 bg-background/80 hover:bg-background rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-sm border border-border'
             >
-                <div className='w-3 h-3 text-alert'>
+                <div className='w-3 h-3'>
                     <CloseIcon />
                 </div>
-            </button>
+            </IconButton>
         </div>
     )
 }

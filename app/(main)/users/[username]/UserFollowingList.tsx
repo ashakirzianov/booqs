@@ -16,17 +16,6 @@ export function UserFollowingList({
             currentUserId={currentUserId}
             title="Following"
             emptyMessage={`${profileUsername} isn't following anyone yet.`}
-            followButtonContent={
-                <>
-                    <span>+</span>
-                    <span>Follow</span>
-                </>
-            }
-            unfollowButtonContent={
-                <>
-                    <span>Unfollow</span>
-                </>
-            }
         />
     )
 }
