@@ -38,7 +38,7 @@ export default async function NotesPage({ params }: {
 
     return (
         <main className="flex flex-row justify-center min-h-screen bg-background">
-            <div className="flex flex-col max-w-4xl w-full p-6">
+            <div className="flex flex-col max-w-4xl w-full">
                 <div className="mb-6">
                     <h1 className="text-3xl font-bold text-primary mb-2">
                         Notes for{' '}
@@ -64,7 +64,7 @@ export default async function NotesPage({ params }: {
                 </div>
 
                 {userNotes.length === 0 ? (
-                    <div className="text-center py-12">
+                    <div className="text-center">
                         <p className="text-dimmed text-lg mb-4">No notes yet</p>
                         <p className="text-dimmed mb-6">Start reading and add notes to see them here</p>
                         <Link
