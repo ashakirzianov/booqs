@@ -1,5 +1,5 @@
 import { fetchNotes } from '@/data/notes'
-import { parseId, type BooqId } from '@/core'
+import { parseId, type BooqId, comparePaths } from '@/core'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { booqHref } from '@/common/href'
@@ -27,6 +27,7 @@ export default async function NotesPage({ params }: {
     }
 
     const userNotes = await fetchNotes({ booqId, authorId: userId })
+    const sortedNotes = userNotes.sort((a, b) => comparePaths(a.range.start, b.range.start))
     const currentUser = await getCurrentUser()
 
     return (
@@ -56,7 +57,7 @@ export default async function NotesPage({ params }: {
                     </div>
                 ) : (
                     <div className="space-y-6">
-                        {userNotes.map((note) => (
+                        {sortedNotes.map((note) => (
                             <NoteCard 
                                 key={note.id} 
                                 note={note} 
