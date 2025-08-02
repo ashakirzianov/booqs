@@ -1,10 +1,11 @@
 import { fetchNotes } from '@/data/notes'
-import { BooqNote } from '@/data/notes'
 import { parseId, type BooqId } from '@/core'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { booqHref } from '@/common/href'
 import { getUserIdInsideRequest } from '@/data/request'
+import { getCurrentUser } from '@/data/user'
+import { NoteCard } from './NoteCard'
 
 type Params = {
     booq_id: string,
@@ -26,6 +27,7 @@ export default async function NotesPage({ params }: {
     }
 
     const userNotes = await fetchNotes({ booqId, authorId: userId })
+    const currentUser = await getCurrentUser()
 
     return (
         <main className="flex flex-row justify-center min-h-screen bg-background">
@@ -55,7 +57,18 @@ export default async function NotesPage({ params }: {
                 ) : (
                     <div className="space-y-6">
                         {userNotes.map((note) => (
-                            <NoteCard key={note.id} note={note} booqId={booqId} />
+                            <NoteCard 
+                                key={note.id} 
+                                note={note} 
+                                booqId={booqId} 
+                                user={currentUser ? {
+                                    id: currentUser.id,
+                                    username: currentUser.username,
+                                    name: currentUser.name,
+                                    emoji: currentUser.emoji,
+                                    profilePictureURL: currentUser.profilePictureURL,
+                                } : undefined}
+                            />
                         ))}
                     </div>
                 )}
@@ -64,33 +77,3 @@ export default async function NotesPage({ params }: {
     )
 }
 
-function NoteCard({ note, booqId }: { note: BooqNote, booqId: BooqId }) {
-    return (
-        <div className="bg-white p-6 transition-shadow duration-200">
-            <div className="mb-4">
-                <div className='rounded shadow-sm p-3'>
-                    <span className="italic text-primary m-0" style={{
-                        backgroundColor: `var(--color-${note.kind})`,
-                    }}>
-                        {note.targetQuote}
-                    </span>
-                </div>
-                {note.content && (
-                    <div className="text-primary mt-4 p-3">
-                        {note.content}
-                    </div>
-                )}
-            </div>
-
-            <div className="flex items-center justify-between text-sm pt-4">
-
-                <Link
-                    href={booqHref({ booqId, path: note.range.start })}
-                    className=" hover:text-highlight hover:underline text-action px-4 py-2 rounded font-medium transition-colors duration-200"
-                >
-                    Show in booq
-                </Link>
-            </div>
-        </div>
-    )
-}
