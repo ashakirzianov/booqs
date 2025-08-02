@@ -162,7 +162,7 @@ export function NoteCard({ note: initialNote, booqId, user }: NoteCardProps) {
                 </div>
 
                 {showColorPicker && (
-                    <div className="border border-gray-200 rounded p-3">
+                    <div className="rounded overflow-clip">
                         <ColorPicker
                             selectedKind={note.kind}
                             onColorChange={handleColorChange}
