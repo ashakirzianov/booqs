@@ -22,9 +22,19 @@ export function NotesFilter({ data, booqId, user }: NotesFilterProps) {
         return data.map(datum => {
             const currentNote = currentNotes.find(n => n.id === datum.note.id)
             if (currentNote) {
+                // Also update overlapping notes with current data
+                const updatedOverlapping = datum.overlapping.map(overlappingNote => {
+                    const currentOverlappingNote = currentNotes.find(n => n.id === overlappingNote.id)
+                    return currentOverlappingNote || overlappingNote
+                }).filter(overlappingNote => {
+                    // Only include overlapping notes that still exist
+                    return currentNotes.some(n => n.id === overlappingNote.id)
+                })
+                
                 return {
                     ...datum,
-                    note: currentNote
+                    note: currentNote,
+                    overlapping: updatedOverlapping
                 }
             }
             return datum
