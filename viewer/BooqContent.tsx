@@ -3,7 +3,7 @@ import { Augmentation, renderNodes } from './render'
 import { BooqNode, BooqPath, BooqRange } from '@/core'
 
 export const BooqContentID = 'booq-root'
-export function BooqContent({
+export default function BooqContent({
     nodes, range, augmentations,
     onAugmentationClick, hrefForPath,
 }: {
