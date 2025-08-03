@@ -31,26 +31,30 @@ export function NotesFilter({ data, user }: NotesFilterProps) {
             {/* Filter selector */}
             <div className="bg-background">
                 <h3 className="flex text-sm font-medium text-dimmed mb-3">Show notes:</h3>
-                <div className="flex flex-wrap justify-start items-center gap-2 py-2">
-                    <FilterButton
-                        active={selectedFilter === 'all'}
-                        onClick={() => setSelectedFilter('all')}
-                        label="All"
-                        count={data.length}
-                    />
-                    {allKinds.filter(kind => availableKinds.includes(kind)).map(kind => {
-                        const count = data.filter(datum => datum.note.kind === kind).length
-                        return (
-                            <FilterButton
-                                key={kind}
-                                active={selectedFilter === kind}
-                                onClick={() => setSelectedFilter(kind)}
-                                label={getKindLabel(kind)}
-                                count={count}
-                                color={`var(--color-${kind})`}
-                            />
-                        )
-                    })}
+                <div className='h-10 my-3 shadow-md rounded overflow-clip' style={{
+                    width: `calc(var(--spacing) * ${(allKinds.length + 1) * 7})`,
+                }}>
+                    <div className="flex flex-row h-full items-stretch justify-between">
+                        <FilterButton
+                            active={selectedFilter === 'all'}
+                            onClick={() => setSelectedFilter('all')}
+                            label="All"
+                            count={data.length}
+                        />
+                        {allKinds.filter(kind => availableKinds.includes(kind)).map(kind => {
+                            const count = data.filter(datum => datum.note.kind === kind).length
+                            return (
+                                <FilterButton
+                                    key={kind}
+                                    active={selectedFilter === kind}
+                                    onClick={() => setSelectedFilter(kind)}
+                                    label={getKindLabel(kind)}
+                                    count={count}
+                                    color={`var(--color-${kind})`}
+                                />
+                            )
+                        })}
+                    </div>
                 </div>
             </div>
 
@@ -86,16 +90,11 @@ function FilterButton({
         <button
             onClick={onClick}
             className={clsx(
-                'flex shadow-md items-center justify-center text-xs font-medium transition-colors duration-200 border-2',
-                {
-                    'border-highlight': active,
-                    'border-transparent': !active,
-                    'w-8 h-8 rounded-full': color !== undefined,
-                    'h-8 px-2 rounded': color === undefined,
-                }
+                'flex items-center justify-center text-xs font-medium transition-colors duration-200 border-b-5 h-full w-full'
             )}
             style={{
                 backgroundColor: color,
+                borderColor: active ? `hsl(from ${color ?? 'var(--color-primary)'} h s l / 100%)` : 'transparent',
             }}
         >
             {color === undefined ? label : null}
