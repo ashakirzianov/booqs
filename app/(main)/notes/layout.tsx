@@ -35,7 +35,6 @@ async function NotesRightPanel() {
 
     return (
         <div className="p-4 h-full bg-white">
-            <h2 className="text-lg font-semibold text-primary mb-4">Books with Notes</h2>
             {validBooqs.length === 0 ? (
                 <p className="text-dimmed text-sm">No books with notes yet</p>
             ) : (
