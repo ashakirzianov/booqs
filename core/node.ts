@@ -3,7 +3,7 @@ import { nodeLength } from './position'
 
 export function nodeForPath(nodes: BooqNode[], path: BooqPath): BooqNode | undefined {
     const [head, ...tail] = path
-    if (!head || head >= nodes.length) {
+    if (head === undefined || head >= nodes.length || head < 0) {
         return undefined
     }
     const node = nodes[head]
@@ -16,7 +16,7 @@ export function nodeForPath(nodes: BooqNode[], path: BooqPath): BooqNode | undef
     }
 }
 
-export function nodesForRange(nodes: BooqNode[], range: BooqRange): BooqNode[] {
+export function nodesForRange(nodes: BooqNode[], range: BooqRange, emptyStubs?: boolean): BooqNode[] {
     const [startHead, ...startTail] = range.start
     const [endHead, ...endTail] = range.end ?? []
     const actualStart = startHead ?? 0
@@ -25,7 +25,7 @@ export function nodesForRange(nodes: BooqNode[], range: BooqRange): BooqNode[] {
     for (let idx = 0; idx < nodes.length; idx++) {
         const node = nodes[idx]
         if (idx < actualStart) {
-            result.push(stubNode(nodeLength(node)))
+            result.push(stubNode(emptyStubs ? 0 : nodeLength(node)))
         } else if (idx === actualStart) {
             if (node?.kind === 'element' && node.children) {
                 result.push({

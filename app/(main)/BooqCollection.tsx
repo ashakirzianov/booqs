@@ -55,10 +55,8 @@ export function BooqCollection({
 function ReadButton({ booqId }: {
     booqId: BooqId,
 }) {
-    return <Link href={booqHref({ booqId, path: [0] })}>
-        <span className='text-action underline text-lg cursor-pointer transition duration-300 hover:text-highlight'>
-            Read
-        </span>
+    return <Link href={booqHref({ booqId, path: [0] })} className='text-action underline text-lg cursor-pointer transition duration-300 hover:text-highlight'>
+        Read
     </Link>
 }
 
@@ -78,6 +76,7 @@ function BooqCard({
                 title={title ?? undefined}
                 author={author}
                 cover={cover}
+                size={210}
             />
         </Link>
         <div className="flex flex-col flex-1 justify-between">

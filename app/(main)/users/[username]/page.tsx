@@ -7,6 +7,7 @@ import { FollowButton } from './FollowButton'
 import { UserFollowingList } from './UserFollowingList'
 import { UserFollowersList } from './UserFollowersList'
 import { getUserIdInsideRequest } from '@/data/request'
+import styles from '@/app/(main)/MainLayout.module.css'
 
 export default async function UserPage({
     params
@@ -36,7 +37,7 @@ export default async function UserPage({
 
     // Get public collections and social data for this user
     const [uploads, following, followers, currentUserFollowing] = await Promise.all([
-        booqCollection('uploads', user.id),
+        booqCollection('uploads', user.id, 210),
         getFollowingList(user.id),
         getFollowersList(user.id),
         currentUserId ? getFollowingList(currentUserId) : Promise.resolve([])
@@ -57,67 +58,69 @@ export default async function UserPage({
     }))
 
     return (
-        <div className="max-w-4xl mx-auto px-4 py-8 space-y-8">
-            {/* Public Profile Section */}
-            <div className="bg-background border border-dimmed rounded-lg p-6">
-                <div className="flex items-center gap-4">
-                    <ProfileBadge
-                        name={user.name}
-                        picture={user.profilePictureURL}
-                        emoji={user.emoji ?? '👤'}
-                        size={4}
-                        border={true}
-                    />
-                    <div className="flex-1">
-                        <div className="flex items-start justify-between">
-                            <div>
-                                <h1 className="text-2xl font-bold text-primary">
-                                    {user.name}
-                                </h1>
-                                <div className="space-y-1 text-dimmed">
-                                    <p className="text-sm">
-                                        <span className="font-medium">Username:</span> {user.username}
-                                    </p>
-                                    <p className="text-sm">
-                                        <span className="font-medium">Member since:</span> {formatDate(user.joinedAt)}
-                                    </p>
+        <main className={styles.mainContent}>
+            <div className="space-y-8">
+                {/* Public Profile Section */}
+                <div className="bg-background shadow-md rounded-lg p-6">
+                    <div className="flex items-center gap-4">
+                        <ProfileBadge
+                            name={user.name}
+                            picture={user.profilePictureURL}
+                            emoji={user.emoji ?? '👤'}
+                            size={4}
+                            border={true}
+                        />
+                        <div className="flex-1">
+                            <div className="flex items-start justify-between">
+                                <div>
+                                    <h1 className="text-2xl font-bold text-primary">
+                                        {user.name}
+                                    </h1>
+                                    <div className="space-y-1 text-dimmed">
+                                        <p className="text-sm">
+                                            <span className="font-medium">Username:</span> {user.username}
+                                        </p>
+                                        <p className="text-sm">
+                                            <span className="font-medium">Member since:</span> {formatDate(user.joinedAt)}
+                                        </p>
+                                    </div>
                                 </div>
+                                {/* Only show follow button if viewing someone else's profile */}
+                                {shouldShowFollowButton && (
+                                    <FollowButton
+                                        username={user.username}
+                                        initialFollowStatus={initialFollowStatus}
+                                    />
+                                )}
                             </div>
-                            {/* Only show follow button if viewing someone else's profile */}
-                            {shouldShowFollowButton && (
-                                <FollowButton
-                                    username={user.username}
-                                    initialFollowStatus={initialFollowStatus}
-                                />
-                            )}
                         </div>
                     </div>
                 </div>
-            </div>
 
-            {/* Social Connections Section */}
-            <div className="space-y-6">
-                <UserFollowingList
-                    following={followingWithStatus}
-                    profileUsername={user.name}
-                    currentUserId={currentUserId ?? null}
-                />
-                <UserFollowersList
-                    followers={followersWithStatus}
-                    profileUsername={user.name}
-                    currentUserId={currentUserId ?? null}
-                />
-            </div>
+                {/* Social Connections Section */}
+                <div className="space-y-6">
+                    <UserFollowingList
+                        following={followingWithStatus}
+                        profileUsername={user.name}
+                        currentUserId={currentUserId ?? null}
+                    />
+                    <UserFollowersList
+                        followers={followersWithStatus}
+                        profileUsername={user.name}
+                        currentUserId={currentUserId ?? null}
+                    />
+                </div>
 
-            {/* Public Booqs Section */}
-            <div className="space-y-6">
-                <BooqCollection
-                    title={`${user.name}'s Books`}
-                    cards={uploads}
-                    signed={false}
-                />
+                {/* Public Booqs Section */}
+                <div className="space-y-6">
+                    <BooqCollection
+                        title={`${user.name}'s Books`}
+                        cards={uploads}
+                        signed={false}
+                    />
+                </div>
             </div>
-        </div>
+        </main>
     )
 }
 

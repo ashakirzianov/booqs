@@ -3,7 +3,7 @@ import { useMemo, useState } from 'react'
 import * as clipboard from 'clipboard-polyfill'
 import { BooqId } from '@/core'
 import type { ContextMenuTarget, NoteTarget } from './ContextMenuContent'
-import { ColorPicker } from './ColorPicker'
+import { ColorPicker } from '@/components/ColorPicker'
 import { formatRelativeTime } from '@/application/common'
 import { HIGHLIGHT_KINDS, useBooqNotes } from '@/application/notes'
 import { ProfileBadge } from '@/components/ProfilePicture'
@@ -28,7 +28,7 @@ export function NoteTargetMenu({
     const isOwnNote = user?.id === note?.author?.id
     const isAuthenticated = !!user?.id
     const hasColor = HIGHLIGHT_KINDS.includes(note?.kind || 'default')
-    const [editContent, setEditContent] = useState(note?.content || '')
+    const [editContent, setEditContent] = useState(note?.content || null)
     if (!note) {
         return null
     }
@@ -88,10 +88,12 @@ export function NoteTargetMenu({
         >
             {/* Color picker - shown for own notes */}
             {isOwnNote && isAuthenticated && hasColor && (
-                <ColorPicker
-                    selectedKind={note.kind}
-                    onColorChange={handleColorChange}
-                />
+                <div className='h-10'>
+                    <ColorPicker
+                        selectedKind={note.kind}
+                        onColorChange={handleColorChange}
+                    />
+                </div>
             )}
 
             {/* Content container with padding */}
@@ -103,8 +105,8 @@ export function NoteTargetMenu({
                             className='w-full px-3 border border-dimmed rounded bg-background text-primary text-sm leading-relaxed resize-y min-h-[80px] focus:outline-none focus:border-action mb-3'
                             style={{ fontFamily: 'var(--font-main)' }}
                             placeholder='Add a note...'
-                            value={editContent}
-                            onChange={(e) => setEditContent(e.target.value)}
+                            value={editContent ?? ''}
+                            onChange={(e) => setEditContent(e.target.value || null)}
                             onKeyDown={(e) => {
                                 if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
                                     e.preventDefault()

@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { PanelButton } from './Buttons'
 import { profileHref, authHref } from '../common/href'
 import { ProfileBadge } from './ProfilePicture'
-import { SignInIcon, Spinner } from './Icons'
+import { SignInIcon, LargeSpinner } from './Icons'
 import { AccountData } from '@/data/user'
 
 export function AccountButton({ user, loading, from }: {
@@ -24,7 +24,7 @@ export function AccountButton({ user, loading, from }: {
 }
 
 export function LoadingAccountButton() {
-    return <Spinner />
+    return <LargeSpinner />
 }
 
 export function SignedAccountButton({ name, profilePictureURL, emoji }: Pick<AccountData, 'name' | 'profilePictureURL' | 'emoji'>) {

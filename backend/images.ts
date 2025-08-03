@@ -14,12 +14,30 @@ export type BooqImageData = {
     sizes?: Partial<Record<CoverSize, BooqImageData>>,
 }
 export type BooqImagesData = Record<string, BooqImageData>
-export type BooqImages = Record<string, Buffer>
+export type BooqImages = {
+    images: Record<string, Buffer>,
+    coverSrc?: string,
+}
 
 export function urlForBooqImageId(booqId: BooqId, imageId: string) {
     const [libraryId, id] = parseId(booqId)
     const assetId = `${libraryId}/${id}/${imageId}`
     return `https://${imageBucket}.s3.amazonaws.com/${assetId}`
+}
+
+export function getUrlAndDimensions(booqId: BooqId, imageData: BooqImageData, coverSize?: CoverSize): {
+    url: string,
+    width: number,
+    height: number,
+} {
+    const image = coverSize && imageData.sizes?.[coverSize]
+        ? imageData.sizes[coverSize]
+        : imageData
+    return {
+        url: urlForBooqImageId(booqId, image.id),
+        width: image.width,
+        height: image.height,
+    }
 }
 
 export async function resolveBooqImage({
@@ -59,7 +77,9 @@ export async function getOrLoadImagesData({
     }
     const images = await loadImages()
     if (images) {
-        const uploaded = await uploadImagesForBooq({ booqId, images })
+        const uploaded = await uploadImagesForBooq({
+            booqId, images,
+        })
         if (Object.keys(uploaded).length > 0) {
             await redis.hset<BooqImageData>(`images:booq:${booqId}`, uploaded)
             return {
@@ -78,14 +98,13 @@ export async function getOrLoadImagesData({
 }
 
 async function uploadImagesForBooq({
-    booqId, coverSrc, images,
+    booqId, images,
 }: {
     booqId: BooqId,
-    coverSrc?: string,
     images: BooqImages,
 }) {
     const data: BooqImagesData = {}
-    for (const [src, buffer] of Object.entries(images)) {
+    for (const [src, buffer] of Object.entries(images.images)) {
         const uploadResult = await uploadImage(buffer, booqId, src)
         if (!uploadResult.success) {
             console.error(`Failed to upload image for ${booqId} with src ${src}`)
@@ -97,7 +116,7 @@ async function uploadImagesForBooq({
             height: uploadResult.height,
             id: uploadResult.id,
         }
-        if (src === coverSrc) {
+        if (src === images.coverSrc) {
             for (const size of coverSizes) {
                 const resized = await uploadImage(buffer, booqId, src, size)
                 if (resized.success) {

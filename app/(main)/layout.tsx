@@ -7,7 +7,7 @@ import { getCurrentUser } from '@/data/user'
 import { hasReadingHistory } from '@/data/history'
 import Link from 'next/link'
 import { feedHref } from '@/common/href'
-import styles from './MainLayout.module.css'
+import styles from '@/app/(main)/MainLayout.module.css'
 
 export default async function MainLayout({
     children,
@@ -29,15 +29,11 @@ export default async function MainLayout({
             <AccountButton user={user} />
         </header>
 
-        <main className={styles.mainContent}>
-            {children}
-        </main>
+        {children}
 
         <aside className={styles.leftPanel}>
             {user && <MainMenu />}
         </aside>
 
-        <aside className={styles.rightPanel}>
-        </aside>
     </div>
 }

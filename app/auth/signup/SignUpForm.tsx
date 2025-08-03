@@ -2,7 +2,8 @@
 import { useState } from 'react'
 import { completeSignUpAction } from '@/data/auth'
 import { EmojiSelector } from '@/components/EmojiSelector'
-import { SubmitButton, IconButton } from '@/components/Buttons'
+import { ActionButton } from '@/components/Buttons'
+import { SmallSpinner } from '@/components/Icons'
 
 type FormDataState = {
     username: string
@@ -146,12 +147,12 @@ export function SignUpForm({
                 <div className='flex flex-col gap-2'>
                     <label className='text-sm font-medium text-secondary'>Profile Emoji</label>
                     <div className='flex items-center gap-3'>
-                        <IconButton
+                        <button
                             onClick={() => setFormData(prev => ({ ...prev, showEmojiSelector: true }))}
-                            className='w-16 h-16 text-3xl border border-dimmed'
+                            className='w-16 h-16 text-3xl border border-dimmed rounded-lg transition-colors hover:bg-dimmed/20 flex items-center justify-center'
                         >
                             {formData.selectedEmoji}
-                        </IconButton>
+                        </button>
                         <span className='text-sm text-secondary'>Click to change</span>
                     </div>
                 </div>
@@ -162,13 +163,12 @@ export function SignUpForm({
                     </div>
                 )}
 
-                <SubmitButton
+                <ActionButton
                     disabled={signUpState.state === 'loading-signup' || !formData.name.trim() || !formData.username.trim()}
-                    loading={signUpState.state === 'loading-signup'}
-                    className='w-full'
-                >
-                    {signUpState.state === 'loading-signup' ? 'Completing Sign Up...' : 'Complete Sign Up'}
-                </SubmitButton>
+                    icon={signUpState.state === 'loading-signup' ? <SmallSpinner /> : null}
+                    variant='primary'
+                    text={signUpState.state === 'loading-signup' ? 'Completing Sign Up...' : 'Complete Sign Up'}
+                />
             </form>
 
             <EmojiSelector

@@ -1,7 +1,8 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { followAction, unfollowAction } from '@/data/user'
-import { FollowButton as FollowButtonComponent } from '@/components/Buttons'
+import { ActionButton } from '@/components/Buttons'
+import { SmallSpinner } from '@/components/Icons'
 
 type ButtonState =
     | { state: 'idle' }
@@ -63,12 +64,14 @@ export function FollowButton({ username, initialFollowStatus }: {
 
     return (
         <div className="flex flex-col items-end gap-1">
-            <FollowButtonComponent
-                isFollowing={isFollowing}
+            <ActionButton
+                text={isFollowing ? 'Unfollow' : 'Follow'}
+                variant='secondary'
                 onClick={handleToggleFollow}
                 disabled={buttonState.state === 'loading'}
-                loading={buttonState.state === 'loading'}
-                className={buttonState.state === 'error' ? 'ring-2 ring-red-500 ring-opacity-50' : ''}
+                hasError={buttonState.state === 'error'}
+                icon={buttonState.state === 'loading' ? <SmallSpinner /> : null}
+                width='calc(var(--spacing) * 30)' // 6rem
             />
 
             {/* Error message */}

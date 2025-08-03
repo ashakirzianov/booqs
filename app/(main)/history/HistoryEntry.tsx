@@ -3,9 +3,9 @@
 import { useState } from 'react'
 import { booqHref } from '@/common/href'
 import { BooqCover } from '@/components/BooqCover'
-import { TrashIcon } from '@/components/Icons'
-import { IconButton } from '@/components/Buttons'
+import { RemoveButton } from '@/components/Buttons'
 import { removeHistoryEntryAction, BriefReadingHistoryEntry } from '@/data/history'
+import Link from 'next/link'
 
 export function HistoryEntry({
     entry
@@ -51,7 +51,7 @@ export function HistoryEntry({
                     cover={cover}
                     title={title}
                     author={authors?.join(', ')}
-                    size={50}
+                    size={210}
                 />
                 <div className="flex-1 min-w-0">
                     <a
@@ -64,9 +64,9 @@ export function HistoryEntry({
                         <div className="text-dimmed text-sm">
                             by {authors?.map((author, idx) => (
                                 <span key={idx}>
-                                    <a href={booqHref({ booqId })} className="hover:text-action transition-colors">
+                                    <Link href={booqHref({ booqId })} className="hover:text-action transition-colors">
                                         {author}
-                                    </a>
+                                    </Link>
                                     {idx < (authors?.length ?? 0) - 1 && ', '}
                                 </span>
                             ))}
@@ -82,21 +82,11 @@ export function HistoryEntry({
                         Continue Reading
                     </a>
                 </div>
-                <IconButton
+                <RemoveButton
                     onClick={handleRemove}
-                    disabled={isRemoving}
-                    variant="danger"
+                    isRemoving={false}
                     title="Remove from history"
-                    className="flex-shrink-0"
-                >
-                    <div className="w-4 h-4">
-                        {isRemoving ? (
-                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-alert"></div>
-                        ) : (
-                            <TrashIcon />
-                        )}
-                    </div>
-                </IconButton>
+                />
             </div>
         </div>
     )

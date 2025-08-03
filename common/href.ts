@@ -89,6 +89,10 @@ export function historyHref() {
     return '/history'
 }
 
+export function notesHref() {
+    return '/notes'
+}
+
 export function myBooqsHref() {
     return collectionsHref()
 }

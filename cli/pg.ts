@@ -62,24 +62,31 @@ export async function pg(options: CliOptions) {
 async function syncImages(options: CliOptions) {
     const verbosity = parseVerbosity(options)
     basic(verbosity, 'Syncing images...')
+    const id = options.switches['id']
+    if (id !== undefined) {
+        basic(verbosity, `Syncing images for specific id: ${id}`)
+        await processImageSync(id as BooqId, verbosity)
+        return
+    }
     const ids = await existingIds()
     const batchSize = parseInt(options.switches['batch'] || '25')
     for (const batch of makeBatches(ids, batchSize)) {
-        const promises = batch.map(async (id) => {
-            try {
-                const booqId: BooqId = `pg-${id}`
-                const { data: imagesData, fromCache } = await uploadImagesForBooqId(booqId)
-                if (fromCache) {
-                    basic(verbosity, `Images for ${id} already in cache`)
-                } else {
-                    basic(verbosity, `Uploaded images for ${id}`)
-                }
-                verbose(verbosity, `Finished syncing images for ${id}: ${imagesData}`)
-            } catch (err) {
-                warn(verbosity, `Error syncing images for ${id}`, err)
-            }
-        })
+        const promises = batch.map(id => processImageSync(`pg-${id}`, verbosity))
         await Promise.all(promises)
+    }
+}
+
+async function processImageSync(booqId: BooqId, verbosity: number) {
+    try {
+        const { data: imagesData, fromCache } = await uploadImagesForBooqId(booqId)
+        if (fromCache) {
+            basic(verbosity, `Images for ${booqId} already in cache`)
+        } else {
+            basic(verbosity, `Uploaded images for ${booqId}`)
+        }
+        verbose(verbosity, `Finished syncing images for ${booqId}: ${imagesData}`)
+    } catch (err) {
+        warn(verbosity, `Error syncing images for ${booqId}`, err)
     }
 }
 

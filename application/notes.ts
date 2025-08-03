@@ -1,7 +1,7 @@
 'use client'
 
-import type { GetResponse, PostBody, PostResponse } from '@/app/api/booq/[library]/[id]/notes/route'
-import type { PatchBody, PatchResponse } from '@/app/api/notes/[id]/route'
+import type { GetResponse } from '@/app/api/notes/route'
+import type { PostBody, PostResponse, PatchBody, PatchResponse } from '@/app/api/notes/[id]/route'
 import { BooqId, BooqRange } from '@/core'
 import { NoteAuthorData, BooqNote, NotePrivacy } from '@/data/notes'
 import { nanoid } from 'nanoid'
@@ -20,7 +20,7 @@ export function useBooqNotes({
     booqId: BooqId,
     user: NoteAuthorData | undefined,
 }) {
-    const notesKey = `/api/booq/${booqId}/notes`
+    const notesKey = `/api/notes?booq_id=${booqId}`
 
     const { data, isLoading } = useSWR(
         notesKey,
@@ -46,8 +46,13 @@ export function useBooqNotes({
 
     const { trigger: postNoteTrigger } = useSWRMutation(
         notesKey,
-        async (url, { arg: body }: { arg: PostBody }) => {
-            const res = await fetch(url, {
+        async (_url, { arg: { body, noteId } }: {
+            arg: {
+                body: PostBody,
+                noteId: string,
+            }
+        }) => {
+            const res = await fetch(`/api/notes/${noteId}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -80,17 +85,20 @@ export function useBooqNotes({
         content,
         targetQuote,
         privacy = 'private', // Default to private if not specified
+        id,
     }: {
         range: BooqRange,
         kind: string,
         content?: string,
         targetQuote: string,
         privacy?: NotePrivacy,
+        id?: string,
     }) {
         if (!user) return undefined
 
+        const noteId = id ?? nanoid(10)
         const postBody: PostBody = {
-            id: nanoid(10),
+            booqId,
             kind,
             range,
             content,
@@ -101,6 +109,7 @@ export function useBooqNotes({
         const now = new Date().toISOString()
         const optimisticResponse: PostResponse = {
             ...postBody,
+            id: noteId,
             author: user,
             createdAt: now,
             updatedAt: now,
@@ -108,7 +117,10 @@ export function useBooqNotes({
             privacy,
         }
 
-        postNoteTrigger(postBody, {
+        postNoteTrigger({
+            body: postBody,
+            noteId,
+        }, {
             optimisticData: (currentData: GetResponse | undefined): GetResponse =>
                 currentData
                     ? { notes: [...currentData.notes, optimisticResponse] }
@@ -196,7 +208,7 @@ export function useBooqNotes({
     function updateNote({ noteId, kind, content }: {
         noteId: string,
         kind?: string,
-        content?: string,
+        content?: string | null,
     }) {
         if (!user || !data) return undefined
 

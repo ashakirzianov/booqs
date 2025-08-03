@@ -1,4 +1,4 @@
-export * from './BooqContent'
+export { default as BooqContent } from './BooqContent'
 export * from './misc'
 export * from './selection'
 export * from './scroll'

@@ -5,7 +5,7 @@ import {
     BooqId, buildFragment, previewForPath, textForRange,
 } from '@/core'
 import { getBookmarks } from '@/backend/bookmarks'
-import { notesFor } from '@/backend/notes'
+import { notesForBooqId } from '@/backend/notes'
 import { booqForId } from '@/backend/library'
 
 export type BooqParent = {
@@ -23,9 +23,7 @@ export const booqResolver: IResolvers<BooqParent> = {
                 : []
         },
         async notes(parent): Promise<NoteParent[]> {
-            return notesFor({
-                booqId: parent.booqId,
-            })
+            return notesForBooqId(parent.booqId)
         },
         async preview(parent, { path, end, length }) {
             const booq = await booqForId(parent.booqId)

@@ -6,9 +6,9 @@ import { BooqId, BooqRange } from '@/core'
 import { quoteHref, userHref } from '@/common/href'
 import { BooqSelection } from '@/viewer'
 import { ProfileBadge } from '@/components/ProfilePicture'
-import { ColorPicker } from './ColorPicker'
+import { ColorPicker } from '@/components/ColorPicker'
 import { useBooqNotes } from '@/application/notes'
-import { CommentIcon, CopyIcon, LinkIcon, RemoveIcon, ShareIcon, QuestionMarkIcon, Spinner } from '@/components/Icons'
+import { CommentIcon, CopyIcon, LinkIcon, RemoveIcon, ShareIcon, QuestionMarkIcon, SmallSpinner } from '@/components/Icons'
 import type { ContextMenuTarget, SelectionTarget, QuoteTarget, NoteTarget } from './ContextMenuContent'
 import { BooqNote, NoteAuthorData } from '@/data/notes'
 import { ReactNode } from 'react'
@@ -73,10 +73,12 @@ export function AddHighlightItem({
     }
 
     return (
-        <ColorPicker
-            selectedKind=""
-            onColorChange={handleColorChange}
-        />
+        <div className='h-10'>
+            <ColorPicker
+                selectedKind=""
+                onColorChange={handleColorChange}
+            />
+        </div>
     )
 }
 
@@ -243,7 +245,7 @@ export function MenuItem({
         <span className='flex grow'>{text}</span>
         {
             spinner
-                ? <div className='flex grow-0'><Spinner /></div>
+                ? <div className='flex grow-0'><SmallSpinner /></div>
                 : null
         }
     </div>

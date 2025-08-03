@@ -1,18 +1,21 @@
 import { BooqCoverData } from '@/data/booqs'
 import React from 'react'
 
-const defaultSize = 70
+const defaultSize: BooqCoverSize = 210
+
+export type BooqCoverSize = 60 | 120 | 210 | 360
 
 export function BooqCover({ cover, title, author, size }: {
     cover: BooqCoverData | undefined,
     title: string | undefined,
     author: string | undefined,
-    size?: number,
+    size: BooqCoverSize,
 }) {
     size = size ?? defaultSize
-    const height = size * 3
+    const height = size
+    const width = size / 3 * 2
     return <div className='flex shrink-0 items-stretch rounded-sm overflow-clip' style={{
-        width: size * 2,
+        width: width,
         height: height,
     }}>
         {

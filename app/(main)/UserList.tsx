@@ -4,7 +4,8 @@ import Link from 'next/link'
 import { userHref } from '@/common/href'
 import { AccountPublicData, followAction, unfollowAction } from '@/data/user'
 import { ProfileBadge } from '@/components/ProfilePicture'
-import { FollowButton } from '@/components/Buttons'
+import { ActionButton } from '@/components/Buttons'
+import { SmallSpinner } from '@/components/Icons'
 
 export type UserWithFollowStatus = AccountPublicData & {
     isFollowing: boolean
@@ -206,7 +207,7 @@ export function UserList({
                                         onClick={() => user.isFollowing ? handleUnfollow(user.username) : handleFollow(user.username)}
                                         disabled={buttonState.state === 'loading'}
                                         loading={buttonState.state === 'loading'}
-                                        className={buttonState.state === 'error' ? 'ring-2 ring-red-500 ring-opacity-50' : ''}
+                                        hasError={buttonState.state === 'error'}
                                     />
 
                                     {/* Error message */}
@@ -223,4 +224,22 @@ export function UserList({
             </div>
         </div>
     )
+}
+
+function FollowButton({ isFollowing, onClick, disabled = false, loading = false, hasError = false }: {
+    isFollowing: boolean,
+    onClick?: () => void,
+    disabled?: boolean,
+    loading?: boolean,
+    hasError?: boolean,
+}) {
+    return <ActionButton
+        text={isFollowing ? 'Unfollow' : 'Follow'}
+        variant='secondary'
+        onClick={onClick}
+        disabled={disabled || loading}
+        hasError={hasError}
+        icon={loading ? <SmallSpinner /> : null}
+        width='calc(var(--spacing) * 30)' // 6rem
+    />
 }

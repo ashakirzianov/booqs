@@ -27,11 +27,11 @@ async function removeRedisKeys(match: string) {
             match,
             count: 1000,
         })
-        console.log(`Batch ${count++}: Found ${keys.length} keys, current cursor: ${cursor}`)
+        console.info(`Batch ${count++}: Found ${keys.length} keys, current cursor: ${cursor}`)
         if (keys.length > 0) {
             await redis.del(...keys)
         }
         current = cursor
     } while (current !== '0')
-    console.log(set)
+    console.info(set)
 }

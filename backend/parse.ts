@@ -45,9 +45,9 @@ export async function parseAndLoadImagesFromFile(file: BooqFile) {
     return loadImages(booq, epub)
 }
 
-async function loadImages(booq: Booq, epub: Epub) {
+async function loadImages(booq: Booq, epub: Epub): Promise<BooqImages> {
     const srcs = collectUniqueSrcsFromBooq(booq)
-    const images: BooqImages = {}
+    const images: BooqImages['images'] = {}
     for (let src of srcs) {
         // TODO: investigate why we need this hack for certain epubs
         if (src.startsWith('../')) {
@@ -60,7 +60,12 @@ async function loadImages(booq: Booq, epub: Epub) {
             console.warn(`Image not found for src: ${src}`)
         }
     }
-    return images
+    const coverItem = await epub.coverItem()
+    const coverSrc = coverItem?.['@href']
+    return {
+        images,
+        coverSrc,
+    }
 }
 
 function collectUniqueSrcsFromBooq(booq: Booq): string[] {

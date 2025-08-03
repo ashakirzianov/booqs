@@ -2,7 +2,7 @@
 
 import { feedHref } from '@/common/href'
 import { Modal } from '@/components/Modal'
-import { BorderButton } from '@/components/Buttons'
+import { ActionButton } from '@/components/Buttons'
 import { deleteAccountAction } from '@/data/auth'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
@@ -38,10 +38,10 @@ export function DeleteAccountButton({ account }: {
 
     return (
         <>
-            <BorderButton
+            <ActionButton
                 text="Delete Account"
                 onClick={openModal}
-                color="alert"
+                variant="alert"
             />
 
             <Modal isOpen={modal} closeModal={closeModal}>
@@ -66,20 +66,20 @@ export function DeleteAccountButton({ account }: {
 
                     <div className='flex gap-3 pt-2'>
                         <div className='flex-1'>
-                            <BorderButton
+                            <ActionButton
                                 text="Cancel"
                                 onClick={closeModal}
-                                color="primary"
-                                className="w-full"
+                                variant="primary"
+                                full
                             />
                         </div>
                         <div className='flex-1'>
-                            <BorderButton
+                            <ActionButton
                                 text={isDeleting ? 'Deleting...' : 'Delete Account'}
                                 onClick={performDelete}
                                 disabled={isDeleting}
-                                color="alert"
-                                className="w-full"
+                                variant="alert"
+                                full
                             />
                         </div>
                     </div>

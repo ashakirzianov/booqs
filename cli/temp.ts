@@ -11,8 +11,8 @@ export async function temp(_options: CliOptions) {
             count: 1000,
         })
         await redis.del(...keys)
-        console.log(`Batch ${count++}: Found ${keys.length} keys, current cursor: ${cursor}`)
+        console.info(`Batch ${count++}: Found ${keys.length} keys, current cursor: ${cursor}`)
         current = cursor
     } while (current !== '0')
-    console.log(set)
+    console.info(set)
 }

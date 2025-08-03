@@ -8,7 +8,7 @@ import { AuthorSearchResultData, BooqSearchResultData } from '@/data/booqs'
 import { authorHref, booqHref, searchHref } from '@/common/href'
 import { BooqCover } from '@/components/BooqCover'
 import { Modal, useModalState } from '@/components/Modal'
-import { Spinner } from '@/components/Icons'
+import { SmallSpinner } from '@/components/Icons'
 
 export function useSearchModalState() {
     return useModalState()
@@ -107,7 +107,7 @@ export function SearchModal({
                     : null}
                 {
                     isLoading
-                        ? <div key='spinner' className='self-center m-lg w-8 h-8'><Spinner /></div>
+                        ? <div key='spinner' className='self-center m-lg w-8 h-8'><SmallSpinner /></div>
                         : results.length === 0
                             ? <div className='text-center text-dimmed p-base'>
                                 No results
@@ -150,7 +150,7 @@ function BooqSearchResultContent({ result, query }: {
             cover={result.cover}
             title={result.title}
             author={result.authors?.join(', ')}
-            size={20}
+            size={60}
         />
         <div className='flex flex-col my-0 mx-lg'>
             <EmphasizedSpan

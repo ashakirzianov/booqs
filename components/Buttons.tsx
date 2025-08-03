@@ -1,14 +1,95 @@
 import clsx from 'clsx'
 import React from 'react'
+import { TrashIcon } from './Icons'
 
-type ButtonProps = {
+export function LightButton({
+    icon, text,
+    onClick,
+    disabled = false,
+    size = 'normal',
+}: {
+    text: string,
+    icon?: React.ReactNode,
+    onClick?: () => void,
+    disabled?: boolean,
+    size?: 'small' | 'normal' | 'large',
+}) {
+    return <button
+        onClick={onClick}
+        disabled={disabled}
+        className={clsx(
+            'flex items-center text-action hover:text-highlight transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer',
+            {
+                'gap-1 text-sm': size === 'small',
+                'gap-1': size === 'normal',
+                'gap-3 text-lg': size === 'large',
+            },
+        )}
+    >
+        {icon && <div className="w-4 h-4">
+            {icon}
+        </div>}
+
+        {text}
+    </button>
+}
+
+export function ActionButton({
+    text, icon,
+    onClick,
+    variant,
+    size = 'normal',
+    full,
+    width,
+    disabled = false,
+    hasError = false,
+}: {
+    text: string,
+    icon?: React.ReactNode,
+    variant: 'primary' | 'secondary' | 'alert',
+    size?: 'small' | 'normal' | 'large',
+    onClick?: () => void,
+    width?: string,
+    disabled?: boolean,
+    full?: boolean,
+    hasError?: boolean,
+}) {
+    return <button
+        onClick={onClick}
+        disabled={disabled}
+        className={clsx(
+            'rounded-md font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center content-center cursor-pointer',
+            {
+                'bg-action text-white hover:bg-highlight': variant === 'primary',
+                'border border-dimmed text-dimmed hover:bg-dimmed/10': variant === 'secondary',
+                'text-alert border border-alert hover:bg-alert hover:text-background': variant === 'alert',
+                'px-3 py-1.5 text-sm gap-1': size === 'small',
+                'px-4 py-2 gap-2': size === 'normal',
+                'px-6 py-3 text-lg gap-3': size === 'large',
+                'w-full': full,
+                'ring-2 ring-red-500 ring-opacity-50': hasError,
+            }
+        )}
+        style={{
+            width: width ? width : undefined,
+        }}
+    >
+        {icon && (
+            <div className="w-4 h-4">
+                {icon}
+            </div>
+        )}
+        {text}
+    </button>
+}
+
+export function PanelButton({
+    children, onClick, selected,
+}: {
     children?: React.ReactNode,
     onClick?: () => void,
     selected?: boolean,
-}
-export function PanelButton({
-    children, onClick, selected,
-}: ButtonProps) {
+}) {
     return <button
         className={clsx('button flex text-dimmed text-2xl cursor-pointer transition duration-150 bg-transparent hover:text-highlight focus:outline-hidden w-8 h-8 justify-center items-center', {
             'text-highlight': selected,
@@ -20,144 +101,27 @@ export function PanelButton({
     </button>
 }
 
-export function BorderButton({ text, onClick, color = 'primary', disabled = false, className = '' }: {
-    text: string,
-    onClick?: () => void,
-    color?: 'primary' | 'alert',
-    disabled?: boolean,
-    className?: string,
-}) {
-    const colorClasses = {
-        primary: 'text-primary border-primary hover:bg-primary hover:text-background',
-        alert: 'text-alert border-alert hover:bg-alert hover:text-background'
-    }
-
-    return <button
-        className={`px-4 py-2 font-medium border rounded-md transition-colors duration-200 ${colorClasses[color]} ${disabled ? 'disabled:opacity-50' : ''} ${className}`}
-        onClick={onClick}
-        disabled={disabled}
-    >
-        {text}
-    </button>
-}
-
-export function LightButton({ children, onClick, className = '', disabled = false }: {
-    children: React.ReactNode,
-    onClick?: () => void,
-    className?: string,
-    disabled?: boolean,
+export function RemoveButton({
+    isRemoving, onClick, title,
+}: {
+    onClick: () => void,
+    title: string,
+    isRemoving: boolean,
 }) {
     return <button
         onClick={onClick}
-        disabled={disabled}
-        className={`flex items-center gap-2 text-action hover:text-highlight transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
-    >
-        {children}
-    </button>
-}
-
-export function IconButton({ children, onClick, className = '', disabled = false, variant = 'default', title }: {
-    children: React.ReactNode,
-    onClick?: () => void,
-    className?: string,
-    disabled?: boolean,
-    variant?: 'default' | 'danger',
-    title?: string,
-}) {
-    const variantClasses = {
-        default: 'text-dimmed hover:text-primary hover:bg-dimmed/20',
-        danger: 'text-alert hover:bg-alert/10'
-    }
-
-    return <button
-        onClick={onClick}
-        disabled={disabled}
+        disabled={isRemoving}
         title={title}
-        className={`p-2 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${variantClasses[variant]} ${className}`}
-    >
-        {children}
-    </button>
-}
-
-export function ActionButton({ children, onClick, className = '', disabled = false, loading = false, variant = 'primary' }: {
-    children: React.ReactNode,
-    onClick?: () => void,
-    className?: string,
-    disabled?: boolean,
-    loading?: boolean,
-    variant?: 'primary' | 'secondary',
-}) {
-    const variantClasses = {
-        primary: 'bg-action text-white hover:bg-highlight',
-        secondary: 'border border-dimmed text-primary hover:bg-dimmed/10'
-    }
-
-    return <button
-        onClick={onClick}
-        disabled={disabled || loading}
-        className={`px-4 py-2 rounded-md font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 ${variantClasses[variant]} ${className}`}
-    >
-        {loading && (
-            <div className="w-4 h-4 border-2 border-current border-t-transparent animate-spin rounded-full"></div>
+        className={clsx(
+            'p-2 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-alert hover:bg-alert/10 cursor-pointer'
         )}
-        {children}
-    </button>
-}
-
-export function FollowButton({ isFollowing, onClick, disabled = false, loading = false, className = '' }: {
-    isFollowing: boolean,
-    onClick?: () => void,
-    disabled?: boolean,
-    loading?: boolean,
-    className?: string,
-}) {
-    return <button
-        onClick={onClick}
-        disabled={disabled || loading}
-        className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 disabled:cursor-not-allowed transform ${isFollowing
-            ? 'bg-gray-200 text-gray-700 hover:bg-gray-300 hover:scale-[1.02]'
-            : 'bg-action text-white hover:bg-highlight hover:text-background hover:scale-[1.02]'
-            } ${loading
-                ? 'opacity-90 scale-[0.98]'
-                : 'opacity-100 scale-100'
-            } ${className}`}
     >
-        <span className="flex items-center gap-1">
-            {loading && (
-                <div className="w-4 h-4 border-2 border-current border-t-transparent animate-spin rounded-full"></div>
-            )}
-            {isFollowing ? (
-                <span>Unfollow</span>
+        <div className="w-4 h-4">
+            {isRemoving ? (
+                <div className="animate-spin border-b-2 border-alert"></div>
             ) : (
-                <>
-                    <span>+</span>
-                    <span>Follow</span>
-                </>
+                <TrashIcon />
             )}
-        </span>
-    </button>
-}
-
-export function SubmitButton({ children, disabled = false, loading = false, className = '', variant = 'primary' }: {
-    children: React.ReactNode,
-    disabled?: boolean,
-    loading?: boolean,
-    className?: string,
-    variant?: 'primary' | 'secondary',
-}) {
-    const variantClasses = {
-        primary: 'bg-action text-white hover:bg-highlight',
-        secondary: 'border border-dimmed text-primary hover:bg-dimmed/10'
-    }
-
-    return <button
-        type="submit"
-        disabled={disabled || loading}
-        className={`px-6 py-3 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 ${variantClasses[variant]} ${className}`}
-    >
-        {loading && (
-            <div className="w-5 h-5 border-2 border-current border-t-transparent animate-spin rounded-full"></div>
-        )}
-        <span>{children}</span>
+        </div>
     </button>
 }
