@@ -40,6 +40,17 @@ export async function generateMetadata({
     return {
         title: `Notes for ${bookData.title} - Booqs`,
         description: `View your notes and annotations for "${bookData.title}"${bookData.authors.length > 0 ? ` by ${bookData.authors.join(', ')}` : ''}.`,
+        openGraph: {
+            title: `Notes for ${bookData.title}`,
+            description: `View notes and annotations for "${bookData.title}"${bookData.authors.length > 0 ? ` by ${bookData.authors.join(', ')}` : ''}.`,
+            images: bookData.cover ? [bookData.cover.url] : undefined,
+        },
+        twitter: {
+            card: 'summary_large_image',
+            title: `Notes for ${bookData.title}`,
+            description: `View notes and annotations for "${bookData.title}"${bookData.authors.length > 0 ? ` by ${bookData.authors.join(', ')}` : ''}.`,
+            images: bookData.cover ? [bookData.cover.url] : undefined,
+        },
     }
 }
 

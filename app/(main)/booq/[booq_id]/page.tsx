@@ -42,6 +42,17 @@ export async function generateMetadata({
     return {
         title: `${detailed.title} ${detailed.authors.length > 0 ? `by ${detailed.authors.join(', ')}` : ''} - Booqs`,
         description: `Read "${detailed.title}"${detailed.authors.length > 0 ? ` by ${detailed.authors.join(', ')}` : ''} on Booqs. ${detailed.subjects.length > 0 ? `Topics: ${detailed.subjects.join(', ')}.` : ''}`,
+        openGraph: {
+            title: `${detailed.title} ${detailed.authors.length > 0 ? `by ${detailed.authors.join(', ')}` : ''}`,
+            description: `Read "${detailed.title}"${detailed.authors.length > 0 ? ` by ${detailed.authors.join(', ')}` : ''} on Booqs.`,
+            images: detailed.cover ? [detailed.cover.url] : undefined,
+        },
+        twitter: {
+            card: 'summary_large_image',
+            title: `${detailed.title} ${detailed.authors.length > 0 ? `by ${detailed.authors.join(', ')}` : ''}`,
+            description: `Read "${detailed.title}"${detailed.authors.length > 0 ? ` by ${detailed.authors.join(', ')}` : ''} on Booqs.`,
+            images: detailed.cover ? [detailed.cover.url] : undefined,
+        },
     }
 }
 
