@@ -4,6 +4,14 @@ import { getReadingHistoryForHistoryList } from '@/data/history'
 import { Pagination } from '@/app/(main)/Pagination'
 import { HistoryEntry } from './HistoryEntry'
 import styles from '@/app/(main)/MainLayout.module.css'
+import { Metadata } from 'next'
+
+export async function generateMetadata(): Promise<Metadata> {
+    return {
+        title: 'Reading History - Booqs',
+        description: 'View your reading history and track your progress through books.',
+    }
+}
 
 const PAGE_SIZE = 20
 

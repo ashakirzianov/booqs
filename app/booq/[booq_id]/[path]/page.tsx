@@ -35,8 +35,8 @@ export async function generateMetadata({
         : await fetchBooqPreview(booqId, booqPath ?? [])
 
     return {
-        title: meta?.title ?? 'Booq',
-        description: meta?.text,
+        title: meta?.title ? `${meta.title} - Booqs` : 'Read Book - Booqs',
+        description: meta?.text ? `${meta.text.slice(0, 160)}...` : 'Read and enjoy books online with Booqs digital library.',
     }
 }
 

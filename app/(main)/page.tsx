@@ -2,6 +2,14 @@ import { ExploreSearch } from './ExploreSearch'
 import { HistoryEntry } from './HistoryEntry'
 import { getReadingHistoryForMainPage } from '@/data/history'
 import styles from '@/app/(main)/MainLayout.module.css'
+import { Metadata } from 'next'
+
+export async function generateMetadata(): Promise<Metadata> {
+    return {
+        title: 'Booqs - Your Digital Library',
+        description: 'Discover, read, and collect books from Project Gutenberg and your personal uploads. Start your reading journey today.',
+    }
+}
 
 export const dynamic = 'force-dynamic'
 export const fetchCache = 'force-no-store'

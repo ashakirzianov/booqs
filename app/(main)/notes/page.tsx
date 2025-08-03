@@ -1,6 +1,14 @@
 import { getCurrentUser } from '@/data/user'
 import { fetchBooqsWithOwnNotes } from '@/data/notes'
 import { notFound, redirect } from 'next/navigation'
+import { Metadata } from 'next'
+
+export async function generateMetadata(): Promise<Metadata> {
+    return {
+        title: 'My Notes - Booqs',
+        description: 'View and manage your book notes and annotations.',
+    }
+}
 
 export default async function NotesPage() {
     const user = await getCurrentUser()

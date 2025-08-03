@@ -5,6 +5,14 @@ import { generateRandomName } from './name'
 import { AddPasskeyPage } from './AddPasskeyPage'
 import { SignUpErrorPage } from './SignUpErrorPage'
 import { getCurrentUser } from '@/data/user'
+import { Metadata } from 'next'
+
+export async function generateMetadata(): Promise<Metadata> {
+    return {
+        title: 'Sign Up - Booqs',
+        description: 'Create your Booqs account to start building your digital library and tracking your reading progress.',
+    }
+}
 
 export default async function SignUpPage({ searchParams }: {
     searchParams: Promise<{

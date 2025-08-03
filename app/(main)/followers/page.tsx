@@ -4,6 +4,14 @@ import { getFollowingList, getFollowersList, getCurrentUser } from '@/data/user'
 import { FollowingList } from './FollowingList'
 import { FollowersList } from './FollowersList'
 import styles from '@/app/(main)/MainLayout.module.css'
+import { Metadata } from 'next'
+
+export async function generateMetadata(): Promise<Metadata> {
+    return {
+        title: 'Following & Followers - Booqs',
+        description: 'Manage your social connections, see who you follow and who follows you.',
+    }
+}
 
 export default async function FollowersPage() {
     const user = await getCurrentUser()

@@ -5,6 +5,14 @@ import { READING_LIST_COLLECTION } from '@/application/collections'
 import { BooqCollection } from '@/app/(main)/BooqCollection'
 import { getCurrentUser } from '@/data/user'
 import styles from '@/app/(main)/MainLayout.module.css'
+import { Metadata } from 'next'
+
+export async function generateMetadata(): Promise<Metadata> {
+    return {
+        title: 'My Collections - Booqs',
+        description: 'Manage your personal book collections, uploaded books, and reading list.',
+    }
+}
 
 export default async function CollectionPage() {
     const user = await getCurrentUser()
