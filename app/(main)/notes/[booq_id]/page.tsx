@@ -6,7 +6,7 @@ import { booqHref, authorHref } from '@/common/href'
 import { getUserIdInsideRequest } from '@/data/request'
 import { getCurrentUser } from '@/data/user'
 import { booqCard, getExpandedFragments } from '@/data/booqs'
-import { NoteCard } from './NoteCard'
+import { NotesFilter } from './NotesFilter'
 
 type Params = {
     booq_id: string,
@@ -79,23 +79,18 @@ export default async function NotesPage({ params }: {
                         </Link>
                     </div>
                 ) : (
-                    <div className="space-y-6">
-                        {sortedNotes.map((note, index) => (
-                            <NoteCard
-                                key={note.id}
-                                note={note}
-                                booqId={booqId}
-                                user={currentUser ? {
-                                    id: currentUser.id,
-                                    username: currentUser.username,
-                                    name: currentUser.name,
-                                    emoji: currentUser.emoji,
-                                    profilePictureURL: currentUser.profilePictureURL,
-                                } : undefined}
-                                expandedFragment={expandedFragments[index]}
-                            />
-                        ))}
-                    </div>
+                    <NotesFilter
+                        notes={sortedNotes}
+                        booqId={booqId}
+                        user={currentUser ? {
+                            id: currentUser.id,
+                            username: currentUser.username,
+                            name: currentUser.name,
+                            emoji: currentUser.emoji,
+                            profilePictureURL: currentUser.profilePictureURL,
+                        } : undefined}
+                        expandedFragments={expandedFragments}
+                    />
                 )}
             </div>
         </main>
