@@ -1,5 +1,9 @@
-import { BooqNode, BooqRange, BooqPath } from './model'
+import { BooqNode, BooqRange, BooqPath, BooqTextNode } from './model'
 import { nodeLength } from './position'
+
+export function isTextNode(node: BooqNode | undefined): node is BooqTextNode {
+    return node?.kind === 'text'
+}
 
 export function nodeForPath(nodes: BooqNode[], path: BooqPath): BooqNode | undefined {
     const [head, ...tail] = path

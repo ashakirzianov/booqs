@@ -12,7 +12,7 @@ import {
     iteratorsNode,
 } from './iterator'
 import { assertNever } from './misc'
-import { nodeForPath } from './node'
+import { isTextNode, nodeForPath } from './node'
 
 export function nodeText(node: BooqNode): string {
     switch (node?.kind) {
@@ -128,7 +128,7 @@ export function textForRange(nodes: BooqNode[], { start, end }: BooqRange): stri
                 return undefined
             }
         }
-    } else if (startNode?.kind === 'text') {
+    } else if (isTextNode(startNode)) {
         if (startTail.length <= 1) {
             result += startNode.content.substring(
                 startTail[0] ?? 0,
@@ -155,7 +155,7 @@ export function textForRange(nodes: BooqNode[], { start, end }: BooqRange): stri
             if (endText) {
                 result += endText
             }
-        } else if (endNode.kind === 'text') {
+        } else if (isTextNode(endNode)) {
             if (endTail.length === 1) {
                 result += endNode.content.substring(0, endTail[0])
             }
