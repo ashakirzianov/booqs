@@ -150,7 +150,7 @@ function BooqSearchResultContent({ result, query }: {
             cover={result.cover}
             title={result.title}
             author={result.authors?.join(', ')}
-            size={20}
+            size={60}
         />
         <div className='flex flex-col my-0 mx-lg'>
             <EmphasizedSpan

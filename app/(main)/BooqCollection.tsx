@@ -76,6 +76,7 @@ function BooqCard({
                 title={title ?? undefined}
                 author={author}
                 cover={cover}
+                size={210}
             />
         </Link>
         <div className="flex flex-col flex-1 justify-between">

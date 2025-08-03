@@ -51,7 +51,7 @@ async function NotesRightPanel() {
                                 cover={card.cover}
                                 title={card.title}
                                 author={card.authors.join(', ')}
-                                size={24}
+                                size={60}
                             />
                             <div className="min-w-0 flex-1">
                                 <div className="font-medium text-primary text-sm line-clamp-2">

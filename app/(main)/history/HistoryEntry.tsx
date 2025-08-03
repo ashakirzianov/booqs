@@ -51,7 +51,7 @@ export function HistoryEntry({
                     cover={cover}
                     title={title}
                     author={authors?.join(', ')}
-                    size={50}
+                    size={210}
                 />
                 <div className="flex-1 min-w-0">
                     <a

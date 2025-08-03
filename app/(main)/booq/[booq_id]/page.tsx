@@ -44,7 +44,7 @@ export default async function Page({ params }: {
                             cover={detailed.cover}
                             title={detailed.title}
                             author={detailed.authors.join(', ')}
-                            size={120}
+                            size={360}
                         />
                     </div>
 

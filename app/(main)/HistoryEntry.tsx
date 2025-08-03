@@ -70,6 +70,7 @@ function BriefEntry({ entry }: {
                     cover={entry.cover}
                     title={entry.title}
                     author={entry.authors[0]}
+                    size={120}
                 />
             </Link>
         </div>

@@ -67,6 +67,7 @@ function UploadModalContent({ closeModal }: {
                     title={result.title}
                     author={undefined}
                     cover={result.cover}
+                    size={210}
                 />
             </div>
             <ModalDivider />

@@ -174,7 +174,7 @@ async function resolveBriefHistoryEvent(event: DbReadingHistoryEvent, userId: st
         lastRead: date,
         title: meta.title,
         authors: meta.authors,
-        cover: meta.cover ? getUrlAndDimensions(booqId as BooqId, meta.cover, 120) : undefined,
+        cover: meta.cover ? getUrlAndDimensions(booqId as BooqId, meta.cover, 210) : undefined,
     }
 }
 
