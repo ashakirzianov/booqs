@@ -410,7 +410,6 @@ describe('core/text', () => {
     it('returns original range when start element has pph=true', () => {
       const range: BooqRange = { start: [0, 0], end: [0, 0, 2] }
       const result = getExpandedRange(pphNodes, range)
-      console.log('Expanded range:', result)
       expect(result.start).toEqual([0, 0])
       expect(result.end).toEqual([0, 1])
     })

@@ -166,7 +166,6 @@ export function textForRange(nodes: BooqNode[], { start, end }: BooqRange): stri
 }
 
 export function getExpandedRange(nodes: BooqNode[], range: BooqRange): BooqRange {
-    console.log('Expanding range:', range)
     const expandedStart = getExpandedStartPath(nodes, range.start)
     const expandedEnd = getExpandedEndPath(nodes, range.end, expandedStart)
 
@@ -180,8 +179,6 @@ function getExpandedStartPath(nodes: BooqNode[], startPath: BooqPath): BooqPath 
     // Check if the start element itself has pph=true
     const startNode = nodeForPath(nodes, startPath)
     if (startNode?.kind === 'element' && startNode.pph === true) {
-        console.log('Start node is a paragraph element with pph=true:', startNode)
-        console.log('Returning start path:', startPath)
         return startPath
     }
 
