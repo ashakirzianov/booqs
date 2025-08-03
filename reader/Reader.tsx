@@ -1,7 +1,7 @@
 'use client'
 // import '@/app/wdyr'
 
-import React, { useMemo } from 'react'
+import React, { useEffect, useMemo } from 'react'
 import { BooqAnchor, BooqId, BooqPath, BooqRange } from '@/core'
 import { PanelButton } from '@/components/Buttons'
 import { booqHref, feedHref } from '@/common/href'
@@ -223,6 +223,7 @@ export function Reader({
         {NavigationButton}
     </>
 
+    const showLoadingIndicator = useIsLoading()
     const RightButtons = <>
         {AskButton}
         {CommentsButton}
@@ -230,6 +231,7 @@ export function Reader({
         <AccountButton
             user={user}
             from={pathname}
+            loading={showLoadingIndicator}
         />
     </>
 
@@ -271,6 +273,14 @@ export function Reader({
         LeftPanelContent={NavigationContent}
         RightPanelContent={RightPanelContent}
     />
+}
+
+function useIsLoading() {
+    const [loading, setLoading] = React.useState(true)
+    useEffect(() => {
+        setLoading(false)
+    }, [])
+    return loading
 }
 
 function AnchorButton({ booqId, anchor, title }: {
