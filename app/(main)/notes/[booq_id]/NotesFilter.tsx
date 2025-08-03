@@ -17,9 +17,7 @@ type NotesFilterProps = {
 export function NotesFilter({ data, user }: NotesFilterProps) {
     const [selectedFilter, setSelectedFilter] = useState<string>('all')
 
-    // Get all unique note kinds from the notes
-    const availableKinds = Array.from(new Set(data.map(datum => datum.note.kind)))
-    const allKinds = [...HIGHLIGHT_KINDS, COMMENT_KIND]
+    const allKinds = Array.from(new Set(data.map(datum => datum.note.kind)))
 
     // Filter notes based on selected filter
     const filteredNotes = selectedFilter === 'all'
@@ -32,7 +30,7 @@ export function NotesFilter({ data, user }: NotesFilterProps) {
             <div className="bg-background">
                 <h3 className="flex text-sm font-medium text-dimmed mb-3">Show notes:</h3>
                 <div className='h-10 my-3 shadow-md rounded overflow-clip' style={{
-                    width: `calc(var(--spacing) * ${(allKinds.length + 1) * 7})`,
+                    width: `calc(var(--spacing) * ${(allKinds.length + 1) * 10})`,
                 }}>
                     <div className="flex flex-row h-full items-stretch justify-between">
                         <FilterButton
@@ -41,7 +39,7 @@ export function NotesFilter({ data, user }: NotesFilterProps) {
                             label="All"
                             count={data.length}
                         />
-                        {allKinds.filter(kind => availableKinds.includes(kind)).map(kind => {
+                        {allKinds.map(kind => {
                             const count = data.filter(datum => datum.note.kind === kind).length
                             return (
                                 <FilterButton
@@ -60,7 +58,7 @@ export function NotesFilter({ data, user }: NotesFilterProps) {
 
             {/* Notes list */}
             <div className="space-y-6">
-                {filteredNotes.map((datum) => {
+                {filteredNotes.length > 0 ? filteredNotes.map((datum) => {
                     return (
                         <NoteCard
                             key={datum.note.id}
@@ -68,7 +66,11 @@ export function NotesFilter({ data, user }: NotesFilterProps) {
                             user={user}
                         />
                     )
-                })}
+                }) : (
+                    <div className="text-center text-dimmed">
+                        No notes of selected color.
+                    </div>
+                )}
             </div>
         </>
     )
