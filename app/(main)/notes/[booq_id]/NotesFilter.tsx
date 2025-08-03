@@ -15,7 +15,14 @@ type NotesFilterProps = {
 }
 
 export function NotesFilter({ data, booqId, user }: NotesFilterProps) {
-    const { notes: currentNotes, isLoading } = useBooqNotes({ booqId, user })
+    const initialNotes = useMemo(() => {
+        return data.map(datum => datum.note)
+    }, [data])
+    const { notes: currentNotes } = useBooqNotes({
+        booqId,
+        user,
+        initialNotes,
+    })
 
     // Merge current notes with initial data, preferring current notes for updates
     const mergedData = useMemo(() => {
@@ -23,10 +30,7 @@ export function NotesFilter({ data, booqId, user }: NotesFilterProps) {
             const currentNote = currentNotes.find(n => n.id === datum.note.id)
             // Also update overlapping notes with current data
             const updatedOverlapping = datum.overlapping.map(overlappingNote => {
-                const currentOverlappingNote = currentNotes.find(n => n.id === overlappingNote.id)
-                return currentOverlappingNote !== undefined
-                    ? currentOverlappingNote
-                    : (isLoading ? overlappingNote : undefined)
+                return currentNotes.find(n => n.id === overlappingNote.id)
             }).filter(overlappingNote => {
                 // Only include overlapping notes that still exist
                 return overlappingNote !== undefined
@@ -38,7 +42,7 @@ export function NotesFilter({ data, booqId, user }: NotesFilterProps) {
                 overlapping: updatedOverlapping
             }
         })
-    }, [data, currentNotes, isLoading])
+    }, [data, currentNotes])
     const [selectedFilter, setSelectedFilter] = useState<string>('all')
 
     const allKinds = Array.from(new Set(mergedData.map(datum => datum.note.kind)))
