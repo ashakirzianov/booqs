@@ -2,7 +2,7 @@
 // import '@/app/wdyr'
 
 import React, { useEffect, useMemo } from 'react'
-import { BooqAnchor, BooqId, BooqPath, BooqRange } from '@/core'
+import { Booq, BooqAnchor, BooqId, BooqPath, BooqRange, buildFragment } from '@/core'
 import { PanelButton } from '@/components/Buttons'
 import { booqHref, feedHref } from '@/common/href'
 import {
@@ -29,36 +29,44 @@ import { ContextMenuContent } from './ContextMenuContent'
 import { usePageData } from './usePageData'
 import { useNavigationState } from './useNavigationState'
 import clsx from 'clsx'
-import { PartialBooqData } from '@/data/booqs'
 import { BooqNote } from '@/data/notes'
 import { AccountData } from '@/data/user'
 
 export function Reader({
-    booq, quote, notes: initialNotes, user,
+    booqId, path, booq, quote, notes: initialNotes, user,
 }: {
-    booq: PartialBooqData,
+    booqId: BooqId,
+    path?: BooqPath,
+    booq: Booq,
     notes: BooqNote[],
     user: AccountData | undefined,
     quote?: BooqRange,
 }) {
+    const fragment = useMemo(() => {
+        return buildFragment({
+            booq,
+            path: path ?? undefined,
+        })
+    }, [booq, path])
     const pathname = usePathname()
     const fontScale = useFontScale()
     useScrollToQuote(quote)
     const {
         currentPath,
     } = useScrollHandler({
-        booqId: booq.booqId,
-        initialPath: booq.fragment.current.path,
+        booqId: booqId,
+        initialPath: fragment.current.path,
     })
     const { currentPage, leftPages, totalPages } = usePageData({
-        booq,
+        fragment,
+        meta: booq.metadata,
         currentPath,
     })
 
     const range: BooqRange = useMemo(() => ({
-        start: booq.fragment.current.path,
-        end: booq.fragment.next?.path ?? [booq.fragment.nodes.length],
-    }), [booq])
+        start: fragment.current.path,
+        end: fragment.next?.path ?? [fragment.nodes.length],
+    }), [fragment])
 
     const {
         navigationOpen, navigationSelection,
@@ -83,7 +91,7 @@ export function Reader({
     const {
         filteredHighlights, allHighlightsAuthors, comments,
     } = useNotesData({
-        booqId: booq.booqId,
+        booqId,
         user,
         currentRange: range,
         highlightsAuthorIds,
@@ -98,12 +106,12 @@ export function Reader({
     const { anchor, menuTarget, setMenuTarget, contextMenuAugmentations, displayTarget } = useContextMenuState()
     const ContextMenuContentNode = useMemo(() => {
         return <ContextMenuContent
-            booqId={booq.booqId}
+            booqId={booqId}
             user={user}
             target={menuTarget}
             setTarget={setMenuTarget}
         />
-    }, [booq.booqId, user, menuTarget, setMenuTarget])
+    }, [booqId, user, menuTarget, setMenuTarget])
 
     const FloaterMenuContent = useMemo(() => {
         if (displayTarget !== 'floater') {
@@ -121,8 +129,8 @@ export function Reader({
     })
 
     const NavigationContent = <NavigationPanel
-        booqId={booq.booqId}
-        title={booq.meta.title ?? 'Untitled'}
+        booqId={booqId}
+        title={booq.metadata.title ?? 'Untitled'}
         toc={booq.toc.items}
         notes={filteredHighlights}
         selection={navigationSelection}
@@ -236,8 +244,8 @@ export function Reader({
     </>
 
     const hrefForPath = useMemo(() => {
-        return (path: BooqPath) => booqHref({ booqId: booq.booqId, path })
-    }, [booq.booqId])
+        return (path: BooqPath) => booqHref({ booqId: booqId, path })
+    }, [booqId])
 
     return <ReaderLayout
         isControlsVisible={isControlsVisible}
@@ -248,7 +256,7 @@ export function Reader({
             fontSize: `${fontScale}%`,
         }}>
             <BooqContent
-                nodes={booq.fragment.nodes}
+                nodes={fragment.nodes}
                 range={range}
                 augmentations={augmentations}
                 onAugmentationClick={onAugmentationClick}
@@ -256,13 +264,13 @@ export function Reader({
             />
         </div>}
         PrevButton={<AnchorButton
-            booqId={booq.booqId}
-            anchor={booq.fragment.previous}
+            booqId={booqId}
+            anchor={fragment.previous}
             title='Previous'
         />}
         NextButton={<AnchorButton
-            booqId={booq.booqId}
-            anchor={booq.fragment.next}
+            booqId={booqId}
+            anchor={fragment.next}
             title='Next'
         />}
         ContextMenu={ContextMenuNode}

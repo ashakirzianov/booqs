@@ -149,6 +149,10 @@ export async function booqPart({
     } satisfies PartialBooqData
 }
 
+export async function fetchFullBooq(booqId: BooqId) {
+    return booqForId(booqId)
+}
+
 
 // Search types and utilities
 export type SearchResultData = AuthorSearchResultData | BooqSearchResultData

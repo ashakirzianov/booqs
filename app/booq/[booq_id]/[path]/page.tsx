@@ -1,5 +1,5 @@
 import { BooqId, parseId, pathFromString } from '@/core'
-import { booqPart, fetchBooqPreview } from '@/data/booqs'
+import { fetchBooqPreview, fetchFullBooq } from '@/data/booqs'
 import { reportBooqHistoryAction } from '@/data/history'
 import { Reader } from '@/reader/Reader'
 import { Metadata } from 'next'
@@ -75,11 +75,12 @@ export default async function BooqPathPage({
     const quoteRange = startPath && endPath
         ? { start: startPath, end: endPath }
         : undefined
-    const booq = await booqPart({
-        booqId,
-        path: booqPath,
-        bypassCache: library === 'lo',
-    })
+
+    const [booq, notes, user] = await Promise.all([
+        fetchFullBooq(booqId),
+        fetchNotes({ booqId }),
+        getCurrentUser(),
+    ])
     if (!booq)
         return notFound()
 
@@ -91,10 +92,9 @@ export default async function BooqPathPage({
         })
     }
 
-    const notes = await fetchNotes({ booqId })
-    const user = await getCurrentUser()
-
     return <Reader
+        booqId={booqId}
+        path={booqPath}
         booq={booq}
         quote={quoteRange}
         notes={notes}
