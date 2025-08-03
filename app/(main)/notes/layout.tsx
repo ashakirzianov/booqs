@@ -1,8 +1,7 @@
 import { fetchBooqsWithOwnNotes } from '@/data/notes'
 import { booqCard, BooqCardData } from '@/data/booqs'
-import Link from 'next/link'
 import { BooqId } from '@/core'
-import { BooqCover } from '@/components/BooqCover'
+import { NotesNavigationItem } from './NotesNavigationItem'
 import styles from '@/app/(main)/MainLayout.module.css'
 
 export default async function NotesLayout({
@@ -42,28 +41,11 @@ async function NotesRightPanel() {
             ) : (
                 <div className="space-y-3">
                     {validBooqs.map(({ booqId, card }) => (
-                        <Link
+                        <NotesNavigationItem
                             key={booqId}
-                            href={`/notes/${booqId}`}
-                            className="flex items-start gap-3 p-2 rounded-lg hover:bg-gray-50 transition-colors duration-200"
-                        >
-                            <BooqCover
-                                cover={card.cover}
-                                title={card.title}
-                                author={card.authors.join(', ')}
-                                size={60}
-                            />
-                            <div className="min-w-0 flex-1">
-                                <div className="font-medium text-primary text-sm line-clamp-2">
-                                    {card.title}
-                                </div>
-                                {card.authors.length > 0 && (
-                                    <div className="text-dimmed text-xs mt-1">
-                                        {card.authors.join(', ')}
-                                    </div>
-                                )}
-                            </div>
-                        </Link>
+                            booqId={booqId}
+                            card={card}
+                        />
                     ))}
                 </div>
             )}
