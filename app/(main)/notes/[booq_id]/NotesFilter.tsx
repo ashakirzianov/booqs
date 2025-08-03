@@ -37,6 +37,15 @@ export function NotesFilter({ data, booqId, user }: NotesFilterProps) {
 
     const allKinds = Array.from(new Set(mergedData.map(datum => datum.note.kind)))
 
+    // Handle note color changes and adjust filter if necessary
+    function handleNoteColorChange(noteId: string, newKind: string) {
+        // If current filter is not 'all' and the note would be filtered out,
+        // switch to the new color filter to keep the note visible
+        if (selectedFilter !== 'all' && selectedFilter !== newKind) {
+            setSelectedFilter(newKind)
+        }
+    }
+
     // Filter notes based on selected filter
     const filteredNotes = selectedFilter === 'all'
         ? mergedData
@@ -82,6 +91,7 @@ export function NotesFilter({ data, booqId, user }: NotesFilterProps) {
                             key={datum.note.id}
                             noteFragmentData={datum}
                             user={user}
+                            onColorChange={handleNoteColorChange}
                         />
                     )
                 }) : (

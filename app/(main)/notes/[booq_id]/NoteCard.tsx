@@ -13,10 +13,11 @@ type NoteCardProps = {
     user: NoteAuthorData | undefined
     expandedFragment?: { nodes: BooqNode[], range: BooqRange } | undefined
     overlappingNotes?: BooqNote[]
+    onColorChange?: (noteId: string, newKind: string) => void
 }
 
 export function NoteCard({
-    noteFragmentData, user,
+    noteFragmentData, user, onColorChange,
 }: NoteCardProps) {
     const { note, overlapping, nodes, range } = noteFragmentData
     const { booqId } = note
@@ -73,6 +74,8 @@ export function NoteCard({
             noteId: note.id,
             kind: kind
         })
+        // Notify parent component about the color change
+        onColorChange?.(note.id, kind)
     }
 
     // Show removal message if note was removed
