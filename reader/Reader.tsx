@@ -2,7 +2,7 @@
 // import '@/app/wdyr'
 
 import React, { useEffect, useMemo } from 'react'
-import { Booq, BooqAnchor, BooqId, BooqPath, BooqRange, buildFragment, pathFromString } from '@/core'
+import { Booq, BooqAnchor, BooqId, BooqPath, BooqRange, buildFragment, pathFromString, rangeFromString } from '@/core'
 import { PanelButton } from '@/components/Buttons'
 import { booqHref, feedHref } from '@/common/href'
 import {
@@ -292,25 +292,20 @@ function useIsLoading() {
 
 function useBooqSearchParams() {
     const searchParams = useSearchParams()
-    const startParam = searchParams.get('start')
-    const endParam = searchParams.get('end')
     const pathParam = searchParams.get('path')
+    const quoteParam = searchParams.get('quote')
     return useMemo(() => {
-        const startPath = startParam !== null
-            ? pathFromString(startParam)
+        const quote = quoteParam !== null
+            ? rangeFromString(quoteParam)
             : undefined
-        const endPath = endParam !== null
-            ? pathFromString(endParam)
-            : undefined
-        const booqPath = pathParam !== null
+        const path = pathParam !== null
             ? pathFromString(pathParam)
             : undefined
-        const quote = startPath && endPath
-            ? { start: startPath, end: endPath }
-            : undefined
-        const path = booqPath ?? [0]
-        return { quote, path }
-    }, [startParam, endParam, pathParam])
+        return {
+            quote,
+            path: path ?? [0],
+        }
+    }, [quoteParam, pathParam])
 }
 
 function AnchorButton({ booqId, anchor, title }: {

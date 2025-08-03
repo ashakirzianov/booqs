@@ -1,4 +1,4 @@
-import { BooqId, parseId, pathFromString } from '@/core'
+import { BooqId, parseId, pathFromString, rangeFromString } from '@/core'
 import { fetchBooqPreview, fetchFullBooq } from '@/data/booqs'
 import { reportBooqHistoryAction } from '@/data/history'
 import { Reader } from '@/reader/Reader'
@@ -12,9 +12,8 @@ type Params = {
     booq_id: string,
 }
 type SearchParams = {
-    start?: string,
-    end?: string,
     path?: string,
+    quote?: string,
 }
 
 export async function generateMetadata({
@@ -29,18 +28,15 @@ export async function generateMetadata({
         return notFound()
     }
     const booqId: BooqId = `${library}-${id}`
-    const { start, end, path } = await searchParams
-    const startPath = start !== undefined
-        ? pathFromString(start)
-        : undefined
-    const endPath = end !== undefined
-        ? pathFromString(end)
+    const { quote, path } = await searchParams
+    const quoteRange = quote !== undefined
+        ? rangeFromString(quote)
         : undefined
     const booqPath = path !== undefined
         ? pathFromString(path)
         : undefined
-    const meta = startPath && endPath
-        ? await fetchBooqPreview(booqId, startPath, endPath)
+    const meta = quoteRange
+        ? await fetchBooqPreview(booqId, quoteRange.start, quoteRange.end)
         : await fetchBooqPreview(booqId, booqPath ?? [])
 
     const coverData = meta?.cover ? getUrlAndDimensions(booqId, meta.cover, 210) : undefined
@@ -74,18 +70,9 @@ export default async function BooqPathPage({
         return notFound()
     }
     const booqId: BooqId = `${library}-${id}`
-    const { start, end, path } = await searchParams
-    const startPath = start !== undefined
-        ? pathFromString(start)
-        : undefined
-    const endPath = end !== undefined
-        ? pathFromString(end)
-        : undefined
+    const { path } = await searchParams
     const booqPath = path !== undefined
         ? pathFromString(path)
-        : undefined
-    const quoteRange = startPath && endPath
-        ? { start: startPath, end: endPath }
         : undefined
 
     const [booq, notes, user] = await Promise.all([
