@@ -15,34 +15,30 @@ type NotesFilterProps = {
 }
 
 export function NotesFilter({ data, booqId, user }: NotesFilterProps) {
-    const { notes: currentNotes } = useBooqNotes({ booqId, user })
-    
+    const { notes: currentNotes, isLoading } = useBooqNotes({ booqId, user })
+
     // Merge current notes with initial data, preferring current notes for updates
     const mergedData = useMemo(() => {
         return data.map(datum => {
             const currentNote = currentNotes.find(n => n.id === datum.note.id)
-            if (currentNote) {
-                // Also update overlapping notes with current data
-                const updatedOverlapping = datum.overlapping.map(overlappingNote => {
-                    const currentOverlappingNote = currentNotes.find(n => n.id === overlappingNote.id)
-                    return currentOverlappingNote || overlappingNote
-                }).filter(overlappingNote => {
-                    // Only include overlapping notes that still exist
-                    return currentNotes.some(n => n.id === overlappingNote.id)
-                })
-                
-                return {
-                    ...datum,
-                    note: currentNote,
-                    overlapping: updatedOverlapping
-                }
+            // Also update overlapping notes with current data
+            const updatedOverlapping = datum.overlapping.map(overlappingNote => {
+                const currentOverlappingNote = currentNotes.find(n => n.id === overlappingNote.id)
+                return currentOverlappingNote !== undefined
+                    ? currentOverlappingNote
+                    : (isLoading ? overlappingNote : undefined)
+            }).filter(overlappingNote => {
+                // Only include overlapping notes that still exist
+                return overlappingNote !== undefined
+            })
+
+            return {
+                ...datum,
+                note: currentNote ?? datum.note,
+                overlapping: updatedOverlapping
             }
-            return datum
-        }).filter(datum => {
-            // Only show notes that still exist in current notes
-            return currentNotes.some(n => n.id === datum.note.id)
         })
-    }, [data, currentNotes])
+    }, [data, currentNotes, isLoading])
     const [selectedFilter, setSelectedFilter] = useState<string>('all')
 
     const allKinds = Array.from(new Set(mergedData.map(datum => datum.note.kind)))
