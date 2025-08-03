@@ -1,30 +1,30 @@
 'use client'
 
 import { useState } from 'react'
-import { BooqNote, NoteAuthorData } from '@/data/notes'
-import { BooqId, BooqNode, BooqRange } from '@/core'
+import { NoteAuthorData } from '@/data/notes'
+import { BooqId } from '@/core'
 import { HIGHLIGHT_KINDS, COMMENT_KIND } from '@/application/notes'
 import { NoteCard } from './NoteCard'
 import clsx from 'clsx'
+import { ExpandedNoteFragmentData } from './NoteFragment'
 
 type NotesFilterProps = {
-    notes: BooqNote[]
+    data: ExpandedNoteFragmentData[]
     booqId: BooqId
     user: NoteAuthorData | undefined
-    expandedFragments: Array<{ nodes: BooqNode[], range: BooqRange } | undefined>
 }
 
-export function NotesFilter({ notes, booqId, user, expandedFragments }: NotesFilterProps) {
+export function NotesFilter({ data, user }: NotesFilterProps) {
     const [selectedFilter, setSelectedFilter] = useState<string>('all')
 
     // Get all unique note kinds from the notes
-    const availableKinds = Array.from(new Set(notes.map(note => note.kind)))
+    const availableKinds = Array.from(new Set(data.map(datum => datum.note.kind)))
     const allKinds = [...HIGHLIGHT_KINDS, COMMENT_KIND]
 
     // Filter notes based on selected filter
     const filteredNotes = selectedFilter === 'all'
-        ? notes
-        : notes.filter(note => note.kind === selectedFilter)
+        ? data
+        : data.filter(datum => datum.note.kind === selectedFilter)
 
     return (
         <>
@@ -36,10 +36,10 @@ export function NotesFilter({ notes, booqId, user, expandedFragments }: NotesFil
                         active={selectedFilter === 'all'}
                         onClick={() => setSelectedFilter('all')}
                         label="All"
-                        count={notes.length}
+                        count={data.length}
                     />
                     {allKinds.filter(kind => availableKinds.includes(kind)).map(kind => {
-                        const count = notes.filter(note => note.kind === kind).length
+                        const count = data.filter(datum => datum.note.kind === kind).length
                         return (
                             <FilterButton
                                 key={kind}
@@ -56,15 +56,12 @@ export function NotesFilter({ notes, booqId, user, expandedFragments }: NotesFil
 
             {/* Notes list */}
             <div className="space-y-6">
-                {filteredNotes.map((note) => {
-                    const originalIndex = notes.findIndex(n => n.id === note.id)
+                {filteredNotes.map((datum) => {
                     return (
                         <NoteCard
-                            key={note.id}
-                            note={note}
-                            booqId={booqId}
+                            key={datum.note.id}
+                            noteFragmentData={datum}
                             user={user}
-                            expandedFragment={expandedFragments[originalIndex]}
                         />
                     )
                 })}

@@ -2,19 +2,23 @@
 
 import { useState, useEffect } from 'react'
 import { BooqNote, NoteAuthorData } from '@/data/notes'
-import { BooqId, BooqNode, BooqRange } from '@/core'
+import { BooqNode, BooqRange } from '@/core'
 import { useBooqNotes } from '@/application/notes'
 import { ActionButton, LightButton } from '@/components/Buttons'
-import { NoteFragment } from './NoteFragment'
+import { ExpandedNoteFragmentData, NoteFragment } from './NoteFragment'
 
 type NoteCardProps = {
-    note: BooqNote
-    booqId: BooqId
+    noteFragmentData: ExpandedNoteFragmentData,
     user: NoteAuthorData | undefined
     expandedFragment?: { nodes: BooqNode[], range: BooqRange } | undefined
+    overlappingNotes?: BooqNote[]
 }
 
-export function NoteCard({ note: initialNote, booqId, user, expandedFragment }: NoteCardProps) {
+export function NoteCard({
+    noteFragmentData, user,
+}: NoteCardProps) {
+    const { note: initialNote } = noteFragmentData
+    const { booqId } = initialNote
     const [isEditing, setIsEditing] = useState(false)
     const [editContent, setEditContent] = useState(initialNote.content || '')
     const [removedNote, setRemovedNote] = useState<BooqNote | null>(null)
@@ -90,13 +94,9 @@ export function NoteCard({ note: initialNote, booqId, user, expandedFragment }: 
         <div className="bg-white p-6 transition-shadow duration-200">
             <div className="mb-4 flex flex-col gap-3">
                 <NoteFragment
-                    booqId={booqId}
-                    range={note.range}
-                    targetQuote={note.targetQuote}
-                    noteKind={note.kind}
+                    data={noteFragmentData}
                     onColorChange={handleColorChange}
                     onRemove={handleRemove}
-                    expandedFragment={expandedFragment}
                 />
 
                 {isEditing ? (

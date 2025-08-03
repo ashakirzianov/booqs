@@ -1,5 +1,5 @@
 import { fetchNotes } from '@/data/notes'
-import { parseId, type BooqId, comparePaths } from '@/core'
+import { parseId, type BooqId, comparePaths, isOverlapping } from '@/core'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { booqHref, authorHref } from '@/common/href'
@@ -7,6 +7,7 @@ import { getUserIdInsideRequest } from '@/data/request'
 import { getCurrentUser } from '@/data/user'
 import { booqCard, getExpandedFragments } from '@/data/booqs'
 import { NotesFilter } from './NotesFilter'
+import { ExpandedNoteFragmentData } from './NoteFragment'
 
 type Params = {
     booq_id: string,
@@ -35,6 +36,33 @@ export default async function NotesPage({ params }: {
     // Pre-load expanded fragments for all notes
     const noteRanges = sortedNotes.map(note => note.range)
     const expandedFragments = await getExpandedFragments(booqId, noteRanges)
+
+    // Calculate overlapping notes for each expanded fragment
+    const noteFragmentData: ExpandedNoteFragmentData[] = expandedFragments.map((fragment, index) => {
+        const note = sortedNotes[index]
+        if (!note || !fragment) return undefined
+        if (!fragment) return {
+            note: sortedNotes[index],
+            overlapping: [],
+            nodes: undefined,
+            range: note.range,
+        }
+
+        // Find all notes that overlap with the expanded range
+        const overlapping = sortedNotes.filter((note, noteIndex) => {
+            // Don't include the note itself
+            if (noteIndex === index) return false
+
+            // Check if the note's range overlaps with the expanded range
+            return isOverlapping(note.range, fragment.range)
+        })
+        return {
+            note: sortedNotes[index],
+            overlapping,
+            nodes: fragment.nodes,
+            range: fragment.range,
+        }
+    }).filter(datum => datum !== undefined)
 
     if (!bookData) {
         notFound()
@@ -80,7 +108,7 @@ export default async function NotesPage({ params }: {
                     </div>
                 ) : (
                     <NotesFilter
-                        notes={sortedNotes}
+                        data={noteFragmentData}
                         booqId={booqId}
                         user={currentUser ? {
                             id: currentUser.id,
@@ -89,7 +117,6 @@ export default async function NotesPage({ params }: {
                             emoji: currentUser.emoji,
                             profilePictureURL: currentUser.profilePictureURL,
                         } : undefined}
-                        expandedFragments={expandedFragments}
                     />
                 )}
             </div>

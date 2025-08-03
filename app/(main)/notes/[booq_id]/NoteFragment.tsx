@@ -2,45 +2,61 @@
 
 import { useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
-import { BooqId, BooqNode, BooqRange } from '@/core'
+import { BooqNode, BooqRange } from '@/core'
 import { CollapseIcon } from '@/components/Icons'
-import { BooqContent, Augmentation } from '@/viewer'
+import { Augmentation, BooqContent } from '@/viewer'
 import { LightButton, RemoveButton } from '@/components/Buttons'
 import { ColorPicker } from '@/components/ColorPicker'
 import { booqHref } from '@/common/href'
+import { BooqNote } from '@/data/notes'
 
 type NoteFragmentProps = {
-    booqId: BooqId
-    range: BooqRange
-    targetQuote: string
-    noteKind: string
-    onColorChange: (kind: string) => void
-    onRemove?: () => void
-    expandedFragment?: { nodes: BooqNode[], range: BooqRange } | undefined
+    data: ExpandedNoteFragmentData,
+    onColorChange: (kind: string) => void,
+    onRemove?: () => void,
+}
+
+export type ExpandedNoteFragmentData = {
+    note: BooqNote,
+    overlapping: BooqNote[],
+    nodes?: BooqNode[],
+    range: BooqRange,
 }
 
 export function NoteFragment({
-    booqId, range, targetQuote, noteKind,
-    expandedFragment: preloadedFragment,
+    data: { note, overlapping, nodes, range },
     onColorChange, onRemove,
 }: NoteFragmentProps) {
     const [isExpanded, setIsExpanded] = useState(false)
     const router = useRouter()
 
-    const augmentationColor = `hsl(from var(--color-${noteKind}) h s l / 40%)`
+    const augmentationColor = `hsl(from var(--color-${note.kind}) h s l / 40%)`
 
-    // Create augmentation for the current note to highlight it in the expanded content
-    const noteAugmentation = useMemo<Augmentation[]>(() => {
-        if (!preloadedFragment) {
+    // Create augmentations for the current note and all overlapping notes
+    const noteAugmentations = useMemo<Augmentation[]>(() => {
+        if (!nodes) {
             return []
         }
 
-        return [{
-            id: `note-${booqId}-${JSON.stringify(range)}`,
-            range: range,
+        const augmentations: Augmentation[] = []
+        augmentations.push({
+            id: `note-${note.id}`,
+            range: note.range,
             color: augmentationColor,
-        }]
-    }, [preloadedFragment, booqId, range, augmentationColor])
+        })
+
+        // Add augmentations for all overlapping notes
+        overlapping.forEach((overlappingNote) => {
+            const overlappingColor = `hsl(from var(--color-${overlappingNote.kind}) h s l / 40%)`
+            augmentations.push({
+                id: `note-${overlappingNote.id}`,
+                range: overlappingNote.range,
+                color: overlappingColor,
+            })
+        })
+
+        return augmentations
+    }, [nodes, overlapping, note.id, note.range, augmentationColor])
 
     function handleExpand() {
         setIsExpanded(!isExpanded)
@@ -48,7 +64,7 @@ export function NoteFragment({
 
     function handleAugmentationClick(_id: string) {
         // Navigate to the note's range start position in the booq
-        const href = booqHref({ booqId, path: range.start })
+        const href = booqHref({ booqId: note.booqId, path: range.start })
         router.push(href)
     }
 
@@ -57,7 +73,7 @@ export function NoteFragment({
             {/* Control row - shows collapse button and controls when expanded */}
             <div className="flex justify-between items-center min-h-[24px] gap-4">
                 <div>
-                    {isExpanded && preloadedFragment && (
+                    {isExpanded && nodes && (
                         <LightButton
                             text="Collapse"
                             icon={<CollapseIcon />}
@@ -77,7 +93,7 @@ export function NoteFragment({
                             )}
                             <div className='w-32 h-6 shadow-md rounded overflow-clip'>
                                 <ColorPicker
-                                    selectedKind={noteKind}
+                                    selectedKind={note.kind}
                                     onColorChange={onColorChange}
                                 />
                             </div>
@@ -87,12 +103,12 @@ export function NoteFragment({
             </div>
 
             {/* Fragment content */}
-            {isExpanded && preloadedFragment ? (
+            {isExpanded && nodes ? (
                 <div className="rounded shadow-sm p-3 bg-background overflow-y-auto font-book text-primary">
                     <BooqContent
-                        nodes={preloadedFragment.nodes}
-                        range={preloadedFragment.range}
-                        augmentations={noteAugmentation}
+                        nodes={nodes}
+                        range={range}
+                        augmentations={noteAugmentations}
                         onAugmentationClick={handleAugmentationClick}
                     />
                 </div>
@@ -105,7 +121,7 @@ export function NoteFragment({
                     <span className="font-book text-primary m-0" style={{
                         backgroundColor: augmentationColor,
                     }}>
-                        {targetQuote}
+                        {note.targetQuote}
                     </span>
                 </div>
             )}
