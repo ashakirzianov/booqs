@@ -85,16 +85,18 @@ export function useBooqNotes({
         content,
         targetQuote,
         privacy = 'private', // Default to private if not specified
+        id,
     }: {
         range: BooqRange,
         kind: string,
         content?: string,
         targetQuote: string,
         privacy?: NotePrivacy,
+        id?: string,
     }) {
         if (!user) return undefined
 
-        const noteId = nanoid(10)
+        const noteId = id ?? nanoid(10)
         const postBody: PostBody = {
             booqId,
             kind,

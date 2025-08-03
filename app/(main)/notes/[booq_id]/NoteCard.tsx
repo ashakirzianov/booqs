@@ -6,6 +6,7 @@ import { BooqNode, BooqRange } from '@/core'
 import { useBooqNotes } from '@/application/notes'
 import { ActionButton, LightButton } from '@/components/Buttons'
 import { ExpandedNoteFragmentData, NoteFragment } from './NoteFragment'
+import { RetryIcon } from '@/components/Icons'
 
 type NoteCardProps = {
     noteFragmentData: ExpandedNoteFragmentData,
@@ -63,7 +64,8 @@ export function NoteCard({
             kind: removedNote.kind,
             content: removedNote.content || undefined,
             targetQuote: removedNote.targetQuote,
-            privacy: removedNote.privacy || 'private'
+            privacy: removedNote.privacy || 'private',
+            id: removedNote.id
         })
         setRemovedNote(null)
     }
@@ -82,6 +84,7 @@ export function NoteCard({
                 <div className="mb-4">
                     <div className="text-dimmed mb-4">Note was removed</div>
                     <LightButton
+                        icon={<RetryIcon />}
                         text="Restore"
                         onClick={handleRestore}
                     />
