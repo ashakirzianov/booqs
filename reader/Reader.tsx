@@ -14,7 +14,6 @@ import { NavigationPanel } from './NavigationPanel'
 import { CommentsPanel } from './CommentsPanel'
 import { ThemerButton } from './Themer'
 import { useFontScale } from '@/application/theme'
-import { useAuth } from '@/application/auth'
 import { useNotesData } from './useNotesData'
 import { useFollowingData } from './useFollowingData'
 import { AccountButton } from '@/components/AccountButton'
@@ -31,15 +30,18 @@ import { usePageData } from './usePageData'
 import { useNavigationState } from './useNavigationState'
 import clsx from 'clsx'
 import { PartialBooqData } from '@/data/booqs'
+import { BooqNote } from '@/data/notes'
+import { AccountData } from '@/data/user'
 
 export function Reader({
-    booq, quote,
+    booq, quote, notes: initialNotes, user,
 }: {
     booq: PartialBooqData,
+    notes: BooqNote[],
+    user: AccountData | undefined,
     quote?: BooqRange,
 }) {
     const pathname = usePathname()
-    const { user, isLoading: isAuthLoading } = useAuth()
     const fontScale = useFontScale()
     useScrollToQuote(quote)
     const {
@@ -80,12 +82,12 @@ export function Reader({
 
     const {
         filteredHighlights, allHighlightsAuthors, comments,
-        notesAreLoading,
     } = useNotesData({
         booqId: booq.booqId,
         user,
         currentRange: range,
         highlightsAuthorIds,
+        initialNotes,
     })
 
     const { followingUserIds, isLoading: isFollowingLoading } = useFollowingData({ user })
@@ -188,7 +190,6 @@ export function Reader({
     const isControlsVisible = (FloaterMenuContent === null) && visible
     // Auto-open right panel when context menu should be displayed in side panel and not hidden
     const shouldShowRightPanel = commentsPanelOpen || (displayTarget === 'side-panel')
-    const showLoadingIndicator = notesAreLoading || isAuthLoading
 
     const toggleAskVisibility = useMemo(() => {
         return () => {
@@ -229,7 +230,6 @@ export function Reader({
         <AccountButton
             user={user}
             from={pathname}
-            loading={showLoadingIndicator}
         />
     </>
 

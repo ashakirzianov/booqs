@@ -5,6 +5,8 @@ import { Reader } from '@/reader/Reader'
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { getUrlAndDimensions } from '@/backend/images'
+import { fetchNotes } from '@/data/notes'
+import { getCurrentUser } from '@/data/user'
 
 type Params = {
     booq_id: string,
@@ -89,5 +91,13 @@ export default async function BooqPathPage({
         })
     }
 
-    return <Reader booq={booq} quote={quoteRange} />
+    const notes = await fetchNotes({ booqId })
+    const user = await getCurrentUser()
+
+    return <Reader
+        booq={booq}
+        quote={quoteRange}
+        notes={notes}
+        user={user}
+    />
 }
