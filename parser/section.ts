@@ -1,4 +1,4 @@
-import { BooqNode, BooqElementNode } from '../core'
+import { BooqNode, BooqElementNode, textNode } from '../core'
 import {
     xmlStringParser, XmlElement, xml2string, childrenOf, nameOf, attributesOf, textOf, asObject, XmlAttributes,
     findByName,
@@ -200,7 +200,7 @@ async function processXmls(xmls: XmlElement[], env: Env) {
 async function processXml(element: XmlElement, env: Env): Promise<BooqNode> {
     const text = textOf(element)
     if (text !== undefined) {
-        return { kind: 'text', content: text }
+        return textNode(text)
     }
 
     const name = nameOf(element)

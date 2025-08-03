@@ -12,20 +12,18 @@ import {
     iteratorsNode,
 } from './iterator'
 import { assertNever } from './misc'
-import { isTextNode, nodeForPath } from './node'
+import { isElementNode, isStubNode, isTextNode, nodeForPath } from './node'
 
 export function nodeText(node: BooqNode): string {
-    switch (node?.kind) {
-        case 'element':
-            return node.children?.map(nodeText).join('') ?? ''
-        case 'text':
-            return node.content
-        case 'stub':
-        case undefined:
-            return ''
-        default:
-            assertNever(node)
-            return ''
+    if (isElementNode(node)) {
+        return node.children?.map(nodeText).join('') ?? ''
+    } else if (isTextNode(node)) {
+        return node
+    } else if (isStubNode(node)) {
+        return ''
+    } else {
+        assertNever(node)
+        return ''
     }
 }
 
@@ -130,11 +128,11 @@ export function textForRange(nodes: BooqNode[], { start, end }: BooqRange): stri
         }
     } else if (isTextNode(startNode)) {
         if (startTail.length <= 1) {
-            result += startNode.content.substring(
+            result += startNode.substring(
                 startTail[0] ?? 0,
                 startHead === endHead && endTail.length > 0
                     ? endTail[0]
-                    : startNode.content.length,
+                    : startNode.length,
             )
         } else {
             return undefined
@@ -157,7 +155,7 @@ export function textForRange(nodes: BooqNode[], { start, end }: BooqRange): stri
             }
         } else if (isTextNode(endNode)) {
             if (endTail.length === 1) {
-                result += endNode.content.substring(0, endTail[0])
+                result += endNode.substring(0, endTail[0])
             }
         }
     }

@@ -1,4 +1,4 @@
-import { assertNever, Booq, BooqId, BooqNode } from '@/core'
+import { Booq, BooqId, BooqNode, isElementNode } from '@/core'
 import { parseEpub } from '@/parser'
 import { Epub, openEpubFile } from '@/parser/epub'
 import { Diagnoser } from 'booqs-epub'
@@ -109,34 +109,28 @@ function preprocessNodes(nodes: BooqNode[], env: PreprocessEnv): BooqNode[] {
 }
 
 function preprocessNode(node: BooqNode, env: PreprocessEnv): BooqNode {
-    switch (node?.kind) {
-        case 'element': {
-            const result = {
-                ...node,
-                children: node.children ? node.children.map(child => preprocessNode(child, env)) : [],
-            }
-            if (result.attrs?.src) {
-                const resolved = env.imagesData[result.attrs.src]
-                if (resolved) {
-                    result.attrs.src = urlForBooqImageId(env.booqId, resolved.id)
-                    result.attrs.width = resolved.width.toString()
-                    result.attrs.height = resolved.height.toString()
-                }
-            } else if (result.attrs?.xlinkHref) {
-                const resolved = env.imagesData[result.attrs.xlinkHref]
-                if (resolved) {
-                    result.attrs.xlinkHref = urlForBooqImageId(env.booqId, resolved.id)
-                    result.attrs.width = resolved.width.toString()
-                    result.attrs.height = resolved.height.toString()
-                }
-            }
-            return result
+    if (isElementNode(node)) {
+        const result = {
+            ...node,
+            children: node.children ? node.children.map(child => preprocessNode(child, env)) : [],
         }
-        case 'text':
-        case 'stub':
-        case undefined:
-            return node
-        default:
-            return assertNever(node)
+        if (result.attrs?.src) {
+            const resolved = env.imagesData[result.attrs.src]
+            if (resolved) {
+                result.attrs.src = urlForBooqImageId(env.booqId, resolved.id)
+                result.attrs.width = resolved.width.toString()
+                result.attrs.height = resolved.height.toString()
+            }
+        } else if (result.attrs?.xlinkHref) {
+            const resolved = env.imagesData[result.attrs.xlinkHref]
+            if (resolved) {
+                result.attrs.xlinkHref = urlForBooqImageId(env.booqId, resolved.id)
+                result.attrs.width = resolved.width.toString()
+                result.attrs.height = resolved.height.toString()
+            }
+        }
+        return result
+    } else {
+        return node
     }
 }

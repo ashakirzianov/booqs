@@ -1,5 +1,5 @@
 import { BooqElementNode, BooqNode, BooqPath, BooqTextNode } from './model'
-import { isTextNode } from './node'
+import { isElementNode, isTextNode } from './node'
 import { pathLessThan } from './path'
 
 export type BooqIterator = BooqNodeIterator | BooqTextIterator
@@ -120,9 +120,9 @@ export function prevLeafNode(iter: BooqIterator): BooqNodeIterator | undefined {
 
 export function nextSibling(iter: BooqIterator) {
     const length = isTextNode(iter.node)
-        ? iter.node.content.length
-        : iter.node?.kind === 'element'
-            ? iter.node?.children?.length ?? 0
+        ? iter.node.length
+        : isElementNode(iter.node)
+            ? iter.node.children?.length ?? 0
             : 0
 
     return iter.index < length - 1
@@ -159,9 +159,9 @@ export function prevIterator(iter: BooqIterator): BooqIterator | undefined {
 }
 
 export function textBefore(iter: BooqTextIterator): string {
-    return iter.node.content.slice(0, iter.index)
+    return iter.node.slice(0, iter.index)
 }
 
 export function textStartingAt(iter: BooqTextIterator): string {
-    return iter.node.content.slice(iter.index)
+    return iter.node.slice(iter.index)
 }
