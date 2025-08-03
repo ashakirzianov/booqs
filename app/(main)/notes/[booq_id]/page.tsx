@@ -8,9 +8,50 @@ import { getCurrentUser } from '@/data/user'
 import { booqCard, getExpandedFragments } from '@/data/booqs'
 import { NotesFilter } from './NotesFilter'
 import { ExpandedNoteFragmentData } from './NoteFragment'
+import { Metadata } from 'next'
 
 type Params = {
     booq_id: string,
+}
+
+export async function generateMetadata({
+    params,
+}: {
+    params: Promise<Params>,
+}): Promise<Metadata> {
+    const { booq_id } = await params
+    const [library, id] = parseId(booq_id as BooqId)
+    if (!library || !id) {
+        return {
+            title: 'Notes Not Found - Booqs',
+            description: 'The requested book notes could not be found.',
+        }
+    }
+    const booqId: BooqId = `${library}-${id}`
+    
+    const bookData = await booqCard(booqId)
+    if (!bookData) {
+        return {
+            title: 'Notes Not Found - Booqs',
+            description: 'The requested book notes could not be found.',
+        }
+    }
+
+    return {
+        title: `Notes for ${bookData.title} - Booqs`,
+        description: `View your notes and annotations for "${bookData.title}"${bookData.authors.length > 0 ? ` by ${bookData.authors.join(', ')}` : ''}.`,
+        openGraph: {
+            title: `Notes for ${bookData.title}`,
+            description: `View notes and annotations for "${bookData.title}"${bookData.authors.length > 0 ? ` by ${bookData.authors.join(', ')}` : ''}.`,
+            images: bookData.cover ? [bookData.cover.url] : undefined,
+        },
+        twitter: {
+            card: 'summary_large_image',
+            title: `Notes for ${bookData.title}`,
+            description: `View notes and annotations for "${bookData.title}"${bookData.authors.length > 0 ? ` by ${bookData.authors.join(', ')}` : ''}.`,
+            images: bookData.cover ? [bookData.cover.url] : undefined,
+        },
+    }
 }
 
 export default async function NotesPage({ params }: {

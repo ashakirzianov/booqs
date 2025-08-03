@@ -4,6 +4,7 @@ import { reportBooqHistoryAction } from '@/data/history'
 import { Reader } from '@/reader/Reader'
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
+import { getUrlAndDimensions } from '@/backend/images'
 
 type Params = {
     booq_id: string,
@@ -34,9 +35,22 @@ export async function generateMetadata({
         ? await fetchBooqPreview(booqId, startPath, endPath)
         : await fetchBooqPreview(booqId, booqPath ?? [])
 
+    const coverData = meta?.cover ? getUrlAndDimensions(booqId, meta.cover, 210) : undefined
+
     return {
-        title: meta?.title ?? 'Booq',
-        description: meta?.text,
+        title: meta?.title ? `${meta.title} - Booqs` : 'Read Book - Booqs',
+        description: meta?.text ? `${meta.text.slice(0, 160)}...` : 'Read and enjoy books online with Booqs digital library.',
+        openGraph: {
+            title: meta?.title || 'Read Book - Booqs',
+            description: meta?.text ? `${meta.text.slice(0, 160)}...` : 'Read and enjoy books online with Booqs digital library.',
+            images: coverData ? [coverData.url] : undefined,
+        },
+        twitter: {
+            card: 'summary_large_image',
+            title: meta?.title || 'Read Book - Booqs',
+            description: meta?.text ? `${meta.text.slice(0, 160)}...` : 'Read and enjoy books online with Booqs digital library.',
+            images: coverData ? [coverData.url] : undefined,
+        },
     }
 }
 

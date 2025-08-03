@@ -8,6 +8,28 @@ import { UserFollowingList } from './UserFollowingList'
 import { UserFollowersList } from './UserFollowersList'
 import { getUserIdInsideRequest } from '@/data/request'
 import styles from '@/app/(main)/MainLayout.module.css'
+import { Metadata } from 'next'
+
+export async function generateMetadata({
+    params
+}: {
+    params: Promise<{ username: string }>
+}): Promise<Metadata> {
+    const { username } = await params
+    
+    const user = await getUserByUsername(username)
+    if (!user) {
+        return {
+            title: 'User Not Found - Booqs',
+            description: 'The requested user profile could not be found.',
+        }
+    }
+
+    return {
+        title: `${user.name} (@${user.username}) - Booqs`,
+        description: `View ${user.name}'s profile, book collection, and reading activity on Booqs.`,
+    }
+}
 
 export default async function UserPage({
     params

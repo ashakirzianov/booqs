@@ -1,3 +1,12 @@
+import { Metadata } from 'next'
+
+export async function generateMetadata(): Promise<Metadata> {
+    return {
+        title: 'Sign In Error - Booqs',
+        description: 'An error occurred during sign in. Please try again.',
+    }
+}
+
 type Params = {
     error: string,
     return_to: string,

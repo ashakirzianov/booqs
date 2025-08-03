@@ -10,9 +10,50 @@ import { getBooqHistory } from '@/data/history'
 import { parseId, type BooqId, type TableOfContentsItem } from '@/core'
 import { getUserIdInsideRequest } from '@/data/request'
 import styles from '@/app/(main)/MainLayout.module.css'
+import { Metadata } from 'next'
 
 type Params = {
     booq_id: string,
+}
+
+export async function generateMetadata({
+    params,
+}: {
+    params: Promise<Params>,
+}): Promise<Metadata> {
+    const { booq_id } = await params
+    const [library, id] = parseId(booq_id as BooqId)
+    if (!library || !id) {
+        return {
+            title: 'Book Not Found',
+            description: 'The requested book could not be found.',
+        }
+    }
+    const booqId: BooqId = `${library}-${id}`
+    
+    const detailed = await booqDetailedData(booqId)
+    if (!detailed) {
+        return {
+            title: 'Book Not Found',
+            description: 'The requested book could not be found.',
+        }
+    }
+
+    return {
+        title: `${detailed.title} ${detailed.authors.length > 0 ? `by ${detailed.authors.join(', ')}` : ''} - Booqs`,
+        description: `Read "${detailed.title}"${detailed.authors.length > 0 ? ` by ${detailed.authors.join(', ')}` : ''} on Booqs. ${detailed.subjects.length > 0 ? `Topics: ${detailed.subjects.join(', ')}.` : ''}`,
+        openGraph: {
+            title: `${detailed.title} ${detailed.authors.length > 0 ? `by ${detailed.authors.join(', ')}` : ''}`,
+            description: `Read "${detailed.title}"${detailed.authors.length > 0 ? ` by ${detailed.authors.join(', ')}` : ''} on Booqs.`,
+            images: detailed.cover ? [detailed.cover.url] : undefined,
+        },
+        twitter: {
+            card: 'summary_large_image',
+            title: `${detailed.title} ${detailed.authors.length > 0 ? `by ${detailed.authors.join(', ')}` : ''}`,
+            description: `Read "${detailed.title}"${detailed.authors.length > 0 ? ` by ${detailed.authors.join(', ')}` : ''} on Booqs.`,
+            images: detailed.cover ? [detailed.cover.url] : undefined,
+        },
+    }
 }
 
 export default async function Page({ params }: {

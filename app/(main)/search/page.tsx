@@ -10,8 +10,8 @@ export async function generateMetadata({
 }) {
     const { query } = await searchParams
     return {
-        title: `Search results for "${query}"`,
-        description: `Search results for "${query}"`,
+        title: `Search results for "${query}" - Booqs`,
+        description: `Find books, authors, and topics related to "${query}". Browse our collection of classic literature and contemporary works.`,
     }
 }
 export default async function SearchPage({

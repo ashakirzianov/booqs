@@ -7,6 +7,14 @@ import { DeleteAccountButton } from './DeleteAccountButton'
 import { PasskeySection } from './PasskeySection'
 import { SignoutButton } from './SignoutButton'
 import styles from '@/app/(main)/MainLayout.module.css'
+import { Metadata } from 'next'
+
+export async function generateMetadata(): Promise<Metadata> {
+    return {
+        title: 'Profile - Booqs',
+        description: 'Manage your account profile, passkeys, and account settings.',
+    }
+}
 
 export default async function ProfilePage() {
     const user = await getCurrentUser()
