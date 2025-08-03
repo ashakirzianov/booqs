@@ -116,7 +116,7 @@ function useCopyQuote(booqId: BooqId, selection?: BooqSelection) {
                 const selectionText = generateQuote(booqId, selection.text, selection.range)
                 e.clipboardData.setData('text/plain', selectionText)
                 prefetch(quoteHref({
-                    id: booqId, range: selection.range,
+                    booqId, range: selection.range,
                 }))
             }
         }

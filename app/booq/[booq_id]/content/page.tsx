@@ -10,11 +10,11 @@ import { getCurrentUser } from '@/data/user'
 
 type Params = {
     booq_id: string,
-    path: string,
 }
 type SearchParams = {
     start?: string,
     end?: string,
+    path?: string,
 }
 
 export async function generateMetadata({
@@ -23,16 +23,22 @@ export async function generateMetadata({
     params: Promise<Params>,
     searchParams: Promise<SearchParams>,
 }): Promise<Metadata> {
-    const { booq_id, path } = await params
+    const { booq_id } = await params
     const [library, id] = parseId(booq_id as BooqId)
     if (!library || !id) {
         return notFound()
     }
     const booqId: BooqId = `${library}-${id}`
-    const { start, end } = await searchParams
-    const startPath = start && pathFromString(start)
-    const endPath = end && pathFromString(end)
-    const booqPath = pathFromString(path)
+    const { start, end, path } = await searchParams
+    const startPath = start !== undefined
+        ? pathFromString(start)
+        : undefined
+    const endPath = end !== undefined
+        ? pathFromString(end)
+        : undefined
+    const booqPath = path !== undefined
+        ? pathFromString(path)
+        : undefined
     const meta = startPath && endPath
         ? await fetchBooqPreview(booqId, startPath, endPath)
         : await fetchBooqPreview(booqId, booqPath ?? [])
@@ -62,16 +68,22 @@ export default async function BooqPathPage({
     params: Promise<Params>,
     searchParams: Promise<SearchParams>,
 }) {
-    const { booq_id, path } = await params
+    const { booq_id } = await params
     const [library, id] = parseId(booq_id as BooqId)
     if (!library || !id) {
         return notFound()
     }
     const booqId: BooqId = `${library}-${id}`
-    const { start, end } = await searchParams
-    const startPath = start && pathFromString(start)
-    const endPath = end && pathFromString(end)
-    const booqPath = pathFromString(path)
+    const { start, end, path } = await searchParams
+    const startPath = start !== undefined
+        ? pathFromString(start)
+        : undefined
+    const endPath = end !== undefined
+        ? pathFromString(end)
+        : undefined
+    const booqPath = path !== undefined
+        ? pathFromString(path)
+        : undefined
     const quoteRange = startPath && endPath
         ? { start: startPath, end: endPath }
         : undefined
@@ -94,9 +106,7 @@ export default async function BooqPathPage({
 
     return <Reader
         booqId={booqId}
-        path={booqPath}
         booq={booq}
-        quote={quoteRange}
         notes={notes}
         user={user}
     />

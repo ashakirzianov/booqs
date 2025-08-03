@@ -2,7 +2,7 @@
 // import '@/app/wdyr'
 
 import React, { useEffect, useMemo } from 'react'
-import { Booq, BooqAnchor, BooqId, BooqPath, BooqRange, buildFragment } from '@/core'
+import { Booq, BooqAnchor, BooqId, BooqPath, BooqRange, buildFragment, pathFromString } from '@/core'
 import { PanelButton } from '@/components/Buttons'
 import { booqHref, feedHref } from '@/common/href'
 import {
@@ -17,7 +17,7 @@ import { useFontScale } from '@/application/theme'
 import { useNotesData } from './useNotesData'
 import { useFollowingData } from './useFollowingData'
 import { AccountButton } from '@/components/AccountButton'
-import { usePathname } from 'next/navigation'
+import { usePathname, useSearchParams } from 'next/navigation'
 import { BackIcon, TocIcon, CommentIcon, QuestionMarkIcon } from '@/components/Icons'
 import Link from 'next/link'
 import { useScrollToQuote } from './useScrollToQuote'
@@ -33,15 +33,14 @@ import { BooqNote } from '@/data/notes'
 import { AccountData } from '@/data/user'
 
 export function Reader({
-    booqId, path, booq, quote, notes: initialNotes, user,
+    booqId, booq, notes: initialNotes, user,
 }: {
     booqId: BooqId,
-    path?: BooqPath,
     booq: Booq,
     notes: BooqNote[],
     user: AccountData | undefined,
-    quote?: BooqRange,
 }) {
+    const { quote, path } = useBooqSearchParams()
     const fragment = useMemo(() => {
         return buildFragment({
             booq,
@@ -289,6 +288,29 @@ function useIsLoading() {
         setLoading(false)
     }, [])
     return loading
+}
+
+function useBooqSearchParams() {
+    const searchParams = useSearchParams()
+    const startParam = searchParams.get('start')
+    const endParam = searchParams.get('end')
+    const pathParam = searchParams.get('path')
+    return useMemo(() => {
+        const startPath = startParam !== null
+            ? pathFromString(startParam)
+            : undefined
+        const endPath = endParam !== null
+            ? pathFromString(endParam)
+            : undefined
+        const booqPath = pathParam !== null
+            ? pathFromString(pathParam)
+            : undefined
+        const quote = startPath && endPath
+            ? { start: startPath, end: endPath }
+            : undefined
+        const path = booqPath ?? [0]
+        return { quote, path }
+    }, [startParam, endParam, pathParam])
 }
 
 function AnchorButton({ booqId, anchor, title }: {

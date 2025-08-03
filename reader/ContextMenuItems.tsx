@@ -139,7 +139,7 @@ export function CopyQuoteItem({
             clipboard.writeText(quote)
             removeSelection()
             prefetch(quoteHref({
-                id: booqId, range: selection.range,
+                booqId, range: selection.range,
             }))
             setTarget({ kind: 'empty' })
         }}
@@ -186,7 +186,7 @@ export function CopyLinkItem({
             clipboard.writeText(link)
             removeSelection()
             prefetch(quoteHref({
-                id: booqId, range: selection.range,
+                booqId, range: selection.range,
             }))
             setTarget({ kind: 'empty' })
         }}
@@ -255,7 +255,7 @@ export function MenuItem({
 }
 
 function generateLink(booqId: BooqId, range: BooqRange) {
-    return `${baseUrl()}${quoteHref({ id: booqId, range })}`
+    return `${baseUrl()}${quoteHref({ booqId, range })}`
 }
 
 function removeSelection() {
