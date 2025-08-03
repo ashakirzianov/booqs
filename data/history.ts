@@ -4,7 +4,7 @@ import { booqDataForIds, booqPreview } from '@/backend/library'
 import { BooqId, BooqPath } from '@/core'
 import { getUserIdInsideRequest } from './request'
 import { BooqCoverData } from './booqs'
-import { urlForBooqImageId } from '@/backend/images'
+import { getUrlAndDimensions } from '@/backend/images'
 
 export type ReadingHistoryEntry = BriefReadingHistoryEntry | DetailedReadingHistoryEntry
 // Brief entry for history page - just book info and read time
@@ -174,11 +174,7 @@ async function resolveBriefHistoryEvent(event: DbReadingHistoryEvent, userId: st
         lastRead: date,
         title: meta.title,
         authors: meta.authors,
-        cover: meta.cover ? {
-            url: urlForBooqImageId(booqId as BooqId, meta.cover.id),
-            width: meta.cover.width,
-            height: meta.cover.height,
-        } : undefined,
+        cover: meta.cover ? getUrlAndDimensions(booqId as BooqId, meta.cover, 120) : undefined,
     }
 }
 
@@ -198,10 +194,6 @@ async function resolveDetailedHistoryEvent(event: DbReadingHistoryEvent, userId:
         booqLength: preview.booqLength,
         title: preview.title ?? '',
         authors: preview.authors ?? [],
-        cover: preview.cover ? {
-            url: urlForBooqImageId(booqId as BooqId, preview.cover.id),
-            width: preview.cover.width,
-            height: preview.cover.height,
-        } : undefined,
+        cover: preview.cover ? getUrlAndDimensions(booqId as BooqId, preview.cover, 210) : undefined,
     }
 }

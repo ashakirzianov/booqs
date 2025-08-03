@@ -25,6 +25,21 @@ export function urlForBooqImageId(booqId: BooqId, imageId: string) {
     return `https://${imageBucket}.s3.amazonaws.com/${assetId}`
 }
 
+export function getUrlAndDimensions(booqId: BooqId, imageData: BooqImageData, coverSize?: CoverSize): {
+    url: string,
+    width: number,
+    height: number,
+} {
+    const image = coverSize && imageData.sizes?.[coverSize]
+        ? imageData.sizes[coverSize]
+        : imageData
+    return {
+        url: urlForBooqImageId(booqId, image.id),
+        width: image.width,
+        height: image.height,
+    }
+}
+
 export async function resolveBooqImage({
     booqId, src,
 }: {

@@ -20,7 +20,7 @@ export default async function SearchPage({
     searchParams: Promise<{ query: string }>
 }) {
     const { query } = await searchParams
-    const results = await booqSearch({ query, libraryId: 'pg' })
+    const results = await booqSearch({ query, libraryId: 'pg', coverSize: 120 })
     return (
         <main className={styles.mainContent}>
             <h1>Search results for &quot;{query}&quot;</h1>

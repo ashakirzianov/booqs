@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
     if (!query) {
         return new Response('Query is required', { status: 400 })
     }
-    const results = await booqSearch({ query, libraryId, limit, offset })
+    const results = await booqSearch({ query, libraryId, limit, offset, coverSize: 120 })
     const response: GetResponse = {
         query,
         results,

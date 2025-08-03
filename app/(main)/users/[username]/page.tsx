@@ -37,7 +37,7 @@ export default async function UserPage({
 
     // Get public collections and social data for this user
     const [uploads, following, followers, currentUserFollowing] = await Promise.all([
-        booqCollection('uploads', user.id),
+        booqCollection('uploads', user.id, 210),
         getFollowingList(user.id),
         getFollowersList(user.id),
         currentUserId ? getFollowingList(currentUserId) : Promise.resolve([])

@@ -2,6 +2,7 @@ import { fetchBooqsWithOwnNotes } from '@/data/notes'
 import { booqCard, BooqCardData } from '@/data/booqs'
 import Link from 'next/link'
 import { BooqId } from '@/core'
+import { BooqCover } from '@/components/BooqCover'
 import styles from '@/app/(main)/MainLayout.module.css'
 
 export default async function NotesLayout({
@@ -46,21 +47,12 @@ async function NotesRightPanel() {
                             href={`/notes/${booqId}`}
                             className="flex items-start gap-3 p-2 rounded-lg hover:bg-gray-50 transition-colors duration-200"
                         >
-                            {card.cover ? (
-                                // TODO: use BooqCover component
-                                // eslint-disable-next-line @next/next/no-img-element
-                                <img
-                                    src={card.cover.url}
-                                    alt={`${card.title} cover`}
-                                    width={card.cover.width}
-                                    height={card.cover.height}
-                                    className="w-12 h-16 object-cover rounded shadow-sm flex-shrink-0"
-                                />
-                            ) : (
-                                <div className="w-12 h-16 bg-gray-200 rounded shadow-sm flex-shrink-0 flex items-center justify-center">
-                                    <span className="text-xs text-gray-400">No cover</span>
-                                </div>
-                            )}
+                            <BooqCover
+                                cover={card.cover}
+                                title={card.title}
+                                author={card.authors.join(', ')}
+                                size={24}
+                            />
                             <div className="min-w-0 flex-1">
                                 <div className="font-medium text-primary text-sm line-clamp-2">
                                     {card.title}
