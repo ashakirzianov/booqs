@@ -10,8 +10,7 @@ import { ColorPicker } from '@/components/ColorPicker'
 import { booqHref } from '@/common/href'
 import { BooqNote } from '@/data/notes'
 
-type NoteFragmentProps = {
-    data: ExpandedNoteFragmentData,
+type NoteFragmentProps = ExpandedNoteFragmentData & {
     onColorChange: (kind: string) => void,
     onRemove?: () => void,
 }
@@ -24,7 +23,7 @@ export type ExpandedNoteFragmentData = {
 }
 
 export function NoteFragment({
-    data: { note, overlapping, nodes, range },
+    note, overlapping, nodes, range,
     onColorChange, onRemove,
 }: NoteFragmentProps) {
     const [isExpanded, setIsExpanded] = useState(false)

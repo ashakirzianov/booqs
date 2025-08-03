@@ -18,7 +18,7 @@ type NoteCardProps = {
 export function NoteCard({
     noteFragmentData, user,
 }: NoteCardProps) {
-    const { note: initialNote } = noteFragmentData
+    const { note: initialNote, overlapping, nodes, range } = noteFragmentData
     const { booqId } = initialNote
     const [isEditing, setIsEditing] = useState(false)
     const [editContent, setEditContent] = useState(initialNote.content || '')
@@ -97,7 +97,10 @@ export function NoteCard({
         <div className="bg-white p-6 transition-shadow duration-200">
             <div className="mb-4 flex flex-col gap-3">
                 <NoteFragment
-                    data={noteFragmentData}
+                    note={note}
+                    overlapping={overlapping}
+                    nodes={nodes}
+                    range={range}
                     onColorChange={handleColorChange}
                     onRemove={handleRemove}
                 />
