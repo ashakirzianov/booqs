@@ -1,5 +1,5 @@
 import { fetchBooqsWithOwnNotes } from '@/data/notes'
-import { booqCard } from '@/data/booqs'
+import { booqCard, BooqCardData } from '@/data/booqs'
 import Link from 'next/link'
 import { BooqId } from '@/core'
 import styles from '@/app/(main)/MainLayout.module.css'
@@ -26,12 +26,12 @@ async function NotesRightPanel() {
 
     const booqsWithNotes = await Promise.all(
         uniqueBooqIds.map(async (booqId) => {
-            const card = await booqCard(booqId)
+            const card = await booqCard(booqId, 120)
             return card ? { booqId, card } : null
         })
     )
 
-    const validBooqs = booqsWithNotes.filter(Boolean) as { booqId: BooqId, card: NonNullable<Awaited<ReturnType<typeof booqCard>>> }[]
+    const validBooqs = booqsWithNotes.filter(Boolean) as { booqId: BooqId, card: BooqCardData }[]
 
     return (
         <div className="p-4 h-full bg-white">
@@ -39,21 +39,38 @@ async function NotesRightPanel() {
             {validBooqs.length === 0 ? (
                 <p className="text-dimmed text-sm">No books with notes yet</p>
             ) : (
-                <div className="space-y-2">
+                <div className="space-y-3">
                     {validBooqs.map(({ booqId, card }) => (
                         <Link
                             key={booqId}
                             href={`/notes/${booqId}`}
-                            className="block p-3 rounded-lg border border-gray-100 hover:border-gray-200 hover:bg-gray-50 transition-colors duration-200"
+                            className="flex items-start gap-3 p-2 rounded-lg hover:bg-gray-50 transition-colors duration-200"
                         >
-                            <div className="font-medium text-primary text-sm line-clamp-2">
-                                {card.title}
-                            </div>
-                            {card.authors.length > 0 && (
-                                <div className="text-dimmed text-xs mt-1">
-                                    {card.authors.join(', ')}
+                            {card.cover ? (
+                                // TODO: use BooqCover component
+                                // eslint-disable-next-line @next/next/no-img-element
+                                <img
+                                    src={card.cover.url}
+                                    alt={`${card.title} cover`}
+                                    width={card.cover.width}
+                                    height={card.cover.height}
+                                    className="w-12 h-16 object-cover rounded shadow-sm flex-shrink-0"
+                                />
+                            ) : (
+                                <div className="w-12 h-16 bg-gray-200 rounded shadow-sm flex-shrink-0 flex items-center justify-center">
+                                    <span className="text-xs text-gray-400">No cover</span>
                                 </div>
                             )}
+                            <div className="min-w-0 flex-1">
+                                <div className="font-medium text-primary text-sm line-clamp-2">
+                                    {card.title}
+                                </div>
+                                {card.authors.length > 0 && (
+                                    <div className="text-dimmed text-xs mt-1">
+                                        {card.authors.join(', ')}
+                                    </div>
+                                )}
+                            </div>
                         </Link>
                     ))}
                 </div>

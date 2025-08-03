@@ -13,7 +13,7 @@ import {
 import { userForId } from '@/backend/users'
 import { booqIdsInCollections } from '@/backend/collections'
 import { BooqData, booqDataForIds, booqForId, booqPreview, booqQuery, booqToc, featuredBooqIds, booqFragmentForRange } from '@/backend/library'
-import { urlForBooqImageId } from '@/backend/images'
+import { CoverSize, urlForBooqImageId } from '@/backend/images'
 
 export type PartialBooqData = {
     booqId: BooqId,
@@ -95,13 +95,13 @@ export async function booqCollection(collection: string, userId: string | undefi
     return cards
 }
 
-export async function booqCard(booqId: BooqId): Promise<BooqCardData | undefined> {
+export async function booqCard(booqId: BooqId, coverSize?: CoverSize): Promise<BooqCardData | undefined> {
     const [card] = await booqDataForIds([booqId])
     if (undefined === card) {
         return undefined
     }
 
-    return buildBooqCardData(card)
+    return buildBooqCardData(card, coverSize)
 }
 
 export async function booqDetailedData(booqId: BooqId): Promise<BooqDetailedData | undefined> {
@@ -275,7 +275,7 @@ export async function getExpandedFragments(booqId: BooqId, ranges: BooqRange[]):
     return ranges.map(range => {
         const expandedRange = getExpandedRange(booq.nodes, range)
         const nodes = nodesForRange(booq.nodes, expandedRange)
-        
+
         return {
             nodes,
             range: expandedRange,
@@ -283,21 +283,25 @@ export async function getExpandedFragments(booqId: BooqId, ranges: BooqRange[]):
     })
 }
 
-function buildBooqCardData(data: BooqData): BooqCardData {
+function buildBooqCardData(data: BooqData, coverSize?: CoverSize): BooqCardData {
     const languages: LanguageInfo[] = data.languages?.map(code => ({
         code,
         name: getLanguageDisplayName(code),
     })) ?? []
+    const coverData = coverSize
+        ? data.cover?.sizes?.[coverSize] ?? data.cover
+        : data.cover
+
     return {
         booqId: data.booqId,
         title: data.title,
         authors: data.authors,
         subjects: data.subjects ?? [],
         languages,
-        cover: data.cover ? {
-            url: urlForBooqImageId(data.booqId, data.cover.id),
-            width: data.cover.width,
-            height: data.cover.height,
+        cover: coverData ? {
+            url: urlForBooqImageId(data.booqId, coverData.id),
+            width: coverData.width,
+            height: coverData.height,
         } : undefined,
     }
 }
