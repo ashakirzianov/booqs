@@ -1,9 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { NoteAuthorData } from '@/data/notes'
 import { BooqId } from '@/core'
-import { HIGHLIGHT_KINDS, COMMENT_KIND } from '@/application/notes'
+import { HIGHLIGHT_KINDS, COMMENT_KIND, useBooqNotes } from '@/application/notes'
 import { NoteCard } from './NoteCard'
 import clsx from 'clsx'
 import { ExpandedNoteFragmentData } from './NoteFragment'
@@ -14,15 +14,33 @@ type NotesFilterProps = {
     user: NoteAuthorData | undefined
 }
 
-export function NotesFilter({ data, user }: NotesFilterProps) {
+export function NotesFilter({ data, booqId, user }: NotesFilterProps) {
+    const { notes: currentNotes } = useBooqNotes({ booqId, user })
+    
+    // Merge current notes with initial data, preferring current notes for updates
+    const mergedData = useMemo(() => {
+        return data.map(datum => {
+            const currentNote = currentNotes.find(n => n.id === datum.note.id)
+            if (currentNote) {
+                return {
+                    ...datum,
+                    note: currentNote
+                }
+            }
+            return datum
+        }).filter(datum => {
+            // Only show notes that still exist in current notes
+            return currentNotes.some(n => n.id === datum.note.id)
+        })
+    }, [data, currentNotes])
     const [selectedFilter, setSelectedFilter] = useState<string>('all')
 
-    const allKinds = Array.from(new Set(data.map(datum => datum.note.kind)))
+    const allKinds = Array.from(new Set(mergedData.map(datum => datum.note.kind)))
 
     // Filter notes based on selected filter
     const filteredNotes = selectedFilter === 'all'
-        ? data
-        : data.filter(datum => datum.note.kind === selectedFilter)
+        ? mergedData
+        : mergedData.filter(datum => datum.note.kind === selectedFilter)
 
     return (
         <>
@@ -37,10 +55,10 @@ export function NotesFilter({ data, user }: NotesFilterProps) {
                             active={selectedFilter === 'all'}
                             onClick={() => setSelectedFilter('all')}
                             label="All"
-                            count={data.length}
+                            count={mergedData.length}
                         />
                         {allKinds.map(kind => {
-                            const count = data.filter(datum => datum.note.kind === kind).length
+                            const count = mergedData.filter(datum => datum.note.kind === kind).length
                             return (
                                 <FilterButton
                                     key={kind}

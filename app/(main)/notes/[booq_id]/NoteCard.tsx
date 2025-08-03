@@ -18,16 +18,14 @@ type NoteCardProps = {
 export function NoteCard({
     noteFragmentData, user,
 }: NoteCardProps) {
-    const { note: initialNote, overlapping, nodes, range } = noteFragmentData
-    const { booqId } = initialNote
+    const { note, overlapping, nodes, range } = noteFragmentData
+    const { booqId } = note
     const [isEditing, setIsEditing] = useState(false)
-    const [editContent, setEditContent] = useState(initialNote.content || '')
+    const [editContent, setEditContent] = useState(note.content || '')
     const [removedNote, setRemovedNote] = useState<BooqNote | null>(null)
-    const { notes, updateNote, removeNote, addNote } = useBooqNotes({ booqId, user })
+    const { updateNote, removeNote, addNote } = useBooqNotes({ booqId, user })
 
-    // Use the updated note from the hook, fall back to initial note if not found
-    const note = notes.find(n => n.id === initialNote.id) || initialNote
-    const isNoteRemoved = !notes.find(n => n.id === initialNote.id) && removedNote !== null
+    const isNoteRemoved = removedNote !== null
 
     // Update editContent when note content changes (but not when editing)
     useEffect(() => {
