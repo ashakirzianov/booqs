@@ -317,7 +317,7 @@ function AnchorButton({ booqId, anchor, title }: {
         return null
     }
     return <Link href={booqHref({ booqId, path: anchor.path })} className='flex items-center h-header'>
-        <div className='flex items-center h-header border border-dimmed text-dimmed'>
+        <div className='flex items-center h-header rounded border border-dimmed text-dimmed p-2 hover:text-primary hover:border-primary transition-colors'>
             {anchor.title ?? title}
         </div>
     </Link>
