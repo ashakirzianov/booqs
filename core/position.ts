@@ -1,19 +1,17 @@
 import { BooqNode, BooqPath } from './model'
 import { assertNever } from './misc'
+import { isElementNode, isTextNode, isStubNode } from './node'
 
 export function nodeLength(node: BooqNode): number {
-    switch (node?.kind) {
-        case 'element':
-            return nodesLength(node.children ?? [])
-        case 'text':
-            return node.content.length
-        case 'stub':
-        case undefined:
-            // Stub nodes are used to represent missing content, so we return their length
-            return node?.length ?? 0
-        default:
-            assertNever(node)
-            return 0
+    if (isElementNode(node)) {
+        return nodesLength(node.children ?? [])
+    } else if (isTextNode(node)) {
+        return node.length
+    } else if (isStubNode(node)) {
+        return node?.length ?? 0
+    } else {
+        assertNever(node)
+        return 0
     }
 }
 

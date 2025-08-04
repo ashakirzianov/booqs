@@ -1,20 +1,22 @@
 import { useMemo } from 'react'
 import { BooqId, BooqRange, pathInRange, pathLessThan } from '@/core'
 import { HIGHLIGHT_KINDS, COMMENT_KIND, useBooqNotes } from '@/application/notes'
-import { NoteAuthorData } from '@/data/notes'
+import { BooqNote, NoteAuthorData } from '@/data/notes'
 
 export function useNotesData({
     booqId,
     user,
     currentRange,
     highlightsAuthorIds,
+    initialNotes,
 }: {
     booqId: BooqId,
     user: NoteAuthorData | undefined,
     currentRange?: BooqRange,
     highlightsAuthorIds: Set<string>,
+    initialNotes: BooqNote[],
 }) {
-    const { notes: allNotes, isLoading } = useBooqNotes({ booqId, user })
+    const { notes: allNotes, isLoading } = useBooqNotes({ booqId, user, initialNotes })
 
     const sortedNotes = useMemo(() => {
         return allNotes

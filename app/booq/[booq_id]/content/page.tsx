@@ -1,18 +1,19 @@
-import { BooqId, parseId, pathFromString } from '@/core'
-import { booqPart, fetchBooqPreview } from '@/data/booqs'
+import { BooqId, parseId, pathFromString, rangeFromString } from '@/core'
+import { fetchBooqPreview, fetchFullBooq } from '@/data/booqs'
 import { reportBooqHistoryAction } from '@/data/history'
 import { Reader } from '@/reader/Reader'
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { getUrlAndDimensions } from '@/backend/images'
+import { fetchNotes } from '@/data/notes'
+import { getCurrentUser } from '@/data/user'
 
 type Params = {
     booq_id: string,
-    path: string,
 }
 type SearchParams = {
-    start?: string,
-    end?: string,
+    path?: string,
+    quote?: string,
 }
 
 export async function generateMetadata({
@@ -21,18 +22,21 @@ export async function generateMetadata({
     params: Promise<Params>,
     searchParams: Promise<SearchParams>,
 }): Promise<Metadata> {
-    const { booq_id, path } = await params
+    const { booq_id } = await params
     const [library, id] = parseId(booq_id as BooqId)
     if (!library || !id) {
         return notFound()
     }
     const booqId: BooqId = `${library}-${id}`
-    const { start, end } = await searchParams
-    const startPath = start && pathFromString(start)
-    const endPath = end && pathFromString(end)
-    const booqPath = pathFromString(path)
-    const meta = startPath && endPath
-        ? await fetchBooqPreview(booqId, startPath, endPath)
+    const { quote, path } = await searchParams
+    const quoteRange = quote !== undefined
+        ? rangeFromString(quote)
+        : undefined
+    const booqPath = path !== undefined
+        ? pathFromString(path)
+        : undefined
+    const meta = quoteRange
+        ? await fetchBooqPreview(booqId, quoteRange.start, quoteRange.end)
         : await fetchBooqPreview(booqId, booqPath ?? [])
 
     const coverData = meta?.cover ? getUrlAndDimensions(booqId, meta.cover, 210) : undefined
@@ -60,24 +64,22 @@ export default async function BooqPathPage({
     params: Promise<Params>,
     searchParams: Promise<SearchParams>,
 }) {
-    const { booq_id, path } = await params
+    const { booq_id } = await params
     const [library, id] = parseId(booq_id as BooqId)
     if (!library || !id) {
         return notFound()
     }
     const booqId: BooqId = `${library}-${id}`
-    const { start, end } = await searchParams
-    const startPath = start && pathFromString(start)
-    const endPath = end && pathFromString(end)
-    const booqPath = pathFromString(path)
-    const quoteRange = startPath && endPath
-        ? { start: startPath, end: endPath }
+    const { path } = await searchParams
+    const booqPath = path !== undefined
+        ? pathFromString(path)
         : undefined
-    const booq = await booqPart({
-        booqId,
-        path: booqPath,
-        bypassCache: library === 'lo',
-    })
+
+    const [booq, notes, user] = await Promise.all([
+        fetchFullBooq(booqId),
+        fetchNotes({ booqId }),
+        getCurrentUser(),
+    ])
     if (!booq)
         return notFound()
 
@@ -89,5 +91,10 @@ export default async function BooqPathPage({
         })
     }
 
-    return <Reader booq={booq} quote={quoteRange} />
+    return <Reader
+        booqId={booqId}
+        booq={booq}
+        notes={notes}
+        user={user}
+    />
 }

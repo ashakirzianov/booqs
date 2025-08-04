@@ -1,19 +1,19 @@
-import { BooqPath, pathToString, BooqRange, pathToId, BooqId } from '@/core'
+import { BooqPath, pathToString, BooqRange, pathToId, BooqId, rangeToString } from '@/core'
 
 export function booqHref({ booqId, path }: {
     booqId: BooqId,
     path?: BooqPath,
 }) {
     return path?.length
-        ? `/booq/${booqId}/${pathToString(path)}#${pathToId(path)}`
-        : `/booq/${booqId}`
+        ? `/booq/${booqId}/content?path=${pathToString(path)}#${pathToId(path)}`
+        : `/booq/${booqId}/content`
 }
 
-export function quoteHref({ id, range }: {
-    id: string,
+export function quoteHref({ booqId, range }: {
+    booqId: BooqId,
     range: BooqRange,
 }) {
-    return `/booq/${id}/${pathToString(range.start)}/?start=${pathToString(range.start)}&end=${pathToString(range.end)}#${pathToId(range.start)}`
+    return `/booq/${booqId}/content?quote=${rangeToString(range)}#${pathToId(range.start)}`
 }
 
 export function feedHref() {

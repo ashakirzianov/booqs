@@ -3,6 +3,9 @@ import {
     BooqElementNode, BooqNode, pathToString,
     pathInRange, samePath, pathLessThan, BooqPath, BooqRange, pathToId,
     assertNever,
+    isTextNode,
+    isStubNode,
+    isElementNode,
 } from '@/core'
 
 export type Augmentation = {
@@ -31,30 +34,28 @@ export function renderNodes(nodes: BooqNode[], ctx: RenderContext): ReactNode[] 
     return result
 }
 function renderNode(node: BooqNode, ctx: RenderContext): ReactNode {
-    switch (node?.kind) {
-        case 'text':
-            switch (ctx.parent?.name) {
-                case 'table': case 'tbody': case 'tr':
-                    return null
-                case 'style':
-                    return node.content
-                default:
-                    return renderTextNode(node.content, ctx)
-            }
-        case 'stub':
-        case undefined:
-            return null
-        case 'element':
-            return createElement(
-                node.name === 'a' && ctx.withinAnchor
-                    ? 'span' // Do not nest anchors
-                    : node.name,
-                getProps(node, ctx),
-                getChildren(node, ctx),
-            )
-        default:
-            assertNever(node)
-            return null
+    if (isTextNode(node)) {
+        switch (ctx.parent?.name) {
+            case 'table': case 'tbody': case 'tr':
+                return null
+            case 'style':
+                return node
+            default:
+                return renderTextNode(node, ctx)
+        }
+    } else if (isStubNode(node)) {
+        return null
+    } else if (isElementNode(node)) {
+        return createElement(
+            node.name === 'a' && ctx.withinAnchor
+                ? 'span' // Do not nest anchors
+                : node.name,
+            getProps(node, ctx),
+            getChildren(node, ctx),
+        )
+    } else {
+        assertNever(node)
+        return null
     }
 }
 

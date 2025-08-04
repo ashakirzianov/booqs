@@ -1,15 +1,16 @@
 import { useMemo } from 'react'
-import { BooqPath, positionForPath } from '@/core'
+import { BooqFragment, BooqMetadata, BooqPath, positionForPath } from '@/core'
 import { pageForPosition } from '@/application/common'
-import { PartialBooqData } from '@/data/booqs'
 
 export function usePageData({
-    booq, currentPath,
+    fragment, meta, currentPath,
 }: {
-    booq: PartialBooqData,
+    fragment: BooqFragment,
+    meta: BooqMetadata,
     currentPath: BooqPath,
 }) {
-    const { fragment: { nodes, next }, meta: { length } } = booq
+    const { nodes, next } = fragment
+    const length = meta.length
 
     return useMemo(() => {
         const position = positionForPath(nodes, currentPath)

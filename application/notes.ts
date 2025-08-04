@@ -15,10 +15,11 @@ export const HIGHLIGHT_KINDS = [
 export const COMMENT_KIND = 'comment'
 
 export function useBooqNotes({
-    booqId, user,
+    booqId, user, initialNotes,
 }: {
     booqId: BooqId,
     user: NoteAuthorData | undefined,
+    initialNotes?: BooqNote[],
 }) {
     const notesKey = `/api/notes?booq_id=${booqId}`
 
@@ -39,9 +40,9 @@ export function useBooqNotes({
         }
     )
 
-    const notes = useMemo(() =>
-        data?.notes.map(noteFromJson) ?? [],
-        [data?.notes]
+    const notes = useMemo(
+        () => data?.notes.map(noteFromJson) ?? initialNotes ?? [],
+        [data?.notes, initialNotes]
     )
 
     const { trigger: postNoteTrigger } = useSWRMutation(

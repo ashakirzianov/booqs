@@ -1,5 +1,17 @@
-import { BooqNode, BooqRange, BooqPath } from './model'
+import { BooqNode, BooqRange, BooqPath, BooqTextNode, BooqElementNode, BooqStubNode } from './model'
 import { nodeLength } from './position'
+
+export function isTextNode(node: BooqNode | undefined): node is BooqTextNode {
+    return typeof node === 'string'
+}
+
+export function isStubNode(node: BooqNode | undefined): node is BooqStubNode {
+    return node === null || node?.kind === 'stub'
+}
+
+export function isElementNode(node: BooqNode | undefined): node is BooqElementNode {
+    return node?.kind === 'element'
+}
 
 export function nodeForPath(nodes: BooqNode[], path: BooqPath): BooqNode | undefined {
     const [head, ...tail] = path
@@ -79,8 +91,12 @@ export function findPathForId(nodes: BooqNode[], targetId: string): BooqPath | u
     return undefined
 }
 
-function stubNode(length: number): BooqNode {
+export function stubNode(length: number): BooqNode {
     return length > 0
         ? { kind: 'stub', length }
         : null
+}
+
+export function textNode(content: string): BooqTextNode {
+    return content
 }

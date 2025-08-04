@@ -26,9 +26,8 @@ export type BooqElementNode = {
     ref?: BooqPath,
     pph?: boolean,
 }
-export type BooqTextNode = {
-    kind: 'text',
-    content: string,
+export type BooqTextNode = string & {
+    kind?: undefined,
 }
 export type BooqStubNode = {
     kind: 'stub',
