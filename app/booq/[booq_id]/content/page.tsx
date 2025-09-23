@@ -3,7 +3,7 @@ import { fetchBooqPreview, fetchFullBooq } from '@/data/booqs'
 import { reportBooqHistoryAction } from '@/data/history'
 import { Reader } from '@/reader/Reader'
 import { Metadata } from 'next'
-import { notFound } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
 import { getUrlAndDimensions } from '@/backend/images'
 import { fetchNotes } from '@/data/notes'
 import { getCurrentUser } from '@/data/user'
@@ -69,16 +69,21 @@ export default async function BooqPathPage({
     if (!library || !id) {
         return notFound()
     }
+
     const booqId: BooqId = `${library}-${id}`
     const { path } = await searchParams
     const booqPath = path !== undefined
         ? pathFromString(path)
         : undefined
 
-    const [booq, notes, user] = await Promise.all([
+    const returnTo = encodeURIComponent(`/booq/${booqId}/content${path ? `?path=${path}#path:${path}` : ''}`)
+    const user = await getCurrentUser()
+    if (!user) {
+        redirect(`/auth?return_to=${returnTo}`)
+    }
+    const [booq, notes] = await Promise.all([
         fetchFullBooq(booqId),
         fetchNotes({ booqId }),
-        getCurrentUser(),
     ])
     if (!booq)
         return notFound()
