@@ -67,7 +67,7 @@ function BriefEntry({ entry }: {
         <div className='flex snap-center relative group'>
             <Link href={booqHref({ booqId: entry.booqId, path: entry.path })}>
                 <BooqCover
-                    cover={entry.cover}
+                    coverUrl={entry.coverUrl}
                     title={entry.title}
                     author={entry.authors[0]}
                     size={120}

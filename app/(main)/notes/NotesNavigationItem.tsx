@@ -24,7 +24,7 @@ export function NotesNavigationItem({ booqId, card }: NotesNavigationItemProps) 
                 }`}
         >
             <BooqCover
-                cover={card.cover}
+                coverUrl={card.coverUrl}
                 title={card.title}
                 author={card.authors.join(', ')}
                 size={60}

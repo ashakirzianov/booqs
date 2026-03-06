@@ -61,7 +61,7 @@ function ReadButton({ booqId }: {
 }
 
 function BooqCard({
-    card: { booqId, title, authors, cover, subjects, languages },
+    card: { booqId, title, authors, coverUrl, subjects, languages },
     actions,
 }: {
     card: BooqCardData,
@@ -75,7 +75,7 @@ function BooqCard({
             <BooqCover
                 title={title ?? undefined}
                 author={author}
-                cover={cover}
+                coverUrl={coverUrl}
                 size={210}
             />
         </Link>

@@ -66,7 +66,7 @@ function UploadModalContent({ closeModal }: {
                 <BooqCover
                     title={result.title}
                     author={undefined}
-                    cover={result.cover}
+                    coverUrl={result.coverUrl}
                     size={210}
                 />
             </div>

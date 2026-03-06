@@ -1,13 +1,11 @@
 import { inspect } from 'util'
 import { deleteAsset, downloadAsset, listObjects, uploadAsset } from '@/backend/blob'
 import {
-    existingIds, existingAssetIds, pgEpubsBucket, insertPgRecord,
+    existingAssetIds, pgEpubsBucket, insertPgRecord,
 } from '@/backend/pg'
 import { parseEpubFile } from '@/parser'
 import { redis } from '@/backend/db'
 import { CliOptions } from './main'
-import { uploadImagesForBooqId } from '@/backend/library'
-import { BooqId } from '@/core/model'
 
 type AssetRecord = {
     assetId: string,
@@ -34,9 +32,6 @@ export async function pg(options: CliOptions) {
                 case 'blob2db':
                     await syncBlobToDB(options)
                     return
-                case 'images':
-                    await syncImages(options)
-                    return
                 default:
                     console.info('Unknown sync subcommand: ', subSubcommand)
                     console.info('Available sync subcommands: web2blob, blob2db')
@@ -56,37 +51,6 @@ export async function pg(options: CliOptions) {
             console.info('Unknown pg subcommand: ', subcommand)
             console.info('Available pg subcommands: sync, cleanup')
             return
-    }
-}
-
-async function syncImages(options: CliOptions) {
-    const verbosity = parseVerbosity(options)
-    basic(verbosity, 'Syncing images...')
-    const id = options.switches['id']
-    if (id !== undefined) {
-        basic(verbosity, `Syncing images for specific id: ${id}`)
-        await processImageSync(id as BooqId, verbosity)
-        return
-    }
-    const ids = await existingIds()
-    const batchSize = parseInt(options.switches['batch'] || '25')
-    for (const batch of makeBatches(ids, batchSize)) {
-        const promises = batch.map(id => processImageSync(`pg-${id}`, verbosity))
-        await Promise.all(promises)
-    }
-}
-
-async function processImageSync(booqId: BooqId, verbosity: number) {
-    try {
-        const { data: imagesData, fromCache } = await uploadImagesForBooqId(booqId)
-        if (fromCache) {
-            basic(verbosity, `Images for ${booqId} already in cache`)
-        } else {
-            basic(verbosity, `Uploaded images for ${booqId}`)
-        }
-        verbose(verbosity, `Finished syncing images for ${booqId}: ${imagesData}`)
-    } catch (err) {
-        warn(verbosity, `Error syncing images for ${booqId}`, err)
     }
 }
 
@@ -315,20 +279,6 @@ async function* existingBlobAssetIds() {
         } else {
             warn(2, `Invalid object in blob: ${object}`)
         }
-    }
-}
-
-function* makeBatches<T>(iterable: Iterable<T>, batchSize: number) {
-    let batch: T[] = []
-    for (const item of iterable) {
-        batch.push(item)
-        if (batch.length >= batchSize) {
-            yield batch
-            batch = []
-        }
-    }
-    if (batch.length > 0) {
-        yield batch
     }
 }
 

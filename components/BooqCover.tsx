@@ -1,12 +1,11 @@
-import { BooqCoverData } from '@/data/booqs'
 import React from 'react'
 
 const defaultSize: BooqCoverSize = 210
 
 export type BooqCoverSize = 60 | 120 | 210 | 360
 
-export function BooqCover({ cover, title, author, size }: {
-    cover: BooqCoverData | undefined,
+export function BooqCover({ coverUrl, title, author, size }: {
+    coverUrl: string | undefined,
     title: string | undefined,
     author: string | undefined,
     size: BooqCoverSize,
@@ -19,19 +18,19 @@ export function BooqCover({ cover, title, author, size }: {
         height: height,
     }}>
         {
-            cover
-                ? <BooqImageCover cover={cover} title={title} />
+            coverUrl
+                ? <BooqImageCover coverUrl={coverUrl} title={title} />
                 : <BooqDefaultCover title={title} author={author} size={size} />
         }
     </div>
 }
 
-function BooqImageCover({ cover, title }: {
-    cover: BooqCoverData,
+function BooqImageCover({ coverUrl, title }: {
+    coverUrl: string,
     title: string | undefined,
 }) {
     return <div title={title ?? undefined} className='flex w-full h-full bg-contain bg-no-repeat bg-center' style={{
-        backgroundImage: `url(${cover.url})`,
+        backgroundImage: `url(${coverUrl})`,
     }} />
 }
 

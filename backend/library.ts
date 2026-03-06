@@ -2,13 +2,13 @@ import {
     Booq, BooqId, BooqMetadata, BooqPath, InLibraryId, LibraryId, parseId, pathToString, positionForPath, previewForPath, TableOfContents, textForRange, BooqRange, nodesForRange, BooqNode,
 } from '@/core'
 import { getCachedValueForKey, cacheValueForKey } from './cache'
-import { parseAndPreprocessBooq, parseAndLoadImagesFromFile } from './parse'
+import { parseAndLoadImagesFromFile, parseAndPreprocessBooq } from './parse'
 import groupBy from 'lodash-es/groupBy'
 import { pgLibrary } from './pg'
 import { userUploadsLibrary } from './uu'
 import { localLibrary } from './lo'
-import { getOrLoadImagesData, BooqImageData, resolveBooqImage } from './images'
 import { getExtraMetadataValues } from '@/core/meta'
+import { urlForBooqImageId } from './urls'
 
 export type BooqData = {
     booqId: BooqId,
@@ -16,7 +16,7 @@ export type BooqData = {
     authors: string[],
     subjects: string[] | undefined,
     languages: string[] | undefined,
-    cover: BooqImageData | undefined,
+    coverSrc: string | undefined,
 }
 
 export type BooqFile = {
@@ -54,22 +54,9 @@ const libraries: {
     lo: localLibrary,
 }
 
-export async function uploadImagesForBooqId(booqId: BooqId) {
-    return getOrLoadImagesData({
-        booqId,
-        loadImages: async () => {
-            const file = await fileForId(booqId)
-            if (!file) {
-                return undefined
-            }
-            return parseAndLoadImagesFromFile(file)
-        },
-    })
-}
-
 export async function booqForId(booqId: BooqId, bypassCache = false): Promise<Booq | undefined> {
     if (bypassCache) {
-        const file = await fileForId(booqId)
+        const file = await booqFileForId(booqId)
         if (!file) {
             return undefined
         }
@@ -79,7 +66,7 @@ export async function booqForId(booqId: BooqId, bypassCache = false): Promise<Bo
     if (cached) {
         return cached
     } else {
-        const file = await fileForId(booqId)
+        const file = await booqFileForId(booqId)
         if (!file) {
             return undefined
         }
@@ -96,7 +83,7 @@ export type BooqPreview = {
     text: string,
     title?: string,
     authors?: string[],
-    cover?: BooqImageData,
+    coverUrl?: string,
     booqLength: number,
 }
 const PREVIEW_LENGTH = 500
@@ -117,15 +104,14 @@ export async function booqPreview(booqId: BooqId, path: BooqPath, end?: BooqPath
     const position = positionForPath(booq.nodes, path)
     const authors = booq.metadata.authors.map(author => author.name)
     const booqLength = booq.metadata.length
-    const cover = booq.metadata.coverSrc
-        ? await resolveBooqImage({ booqId, src: booq.metadata.coverSrc })
-        : undefined
-    const preview = {
+    const preview: BooqPreview = {
         position,
         text,
         title: booq.metadata.title,
         authors,
-        cover,
+        coverUrl: booq.metadata.coverSrc
+            ? urlForBooqImageId(booqId, booq.metadata.coverSrc, 210)
+            : undefined,
         booqLength,
     }
     await cacheValueForKey(key, preview, 60 * 60) // Cache for 1 hour
@@ -231,27 +217,13 @@ async function buildBooqData({
     booqId: BooqId,
     meta: BooqMetadata,
 }): Promise<BooqData> {
-    let cover: BooqImageData | undefined
-    if (coverSrc) {
-        const { data } = await getOrLoadImagesData({
-            booqId,
-            loadImages: async () => {
-                const file = await fileForId(booqId)
-                if (!file) {
-                    return undefined
-                }
-                return parseAndLoadImagesFromFile(file)
-            },
-        })
-        cover = data?.[coverSrc]
-    }
     return {
         booqId,
         title,
         authors: authors.map(author => author.name),
         subjects: getExtraMetadataValues('subject', extra),
         languages: getExtraMetadataValues('language', extra),
-        cover,
+        coverSrc,
     }
 }
 
@@ -266,7 +238,19 @@ export async function booqFragmentForRange(booqId: BooqId, range: BooqRange): Pr
     return { nodes }
 }
 
-async function fileForId(booqId: BooqId) {
+export async function booqImages(booqId: BooqId): Promise<Record<string, Buffer> | undefined> {
+    const file = await booqFileForId(booqId)
+    if (!file) {
+        return undefined
+    }
+    const booqImages = await parseAndLoadImagesFromFile(file)
+    if (!booqImages) {
+        return undefined
+    }
+    return booqImages.images
+}
+
+async function booqFileForId(booqId: BooqId) {
     const [prefix, id] = parseId(booqId)
     const library = libraries[prefix]
     return library && id
