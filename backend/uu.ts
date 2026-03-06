@@ -5,9 +5,9 @@ import type { InLibraryCard, Library } from './library'
 import { parseEpubFile } from '@/parser'
 import { Booq, BooqMetadata } from '@/core'
 import { nanoid } from 'nanoid'
-import { deleteAsset, downloadAsset, uploadAsset } from './blob'
-import { deleteImagesForBooq } from './variants'
+import { deleteAsset, deleteAssetsWithPrefix, downloadAsset, uploadAsset } from './blob'
 import { sql } from './db'
+import { IMAGES_BUCKET } from './urls'
 
 export const userUploadsLibrary: Library = {
     cards, fileForId,
@@ -215,8 +215,12 @@ async function deleteBooq({ id, assetId }: {
     id: string,
     assetId: string,
 }) {
+    const booqId = `uu-${id}`
     const blobPromise = deleteAsset(userUploadedEpubsBucket, assetId)
-    const imagesPromise = deleteImagesForBooq(`uu-${id}`)
+    const imagesPromise = Promise.all([
+        deleteAssetsWithPrefix(IMAGES_BUCKET, `originals/${booqId}/`),
+        deleteAssetsWithPrefix(IMAGES_BUCKET, `variants/${booqId}/`),
+    ])
     const dbPromise = deleteCards([id])
     const [blobResult, , dbResult] = await Promise.all([blobPromise, imagesPromise, dbPromise])
     return blobResult && dbResult

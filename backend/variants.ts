@@ -1,9 +1,8 @@
 import { BooqId } from '@/core'
 import { booqImages } from './library'
 import { generateVariant, ImageVariant } from './images'
-import { deleteAssetsWithPrefix, downloadAsset, uploadAsset } from './blob'
-
-const imageBucket = 'booqs-images'
+import { downloadAsset, uploadAsset } from './blob'
+import { IMAGES_BUCKET } from './urls'
 
 export async function getImageVariant(booqId: BooqId, filePathWithVariant: string): Promise<{
     buffer: Buffer,
@@ -109,27 +108,20 @@ function contentTypeForFormat(format: string): string {
     }
 }
 
-export async function deleteImagesForBooq(booqId: BooqId) {
-    await Promise.all([
-        deleteAssetsWithPrefix(imageBucket, `originals/${booqId}/`),
-        deleteAssetsWithPrefix(imageBucket, `variants/${booqId}/`),
-    ])
-}
-
 async function uploadOriginalImage(booqId: BooqId, imageId: string, buffer: Buffer) {
-    return uploadAsset(imageBucket, `originals/${booqId}/${imageId}`, buffer)
+    return uploadAsset(IMAGES_BUCKET, `originals/${booqId}/${imageId}`, buffer)
 }
 
 async function uploadVariantImage(booqId: BooqId, variantPath: string, buffer: Buffer) {
-    return uploadAsset(imageBucket, `variants/${booqId}/${variantPath}`, buffer)
+    return uploadAsset(IMAGES_BUCKET, `variants/${booqId}/${variantPath}`, buffer)
 }
 
 async function downloadOriginalImage(booqId: BooqId, imageId: string): Promise<Buffer | undefined> {
     const s3Key = `originals/${booqId}/${imageId}`
-    return downloadAsset(imageBucket, s3Key)
+    return downloadAsset(IMAGES_BUCKET, s3Key)
 }
 
 async function downloadVariantImage(booqId: BooqId, variantPath: string): Promise<Buffer | undefined> {
     const s3Key = `variants/${booqId}/${variantPath}`
-    return downloadAsset(imageBucket, s3Key)
+    return downloadAsset(IMAGES_BUCKET, s3Key)
 }
