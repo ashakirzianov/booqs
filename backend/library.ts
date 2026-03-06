@@ -8,6 +8,7 @@ import { pgLibrary } from './pg'
 import { userUploadsLibrary } from './uu'
 import { localLibrary } from './lo'
 import { getExtraMetadataValues } from '@/core/meta'
+import { urlForBooqImageId } from './image-url'
 
 export type BooqData = {
     booqId: BooqId,
@@ -55,7 +56,7 @@ const libraries: {
 
 export async function booqForId(booqId: BooqId, bypassCache = false): Promise<Booq | undefined> {
     if (bypassCache) {
-        const file = await fileForId(booqId)
+        const file = await booqFileForId(booqId)
         if (!file) {
             return undefined
         }
@@ -65,7 +66,7 @@ export async function booqForId(booqId: BooqId, bypassCache = false): Promise<Bo
     if (cached) {
         return cached
     } else {
-        const file = await fileForId(booqId)
+        const file = await booqFileForId(booqId)
         if (!file) {
             return undefined
         }
@@ -82,7 +83,7 @@ export type BooqPreview = {
     text: string,
     title?: string,
     authors?: string[],
-    coverSrc?: string,
+    coverUrl?: string,
     booqLength: number,
 }
 const PREVIEW_LENGTH = 500
@@ -108,7 +109,9 @@ export async function booqPreview(booqId: BooqId, path: BooqPath, end?: BooqPath
         text,
         title: booq.metadata.title,
         authors,
-        coverSrc: booq.metadata.coverSrc,
+        coverUrl: booq.metadata.coverSrc
+            ? urlForBooqImageId(booqId, booq.metadata.coverSrc, 210)
+            : undefined,
         booqLength,
     }
     await cacheValueForKey(key, preview, 60 * 60) // Cache for 1 hour
@@ -235,11 +238,7 @@ export async function booqFragmentForRange(booqId: BooqId, range: BooqRange): Pr
     return { nodes }
 }
 
-export async function epubFileForBooqId(booqId: BooqId): Promise<BooqFile | undefined> {
-    return fileForId(booqId)
-}
-
-async function fileForId(booqId: BooqId) {
+export async function booqFileForId(booqId: BooqId) {
     const [prefix, id] = parseId(booqId)
     const library = libraries[prefix]
     return library && id

@@ -4,7 +4,6 @@ import { reportBooqHistoryAction } from '@/data/history'
 import { Reader } from '@/reader/Reader'
 import { Metadata } from 'next'
 import { notFound, redirect } from 'next/navigation'
-import { urlForBooqImageId } from '@/backend/images'
 import { fetchNotes } from '@/data/notes'
 import { getCurrentUser } from '@/data/user'
 
@@ -39,8 +38,8 @@ export async function generateMetadata({
         ? await fetchBooqPreview(booqId, quoteRange.start, quoteRange.end)
         : await fetchBooqPreview(booqId, booqPath ?? [])
 
-    const images = meta?.coverSrc
-        ? [urlForBooqImageId(booqId, meta.coverSrc, 210)]
+    const images = meta?.coverUrl
+        ? [meta.coverUrl]
         : undefined
 
     return {
