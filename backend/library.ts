@@ -7,7 +7,7 @@ import groupBy from 'lodash-es/groupBy'
 import { pgLibrary } from './pg'
 import { userUploadsLibrary } from './uu'
 import { localLibrary } from './lo'
-import { getOrLoadImagesData, resolveBooqImage } from './images'
+import { getOrLoadImagesData } from './images'
 import { getExtraMetadataValues } from '@/core/meta'
 
 export type BooqData = {
@@ -117,15 +117,12 @@ export async function booqPreview(booqId: BooqId, path: BooqPath, end?: BooqPath
     const position = positionForPath(booq.nodes, path)
     const authors = booq.metadata.authors.map(author => author.name)
     const booqLength = booq.metadata.length
-    const cover = booq.metadata.coverSrc
-        ? await resolveBooqImage({ booqId, src: booq.metadata.coverSrc })
-        : undefined
-    const preview = {
+    const preview: BooqPreview = {
         position,
         text,
         title: booq.metadata.title,
         authors,
-        cover,
+        coverSrc: booq.metadata.coverSrc,
         booqLength,
     }
     await cacheValueForKey(key, preview, 60 * 60) // Cache for 1 hour

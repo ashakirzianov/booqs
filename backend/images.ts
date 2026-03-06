@@ -7,11 +7,11 @@ export const imageBucket = 'booqs-images'
 export const coverSizes = [60, 120, 210] as const
 export type CoverSize = typeof coverSizes[number]
 
-export type BooqImageData = {
+export type ImageDimensions = {
     width: number,
     height: number,
 }
-export type BooqImagesData = Record<string, BooqImageData>
+export type BooqImagesData = Record<string, ImageDimensions>
 export type BooqImages = {
     images: Record<string, Buffer>,
     coverSrc?: string,
@@ -21,16 +21,6 @@ export function urlForBooqImageId(booqId: BooqId, imageId: string, width?: numbe
     const assetId = `${booqId}/${imageId}`
     const url = `${process.env.NEXT_PUBLIC_URL}/api/images/@${assetId}${width ? `w${width}` : ''}.webp`
     return url
-}
-
-export async function resolveBooqImage({
-    booqId, src,
-}: {
-    booqId: BooqId,
-    src: string,
-}): Promise<BooqImageData | undefined> {
-    const imageData = await redis.hget<BooqImageData>(`images:booq:${booqId}`, src)
-    return imageData ?? undefined
 }
 
 export async function getOrLoadImagesData({
@@ -64,7 +54,7 @@ export async function getOrLoadImagesData({
             booqId, images,
         })
         if (Object.keys(uploaded).length > 0) {
-            await redis.hset<BooqImageData>(`images:booq:${booqId}`, uploaded)
+            await redis.hset<ImageDimensions>(`images:booq:${booqId}`, uploaded)
             return {
                 data: uploaded,
                 fromCache: false,
@@ -94,7 +84,7 @@ async function uploadImagesForBooq({
             continue
 
         }
-        const imageData: BooqImageData = {
+        const imageData: ImageDimensions = {
             width: uploadResult.width,
             height: uploadResult.height,
         }
