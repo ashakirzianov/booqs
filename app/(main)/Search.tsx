@@ -6,8 +6,9 @@ export function Search() {
     const { isOpen, openModal, closeModal } = useSearchModalState()
     return <>
         <input
-            className='font-normal border-none text-xl shadow rounded p-4 max-h-12 w-40 bg-background cursor-pointer
-            focus:max-w-auto focus:outline-hidden focus:ring-0 focus:border-none dark:shadow-slate-800
+            className='font-normal text-xl shadow rounded p-4 max-h-12 w-40 bg-background text-primary cursor-pointer
+            border border-border dark:shadow-slate-700
+            focus:max-w-auto focus:outline-hidden focus:ring-0
             placeholder:text-dimmed'
             type="text"
             placeholder="Search..."

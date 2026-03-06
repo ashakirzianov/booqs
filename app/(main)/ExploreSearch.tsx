@@ -6,9 +6,10 @@ export function ExploreSearch() {
     const { isOpen, openModal, closeModal } = useSearchModalState()
     return <>
         <input
-            className='font-normal border-none text-2xl shadow-lg rounded-lg p-6 w-96 max-w-[90vw] bg-background cursor-pointer
-            focus:max-w-auto focus:outline-hidden focus:ring-0 focus:border-none
-            placeholder:text-dimmed transition-shadow hover:shadow-xl'
+            className='font-normal text-2xl shadow-lg rounded-lg p-6 w-96 max-w-[90vw] bg-background text-primary cursor-pointer
+            border border-border
+            focus:max-w-auto focus:outline-hidden focus:ring-0
+            placeholder:text-dimmed transition-shadow hover:shadow-xl dark:shadow-slate-700 dark:hover:shadow-slate-700'
             type="text"
             placeholder="Search for books..."
             onClick={openModal}

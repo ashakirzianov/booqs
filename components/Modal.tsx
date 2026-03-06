@@ -56,6 +56,7 @@ export function Modal({
     }, [closeModal])
     return <dialog ref={dialogRef}
         className='pointer-events-auto transition duration-300 shadow-xl rounded bg-background
+  border border-border
   dark:shadow-slate-800 dark:shadow
   backdrop:backdrop-blur-xs
   opacity-0 open:opacity-100 p-0

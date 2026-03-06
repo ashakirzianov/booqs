@@ -62,8 +62,8 @@ export function SearchModal({
             <input
                 autoFocus={true}
                 onFocus={e => e.target.select()}
-                className='font-normal border-none text-xl p-4 w-full
-            max-h-12 bg-background text-primary shadow
+                className='font-normal text-xl p-4 w-full
+            max-h-12 bg-background text-primary border-none border-b border-border
             focus:outline-hidden focus:ring-0 focus:border-none
             placeholder:text-dimmed'
                 tabIndex={1}
@@ -72,7 +72,7 @@ export function SearchModal({
                 value={input}
                 onChange={e => setInput(e.target.value)}
             />
-            <div className='flex flex-col grow overflow-y-auto'>
+            <div className='flex flex-col grow overflow-y-auto text-primary'>
                 {authors.length > 0
                     ? <div>
                         <h1 className='font-bold p-2 text-xl'>Authors</h1>
