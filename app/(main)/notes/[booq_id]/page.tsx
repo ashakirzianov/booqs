@@ -1,5 +1,5 @@
 import { fetchNotes } from '@/data/notes'
-import { parseId, type BooqId, comparePaths, isOverlapping } from '@/core'
+import { parseIdOpt, type BooqId, comparePaths, isOverlapping } from '@/core'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { booqHref, authorHref } from '@/common/href'
@@ -20,7 +20,7 @@ export async function generateMetadata({
     params: Promise<Params>,
 }): Promise<Metadata> {
     const { booq_id } = await params
-    const [library, id] = parseId(booq_id as BooqId)
+    const [library, id] = parseIdOpt(booq_id) ?? [null, null]
     if (!library || !id) {
         return {
             title: 'Notes Not Found - Booqs',
@@ -58,7 +58,7 @@ export default async function NotesPage({ params }: {
     params: Promise<Params>,
 }) {
     const { booq_id } = await params
-    const [library, id] = parseId(booq_id as BooqId)
+    const [library, id] = parseIdOpt(booq_id) ?? [null, null]
     if (!library || !id) {
         notFound()
     }

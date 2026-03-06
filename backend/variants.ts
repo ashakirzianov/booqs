@@ -2,8 +2,7 @@ import { BooqId } from '@/core'
 import { booqImages } from './library'
 import { generateVariant, ImageVariant } from './images'
 import { downloadAsset, uploadAsset } from './blob'
-
-const imageBucket = 'booqs-images'
+import { IMAGES_BUCKET } from './urls'
 
 export async function getImageVariant(booqId: BooqId, filePathWithVariant: string): Promise<{
     buffer: Buffer,
@@ -70,12 +69,12 @@ async function getOrExtractOriginal(booqId: BooqId, filePath: string): Promise<B
     }
 
     await Promise.all(
-        Object.entries(images).map(([src, buffer]) =>
+        Object.entries(images.images).map(([src, buffer]) =>
             uploadOriginalImage(booqId, src, buffer)
         )
     )
 
-    return images[filePath]
+    return images.images[filePath]
 }
 
 async function getOrGenerateVariant(
@@ -110,19 +109,19 @@ function contentTypeForFormat(format: string): string {
 }
 
 async function uploadOriginalImage(booqId: BooqId, imageId: string, buffer: Buffer) {
-    return uploadAsset(imageBucket, `originals/${booqId}/${imageId}`, buffer)
+    return uploadAsset(IMAGES_BUCKET, `originals/${booqId}/${imageId}`, buffer)
 }
 
 async function uploadVariantImage(booqId: BooqId, variantPath: string, buffer: Buffer) {
-    return uploadAsset(imageBucket, `variants/${booqId}/${variantPath}`, buffer)
+    return uploadAsset(IMAGES_BUCKET, `variants/${booqId}/${variantPath}`, buffer)
 }
 
 async function downloadOriginalImage(booqId: BooqId, imageId: string): Promise<Buffer | undefined> {
     const s3Key = `originals/${booqId}/${imageId}`
-    return downloadAsset(imageBucket, s3Key)
+    return downloadAsset(IMAGES_BUCKET, s3Key)
 }
 
 async function downloadVariantImage(booqId: BooqId, variantPath: string): Promise<Buffer | undefined> {
     const s3Key = `variants/${booqId}/${variantPath}`
-    return downloadAsset(imageBucket, s3Key)
+    return downloadAsset(IMAGES_BUCKET, s3Key)
 }

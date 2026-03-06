@@ -1,5 +1,6 @@
 import {
-    Booq, BooqId, BooqMetadata, BooqPath, InLibraryId, LibraryId, parseId, pathToString, positionForPath, previewForPath, TableOfContents, textForRange, BooqRange, nodesForRange, BooqNode,
+    Booq, BooqId, BooqMetadata, BooqPath, InLibraryId, LibraryId, pathToString, positionForPath, previewForPath, TableOfContents, textForRange, BooqRange, nodesForRange, BooqNode,
+    parseId,
 } from '@/core'
 import { getCachedValueForKey, cacheValueForKey } from './cache'
 import { parseAndLoadImagesFromFile, parseAndPreprocessBooq } from './parse'
@@ -9,6 +10,7 @@ import { userUploadsLibrary } from './uu'
 import { localLibrary } from './lo'
 import { getExtraMetadataValues } from '@/core/meta'
 import { urlForBooqImageId } from './urls'
+import { BooqImages } from './images'
 
 export type BooqData = {
     booqId: BooqId,
@@ -122,9 +124,7 @@ export async function booqDataForIds(ids: BooqId[]): Promise<Array<BooqData | un
     const parsed = ids
         .map(idString => {
             const [library, id] = parseId(idString)
-            return library && id
-                ? { library, id }
-                : undefined
+            return { library, id }
         })
         .filter(p => p !== undefined)
     const grouped = groupBy(
@@ -238,7 +238,7 @@ export async function booqFragmentForRange(booqId: BooqId, range: BooqRange): Pr
     return { nodes }
 }
 
-export async function booqImages(booqId: BooqId): Promise<Record<string, Buffer> | undefined> {
+export async function booqImages(booqId: BooqId): Promise<BooqImages | undefined> {
     const file = await booqFileForId(booqId)
     if (!file) {
         return undefined
@@ -247,7 +247,7 @@ export async function booqImages(booqId: BooqId): Promise<Record<string, Buffer>
     if (!booqImages) {
         return undefined
     }
-    return booqImages.images
+    return booqImages
 }
 
 async function booqFileForId(booqId: BooqId) {
