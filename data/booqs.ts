@@ -13,7 +13,7 @@ import {
 import { userForId } from '@/backend/users'
 import { booqIdsInCollections } from '@/backend/collections'
 import { BooqData, booqDataForIds, booqForId, booqPreview, booqQuery, booqToc, featuredBooqIds, booqFragmentForRange } from '@/backend/library'
-import { CoverSize, getUrlAndDimensions } from '@/backend/images'
+import { CoverSize, urlForBooqImageId } from '@/backend/images'
 
 export type PartialBooqData = {
     booqId: BooqId,
@@ -27,18 +27,13 @@ export type LanguageInfo = {
     name: string,
 }
 
-export type BooqCoverData = {
-    url: string,
-    width: number,
-    height: number,
-}
 export type BooqCardData = {
     booqId: BooqId,
     title: string,
     authors: string[],
     subjects: string[],
     languages: LanguageInfo[],
-    cover: BooqCoverData | undefined,
+    coverUrl: string | undefined,
 }
 
 
@@ -150,7 +145,7 @@ export async function booqPart({
 }
 
 export async function fetchFullBooq(booqId: BooqId) {
-    return booqForId(booqId)
+    return booqForId(booqId, true)
 }
 
 
@@ -165,11 +160,7 @@ export type BooqSearchResultData = {
     booqId: BooqId,
     title: string,
     authors?: string[],
-    cover?: {
-        url: string,
-        width: number,
-        height: number,
-    },
+    coverUrl?: string,
 }
 
 export async function booqSearch({ query, libraryId, limit = 20, offset, coverSize }: { query: string, libraryId: string, limit?: number, offset?: number, coverSize?: CoverSize }): Promise<SearchResultData[]> {
@@ -185,8 +176,8 @@ export async function booqSearch({ query, libraryId, limit = 20, offset, coverSi
             booqId: result.booqId,
             title: result.title,
             authors: result.authors,
-            cover: result.cover
-                ? getUrlAndDimensions(result.booqId, result.cover, coverSize)
+            coverUrl: result.coverSrc
+                ? urlForBooqImageId(result.booqId, result.coverSrc, coverSize)
                 : undefined,
         }
     })
@@ -298,6 +289,8 @@ function buildBooqCardData(data: BooqData, coverSize?: CoverSize): BooqCardData 
         authors: data.authors,
         subjects: data.subjects ?? [],
         languages,
-        cover: data.cover ? getUrlAndDimensions(data.booqId, data.cover, coverSize) : undefined,
+        coverUrl: data.coverSrc
+            ? urlForBooqImageId(data.booqId, data.coverSrc, coverSize)
+            : undefined,
     }
 }

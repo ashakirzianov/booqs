@@ -30,7 +30,7 @@ export async function generateMetadata({
         }
     }
     const booqId: BooqId = `${library}-${id}`
-    
+
     const detailed = await booqDetailedData(booqId)
     if (!detailed) {
         return {
@@ -45,13 +45,13 @@ export async function generateMetadata({
         openGraph: {
             title: `${detailed.title} ${detailed.authors.length > 0 ? `by ${detailed.authors.join(', ')}` : ''}`,
             description: `Read "${detailed.title}"${detailed.authors.length > 0 ? ` by ${detailed.authors.join(', ')}` : ''} on Booqs.`,
-            images: detailed.cover ? [detailed.cover.url] : undefined,
+            images: detailed.coverUrl ? [detailed.coverUrl] : undefined,
         },
         twitter: {
             card: 'summary_large_image',
             title: `${detailed.title} ${detailed.authors.length > 0 ? `by ${detailed.authors.join(', ')}` : ''}`,
             description: `Read "${detailed.title}"${detailed.authors.length > 0 ? ` by ${detailed.authors.join(', ')}` : ''} on Booqs.`,
-            images: detailed.cover ? [detailed.cover.url] : undefined,
+            images: detailed.coverUrl ? [detailed.coverUrl] : undefined,
         },
     }
 }
@@ -82,7 +82,7 @@ export default async function Page({ params }: {
                 <div className="flex flex-col lg:flex-row gap-8 mb-8">
                     <div className="flex justify-center lg:justify-start">
                         <BooqCover
-                            cover={detailed.cover}
+                            coverUrl={detailed.coverUrl}
                             title={detailed.title}
                             author={detailed.authors.join(', ')}
                             size={360}

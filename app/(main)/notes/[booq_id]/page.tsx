@@ -28,7 +28,7 @@ export async function generateMetadata({
         }
     }
     const booqId: BooqId = `${library}-${id}`
-    
+
     const bookData = await booqCard(booqId)
     if (!bookData) {
         return {
@@ -43,13 +43,13 @@ export async function generateMetadata({
         openGraph: {
             title: `Notes for ${bookData.title}`,
             description: `View notes and annotations for "${bookData.title}"${bookData.authors.length > 0 ? ` by ${bookData.authors.join(', ')}` : ''}.`,
-            images: bookData.cover ? [bookData.cover.url] : undefined,
+            images: bookData.coverUrl ? [bookData.coverUrl] : undefined,
         },
         twitter: {
             card: 'summary_large_image',
             title: `Notes for ${bookData.title}`,
             description: `View notes and annotations for "${bookData.title}"${bookData.authors.length > 0 ? ` by ${bookData.authors.join(', ')}` : ''}.`,
-            images: bookData.cover ? [bookData.cover.url] : undefined,
+            images: bookData.coverUrl ? [bookData.coverUrl] : undefined,
         },
     }
 }

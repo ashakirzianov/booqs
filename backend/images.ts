@@ -10,8 +10,6 @@ export type CoverSize = typeof coverSizes[number]
 export type BooqImageData = {
     width: number,
     height: number,
-    id: string,
-    sizes?: Partial<Record<CoverSize, BooqImageData>>,
 }
 export type BooqImagesData = Record<string, BooqImageData>
 export type BooqImages = {
@@ -19,25 +17,10 @@ export type BooqImages = {
     coverSrc?: string,
 }
 
-export function urlForBooqImageId(booqId: BooqId, imageId: string) {
+export function urlForBooqImageId(booqId: BooqId, imageId: string, width?: number): string {
     const assetId = `${booqId}/${imageId}`
-    const url = `${process.env.NEXT_PUBLIC_URL}/api/images/${assetId}@.webp`
+    const url = `${process.env.NEXT_PUBLIC_URL}/api/images/@${assetId}${width ? `w${width}` : ''}.webp`
     return url
-}
-
-export function getUrlAndDimensions(booqId: BooqId, imageData: BooqImageData, coverSize?: CoverSize): {
-    url: string,
-    width: number,
-    height: number,
-} {
-    const image = coverSize && imageData.sizes?.[coverSize]
-        ? imageData.sizes[coverSize]
-        : imageData
-    return {
-        url: urlForBooqImageId(booqId, image.id),
-        width: image.width,
-        height: image.height,
-    }
 }
 
 export async function resolveBooqImage({
@@ -114,19 +97,10 @@ async function uploadImagesForBooq({
         const imageData: BooqImageData = {
             width: uploadResult.width,
             height: uploadResult.height,
-            id: uploadResult.id,
         }
         if (src === images.coverSrc) {
             for (const size of coverSizes) {
-                const resized = await uploadImage(buffer, booqId, src, size)
-                if (resized.success) {
-                    imageData.sizes = imageData.sizes || {}
-                    imageData.sizes[size] = {
-                        width: resized.width,
-                        height: resized.height,
-                        id: resized.id,
-                    }
-                }
+                await uploadImage(buffer, booqId, src, size)
             }
         }
         data[src] = imageData

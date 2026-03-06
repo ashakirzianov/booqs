@@ -7,7 +7,7 @@ import groupBy from 'lodash-es/groupBy'
 import { pgLibrary } from './pg'
 import { userUploadsLibrary } from './uu'
 import { localLibrary } from './lo'
-import { getOrLoadImagesData, BooqImageData, resolveBooqImage } from './images'
+import { getOrLoadImagesData, resolveBooqImage } from './images'
 import { getExtraMetadataValues } from '@/core/meta'
 
 export type BooqData = {
@@ -16,7 +16,7 @@ export type BooqData = {
     authors: string[],
     subjects: string[] | undefined,
     languages: string[] | undefined,
-    cover: BooqImageData | undefined,
+    coverSrc: string | undefined,
 }
 
 export type BooqFile = {
@@ -96,7 +96,7 @@ export type BooqPreview = {
     text: string,
     title?: string,
     authors?: string[],
-    cover?: BooqImageData,
+    coverSrc?: string,
     booqLength: number,
 }
 const PREVIEW_LENGTH = 500
@@ -231,27 +231,13 @@ async function buildBooqData({
     booqId: BooqId,
     meta: BooqMetadata,
 }): Promise<BooqData> {
-    let cover: BooqImageData | undefined
-    if (coverSrc) {
-        const { data } = await getOrLoadImagesData({
-            booqId,
-            loadImages: async () => {
-                const file = await fileForId(booqId)
-                if (!file) {
-                    return undefined
-                }
-                return parseAndLoadImagesFromFile(file)
-            },
-        })
-        cover = data?.[coverSrc]
-    }
     return {
         booqId,
         title,
         authors: authors.map(author => author.name),
         subjects: getExtraMetadataValues('subject', extra),
         languages: getExtraMetadataValues('language', extra),
-        cover,
+        coverSrc,
     }
 }
 
