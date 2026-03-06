@@ -69,12 +69,12 @@ async function getOrExtractOriginal(booqId: BooqId, filePath: string): Promise<B
     }
 
     await Promise.all(
-        Object.entries(images).map(([src, buffer]) =>
+        Object.entries(images.images).map(([src, buffer]) =>
             uploadOriginalImage(booqId, src, buffer)
         )
     )
 
-    return images[filePath]
+    return images.images[filePath]
 }
 
 async function getOrGenerateVariant(

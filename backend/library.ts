@@ -10,6 +10,7 @@ import { userUploadsLibrary } from './uu'
 import { localLibrary } from './lo'
 import { getExtraMetadataValues } from '@/core/meta'
 import { urlForBooqImageId } from './urls'
+import { BooqImages } from './images'
 
 export type BooqData = {
     booqId: BooqId,
@@ -237,7 +238,7 @@ export async function booqFragmentForRange(booqId: BooqId, range: BooqRange): Pr
     return { nodes }
 }
 
-export async function booqImages(booqId: BooqId): Promise<Record<string, Buffer> | undefined> {
+export async function booqImages(booqId: BooqId): Promise<BooqImages | undefined> {
     const file = await booqFileForId(booqId)
     if (!file) {
         return undefined
@@ -246,7 +247,7 @@ export async function booqImages(booqId: BooqId): Promise<Record<string, Buffer>
     if (!booqImages) {
         return undefined
     }
-    return booqImages.images
+    return booqImages
 }
 
 async function booqFileForId(booqId: BooqId) {
