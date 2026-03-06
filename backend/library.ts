@@ -2,12 +2,11 @@ import {
     Booq, BooqId, BooqMetadata, BooqPath, InLibraryId, LibraryId, parseId, pathToString, positionForPath, previewForPath, TableOfContents, textForRange, BooqRange, nodesForRange, BooqNode,
 } from '@/core'
 import { getCachedValueForKey, cacheValueForKey } from './cache'
-import { parseAndPreprocessBooq, parseAndLoadImagesFromFile } from './parse'
+import { parseAndPreprocessBooq } from './parse'
 import groupBy from 'lodash-es/groupBy'
 import { pgLibrary } from './pg'
 import { userUploadsLibrary } from './uu'
 import { localLibrary } from './lo'
-import { getOrLoadImagesData } from './images'
 import { getExtraMetadataValues } from '@/core/meta'
 
 export type BooqData = {
@@ -52,19 +51,6 @@ const libraries: {
     pg: pgLibrary,
     uu: userUploadsLibrary,
     lo: localLibrary,
-}
-
-export async function uploadImagesForBooqId(booqId: BooqId) {
-    return getOrLoadImagesData({
-        booqId,
-        loadImages: async () => {
-            const file = await fileForId(booqId)
-            if (!file) {
-                return undefined
-            }
-            return parseAndLoadImagesFromFile(file)
-        },
-    })
 }
 
 export async function booqForId(booqId: BooqId, bypassCache = false): Promise<Booq | undefined> {

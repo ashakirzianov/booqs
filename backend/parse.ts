@@ -2,7 +2,7 @@ import { Booq, BooqId, BooqNode, isElementNode } from '@/core'
 import { parseEpub } from '@/parser'
 import { Epub, openEpubFile } from '@/parser/epub'
 import { Diagnoser } from 'booqs-epub'
-import { getOrLoadImagesData, BooqImages, BooqImagesData, urlForBooqImageId } from './images'
+import { BooqImages, BooqImageDimensions, urlForBooqImageId, imageDimensions } from './images'
 import { BooqFile } from './library'
 
 export async function parseAndPreprocessBooq(booqId: BooqId, file: BooqFile): Promise<Booq | undefined> {
@@ -18,14 +18,12 @@ export async function parseAndPreprocessBooq(booqId: BooqId, file: BooqFile): Pr
         console.error(`Failed to parse booq for id ${booqId}`)
         return undefined
     }
-    const { data: imagesData } = await getOrLoadImagesData({
-        booqId,
-        loadImages: () => loadImages(booq, epub),
-    })
-    if (!imagesData) {
+    const dimensions = await loadImageDimensions(booq, epub)
+    if (Object.keys(dimensions).length === 0) {
         return booq
     } else {
-        return preprocessBooq(booq, booqId, imagesData)
+        return preprocessBooq(booq, booqId, dimensions)
+
     }
 }
 
@@ -43,6 +41,27 @@ export async function parseAndLoadImagesFromFile(file: BooqFile) {
         return undefined
     }
     return loadImages(booq, epub)
+}
+
+async function loadImageDimensions(booq: Booq, epub: Epub): Promise<BooqImageDimensions> {
+    const images = await loadImages(booq, epub)
+    const dimensions: BooqImageDimensions = {}
+    for (const [src, buffer] of Object.entries(images.images)) {
+        try {
+            const metadata = await imageDimensions(buffer)
+            if (metadata.width && metadata.height) {
+                dimensions[src] = {
+                    width: metadata.width,
+                    height: metadata.height,
+                }
+            } else {
+                console.warn(`Failed to get dimensions for image with src ${src}`)
+            }
+        } catch (e) {
+            console.warn(`Error processing image with src ${src}:`, e)
+        }
+    }
+    return dimensions
 }
 
 async function loadImages(booq: Booq, epub: Epub): Promise<BooqImages> {
@@ -92,8 +111,8 @@ function collectUniqueSrcsFromBooq(booq: Booq): string[] {
     return Array.from(srcs)
 }
 
-function preprocessBooq(booq: Booq, booqId: BooqId, imagesData: BooqImagesData): Booq {
-    const nodes = preprocessNodes(booq.nodes, { booqId, imagesData })
+function preprocessBooq(booq: Booq, booqId: BooqId, imageDimensions: BooqImageDimensions): Booq {
+    const nodes = preprocessNodes(booq.nodes, { booqId, imageDimensions })
     return {
         ...booq,
         nodes,
@@ -102,7 +121,7 @@ function preprocessBooq(booq: Booq, booqId: BooqId, imagesData: BooqImagesData):
 
 type PreprocessEnv = {
     booqId: BooqId,
-    imagesData: BooqImagesData,
+    imageDimensions: BooqImageDimensions,
 }
 function preprocessNodes(nodes: BooqNode[], env: PreprocessEnv): BooqNode[] {
     return nodes.map(node => preprocessNode(node, env))
@@ -115,14 +134,14 @@ function preprocessNode(node: BooqNode, env: PreprocessEnv): BooqNode {
             children: node.children ? node.children.map(child => preprocessNode(child, env)) : [],
         }
         if (result.attrs?.src) {
-            const resolved = env.imagesData[result.attrs.src]
+            const resolved = env.imageDimensions[result.attrs.src]
             if (resolved) {
                 result.attrs.src = urlForBooqImageId(env.booqId, result.attrs.src)
                 result.attrs.width = resolved.width.toString()
                 result.attrs.height = resolved.height.toString()
             }
         } else if (result.attrs?.xlinkHref) {
-            const resolved = env.imagesData[result.attrs.xlinkHref]
+            const resolved = env.imageDimensions[result.attrs.xlinkHref]
             if (resolved) {
                 result.attrs.xlinkHref = urlForBooqImageId(env.booqId, result.attrs.xlinkHref)
                 result.attrs.width = resolved.width.toString()
