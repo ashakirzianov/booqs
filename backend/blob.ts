@@ -8,6 +8,8 @@ import AWS_S3, {
     HeadObjectCommand,
 } from '@aws-sdk/client-s3'
 
+export const IMAGES_BUCKET = 'booqs-images'
+
 let _service: S3Client | undefined
 function service() {
     if (!_service) {

@@ -5,7 +5,7 @@ import { BooqId } from '@/core'
 import { addUpload } from '@/backend/collections'
 import { getCurrentUser } from './user'
 import { booqDataForIds } from '@/backend/library'
-import { urlForBooqImageVariant } from '@/backend/urls'
+import { urlForBooqImageVariant } from '@/common/href'
 
 export async function uploadEpubAction(file: File) {
     const auth = await getCurrentUser()

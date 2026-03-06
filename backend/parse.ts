@@ -4,7 +4,7 @@ import { Epub, openEpubFile } from '@/parser/epub'
 import { Diagnoser } from 'booqs-epub'
 import { BooqImages, BooqImageDimensions, imageDimensions } from './images'
 import { BooqFile } from './library'
-import { urlForBooqImageVariant } from './urls'
+import { urlForBooqImageVariant } from '@/common/href'
 
 export async function parseAndPreprocessBooq(booqId: BooqId, file: BooqFile): Promise<Booq | undefined> {
     if (file.kind !== 'epub') {

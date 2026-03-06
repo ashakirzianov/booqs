@@ -3,7 +3,7 @@ import { addBooqHistory, booqHistoryForUser, removeBooqHistory, DbReadingHistory
 import { booqDataForIds, booqPreview } from '@/backend/library'
 import { BooqId, BooqPath } from '@/core'
 import { getUserIdInsideRequest } from './request'
-import { urlForBooqImageVariant } from '@/backend/urls'
+import { urlForBooqImageVariant } from '@/common/href'
 
 export type ReadingHistoryEntry = BriefReadingHistoryEntry | DetailedReadingHistoryEntry
 // Brief entry for history page - just book info and read time

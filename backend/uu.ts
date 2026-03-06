@@ -5,9 +5,8 @@ import type { InLibraryCard, Library } from './library'
 import { parseEpubFile } from '@/parser'
 import { Booq, BooqMetadata } from '@/core'
 import { nanoid } from 'nanoid'
-import { deleteAsset, deleteAssetsWithPrefix, downloadAsset, uploadAsset } from './blob'
+import { deleteAsset, deleteAssetsWithPrefix, downloadAsset, IMAGES_BUCKET, uploadAsset } from './blob'
 import { sql } from './db'
-import { IMAGES_BUCKET } from './urls'
 
 export const userUploadsLibrary: Library = {
     cards, fileForId,

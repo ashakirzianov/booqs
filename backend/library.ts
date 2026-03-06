@@ -9,7 +9,7 @@ import { pgLibrary } from './pg'
 import { userUploadsLibrary } from './uu'
 import { localLibrary } from './lo'
 import { getExtraMetadataValues } from '@/core/meta'
-import { urlForBooqImageVariant } from './urls'
+import { urlForBooqImageVariant } from '@/common/href'
 import { BooqImages } from './images'
 
 export type BooqData = {
