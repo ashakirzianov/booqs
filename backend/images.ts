@@ -20,9 +20,9 @@ export type BooqImages = {
 }
 
 export function urlForBooqImageId(booqId: BooqId, imageId: string) {
-    const [libraryId, id] = parseId(booqId)
-    const assetId = `${libraryId}/${id}/${imageId}`
-    return `https://${imageBucket}.s3.amazonaws.com/${assetId}`
+    const assetId = `${booqId}/${imageId}`
+    const url = `${process.env.NEXT_PUBLIC_URL}/api/images/${assetId}@.webp`
+    return url
 }
 
 export function getUrlAndDimensions(booqId: BooqId, imageData: BooqImageData, coverSize?: CoverSize): {

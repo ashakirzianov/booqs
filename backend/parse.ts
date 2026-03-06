@@ -117,14 +117,14 @@ function preprocessNode(node: BooqNode, env: PreprocessEnv): BooqNode {
         if (result.attrs?.src) {
             const resolved = env.imagesData[result.attrs.src]
             if (resolved) {
-                result.attrs.src = urlForBooqImageId(env.booqId, resolved.id)
+                result.attrs.src = urlForBooqImageId(env.booqId, result.attrs.src)
                 result.attrs.width = resolved.width.toString()
                 result.attrs.height = resolved.height.toString()
             }
         } else if (result.attrs?.xlinkHref) {
             const resolved = env.imagesData[result.attrs.xlinkHref]
             if (resolved) {
-                result.attrs.xlinkHref = urlForBooqImageId(env.booqId, resolved.id)
+                result.attrs.xlinkHref = urlForBooqImageId(env.booqId, result.attrs.xlinkHref)
                 result.attrs.width = resolved.width.toString()
                 result.attrs.height = resolved.height.toString()
             }
