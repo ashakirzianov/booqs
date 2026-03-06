@@ -7,7 +7,7 @@ import { booqHref, authorHref } from '@/common/href'
 import { notFound } from 'next/navigation'
 import { READING_LIST_COLLECTION } from '@/application/collections'
 import { getBooqHistory } from '@/data/history'
-import { parseId, type BooqId, type TableOfContentsItem } from '@/core'
+import { parseIdOpt, type BooqId, type TableOfContentsItem } from '@/core'
 import { getUserIdInsideRequest } from '@/data/request'
 import styles from '@/app/(main)/MainLayout.module.css'
 import { Metadata } from 'next'
@@ -22,7 +22,7 @@ export async function generateMetadata({
     params: Promise<Params>,
 }): Promise<Metadata> {
     const { booq_id } = await params
-    const [library, id] = parseId(booq_id as BooqId)
+    const [library, id] = parseIdOpt(booq_id) ?? [null, null]
     if (!library || !id) {
         return {
             title: 'Book Not Found',
@@ -60,7 +60,7 @@ export default async function Page({ params }: {
     params: Promise<Params>,
 }) {
     const { booq_id } = await params
-    const [library, id] = parseId(booq_id as BooqId)
+    const [library, id] = parseIdOpt(booq_id) ?? [null, null]
     if (!library || !id) {
         notFound()
     }

@@ -1,5 +1,6 @@
 import {
-    Booq, BooqId, BooqMetadata, BooqPath, InLibraryId, LibraryId, parseId, pathToString, positionForPath, previewForPath, TableOfContents, textForRange, BooqRange, nodesForRange, BooqNode,
+    Booq, BooqId, BooqMetadata, BooqPath, InLibraryId, LibraryId, pathToString, positionForPath, previewForPath, TableOfContents, textForRange, BooqRange, nodesForRange, BooqNode,
+    parseId,
 } from '@/core'
 import { getCachedValueForKey, cacheValueForKey } from './cache'
 import { parseAndLoadImagesFromFile, parseAndPreprocessBooq } from './parse'
@@ -122,9 +123,7 @@ export async function booqDataForIds(ids: BooqId[]): Promise<Array<BooqData | un
     const parsed = ids
         .map(idString => {
             const [library, id] = parseId(idString)
-            return library && id
-                ? { library, id }
-                : undefined
+            return { library, id }
         })
         .filter(p => p !== undefined)
     const grouped = groupBy(

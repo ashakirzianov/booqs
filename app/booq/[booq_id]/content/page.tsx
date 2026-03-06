@@ -1,4 +1,4 @@
-import { BooqId, parseId, pathFromString, rangeFromString } from '@/core'
+import { BooqId, parseIdOpt, pathFromString, rangeFromString } from '@/core'
 import { fetchBooqPreview, fetchFullBooq } from '@/data/booqs'
 import { reportBooqHistoryAction } from '@/data/history'
 import { Reader } from '@/reader/Reader'
@@ -22,7 +22,7 @@ export async function generateMetadata({
     searchParams: Promise<SearchParams>,
 }): Promise<Metadata> {
     const { booq_id } = await params
-    const [library, id] = parseId(booq_id as BooqId)
+    const [library, id] = parseIdOpt(booq_id) ?? [null, null]
     if (!library || !id) {
         return notFound()
     }
@@ -66,7 +66,7 @@ export default async function BooqPathPage({
     searchParams: Promise<SearchParams>,
 }) {
     const { booq_id } = await params
-    const [library, id] = parseId(booq_id as BooqId)
+    const [library, id] = parseIdOpt(booq_id) ?? [null, null]
     if (!library || !id) {
         return notFound()
     }
