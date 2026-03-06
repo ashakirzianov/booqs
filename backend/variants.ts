@@ -1,7 +1,7 @@
 import { BooqId } from '@/core'
 import { booqImages } from './library'
 import { generateVariant, ImageVariant } from './images'
-import { downloadAsset, uploadAsset } from './blob'
+import { deleteAssetsWithPrefix, downloadAsset, uploadAsset } from './blob'
 
 const imageBucket = 'booqs-images'
 
@@ -107,6 +107,13 @@ function contentTypeForFormat(format: string): string {
         case 'jpeg': return 'image/jpeg'
         default: return 'application/octet-stream'
     }
+}
+
+export async function deleteImagesForBooq(booqId: BooqId) {
+    await Promise.all([
+        deleteAssetsWithPrefix(imageBucket, `originals/${booqId}/`),
+        deleteAssetsWithPrefix(imageBucket, `variants/${booqId}/`),
+    ])
 }
 
 async function uploadOriginalImage(booqId: BooqId, imageId: string, buffer: Buffer) {

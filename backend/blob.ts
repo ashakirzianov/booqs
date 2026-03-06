@@ -4,6 +4,7 @@ import AWS_S3, {
     GetObjectCommand, GetObjectCommandOutput,
     ListObjectsV2Command,
     DeleteObjectCommand,
+    DeleteObjectsCommand,
     HeadObjectCommand,
 } from '@aws-sdk/client-s3'
 
@@ -80,6 +81,19 @@ export async function assetExists(bucket: string, assetId: string): Promise<bool
     }
 }
 
+export async function deleteAssetsWithPrefix(bucket: string, prefix: string) {
+    for await (const batch of listObjectBatches(bucket, prefix)) {
+        if (batch.length === 0) continue
+        const command = new DeleteObjectsCommand({
+            Bucket: bucket,
+            Delete: {
+                Objects: batch.map(obj => ({ Key: obj.Key! })),
+            },
+        })
+        await service().send(command)
+    }
+}
+
 export async function* listObjects(bucket: string) {
     for await (const batch of listObjectBatches(bucket)) {
         yield* batch
@@ -87,12 +101,13 @@ export async function* listObjects(bucket: string) {
 }
 
 type ContinuationToken = string
-async function* listObjectBatches(bucket: string) {
+async function* listObjectBatches(bucket: string, prefix?: string) {
     let objects: AWS_S3.ListObjectsV2CommandOutput
     let token: ContinuationToken | undefined = undefined
     do {
         const command = new ListObjectsV2Command({
             Bucket: bucket,
+            Prefix: prefix,
             ContinuationToken: token,
         })
         objects = await service().send(command)
