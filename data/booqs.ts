@@ -13,7 +13,7 @@ import {
 import { userForId } from '@/backend/users'
 import { booqIdsInCollections } from '@/backend/collections'
 import { BooqData, booqDataForIds, booqForId, booqPreview, booqQuery, booqToc, featuredBooqIds, booqFragmentForRange } from '@/backend/library'
-import { CoverSize, urlForBooqImageId } from '@/backend/image-url'
+import { CoverSize, urlForBooqImageId } from '@/backend/urls'
 
 export type PartialBooqData = {
     booqId: BooqId,

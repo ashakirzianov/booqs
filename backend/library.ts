@@ -2,13 +2,13 @@ import {
     Booq, BooqId, BooqMetadata, BooqPath, InLibraryId, LibraryId, parseId, pathToString, positionForPath, previewForPath, TableOfContents, textForRange, BooqRange, nodesForRange, BooqNode,
 } from '@/core'
 import { getCachedValueForKey, cacheValueForKey } from './cache'
-import { parseAndPreprocessBooq } from './parse'
+import { parseAndLoadImagesFromFile, parseAndPreprocessBooq } from './parse'
 import groupBy from 'lodash-es/groupBy'
 import { pgLibrary } from './pg'
 import { userUploadsLibrary } from './uu'
 import { localLibrary } from './lo'
 import { getExtraMetadataValues } from '@/core/meta'
-import { urlForBooqImageId } from './image-url'
+import { urlForBooqImageId } from './urls'
 
 export type BooqData = {
     booqId: BooqId,
@@ -238,7 +238,19 @@ export async function booqFragmentForRange(booqId: BooqId, range: BooqRange): Pr
     return { nodes }
 }
 
-export async function booqFileForId(booqId: BooqId) {
+export async function booqImages(booqId: BooqId): Promise<Record<string, Buffer> | undefined> {
+    const file = await booqFileForId(booqId)
+    if (!file) {
+        return undefined
+    }
+    const booqImages = await parseAndLoadImagesFromFile(file)
+    if (!booqImages) {
+        return undefined
+    }
+    return booqImages.images
+}
+
+async function booqFileForId(booqId: BooqId) {
     const [prefix, id] = parseId(booqId)
     const library = libraries[prefix]
     return library && id

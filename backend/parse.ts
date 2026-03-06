@@ -2,9 +2,9 @@ import { Booq, BooqId, BooqNode, isElementNode } from '@/core'
 import { parseEpub } from '@/parser'
 import { Epub, openEpubFile } from '@/parser/epub'
 import { Diagnoser } from 'booqs-epub'
-import { BooqImages, BooqImageDimensions, imageDimensions } from './image-processor'
+import { BooqImages, BooqImageDimensions, imageDimensions } from './images'
 import { BooqFile } from './library'
-import { urlForBooqImageId } from './image-url'
+import { urlForBooqImageId } from './urls'
 
 export async function parseAndPreprocessBooq(booqId: BooqId, file: BooqFile): Promise<Booq | undefined> {
     if (file.kind !== 'epub') {

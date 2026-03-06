@@ -1,5 +1,5 @@
 import { BooqId } from '@/core'
-import { fetchImageVariant } from '@/data/images'
+import { fetchImageVariant } from '@/data/variants'
 import { NextRequest } from 'next/server'
 
 type Params = {
