@@ -13,7 +13,7 @@ import {
 import { userForId } from '@/backend/users'
 import { booqIdsInCollections } from '@/backend/collections'
 import { BooqData, booqDataForIds, booqForId, booqPreview, booqQuery, booqToc, featuredBooqIds, booqFragmentForRange } from '@/backend/library'
-import { CoverSize, urlForBooqImageId } from '@/backend/urls'
+import { VariantSize, urlForBooqImageVariant } from '@/backend/urls'
 
 export type PartialBooqData = {
     booqId: BooqId,
@@ -45,7 +45,7 @@ export async function featuredIds() {
     return featuredBooqIds()
 }
 
-export async function featuredBooqCards(coverSize?: CoverSize): Promise<BooqCardData[]> {
+export async function featuredBooqCards(coverSize?: VariantSize): Promise<BooqCardData[]> {
     const ids = await featuredIds()
     const cards = (await booqDataForIds(ids))
         .filter(card => card !== undefined)
@@ -61,7 +61,7 @@ export async function booqCardsForQuery({
     query: string,
     limit: number,
     offset?: number,
-    coverSize?: CoverSize,
+    coverSize?: VariantSize,
 }): Promise<{ cards: BooqCardData[], hasMore: boolean, total?: number }> {
     const { cards, hasMore, total } = await booqQuery(libraryId, {
         kind,
@@ -76,7 +76,7 @@ export async function booqCardsForQuery({
     }
 }
 
-export async function booqCollection(collection: string, userId: string | undefined, coverSize?: CoverSize): Promise<BooqCardData[]> {
+export async function booqCollection(collection: string, userId: string | undefined, coverSize?: VariantSize): Promise<BooqCardData[]> {
     if (!userId) {
         return []
     }
@@ -91,7 +91,7 @@ export async function booqCollection(collection: string, userId: string | undefi
     return cards
 }
 
-export async function booqCard(booqId: BooqId, coverSize?: CoverSize): Promise<BooqCardData | undefined> {
+export async function booqCard(booqId: BooqId, coverSize?: VariantSize): Promise<BooqCardData | undefined> {
     const [card] = await booqDataForIds([booqId])
     if (undefined === card) {
         return undefined
@@ -163,7 +163,7 @@ export type BooqSearchResultData = {
     coverUrl?: string,
 }
 
-export async function booqSearch({ query, libraryId, limit = 20, offset, coverSize }: { query: string, libraryId: string, limit?: number, offset?: number, coverSize?: CoverSize }): Promise<SearchResultData[]> {
+export async function booqSearch({ query, libraryId, limit = 20, offset, coverSize }: { query: string, libraryId: string, limit?: number, offset?: number, coverSize?: VariantSize }): Promise<SearchResultData[]> {
     const results = await booqQuery(libraryId, {
         kind: 'search',
         query,
@@ -177,7 +177,7 @@ export async function booqSearch({ query, libraryId, limit = 20, offset, coverSi
             title: result.title,
             authors: result.authors,
             coverUrl: result.coverSrc
-                ? urlForBooqImageId(result.booqId, result.coverSrc, coverSize)
+                ? urlForBooqImageVariant({ booqId: result.booqId, imageId: result.coverSrc, width: coverSize })
                 : undefined,
         }
     })
@@ -277,7 +277,7 @@ export async function getExpandedFragments(booqId: BooqId, ranges: BooqRange[]):
     })
 }
 
-function buildBooqCardData(data: BooqData, coverSize?: CoverSize): BooqCardData {
+function buildBooqCardData(data: BooqData, coverSize?: VariantSize): BooqCardData {
     const languages: LanguageInfo[] = data.languages?.map(code => ({
         code,
         name: getLanguageDisplayName(code),
@@ -290,7 +290,7 @@ function buildBooqCardData(data: BooqData, coverSize?: CoverSize): BooqCardData 
         subjects: data.subjects ?? [],
         languages,
         coverUrl: data.coverSrc
-            ? urlForBooqImageId(data.booqId, data.coverSrc, coverSize)
+            ? urlForBooqImageVariant({ booqId: data.booqId, imageId: data.coverSrc, width: coverSize })
             : undefined,
     }
 }

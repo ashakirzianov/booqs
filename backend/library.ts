@@ -9,7 +9,7 @@ import { pgLibrary } from './pg'
 import { userUploadsLibrary } from './uu'
 import { localLibrary } from './lo'
 import { getExtraMetadataValues } from '@/core/meta'
-import { urlForBooqImageId } from './urls'
+import { urlForBooqImageVariant } from './urls'
 import { BooqImages } from './images'
 
 export type BooqData = {
@@ -112,7 +112,7 @@ export async function booqPreview(booqId: BooqId, path: BooqPath, end?: BooqPath
         title: booq.metadata.title,
         authors,
         coverUrl: booq.metadata.coverSrc
-            ? urlForBooqImageId(booqId, booq.metadata.coverSrc, 210)
+            ? urlForBooqImageVariant({ booqId, imageId: booq.metadata.coverSrc, width: 240 })
             : undefined,
         booqLength,
     }

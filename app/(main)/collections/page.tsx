@@ -21,8 +21,8 @@ export default async function CollectionPage() {
     }
 
     const [readingList, uploads] = await Promise.all([
-        booqCollection(READING_LIST_COLLECTION, user.id, 210),
-        booqCollection('uploads', user.id, 210),
+        booqCollection(READING_LIST_COLLECTION, user.id, 240),
+        booqCollection('uploads', user.id, 240),
     ])
 
     return (

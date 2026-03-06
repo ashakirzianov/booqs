@@ -3,7 +3,7 @@ import { addBooqHistory, booqHistoryForUser, removeBooqHistory, DbReadingHistory
 import { booqDataForIds, booqPreview } from '@/backend/library'
 import { BooqId, BooqPath } from '@/core'
 import { getUserIdInsideRequest } from './request'
-import { urlForBooqImageId } from '@/backend/urls'
+import { urlForBooqImageVariant } from '@/backend/urls'
 
 export type ReadingHistoryEntry = BriefReadingHistoryEntry | DetailedReadingHistoryEntry
 // Brief entry for history page - just book info and read time
@@ -174,7 +174,7 @@ async function resolveBriefHistoryEvent(event: DbReadingHistoryEvent, userId: st
         title: meta.title,
         authors: meta.authors,
         coverUrl: meta.coverSrc
-            ? urlForBooqImageId(meta.booqId, meta.coverSrc, 210)
+            ? urlForBooqImageVariant({ booqId: meta.booqId, imageId: meta.coverSrc, width: 240 })
             : undefined,
     }
 }

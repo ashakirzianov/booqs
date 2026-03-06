@@ -5,7 +5,7 @@ import { BooqId } from '@/core'
 import { addUpload } from '@/backend/collections'
 import { getCurrentUser } from './user'
 import { booqDataForIds } from '@/backend/library'
-import { urlForBooqImageId } from '@/backend/urls'
+import { urlForBooqImageVariant } from '@/backend/urls'
 
 export async function uploadEpubAction(file: File) {
     const auth = await getCurrentUser()
@@ -28,7 +28,7 @@ export async function uploadEpubAction(file: File) {
                 booqId,
                 title: data.title ?? undefined,
                 coverUrl: data.coverSrc
-                    ? urlForBooqImageId(data.booqId, data.coverSrc, 300)
+                    ? urlForBooqImageVariant({ booqId: data.booqId, imageId: data.coverSrc, width: 360 })
                     : undefined,
             } as const
         }
