@@ -28,7 +28,8 @@
       "Bash(true)",
       "Bash(gtimeout:*)",
       "Bash(cp:*)",
-      "Bash(source .env.local && curl -s -X POST \"$UPSTASH_REDIS_REST_URL/ping\" -H \"Authorization: Bearer $UPSTASH_REDIS_REST_TOKEN\")"
+      "Bash(source .env.local && curl -s -X POST \"$UPSTASH_REDIS_REST_URL/ping\" -H \"Authorization: Bearer $UPSTASH_REDIS_REST_TOKEN\")",
+      "mcp__ide__getDiagnostics"
     ]
   },
   "enableAllProjectMcpServers": false

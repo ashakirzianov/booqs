@@ -266,6 +266,10 @@ export async function booqFragmentForRange(booqId: BooqId, range: BooqRange): Pr
     return { nodes }
 }
 
+export async function epubFileForBooqId(booqId: BooqId): Promise<BooqFile | undefined> {
+    return fileForId(booqId)
+}
+
 async function fileForId(booqId: BooqId) {
     const [prefix, id] = parseId(booqId)
     const library = libraries[prefix]
