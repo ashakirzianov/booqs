@@ -1,5 +1,4 @@
 import {
-  BooqIterator,
   BooqNodeIterator,
   BooqTextIterator,
   isNodeIterator,
@@ -19,14 +18,11 @@ import {
   textBefore,
   textStartingAt,
 } from '../../core/iterator'
-import { BooqNode, BooqElementNode, BooqTextNode, BooqPath } from '../../core/model'
+import { BooqNode, BooqElementNode, BooqTextNode } from '../../core/model'
 
 describe('core/iterator', () => {
   // Test data setup helpers
-  const createTextNode = (content: string): BooqTextNode => ({
-    kind: 'text',
-    content,
-  })
+  const createTextNode = (content: string): BooqTextNode => (content)
 
   const createElement = (name: string, children?: BooqNode[]): BooqElementNode => ({
     kind: 'element',
@@ -157,7 +153,7 @@ describe('core/iterator', () => {
       expect(isTextIterator(result!)).toBe(true)
       const textIter = result as BooqTextIterator
       expect(textIter.index).toBe(4)
-      expect(textIter.node.content).toBe('Span content')
+      expect(textIter.node).toBe('Span content')
     })
 
     it('returns undefined for invalid path - out of bounds', () => {
@@ -705,7 +701,7 @@ describe('core/iterator', () => {
       // Create a simple nested iterator structure
       const parentIter = createNodeIterator(simpleElement, 0)
       const childIter = createNodeIterator(nestedElement, 1, parentIter)
-      
+
       expect(() => iteratorsPath(childIter)).not.toThrow()
       const path = iteratorsPath(childIter)
       expect(path.length).toBe(2) // parent and child
