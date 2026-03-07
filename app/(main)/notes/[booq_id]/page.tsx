@@ -2,7 +2,7 @@ import { fetchNotes } from '@/data/notes'
 import { parseIdOpt, type BooqId, comparePaths, isOverlapping } from '@/core'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import { booqContentHref, authorHref, urlForBooqImageVariant } from '@/common/href'
+import { booqContentHref, authorHref, booqImageUrl } from '@/common/href'
 import { getUserIdInsideRequest } from '@/data/request'
 import { getCurrentUser } from '@/data/user'
 import { booqCard, getExpandedFragments } from '@/data/booqs'
@@ -38,7 +38,7 @@ export async function generateMetadata({
     }
 
     const images = bookData.coverSrc
-        ? [urlForBooqImageVariant({ booqId, imageId: bookData.coverSrc, width: 360 })]
+        ? [booqImageUrl({ booqId, imageId: bookData.coverSrc, width: 360 })]
         : undefined
 
     return {

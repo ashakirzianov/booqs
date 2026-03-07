@@ -3,7 +3,7 @@ import { BooqCover } from '@/components/BooqCover'
 import { BooqTags } from '@/components/BooqTags'
 import { CollectionButton } from '@/app/(main)/CollectionButton'
 import Link from 'next/link'
-import { booqContentHref, authorHref, urlForBooqImageVariant } from '@/common/href'
+import { booqContentHref, authorHref, booqImageUrl } from '@/common/href'
 import { notFound } from 'next/navigation'
 import { READING_LIST_COLLECTION } from '@/application/collections'
 import { getBooqHistory } from '@/data/history'
@@ -40,7 +40,7 @@ export async function generateMetadata({
     }
 
     const images = detailed.coverSrc
-        ? [urlForBooqImageVariant({ booqId, imageId: detailed.coverSrc, width: 360 })]
+        ? [booqImageUrl({ booqId, imageId: detailed.coverSrc, width: 360 })]
         : undefined
 
     return {

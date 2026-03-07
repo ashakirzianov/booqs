@@ -4,7 +4,7 @@ import { Epub, openEpubFile } from '@/parser/epub'
 import { Diagnoser } from 'booqs-epub'
 import { BooqImages, BooqImageDimensions, imageDimensions } from './images'
 import { BooqFile } from './library'
-import { urlForBooqImageVariant } from '@/common/href'
+import { booqImageUrl } from '@/common/href'
 
 export async function parseAndPreprocessBooq(booqId: BooqId, file: BooqFile): Promise<Booq | undefined> {
     if (file.kind !== 'epub') {
@@ -137,14 +137,14 @@ function preprocessNode(node: BooqNode, env: PreprocessEnv): BooqNode {
         if (result.attrs?.src) {
             const resolved = env.imageDimensions[result.attrs.src]
             if (resolved) {
-                result.attrs.src = urlForBooqImageVariant({ booqId: env.booqId, imageId: result.attrs.src })
+                result.attrs.src = booqImageUrl({ booqId: env.booqId, imageId: result.attrs.src })
                 result.attrs.width = resolved.width.toString()
                 result.attrs.height = resolved.height.toString()
             }
         } else if (result.attrs?.xlinkHref) {
             const resolved = env.imageDimensions[result.attrs.xlinkHref]
             if (resolved) {
-                result.attrs.xlinkHref = urlForBooqImageVariant({ booqId: env.booqId, imageId: result.attrs.xlinkHref })
+                result.attrs.xlinkHref = booqImageUrl({ booqId: env.booqId, imageId: result.attrs.xlinkHref })
                 result.attrs.width = resolved.width.toString()
                 result.attrs.height = resolved.height.toString()
             }

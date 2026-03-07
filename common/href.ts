@@ -133,7 +133,7 @@ export function userHref({ username }: { username: string }) {
 
 export const variantSizes = [60, 120, 240, 360] as const
 export type VariantSize = typeof variantSizes[number]
-export function urlForBooqImageVariant({ booqId, imageId, width }: {
+export function booqImageUrl({ booqId, imageId, width }: {
     booqId: BooqId, imageId: string, width?: VariantSize
 }): string {
     const assetId = `${booqId}/${imageId}`

@@ -1,4 +1,4 @@
-import { urlForBooqImageVariant } from '@/common/href'
+import { booqImageUrl } from '@/common/href'
 import { BooqId } from '@/core'
 import React from 'react'
 
@@ -22,7 +22,7 @@ export function BooqCover({ booqId, coverSrc, title, author, size }: {
     }}>
         {
             coverSrc
-                ? <BooqImageCover coverUrl={urlForBooqImageVariant({ booqId, imageId: coverSrc, width: size })} title={title} />
+                ? <BooqImageCover coverUrl={booqImageUrl({ booqId, imageId: coverSrc, width: size })} title={title} />
                 : <BooqDefaultCover title={title} author={author} size={size} />
         }
     </div>

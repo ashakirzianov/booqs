@@ -6,7 +6,7 @@ import { Metadata } from 'next'
 import { notFound, redirect } from 'next/navigation'
 import { fetchNotes } from '@/data/notes'
 import { getCurrentUser } from '@/data/user'
-import { urlForBooqImageVariant } from '@/common/href'
+import { booqImageUrl } from '@/common/href'
 
 type Params = {
     booq_id: string,
@@ -40,7 +40,7 @@ export async function generateMetadata({
         : await fetchBooqPreview(booqId, booqPath ?? [])
 
     const images = meta?.coverSrc
-        ? [urlForBooqImageVariant({ booqId, imageId: meta.coverSrc, width: 360 })]
+        ? [booqImageUrl({ booqId, imageId: meta.coverSrc, width: 360 })]
         : undefined
 
     return {
