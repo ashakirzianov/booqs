@@ -42,5 +42,17 @@ export const noteResolver: IResolvers<NoteParent> = {
         targetQuote(parent) {
             return parent.target_quote
         },
+        content(parent) {
+            return parent.content
+        },
+        privacy(parent) {
+            return parent.privacy
+        },
+        createdAt(parent) {
+            return parent.created_at
+        },
+        updatedAt(parent) {
+            return parent.updated_at
+        },
     },
 }
