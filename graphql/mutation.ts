@@ -1,14 +1,41 @@
 import { IResolvers } from '@graphql-tools/utils'
 import { ResolverContext } from './context'
-import { deleteUserForId, userForId, updateUser } from '@/backend/users'
+import { deleteUserForId, userForId, updateUser, userForUsername } from '@/backend/users'
 import { addNote, removeNote, updateNote } from '@/backend/notes'
 import { initiatePasskeyLogin, initiatePasskeyRegistration, verifyPasskeyLogin, verifyPasskeyRegistration } from '@/backend/passkey'
 import { addToCollection, removeFromCollection } from '@/backend/collections'
-import { addBooqHistory } from '@/backend/history'
+import { addBooqHistory, removeBooqHistory } from '@/backend/history'
 import { addBookmark, deleteBookmark } from '@/backend/bookmarks'
+import { followUser, unfollowUser } from '@/backend/follows'
 
 export const mutationResolver: IResolvers<any, ResolverContext> = {
     Mutation: {
+        async follow(_, { username }, { userId }): Promise<boolean> {
+            if (!userId) {
+                return false
+            }
+            const target = await userForUsername(username)
+            if (!target) {
+                return false
+            }
+            return followUser(userId, target.id)
+        },
+        async unfollow(_, { username }, { userId }): Promise<boolean> {
+            if (!userId) {
+                return false
+            }
+            const target = await userForUsername(username)
+            if (!target) {
+                return false
+            }
+            return unfollowUser(userId, target.id)
+        },
+        async removeHistory(_, { booqId }, { userId }): Promise<boolean> {
+            if (!userId) {
+                return false
+            }
+            return removeBooqHistory(userId, booqId)
+        },
         signout(_, __, { clearAuth }) {
             clearAuth()
             return true
@@ -70,12 +97,13 @@ export const mutationResolver: IResolvers<any, ResolverContext> = {
                 return false
             }
         },
-        async updateNote(_, { id, kind }, { userId }): Promise<boolean> {
+        async updateNote(_, { id, kind, content }, { userId }): Promise<boolean> {
             if (userId) {
                 await updateNote({
                     authorId: userId,
                     id: id,
                     kind,
+                    content,
                 })
                 return true
             } else {

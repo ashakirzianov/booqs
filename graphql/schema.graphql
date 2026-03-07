@@ -15,7 +15,7 @@ type Mutation {
     removeBookmark(id: ID!): Boolean
     addNote(note: NoteInput!): Boolean
     removeNote(id: ID!): Boolean
-    updateNote(id: ID!, color: String): Boolean
+    updateNote(id: ID!, kind: String, content: String): Boolean
     addBooqHistory(event: BooqHistoryInput!): Boolean
     addToCollection(name: String!, booqId: ID!): Boolean
     removeFromCollection(name: String!, booqId: ID!): Boolean
@@ -30,6 +30,10 @@ type Mutation {
         id: String!
         response: WebAuthnAuthenticationResponseJSON!
     ): AuthResult
+
+    follow(username: String!): Boolean
+    unfollow(username: String!): Boolean
+    removeHistory(booqId: ID!): Boolean
 
     signout: Boolean
     deleteAccount: Boolean
@@ -53,6 +57,10 @@ scalar WebAuthnAuthenticationResponseJSON
 
 type Booq {
     id: ID!
+    title: String
+    authors: [String!]
+    subjects: [String!]
+    coverSrc: String
     bookmarks: [Bookmark]
     notes: [Note]
     preview(path: [Int!], end: [Int!], length: Int = 500): String
@@ -77,6 +85,7 @@ type User {
     followingCount: Int!
     followers: [User!]!
     following: [User!]!
+    isFollowing: Boolean
 }
 
 union SearchResult = Booq | Author
@@ -141,8 +150,12 @@ type Note {
     end: [Int!]!
     kind: String
     text: String
+    content: String
     targetQuote: String
     position: Int
+    privacy: String
+    createdAt: String
+    updatedAt: String
 }
 type BooqHistory {
     booq: Booq!

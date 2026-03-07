@@ -1,9 +1,10 @@
 import { DbUser, usersForIds } from '@/backend/users'
-import { getFollowersCount, getFollowingCount, getFollowers, getFollowing } from '@/backend/follows'
+import { getFollowersCount, getFollowingCount, getFollowers, getFollowing, isFollowing } from '@/backend/follows'
 import { IResolvers } from '@graphql-tools/utils'
+import { ResolverContext } from './context'
 
 export type UserParent = DbUser
-export const userResolver: IResolvers<UserParent> = {
+export const userResolver: IResolvers<UserParent, ResolverContext> = {
     User: {
         joinedAt(parent) {
             return parent.joined_at
@@ -27,6 +28,12 @@ export const userResolver: IResolvers<UserParent> = {
         async following(parent) {
             const followingIds = await getFollowing(parent.id)
             return await usersForIds(followingIds)
+        },
+        async isFollowing(parent, _, { userId }) {
+            if (!userId) {
+                return false
+            }
+            return isFollowing(userId, parent.id)
         },
     },
 }

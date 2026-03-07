@@ -11,9 +11,25 @@ import { booqForId } from '@/backend/library'
 export type BooqParent = {
     kind?: 'booq' | undefined,
     booqId: BooqId,
+    title?: string,
+    authors?: string[],
+    subjects?: string[],
+    coverSrc?: string,
 }
 export const booqResolver: IResolvers<BooqParent> = {
     Booq: {
+        title(parent) {
+            return parent.title
+        },
+        authors(parent) {
+            return parent.authors
+        },
+        subjects(parent) {
+            return parent.subjects
+        },
+        coverSrc(parent) {
+            return parent.coverSrc
+        },
         async bookmarks(parent, _, { user }): Promise<BookmarkParent[]> {
             return user
                 ? getBookmarks({
