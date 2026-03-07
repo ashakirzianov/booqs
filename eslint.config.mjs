@@ -1,20 +1,11 @@
-import { dirname } from 'path'
-import { fileURLToPath } from 'url'
-import { FlatCompat } from '@eslint/eslintrc'
+import coreWebVitals from 'eslint-config-next/core-web-vitals'
+import nextTypescript from 'eslint-config-next/typescript'
 import stylisticTs from '@stylistic/eslint-plugin-ts'
 import parserTs from '@typescript-eslint/parser'
 
-
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = dirname(__filename)
-
-const compat = new FlatCompat({
-    baseDirectory: __dirname,
-})
-
-// TODO: use new config style?
 const eslintConfig = [
-    ...compat.extends('next/core-web-vitals', 'next/typescript'),
+    ...coreWebVitals,
+    ...nextTypescript,
     {
         plugins: {
             '@stylistic/ts': stylisticTs
@@ -23,6 +14,10 @@ const eslintConfig = [
             parser: parserTs,
         },
         rules: {
+            // React Compiler rules produce false positives on valid patterns this project uses
+            'react-hooks/set-state-in-effect': 'off',
+            'react-hooks/refs': 'off',
+            'react-hooks/preserve-manual-memoization': 'off',
             '@stylistic/ts/semi': ['error', 'never'],
             'prefer-const': ['error', {
                 destructuring: 'all'

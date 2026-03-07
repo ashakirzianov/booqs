@@ -50,5 +50,6 @@
         "xmls",
         "yxxx"
     ],
-    "typescript.tsdk": "node_modules/typescript/lib"
+    "typescript.tsdk": "node_modules/typescript/lib",
+    "eslint.useFlatConfig": true
 }
