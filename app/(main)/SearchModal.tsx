@@ -5,7 +5,7 @@ import { ReactNode, useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useDebouncedValue } from '@/application/utils'
 import { AuthorSearchResultData, BooqSearchResultData } from '@/data/booqs'
-import { authorHref, booqHref, searchHref } from '@/common/href'
+import { authorHref, booqDetailsHref, searchHref } from '@/common/href'
 import { BooqCover } from '@/components/BooqCover'
 import { Modal, useModalState } from '@/components/Modal'
 import { SmallSpinner } from '@/components/Icons'
@@ -49,7 +49,7 @@ export function SearchModal({
                             push(authorHref({ name: author.name, libraryId: 'pg' }))
                         } else {
                             const booq = booqs[selected - authors.length]
-                            push(booqHref({ booqId: booq.booqId, path: [0] }))
+                            push(booqDetailsHref({ booqId: booq.booqId }))
                         }
                         closeModal()
                     } else {
@@ -145,7 +145,7 @@ function BooqSearchResultContent({ result, query }: {
     result: BooqSearchResultData,
     query: string,
 }) {
-    return <Link href={booqHref({ booqId: result.booqId, path: [0] })} className='flex flex-row'>
+    return <Link href={booqDetailsHref({ booqId: result.booqId })} className='flex flex-row'>
         <BooqCover
             booqId={result.booqId}
             coverSrc={result.coverSrc}
