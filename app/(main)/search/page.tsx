@@ -2,6 +2,7 @@ import { authorHref, booqHref } from '@/common/href'
 import { AuthorSearchResultData, BooqSearchResultData, booqSearch, SearchResultData } from '@/data/booqs'
 import Link from 'next/link'
 import styles from '@/app/(main)/MainLayout.module.css'
+import { BooqCover } from '@/components/BooqCover'
 
 export async function generateMetadata({
     searchParams,
@@ -14,6 +15,7 @@ export async function generateMetadata({
         description: `Find books, authors, and topics related to "${query}". Browse our collection of classic literature and contemporary works.`,
     }
 }
+
 export default async function SearchPage({
     searchParams,
 }: {
@@ -21,59 +23,88 @@ export default async function SearchPage({
 }) {
     const { query } = await searchParams
     const results = await booqSearch({ query, libraryId: 'pg' })
+    const authors = results.filter(r => r.kind === 'author') as AuthorSearchResultData[]
+    const booqs = results.filter(r => r.kind === 'booq') as BooqSearchResultData[]
+
     return (
         <main className={styles.mainContent}>
-            <h1>Search results for &quot;{query}&quot;</h1>
-            <ul>
-                {results.map((result, index) => (
-                    <li key={index}>
-                        <SearchResultItem result={result} />
-                    </li>
-                ))}
-            </ul>
+            <h1 className='text-2xl font-bold px-4 pt-6 pb-2 text-primary'>
+                Search results for &ldquo;{query}&rdquo;
+            </h1>
+            {results.length === 0
+                ? <p className='text-dimmed px-4 py-8 text-center'>No results found for &ldquo;{query}&rdquo;.</p>
+                : <>
+                    {authors.length > 0 && (
+                        <section className='mb-6'>
+                            <h2 className='text-lg font-bold px-4 py-2 text-dimmed uppercase tracking-wide'>Authors</h2>
+                            <ul className='flex flex-col'>
+                                {authors.map((result, idx) => (
+                                    <li key={idx}>
+                                        <AuthorResultRow result={result} />
+                                    </li>
+                                ))}
+                            </ul>
+                        </section>
+                    )}
+                    {booqs.length > 0 && (
+                        <section>
+                            {authors.length > 0 && (
+                                <h2 className='text-lg font-bold px-4 py-2 text-dimmed uppercase tracking-wide'>Books</h2>
+                            )}
+                            <ul className='flex flex-col'>
+                                {booqs.map((result, idx) => (
+                                    <li key={idx} className='border-b border-border last:border-b-0'>
+                                        <BooqResultRow result={result} />
+                                    </li>
+                                ))}
+                            </ul>
+                        </section>
+                    )}
+                </>
+            }
         </main>
     )
 }
 
-function SearchResultItem({ result }: {
-    result: SearchResultData,
-}) {
-    if (result.kind === 'booq') {
-        return <BooqSearchResultItem result={result} />
-    } else if (result.kind === 'author') {
-        return <AuthorSearchResultItem result={result} />
-    } else {
-        return null
-    }
-}
-
-function BooqSearchResultItem({
-    result,
-}: {
-    result: BooqSearchResultData,
-}) {
+function BooqResultRow({ result }: { result: BooqSearchResultData }) {
+    const author = result.authors?.join(', ')
     return (
-        <div>
-            <h2>
-                <Link href={booqHref({ booqId: result.booqId })}>
+        <div className='flex flex-row gap-4 items-center px-4 py-3 hover:bg-border transition-colors'>
+            <Link href={booqHref({ booqId: result.booqId, path: [0] })} className='shrink-0'>
+                <BooqCover
+                    booqId={result.booqId}
+                    coverSrc={result.coverSrc}
+                    title={result.title}
+                    author={author}
+                    size={60}
+                />
+            </Link>
+            <div className='flex flex-col flex-1 min-w-0'>
+                <Link href={booqHref({ booqId: result.booqId })} className='text-lg font-bold text-primary hover:underline truncate'>
                     {result.title}
                 </Link>
-            </h2>
-            <p>by {result.authors?.join(', ')}</p>
+                {author && (
+                    <span className='text-dimmed text-sm'>
+                        by <Link href={authorHref({ name: author, libraryId: 'pg' })} className='hover:underline'>
+                            {author}
+                        </Link>
+                    </span>
+                )}
+            </div>
+            <Link href={booqHref({ booqId: result.booqId, path: [0] })} className='shrink-0 text-action hover:text-highlight transition-colors font-bold'>
+                Read
+            </Link>
         </div>
     )
 }
 
-function AuthorSearchResultItem({
-    result,
-}: {
-    result: AuthorSearchResultData,
-}) {
+function AuthorResultRow({ result }: { result: AuthorSearchResultData }) {
     return (
-        <div>
-            <h2><Link href={authorHref({ name: result.name, libraryId: 'pg' })}>
-                {result.name}
-            </Link></h2>
-        </div>
+        <Link
+            href={authorHref({ name: result.name, libraryId: 'pg' })}
+            className='flex items-center px-4 py-3 text-primary hover:bg-border transition-colors border-b border-border last:border-b-0'
+        >
+            <span className='text-lg'>{result.name}</span>
+        </Link>
     )
 }
