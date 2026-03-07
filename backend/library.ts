@@ -9,7 +9,6 @@ import { pgLibrary } from './pg'
 import { userUploadsLibrary } from './uu'
 import { localLibrary } from './lo'
 import { getExtraMetadataValues } from '@/core/meta'
-import { urlForBooqImageId } from './urls'
 import { BooqImages } from './images'
 
 export type BooqData = {
@@ -85,7 +84,7 @@ export type BooqPreview = {
     text: string,
     title?: string,
     authors?: string[],
-    coverUrl?: string,
+    coverSrc?: string,
     booqLength: number,
 }
 const PREVIEW_LENGTH = 500
@@ -111,9 +110,7 @@ export async function booqPreview(booqId: BooqId, path: BooqPath, end?: BooqPath
         text,
         title: booq.metadata.title,
         authors,
-        coverUrl: booq.metadata.coverSrc
-            ? urlForBooqImageId(booqId, booq.metadata.coverSrc, 210)
-            : undefined,
+        coverSrc: booq.metadata.coverSrc,
         booqLength,
     }
     await cacheValueForKey(key, preview, 60 * 60) // Cache for 1 hour

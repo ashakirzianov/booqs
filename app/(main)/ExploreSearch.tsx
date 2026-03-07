@@ -1,9 +1,10 @@
 'use client'
 
-import { SearchModal, useSearchModalState } from './SearchModal'
+import { SearchModal, useSearchHotkey, useSearchModalState } from './SearchModal'
 
 export function ExploreSearch() {
     const { isOpen, openModal, closeModal } = useSearchModalState()
+    useSearchHotkey({ isOpen, openModal, closeModal })
     return <>
         <input
             className='font-normal text-2xl shadow-lg rounded-lg p-6 w-96 max-w-[90vw] bg-background text-primary cursor-pointer

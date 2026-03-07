@@ -1,7 +1,7 @@
 import { Fragment } from 'react'
 import { NoteNodeComp } from './NoteNode'
 import { PathNotesNode } from './nodes'
-import { booqHref } from '@/common/href'
+import { booqContentHref } from '@/common/href'
 import Link from 'next/link'
 import { BooqId, TableOfContentsItem } from '@/core'
 import { NoteAuthorData } from '@/data/notes'
@@ -41,7 +41,7 @@ function Path({ items, booqId }: {
                 : <Fragment key={idx}>
                     {idx === 0 ? null : <div className='mr-base'>/</div>}
                     <div className='font-bold mr-base hover:underline'>
-                        <Link href={booqHref({ booqId, path: item.path })}>
+                        <Link href={booqContentHref({ booqId, path: item.path })}>
                             {item.title}
                         </Link>
                     </div>

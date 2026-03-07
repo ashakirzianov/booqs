@@ -1,8 +1,7 @@
 import { BooqId } from '@/core'
 import { booqImages } from './library'
 import { generateVariant, ImageVariant } from './images'
-import { downloadAsset, uploadAsset } from './blob'
-import { IMAGES_BUCKET } from './urls'
+import { downloadAsset, IMAGES_BUCKET, uploadAsset } from './blob'
 
 export async function getImageVariant(booqId: BooqId, filePathWithVariant: string): Promise<{
     buffer: Buffer,

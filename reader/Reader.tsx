@@ -4,7 +4,7 @@
 import React, { useEffect, useMemo } from 'react'
 import { Booq, BooqAnchor, BooqId, BooqPath, BooqRange, buildFragment, pathFromString, rangeFromString } from '@/core'
 import { PanelButton } from '@/components/Buttons'
-import { booqHref, feedHref } from '@/common/href'
+import { booqContentHref, feedHref } from '@/common/href'
 import {
     BooqContent,
 } from '@/viewer'
@@ -243,7 +243,7 @@ export function Reader({
     </>
 
     const hrefForPath = useMemo(() => {
-        return (path: BooqPath) => booqHref({ booqId: booqId, path })
+        return (path: BooqPath) => booqContentHref({ booqId: booqId, path })
     }, [booqId])
 
     return <ReaderLayout
@@ -316,7 +316,7 @@ function AnchorButton({ booqId, anchor, title }: {
     if (!anchor) {
         return null
     }
-    return <Link href={booqHref({ booqId, path: anchor.path })} className='flex items-center h-header'>
+    return <Link href={booqContentHref({ booqId, path: anchor.path })} className='flex items-center h-header'>
         <div className='flex items-center h-header rounded border border-dimmed text-dimmed p-2 hover:text-primary hover:border-primary transition-colors'>
             {anchor.title ?? title}
         </div>

@@ -1,12 +1,18 @@
 import { BooqPath, pathToString, BooqRange, pathToId, BooqId, rangeToString } from '@/core'
 
-export function booqHref({ booqId, path }: {
+export function booqContentHref({ booqId, path }: {
     booqId: BooqId,
     path?: BooqPath,
 }) {
     return path?.length
         ? `/booq/${booqId}/content?path=${pathToString(path)}#${pathToId(path)}`
         : `/booq/${booqId}/content`
+}
+
+export function booqDetailsHref({ booqId }: {
+    booqId: BooqId,
+}) {
+    return `/booq/${booqId}`
 }
 
 export function quoteHref({ booqId, range }: {
@@ -23,7 +29,7 @@ export function feedHref() {
 export function searchHref({ query }: {
     query: string,
 }) {
-    return `/search?query=${encodeURIComponent(query)}`
+    return `/search/${encodeURIComponent(query)}`
 }
 
 export function authHref({ returnTo }: {
@@ -123,4 +129,14 @@ export function languageHref({ language, libraryId }: { language: string, librar
 
 export function userHref({ username }: { username: string }) {
     return `/users/${username}`
+}
+
+export const variantSizes = [60, 120, 240, 360] as const
+export type VariantSize = typeof variantSizes[number]
+export function booqImageUrl({ booqId, imageId, width }: {
+    booqId: BooqId, imageId: string, width?: VariantSize
+}): string {
+    const assetId = `${booqId}/${imageId}`
+    const url = `${process.env.NEXT_PUBLIC_IMAGE_ROOT}/${assetId}@${width ? `w${width}` : ''}.webp`
+    return url
 }

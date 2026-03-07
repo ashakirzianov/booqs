@@ -3,11 +3,11 @@ import React from 'react'
 import { useCollection } from '@/application/collections'
 import { BooqId } from '@/core'
 
-export function CollectionButton({ 
-    booqId, 
-    collection, 
-    AddButtonContent, 
-    RemoveButtonContent 
+export function CollectionButton({
+    booqId,
+    collection,
+    AddButtonContent,
+    RemoveButtonContent
 }: {
     booqId: BooqId,
     collection: string,
@@ -29,7 +29,7 @@ export function CollectionButton({
     if (isLoading) {
         return null
     }
-    return <span className='text-action underline text-lg cursor-pointer transition duration-300 hover:text-highlight' onClick={toggle}>
+    return <span className='text-action cursor-pointer transition-colors duration-300 hover:text-highlight font-bold' onClick={toggle}>
         {inCollection
             ? RemoveButtonContent
             : AddButtonContent}

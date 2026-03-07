@@ -16,7 +16,7 @@ export async function generateMetadata({
     params: Promise<{ username: string }>
 }): Promise<Metadata> {
     const { username } = await params
-    
+
     const user = await getUserByUsername(username)
     if (!user) {
         return {
@@ -59,7 +59,7 @@ export default async function UserPage({
 
     // Get public collections and social data for this user
     const [uploads, following, followers, currentUserFollowing] = await Promise.all([
-        booqCollection('uploads', user.id, 210),
+        booqCollection('uploads', user.id),
         getFollowingList(user.id),
         getFollowersList(user.id),
         currentUserId ? getFollowingList(currentUserId) : Promise.resolve([])

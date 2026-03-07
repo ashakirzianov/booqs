@@ -2,7 +2,7 @@ import { Popover } from '@/components/Popover'
 import { ContextMenuContent } from '@/reader/ContextMenuContent'
 import { MoreIcon } from '@/components/Icons'
 import clsx from 'clsx'
-import { booqHref } from '@/common/href'
+import { booqContentHref } from '@/common/href'
 import Link from 'next/link'
 import { BooqId } from '@/core'
 import { NoteAuthorData, BooqNote } from '@/data/notes'
@@ -16,7 +16,7 @@ export function NoteNodeComp({ booqId, note, user }: {
         borderLeft: `3px solid var(--color-${note.kind})`,
     }}>
         <div className='w-full text-primary text-justify'>
-            <Link href={booqHref({ booqId, path: note.range.start })} className='text-primary hover:text-highlight'>
+            <Link href={booqContentHref({ booqId, path: note.range.start })} className='text-primary hover:text-highlight'>
                 {note.targetQuote}
             </Link>
         </div>

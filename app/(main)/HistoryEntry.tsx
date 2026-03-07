@@ -6,7 +6,7 @@ import { pageForPosition } from '@/application/common'
 import Link from 'next/link'
 import { DetailedReadingHistoryEntry, BriefReadingHistoryEntry, ReadingHistoryEntry, removeHistoryEntryAction } from '@/data/history'
 import { BooqPath } from '@/core'
-import { booqHref } from '@/common/href'
+import { booqContentHref } from '@/common/href'
 
 export function HistoryEntry({ entry }: {
     entry: ReadingHistoryEntry
@@ -46,7 +46,7 @@ function DetailedEntry({ entry }: {
 }) {
     return (
         <div className='flex snap-center relative group'>
-            <Link href={booqHref({ booqId: entry.booqId, path: entry.path })}>
+            <Link href={booqContentHref({ booqId: entry.booqId, path: entry.path })}>
                 <BooqPreview
                     path={entry.path}
                     text={entry.text}
@@ -65,9 +65,10 @@ function BriefEntry({ entry }: {
 }) {
     return (
         <div className='flex snap-center relative group'>
-            <Link href={booqHref({ booqId: entry.booqId, path: entry.path })}>
+            <Link href={booqContentHref({ booqId: entry.booqId, path: entry.path })}>
                 <BooqCover
-                    coverUrl={entry.coverUrl}
+                    booqId={entry.booqId}
+                    coverSrc={entry.coverSrc}
                     title={entry.title}
                     author={entry.authors[0]}
                     size={120}

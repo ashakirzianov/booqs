@@ -1,11 +1,14 @@
+import { booqImageUrl } from '@/common/href'
+import { BooqId } from '@/core'
 import React from 'react'
 
-const defaultSize: BooqCoverSize = 210
+const defaultSize: BooqCoverSize = 240
 
-export type BooqCoverSize = 60 | 120 | 210 | 360
+export type BooqCoverSize = 60 | 120 | 240 | 360
 
-export function BooqCover({ coverUrl, title, author, size }: {
-    coverUrl: string | undefined,
+export function BooqCover({ booqId, coverSrc, title, author, size }: {
+    booqId: BooqId,
+    coverSrc: string | undefined,
     title: string | undefined,
     author: string | undefined,
     size: BooqCoverSize,
@@ -18,8 +21,8 @@ export function BooqCover({ coverUrl, title, author, size }: {
         height: height,
     }}>
         {
-            coverUrl
-                ? <BooqImageCover coverUrl={coverUrl} title={title} />
+            coverSrc
+                ? <BooqImageCover coverUrl={booqImageUrl({ booqId, imageId: coverSrc, width: size })} title={title} />
                 : <BooqDefaultCover title={title} author={author} size={size} />
         }
     </div>
