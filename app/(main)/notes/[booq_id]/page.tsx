@@ -2,7 +2,7 @@ import { fetchNotes } from '@/data/notes'
 import { parseIdOpt, type BooqId, comparePaths, isOverlapping } from '@/core'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import { booqHref, authorHref, urlForBooqImageVariant } from '@/common/href'
+import { booqContentHref, authorHref, urlForBooqImageVariant } from '@/common/href'
 import { getUserIdInsideRequest } from '@/data/request'
 import { getCurrentUser } from '@/data/user'
 import { booqCard, getExpandedFragments } from '@/data/booqs'
@@ -120,7 +120,7 @@ export default async function NotesPage({ params }: {
                     <h1 className="text-3xl font-bold text-primary mb-2">
                         Notes for{' '}
                         <Link
-                            href={booqHref({ booqId, path: [0] })}
+                            href={booqContentHref({ booqId, path: [0] })}
                             className="hover:text-highlight hover:underline"
                         >
                             {bookData.title}
@@ -145,7 +145,7 @@ export default async function NotesPage({ params }: {
                         <p className="text-dimmed text-lg mb-4">No notes yet</p>
                         <p className="text-dimmed mb-6">Start reading and add notes to see them here</p>
                         <Link
-                            href={booqHref({ booqId, path: [0] })}
+                            href={booqContentHref({ booqId, path: [0] })}
                             className="bg-action hover:bg-highlight text-light px-6 py-3 rounded-lg font-semibold transition-colors duration-200"
                         >
                             Start Reading

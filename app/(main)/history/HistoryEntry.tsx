@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { booqHref } from '@/common/href'
+import { booqContentHref } from '@/common/href'
 import { BooqCover } from '@/components/BooqCover'
 import { RemoveButton } from '@/components/Buttons'
 import { removeHistoryEntryAction, BriefReadingHistoryEntry } from '@/data/history'
@@ -56,7 +56,7 @@ export function HistoryEntry({
                 />
                 <div className="flex-1 min-w-0">
                     <a
-                        href={booqHref({ booqId })}
+                        href={booqContentHref({ booqId })}
                         className="block hover:text-action transition-colors"
                     >
                         <h3 className="font-medium text-lg truncate">{title}</h3>
@@ -65,7 +65,7 @@ export function HistoryEntry({
                         <div className="text-dimmed text-sm">
                             by {authors?.map((author, idx) => (
                                 <span key={idx}>
-                                    <Link href={booqHref({ booqId })} className="hover:text-action transition-colors">
+                                    <Link href={booqContentHref({ booqId })} className="hover:text-action transition-colors">
                                         {author}
                                     </Link>
                                     {idx < (authors?.length ?? 0) - 1 && ', '}
@@ -77,7 +77,7 @@ export function HistoryEntry({
                         Last read: {new Date(lastRead).toLocaleDateString()}
                     </div>
                     <a
-                        href={booqHref({ booqId, path: entry.path })}
+                        href={booqContentHref({ booqId, path: entry.path })}
                         className="inline-block mt-2 text-action hover:text-highlight text-sm font-medium"
                     >
                         Continue Reading

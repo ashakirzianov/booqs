@@ -7,7 +7,7 @@ import { CollapseIcon } from '@/components/Icons'
 import { Augmentation, BooqContent } from '@/viewer'
 import { LightButton, RemoveButton } from '@/components/Buttons'
 import { ColorPicker } from '@/components/ColorPicker'
-import { booqHref } from '@/common/href'
+import { booqContentHref } from '@/common/href'
 import { BooqNote } from '@/data/notes'
 
 type NoteFragmentProps = ExpandedNoteFragmentData & {
@@ -63,7 +63,7 @@ export function NoteFragment({
 
     function handleAugmentationClick(_id: string) {
         // Navigate to the note's range start position in the booq
-        const href = booqHref({ booqId: note.booqId, path: range.start })
+        const href = booqContentHref({ booqId: note.booqId, path: range.start })
         router.push(href)
     }
 

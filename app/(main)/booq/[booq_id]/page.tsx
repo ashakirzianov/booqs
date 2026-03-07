@@ -3,7 +3,7 @@ import { BooqCover } from '@/components/BooqCover'
 import { BooqTags } from '@/components/BooqTags'
 import { CollectionButton } from '@/app/(main)/CollectionButton'
 import Link from 'next/link'
-import { booqHref, authorHref, urlForBooqImageVariant } from '@/common/href'
+import { booqContentHref, authorHref, urlForBooqImageVariant } from '@/common/href'
 import { notFound } from 'next/navigation'
 import { READING_LIST_COLLECTION } from '@/application/collections'
 import { getBooqHistory } from '@/data/history'
@@ -129,7 +129,7 @@ export default async function Page({ params }: {
 
                         <div className="flex gap-4 items-center">
                             <Link
-                                href={history ? booqHref({ booqId, path: history.path }) : booqHref({ booqId, path: [0] })}
+                                href={history ? booqContentHref({ booqId, path: history.path }) : booqContentHref({ booqId, path: [0] })}
                                 className="bg-action hover:bg-highlight text-light px-6 py-3 rounded-lg font-semibold text-lg transition-colors duration-200 shadow-md hover:shadow-lg"
                             >
                                 {history ? 'Continue Reading' : 'Start Reading'}
@@ -176,7 +176,7 @@ function TableOfContentsItem({ item, booqId }: {
 
     return (
         <Link
-            href={booqHref({ booqId, path: item.path })}
+            href={booqContentHref({ booqId, path: item.path })}
             className="block py-2 px-3 rounded hover:bg-gray-50 transition-colors duration-150"
             style={{ paddingLeft }}
         >

@@ -1,7 +1,7 @@
 'use client'
 import { PanelButton } from '@/components/Buttons'
 import { BooqCover } from '@/components/BooqCover'
-import { booqHref } from '@/common/href'
+import { booqContentHref } from '@/common/href'
 import { useUpload } from '@/application/upload'
 import { useCallback, useRef, useState } from 'react'
 import { SmallSpinner, UploadIcon } from '@/components/Icons'
@@ -74,7 +74,7 @@ function UploadModalContent({ closeModal }: {
             <ModalDivider />
             <ModalButton
                 text='Read now'
-                href={booqHref({ booqId: result.booqId, path: [0] })}
+                href={booqContentHref({ booqId: result.booqId, path: [0] })}
             />
             <ModalDivider />
             <ModalButton

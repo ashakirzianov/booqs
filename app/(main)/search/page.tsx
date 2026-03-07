@@ -1,4 +1,4 @@
-import { authorHref, booqDetailsHref, booqHref } from '@/common/href'
+import { authorHref, booqDetailsHref, booqContentHref } from '@/common/href'
 import { AuthorSearchResultData, BooqSearchResultData, booqSearch } from '@/data/booqs'
 import Link from 'next/link'
 import styles from '@/app/(main)/MainLayout.module.css'
@@ -91,7 +91,7 @@ function BooqResultRow({ result }: { result: BooqSearchResultData }) {
                     </span>
                 )}
             </div>
-            <Link href={booqHref({ booqId: result.booqId, path: [0] })} className='shrink-0 text-action hover:text-highlight transition-colors font-bold'>
+            <Link href={booqContentHref({ booqId: result.booqId, path: [0] })} className='shrink-0 text-action hover:text-highlight transition-colors font-bold'>
                 Read
             </Link>
         </div>

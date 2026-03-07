@@ -6,7 +6,7 @@ import { ReactNode } from 'react'
 import { BooqCover } from '@/components/BooqCover'
 import { BooqTags } from '@/components/BooqTags'
 import { CollectionButton } from './CollectionButton'
-import { booqHref, authorHref } from '@/common/href'
+import { booqContentHref, authorHref } from '@/common/href'
 export function BooqCollection({
     cards, title, collection, signed,
 }: {
@@ -55,7 +55,7 @@ export function BooqCollection({
 function ReadButton({ booqId }: {
     booqId: BooqId,
 }) {
-    return <Link href={booqHref({ booqId, path: [0] })} className='text-action underline text-lg cursor-pointer transition duration-300 hover:text-highlight'>
+    return <Link href={booqContentHref({ booqId, path: [0] })} className='text-action underline text-lg cursor-pointer transition duration-300 hover:text-highlight'>
         Read
     </Link>
 }
@@ -68,7 +68,7 @@ function BooqCard({
     actions?: ReactNode,
 }) {
     const author = authors?.join(', ')
-    const booqUrl = booqHref({ booqId })
+    const booqUrl = booqContentHref({ booqId })
     const [libraryId] = parseId(booqId)
     return <div className="flex flex-col grow gap-4 items-center sm:flex-row sm:flex-wrap sm:items-stretch h-full">
         <Link href={booqUrl}>
