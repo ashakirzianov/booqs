@@ -2,7 +2,7 @@ import { fetchNotes } from '@/data/notes'
 import { parseIdOpt, type BooqId, comparePaths, isOverlapping } from '@/core'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import { booqHref, authorHref } from '@/common/href'
+import { booqHref, authorHref, urlForBooqImageVariant } from '@/common/href'
 import { getUserIdInsideRequest } from '@/data/request'
 import { getCurrentUser } from '@/data/user'
 import { booqCard, getExpandedFragments } from '@/data/booqs'
@@ -37,19 +37,23 @@ export async function generateMetadata({
         }
     }
 
+    const images = bookData.coverSrc
+        ? [urlForBooqImageVariant({ booqId, imageId: bookData.coverSrc, width: 360 })]
+        : undefined
+
     return {
         title: `Notes for ${bookData.title} - Booqs`,
         description: `View your notes and annotations for "${bookData.title}"${bookData.authors.length > 0 ? ` by ${bookData.authors.join(', ')}` : ''}.`,
         openGraph: {
             title: `Notes for ${bookData.title}`,
             description: `View notes and annotations for "${bookData.title}"${bookData.authors.length > 0 ? ` by ${bookData.authors.join(', ')}` : ''}.`,
-            images: bookData.coverUrl ? [bookData.coverUrl] : undefined,
+            images,
         },
         twitter: {
             card: 'summary_large_image',
             title: `Notes for ${bookData.title}`,
             description: `View notes and annotations for "${bookData.title}"${bookData.authors.length > 0 ? ` by ${bookData.authors.join(', ')}` : ''}.`,
-            images: bookData.coverUrl ? [bookData.coverUrl] : undefined,
+            images,
         },
     }
 }

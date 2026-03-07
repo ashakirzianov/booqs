@@ -26,7 +26,7 @@ async function NotesRightPanel() {
 
     const booqsWithNotes = await Promise.all(
         uniqueBooqIds.map(async (booqId) => {
-            const card = await booqCard(booqId, 120)
+            const card = await booqCard(booqId)
             return card ? { booqId, card } : null
         })
     )

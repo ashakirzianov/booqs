@@ -3,7 +3,7 @@ import { BooqCover } from '@/components/BooqCover'
 import { BooqTags } from '@/components/BooqTags'
 import { CollectionButton } from '@/app/(main)/CollectionButton'
 import Link from 'next/link'
-import { booqHref, authorHref } from '@/common/href'
+import { booqHref, authorHref, urlForBooqImageVariant } from '@/common/href'
 import { notFound } from 'next/navigation'
 import { READING_LIST_COLLECTION } from '@/application/collections'
 import { getBooqHistory } from '@/data/history'
@@ -39,19 +39,23 @@ export async function generateMetadata({
         }
     }
 
+    const images = detailed.coverSrc
+        ? [urlForBooqImageVariant({ booqId, imageId: detailed.coverSrc, width: 360 })]
+        : undefined
+
     return {
         title: `${detailed.title} ${detailed.authors.length > 0 ? `by ${detailed.authors.join(', ')}` : ''} - Booqs`,
         description: `Read "${detailed.title}"${detailed.authors.length > 0 ? ` by ${detailed.authors.join(', ')}` : ''} on Booqs. ${detailed.subjects.length > 0 ? `Topics: ${detailed.subjects.join(', ')}.` : ''}`,
         openGraph: {
             title: `${detailed.title} ${detailed.authors.length > 0 ? `by ${detailed.authors.join(', ')}` : ''}`,
             description: `Read "${detailed.title}"${detailed.authors.length > 0 ? ` by ${detailed.authors.join(', ')}` : ''} on Booqs.`,
-            images: detailed.coverUrl ? [detailed.coverUrl] : undefined,
+            images,
         },
         twitter: {
             card: 'summary_large_image',
             title: `${detailed.title} ${detailed.authors.length > 0 ? `by ${detailed.authors.join(', ')}` : ''}`,
             description: `Read "${detailed.title}"${detailed.authors.length > 0 ? ` by ${detailed.authors.join(', ')}` : ''} on Booqs.`,
-            images: detailed.coverUrl ? [detailed.coverUrl] : undefined,
+            images,
         },
     }
 }
@@ -82,7 +86,8 @@ export default async function Page({ params }: {
                 <div className="flex flex-col lg:flex-row gap-8 mb-8">
                     <div className="flex justify-center lg:justify-start">
                         <BooqCover
-                            coverUrl={detailed.coverUrl}
+                            booqId={booqId}
+                            coverSrc={detailed.coverSrc}
                             title={detailed.title}
                             author={detailed.authors.join(', ')}
                             size={360}

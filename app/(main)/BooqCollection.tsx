@@ -61,7 +61,7 @@ function ReadButton({ booqId }: {
 }
 
 function BooqCard({
-    card: { booqId, title, authors, coverUrl, subjects, languages },
+    card: { booqId, title, authors, coverSrc, subjects, languages },
     actions,
 }: {
     card: BooqCardData,
@@ -73,10 +73,11 @@ function BooqCard({
     return <div className="flex flex-col grow gap-4 items-center sm:flex-row sm:flex-wrap sm:items-stretch h-full">
         <Link href={booqUrl}>
             <BooqCover
+                booqId={booqId}
                 title={title ?? undefined}
                 author={author}
-                coverUrl={coverUrl}
-                size={210}
+                coverSrc={coverSrc}
+                size={240}
             />
         </Link>
         <div className="flex flex-col flex-1 justify-between">

@@ -147,7 +147,8 @@ function BooqSearchResultContent({ result, query }: {
 }) {
     return <Link href={booqHref({ booqId: result.booqId, path: [0] })} className='flex flex-row'>
         <BooqCover
-            coverUrl={result.coverUrl}
+            booqId={result.booqId}
+            coverSrc={result.coverSrc}
             title={result.title}
             author={result.authors?.join(', ')}
             size={60}

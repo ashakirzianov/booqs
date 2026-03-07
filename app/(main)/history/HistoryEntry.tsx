@@ -14,7 +14,7 @@ export function HistoryEntry({
 }) {
     const [isRemoving, setIsRemoving] = useState(false)
     const [isRemoved, setIsRemoved] = useState(false)
-    const { booqId, coverUrl, title, authors, lastRead } = entry
+    const { booqId, coverSrc, title, authors, lastRead } = entry
 
     async function handleRemove() {
         if (isRemoving || isRemoved) return
@@ -48,10 +48,11 @@ export function HistoryEntry({
         <div className="border shadow-sm rounded-lg p-4 hover:bg-secondary transition-colors">
             <div className="flex items-start gap-4">
                 <BooqCover
-                    coverUrl={coverUrl}
+                    booqId={booqId}
+                    coverSrc={coverSrc}
                     title={title}
                     author={authors?.join(', ')}
-                    size={210}
+                    size={240}
                 />
                 <div className="flex-1 min-w-0">
                     <a

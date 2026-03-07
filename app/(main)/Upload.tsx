@@ -64,10 +64,11 @@ function UploadModalContent({ closeModal }: {
             <ModalLabel text={`${result.title}`} />
             <div className='p-4'>
                 <BooqCover
+                    booqId={result.booqId}
                     title={result.title}
                     author={undefined}
-                    coverUrl={result.coverUrl}
-                    size={210}
+                    coverSrc={result.coverSrc}
+                    size={240}
                 />
             </div>
             <ModalDivider />

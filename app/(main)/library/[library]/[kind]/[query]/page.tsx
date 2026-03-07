@@ -90,7 +90,6 @@ export default async function LibraryQuery({
                 libraryId: library,
                 limit: PAGE_SIZE,
                 offset,
-                coverSize: 240
             })
             title = `Booqs by ${decoded}`
             break
@@ -101,7 +100,6 @@ export default async function LibraryQuery({
                 libraryId: library,
                 limit: PAGE_SIZE,
                 offset,
-                coverSize: 240
             })
             title = `Booqs on ${decoded}`
             break
@@ -112,7 +110,6 @@ export default async function LibraryQuery({
                 libraryId: library,
                 limit: PAGE_SIZE,
                 offset,
-                coverSize: 240
             })
             const displayName = await fetchLanguageDisplayName(decoded)
             title = `Booqs in ${displayName}`
