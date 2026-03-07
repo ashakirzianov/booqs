@@ -14,6 +14,27 @@ export function useSearchModalState() {
     return useModalState()
 }
 
+export function useSearchHotkey({ isOpen, openModal, closeModal }: {
+    isOpen: boolean,
+    openModal: () => void,
+    closeModal: () => void,
+}) {
+    useEffect(() => {
+        function handleKeyDown(e: KeyboardEvent) {
+            if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+                e.preventDefault()
+                if (isOpen) {
+                    closeModal()
+                } else {
+                    openModal()
+                }
+            }
+        }
+        document.addEventListener('keydown', handleKeyDown)
+        return () => document.removeEventListener('keydown', handleKeyDown)
+    }, [isOpen, openModal, closeModal])
+}
+
 export function SearchModal({
     isOpen, closeModal,
 }: {
