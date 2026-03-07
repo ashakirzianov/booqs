@@ -81,7 +81,7 @@ export function NoteCard({
     // Show removal message if note was removed
     if (isNoteRemoved) {
         return (
-            <div className="bg-white p-6 transition-shadow duration-200">
+            <div className="bg-background p-6 transition-shadow duration-200">
                 <div className="mb-4">
                     <div className="text-dimmed mb-4">Note was removed</div>
                     <LightButton
@@ -95,7 +95,7 @@ export function NoteCard({
     }
 
     return (
-        <div className="bg-white p-6 transition-shadow duration-200">
+        <div className="bg-background p-6 transition-shadow duration-200">
             <div className="mb-4 flex flex-col gap-3">
                 <NoteFragment
                     note={note}

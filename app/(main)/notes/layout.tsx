@@ -34,7 +34,7 @@ async function NotesRightPanel() {
     const validBooqs = booqsWithNotes.filter(Boolean) as { booqId: BooqId, card: BooqCardData }[]
 
     return (
-        <div className="p-4 h-full bg-white">
+        <div className="p-4 h-full bg-background">
             {validBooqs.length === 0 ? (
                 <p className="text-dimmed text-sm">No books with notes yet</p>
             ) : (
