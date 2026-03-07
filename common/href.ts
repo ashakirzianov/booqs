@@ -9,6 +9,12 @@ export function booqHref({ booqId, path }: {
         : `/booq/${booqId}/content`
 }
 
+export function booqDetailsHref({ booqId }: {
+    booqId: BooqId,
+}) {
+    return `/booq/${booqId}`
+}
+
 export function quoteHref({ booqId, range }: {
     booqId: BooqId,
     range: BooqRange,

@@ -1,5 +1,5 @@
-import { authorHref, booqHref } from '@/common/href'
-import { AuthorSearchResultData, BooqSearchResultData, booqSearch, SearchResultData } from '@/data/booqs'
+import { authorHref, booqDetailsHref, booqHref } from '@/common/href'
+import { AuthorSearchResultData, BooqSearchResultData, booqSearch } from '@/data/booqs'
 import Link from 'next/link'
 import styles from '@/app/(main)/MainLayout.module.css'
 import { BooqCover } from '@/components/BooqCover'
@@ -70,7 +70,7 @@ function BooqResultRow({ result }: { result: BooqSearchResultData }) {
     const author = result.authors?.join(', ')
     return (
         <div className='flex flex-row gap-4 items-center px-4 py-3 hover:bg-border transition-colors'>
-            <Link href={booqHref({ booqId: result.booqId, path: [0] })} className='shrink-0'>
+            <Link href={booqDetailsHref({ booqId: result.booqId })} className='shrink-0'>
                 <BooqCover
                     booqId={result.booqId}
                     coverSrc={result.coverSrc}
@@ -80,7 +80,7 @@ function BooqResultRow({ result }: { result: BooqSearchResultData }) {
                 />
             </Link>
             <div className='flex flex-col flex-1 min-w-0'>
-                <Link href={booqHref({ booqId: result.booqId })} className='text-lg font-bold text-primary hover:underline truncate'>
+                <Link href={booqDetailsHref({ booqId: result.booqId })} className='text-lg font-bold text-primary hover:underline truncate'>
                     {result.title}
                 </Link>
                 {author && (
