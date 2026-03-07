@@ -29,7 +29,7 @@ export function feedHref() {
 export function searchHref({ query }: {
     query: string,
 }) {
-    return `/search?query=${encodeURIComponent(query)}`
+    return `/search/${encodeURIComponent(query)}`
 }
 
 export function authHref({ returnTo }: {

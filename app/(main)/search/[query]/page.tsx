@@ -3,36 +3,45 @@ import { AuthorSearchResultData, BooqSearchResultData, booqSearch } from '@/data
 import Link from 'next/link'
 import styles from '@/app/(main)/MainLayout.module.css'
 import { BooqCover } from '@/components/BooqCover'
+import { CollectionButton } from '@/app/(main)/CollectionButton'
+import { READING_LIST_COLLECTION } from '@/application/collections'
+import { getUserIdInsideRequest } from '@/data/request'
 
 export async function generateMetadata({
-    searchParams,
+    params,
 }: {
-    searchParams: Promise<{ query: string }>
+    params: Promise<{ query: string }>
 }) {
-    const { query } = await searchParams
+    const { query } = await params
+    const decoded = decodeURIComponent(query)
     return {
-        title: `Search results for "${query}" - Booqs`,
-        description: `Find books, authors, and topics related to "${query}". Browse our collection of classic literature and contemporary works.`,
+        title: `Search results for "${decoded}" - Booqs`,
+        description: `Find books, authors, and topics related to "${decoded}". Browse our collection of classic literature and contemporary works.`,
     }
 }
 
 export default async function SearchPage({
-    searchParams,
+    params,
 }: {
-    searchParams: Promise<{ query: string }>
+    params: Promise<{ query: string }>
 }) {
-    const { query } = await searchParams
-    const results = await booqSearch({ query, libraryId: 'pg' })
+    const { query } = await params
+    const decoded = decodeURIComponent(query)
+    const [results, userId] = await Promise.all([
+        booqSearch({ query: decoded, libraryId: 'pg' }),
+        getUserIdInsideRequest(),
+    ])
+    const signed = Boolean(userId)
     const authors = results.filter(r => r.kind === 'author') as AuthorSearchResultData[]
     const booqs = results.filter(r => r.kind === 'booq') as BooqSearchResultData[]
 
     return (
         <main className={styles.mainContent}>
             <h1 className='text-2xl font-bold px-4 pt-6 pb-2 text-primary'>
-                Search results for &ldquo;{query}&rdquo;
+                Search results for &ldquo;{decoded}&rdquo;
             </h1>
             {results.length === 0
-                ? <p className='text-dimmed px-4 py-8 text-center'>No results found for &ldquo;{query}&rdquo;.</p>
+                ? <p className='text-dimmed px-4 py-8 text-center'>No results found for &ldquo;{decoded}&rdquo;.</p>
                 : <>
                     {authors.length > 0 && (
                         <section className='mb-6'>
@@ -54,7 +63,7 @@ export default async function SearchPage({
                             <ul className='flex flex-col'>
                                 {booqs.map((result, idx) => (
                                     <li key={idx} className='border-b border-border last:border-b-0'>
-                                        <BooqResultRow result={result} />
+                                        <BooqResultRow result={result} signed={signed} />
                                     </li>
                                 ))}
                             </ul>
@@ -66,7 +75,7 @@ export default async function SearchPage({
     )
 }
 
-function BooqResultRow({ result }: { result: BooqSearchResultData }) {
+function BooqResultRow({ result, signed }: { result: BooqSearchResultData, signed: boolean }) {
     const author = result.authors?.join(', ')
     return (
         <div className='flex flex-row gap-4 items-center px-4 py-3 hover:bg-border transition-colors'>
@@ -91,9 +100,19 @@ function BooqResultRow({ result }: { result: BooqSearchResultData }) {
                     </span>
                 )}
             </div>
-            <Link href={booqContentHref({ booqId: result.booqId, path: [0] })} className='shrink-0 text-action hover:text-highlight transition-colors font-bold'>
-                Read
-            </Link>
+            <div className='shrink-0 flex gap-3 items-center'>
+                {signed && (
+                    <CollectionButton
+                        booqId={result.booqId}
+                        collection={READING_LIST_COLLECTION}
+                        AddButtonContent={<span>Add</span>}
+                        RemoveButtonContent={<span>Remove</span>}
+                    />
+                )}
+                <Link href={booqContentHref({ booqId: result.booqId, path: [0] })} className='text-action hover:text-highlight transition-colors font-bold'>
+                    Read
+                </Link>
+            </div>
         </div>
     )
 }
