@@ -31,6 +31,10 @@ type Mutation {
         response: WebAuthnAuthenticationResponseJSON!
     ): AuthResult
 
+    initiateSign(email: String!, returnTo: String): Boolean
+    completeSignIn(email: String!, secret: String!): AuthResult
+    completeSignUp(email: String!, secret: String!, username: String!, name: String!, emoji: String!): AuthResult
+
     follow(username: String!): Boolean
     unfollow(username: String!): Boolean
     removeHistory(booqId: ID!): Boolean
@@ -135,6 +139,7 @@ type Tag {
     value: String
 }
 type AuthResult {
+    token: String
     user: User
 }
 type Bookmark {

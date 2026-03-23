@@ -3,6 +3,8 @@ import { ResolverContext } from './context'
 import { deleteUserForId, userForId, updateUser, userForUsername } from '@/backend/users'
 import { addNote, removeNote, updateNote } from '@/backend/notes'
 import { initiatePasskeyLogin, initiatePasskeyRegistration, verifyPasskeyLogin, verifyPasskeyRegistration } from '@/backend/passkey'
+import { initiateSignRequest, completeSignInRequest, completeSignUp } from '@/backend/sign'
+import { generateToken } from '@/backend/token'
 import { addToCollection, removeFromCollection } from '@/backend/collections'
 import { addBooqHistory, removeBooqHistory } from '@/backend/history'
 import { addBookmark, deleteBookmark } from '@/backend/bookmarks'
@@ -141,6 +143,33 @@ export const mutationResolver: IResolvers<any, ResolverContext> = {
             } else {
                 return false
             }
+        },
+        async initiateSign(_, { email, returnTo }: { email: string, returnTo?: string }) {
+            const result = await initiateSignRequest({
+                email,
+                from: returnTo ?? '/',
+            })
+            return result.kind !== 'error'
+        },
+        async completeSignIn(_, { email, secret }: { email: string, secret: string }, { setAuthForUserId }) {
+            const result = await completeSignInRequest({ email, secret })
+            if (!result.success) {
+                return undefined
+            }
+            const token = generateToken(result.user.id)
+            setAuthForUserId(result.user.id)
+            return { token, user: result.user }
+        },
+        async completeSignUp(_, { email, secret, username, name, emoji }: {
+            email: string, secret: string, username: string, name: string, emoji: string,
+        }, { setAuthForUserId }) {
+            const result = await completeSignUp({ email, secret, username, name, emoji })
+            if (!result.success) {
+                return undefined
+            }
+            const token = generateToken(result.user.id)
+            setAuthForUserId(result.user.id)
+            return { token, user: result.user }
         },
         async initPasskeyRegistration(_, __, { userId, origin }) {
             if (!userId) {

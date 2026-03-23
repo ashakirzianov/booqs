@@ -30,8 +30,8 @@ The email magic link flow exists as server actions in [data/auth.ts](data/auth.t
 - Passkey mutations already follow the pattern: call backend, then `setAuthForUserId()`, return `AuthResult`
 
 ### Schema changes
-- [ ] Add `token: String` field to `AuthResult` type (passkey mutations can return it too, but it's optional for backward compat)
-- [ ] Add mutations to schema:
+- [x] Add `token: String` field to `AuthResult` type (passkey mutations can return it too, but it's optional for backward compat)
+- [x] Add mutations to schema:
   ```graphql
   initiateSign(email: String!, returnTo: String): Boolean
   completeSignIn(email: String!, secret: String!): AuthResult
@@ -39,11 +39,11 @@ The email magic link flow exists as server actions in [data/auth.ts](data/auth.t
   ```
 
 ### Resolver changes
-- [ ] In [graphql/mutation.ts](graphql/mutation.ts): add resolvers for the three mutations
+- [x] In [graphql/mutation.ts](graphql/mutation.ts): add resolvers for the three mutations
   - `initiateSign`: call `backend/sign.initiateSignRequest()`, return `true` on success
   - `completeSignIn`: call `backend/sign.completeSignInRequest()`, call `setAuthForUserId()`, return `{ token, user }`
   - `completeSignUp`: call `backend/sign.completeSignUp()`, call `setAuthForUserId()`, return `{ token, user }`
-- [ ] Generate the JWT token via `generateToken(userId)` and include it in the response body so non-browser clients can use it
+- [x] Generate the JWT token via `generateToken(userId)` and include it in the response body so non-browser clients can use it
 
 ### Notes
 - The server actions in `data/auth.ts` do additional things (set cookies via `setUserIdInsideRequest`, revalidation). The GraphQL mutations should call the `backend/sign.*` functions directly (same layer as other GraphQL resolvers), not the server actions.
