@@ -2,6 +2,31 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Collaboration Workflow
+
+### Task Management
+- Work is driven through a combination of direct prompts and task files.
+- Task files live at the project root as `.md` files using checklist format, optionally divided into categories.
+- Tasks in a file are pre-approved — execute them without presenting the approach first.
+
+### Planning & Scope
+- Just do it — no upfront planning unless explicitly requested.
+- Ask about ambiguity rather than guessing.
+
+### Code Changes
+- Small incremental commits.
+- The user makes all commits — do NOT commit unless explicitly asked.
+- Only add tests when explicitly asked.
+
+### Communication Style
+- Explanatory — include reasoning behind choices.
+- Proactively suggest improvements noticed along the way.
+- Add suggestions to a suggestions section in the relevant task file AND mention them in conversation.
+
+### Review & Iteration
+- Present approach before executing (for direct prompts), unless told otherwise.
+- Iterate on feedback immediately, unless explicitly told to add to backlog/task list.
+
 ## Development Commands
 
 ### Build, Lint, and Test
