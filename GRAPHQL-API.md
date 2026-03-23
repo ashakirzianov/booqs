@@ -118,5 +118,4 @@ The email magic link flow exists as server actions in [data/auth.ts](data/auth.t
 ## Suggestions
 
 - [ ] Consider typing `libraryBrowse.kind` as a GraphQL enum instead of `String!` for validation and discoverability
-- [ ] Consider adding `token` to existing passkey `AuthResult` responses too, for consistency
 - [ ] The `notesWithAuthorFor` function has a TODO for privacy filtering — this work would be a good time to address it
