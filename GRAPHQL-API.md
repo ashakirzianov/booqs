@@ -10,9 +10,9 @@ The GraphQL endpoint currently authenticates via `token` cookie only. It needs t
 - [app/api/graphql/route.ts](app/api/graphql/route.ts) already has access to `headers()` but only reads `origin`.
 
 ### Changes
-- [ ] In [graphql/context.ts](graphql/context.ts): extend `RequestContext` to include `getHeader(name: string): string | undefined`
-- [ ] In `context()`: try `Authorization` header first via `userIdFromHeader()`, fall back to cookie
-- [ ] In [app/api/graphql/route.ts](app/api/graphql/route.ts): pass `getHeader` into the context factory using Next.js `headers()`
+- [x] In [graphql/context.ts](graphql/context.ts): extend `RequestContext` to include `getHeader(name: string): string | undefined`
+- [x] In `context()`: try `Authorization` header first via `userIdFromHeader()`, fall back to cookie
+- [x] In [app/api/graphql/route.ts](app/api/graphql/route.ts): pass `getHeader` into the context factory using Next.js `headers()`
 
 ### Notes
 - Minimal change — the JWT verification code already exists, we just need to wire it into the GraphQL context.

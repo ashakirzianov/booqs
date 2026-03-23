@@ -1,4 +1,4 @@
-import { generateToken, userIdFromToken } from '@/backend/token'
+import { generateToken, userIdFromHeader, userIdFromToken } from '@/backend/token'
 
 export type ResolverContext = {
     userId?: string,
@@ -14,12 +14,15 @@ type CookieOptions = {
 type RequestContext = {
     origin?: string,
     getCookie(name: string): string | undefined,
+    getHeader(name: string): string | undefined,
     setCookie(name: string, value: string, options?: CookieOptions): void,
     clearCookie(name: string, options?: CookieOptions): void,
 }
 export async function context(ctx: RequestContext): Promise<ResolverContext> {
-    const authToken = ctx.getCookie('token') ?? ''
-    const userId = userIdFromToken(authToken)
+    const authHeader = ctx.getHeader('authorization')
+    const userId = authHeader
+        ? userIdFromHeader(authHeader)
+        : userIdFromToken(ctx.getCookie('token') ?? '')
 
     return {
         userId,
