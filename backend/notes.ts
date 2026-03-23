@@ -42,10 +42,12 @@ export async function notesForBooqId(booqId: string, _userId?: string): Promise<
     `
   return result as DbNote[]
 }
-export async function notesWithAuthorFor({ booqId, authorId, userId: _userId }: {
+export async function notesWithAuthorFor({ booqId, authorId, userId: _userId, limit, offset }: {
   booqId?: BooqId,
   authorId?: string,
   userId?: string,
+  limit?: number,
+  offset?: number,
 }): Promise<DbNoteWithAuthor[]> {
   // TODO: userId parameter will be used in the future to support privacy filtering
   const notes = await sql`
@@ -56,6 +58,8 @@ export async function notesWithAuthorFor({ booqId, authorId, userId: _userId }: 
       ${booqId !== undefined ? sql`AND booq_id = ${booqId}` : sql``}
       ${authorId !== undefined ? sql`AND n.author_id = ${authorId}` : sql``}
       ORDER BY n.created_at
+      ${limit !== undefined ? sql`LIMIT ${limit}` : sql``}
+      ${offset !== undefined ? sql`OFFSET ${offset}` : sql``}
       `
 
   return notes as DbNoteWithAuthor[]

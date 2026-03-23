@@ -8,6 +8,7 @@ type Query {
     history: [BooqHistory]
     collection(name: String!): Collection
     featured(limit: Int!): [Booq]
+    myNotes(booqId: ID, limit: Int, offset: Int): [Note!]!
     libraryBrowse(library: String!, kind: LibraryBrowseKind!, query: String!, limit: Int, offset: Int): LibraryBrowseResult!
     copilot(context: CopilotContext!): Copilot
 }

@@ -89,16 +89,16 @@ The email magic link flow exists as server actions in [data/auth.ts](data/auth.t
 - No top-level GraphQL query for "all my notes".
 
 ### Schema changes
-- [ ] Add query to schema:
+- [x] Add query to schema:
   ```graphql
   myNotes(booqId: ID, limit: Int, offset: Int): [Note!]!
   ```
 
 ### Resolver/backend changes
-- [ ] In [graphql/query.ts](graphql/query.ts): add `myNotes` resolver
+- [x] In [graphql/query.ts](graphql/query.ts): add `myNotes` resolver
   - Requires `userId` from context (return empty array if not authenticated)
   - Calls `notesWithAuthorFor({ booqId, authorId: userId })`
-- [ ] In [backend/notes.ts](backend/notes.ts): add `limit`/`offset` support to `notesWithAuthorFor()` (currently returns all results)
+- [x] In [backend/notes.ts](backend/notes.ts): add `limit`/`offset` support to `notesWithAuthorFor()` (currently returns all results)
 
 ### Notes
 - `notesWithAuthorFor({ authorId })` already does the heavy lifting — it joins notes with users and supports optional `booqId` filtering. We just need to add pagination and expose it as a query.
