@@ -9,7 +9,7 @@ import { booqIdsInCollections } from '@/backend/collections'
 import { userForId, userForUsername } from '@/backend/users'
 import { CollectionParent } from './collection'
 import { BooqId } from '@/core'
-import { booqDataForId, booqDataForIds, booqQuery, featuredBooqIds } from '@/backend/library'
+import { booqDataForId, booqDataForIds, booqQuery, featuredBooqIds, LibraryQuery } from '@/backend/library'
 
 type SearchResultParent = BooqParent | AuthorParent
 
@@ -62,6 +62,17 @@ export const queryResolver: IResolvers<unknown, ResolverContext> = {
             }
             const booqIds: BooqId[] = await booqIdsInCollections(userId, name) as BooqId[]
             return { name, booqIds }
+        },
+        async libraryBrowse(_, { library, kind, query, limit, offset }: {
+            library: string, kind: LibraryQuery['kind'], query: string, limit?: number, offset?: number,
+        }) {
+            const result = await booqQuery(library, {
+                kind,
+                query,
+                limit: limit ?? 24,
+                offset,
+            })
+            return { booqs: result.cards, hasMore: result.hasMore }
         },
         async featured(_, { limit }): Promise<Array<BooqParent | undefined>> {
             const ids = await featuredBooqIds(limit)

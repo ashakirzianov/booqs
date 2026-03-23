@@ -8,6 +8,7 @@ type Query {
     history: [BooqHistory]
     collection(name: String!): Collection
     featured(limit: Int!): [Booq]
+    libraryBrowse(library: String!, kind: String!, query: String!, limit: Int, offset: Int): LibraryBrowseResult!
     copilot(context: CopilotContext!): Copilot
 }
 type Mutation {
@@ -138,6 +139,11 @@ type Tag {
     tag: String!
     value: String
 }
+type LibraryBrowseResult {
+    booqs: [Booq!]!
+    hasMore: Boolean!
+}
+
 type AuthResult {
     token: String
     user: User

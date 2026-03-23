@@ -59,11 +59,11 @@ The email magic link flow exists as server actions in [data/auth.ts](data/auth.t
 - GraphQL: `search(query, limit)` exists but hardcodes `kind: 'search'` and library `'pg'`. No browse-by-subject/language query.
 
 ### Schema changes
-- [ ] Add query to schema:
+- [x] Add query to schema:
   ```graphql
   libraryBrowse(library: String!, kind: String!, query: String!, limit: Int, offset: Int): LibraryBrowseResult!
   ```
-- [ ] Add result type:
+- [x] Add result type:
   ```graphql
   type LibraryBrowseResult {
     booqs: [Booq!]!
@@ -72,7 +72,7 @@ The email magic link flow exists as server actions in [data/auth.ts](data/auth.t
   ```
 
 ### Resolver changes
-- [ ] In [graphql/query.ts](graphql/query.ts): add `libraryBrowse` resolver that calls `booqQuery(library, { kind, query, limit, offset })` and returns `{ booqs, hasMore }`
+- [x] In [graphql/query.ts](graphql/query.ts): add `libraryBrowse` resolver that calls `booqQuery(library, { kind, query, limit, offset })` and returns `{ booqs, hasMore }`
 
 ### Notes
 - `booqQuery` already returns `{ cards: BooqData[], hasMore }` where `BooqData` maps to `BooqParent`. This is a thin wrapper.
