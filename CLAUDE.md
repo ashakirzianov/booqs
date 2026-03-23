@@ -16,6 +16,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ### Code Changes
 - Small incremental commits.
 - The user makes all commits — do NOT commit unless explicitly asked.
+- Propose a commit message after each change.
 - Only add tests when explicitly asked.
 
 ### Communication Style
