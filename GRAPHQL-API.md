@@ -106,12 +106,84 @@ The email magic link flow exists as server actions in [data/auth.ts](data/auth.t
 
 ---
 
+## 5. Copilot Answer Streaming Subscription
+
+### What exists
+- `/api/copilot/answer/stream` streams AI answers as text chunks for the web app
+- `copilot(context).answer(question)` returns the full response in one shot
+- graphql-yoga supports subscriptions out of the box (WebSocket via graphql-ws, or SSE)
+
+### Schema changes
+- [ ] Add `Subscription` type:
+  ```graphql
+  type Subscription {
+      copilotAnswerStream(context: CopilotContext!, question: String!): String!
+  }
+  ```
+
+### Resolver changes
+- [ ] Implement subscription resolver that wraps the existing streaming AI call and yields text chunks as they arrive
+- [ ] Configure graphql-yoga subscription transport (WebSocket/SSE)
+
+### Notes
+- Each event yields the next text chunk (or accumulated text — either works). The Flutter side will subscribe over WebSocket and display text incrementally.
+
+---
+
+## 6. Presigned Book Upload Mutations
+
+### What exists
+- `uploadEpubAction` handles upload end-to-end (receive file, parse EPUB, create record)
+- S3 storage is already used for book assets
+- No presigned URL support yet
+
+### Schema changes
+- [ ] Add mutations:
+  ```graphql
+  requestEpubUpload(fileName: String!): EpubUploadRequest!
+  confirmEpubUpload(uploadId: String!): UploadResult!
+  ```
+- [ ] Add types:
+  ```graphql
+  type EpubUploadRequest {
+      uploadId: String!
+      uploadUrl: String!
+      headers: [UploadHeader!]
+  }
+
+  type UploadHeader {
+      name: String!
+      value: String!
+  }
+
+  type UploadResult {
+      success: Boolean!
+      booqId: ID
+      title: String
+      coverSrc: String
+      error: String
+  }
+  ```
+
+### Resolver/backend changes
+- [ ] Implement presigned S3 PUT URL generation scoped to user and upload ID (15min expiry)
+- [ ] Implement `requestEpubUpload` resolver: generate upload ID, create presigned URL, return to client
+- [ ] Implement `confirmEpubUpload` resolver: download from storage, parse EPUB, create book record (reuse `uploadEpubAction` logic)
+
+### Notes
+- No file data flows through GraphQL — client PUTs directly to the presigned URL, then confirms via mutation.
+- The same backend logic should also be exposed via API routes (`POST /api/upload/request`, `POST /api/upload/confirm`) for web app consistency. See [BOOK-UPLOAD.md](BOOK-UPLOAD.md).
+
+---
+
 ## Suggested Implementation Order
 
 1. **Bearer token** — smallest change, unblocks API consumers immediately
 2. **Magic link mutations** — builds on bearer token (returns token in body)
 3. **Library browse** — independent, straightforward wrapper
 4. **myNotes** — independent, needs minor backend pagination addition
+5. **Copilot streaming** — independent, depends on subscription transport setup
+6. **Presigned upload mutations** — depends on backend presigned URL support (see [BOOK-UPLOAD.md](BOOK-UPLOAD.md))
 
 ---
 
