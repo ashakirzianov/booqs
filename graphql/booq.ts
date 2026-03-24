@@ -18,6 +18,9 @@ export type BooqParent = {
 }
 export const booqResolver: IResolvers<BooqParent> = {
     Booq: {
+        id(parent) {
+            return parent.booqId
+        },
         title(parent) {
             return parent.title
         },
