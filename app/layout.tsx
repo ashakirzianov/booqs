@@ -3,6 +3,7 @@ import { Metadata, Viewport } from 'next'
 
 import { Lato, Lora } from 'next/font/google'
 import { AppProvider } from '@/application/provider'
+import { SpeedInsights } from '@vercel/speed-insights/next'
 
 const lato = Lato({
     subsets: ['latin'],
@@ -39,6 +40,7 @@ export default function RootLayout({
                         {children}
                     </AppProvider>
                 </main>
+                <SpeedInsights />
             </body>
         </html>
     )
