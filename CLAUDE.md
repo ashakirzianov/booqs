@@ -18,6 +18,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - The user makes all commits — do NOT commit unless explicitly asked.
 - Propose a commit message after each change.
 - Only add tests when explicitly asked.
+- When making functional changes (new features, new API endpoints, changed behavior), update SPECS.md to reflect the change.
 
 ### Communication Style
 - Explanatory — include reasoning behind choices.

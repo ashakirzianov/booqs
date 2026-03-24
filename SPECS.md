@@ -726,12 +726,39 @@ Used for mutations from client components:
 - Follow/Unfollow operations
 
 ### 18.4 GraphQL API
-Schema-defined API using graphql-yoga for:
-- Book queries (search, metadata, content)
-- User queries
-- Bookmark/note operations
-- Collection management
-- History tracking
+
+Schema-defined API at `/api/graphql` using graphql-yoga. Supports authentication via `Authorization: Bearer <jwt>` header or `token` cookie.
+
+**Queries:**
+- `ping` — Health check
+- `me` — Current authenticated user
+- `user(username)` — Public user profile
+- `booq(id)` — Book by ID, including metadata, content nodes, fragments, table of contents, bookmarks, and notes
+- `author(name)` — Author with paginated book list
+- `search(query, limit)` — Full-text search returning books and authors
+- `libraryBrowse(library, kind, query, limit, offset)` — Browse books by author, subject, or language within a library (kind is an enum: `search`, `author`, `subject`, `language`)
+- `myNotes(booqId, limit, offset)` — Current user's notes, optionally filtered by book
+- `history` — Current user's reading history
+- `collection(name)` — Named collection (e.g., `reading_list`) for current user
+- `featured(limit)` — Featured books
+- `copilot(context)` — AI assistant scoped to a text range, with sub-field `answer(question)` and `suggestions`
+
+**Mutations — Data:**
+- `addBookmark` / `removeBookmark` — Manage bookmarks
+- `addNote` / `removeNote` / `updateNote` — Manage highlights, notes, and comments
+- `addBooqHistory` / `removeHistory` — Record and manage reading history
+- `addToCollection` / `removeFromCollection` — Manage collections
+- `follow` / `unfollow` — Social follow/unfollow
+- `updateUser(input)` — Update profile (name, emoji, username)
+
+**Mutations — Authentication:**
+- `initiateSign(email, returnTo)` — Send magic link email
+- `completeSignIn(email, secret)` — Complete sign-in via magic link secret, returns JWT token
+- `completeSignUp(email, secret, username, name, emoji)` — Complete registration via magic link secret, returns JWT token
+- `initPasskeyRegistration` / `verifyPasskeyRegistration` — WebAuthn passkey registration flow
+- `initPasskeyLogin` / `verifyPasskeyLogin` — WebAuthn passkey login flow
+- `signout` — Clear authentication
+- `deleteAccount` — Delete user account
 
 ---
 
