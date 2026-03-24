@@ -114,7 +114,7 @@ The email magic link flow exists as server actions in [data/auth.ts](data/auth.t
 - graphql-yoga supports subscriptions out of the box (WebSocket via graphql-ws, or SSE)
 
 ### Schema changes
-- [ ] Add `Subscription` type:
+- [x] Add `Subscription` type:
   ```graphql
   type Subscription {
       copilotAnswerStream(context: CopilotContext!, question: String!): String!
@@ -122,8 +122,8 @@ The email magic link flow exists as server actions in [data/auth.ts](data/auth.t
   ```
 
 ### Resolver changes
-- [ ] Implement subscription resolver that wraps the existing streaming AI call and yields text chunks as they arrive
-- [ ] Configure graphql-yoga subscription transport (WebSocket/SSE)
+- [x] Implement subscription resolver that wraps the existing streaming AI call and yields text chunks as they arrive
+- [x] Configure graphql-yoga subscription transport (WebSocket/SSE) — graphql-yoga supports SSE out of the box, no extra config needed
 
 ### Notes
 - Each event yields the next text chunk (or accumulated text — either works). The Flutter side will subscribe over WebSocket and display text incrementally.

@@ -760,6 +760,9 @@ Schema-defined API at `/api/graphql` using graphql-yoga. Supports authentication
 - `signout` — Clear authentication
 - `deleteAccount` — Delete user account
 
+**Subscriptions (SSE):**
+- `copilotAnswerStream(context, question)` — Streams AI answer text chunks as they are generated, matching the behavior of the `/api/copilot/answer/stream` REST endpoint
+
 ---
 
 ## 19. State Management Patterns

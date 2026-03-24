@@ -12,6 +12,9 @@ type Query {
     libraryBrowse(library: String!, kind: LibraryBrowseKind!, query: String!, limit: Int, offset: Int): LibraryBrowseResult!
     copilot(context: CopilotContext!): Copilot
 }
+type Subscription {
+    copilotAnswerStream(context: CopilotContext!, question: String!): String!
+}
 type Mutation {
     addBookmark(bookmark: BookmarkInput!): Boolean
     removeBookmark(id: ID!): Boolean
