@@ -49,7 +49,8 @@
       "Bash(npx eslint . --format json 2>&1 | python3 -c \"\nimport sys, json\ndata = json.load\\(sys.stdin\\)\nfor f in data:\n    for msg in f.get\\('messages', []\\):\n        print\\(msg.get\\('ruleId', 'NO_RULE'\\), '-', msg.get\\('message', ''\\)[:60]\\)\n\" 2>&1)",
       "Bash(npm outdated 2>&1)",
       "Bash(npm info @types/react version && npm info @types/react-dom version && npm info @types/node version && npm info typescript version && npm info sharp version)",
-      "Bash(ls -la /Users/ashakirzianov/repos/booqs/app/\\\\\\(main\\\\\\)/library/)"
+      "Bash(ls -la /Users/ashakirzianov/repos/booqs/app/\\\\\\(main\\\\\\)/library/)",
+      "Bash(git rm:*)"
     ]
   },
   "enableAllProjectMcpServers": false
