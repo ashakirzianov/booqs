@@ -7,6 +7,15 @@ import { BooqFile } from './library'
 import { booqImageUrl } from '@/common/href'
 
 export async function parseAndPreprocessBooq(booqId: BooqId, file: BooqFile): Promise<Booq | undefined> {
+    try {
+        return await parseAndPreprocessBooqUnsafe(booqId, file)
+    } catch (e) {
+        console.error(`Error parsing booq ${booqId}:`, e)
+        return undefined
+    }
+}
+
+async function parseAndPreprocessBooqUnsafe(booqId: BooqId, file: BooqFile): Promise<Booq | undefined> {
     if (file.kind !== 'epub') {
         return undefined
     }
@@ -24,7 +33,6 @@ export async function parseAndPreprocessBooq(booqId: BooqId, file: BooqFile): Pr
         return booq
     } else {
         return preprocessBooq(booq, booqId, dimensions)
-
     }
 }
 
@@ -46,20 +54,26 @@ export async function parseAndLoadImagesFromFile(file: BooqFile) {
 
 async function loadImageDimensions(booq: Booq, epub: Epub): Promise<BooqImageDimensions> {
     const images = await loadImages(booq, epub)
-    const dimensions: BooqImageDimensions = {}
-    for (const [src, buffer] of Object.entries(images.images)) {
-        try {
-            const metadata = await imageDimensions(buffer)
-            if (metadata.width && metadata.height) {
-                dimensions[src] = {
-                    width: metadata.width,
-                    height: metadata.height,
+    const entries = Object.entries(images.images)
+    const results = await Promise.all(
+        entries.map(async ([src, buffer]) => {
+            try {
+                const metadata = await imageDimensions(buffer)
+                if (metadata.width && metadata.height) {
+                    return [src, { width: metadata.width, height: metadata.height }] as const
                 }
-            } else {
-                console.warn(`Failed to get dimensions for image with src ${src}`)
+                console.warn(`Missing dimensions for image: ${src}`)
+                return null
+            } catch (e) {
+                console.warn(`Error processing image ${src}:`, e instanceof Error ? e.message : e)
+                return null
             }
-        } catch (e) {
-            console.warn(`Error processing image with src ${src}:`, e)
+        })
+    )
+    const dimensions: BooqImageDimensions = {}
+    for (const result of results) {
+        if (result) {
+            dimensions[result[0]] = result[1]
         }
     }
     return dimensions
