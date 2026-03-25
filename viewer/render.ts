@@ -118,7 +118,7 @@ function getProps(node: BooqElementNode, {
             ? (node.attrs?.className ? `booq-pph ${node.attrs.className}` : 'booq-pph')
             : node.attrs?.className,
         key: pathToString(path),
-        style: node.style,
+        style: node.attrs?.style ? parseInlineStyle(node.attrs.style) : undefined,
         href: node.ref
             ? (
                 pathInRange(node.ref, range)
@@ -238,4 +238,19 @@ function breakPath(path: BooqPath) {
     const head = path.slice(0, path.length - 1)
     const tail = path[path.length - 1]
     return [head, tail] as const
+}
+
+function parseInlineStyle(style: string): Record<string, string> {
+    const result: Record<string, string> = {}
+    for (const rule of style.split(';')) {
+        const trimmed = rule.trim()
+        if (trimmed.length === 0) continue
+        const colonIndex = trimmed.indexOf(':')
+        if (colonIndex === -1) continue
+        const property = trimmed.slice(0, colonIndex).trim()
+            .replace(/-([a-z])/g, (_, char) => char.toUpperCase())
+        const value = trimmed.slice(colonIndex + 1).trim()
+        result[property] = value
+    }
+    return result
 }

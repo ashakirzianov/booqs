@@ -11,14 +11,10 @@ export type BooqRange = {
 export type BooqNodeAttrs = {
     [name in string]?: string;
 }
-export type BooqNodeStyle = {
-    [name in string]?: string;
-}
 export type BooqElementNode = {
     kind: 'element',
     name: string,
     id?: string,
-    style?: BooqNodeStyle,
     css?: string,
     styleRefs?: string[],
     children?: BooqNode[],

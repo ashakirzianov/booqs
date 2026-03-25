@@ -250,14 +250,11 @@ async function processRegularXml(element: XmlElement, env: Env): Promise<BooqNod
         })
         return stub()
     }
-    const { id, style, ...rest } = attributes ?? {}
+    const { id, ...rest } = attributes ?? {}
     const result: BooqElementNode = {
         kind: 'element',
         name,
         id: processId(id, env),
-        style: style
-            ? parseInlineStyle(style)
-            : undefined,
         attrs: processAttributes(rest, env),
         children: children?.length
             ? await processXmls(children, env)
@@ -356,23 +353,6 @@ function processAttributes(attrs: XmlAttributes, _env: Env) {
         : undefined
 }
 
-function parseInlineStyle(style: string): Record<string, string> {
-    const rules = style.split(';')
-        .map(rule => rule.trim())
-        .filter(rule => rule.length > 0)
-        .map(rule => {
-            const [property, value] = rule.split(':')
-            const camelCaseProperty = property
-                .trim()
-                .replace(/-([a-z])/g, (_, char) => char.toUpperCase())
-            return [
-                camelCaseProperty,
-                value?.trim(),
-            ]
-        })
-    const styleObject = Object.fromEntries(rules)
-    return styleObject
-}
 
 function isEmptyText(xml: XmlElement) {
     const text = textOf(xml)
