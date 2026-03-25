@@ -4,13 +4,13 @@ Replaces direct file upload with a two-step presigned URL flow. Both the web app
 
 ## Backend — Presigned URL support
 
-- [ ] Implement presigned S3 PUT URL generation (scoped to user + upload ID, 15min expiry)
-- [ ] Implement upload confirmation logic: download from storage, parse EPUB, create book record (extract from existing `uploadEpubAction`)
+- [x] Implement presigned S3 PUT URL generation (scoped to user + upload ID, 15min expiry)
+- [x] Implement upload confirmation logic: download from storage, parse EPUB, create book record (extract from existing `uploadEpubAction`)
 
 ## API Routes (web app)
 
-- [ ] `POST /api/upload/request` — returns `{ uploadId, uploadUrl, headers }`
-- [ ] `POST /api/upload/confirm` — returns `{ success, booqId, title, coverSrc, error }`
+- [x] `POST /api/upload/request` — returns `{ uploadId, uploadUrl }`
+- [x] `POST /api/upload/confirm` — returns `{ success, booqId, title, coverSrc, error }`
 
 ## GraphQL Mutations (native apps)
 

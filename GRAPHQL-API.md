@@ -138,22 +138,16 @@ The email magic link flow exists as server actions in [data/auth.ts](data/auth.t
 - No presigned URL support yet
 
 ### Schema changes
-- [ ] Add mutations:
+- [x] Add mutations:
   ```graphql
-  requestEpubUpload(fileName: String!): EpubUploadRequest!
-  confirmEpubUpload(uploadId: String!): UploadResult!
+  requestUpload: UploadRequest
+  confirmUpload(uploadId: String!): UploadResult!
   ```
-- [ ] Add types:
+- [x] Add types:
   ```graphql
-  type EpubUploadRequest {
+  type UploadRequest {
       uploadId: String!
       uploadUrl: String!
-      headers: [UploadHeader!]
-  }
-
-  type UploadHeader {
-      name: String!
-      value: String!
   }
 
   type UploadResult {
@@ -166,9 +160,9 @@ The email magic link flow exists as server actions in [data/auth.ts](data/auth.t
   ```
 
 ### Resolver/backend changes
-- [ ] Implement presigned S3 PUT URL generation scoped to user and upload ID (15min expiry)
-- [ ] Implement `requestEpubUpload` resolver: generate upload ID, create presigned URL, return to client
-- [ ] Implement `confirmEpubUpload` resolver: download from storage, parse EPUB, create book record (reuse `uploadEpubAction` logic)
+- [x] Implement presigned S3 PUT URL generation scoped to user and upload ID (15min expiry)
+- [x] Implement `requestUpload` resolver: generate upload ID, create presigned URL, return to client
+- [x] Implement `confirmUpload` resolver: download from storage, parse EPUB, create book record (reuse `uploadEpubAction` logic)
 
 ### Notes
 - No file data flows through GraphQL — client PUTs directly to the presigned URL, then confirms via mutation.

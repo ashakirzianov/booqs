@@ -44,9 +44,25 @@ type Mutation {
     unfollow(username: String!): Boolean
     removeHistory(booqId: ID!): Boolean
 
+    requestUpload: UploadRequest
+    confirmUpload(uploadId: String!): UploadResult!
+
     signout: Boolean
     deleteAccount: Boolean
     updateUser(input: UpdateUserInput!): UpdateUserResult
+}
+
+type UploadRequest {
+    uploadId: String!
+    uploadUrl: String!
+}
+
+type UploadResult {
+    success: Boolean!
+    booqId: ID
+    title: String
+    coverSrc: String
+    error: String
 }
 
 type InitPasskeyRegistrationResponse {

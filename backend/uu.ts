@@ -5,7 +5,7 @@ import type { InLibraryCard, Library } from './library'
 import { parseEpubFile } from '@/parser'
 import { Booq, BooqMetadata } from '@/core'
 import { nanoid } from 'nanoid'
-import { deleteAsset, deleteAssetsWithPrefix, downloadAsset, IMAGES_BUCKET, uploadAsset } from './blob'
+import { deleteAsset, deleteAssetsWithPrefix, downloadAsset, generatePresignedUploadUrl, IMAGES_BUCKET, uploadAsset } from './blob'
 import { sql } from './db'
 
 export const userUploadsLibrary: Library = {
@@ -99,6 +99,38 @@ async function uploadNewEpub({ buffer, hash }: File, userId: string) {
     }
     await addToRegistry({ uploadId: insertResult.id, userId })
     return convertToLibraryCard(insertResult)
+}
+
+export async function requestUpload() {
+    const uploadId = nanoid(10)
+    const key = `pending/${uploadId}`
+    const uploadUrl = await generatePresignedUploadUrl(userUploadedEpubsBucket, key)
+    return { uploadId, uploadUrl }
+}
+
+export type ConfirmUploadResult =
+    | { success: true, booqId: string, title?: string, coverSrc?: string }
+    | { success: false, error: string }
+
+export async function confirmUpload(uploadId: string, userId: string): Promise<ConfirmUploadResult> {
+    const key = `pending/${uploadId}`
+    const buffer = await downloadAsset(userUploadedEpubsBucket, key)
+    if (!buffer) {
+        return { success: false, error: 'Upload not found or expired' }
+    }
+
+    const result = await uploadEpubForUser(buffer, userId)
+    if (!result) {
+        return { success: false, error: 'Failed to parse EPUB file' }
+    }
+
+    const booqId = `uu-${result.id}`
+    return {
+        success: true,
+        booqId,
+        title: result.meta.title,
+        coverSrc: result.meta.coverSrc,
+    }
 }
 
 async function cardForHash(hash: string) {

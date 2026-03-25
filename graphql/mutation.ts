@@ -9,6 +9,7 @@ import { addToCollection, removeFromCollection } from '@/backend/collections'
 import { addBooqHistory, removeBooqHistory } from '@/backend/history'
 import { addBookmark, deleteBookmark } from '@/backend/bookmarks'
 import { followUser, unfollowUser } from '@/backend/follows'
+import { requestUpload, confirmUpload } from '@/backend/uu'
 
 export const mutationResolver: IResolvers<any, ResolverContext> = {
     Mutation: {
@@ -231,6 +232,18 @@ export const mutationResolver: IResolvers<any, ResolverContext> = {
             }
 
             return undefined
+        },
+        async requestUpload(_, __, { userId }) {
+            if (!userId) {
+                return null
+            }
+            return requestUpload()
+        },
+        async confirmUpload(_, { uploadId }: { uploadId: string }, { userId }) {
+            if (!userId) {
+                return { success: false, error: 'Authentication required' }
+            }
+            return confirmUpload(uploadId, userId)
         },
         async updateUser(_, { input }, { userId }) {
             if (!userId) {

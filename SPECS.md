@@ -504,6 +504,11 @@ Upload button in header (upload icon, `PanelButton` style).
 
 Accepts only `.epub` files (`application/epub+zip`).
 
+**Presigned URL upload flow** (for API/native app clients):
+1. Client calls `POST /api/upload/request` (or `requestUpload` GraphQL mutation) — receives `uploadId` and a presigned S3 PUT URL (15min expiry)
+2. Client PUTs the file directly to the presigned URL
+3. Client calls `POST /api/upload/confirm` (or `confirmUpload` GraphQL mutation) with `uploadId` — backend downloads from S3, parses EPUB, creates the book record, and returns `{ success, booqId, title, coverSrc }`
+
 ---
 
 ## 8. Collections / Reading List
@@ -712,6 +717,7 @@ All main pages are server components that fetch data directly from the data laye
 - `me/` - Current user data
 - `notes/` - Notes CRUD
 - `search/` - Search API
+- `upload/` - Presigned URL upload flow (request + confirm)
 - `users/` - User data
 
 ### 18.3 Server Actions
@@ -750,6 +756,8 @@ Schema-defined API at `/api/graphql` using graphql-yoga. Supports authentication
 - `addToCollection` / `removeFromCollection` — Manage collections
 - `follow` / `unfollow` — Social follow/unfollow
 - `updateUser(input)` — Update profile (name, emoji, username)
+- `requestUpload` — Get a presigned S3 upload URL and upload ID
+- `confirmUpload(uploadId)` — Confirm upload, parse file, and create book record
 
 **Mutations — Authentication:**
 - `initiateSign(email, returnTo)` — Send magic link email

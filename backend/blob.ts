@@ -7,6 +7,7 @@ import AWS_S3, {
     DeleteObjectsCommand,
     HeadObjectCommand,
 } from '@aws-sdk/client-s3'
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 
 export const IMAGES_BUCKET = 'booqs-images'
 
@@ -100,6 +101,15 @@ export async function* listObjects(bucket: string) {
     for await (const batch of listObjectBatches(bucket)) {
         yield* batch
     }
+}
+
+export async function generatePresignedUploadUrl(bucket: string, key: string, expiresInSeconds: number = 900) {
+    const command = new PutObjectCommand({
+        Bucket: bucket,
+        Key: key,
+    })
+    const url = await getSignedUrl(service(), command, { expiresIn: expiresInSeconds })
+    return url
 }
 
 type ContinuationToken = string
