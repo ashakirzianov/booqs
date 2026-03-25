@@ -4,7 +4,7 @@ import { BooqCover } from '@/components/BooqCover'
 import { booqContentHref } from '@/common/href'
 import { useUpload } from '@/application/upload'
 import { useCallback, useRef, useState } from 'react'
-import { SmallSpinner, UploadIcon } from '@/components/Icons'
+import { LargeSpinner, UploadIcon } from '@/components/Icons'
 import { Modal, ModalButton, ModalDivider, ModalLabel } from '@/components/Modal'
 
 export function UploadButton() {
@@ -85,7 +85,9 @@ function UploadModalContent({ closeModal }: {
     } else if (loading) {
         return <>
             <ModalLabel text={`Uploading ${file.name}...`} />
-            <SmallSpinner />
+            <div className='p-4'>
+                <LargeSpinner />
+            </div>
             <ModalDivider />
             <ModalButton
                 text='Dismiss'
