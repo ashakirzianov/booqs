@@ -28,12 +28,9 @@ async function parseAndPreprocessBooqUnsafe(booqId: BooqId, file: BooqFile): Pro
         console.error(`Failed to parse booq for id ${booqId}`)
         return undefined
     }
+    normalizeImageSrcsInBooq(booq)
     const dimensions = await loadImageDimensions(booq, epub)
-    if (Object.keys(dimensions).length === 0) {
-        return booq
-    } else {
-        return preprocessBooq(booq, booqId, dimensions)
-    }
+    return preprocessBooq(booq, booqId, dimensions)
 }
 
 export async function parseAndLoadImagesFromFile(file: BooqFile) {
@@ -82,11 +79,7 @@ async function loadImageDimensions(booq: Booq, epub: Epub): Promise<BooqImageDim
 async function loadImages(booq: Booq, epub: Epub): Promise<BooqImages> {
     const srcs = collectUniqueSrcsFromBooq(booq)
     const images: BooqImages['images'] = {}
-    for (let src of srcs) {
-        // TODO: investigate why we need this hack for certain epubs
-        if (src.startsWith('../')) {
-            src = src.substring('../'.length)
-        }
+    for (const src of srcs) {
         const image = await epub.loadBinaryFile(src)
         if (image) {
             images[src] = image
@@ -99,6 +92,40 @@ async function loadImages(booq: Booq, epub: Epub): Promise<BooqImages> {
     return {
         images,
         coverSrc,
+    }
+}
+
+// Epub image srcs are relative to the XHTML file (e.g., "../Images/fig.jpg" from "Text/chapter.xhtml").
+// booqs-epub's resolveHref just concatenates basePath + href without resolving "..", so we strip
+// the prefix here. This works for the standard epub layout where all content lives under one root
+// directory (e.g., OEBPS/). It would break for deeply nested structures where "../" traverses
+// multiple levels — but that's uncommon in practice.
+function normalizeImageSrc(src: string): string {
+    while (src.startsWith('../')) {
+        src = src.substring('../'.length)
+    }
+    return src
+}
+
+function normalizeImageSrcsInBooq(booq: Booq): void {
+    function normalizeNodes(nodes: BooqNode[]) {
+        for (const node of nodes) {
+            if (node?.kind === 'element') {
+                if (node.attrs?.src) {
+                    node.attrs.src = normalizeImageSrc(node.attrs.src)
+                }
+                if (node.attrs?.xlinkHref) {
+                    node.attrs.xlinkHref = normalizeImageSrc(node.attrs.xlinkHref)
+                }
+                if (node.children) {
+                    normalizeNodes(node.children)
+                }
+            }
+        }
+    }
+    normalizeNodes(booq.nodes)
+    if (booq.metadata.coverSrc) {
+        booq.metadata.coverSrc = normalizeImageSrc(booq.metadata.coverSrc)
     }
 }
 
