@@ -92,8 +92,8 @@ This is a Next.js application for reading and managing ebooks (called "booqs"). 
 6. **History**: Reading progress and history tracking
 
 ### Key Models
-- **Booq**: Core book model with metadata and content
-- **Fragment**: Text segments for search and navigation
+- **Booq**: Core book model with nodes, deduplicated styles map, metadata, and table of contents
+- **Fragment**: A renderable subset of a book's content with hydrated CSS, navigation anchors, and its own styles subset
 - **Note**: User annotations on book content
 - **Bookmark**: User bookmarks within books
 - **Collection**: User-created book collections

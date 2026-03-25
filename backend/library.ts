@@ -1,9 +1,10 @@
 import {
-    Booq, BooqId, BooqMetadata, BooqPath, InLibraryId, LibraryId, pathToString, positionForPath, previewForPath, TableOfContents, textForRange, BooqRange, nodesForRange, BooqNode,
+    Booq, BooqId, BooqMetadata, BooqPath, BooqStyles, InLibraryId, LibraryId, pathToString, positionForPath, previewForPath, TableOfContents, textForRange, BooqRange, nodesForRange, BooqNode,
     parseId,
 } from '@/core'
 import { getCachedValueForKey, cacheValueForKey } from './cache'
 import { parseAndLoadImagesFromFile, parseAndPreprocessBooq } from './parse'
+import { hydrateCss } from '@/parser/css'
 import groupBy from 'lodash-es/groupBy'
 import { pgLibrary } from './pg'
 import { userUploadsLibrary } from './uu'
@@ -229,6 +230,10 @@ export async function booqImages(booqId: BooqId): Promise<BooqImages | undefined
         return undefined
     }
     return booqImages
+}
+
+export function hydrateFragmentNodes(nodes: BooqNode[], styles: BooqStyles): BooqNode[] {
+    return hydrateCss(nodes, styles)
 }
 
 async function booqFileForId(booqId: BooqId) {

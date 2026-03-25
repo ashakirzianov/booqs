@@ -9,6 +9,7 @@ import selectorParser from 'postcss-selector-parser'
 import { flatten } from 'lodash'
 import { XmlElement, attributesOf } from './xmlTree'
 import { Diagnoser } from 'booqs-epub'
+import { BooqNode, BooqStyles, isElementNode } from '@/core'
 
 export function preprocessCss(cssString: string, options: {
     prefix: string,
@@ -262,4 +263,31 @@ const ignorePseudo = [
 ]
 function supportedSelector(selector: string): boolean {
     return !ignorePseudo.some(pseudo => selector.endsWith(pseudo))
+}
+
+export function hydrateCss(nodes: BooqNode[], styles: BooqStyles): BooqNode[] {
+    return nodes.map(node => hydrateNode(node, styles))
+}
+
+function hydrateNode(node: BooqNode, styles: BooqStyles): BooqNode {
+    if (!isElementNode(node)) {
+        return node
+    }
+    const children = node.children
+        ? node.children.map(child => hydrateNode(child, styles))
+        : undefined
+    if (node.styleRefs && node.styleRefs.length > 0) {
+        const prefix = node.attrs?.className ?? ''
+        const rawCss = node.styleRefs
+            .map(ref => styles[ref])
+            .filter(Boolean)
+            .join('\n')
+        const css = rawCss.length > 0
+            ? preprocessCss(rawCss, { prefix })
+            : undefined
+        return { ...node, css, styleRefs: undefined, children }
+    }
+    return children !== node.children
+        ? { ...node, children }
+        : node
 }

@@ -1,5 +1,5 @@
 import {
-    BooqNode, Booq, BooqPath, nodesForRange, pathLessThan,
+    BooqNode, BooqStyles, Booq, BooqPath, nodesForRange, pathLessThan, isElementNode,
 } from '@/core'
 
 export type BooqFragment = {
@@ -8,6 +8,7 @@ export type BooqFragment = {
     next?: BooqAnchor,
     position: number,
     nodes: BooqNode[],
+    styles: BooqStyles,
 }
 export type BooqAnchor = {
     path: BooqPath,
@@ -36,6 +37,7 @@ function fullBooqFragment(booq: Booq): BooqFragment {
         },
         position: 0,
         nodes: booq.nodes,
+        styles: booq.styles,
     }
 }
 
@@ -62,11 +64,40 @@ function fragmentForPath(booq: Booq, path: BooqPath): BooqFragment {
         end: next?.path ?? [booq.nodes.length],
     })
 
+    const styles = collectReferencedStyles(nodes, booq.styles)
+
     return {
         previous, current, next,
         position: current.position,
         nodes,
+        styles,
     }
+}
+
+function collectReferencedStyles(nodes: BooqNode[], allStyles: BooqStyles): BooqStyles {
+    const refs = new Set<string>()
+    function walk(nodes: BooqNode[]) {
+        for (const node of nodes) {
+            if (isElementNode(node)) {
+                if (node.styleRefs) {
+                    for (const ref of node.styleRefs) {
+                        refs.add(ref)
+                    }
+                }
+                if (node.children) {
+                    walk(node.children)
+                }
+            }
+        }
+    }
+    walk(nodes)
+    const styles: BooqStyles = {}
+    for (const ref of refs) {
+        if (allStyles[ref] !== undefined) {
+            styles[ref] = allStyles[ref]
+        }
+    }
+    return styles
 }
 
 const fragmentLength = 4500

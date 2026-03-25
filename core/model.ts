@@ -20,6 +20,7 @@ export type BooqElementNode = {
     id?: string,
     style?: BooqNodeStyle,
     css?: string,
+    styleRefs?: string[],
     children?: BooqNode[],
     attrs?: BooqNodeAttrs,
     fileName?: string,
@@ -65,8 +66,10 @@ export type BooqMetadata = {
     coverSrc: string | undefined,
     length: number,
 }
+export type BooqStyles = Record<string, string>
 export type Booq = {
     nodes: BooqNode[],
+    styles: BooqStyles,
     metadata: BooqMetadata,
     toc: TableOfContents,
 }

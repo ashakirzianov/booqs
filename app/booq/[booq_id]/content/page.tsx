@@ -1,5 +1,5 @@
 import { BooqId, parseIdOpt, pathFromString, rangeFromString } from '@/core'
-import { fetchBooqPreview, fetchFullBooq } from '@/data/booqs'
+import { fetchBooqPreview, fetchBooqFragment } from '@/data/booqs'
 import { reportBooqHistoryAction } from '@/data/history'
 import { Reader } from '@/reader/Reader'
 import { Metadata } from 'next'
@@ -83,11 +83,11 @@ export default async function BooqPathPage({
     if (!user) {
         redirect(`/auth?return_to=${returnTo}`)
     }
-    const [booq, notes] = await Promise.all([
-        fetchFullBooq(booqId),
+    const [booqData, notes] = await Promise.all([
+        fetchBooqFragment(booqId, booqPath),
         fetchNotes({ booqId }),
     ])
-    if (!booq)
+    if (!booqData)
         return notFound()
 
     // Report history event before rendering the page
@@ -100,7 +100,9 @@ export default async function BooqPathPage({
 
     return <Reader
         booqId={booqId}
-        booq={booq}
+        fragment={booqData.fragment}
+        metadata={booqData.metadata}
+        toc={booqData.toc}
         notes={notes}
         user={user}
     />

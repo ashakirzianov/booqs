@@ -12,7 +12,7 @@ import {
 } from '@/core'
 import { userForId } from '@/backend/users'
 import { booqIdsInCollections } from '@/backend/collections'
-import { BooqData, booqDataForIds, booqForId, booqPreview, booqQuery, booqToc, featuredBooqIds, booqFragmentForRange } from '@/backend/library'
+import { BooqData, booqDataForIds, booqForId, booqPreview, booqQuery, booqToc, featuredBooqIds, hydrateFragmentNodes } from '@/backend/library'
 
 export type PartialBooqData = {
     booqId: BooqId,
@@ -136,14 +136,23 @@ export async function booqPart({
 
     return {
         booqId,
-        fragment,
+        fragment: { ...fragment, nodes: hydrateFragmentNodes(fragment.nodes, fragment.styles) },
         toc: booq.toc,
         meta: booq.metadata,
     } satisfies PartialBooqData
 }
 
-export async function fetchFullBooq(booqId: BooqId) {
-    return booqForId(booqId)
+export async function fetchBooqFragment(booqId: BooqId, path?: BooqPath) {
+    const booq = await booqForId(booqId)
+    if (!booq) {
+        return undefined
+    }
+    const fragment = buildFragment({ booq, path })
+    return {
+        fragment: { ...fragment, nodes: hydrateFragmentNodes(fragment.nodes, fragment.styles) },
+        metadata: booq.metadata,
+        toc: booq.toc,
+    }
 }
 
 
@@ -244,14 +253,10 @@ export async function fetchExpandedFragmentForRange(booqId: BooqId, range: BooqR
     }
 
     const expandedRange = getExpandedRange(booq.nodes, range)
-    const result = await booqFragmentForRange(booqId, expandedRange)
-
-    if (!result) {
-        return undefined
-    }
+    const nodes = nodesForRange(booq.nodes, expandedRange)
 
     return {
-        nodes: result.nodes,
+        nodes: hydrateFragmentNodes(nodes, booq.styles),
         range: expandedRange,
     }
 }
@@ -267,7 +272,7 @@ export async function getExpandedFragments(booqId: BooqId, ranges: BooqRange[]):
         const nodes = nodesForRange(booq.nodes, expandedRange)
 
         return {
-            nodes,
+            nodes: hydrateFragmentNodes(nodes, booq.styles),
             range: expandedRange,
         }
     })

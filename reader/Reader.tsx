@@ -2,7 +2,8 @@
 // import '@/app/wdyr'
 
 import React, { useEffect, useMemo } from 'react'
-import { Booq, BooqAnchor, BooqId, BooqPath, BooqRange, buildFragment, pathFromString, rangeFromString } from '@/core'
+import { BooqAnchor, BooqId, BooqMetadata, BooqPath, BooqRange, TableOfContents, pathFromString, rangeFromString } from '@/core'
+import { BooqFragment } from '@/core/fragment'
 import { PanelButton } from '@/components/Buttons'
 import { booqContentHref, feedHref } from '@/common/href'
 import {
@@ -33,20 +34,16 @@ import { BooqNote } from '@/data/notes'
 import { AccountData } from '@/data/user'
 
 export function Reader({
-    booqId, booq, notes: initialNotes, user,
+    booqId, fragment, metadata, toc, notes: initialNotes, user,
 }: {
     booqId: BooqId,
-    booq: Booq,
+    fragment: BooqFragment,
+    metadata: BooqMetadata,
+    toc: TableOfContents,
     notes: BooqNote[],
     user: AccountData | undefined,
 }) {
-    const { quote, path } = useBooqSearchParams()
-    const fragment = useMemo(() => {
-        return buildFragment({
-            booq,
-            path: path ?? undefined,
-        })
-    }, [booq, path])
+    const { quote } = useBooqSearchParams()
     const pathname = usePathname()
     const fontScale = useFontScale()
     useScrollToQuote(quote)
@@ -58,7 +55,7 @@ export function Reader({
     })
     const { currentPage, leftPages, totalPages } = usePageData({
         fragment,
-        meta: booq.metadata,
+        meta: metadata,
         currentPath,
     })
 
@@ -129,8 +126,8 @@ export function Reader({
 
     const NavigationContent = <NavigationPanel
         booqId={booqId}
-        title={booq.metadata.title ?? 'Untitled'}
-        toc={booq.toc.items}
+        title={metadata.title ?? 'Untitled'}
+        toc={toc.items}
         notes={filteredHighlights}
         selection={navigationSelection}
         user={user}
