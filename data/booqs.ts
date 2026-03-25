@@ -143,7 +143,7 @@ export async function booqPart({
 }
 
 export async function fetchFullBooq(booqId: BooqId) {
-    return booqForId(booqId, true)
+    return booqForId(booqId)
 }
 
 

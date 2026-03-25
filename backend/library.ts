@@ -55,28 +55,12 @@ const libraries: {
     lo: localLibrary,
 }
 
-export async function booqForId(booqId: BooqId, bypassCache = false): Promise<Booq | undefined> {
-    if (bypassCache) {
-        const file = await booqFileForId(booqId)
-        if (!file) {
-            return undefined
-        }
-        return parseAndPreprocessBooq(booqId, file)
+export async function booqForId(booqId: BooqId): Promise<Booq | undefined> {
+    const file = await booqFileForId(booqId)
+    if (!file) {
+        return undefined
     }
-    const cached = await getCachedValueForKey<Booq>(`booq:${booqId}`)
-    if (cached) {
-        return cached
-    } else {
-        const file = await booqFileForId(booqId)
-        if (!file) {
-            return undefined
-        }
-        const booq = await parseAndPreprocessBooq(booqId, file)
-        if (booq) {
-            await cacheValueForKey(`booq:${booqId}`, booq)
-        }
-        return booq
-    }
+    return parseAndPreprocessBooq(booqId, file)
 }
 
 export type BooqPreview = {
