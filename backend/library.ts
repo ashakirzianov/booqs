@@ -3,6 +3,7 @@ import {
     parseId,
 } from '@/core'
 import { getCachedValueForKey, cacheValueForKey } from './cache'
+import { downloadAsset, uploadAsset } from './blob'
 import { parseAndLoadImagesFromFile, parseAndPreprocessBooq } from './parse'
 import groupBy from 'lodash-es/groupBy'
 import { pgLibrary } from './pg'
@@ -55,12 +56,41 @@ const libraries: {
     lo: localLibrary,
 }
 
+const CACHE_BUCKET = 'booqs-cache'
+
 export async function booqForId(booqId: BooqId): Promise<Booq | undefined> {
+    const cached = await getCachedBooq(booqId)
+    if (cached) {
+        return cached
+    }
     const file = await booqFileForId(booqId)
     if (!file) {
         return undefined
     }
-    return parseAndPreprocessBooq(booqId, file)
+    const booq = await parseAndPreprocessBooq(booqId, file)
+    if (booq) {
+        cacheBooq(booqId, booq).catch(e =>
+            console.warn(`Failed to cache booq ${booqId}:`, e instanceof Error ? e.message : e)
+        )
+    }
+    return booq
+}
+
+async function getCachedBooq(booqId: BooqId): Promise<Booq | undefined> {
+    const buffer = await downloadAsset(CACHE_BUCKET, `booqs/${booqId}.json`)
+    if (!buffer) {
+        return undefined
+    }
+    try {
+        return JSON.parse(buffer.toString('utf-8'))
+    } catch {
+        return undefined
+    }
+}
+
+async function cacheBooq(booqId: BooqId, booq: Booq): Promise<void> {
+    const json = JSON.stringify(booq)
+    await uploadAsset(CACHE_BUCKET, `booqs/${booqId}.json`, Buffer.from(json, 'utf-8'))
 }
 
 export type BooqPreview = {
