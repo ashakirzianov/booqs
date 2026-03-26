@@ -253,6 +253,7 @@ export function Reader({
         }}>
             <BooqContent
                 nodes={fragment.nodes}
+                styles={fragment.styles}
                 range={range}
                 augmentations={augmentations}
                 onAugmentationClick={onAugmentationClick}

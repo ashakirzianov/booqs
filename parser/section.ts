@@ -95,19 +95,14 @@ async function processSectionContent(content: string, env: Env): Promise<BooqNod
         children.push(child)
     }
     if (env.css.length > 0) {
-        const inlineKey = `inline:${env.id}`
-        const inlinePrefix = generateSelectorPrefix(inlineKey)
-        env.styles[inlineKey] = preprocessCss(env.css, { prefix: inlinePrefix })
-        env.styleRefs.push(inlineKey)
+        const key = generateSelectorPrefix(`inline-${env.id}`)
+        env.styles[key] = preprocessCss(env.css, { prefix: key })
+        env.styleRefs.push(key)
     }
-    const className = env.styleRefs.length > 0
-        ? env.styleRefs.map(ref => generateSelectorPrefix(ref)).join(' ')
-        : undefined
     return {
         kind: 'element',
         name: 'section',
         styleRefs: env.styleRefs.length > 0 ? env.styleRefs : undefined,
-        attrs: className ? { className } : undefined,
         id: env.fileName,
         fileName: env.fileName,
         children,
@@ -189,7 +184,8 @@ async function processLink(link: XmlElement, env: Env): Promise<BooqNode> {
         return stub()
     }
     const resolved = resolveRelativePath(href, env.fileName)
-    if (!(resolved in env.styles)) {
+    const key = generateSelectorPrefix(`ref-${resolved}`)
+    if (!(key in env.styles)) {
         const content = await env.resolveTextFile(href)
         if (content === undefined) {
             env.diags.push({
@@ -198,10 +194,9 @@ async function processLink(link: XmlElement, env: Env): Promise<BooqNode> {
             })
             return stub()
         }
-        const prefix = generateSelectorPrefix(resolved)
-        env.styles[resolved] = preprocessCss(content, { prefix })
+        env.styles[key] = preprocessCss(content, { prefix: key })
     }
-    env.styleRefs.push(resolved)
+    env.styleRefs.push(key)
     return stub()
 }
 

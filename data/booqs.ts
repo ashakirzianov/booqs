@@ -3,16 +3,18 @@ import {
     BooqPath, buildFragment,
     BooqId,
     BooqMetadata,
+    BooqStyles,
     TableOfContents,
     BooqFragment,
     BooqRange,
     BooqNode,
     getExpandedRange,
     nodesForRange,
+    collectReferencedStyles,
 } from '@/core'
 import { userForId } from '@/backend/users'
 import { booqIdsInCollections } from '@/backend/collections'
-import { BooqData, booqDataForIds, booqForId, booqPreview, booqQuery, booqToc, featuredBooqIds, hydrateFragmentNodes } from '@/backend/library'
+import { BooqData, booqDataForIds, booqForId, booqPreview, booqQuery, booqToc, featuredBooqIds } from '@/backend/library'
 
 export type PartialBooqData = {
     booqId: BooqId,
@@ -118,17 +120,16 @@ export async function fetchBooqPreview(booqId: BooqId, path: BooqPath, end?: Boo
 }
 
 export async function booqPart({
-    booqId, path, bypassCache,
+    booqId, path,
 }: {
     booqId: BooqId,
     path?: BooqPath,
-    bypassCache?: boolean,
 }): Promise<PartialBooqData | undefined> {
     const [card] = await booqDataForIds([booqId])
     if (card === undefined) {
         return undefined
     }
-    const booq = await booqForId(booqId, bypassCache)
+    const booq = await booqForId(booqId)
     if (booq === undefined) {
         return undefined
     }
@@ -136,7 +137,7 @@ export async function booqPart({
 
     return {
         booqId,
-        fragment: { ...fragment, nodes: hydrateFragmentNodes(fragment.nodes, fragment.styles) },
+        fragment,
         toc: booq.toc,
         meta: booq.metadata,
     } satisfies PartialBooqData
@@ -149,7 +150,7 @@ export async function fetchBooqFragment(booqId: BooqId, path?: BooqPath) {
     }
     const fragment = buildFragment({ booq, path })
     return {
-        fragment: { ...fragment, nodes: hydrateFragmentNodes(fragment.nodes, fragment.styles) },
+        fragment,
         metadata: booq.metadata,
         toc: booq.toc,
     }
@@ -246,7 +247,9 @@ function getLanguageDisplayName(languageCode: string): string {
     return languageNames[languageCode.toLowerCase()] || languageCode
 }
 
-export async function fetchExpandedFragmentForRange(booqId: BooqId, range: BooqRange): Promise<{ nodes: BooqNode[], range: BooqRange } | undefined> {
+export type ExpandedFragment = { nodes: BooqNode[], styles: BooqStyles, range: BooqRange }
+
+export async function fetchExpandedFragmentForRange(booqId: BooqId, range: BooqRange): Promise<ExpandedFragment | undefined> {
     const booq = await booqForId(booqId)
     if (!booq) {
         return undefined
@@ -256,12 +259,13 @@ export async function fetchExpandedFragmentForRange(booqId: BooqId, range: BooqR
     const nodes = nodesForRange(booq.nodes, expandedRange)
 
     return {
-        nodes: hydrateFragmentNodes(nodes, booq.styles),
+        nodes,
+        styles: collectReferencedStyles(nodes, booq.styles),
         range: expandedRange,
     }
 }
 
-export async function getExpandedFragments(booqId: BooqId, ranges: BooqRange[]): Promise<Array<{ nodes: BooqNode[], range: BooqRange } | undefined>> {
+export async function getExpandedFragments(booqId: BooqId, ranges: BooqRange[]): Promise<Array<ExpandedFragment | undefined>> {
     const booq = await booqForId(booqId)
     if (!booq) {
         return ranges.map(() => undefined)
@@ -272,7 +276,8 @@ export async function getExpandedFragments(booqId: BooqId, ranges: BooqRange[]):
         const nodes = nodesForRange(booq.nodes, expandedRange)
 
         return {
-            nodes: hydrateFragmentNodes(nodes, booq.styles),
+            nodes,
+            styles: collectReferencedStyles(nodes, booq.styles),
             range: expandedRange,
         }
     })

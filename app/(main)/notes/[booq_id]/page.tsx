@@ -105,6 +105,7 @@ export default async function NotesPage({ params }: {
             note: sortedNotes[index],
             overlapping,
             nodes: fragment.nodes,
+            styles: fragment.styles,
             range: fragment.range,
         }
     }).filter(datum => datum !== undefined)

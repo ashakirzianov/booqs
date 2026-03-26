@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
-import { BooqNode, BooqRange } from '@/core'
+import { BooqNode, BooqStyles, BooqRange } from '@/core'
 import { CollapseIcon } from '@/components/Icons'
 import { Augmentation, BooqContent } from '@/viewer'
 import { LightButton, RemoveButton } from '@/components/Buttons'
@@ -19,11 +19,12 @@ export type ExpandedNoteFragmentData = {
     note: BooqNote,
     overlapping: BooqNote[],
     nodes?: BooqNode[],
+    styles?: BooqStyles,
     range: BooqRange,
 }
 
 export function NoteFragment({
-    note, overlapping, nodes, range,
+    note, overlapping, nodes, styles, range,
     onColorChange, onRemove,
 }: NoteFragmentProps) {
     const [isExpanded, setIsExpanded] = useState(false)
@@ -106,6 +107,7 @@ export function NoteFragment({
                 <div className="rounded shadow-sm p-3 bg-background overflow-y-auto font-book text-primary">
                     <BooqContent
                         nodes={nodes}
+                        styles={styles ?? {}}
                         range={range}
                         augmentations={noteAugmentations}
                         onAugmentationClick={handleAugmentationClick}

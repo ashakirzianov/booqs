@@ -15,7 +15,6 @@ export type BooqElementNode = {
     kind: 'element',
     name: string,
     id?: string,
-    css?: string,
     styleRefs?: string[],
     children?: BooqNode[],
     attrs?: BooqNodeAttrs,

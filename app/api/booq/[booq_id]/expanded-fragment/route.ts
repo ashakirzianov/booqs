@@ -1,4 +1,4 @@
-import { BooqId, BooqRange, BooqNode } from '@/core'
+import { BooqId, BooqRange, BooqNode, BooqStyles } from '@/core'
 import { fetchExpandedFragmentForRange } from '@/data/booqs'
 import { NextRequest } from 'next/server'
 
@@ -8,6 +8,7 @@ type Params = {
 
 export type GetResponse = {
     nodes: BooqNode[],
+    styles: BooqStyles,
     range: BooqRange,
 }
 
@@ -38,6 +39,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Pa
 
     const response: GetResponse = {
         nodes: result.nodes,
+        styles: result.styles,
         range: result.range,
     }
 

@@ -74,7 +74,7 @@ function fragmentForPath(booq: Booq, path: BooqPath): BooqFragment {
     }
 }
 
-function collectReferencedStyles(nodes: BooqNode[], allStyles: BooqStyles): BooqStyles {
+export function collectReferencedStyles(nodes: BooqNode[], allStyles: BooqStyles): BooqStyles {
     const refs = new Set<string>()
     function walk(nodes: BooqNode[]) {
         for (const node of nodes) {

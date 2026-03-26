@@ -6,7 +6,7 @@ import {
 } from '@/core'
 import { getBookmarks } from '@/backend/bookmarks'
 import { notesForBooqId } from '@/backend/notes'
-import { booqForId, hydrateFragmentNodes } from '@/backend/library'
+import { booqForId } from '@/backend/library'
 
 export type BooqParent = {
     kind?: 'booq' | undefined,
@@ -62,7 +62,7 @@ export const booqResolver: IResolvers<BooqParent> = {
         async nodes(parent) {
             const booq = await booqForId(parent.booqId)
             return booq
-                ? hydrateFragmentNodes(booq.nodes, booq.styles)
+                ? booq.nodes
                 : undefined
         },
         async fragment(parent, { path }) {
@@ -70,11 +70,7 @@ export const booqResolver: IResolvers<BooqParent> = {
             if (!booq) {
                 return undefined
             }
-            const fragment = buildFragment({ booq, path })
-            return {
-                ...fragment,
-                nodes: hydrateFragmentNodes(fragment.nodes, fragment.styles),
-            }
+            return buildFragment({ booq, path })
         },
         async tableOfContents(parent) {
             const booq = await booqForId(parent.booqId)

@@ -1,6 +1,6 @@
 import { ReactNode, createElement } from 'react'
 import {
-    BooqElementNode, BooqNode, pathToString,
+    BooqElementNode, BooqNode, BooqStyles, pathToString,
     pathInRange, samePath, pathLessThan, BooqPath, BooqRange, pathToId,
     assertNever,
     isTextNode,
@@ -18,6 +18,7 @@ export type Augmentation = {
 type RenderContext = {
     path: BooqPath,
     range: BooqRange,
+    styles: BooqStyles,
     parent?: BooqElementNode,
     withinAnchor?: boolean,
     augmentations: Augmentation[],
@@ -111,12 +112,17 @@ function renderTextNode(text: string, {
 function getProps(node: BooqElementNode, {
     path, range, hrefForPath,
 }: RenderContext) {
+    const styleRefsClass = node.styleRefs?.join(' ')
+    const baseClass = node.attrs?.className
+        ? (styleRefsClass ? `${node.attrs.className} ${styleRefsClass}` : node.attrs.className)
+        : styleRefsClass
+    const className = node.pph
+        ? (baseClass ? `booqs-pph ${baseClass}` : 'booqs-pph')
+        : baseClass
     return {
         ...node.attrs,
         id: pathToId(path),
-        className: node.pph
-            ? (node.attrs?.className ? `booq-pph ${node.attrs.className}` : 'booq-pph')
-            : node.attrs?.className,
+        className,
         key: pathToString(path),
         style: node.attrs?.style ? parseInlineStyle(node.attrs.style) : undefined,
         href: node.ref
@@ -137,17 +143,18 @@ function getChildren(node: BooqElementNode, ctx: RenderContext) {
         parent: node,
         withinAnchor: ctx.withinAnchor || node.name === 'a',
     })
-    if (node.css) {
-        const styleNode = createElement(
-            'style',
-            {
-                key: `${pathToString(ctx.path)}-style`,
-            },
-            node.css,
-        )
+    if (node.styleRefs && node.styleRefs.length > 0) {
+        const styleNodes = node.styleRefs
+            .map(ref => ctx.styles[ref])
+            .filter(Boolean)
+            .map((css, i) => createElement(
+                'style',
+                { key: `${pathToString(ctx.path)}-style-${i}` },
+                css,
+            ))
         return children
-            ? [styleNode, ...children]
-            : styleNode
+            ? [...styleNodes, ...children]
+            : styleNodes.length > 0 ? styleNodes : null
     }
     return (children?.length ?? 0) > 0
         ? children

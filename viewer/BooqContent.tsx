@@ -1,13 +1,14 @@
 import { useMemo } from 'react'
 import { Augmentation, renderNodes } from './render'
-import { BooqNode, BooqPath, BooqRange } from '@/core'
+import { BooqNode, BooqStyles, BooqPath, BooqRange } from '@/core'
 
 export const BooqContentID = 'booq-root'
 export default function BooqContent({
-    nodes, range, augmentations,
+    nodes, styles, range, augmentations,
     onAugmentationClick, hrefForPath,
 }: {
     nodes: BooqNode[],
+    styles: BooqStyles,
     range: BooqRange,
     augmentations: Augmentation[],
     onAugmentationClick?: (id: string) => void,
@@ -18,10 +19,10 @@ export default function BooqContent({
             {
                 renderNodes(nodes, {
                     path: [],
-                    range, augmentations, onAugmentationClick,
+                    styles, range, augmentations, onAugmentationClick,
                     hrefForPath,
                 })
             }
         </div>
-    }, [nodes, range, augmentations, onAugmentationClick, hrefForPath])
+    }, [nodes, styles, range, augmentations, onAugmentationClick, hrefForPath])
 }
