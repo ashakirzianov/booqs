@@ -6,22 +6,23 @@ export function isTextNode(node: BooqNode | undefined): node is BooqTextNode {
 }
 
 export function isStubNode(node: BooqNode | undefined): node is BooqStubNode {
-    return node === null || node?.kind === 'stub'
+    return node === null || node?.stub !== undefined
 }
 
 export function isSectionNode(node: BooqNode | undefined): node is BooqSectionNode {
-    return node?.kind === 'section'
+    return node?.section !== undefined
 }
 
 export function isElementNode(node: BooqNode | undefined): node is BooqElementNode {
-    return node?.kind === 'element'
+    return node?.name !== undefined
 }
 
-function nodeChildren(node: BooqNode): BooqNode[] | undefined {
-    if (node?.kind === 'element' || node?.kind === 'section') {
-        return node.children
-    }
-    return undefined
+export function isContainerNode(node: BooqNode | undefined): node is BooqElementNode | BooqSectionNode {
+    return node?.children !== undefined
+}
+
+export function nodeChildren(node: BooqNode): BooqNode[] | undefined {
+    return node?.children
 }
 
 export function nodeForPath(nodes: BooqNode[], path: BooqPath): BooqNode | undefined {
@@ -86,10 +87,8 @@ export function nodesForRange(nodes: BooqNode[], range: BooqRange, emptyStubs?: 
 export function findPathForId(nodes: BooqNode[], targetId: string): BooqPath | undefined {
     for (let idx = 0; idx < nodes.length; idx++) {
         const node = nodes[idx]
-        if (node?.kind === 'element') {
-            if (node.id === targetId) {
-                return [idx]
-            }
+        if (isElementNode(node) && node.id === targetId) {
+            return [idx]
         }
         const children = nodeChildren(node)
         if (children) {
@@ -104,7 +103,7 @@ export function findPathForId(nodes: BooqNode[], targetId: string): BooqPath | u
 
 export function stubNode(length: number): BooqNode {
     return length > 0
-        ? { kind: 'stub', length }
+        ? { stub: length }
         : null
 }
 

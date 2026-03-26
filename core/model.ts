@@ -12,26 +12,33 @@ export type BooqNodeAttrs = {
     [name in string]?: string;
 }
 export type BooqSectionNode = {
-    kind: 'section',
     section: string,
     styleRefs?: string[],
     children: BooqNode[],
+    name?: undefined,
+    stub?: undefined,
 }
 export type BooqElementNode = {
-    kind: 'element',
     name: string,
     id?: string,
-    children?: BooqNode[],
+    children: BooqNode[],
     attrs?: BooqNodeAttrs,
     ref?: BooqPath,
     pph?: boolean,
+    section?: undefined,
+    stub?: undefined,
 }
 export type BooqTextNode = string & {
-    kind?: undefined,
+    children?: undefined,
+    section?: undefined,
+    name?: undefined,
+    stub?: undefined,
 }
 export type BooqStubNode = {
-    kind: 'stub',
-    length?: number,
+    stub: number,
+    children?: undefined,
+    section?: undefined,
+    name?: undefined,
 } | null
 export type BooqNode = BooqSectionNode | BooqElementNode | BooqTextNode | BooqStubNode
 

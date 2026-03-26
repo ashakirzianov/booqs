@@ -1,5 +1,5 @@
 import { BooqElementNode, BooqSectionNode, BooqNode, BooqPath, BooqTextNode } from './model'
-import { isTextNode } from './node'
+import { isContainerNode, isTextNode, nodeChildren } from './node'
 import { pathLessThan } from './path'
 
 type BooqContainerNode = BooqElementNode | BooqSectionNode
@@ -17,7 +17,7 @@ export type BooqTextIterator = {
 }
 
 export function isContainerIterator(iter: BooqIterator): iter is BooqContainerIterator {
-    return iter.node?.kind === 'element' || iter.node?.kind === 'section'
+    return isContainerNode(iter.node)
 }
 
 export function isTextIterator(iter: BooqIterator): iter is BooqTextIterator {
@@ -53,14 +53,13 @@ export function iteratorAtPath(nodes: BooqNode[], path: BooqPath): BooqIterator 
                 index: tail[0],
                 parent: current,
             }
-        } else if ((node?.kind === 'element' || node?.kind === 'section') && node.children) {
+        } else if (isContainerNode(node)) {
             return iteratorAtPathImpl(node, tail, current)
         } else {
             return undefined
         }
     }
     return iteratorAtPathImpl({
-        kind: 'element',
         name: 'root',
         children: nodes,
     }, path, undefined)
@@ -75,14 +74,12 @@ export function iteratorsPath(iter: BooqIterator): BooqPath {
 }
 
 export function iteratorsNode(iter: BooqIterator): BooqNode | undefined {
-    return (iter.node?.kind === 'element' || iter.node?.kind === 'section')
-        ? iter.node.children?.[iter.index]
-        : undefined
+    return nodeChildren(iter.node)?.[iter.index]
 }
 
 export function firstLeafNode(iter: BooqContainerIterator): BooqContainerIterator {
     const node = iter.node.children?.[iter.index]
-    if ((node?.kind === 'element' || node?.kind === 'section') && node.children?.length) {
+    if (node?.children?.length) {
         return firstLeafNode({
             parent: iter,
             index: 0,
@@ -95,7 +92,7 @@ export function firstLeafNode(iter: BooqContainerIterator): BooqContainerIterato
 
 export function lastLeafNode(iter: BooqContainerIterator): BooqContainerIterator {
     const node = iter.node.children?.[iter.index]
-    if ((node?.kind === 'element' || node?.kind === 'section') && node.children?.length) {
+    if (node?.children?.length) {
         return lastLeafNode({
             parent: iter,
             index: node.children.length - 1,
@@ -123,9 +120,7 @@ export function prevLeafNode(iter: BooqIterator): BooqContainerIterator | undefi
 export function nextSibling(iter: BooqIterator) {
     const length = isTextNode(iter.node)
         ? iter.node.length
-        : (iter.node?.kind === 'element' || iter.node?.kind === 'section')
-            ? iter.node.children?.length ?? 0
-            : 0
+        : nodeChildren(iter.node)?.length ?? 0
 
     return iter.index < length - 1
         ? { ...iter, index: iter.index + 1 }

@@ -12,7 +12,7 @@ import {
     iteratorsNode,
 } from './iterator'
 import { assertNever } from './misc'
-import { isElementNode, isSectionNode, isStubNode, isTextNode, nodeForPath } from './node'
+import { isContainerNode, isElementNode, isSectionNode, isStubNode, isTextNode, nodeForPath } from './node'
 
 export function nodeText(node: BooqNode): string {
     if (isSectionNode(node) || isElementNode(node)) {
@@ -109,7 +109,7 @@ export function textForRange(nodes: BooqNode[], { start, end }: BooqRange): stri
 
     let result = ''
     const startNode = nodes[startHead]
-    if (startNode?.kind === 'element') {
+    if (isContainerNode(startNode)) {
         if (startTail.length === 0) {
             // No sub-path specified, include all content from this element
             result += nodeText(startNode)
@@ -145,7 +145,7 @@ export function textForRange(nodes: BooqNode[], { start, end }: BooqRange): stri
     }
     const endNode = nodes[endHead]
     if (startHead !== endHead && endNode) {
-        if (endNode.kind === 'element') {
+        if (isContainerNode(endNode)) {
             const endText = textForRange(endNode.children ?? [], {
                 start: [0],
                 end: endTail,
@@ -176,7 +176,7 @@ export function getExpandedRange(nodes: BooqNode[], range: BooqRange): BooqRange
 function getExpandedStartPath(nodes: BooqNode[], startPath: BooqPath): BooqPath {
     // Check if the start element itself has pph=true
     const startNode = nodeForPath(nodes, startPath)
-    if (startNode?.kind === 'element' && startNode.pph === true) {
+    if (isElementNode(startNode) && startNode.pph === true) {
         return startPath
     }
 
@@ -184,7 +184,7 @@ function getExpandedStartPath(nodes: BooqNode[], startPath: BooqPath): BooqPath 
     for (let depth = startPath.length - 1; depth > 0; depth--) {
         const parentPath = startPath.slice(0, depth)
         const parentNode = nodeForPath(nodes, parentPath)
-        if (parentNode?.kind === 'element' && parentNode.pph === true) {
+        if (isElementNode(parentNode) && parentNode.pph === true) {
             return parentPath
         }
     }
@@ -201,7 +201,7 @@ function getExpandedEndPath(nodes: BooqNode[], endPath: BooqPath, expandedStart:
 
     // Check if the end element itself has pph=true
     const endNode = nodeForPath(nodes, endPath)
-    if (endNode?.kind === 'element' && endNode.pph === true) {
+    if (isElementNode(endNode) && endNode.pph === true) {
         // Return next sibling of the end element
         const nextSiblingPath = [...endPath]
         nextSiblingPath[nextSiblingPath.length - 1] += 1
@@ -213,7 +213,7 @@ function getExpandedEndPath(nodes: BooqNode[], endPath: BooqPath, expandedStart:
     for (let depth = endPath.length - 1; depth > 0; depth--) {
         const parentPath = endPath.slice(0, depth)
         const parentNode = nodeForPath(nodes, parentPath)
-        if (parentNode?.kind === 'element' && parentNode.pph === true) {
+        if (isElementNode(parentNode) && parentNode.pph === true) {
             parentWithPph = parentPath
             break
         }

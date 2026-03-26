@@ -1,4 +1,4 @@
-import { BooqNode, BooqElementNode, textNode } from '../core'
+import { BooqNode, BooqElementNode, textNode, isElementNode } from '../core'
 import {
     xmlStringParser, XmlElement, xml2string, childrenOf, nameOf, attributesOf, textOf, asObject, XmlAttributes,
     findByName,
@@ -54,7 +54,6 @@ async function processSectionContent(content: string, env: Env): Promise<BooqNod
             data: { xml: xml2string(document) },
         })
         return {
-            kind: 'section',
             section: env.fileName,
             children: [],
         }
@@ -72,7 +71,7 @@ async function processSectionContent(content: string, env: Env): Promise<BooqNod
                 break
             case 'body':
                 child = await processXml(element, env)
-                if (child?.kind === 'element') {
+                if (isElementNode(child)) {
                     child.name = 'div'
                 }
                 else {
@@ -99,7 +98,6 @@ async function processSectionContent(content: string, env: Env): Promise<BooqNod
         env.styleRefs.push(key)
     }
     return {
-        kind: 'section',
         section: env.fileName,
         styleRefs: env.styleRefs.length > 0 ? env.styleRefs : undefined,
         children,
@@ -135,7 +133,6 @@ async function processHead(head: XmlElement, env: Env): Promise<BooqNode> {
         children.push(child)
     }
     return {
-        kind: 'element',
         name: 'div',
         children,
     }
@@ -246,13 +243,12 @@ async function processRegularXml(element: XmlElement, env: Env): Promise<BooqNod
     }
     const { id, ...rest } = attributes ?? {}
     const result: BooqElementNode = {
-        kind: 'element',
         name,
         id: processId(id, env),
         attrs: processAttributes(rest, env),
         children: children?.length
             ? await processXmls(children, env)
-            : undefined,
+            : [],
     }
     return result
 }
