@@ -1,11 +1,8 @@
 import { ReactNode, createElement } from 'react'
 import {
-    BooqElementNode, BooqNode, BooqStyles, pathToString,
+    BooqElementNode, BooqSectionNode, BooqNode, BooqStyles, pathToString,
     pathInRange, samePath, pathLessThan, BooqPath, BooqRange, pathToId,
-    assertNever,
-    isTextNode,
-    isStubNode,
-    isElementNode,
+    assertNever, isTextNode, isStubNode, isElementNode, isSectionNode,
 } from '@/core'
 
 export type Augmentation = {
@@ -46,6 +43,8 @@ function renderNode(node: BooqNode, ctx: RenderContext): ReactNode {
         }
     } else if (isStubNode(node)) {
         return null
+    } else if (isSectionNode(node)) {
+        return renderSectionNode(node, ctx)
     } else if (isElementNode(node)) {
         return createElement(
             node.name === 'a' && ctx.withinAnchor
@@ -58,6 +57,31 @@ function renderNode(node: BooqNode, ctx: RenderContext): ReactNode {
         assertNever(node)
         return null
     }
+}
+
+function renderSectionNode(node: BooqSectionNode, ctx: RenderContext): ReactNode {
+    const children = node.children ? renderNodes(node.children, {
+        ...ctx,
+        parent: undefined,
+    }) : null
+    const styleNodes = (node.styleRefs ?? [])
+        .map((ref: string) => ctx.styles[ref])
+        .filter(Boolean)
+        .map((css: string, i: number) => createElement(
+            'style',
+            { key: `${pathToString(ctx.path)}-style-${i}` },
+            css,
+        ))
+    const className = node.styleRefs?.join(' ')
+    return createElement(
+        'section',
+        {
+            key: pathToString(ctx.path),
+            id: pathToId(ctx.path),
+            className,
+        },
+        [...styleNodes, ...(children ?? [])],
+    )
 }
 
 function renderTextNode(text: string, {
@@ -112,13 +136,9 @@ function renderTextNode(text: string, {
 function getProps(node: BooqElementNode, {
     path, range, hrefForPath,
 }: RenderContext) {
-    const styleRefsClass = node.styleRefs?.join(' ')
-    const baseClass = node.attrs?.className
-        ? (styleRefsClass ? `${node.attrs.className} ${styleRefsClass}` : node.attrs.className)
-        : styleRefsClass
     const className = node.pph
-        ? (baseClass ? `booqs-pph ${baseClass}` : 'booqs-pph')
-        : baseClass
+        ? (node.attrs?.className ? `booqs-pph ${node.attrs.className}` : 'booqs-pph')
+        : node.attrs?.className
     return {
         ...node.attrs,
         id: pathToId(path),
@@ -143,19 +163,6 @@ function getChildren(node: BooqElementNode, ctx: RenderContext) {
         parent: node,
         withinAnchor: ctx.withinAnchor || node.name === 'a',
     })
-    if (node.styleRefs && node.styleRefs.length > 0) {
-        const styleNodes = node.styleRefs
-            .map(ref => ctx.styles[ref])
-            .filter(Boolean)
-            .map((css, i) => createElement(
-                'style',
-                { key: `${pathToString(ctx.path)}-style-${i}` },
-                css,
-            ))
-        return children
-            ? [...styleNodes, ...children]
-            : styleNodes.length > 0 ? styleNodes : null
-    }
     return (children?.length ?? 0) > 0
         ? children
         : null

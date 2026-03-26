@@ -1,4 +1,4 @@
-import { Booq, BooqId, BooqNode, isElementNode } from '@/core'
+import { Booq, BooqId, BooqNode, isElementNode, isSectionNode } from '@/core'
 import { parseEpub } from '@/parser'
 import { Epub, openEpubFile } from '@/parser/epub'
 import { Diagnoser } from 'booqs-epub'
@@ -110,16 +110,16 @@ function normalizeImageSrc(src: string): string {
 function normalizeImageSrcsInBooq(booq: Booq): void {
     function normalizeNodes(nodes: BooqNode[]) {
         for (const node of nodes) {
-            if (node?.kind === 'element') {
+            if (isElementNode(node)) {
                 if (node.attrs?.src) {
                     node.attrs.src = normalizeImageSrc(node.attrs.src)
                 }
                 if (node.attrs?.xlinkHref) {
                     node.attrs.xlinkHref = normalizeImageSrc(node.attrs.xlinkHref)
                 }
-                if (node.children) {
-                    normalizeNodes(node.children)
-                }
+            }
+            if (isElementNode(node) || isSectionNode(node)) {
+                normalizeNodes(node.children ?? [])
             }
         }
     }
@@ -133,16 +133,16 @@ function collectUniqueSrcsFromBooq(booq: Booq): string[] {
     const srcs = new Set<string>()
     function collectSrcsFromNodes(nodes: BooqNode[]) {
         for (const node of nodes) {
-            if (node?.kind === 'element') {
+            if (isElementNode(node)) {
                 if (node.attrs?.src) {
                     srcs.add(node.attrs.src)
                 }
                 if (node.attrs?.xlinkHref) {
                     srcs.add(node.attrs.xlinkHref)
                 }
-                if (node.children) {
-                    collectSrcsFromNodes(node.children)
-                }
+            }
+            if (isElementNode(node) || isSectionNode(node)) {
+                collectSrcsFromNodes(node.children ?? [])
             }
         }
     }
@@ -170,7 +170,12 @@ function preprocessNodes(nodes: BooqNode[], env: PreprocessEnv): BooqNode[] {
 }
 
 function preprocessNode(node: BooqNode, env: PreprocessEnv): BooqNode {
-    if (isElementNode(node)) {
+    if (isSectionNode(node)) {
+        return {
+            ...node,
+            children: preprocessNodes(node.children, env),
+        }
+    } else if (isElementNode(node)) {
         const result = {
             ...node,
             children: node.children ? node.children.map(child => preprocessNode(child, env)) : [],

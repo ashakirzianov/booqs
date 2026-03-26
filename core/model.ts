@@ -11,14 +11,18 @@ export type BooqRange = {
 export type BooqNodeAttrs = {
     [name in string]?: string;
 }
+export type BooqSectionNode = {
+    kind: 'section',
+    section: string,
+    styleRefs?: string[],
+    children: BooqNode[],
+}
 export type BooqElementNode = {
     kind: 'element',
     name: string,
     id?: string,
-    styleRefs?: string[],
     children?: BooqNode[],
     attrs?: BooqNodeAttrs,
-    fileName?: string,
     ref?: BooqPath,
     pph?: boolean,
 }
@@ -29,7 +33,7 @@ export type BooqStubNode = {
     kind: 'stub',
     length?: number,
 } | null
-export type BooqNode = BooqElementNode | BooqTextNode | BooqStubNode
+export type BooqNode = BooqSectionNode | BooqElementNode | BooqTextNode | BooqStubNode
 
 export type TableOfContentsItem = {
     title: string | undefined,

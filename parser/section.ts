@@ -54,10 +54,9 @@ async function processSectionContent(content: string, env: Env): Promise<BooqNod
             data: { xml: xml2string(document) },
         })
         return {
-            kind: 'element',
-            name: 'section',
-            id: env.fileName,
-            fileName: env.fileName,
+            kind: 'section',
+            section: env.fileName,
+            children: [],
         }
     }
     const elements = childrenOf(html)
@@ -100,11 +99,9 @@ async function processSectionContent(content: string, env: Env): Promise<BooqNod
         env.styleRefs.push(key)
     }
     return {
-        kind: 'element',
-        name: 'section',
+        kind: 'section',
+        section: env.fileName,
         styleRefs: env.styleRefs.length > 0 ? env.styleRefs : undefined,
-        id: env.fileName,
-        fileName: env.fileName,
         children,
     }
 }

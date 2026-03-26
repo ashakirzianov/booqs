@@ -6,16 +6,16 @@ import {
     prevLeafNode,
     textBefore,
     textStartingAt,
-    BooqNodeIterator,
-    isNodeIterator,
+    BooqContainerIterator,
+    isContainerIterator,
     isTextIterator,
     iteratorsNode,
 } from './iterator'
 import { assertNever } from './misc'
-import { isElementNode, isStubNode, isTextNode, nodeForPath } from './node'
+import { isElementNode, isSectionNode, isStubNode, isTextNode, nodeForPath } from './node'
 
 export function nodeText(node: BooqNode): string {
-    if (isElementNode(node)) {
+    if (isSectionNode(node) || isElementNode(node)) {
         return node.children?.map(nodeText).join('') ?? ''
     } else if (isTextNode(node)) {
         return node
@@ -37,7 +37,7 @@ export function previewForPath(nodes: BooqNode[], path: BooqPath, length: number
     if (!found) {
         return undefined
     }
-    let iter: BooqNodeIterator | undefined = isNodeIterator(found)
+    let iter: BooqContainerIterator | undefined = isContainerIterator(found)
         ? firstLeafNode(found)
         : found.parent
     let preview = ''
@@ -63,7 +63,7 @@ export function getQuoteAndContext(nodes: BooqNode[], range: BooqRange, length: 
     // Get context before the range
     const startIter = iteratorAtPath(nodes, range.start)
     let contextBefore = ''
-    let iter: BooqNodeIterator | undefined = undefined
+    let iter: BooqContainerIterator | undefined = undefined
     if (startIter && isTextIterator(startIter)) {
         contextBefore = textBefore(startIter) + contextBefore
         iter = startIter.parent

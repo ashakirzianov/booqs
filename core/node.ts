@@ -1,4 +1,4 @@
-import { BooqNode, BooqRange, BooqPath, BooqTextNode, BooqElementNode, BooqStubNode } from './model'
+import { BooqNode, BooqRange, BooqPath, BooqTextNode, BooqElementNode, BooqSectionNode, BooqStubNode } from './model'
 import { nodeLength } from './position'
 
 export function isTextNode(node: BooqNode | undefined): node is BooqTextNode {
@@ -9,8 +9,19 @@ export function isStubNode(node: BooqNode | undefined): node is BooqStubNode {
     return node === null || node?.kind === 'stub'
 }
 
+export function isSectionNode(node: BooqNode | undefined): node is BooqSectionNode {
+    return node?.kind === 'section'
+}
+
 export function isElementNode(node: BooqNode | undefined): node is BooqElementNode {
     return node?.kind === 'element'
+}
+
+function nodeChildren(node: BooqNode): BooqNode[] | undefined {
+    if (node?.kind === 'element' || node?.kind === 'section') {
+        return node.children
+    }
+    return undefined
 }
 
 export function nodeForPath(nodes: BooqNode[], path: BooqPath): BooqNode | undefined {
@@ -21,11 +32,9 @@ export function nodeForPath(nodes: BooqNode[], path: BooqPath): BooqNode | undef
     const node = nodes[head]
     if (tail.length === 0) {
         return node
-    } else if (node?.kind === 'element') {
-        return nodeForPath(node.children ?? [], tail)
-    } else {
-        return undefined
     }
+    const children = nodeChildren(node)
+    return children ? nodeForPath(children, tail) : undefined
 }
 
 export function nodesForRange(nodes: BooqNode[], range: BooqRange, emptyStubs?: boolean): BooqNode[] {
@@ -36,17 +45,18 @@ export function nodesForRange(nodes: BooqNode[], range: BooqRange, emptyStubs?: 
     const result: BooqNode[] = []
     for (let idx = 0; idx < nodes.length; idx++) {
         const node = nodes[idx]
+        const children = nodeChildren(node)
         if (idx < actualStart) {
             result.push(stubNode(emptyStubs ? 0 : nodeLength(node)))
         } else if (idx === actualStart) {
-            if (node?.kind === 'element' && node.children) {
+            if (children) {
                 result.push({
-                    ...node,
-                    children: nodesForRange(node.children, {
+                    ...node as (BooqElementNode | BooqSectionNode),
+                    children: nodesForRange(children, {
                         start: startTail,
                         end: actualEnd === idx && endTail.length > 0
                             ? endTail
-                            : [node.children.length],
+                            : [children.length],
                     }),
                 })
             } else {
@@ -55,10 +65,10 @@ export function nodesForRange(nodes: BooqNode[], range: BooqRange, emptyStubs?: 
         } else if (idx < actualEnd) {
             result.push(node)
         } else if (idx === actualEnd && endTail.length) {
-            if (node?.kind === 'element' && node.children) {
+            if (children) {
                 result.push({
-                    ...node,
-                    children: nodesForRange(node.children, {
+                    ...node as (BooqElementNode | BooqSectionNode),
+                    children: nodesForRange(children, {
                         start: [0],
                         end: endTail,
                     }),
@@ -77,14 +87,15 @@ export function findPathForId(nodes: BooqNode[], targetId: string): BooqPath | u
     for (let idx = 0; idx < nodes.length; idx++) {
         const node = nodes[idx]
         if (node?.kind === 'element') {
-            const { id, children } = node
-            if (id === targetId) {
+            if (node.id === targetId) {
                 return [idx]
-            } else if (children) {
-                const path = findPathForId(children, targetId)
-                if (path) {
-                    return [idx, ...path]
-                }
+            }
+        }
+        const children = nodeChildren(node)
+        if (children) {
+            const path = findPathForId(children, targetId)
+            if (path) {
+                return [idx, ...path]
             }
         }
     }
