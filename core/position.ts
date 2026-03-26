@@ -1,10 +1,10 @@
 import { BooqNode, BooqPath } from './model'
 import { assertNever } from './misc'
-import { isElementNode, isSectionNode, isTextNode, isStubNode, nodeChildren } from './node'
+import { isTextNode, isStubNode, nodeChildren, isContainerNode } from './node'
 
 export function nodeLength(node: BooqNode): number {
-    if (isSectionNode(node) || isElementNode(node)) {
-        return nodesLength(node.children ?? [])
+    if (isContainerNode(node)) {
+        return nodesLength(node.children)
     } else if (isTextNode(node)) {
         return node.length
     } else if (isStubNode(node)) {

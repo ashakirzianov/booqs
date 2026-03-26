@@ -25,6 +25,30 @@ export function nodeChildren(node: BooqNode): BooqNode[] | undefined {
     return node?.children
 }
 
+export function visitNodes(nodes: BooqNode[], visitor: (node: BooqNode) => void): void {
+    for (const node of nodes) {
+        visitor(node)
+        const children = nodeChildren(node)
+        if (children) {
+            visitNodes(children, visitor)
+        }
+    }
+}
+
+export function mapNodes(nodes: BooqNode[], transform: (node: BooqNode) => BooqNode): BooqNode[] {
+    return nodes.map(node => {
+        const mapped = transform(node)
+        if (mapped?.children) {
+            const mappedChildren = mapNodes(mapped.children, transform)
+            return {
+                ...mapped,
+                children: mappedChildren,
+            }
+        }
+        return mapped
+    })
+}
+
 export function nodeForPath(nodes: BooqNode[], path: BooqPath): BooqNode | undefined {
     const [head, ...tail] = path
     if (head === undefined || head >= nodes.length || head < 0) {

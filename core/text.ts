@@ -12,10 +12,10 @@ import {
     iteratorsNode,
 } from './iterator'
 import { assertNever } from './misc'
-import { isContainerNode, isElementNode, isSectionNode, isStubNode, isTextNode, nodeForPath } from './node'
+import { isContainerNode, isElementNode, isStubNode, isTextNode, nodeForPath } from './node'
 
 export function nodeText(node: BooqNode): string {
-    if (isSectionNode(node) || isElementNode(node)) {
+    if (isContainerNode(node)) {
         return node.children?.map(nodeText).join('') ?? ''
     } else if (isTextNode(node)) {
         return node

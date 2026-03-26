@@ -1,5 +1,5 @@
 import {
-    BooqNode, BooqStyles, Booq, BooqPath, nodesForRange, pathLessThan, isSectionNode,
+    BooqNode, BooqStyles, Booq, BooqPath, nodesForRange, pathLessThan, isSectionNode, visitNodes,
 } from '@/core'
 
 export type BooqFragment = {
@@ -76,21 +76,13 @@ function fragmentForPath(booq: Booq, path: BooqPath): BooqFragment {
 
 export function collectReferencedStyles(nodes: BooqNode[], allStyles: BooqStyles): BooqStyles {
     const refs = new Set<string>()
-    function walk(nodes: BooqNode[]) {
-        for (const node of nodes) {
-            if (isSectionNode(node)) {
-                if (node.styleRefs) {
-                    for (const ref of node.styleRefs) {
-                        refs.add(ref)
-                    }
-                }
-                if (node.children) {
-                    walk(node.children)
-                }
+    visitNodes(nodes, node => {
+        if (isSectionNode(node) && node.styleRefs) {
+            for (const ref of node.styleRefs) {
+                refs.add(ref)
             }
         }
-    }
-    walk(nodes)
+    })
     const styles: BooqStyles = {}
     for (const ref of refs) {
         if (allStyles[ref] !== undefined) {
