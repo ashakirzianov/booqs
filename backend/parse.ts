@@ -49,7 +49,7 @@ export async function parseAndLoadImagesFromFile(file: BooqFile) {
     return loadImages(booq, epub)
 }
 
-async function loadImageDimensions(booq: Booq, epub: Epub): Promise<BooqImageDimensions> {
+export async function loadImageDimensions(booq: Booq, epub: Epub): Promise<BooqImageDimensions> {
     const images = await loadImages(booq, epub)
     const entries = Object.entries(images.images)
     const results = await Promise.all(
