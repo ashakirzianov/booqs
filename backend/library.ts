@@ -57,6 +57,7 @@ const libraries: {
 }
 
 const CACHE_BUCKET = 'booqs-cache'
+const CACHE_PATH = 'booqs'
 
 export async function booqForId(booqId: BooqId): Promise<Booq | undefined> {
     const [library] = parseId(booqId)
@@ -81,7 +82,7 @@ export async function booqForId(booqId: BooqId): Promise<Booq | undefined> {
 }
 
 async function getCachedBooq(booqId: BooqId): Promise<Booq | undefined> {
-    const buffer = await downloadAsset(CACHE_BUCKET, `booqs/${booqId}.json`)
+    const buffer = await downloadAsset(CACHE_BUCKET, `${CACHE_PATH}/${booqId}.json`)
     if (!buffer) {
         return undefined
     }
@@ -94,7 +95,7 @@ async function getCachedBooq(booqId: BooqId): Promise<Booq | undefined> {
 
 async function cacheBooq(booqId: BooqId, booq: Booq): Promise<void> {
     const json = JSON.stringify(booq)
-    await uploadAsset(CACHE_BUCKET, `booqs/${booqId}.json`, Buffer.from(json, 'utf-8'))
+    await uploadAsset(CACHE_BUCKET, `${CACHE_PATH}/${booqId}.json`, Buffer.from(json, 'utf-8'))
 }
 
 export type BooqPreview = {
