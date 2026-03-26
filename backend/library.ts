@@ -59,16 +59,20 @@ const libraries: {
 const CACHE_BUCKET = 'booqs-cache'
 
 export async function booqForId(booqId: BooqId): Promise<Booq | undefined> {
-    const cached = await getCachedBooq(booqId)
-    if (cached) {
-        return cached
+    const [library] = parseId(booqId)
+    const useCache = library !== 'lo'
+    if (useCache) {
+        const cached = await getCachedBooq(booqId)
+        if (cached) {
+            return cached
+        }
     }
     const file = await booqFileForId(booqId)
     if (!file) {
         return undefined
     }
     const booq = await parseAndPreprocessBooq(booqId, file)
-    if (booq) {
+    if (booq && useCache) {
         cacheBooq(booqId, booq).catch(e =>
             console.warn(`Failed to cache booq ${booqId}:`, e instanceof Error ? e.message : e)
         )
