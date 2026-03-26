@@ -36,7 +36,7 @@ function getCurrentPath() {
 function getCurrent(element: Element): Element | undefined {
     if (!isPartiallyVisible(element)) {
         return undefined
-    } else if (element.className?.includes('booqs-pph')) {
+    } else if (element.className?.includes?.('booqs-pph')) {
         return element
     }
     const children = element.children
