@@ -94,19 +94,20 @@ async function processSectionContent(content: string, env: Env): Promise<BooqNod
         }
         children.push(child)
     }
-    const prefix = generateSelectorPrefix(env.id)
     if (env.css.length > 0) {
         const inlineKey = `inline:${env.id}`
-        env.styles[inlineKey] = env.css
+        const inlinePrefix = generateSelectorPrefix(inlineKey)
+        env.styles[inlineKey] = preprocessCss(env.css, { prefix: inlinePrefix })
         env.styleRefs.push(inlineKey)
     }
+    const className = env.styleRefs.length > 0
+        ? env.styleRefs.map(ref => generateSelectorPrefix(ref)).join(' ')
+        : undefined
     return {
         kind: 'element',
         name: 'section',
         styleRefs: env.styleRefs.length > 0 ? env.styleRefs : undefined,
-        attrs: {
-            className: prefix,
-        },
+        attrs: className ? { className } : undefined,
         id: env.fileName,
         fileName: env.fileName,
         children,
@@ -197,7 +198,8 @@ async function processLink(link: XmlElement, env: Env): Promise<BooqNode> {
             })
             return stub()
         }
-        env.styles[resolved] = content
+        const prefix = generateSelectorPrefix(resolved)
+        env.styles[resolved] = preprocessCss(content, { prefix })
     }
     env.styleRefs.push(resolved)
     return stub()

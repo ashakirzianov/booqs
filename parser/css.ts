@@ -277,14 +277,10 @@ function hydrateNode(node: BooqNode, styles: BooqStyles): BooqNode {
         ? node.children.map(child => hydrateNode(child, styles))
         : undefined
     if (node.styleRefs && node.styleRefs.length > 0) {
-        const prefix = node.attrs?.className ?? ''
-        const rawCss = node.styleRefs
+        const css = node.styleRefs
             .map(ref => styles[ref])
             .filter(Boolean)
-            .join('\n')
-        const css = rawCss.length > 0
-            ? preprocessCss(rawCss, { prefix })
-            : undefined
+            .join('\n') || undefined
         return { ...node, css, styleRefs: undefined, children }
     }
     return children !== node.children
