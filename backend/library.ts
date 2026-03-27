@@ -136,7 +136,7 @@ export async function booqPreview(booqId: BooqId, path: BooqPath, end?: BooqPath
     return preview
 }
 
-export async function booqDataForIds(ids: BooqId[]): Promise<Array<BooqData | undefined>> {
+export async function booqDataForIds(ids: readonly BooqId[]): Promise<Array<BooqData | undefined>> {
     const parsed = ids
         .map(idString => {
             const [library, id] = parseId(idString)

@@ -38,7 +38,7 @@ export async function userForUsername(username: string): Promise<DbUser | null> 
     return user ? (user as DbUser) : null
 }
 
-export async function usersForIds(ids: string[]): Promise<DbUser[]> {
+export async function usersForIds(ids: readonly string[]): Promise<DbUser[]> {
     if (ids.length === 0) {
         return []
     }

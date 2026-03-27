@@ -18,13 +18,13 @@ export function createLoaders(): GraphQLLoaders {
 
     const booqDataLoader = new DataLoader<BooqId, BooqData | undefined>(
         async (ids) => {
-            return booqDataForIds([...ids])
+            return booqDataForIds(ids)
         },
     )
 
     const userLoader = new DataLoader<string, DbUser | null>(
         async (ids) => {
-            const users = await usersForIds([...ids])
+            const users = await usersForIds(ids)
             const userMap = new Map(users.map(u => [u.id, u]))
             return ids.map(id => userMap.get(id) ?? null)
         },
