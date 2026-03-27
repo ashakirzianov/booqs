@@ -51,11 +51,14 @@ export const queryResolver: IResolvers<unknown, ResolverContext> = {
             const user = await userForUsername(username)
             return user ?? undefined
         },
-        async history(_, __, { userId }): Promise<BooqHistoryParent[]> {
+        async history(_, { limit, offset }: { limit?: number, offset?: number }, { userId }): Promise<BooqHistoryParent[]> {
             const result = userId
                 ? await booqHistoryForUser(userId)
                 : []
-            return result
+            const start = offset ?? 0
+            return limit !== undefined
+                ? result.slice(start, start + limit)
+                : result.slice(start)
         },
         async collection(_, { name }, { userId }): Promise<CollectionParent | null> {
             if (!userId) {

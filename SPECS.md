@@ -745,7 +745,7 @@ Schema-defined API at `/api/graphql` using graphql-yoga. Supports authentication
 - `search(query, limit)` — Full-text search returning books and authors
 - `libraryBrowse(library, kind, query, limit, offset)` — Browse books by author, subject, or language within a library (kind is an enum: `search`, `author`, `subject`, `language`)
 - `myNotes(booqId, limit, offset)` — Current user's notes, optionally filtered by book
-- `history` — Current user's reading history
+- `history(limit, offset)` — Current user's reading history with pagination
 - `collection(name)` — Named collection (e.g., `reading_list`) for current user
 - `featured(limit)` — Featured books
 - `copilot(context)` — AI assistant scoped to a text range, with sub-field `answer(question)` and `suggestions`

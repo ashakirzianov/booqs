@@ -298,7 +298,7 @@ type User {
 - Server actions support `limit`/`offset` for paginated history
 
 ### Schema changes
-- [ ] Add pagination parameters to `history` query:
+- [x] Add pagination parameters to `history` query:
   ```graphql
   history(limit: Int, offset: Int): [BooqHistory]
   ```

@@ -5,7 +5,7 @@ type Query {
     booq(id: ID!): Booq
     author(name: String!): Author
     search(query: String!, limit: Int): [SearchResult!]
-    history: [BooqHistory]
+    history(limit: Int, offset: Int): [BooqHistory]
     collection(name: String!): Collection
     featured(limit: Int!): [Booq]
     myNotes(booqId: ID, limit: Int, offset: Int): [Note!]!
