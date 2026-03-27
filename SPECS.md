@@ -740,7 +740,7 @@ Schema-defined API at `/api/graphql` using graphql-yoga. Supports authentication
 - `ping` — Health check
 - `me` — Current authenticated user
 - `user(username)` — Public user profile
-- `booq(id)` — Book by ID, including metadata, content nodes, styles map, chapters (with scoped fragment styles), expanded fragments for note previews, table of contents, bookmarks, and notes
+- `booq(id)` — Book by ID, including metadata, content nodes, styles map, chapters (with scoped fragment styles), table of contents, bookmarks, and notes
 - `author(name)` — Author with paginated book list
 - `search(query, limit)` — Full-text search returning books and authors
 - `libraryBrowse(library, kind, query, limit, offset)` — Browse books by author, subject, or language within a library (kind is an enum: `search`, `author`, `subject`, `language`)

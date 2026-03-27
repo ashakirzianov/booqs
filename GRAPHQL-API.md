@@ -178,7 +178,7 @@ The email magic link flow exists as server actions in [data/auth.ts](data/auth.t
 - `BooqAnchor` now includes `position` (moved from the old `BooqFragment`)
 - Added `styles` field to both `Booq` type (full map) and `BooqFragment` type (scoped subset)
 - Renamed `Booq.fragment(path)` → `Booq.chapter(path)` returning `BooqChapter`
-- Added `Booq.expandedFragment(start, end)` returning `BooqFragment` for note previews
+- Added `Note.surroundingFragment` returning `BooqFragment` — the expanded content around a note's range
 - Renamed all related core types and functions: `buildFragment` → `buildChapter`, `BooqFragment` → `BooqChapter`, etc.
 - Removed unused `backend/fragment.ts` and `core/fragment.ts` (replaced by `core/section.ts`)
 
@@ -187,17 +187,16 @@ The email magic link flow exists as server actions in [data/auth.ts](data/auth.t
 - [x] Add `styles` field to `BooqFragment` type (returns only styles referenced by fragment nodes)
 - [x] Restructure `BooqFragment` → `BooqChapter` with nested `BooqFragment`
 - [x] Move `position` to `BooqAnchor`
-- [x] Add `Booq.expandedFragment(start, end)` field
+- [x] Add `Note.surroundingFragment` field (moved from `Booq.expandedFragment`)
 - [x] Rename `Booq.fragment(path)` → `Booq.chapter(path)`
 
 ### Resolver changes
 - [x] In `booq.ts`: resolve `styles` by returning `booq.styles`
 - [x] In `booq.ts`: section resolver returns `BooqChapter` with nested `BooqFragment`
-- [x] In `booq.ts`: `expandedFragment` resolver calls `getExpandedRange` + `nodesForRange` + `collectReferencedStyles`
+- [x] In `note.ts`: `surroundingFragment` resolver calls `getExpandedRange` + `nodesForRange` + `collectReferencedStyles` using the note's own range
 
 ### Notes
-- The web app fetches all note fragments in a single server-side call (`getExpandedFragments` with an array of ranges). GraphQL clients would need to request each fragment separately via the `expandedFragment` field, or we could add a batch query that accepts multiple ranges.
-- The expanded range includes surrounding nodes for context, not just the exact note range.
+- `Note.surroundingFragment` expands the note's range to paragraph boundaries and returns the surrounding content with scoped styles. Uses `booqLoader` so multiple notes on the same book share a single book load.
 
 ---
 

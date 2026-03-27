@@ -4,7 +4,6 @@ import { NoteParent } from './note'
 import { ResolverContext } from './context'
 import {
     BooqId, buildChapter, previewForPath, textForRange,
-    getExpandedRange, nodesForRange, collectReferencedStyles,
 } from '@/core'
 import { getBookmarks } from '@/backend/bookmarks'
 import { notesWithAuthorFor } from '@/backend/notes'
@@ -87,21 +86,6 @@ export const booqResolver: IResolvers<BooqParent, ResolverContext> = {
                 return undefined
             }
             return buildChapter({ booq, path })
-        },
-        async expandedFragment(parent, { start, end }, { booqLoader }) {
-            const booq = await booqLoader.load(parent.booqId)
-            if (!booq) {
-                return undefined
-            }
-            const expandedRange = getExpandedRange(booq.nodes, { start, end })
-            const nodes = nodesForRange(booq.nodes, expandedRange)
-            const styles = collectReferencedStyles(nodes, booq.styles)
-            return {
-                start: expandedRange.start,
-                end: expandedRange.end,
-                nodes,
-                styles,
-            }
         },
         async tableOfContents(parent, _, { booqLoader }) {
             const booq = await booqLoader.load(parent.booqId)

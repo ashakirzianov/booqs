@@ -91,7 +91,6 @@ type Booq {
     notes(username: String, limit: Int, offset: Int): [Note!]!
     preview(path: [Int!], end: [Int!], length: Int = 500): String
     chapter(path: [Int!]): BooqChapter
-    expandedFragment(start: [Int!]!, end: [Int!]!): BooqFragment
     nodes: [BooqNode]
     styles: BooqNode
     tableOfContents: [TocItem!]
@@ -208,6 +207,7 @@ type Note {
     text: String
     content: String
     targetQuote: String
+    surroundingFragment: BooqFragment
     position: Int
     privacy: String
     createdAt: String
