@@ -65,6 +65,12 @@ export const booqResolver: IResolvers<BooqParent> = {
                 ? booq.nodes
                 : undefined
         },
+        async styles(parent) {
+            const booq = await booqForId(parent.booqId)
+            return booq
+                ? booq.styles
+                : undefined
+        },
         async fragment(parent, { path }) {
             const booq = await booqForId(parent.booqId)
             if (!booq) {

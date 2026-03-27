@@ -92,6 +92,7 @@ type Booq {
     preview(path: [Int!], end: [Int!], length: Int = 500): String
     fragment(path: [Int!]): BooqFragment
     nodes: [BooqNode]
+    styles: BooqNode
     tableOfContents: [TocItem!]
 }
 
@@ -149,6 +150,7 @@ type BooqFragment {
     next: BooqAnchor
     position: Int!
     nodes: [BooqNode]
+    styles: BooqNode
 }
 
 type BooqAnchor {

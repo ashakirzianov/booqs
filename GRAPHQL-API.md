@@ -179,12 +179,12 @@ The email magic link flow exists as server actions in [data/auth.ts](data/auth.t
 - `BooqNode` JSON scalar already exists for untyped JSON
 
 ### Schema changes
-- [ ] Add `styles` field to `Booq` type (returns full styles map)
-- [ ] Add `styles` field to `BooqFragment` type (returns only styles referenced by fragment nodes)
+- [x] Add `styles` field to `Booq` type (returns full styles map)
+- [x] Add `styles` field to `BooqFragment` type (returns only styles referenced by fragment nodes)
 
 ### Resolver changes
-- [ ] In `booq.ts`: resolve `styles` by returning `booq.styles`
-- [ ] In `booq.ts` fragment resolver: call `collectReferencedStyles(fragment.nodes, booq.styles)` and include in response
+- [x] In `booq.ts`: resolve `styles` by returning `booq.styles`
+- [x] In `booq.ts` fragment resolver: call `collectReferencedStyles(fragment.nodes, booq.styles)` and include in response
 
 ### Notes
 - Using the existing `BooqNode` JSON scalar for the styles field is simplest. A dedicated `JSON` scalar would be more semantically correct but functionally equivalent.
