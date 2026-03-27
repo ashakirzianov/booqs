@@ -170,6 +170,61 @@ The email magic link flow exists as server actions in [data/auth.ts](data/auth.t
 
 ---
 
+## 7. Expose styles on Booq and BooqFragment
+
+### What exists
+- `Booq.styles` (`Record<string, string>`) contains preprocessed CSS keyed by style ref
+- `BooqSectionNode.styleRefs` references keys in this map
+- `collectReferencedStyles` in `core/fragment.ts` extracts the subset of styles needed by a fragment's nodes
+- `BooqNode` JSON scalar already exists for untyped JSON
+
+### Schema changes
+- [ ] Add `styles` field to `Booq` type (returns full styles map)
+- [ ] Add `styles` field to `BooqFragment` type (returns only styles referenced by fragment nodes)
+
+### Resolver changes
+- [ ] In `booq.ts`: resolve `styles` by returning `booq.styles`
+- [ ] In `booq.ts` fragment resolver: call `collectReferencedStyles(fragment.nodes, booq.styles)` and include in response
+
+### Notes
+- Using the existing `BooqNode` JSON scalar for the styles field is simplest. A dedicated `JSON` scalar would be more semantically correct but functionally equivalent.
+- Without styles, section nodes with `styleRefs` render unstyled content.
+
+---
+
+## 8. Expanded fragment query for note previews
+
+### What exists
+- `getExpandedFragments(booqId, ranges)` in `data/booqs.ts` returns nodes + styles for ranges around notes
+- `fetchExpandedFragmentForRange(booqId, range)` does the same for a single range
+- REST endpoint `GET /api/booq/[booq_id]/expanded-fragment?range=...` exposes single-range version
+- `getExpandedRange` in `core/text.ts` expands a range to include surrounding context nodes
+- Notes page uses `getExpandedFragments` to render note previews with context
+
+### Schema changes
+- [ ] Add field to `Booq` type:
+  ```graphql
+  expandedFragment(start: [Int!]!, end: [Int!]!): ExpandedFragment
+  ```
+- [ ] Add type:
+  ```graphql
+  type ExpandedFragment {
+      nodes: [BooqNode]
+      styles: BooqNode  # JSON scalar — Record<string, string>
+      start: [Int!]!
+      end: [Int!]!
+  }
+  ```
+
+### Resolver changes
+- [ ] In `booq.ts`: resolve `expandedFragment` by calling `getExpandedRange` + `nodesForRange` + `collectReferencedStyles`
+
+### Notes
+- The web app fetches all note fragments in a single server-side call (`getExpandedFragments` with an array of ranges). GraphQL clients would need to request each fragment separately via the `expandedFragment` field, or we could add a batch query that accepts multiple ranges.
+- The expanded range includes surrounding nodes for context, not just the exact note range.
+
+---
+
 ## Suggested Implementation Order
 
 1. **Bearer token** — smallest change, unblocks API consumers immediately
@@ -178,6 +233,8 @@ The email magic link flow exists as server actions in [data/auth.ts](data/auth.t
 4. **myNotes** — independent, needs minor backend pagination addition
 5. **Copilot streaming** — independent, depends on subscription transport setup
 6. **Presigned upload mutations** — depends on backend presigned URL support (see [BOOK-UPLOAD.md](BOOK-UPLOAD.md))
+7. **Expose styles** — needed for styled rendering via GraphQL
+8. **Expanded fragment query** — needed for note previews with context
 
 ---
 
