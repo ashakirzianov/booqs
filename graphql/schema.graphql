@@ -13,7 +13,7 @@ type Query {
     copilot(context: CopilotContext!): Copilot
 }
 type Subscription {
-    copilotAnswerStream(context: CopilotContext!, question: String!): String!
+    copilotAnswerStream(context: CopilotContext!, question: String!, footnote: String): String!
 }
 type Mutation {
     addBookmark(bookmark: BookmarkInput!): Boolean

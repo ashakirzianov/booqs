@@ -34,14 +34,16 @@ export const copilotResolver: IResolvers<CopilotParent> = {
     },
     Subscription: {
         copilotAnswerStream: {
-            async *subscribe(_, { context, question }: {
+            async *subscribe(_, { context, question, footnote }: {
                 context: CopilotInput,
                 question: string,
+                footnote?: string,
             }) {
                 const result = await generateAnswerStreaming({
                     booqId: context.booqId as BooqId,
                     range: { start: context.start, end: context.end },
                     question,
+                    footnote,
                 })
                 if (!result.success) {
                     return

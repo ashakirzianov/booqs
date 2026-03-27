@@ -312,7 +312,7 @@ type User {
 - GraphQL `copilotAnswerStream` subscription only accepts `context` and `question`
 
 ### Schema changes
-- [ ] Add `footnote` parameter to subscription:
+- [x] Add `footnote` parameter to subscription:
   ```graphql
   type Subscription {
       copilotAnswerStream(context: CopilotContext!, question: String!, footnote: String): String!

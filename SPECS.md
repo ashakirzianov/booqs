@@ -770,7 +770,7 @@ Schema-defined API at `/api/graphql` using graphql-yoga. Supports authentication
 - `deleteAccount` — Delete user account
 
 **Subscriptions (SSE):**
-- `copilotAnswerStream(context, question)` — Streams AI answer text chunks as they are generated, matching the behavior of the `/api/copilot/answer/stream` REST endpoint
+- `copilotAnswerStream(context, question, footnote)` — Streams AI answer text chunks as they are generated, with optional footnote for additional context
 
 ---
 
