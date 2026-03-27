@@ -141,6 +141,11 @@ function collectUniqueSrcsFromBooq(booq: Booq): string[] {
     return Array.from(srcs)
 }
 
+export async function extractSingleImageFromEpub(epubBuffer: Buffer, imagePath: string): Promise<Buffer | undefined> {
+    const epub = await openEpubFile({ fileBuffer: epubBuffer })
+    return epub.loadBinaryFile(imagePath)
+}
+
 function preprocessBooq(booq: Booq, booqId: BooqId, imageDimensions: BooqImageDimensions): Booq {
     const nodes = mapNodes(booq.nodes, node => {
         if (!isElementNode(node)) {

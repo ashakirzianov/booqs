@@ -2,6 +2,8 @@ import { BooqId } from '@/core'
 import { fetchImageVariant } from '@/data/variants'
 import { NextRequest } from 'next/server'
 
+export const maxDuration = 60
+
 type Params = {
     booq_id: string,
     file_path: string[],

@@ -1,5 +1,5 @@
 import { BooqId } from '@/core'
-import { booqImages } from './library'
+import { booqSingleImage } from './library'
 import { generateVariant, ImageVariant } from './images'
 import { downloadAsset, IMAGES_BUCKET, uploadAsset } from './blob'
 
@@ -62,18 +62,13 @@ async function getOrExtractOriginal(booqId: BooqId, filePath: string): Promise<B
         return existing
     }
 
-    const images = await booqImages(booqId)
-    if (!images) {
+    const image = await booqSingleImage(booqId, filePath)
+    if (!image) {
         return undefined
     }
 
-    await Promise.all(
-        Object.entries(images.images).map(([src, buffer]) =>
-            uploadOriginalImage(booqId, src, buffer)
-        )
-    )
-
-    return images.images[filePath]
+    await uploadOriginalImage(booqId, filePath, image)
+    return image
 }
 
 async function getOrGenerateVariant(

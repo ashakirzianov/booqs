@@ -4,13 +4,12 @@ import {
 } from '@/core'
 import { getCachedValueForKey, cacheValueForKey } from './cache'
 import { downloadAsset, uploadAsset } from './blob'
-import { parseAndLoadImagesFromFile, parseAndPreprocessBooq } from './parse'
+import { extractSingleImageFromEpub, parseAndPreprocessBooq } from './parse'
 import groupBy from 'lodash-es/groupBy'
 import { pgLibrary } from './pg'
 import { userUploadsLibrary } from './uu'
 import { localLibrary } from './lo'
 import { getExtraMetadataValues } from '@/core/meta'
-import { BooqImages } from './images'
 
 export type BooqData = {
     booqId: BooqId,
@@ -254,16 +253,12 @@ export async function booqFragmentForRange(booqId: BooqId, range: BooqRange): Pr
     return { nodes }
 }
 
-export async function booqImages(booqId: BooqId): Promise<BooqImages | undefined> {
+export async function booqSingleImage(booqId: BooqId, imagePath: string): Promise<Buffer | undefined> {
     const file = await booqFileForId(booqId)
     if (!file) {
         return undefined
     }
-    const booqImages = await parseAndLoadImagesFromFile(file)
-    if (!booqImages) {
-        return undefined
-    }
-    return booqImages
+    return extractSingleImageFromEpub(file.file, imagePath)
 }
 
 async function booqFileForId(booqId: BooqId) {
