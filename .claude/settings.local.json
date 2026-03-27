@@ -52,7 +52,10 @@
       "Bash(ls -la /Users/ashakirzianov/repos/booqs/app/\\\\\\(main\\\\\\)/library/)",
       "Bash(git rm:*)",
       "Bash(wc -c /Users/ashakirzianov/repos/booqs/node_modules/postcss/lib/*.js)",
-      "Bash(npm list:*)"
+      "Bash(npm list:*)",
+      "Bash(git fetch:*)",
+      "Bash(git merge:*)",
+      "Bash(git commit:*)"
     ]
   },
   "enableAllProjectMcpServers": false
