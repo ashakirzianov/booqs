@@ -7,6 +7,7 @@ import { validateEpub } from '@/parser/validate'
 import { inspect } from 'util'
 import { parseEpub } from '@/parser'
 import { createZipFileProvider } from '@/parser/zip'
+import { loadImageDimensions } from '@/backend/parse'
 
 export async function parseEpubs(options: CliOptions) {
     console.info('Processing epub files...')
@@ -22,9 +23,9 @@ export async function parseEpubs(options: CliOptions) {
     const timeKey = `parse: ${optionsString}`
     console.time(timeKey)
     console.time(`chunk ${chunk}`)
-    for await (const path of allEpubFiles(paths)) {
+    for await (const filePath of allEpubFiles(paths)) {
         try {
-            const { booq, epub, diags } = await processEpubFile(path, options)
+            const { booq, epub, diags } = await processEpubFile(filePath, options)
             if ((++count) % CHUNK_SIZE === 0) {
                 console.info(`Processed ${count} files`)
                 console.timeEnd(`chunk ${chunk++}`)
@@ -38,30 +39,37 @@ export async function parseEpubs(options: CliOptions) {
                 }
             }
             if (options.switches['metadata'] === 'true') {
-                console.info(`Metadata for ${path}: ${pretty(booq?.metadata)}`)
+                console.info(`Metadata for ${filePath}: ${pretty(booq?.metadata)}`)
                 if (options.switches['raw'] === 'true') {
                     const rawMetadata = await epub.metadata()
-                    console.info(`Raw metadata for ${path}: ${pretty(rawMetadata)}`)
+                    console.info(`Raw metadata for ${filePath}: ${pretty(rawMetadata)}`)
                 }
             }
             const filtered = filterDiags(diags, options)
             if (filtered.length > 0) {
-                console.info(`Problems found in ${path}: ${pretty(filtered)}`)
+                console.info(`Problems found in ${filePath}: ${pretty(filtered)}`)
                 problems.push({
-                    path,
+                    path: filePath,
                     diags: filtered,
                 })
                 if (options.switches['quick-fail'] === 'true') {
                     break
                 }
             }
+            if (options.switches['save'] === 'true' && booq) {
+                const dimensions = await loadImageDimensions(booq, epub)
+                const outputPath = filePath.replace(/\.epub$/i, '.booq')
+                const data = { ...booq, imageDimensions: dimensions }
+                await fs.promises.writeFile(outputPath, JSON.stringify(data))
+                console.info(`Saved to ${outputPath}`)
+            }
             if (options.switches['one'] === 'true') {
                 break
             }
         } catch (err) {
-            console.error(`Error processing file ${path}: ${err}`)
+            console.error(`Error processing file ${filePath}: ${err}`)
             problems.push({
-                path,
+                path: filePath,
                 diags: [
                     {
                         message: `Error processing file`,

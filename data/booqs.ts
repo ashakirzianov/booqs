@@ -1,22 +1,24 @@
 'use server'
 import {
-    BooqPath, buildFragment,
+    BooqPath, buildChapter,
     BooqId,
     BooqMetadata,
+    BooqStyles,
     TableOfContents,
-    BooqFragment,
+    BooqChapter,
     BooqRange,
     BooqNode,
     getExpandedRange,
     nodesForRange,
+    collectReferencedStyles,
 } from '@/core'
 import { userForId } from '@/backend/users'
 import { booqIdsInCollections } from '@/backend/collections'
-import { BooqData, booqDataForIds, booqForId, booqPreview, booqQuery, booqToc, featuredBooqIds, booqFragmentForRange } from '@/backend/library'
+import { BooqData, booqDataForIds, booqForId, booqPreview, booqQuery, booqToc, featuredBooqIds } from '@/backend/library'
 
 export type PartialBooqData = {
     booqId: BooqId,
-    fragment: BooqFragment,
+    chapter: BooqChapter,
     meta: BooqMetadata,
     toc: TableOfContents,
 }
@@ -118,32 +120,40 @@ export async function fetchBooqPreview(booqId: BooqId, path: BooqPath, end?: Boo
 }
 
 export async function booqPart({
-    booqId, path, bypassCache,
+    booqId, path,
 }: {
     booqId: BooqId,
     path?: BooqPath,
-    bypassCache?: boolean,
 }): Promise<PartialBooqData | undefined> {
     const [card] = await booqDataForIds([booqId])
     if (card === undefined) {
         return undefined
     }
-    const booq = await booqForId(booqId, bypassCache)
+    const booq = await booqForId(booqId)
     if (booq === undefined) {
         return undefined
     }
-    const fragment = buildFragment({ booq, path })
+    const chapter = buildChapter({ booq, path })
 
     return {
         booqId,
-        fragment,
+        chapter,
         toc: booq.toc,
         meta: booq.metadata,
     } satisfies PartialBooqData
 }
 
-export async function fetchFullBooq(booqId: BooqId) {
-    return booqForId(booqId, true)
+export async function fetchBooqChapter(booqId: BooqId, path?: BooqPath) {
+    const booq = await booqForId(booqId)
+    if (!booq) {
+        return undefined
+    }
+    const chapter = buildChapter({ booq, path })
+    return {
+        chapter,
+        metadata: booq.metadata,
+        toc: booq.toc,
+    }
 }
 
 
@@ -237,26 +247,25 @@ function getLanguageDisplayName(languageCode: string): string {
     return languageNames[languageCode.toLowerCase()] || languageCode
 }
 
-export async function fetchExpandedFragmentForRange(booqId: BooqId, range: BooqRange): Promise<{ nodes: BooqNode[], range: BooqRange } | undefined> {
+export type ExpandedFragment = { nodes: BooqNode[], styles: BooqStyles, range: BooqRange }
+
+export async function fetchExpandedFragmentForRange(booqId: BooqId, range: BooqRange): Promise<ExpandedFragment | undefined> {
     const booq = await booqForId(booqId)
     if (!booq) {
         return undefined
     }
 
     const expandedRange = getExpandedRange(booq.nodes, range)
-    const result = await booqFragmentForRange(booqId, expandedRange)
-
-    if (!result) {
-        return undefined
-    }
+    const nodes = nodesForRange(booq.nodes, expandedRange)
 
     return {
-        nodes: result.nodes,
+        nodes,
+        styles: collectReferencedStyles(nodes, booq.styles),
         range: expandedRange,
     }
 }
 
-export async function getExpandedFragments(booqId: BooqId, ranges: BooqRange[]): Promise<Array<{ nodes: BooqNode[], range: BooqRange } | undefined>> {
+export async function getExpandedFragments(booqId: BooqId, ranges: BooqRange[]): Promise<Array<ExpandedFragment | undefined>> {
     const booq = await booqForId(booqId)
     if (!booq) {
         return ranges.map(() => undefined)
@@ -268,6 +277,7 @@ export async function getExpandedFragments(booqId: BooqId, ranges: BooqRange[]):
 
         return {
             nodes,
+            styles: collectReferencedStyles(nodes, booq.styles),
             range: expandedRange,
         }
     })

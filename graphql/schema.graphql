@@ -5,10 +5,15 @@ type Query {
     booq(id: ID!): Booq
     author(name: String!): Author
     search(query: String!, limit: Int): [SearchResult!]
-    history: [BooqHistory]
+    history(limit: Int, offset: Int): [BooqHistory]
     collection(name: String!): Collection
     featured(limit: Int!): [Booq]
+    notes(username: String!, limit: Int, offset: Int): [Note!]!
+    libraryBrowse(library: String!, kind: LibraryBrowseKind!, query: String!, limit: Int, offset: Int): LibraryBrowseResult!
     copilot(context: CopilotContext!): Copilot
+}
+type Subscription {
+    copilotAnswerStream(context: CopilotContext!, question: String!, footnote: String): String!
 }
 type Mutation {
     addBookmark(bookmark: BookmarkInput!): Boolean
@@ -31,13 +36,34 @@ type Mutation {
         response: WebAuthnAuthenticationResponseJSON!
     ): AuthResult
 
+    initiateSign(email: String!, returnTo: String): Boolean
+    completeSignIn(email: String!, secret: String!): AuthResult
+    completeSignUp(email: String!, secret: String!, username: String!, name: String!, emoji: String!): AuthResult
+
     follow(username: String!): Boolean
     unfollow(username: String!): Boolean
     removeHistory(booqId: ID!): Boolean
 
+    requestUpload: UploadRequest
+    confirmUpload(uploadId: String!): UploadResult!
+
+    deletePasskey(id: ID!): Boolean
     signout: Boolean
     deleteAccount: Boolean
     updateUser(input: UpdateUserInput!): UpdateUserResult
+}
+
+type UploadRequest {
+    uploadId: String!
+    uploadUrl: String!
+}
+
+type UploadResult {
+    success: Boolean!
+    booqId: ID
+    title: String
+    coverSrc: String
+    error: String
 }
 
 type InitPasskeyRegistrationResponse {
@@ -62,10 +88,11 @@ type Booq {
     subjects: [String!]
     coverSrc: String
     bookmarks: [Bookmark]
-    notes: [Note]
+    notes(username: String, limit: Int, offset: Int): [Note!]!
     preview(path: [Int!], end: [Int!], length: Int = 500): String
-    fragment(path: [Int!]): BooqFragment
+    chapter(path: [Int!]): BooqChapter
     nodes: [BooqNode]
+    styles: BooqNode
     tableOfContents: [TocItem!]
 }
 
@@ -86,6 +113,14 @@ type User {
     followers: [User!]!
     following: [User!]!
     isFollowing: Boolean
+    booqsWithNotes: [Booq!]!
+    passkeys: [Passkey!]
+}
+
+type Passkey {
+    id: ID!
+    label: String
+    createdAt: String!
 }
 
 union SearchResult = Booq | Author
@@ -110,17 +145,24 @@ input BooqHistoryInput {
 
 scalar BooqNode
 
-type BooqFragment {
+type BooqChapter {
     previous: BooqAnchor
     current: BooqAnchor!
     next: BooqAnchor
-    position: Int!
+    fragment: BooqFragment!
+}
+
+type BooqFragment {
+    start: [Int!]!
+    end: [Int!]!
     nodes: [BooqNode]
+    styles: BooqNode
 }
 
 type BooqAnchor {
     title: String
     path: [Int!]!
+    position: Int!
 }
 
 type TocItem {
@@ -134,7 +176,20 @@ type Tag {
     tag: String!
     value: String
 }
+enum LibraryBrowseKind {
+    search
+    author
+    subject
+    language
+}
+
+type LibraryBrowseResult {
+    booqs: [Booq!]!
+    hasMore: Boolean!
+}
+
 type AuthResult {
+    token: String
     user: User
 }
 type Bookmark {
@@ -152,6 +207,7 @@ type Note {
     text: String
     content: String
     targetQuote: String
+    surroundingFragment: BooqFragment
     position: Int
     privacy: String
     createdAt: String

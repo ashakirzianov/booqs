@@ -27,6 +27,7 @@ const { handleRequest } = createYoga({
     return context({
       origin,
       getCookie(name) { return cookieStore.get(name)?.value },
+      getHeader(name) { return hs.get(name) ?? undefined },
       setCookie(name, value, options) {
         cookieStore.set(name, value, options)
       },

@@ -1,7 +1,7 @@
 import {
-  BooqNodeIterator,
+  BooqContainerIterator,
   BooqTextIterator,
-  isNodeIterator,
+  isContainerIterator,
   isTextIterator,
   iteratorLessThan,
   iteratorAtPath,
@@ -70,8 +70,8 @@ describe('core/iterator', () => {
   function createNodeIterator(
     node: BooqElementNode,
     index: number,
-    parent?: BooqNodeIterator
-  ): BooqNodeIterator {
+    parent?: BooqContainerIterator
+  ): BooqContainerIterator {
     return { node, index, parent }
   }
 
@@ -79,7 +79,7 @@ describe('core/iterator', () => {
   function createTextIterator(
     node: BooqTextNode,
     index: number,
-    parent: BooqNodeIterator
+    parent: BooqContainerIterator
   ): BooqTextIterator {
     return { node, index, parent }
   }
@@ -88,18 +88,18 @@ describe('core/iterator', () => {
     describe('isNodeIterator', () => {
       it('returns true for node iterators', () => {
         const nodeIter = createNodeIterator(simpleElement, 0)
-        expect(isNodeIterator(nodeIter)).toBe(true)
+        expect(isContainerIterator(nodeIter)).toBe(true)
       })
 
       it('returns false for text iterators', () => {
         const parent = createNodeIterator(simpleElement, 0)
         const textIter = createTextIterator(simpleTextNode, 5, parent)
-        expect(isNodeIterator(textIter)).toBe(false)
+        expect(isContainerIterator(textIter)).toBe(false)
       })
 
       it('handles undefined node gracefully', () => {
         const iterWithUndefinedNode = { node: undefined as any, index: 0, parent: undefined }
-        expect(isNodeIterator(iterWithUndefinedNode)).toBe(false)
+        expect(isContainerIterator(iterWithUndefinedNode)).toBe(false)
       })
     })
 

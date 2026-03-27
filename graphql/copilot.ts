@@ -1,4 +1,4 @@
-import { generateSuggestions, generateAnswer } from '@/backend/copilot'
+import { generateSuggestions, generateAnswer, generateAnswerStreaming } from '@/backend/copilot'
 import { BooqId } from '@/core'
 import { IResolvers } from '@graphql-tools/utils'
 
@@ -30,6 +30,36 @@ export const copilotResolver: IResolvers<CopilotParent> = {
                 return undefined
             }
             return result.output
+        },
+    },
+    Subscription: {
+        copilotAnswerStream: {
+            async *subscribe(_, { context, question, footnote }: {
+                context: CopilotInput,
+                question: string,
+                footnote?: string,
+            }) {
+                const result = await generateAnswerStreaming({
+                    booqId: context.booqId as BooqId,
+                    range: { start: context.start, end: context.end },
+                    question,
+                    footnote,
+                })
+                if (!result.success) {
+                    return
+                }
+                const reader = result.stream.getReader()
+                const decoder = new TextDecoder()
+                try {
+                    while (true) {
+                        const { done, value } = await reader.read()
+                        if (done) break
+                        yield { copilotAnswerStream: decoder.decode(value) }
+                    }
+                } finally {
+                    reader.releaseLock()
+                }
+            },
         },
     },
 }

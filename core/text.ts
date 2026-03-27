@@ -6,16 +6,16 @@ import {
     prevLeafNode,
     textBefore,
     textStartingAt,
-    BooqNodeIterator,
-    isNodeIterator,
+    BooqContainerIterator,
+    isContainerIterator,
     isTextIterator,
     iteratorsNode,
 } from './iterator'
 import { assertNever } from './misc'
-import { isElementNode, isStubNode, isTextNode, nodeForPath } from './node'
+import { isContainerNode, isElementNode, isStubNode, isTextNode, nodeForPath } from './node'
 
 export function nodeText(node: BooqNode): string {
-    if (isElementNode(node)) {
+    if (isContainerNode(node)) {
         return node.children?.map(nodeText).join('') ?? ''
     } else if (isTextNode(node)) {
         return node
@@ -37,7 +37,7 @@ export function previewForPath(nodes: BooqNode[], path: BooqPath, length: number
     if (!found) {
         return undefined
     }
-    let iter: BooqNodeIterator | undefined = isNodeIterator(found)
+    let iter: BooqContainerIterator | undefined = isContainerIterator(found)
         ? firstLeafNode(found)
         : found.parent
     let preview = ''
@@ -63,7 +63,7 @@ export function getQuoteAndContext(nodes: BooqNode[], range: BooqRange, length: 
     // Get context before the range
     const startIter = iteratorAtPath(nodes, range.start)
     let contextBefore = ''
-    let iter: BooqNodeIterator | undefined = undefined
+    let iter: BooqContainerIterator | undefined = undefined
     if (startIter && isTextIterator(startIter)) {
         contextBefore = textBefore(startIter) + contextBefore
         iter = startIter.parent
@@ -109,7 +109,7 @@ export function textForRange(nodes: BooqNode[], { start, end }: BooqRange): stri
 
     let result = ''
     const startNode = nodes[startHead]
-    if (startNode?.kind === 'element') {
+    if (isContainerNode(startNode)) {
         if (startTail.length === 0) {
             // No sub-path specified, include all content from this element
             result += nodeText(startNode)
@@ -145,7 +145,7 @@ export function textForRange(nodes: BooqNode[], { start, end }: BooqRange): stri
     }
     const endNode = nodes[endHead]
     if (startHead !== endHead && endNode) {
-        if (endNode.kind === 'element') {
+        if (isContainerNode(endNode)) {
             const endText = textForRange(endNode.children ?? [], {
                 start: [0],
                 end: endTail,
@@ -176,7 +176,7 @@ export function getExpandedRange(nodes: BooqNode[], range: BooqRange): BooqRange
 function getExpandedStartPath(nodes: BooqNode[], startPath: BooqPath): BooqPath {
     // Check if the start element itself has pph=true
     const startNode = nodeForPath(nodes, startPath)
-    if (startNode?.kind === 'element' && startNode.pph === true) {
+    if (isElementNode(startNode) && startNode.pph === true) {
         return startPath
     }
 
@@ -184,7 +184,7 @@ function getExpandedStartPath(nodes: BooqNode[], startPath: BooqPath): BooqPath 
     for (let depth = startPath.length - 1; depth > 0; depth--) {
         const parentPath = startPath.slice(0, depth)
         const parentNode = nodeForPath(nodes, parentPath)
-        if (parentNode?.kind === 'element' && parentNode.pph === true) {
+        if (isElementNode(parentNode) && parentNode.pph === true) {
             return parentPath
         }
     }
@@ -201,7 +201,7 @@ function getExpandedEndPath(nodes: BooqNode[], endPath: BooqPath, expandedStart:
 
     // Check if the end element itself has pph=true
     const endNode = nodeForPath(nodes, endPath)
-    if (endNode?.kind === 'element' && endNode.pph === true) {
+    if (isElementNode(endNode) && endNode.pph === true) {
         // Return next sibling of the end element
         const nextSiblingPath = [...endPath]
         nextSiblingPath[nextSiblingPath.length - 1] += 1
@@ -213,7 +213,7 @@ function getExpandedEndPath(nodes: BooqNode[], endPath: BooqPath, expandedStart:
     for (let depth = endPath.length - 1; depth > 0; depth--) {
         const parentPath = endPath.slice(0, depth)
         const parentNode = nodeForPath(nodes, parentPath)
-        if (parentNode?.kind === 'element' && parentNode.pph === true) {
+        if (isElementNode(parentNode) && parentNode.pph === true) {
             parentWithPph = parentPath
             break
         }

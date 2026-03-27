@@ -263,3 +263,4 @@ const ignorePseudo = [
 function supportedSelector(selector: string): boolean {
     return !ignorePseudo.some(pseudo => selector.endsWith(pseudo))
 }
+

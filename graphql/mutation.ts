@@ -1,12 +1,16 @@
 import { IResolvers } from '@graphql-tools/utils'
 import { ResolverContext } from './context'
-import { deleteUserForId, userForId, updateUser, userForUsername } from '@/backend/users'
+import { deleteUserForId, updateUser, userForUsername } from '@/backend/users'
 import { addNote, removeNote, updateNote } from '@/backend/notes'
 import { initiatePasskeyLogin, initiatePasskeyRegistration, verifyPasskeyLogin, verifyPasskeyRegistration } from '@/backend/passkey'
+import { initiateSignRequest, completeSignInRequest, completeSignUp } from '@/backend/sign'
+import { generateToken } from '@/backend/token'
 import { addToCollection, removeFromCollection } from '@/backend/collections'
 import { addBooqHistory, removeBooqHistory } from '@/backend/history'
 import { addBookmark, deleteBookmark } from '@/backend/bookmarks'
 import { followUser, unfollowUser } from '@/backend/follows'
+import { deletePasskeyCredential } from '@/backend/passkey'
+import { requestUpload, confirmUpload } from '@/backend/uu'
 
 export const mutationResolver: IResolvers<any, ResolverContext> = {
     Mutation: {
@@ -39,6 +43,12 @@ export const mutationResolver: IResolvers<any, ResolverContext> = {
         signout(_, __, { clearAuth }) {
             clearAuth()
             return true
+        },
+        async deletePasskey(_, { id }: { id: string }, { userId }) {
+            if (!userId) {
+                return false
+            }
+            return deletePasskeyCredential(userId, id)
         },
         async deleteAccount(_, __, { userId, clearAuth }) {
             if (userId) {
@@ -142,11 +152,38 @@ export const mutationResolver: IResolvers<any, ResolverContext> = {
                 return false
             }
         },
-        async initPasskeyRegistration(_, __, { userId, origin }) {
+        async initiateSign(_, { email, returnTo }: { email: string, returnTo?: string }) {
+            const result = await initiateSignRequest({
+                email,
+                from: returnTo ?? '/',
+            })
+            return result.kind !== 'error'
+        },
+        async completeSignIn(_, { email, secret }: { email: string, secret: string }, { setAuthForUserId }) {
+            const result = await completeSignInRequest({ email, secret })
+            if (!result.success) {
+                return undefined
+            }
+            const token = generateToken(result.user.id)
+            setAuthForUserId(result.user.id)
+            return { token, user: result.user }
+        },
+        async completeSignUp(_, { email, secret, username, name, emoji }: {
+            email: string, secret: string, username: string, name: string, emoji: string,
+        }, { setAuthForUserId }) {
+            const result = await completeSignUp({ email, secret, username, name, emoji })
+            if (!result.success) {
+                return undefined
+            }
+            const token = generateToken(result.user.id)
+            setAuthForUserId(result.user.id)
+            return { token, user: result.user }
+        },
+        async initPasskeyRegistration(_, __, { userId, origin, userLoader }) {
             if (!userId) {
                 return undefined
             }
-            const user = await userForId(userId)
+            const user = await userLoader.load(userId)
             if (!user) {
                 return undefined
             }
@@ -202,6 +239,18 @@ export const mutationResolver: IResolvers<any, ResolverContext> = {
             }
 
             return undefined
+        },
+        async requestUpload(_, __, { userId }) {
+            if (!userId) {
+                return null
+            }
+            return requestUpload()
+        },
+        async confirmUpload(_, { uploadId }: { uploadId: string }, { userId }) {
+            if (!userId) {
+                return { success: false, error: 'Authentication required' }
+            }
+            return confirmUpload(uploadId, userId)
         },
         async updateUser(_, { input }, { userId }) {
             if (!userId) {

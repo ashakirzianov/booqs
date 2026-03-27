@@ -31,7 +31,12 @@ export async function sendSignInLink({
         <div style="text-align: center; margin: 32px 0;">
             <a href="${signInUrl}" style="background-color: #007bff; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: 500; display: inline-block;">Sign In to Booqs</a>
         </div>
-        
+
+        <div style="text-align: center; margin: 24px 0;">
+            <p style="color: #6c757d; margin: 0 0 8px 0; font-size: 14px;">Or use this code to sign in:</p>
+            <p style="font-family: monospace; font-size: 18px; letter-spacing: 2px; color: #1a1a1a; background-color: #f0f0f0; padding: 12px 20px; border-radius: 6px; display: inline-block; margin: 0; user-select: all;">${secret}</p>
+        </div>
+
         <div style="text-align: center; margin-top: 32px; padding-top: 20px; border-top: 1px solid #e9ecef;">
             <p style="color: #6c757d; margin: 0 0 8px 0; font-size: 14px;">If you didn't request this, please ignore this email.</p>
             <p style="color: #6c757d; margin: 0; font-size: 14px;">This link will expire in 1 hour for security reasons.</p>
@@ -42,6 +47,8 @@ export async function sendSignInLink({
 
 Click here to sign in to your account:
 ${signInUrl}
+
+Or use this code to sign in: ${secret}
 
 If you didn't request this, please ignore this email.
 
@@ -75,7 +82,12 @@ export async function sendSignUpLink({
         <div style="text-align: center; margin: 32px 0;">
             <a href="${signUpUrl}" style="background-color: #28a745; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: 500; display: inline-block;">Complete Account Setup</a>
         </div>
-        
+
+        <div style="text-align: center; margin: 24px 0;">
+            <p style="color: #6c757d; margin: 0 0 8px 0; font-size: 14px;">Or use this code to complete setup:</p>
+            <p style="font-family: monospace; font-size: 18px; letter-spacing: 2px; color: #1a1a1a; background-color: #f0f0f0; padding: 12px 20px; border-radius: 6px; display: inline-block; margin: 0; user-select: all;">${secret}</p>
+        </div>
+
         <div style="text-align: center; margin-top: 32px; padding-top: 20px; border-top: 1px solid #e9ecef;">
             <p style="color: #6c757d; margin: 0 0 8px 0; font-size: 14px;">If you didn't request this, please ignore this email.</p>
             <p style="color: #6c757d; margin: 0; font-size: 14px;">This link will expire in 1 hour for security reasons.</p>
@@ -86,6 +98,8 @@ export async function sendSignUpLink({
 
 Click here to complete your account setup:
 ${signUpUrl}
+
+Or use this code to complete setup: ${secret}
 
 If you didn't request this, please ignore this email.
 

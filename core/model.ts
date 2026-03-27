@@ -11,29 +11,36 @@ export type BooqRange = {
 export type BooqNodeAttrs = {
     [name in string]?: string;
 }
-export type BooqNodeStyle = {
-    [name in string]?: string;
+export type BooqSectionNode = {
+    section: string,
+    styleRefs?: string[],
+    children: BooqNode[],
+    name?: undefined,
+    stub?: undefined,
 }
 export type BooqElementNode = {
-    kind: 'element',
     name: string,
     id?: string,
-    style?: BooqNodeStyle,
-    css?: string,
-    children?: BooqNode[],
+    children: BooqNode[],
     attrs?: BooqNodeAttrs,
-    fileName?: string,
     ref?: BooqPath,
     pph?: boolean,
+    section?: undefined,
+    stub?: undefined,
 }
 export type BooqTextNode = string & {
-    kind?: undefined,
+    children?: undefined,
+    section?: undefined,
+    name?: undefined,
+    stub?: undefined,
 }
 export type BooqStubNode = {
-    kind: 'stub',
-    length?: number,
+    stub: number,
+    children?: undefined,
+    section?: undefined,
+    name?: undefined,
 } | null
-export type BooqNode = BooqElementNode | BooqTextNode | BooqStubNode
+export type BooqNode = BooqSectionNode | BooqElementNode | BooqTextNode | BooqStubNode
 
 export type TableOfContentsItem = {
     title: string | undefined,
@@ -65,8 +72,10 @@ export type BooqMetadata = {
     coverSrc: string | undefined,
     length: number,
 }
+export type BooqStyles = Record<string, string>
 export type Booq = {
     nodes: BooqNode[],
+    styles: BooqStyles,
     metadata: BooqMetadata,
     toc: TableOfContents,
 }

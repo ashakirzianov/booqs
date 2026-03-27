@@ -1,4 +1,4 @@
-export * from './fragment'
+export * from './chapter'
 export * from './misc'
 export * from './model'
 export * from './node'

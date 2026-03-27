@@ -1,11 +1,8 @@
 import { ReactNode, createElement } from 'react'
 import {
-    BooqElementNode, BooqNode, pathToString,
+    BooqElementNode, BooqSectionNode, BooqNode, BooqStyles, pathToString,
     pathInRange, samePath, pathLessThan, BooqPath, BooqRange, pathToId,
-    assertNever,
-    isTextNode,
-    isStubNode,
-    isElementNode,
+    assertNever, isTextNode, isStubNode, isElementNode, isSectionNode,
 } from '@/core'
 
 export type Augmentation = {
@@ -18,6 +15,7 @@ export type Augmentation = {
 type RenderContext = {
     path: BooqPath,
     range: BooqRange,
+    styles: BooqStyles,
     parent?: BooqElementNode,
     withinAnchor?: boolean,
     augmentations: Augmentation[],
@@ -45,6 +43,8 @@ function renderNode(node: BooqNode, ctx: RenderContext): ReactNode {
         }
     } else if (isStubNode(node)) {
         return null
+    } else if (isSectionNode(node)) {
+        return renderSectionNode(node, ctx)
     } else if (isElementNode(node)) {
         return createElement(
             node.name === 'a' && ctx.withinAnchor
@@ -57,6 +57,31 @@ function renderNode(node: BooqNode, ctx: RenderContext): ReactNode {
         assertNever(node)
         return null
     }
+}
+
+function renderSectionNode(node: BooqSectionNode, ctx: RenderContext): ReactNode {
+    const children = node.children ? renderNodes(node.children, {
+        ...ctx,
+        parent: undefined,
+    }) : null
+    const styleNodes = (node.styleRefs ?? [])
+        .map((ref: string) => ctx.styles[ref])
+        .filter(Boolean)
+        .map((css: string, i: number) => createElement(
+            'style',
+            { key: `${pathToString(ctx.path)}-style-${i}` },
+            css,
+        ))
+    const className = node.styleRefs?.join(' ')
+    return createElement(
+        'section',
+        {
+            key: pathToString(ctx.path),
+            id: pathToId(ctx.path),
+            className,
+        },
+        [...styleNodes, ...(children ?? [])],
+    )
 }
 
 function renderTextNode(text: string, {
@@ -111,14 +136,15 @@ function renderTextNode(text: string, {
 function getProps(node: BooqElementNode, {
     path, range, hrefForPath,
 }: RenderContext) {
+    const className = node.pph
+        ? (node.attrs?.className ? `booqs-pph ${node.attrs.className}` : 'booqs-pph')
+        : node.attrs?.className
     return {
         ...node.attrs,
         id: pathToId(path),
-        className: node.pph
-            ? (node.attrs?.className ? `booq-pph ${node.attrs.className}` : 'booq-pph')
-            : node.attrs?.className,
+        className,
         key: pathToString(path),
-        style: node.style,
+        style: node.attrs?.style ? parseInlineStyle(node.attrs.style) : undefined,
         href: node.ref
             ? (
                 pathInRange(node.ref, range)
@@ -137,18 +163,6 @@ function getChildren(node: BooqElementNode, ctx: RenderContext) {
         parent: node,
         withinAnchor: ctx.withinAnchor || node.name === 'a',
     })
-    if (node.css) {
-        const styleNode = createElement(
-            'style',
-            {
-                key: `${pathToString(ctx.path)}-style`,
-            },
-            node.css,
-        )
-        return children
-            ? [styleNode, ...children]
-            : styleNode
-    }
     return (children?.length ?? 0) > 0
         ? children
         : null
@@ -238,4 +252,19 @@ function breakPath(path: BooqPath) {
     const head = path.slice(0, path.length - 1)
     const tail = path[path.length - 1]
     return [head, tail] as const
+}
+
+function parseInlineStyle(style: string): Record<string, string> {
+    const result: Record<string, string> = {}
+    for (const rule of style.split(';')) {
+        const trimmed = rule.trim()
+        if (trimmed.length === 0) continue
+        const colonIndex = trimmed.indexOf(':')
+        if (colonIndex === -1) continue
+        const property = trimmed.slice(0, colonIndex).trim()
+            .replace(/-([a-z])/g, (_, char) => char.toUpperCase())
+        const value = trimmed.slice(colonIndex + 1).trim()
+        result[property] = value
+    }
+    return result
 }

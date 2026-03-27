@@ -1,4 +1,4 @@
-import { BooqNode, BooqElementNode, textNode } from '../core'
+import { BooqNode, BooqElementNode, textNode, isElementNode } from '../core'
 import {
     xmlStringParser, XmlElement, xml2string, childrenOf, nameOf, attributesOf, textOf, asObject, XmlAttributes,
     findByName,
@@ -15,24 +15,32 @@ export type EpubSection = {
     id: string,
     content: string,
 }
-export async function parseSection(section: EpubSection, file: Epub, diags: Diagnoser): Promise<BooqNode> {
-    const node = await processSectionContent(section.content, {
+export async function parseSection({ section, file, styles, diags }: {
+    section: EpubSection,
+    file: Epub,
+    styles: Record<string, string>,
+    diags: Diagnoser,
+}): Promise<BooqNode> {
+    return processSectionContent(section.content, {
         id: section.id,
         fileName: section.fileName,
         css: '',
+        styleRefs: [],
+        styles,
         diags,
         resolveTextFile: async href => {
             const resolved = resolveRelativePath(href, section.fileName)
             return file.loadTextFile(resolved)
         },
     })
-    return node
 }
 
 type Env = {
     id: string,
     fileName: string,
     css: string,
+    styleRefs: string[],
+    styles: Record<string, string>,
     diags: Diagnoser,
     resolveTextFile: (href: string) => Promise<string | undefined>,
 }
@@ -46,10 +54,8 @@ async function processSectionContent(content: string, env: Env): Promise<BooqNod
             data: { xml: xml2string(document) },
         })
         return {
-            kind: 'element',
-            name: 'section',
-            id: env.fileName,
-            fileName: env.fileName,
+            section: env.fileName,
+            children: [],
         }
     }
     const elements = childrenOf(html)
@@ -65,7 +71,7 @@ async function processSectionContent(content: string, env: Env): Promise<BooqNod
                 break
             case 'body':
                 child = await processXml(element, env)
-                if (child?.kind === 'element') {
+                if (isElementNode(child)) {
                     child.name = 'div'
                 }
                 else {
@@ -86,21 +92,14 @@ async function processSectionContent(content: string, env: Env): Promise<BooqNod
         }
         children.push(child)
     }
-    const prefix = generateSelectorPrefix(env.id)
-    const css = env.css.length > 0
-        ? preprocessCss(env.css, {
-            prefix,
-        })
-        : undefined
+    if (env.css.length > 0) {
+        const key = generateSelectorPrefix(`inline-${env.id}`)
+        env.styles[key] = preprocessCss(env.css, { prefix: key })
+        env.styleRefs.push(key)
+    }
     return {
-        kind: 'element',
-        name: 'section',
-        css,
-        attrs: {
-            className: prefix,
-        },
-        id: env.fileName,
-        fileName: env.fileName,
+        section: env.fileName,
+        styleRefs: env.styleRefs.length > 0 ? env.styleRefs : undefined,
         children,
     }
 }
@@ -134,7 +133,6 @@ async function processHead(head: XmlElement, env: Env): Promise<BooqNode> {
         children.push(child)
     }
     return {
-        kind: 'element',
         name: 'div',
         children,
     }
@@ -179,18 +177,21 @@ async function processLink(link: XmlElement, env: Env): Promise<BooqNode> {
         })
         return stub()
     }
-    const content = await env.resolveTextFile(href)
-    if (content === undefined) {
-        env.diags.push({
-            message: `couldn't load css: ${href}`,
-            data: { xml: xml2string(link) },
-        })
-        return stub()
-    } else {
-        env.css += content
-        env.css += '\n'
-        return stub()
+    const resolved = resolveRelativePath(href, env.fileName)
+    const key = generateSelectorPrefix(`ref-${resolved}`)
+    if (!(key in env.styles)) {
+        const content = await env.resolveTextFile(href)
+        if (content === undefined) {
+            env.diags.push({
+                message: `couldn't load css: ${href}`,
+                data: { xml: xml2string(link) },
+            })
+            return stub()
+        }
+        env.styles[key] = preprocessCss(content, { prefix: key })
     }
+    env.styleRefs.push(key)
+    return stub()
 }
 
 async function processXmls(xmls: XmlElement[], env: Env) {
@@ -240,18 +241,14 @@ async function processRegularXml(element: XmlElement, env: Env): Promise<BooqNod
         })
         return stub()
     }
-    const { id, style, ...rest } = attributes ?? {}
+    const { id, ...rest } = attributes ?? {}
     const result: BooqElementNode = {
-        kind: 'element',
         name,
         id: processId(id, env),
-        style: style
-            ? parseInlineStyle(style)
-            : undefined,
         attrs: processAttributes(rest, env),
         children: children?.length
             ? await processXmls(children, env)
-            : undefined,
+            : [],
     }
     return result
 }
@@ -346,23 +343,6 @@ function processAttributes(attrs: XmlAttributes, _env: Env) {
         : undefined
 }
 
-function parseInlineStyle(style: string): Record<string, string> {
-    const rules = style.split(';')
-        .map(rule => rule.trim())
-        .filter(rule => rule.length > 0)
-        .map(rule => {
-            const [property, value] = rule.split(':')
-            const camelCaseProperty = property
-                .trim()
-                .replace(/-([a-z])/g, (_, char) => char.toUpperCase())
-            return [
-                camelCaseProperty,
-                value?.trim(),
-            ]
-        })
-    const styleObject = Object.fromEntries(rules)
-    return styleObject
-}
 
 function isEmptyText(xml: XmlElement) {
     const text = textOf(xml)

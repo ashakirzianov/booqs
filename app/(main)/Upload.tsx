@@ -4,7 +4,7 @@ import { BooqCover } from '@/components/BooqCover'
 import { booqContentHref } from '@/common/href'
 import { useUpload } from '@/application/upload'
 import { useCallback, useRef, useState } from 'react'
-import { SmallSpinner, UploadIcon } from '@/components/Icons'
+import { UploadIcon } from '@/components/Icons'
 import { Modal, ModalButton, ModalDivider, ModalLabel } from '@/components/Modal'
 
 export function UploadButton() {
@@ -38,7 +38,7 @@ function UploadModalContent({ closeModal }: {
         file, openDialog, dialogContent, clearFile,
     } = useSelectFileDialog({ accept: 'application/epub+zip' })
     const {
-        uploadFile, loading, result, error,
+        uploadFile, loading, progress, result, error,
     } = useUpload()
     function closeAndClear() {
         closeModal()
@@ -85,7 +85,7 @@ function UploadModalContent({ closeModal }: {
     } else if (loading) {
         return <>
             <ModalLabel text={`Uploading ${file.name}...`} />
-            <SmallSpinner />
+            <UploadProgressBar progress={progress ?? 0} />
             <ModalDivider />
             <ModalButton
                 text='Dismiss'
@@ -122,6 +122,17 @@ function UploadModalContent({ closeModal }: {
             />
         </>
     }
+}
+
+function UploadProgressBar({ progress }: { progress: number }) {
+    return <div className='w-full px-4 py-4'>
+        <div className='w-full h-2 bg-border rounded-full overflow-hidden'>
+            <div
+                className='h-full bg-action rounded-full transition-all duration-300 ease-out'
+                style={{ width: `${progress}%` }}
+            />
+        </div>
+    </div>
 }
 
 function useSelectFileDialog({ accept }: {

@@ -1,7 +1,12 @@
 import { DbUser, usersForIds } from '@/backend/users'
 import { getFollowersCount, getFollowingCount, getFollowers, getFollowing, isFollowing } from '@/backend/follows'
+import { getUserPasskeys } from '@/backend/passkey'
+import { getBooqsWithOwnNotes } from '@/backend/notes'
+import { BooqId } from '@/core'
+import { BooqData } from '@/backend/library'
 import { IResolvers } from '@graphql-tools/utils'
 import { ResolverContext } from './context'
+import { BooqParent } from './booq'
 
 export type UserParent = DbUser
 export const userResolver: IResolvers<UserParent, ResolverContext> = {
@@ -34,6 +39,20 @@ export const userResolver: IResolvers<UserParent, ResolverContext> = {
                 return false
             }
             return isFollowing(userId, parent.id)
+        },
+        async booqsWithNotes(parent, _, { userId, booqDataLoader }): Promise<BooqParent[]> {
+            if (!userId || userId !== parent.id) {
+                return []
+            }
+            const booqIds = await getBooqsWithOwnNotes(userId)
+            const results = await booqDataLoader.loadMany(booqIds as BooqId[])
+            return results.filter((r): r is BooqData => r !== undefined && !(r instanceof Error))
+        },
+        async passkeys(parent, _, { userId }) {
+            if (!userId || userId !== parent.id) {
+                return null
+            }
+            return getUserPasskeys(parent.id)
         },
     },
 }

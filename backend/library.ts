@@ -3,6 +3,7 @@ import {
     parseId,
 } from '@/core'
 import { getCachedValueForKey, cacheValueForKey } from './cache'
+import { downloadAsset, uploadAsset } from './blob'
 import { parseAndLoadImagesFromFile, parseAndPreprocessBooq } from './parse'
 import groupBy from 'lodash-es/groupBy'
 import { pgLibrary } from './pg'
@@ -55,28 +56,46 @@ const libraries: {
     lo: localLibrary,
 }
 
-export async function booqForId(booqId: BooqId, bypassCache = false): Promise<Booq | undefined> {
-    if (bypassCache) {
-        const file = await booqFileForId(booqId)
-        if (!file) {
-            return undefined
+const CACHE_BUCKET = 'booqs-cache'
+const CACHE_PATH = 'booqs'
+
+export async function booqForId(booqId: BooqId): Promise<Booq | undefined> {
+    const [library] = parseId(booqId)
+    const useCache = library !== 'lo'
+    if (useCache) {
+        const cached = await getCachedBooq(booqId)
+        if (cached) {
+            return cached
         }
-        return parseAndPreprocessBooq(booqId, file)
     }
-    const cached = await getCachedValueForKey<Booq>(`booq:${booqId}`)
-    if (cached) {
-        return cached
-    } else {
-        const file = await booqFileForId(booqId)
-        if (!file) {
-            return undefined
-        }
-        const booq = await parseAndPreprocessBooq(booqId, file)
-        if (booq) {
-            await cacheValueForKey(`booq:${booqId}`, booq)
-        }
-        return booq
+    const file = await booqFileForId(booqId)
+    if (!file) {
+        return undefined
     }
+    const booq = await parseAndPreprocessBooq(booqId, file)
+    if (booq && useCache) {
+        cacheBooq(booqId, booq).catch(e =>
+            console.warn(`Failed to cache booq ${booqId}:`, e instanceof Error ? e.message : e)
+        )
+    }
+    return booq
+}
+
+async function getCachedBooq(booqId: BooqId): Promise<Booq | undefined> {
+    const buffer = await downloadAsset(CACHE_BUCKET, `${CACHE_PATH}/${booqId}.json`)
+    if (!buffer) {
+        return undefined
+    }
+    try {
+        return JSON.parse(buffer.toString('utf-8'))
+    } catch {
+        return undefined
+    }
+}
+
+async function cacheBooq(booqId: BooqId, booq: Booq): Promise<void> {
+    const json = JSON.stringify(booq)
+    await uploadAsset(CACHE_BUCKET, `${CACHE_PATH}/${booqId}.json`, Buffer.from(json, 'utf-8'))
 }
 
 export type BooqPreview = {
@@ -117,7 +136,7 @@ export async function booqPreview(booqId: BooqId, path: BooqPath, end?: BooqPath
     return preview
 }
 
-export async function booqDataForIds(ids: BooqId[]): Promise<Array<BooqData | undefined>> {
+export async function booqDataForIds(ids: readonly BooqId[]): Promise<Array<BooqData | undefined>> {
     const parsed = ids
         .map(idString => {
             const [library, id] = parseId(idString)

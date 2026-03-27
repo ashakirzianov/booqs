@@ -10,8 +10,15 @@ export type BooqImages = {
     coverSrc?: string,
 }
 
+const IMAGE_TIMEOUT_MS = 5000
+
 export async function imageDimensions(buffer: Buffer): Promise<{ width: number, height: number }> {
-    const metadata = await sharp(buffer).metadata()
+    const metadata = await Promise.race([
+        sharp(buffer).metadata(),
+        new Promise<never>((_, reject) =>
+            setTimeout(() => reject(new Error('Image processing timed out')), IMAGE_TIMEOUT_MS)
+        ),
+    ])
     return {
         width: metadata.width ?? 0,
         height: metadata.height ?? 0,

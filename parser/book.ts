@@ -1,4 +1,4 @@
-import { BooqNode, Booq, nodesLength } from '../core'
+import { BooqNode, BooqStyles, Booq, nodesLength } from '../core'
 import { Epub } from './epub'
 import { EpubSection, parseSection } from './section'
 import { buildToc } from './toc'
@@ -9,6 +9,7 @@ import { Diagnoser } from 'booqs-epub'
 // TODO: make sync again
 export async function processEpub(epub: Epub, diags: Diagnoser): Promise<Booq | undefined> {
     const nodes: BooqNode[] = []
+    const styles: BooqStyles = {}
     const spine = await epub.spine() ?? []
     for (const { manifestItem } of spine) {
         const id = manifestItem['@id']
@@ -27,8 +28,8 @@ export async function processEpub(epub: Epub, diags: Diagnoser): Promise<Booq | 
             fileName: href,
             content: loaded.content,
         }
-        const value = await parseSection(section, epub, diags)
-        nodes.push(value)
+        const node = await parseSection({ section, file: epub, styles, diags })
+        nodes.push(node)
     }
 
     const length = nodesLength(nodes)
@@ -43,6 +44,7 @@ export async function processEpub(epub: Epub, diags: Diagnoser): Promise<Booq | 
 
     return {
         nodes: prepocessed,
+        styles,
         metadata: meta,
         toc: toc ?? {
             title: undefined,

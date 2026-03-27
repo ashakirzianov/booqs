@@ -1,21 +1,23 @@
-import { BooqElementNode, BooqNode, BooqPath, BooqTextNode } from './model'
-import { isElementNode, isTextNode } from './node'
+import { BooqElementNode, BooqSectionNode, BooqNode, BooqPath, BooqTextNode } from './model'
+import { isContainerNode, isTextNode, nodeChildren } from './node'
 import { pathLessThan } from './path'
 
-export type BooqIterator = BooqNodeIterator | BooqTextIterator
-export type BooqNodeIterator = {
-    node: BooqElementNode,
+type BooqContainerNode = BooqElementNode | BooqSectionNode
+
+export type BooqIterator = BooqContainerIterator | BooqTextIterator
+export type BooqContainerIterator = {
+    node: BooqContainerNode,
     index: number,
-    parent: BooqNodeIterator | undefined,
+    parent: BooqContainerIterator | undefined,
 }
 export type BooqTextIterator = {
     node: BooqTextNode,
     index: number,
-    parent: BooqNodeIterator,
+    parent: BooqContainerIterator,
 }
 
-export function isNodeIterator(iter: BooqIterator): iter is BooqNodeIterator {
-    return iter.node?.kind === 'element'
+export function isContainerIterator(iter: BooqIterator): iter is BooqContainerIterator {
+    return isContainerNode(iter.node)
 }
 
 export function isTextIterator(iter: BooqIterator): iter is BooqTextIterator {
@@ -29,14 +31,14 @@ export function iteratorLessThan(a: BooqIterator, b: BooqIterator): boolean {
 }
 
 export function iteratorAtPath(nodes: BooqNode[], path: BooqPath): BooqIterator | undefined {
-    function iteratorAtPathImpl(element: BooqElementNode, path: BooqPath, parent: BooqNodeIterator | undefined): BooqIterator | undefined {
+    function iteratorAtPathImpl(container: BooqContainerNode, path: BooqPath, parent: BooqContainerIterator | undefined): BooqIterator | undefined {
         const [head, ...tail] = path
-        if (head === undefined || head >= (element.children?.length ?? 0)) {
+        if (head === undefined || head >= (container.children?.length ?? 0)) {
             return undefined
         }
-        const node = element.children?.[head]
-        const current = {
-            node: element,
+        const node = container.children?.[head]
+        const current: BooqContainerIterator = {
+            node: container,
             index: head,
             parent,
         }
@@ -51,14 +53,13 @@ export function iteratorAtPath(nodes: BooqNode[], path: BooqPath): BooqIterator 
                 index: tail[0],
                 parent: current,
             }
-        } else if (node?.kind !== 'element' || !node.children) {
-            return undefined
-        } else {
+        } else if (isContainerNode(node)) {
             return iteratorAtPathImpl(node, tail, current)
+        } else {
+            return undefined
         }
     }
     return iteratorAtPathImpl({
-        kind: 'element',
         name: 'root',
         children: nodes,
     }, path, undefined)
@@ -73,14 +74,12 @@ export function iteratorsPath(iter: BooqIterator): BooqPath {
 }
 
 export function iteratorsNode(iter: BooqIterator): BooqNode | undefined {
-    return iter.node?.kind === 'element'
-        ? iter.node.children?.[iter.index]
-        : undefined
+    return nodeChildren(iter.node)?.[iter.index]
 }
 
-export function firstLeafNode(iter: BooqNodeIterator): BooqNodeIterator {
+export function firstLeafNode(iter: BooqContainerIterator): BooqContainerIterator {
     const node = iter.node.children?.[iter.index]
-    if (node?.kind === 'element') {
+    if (node?.children?.length) {
         return firstLeafNode({
             parent: iter,
             index: 0,
@@ -91,9 +90,9 @@ export function firstLeafNode(iter: BooqNodeIterator): BooqNodeIterator {
     }
 }
 
-export function lastLeafNode(iter: BooqNodeIterator): BooqNodeIterator {
+export function lastLeafNode(iter: BooqContainerIterator): BooqContainerIterator {
     const node = iter.node.children?.[iter.index]
-    if (node?.kind === 'element' && node.children?.length) {
+    if (node?.children?.length) {
         return lastLeafNode({
             parent: iter,
             index: node.children.length - 1,
@@ -104,16 +103,16 @@ export function lastLeafNode(iter: BooqNodeIterator): BooqNodeIterator {
     }
 }
 
-export function nextLeafNode(iter: BooqIterator): BooqNodeIterator | undefined {
+export function nextLeafNode(iter: BooqIterator): BooqContainerIterator | undefined {
     const next = nextIterator(iter)
-    return next && isNodeIterator(next)
+    return next && isContainerIterator(next)
         ? firstLeafNode(next)
         : undefined
 }
 
-export function prevLeafNode(iter: BooqIterator): BooqNodeIterator | undefined {
+export function prevLeafNode(iter: BooqIterator): BooqContainerIterator | undefined {
     const prev = prevIterator(iter)
-    return prev && isNodeIterator(prev)
+    return prev && isContainerIterator(prev)
         ? lastLeafNode(prev)
         : undefined
 }
@@ -121,9 +120,7 @@ export function prevLeafNode(iter: BooqIterator): BooqNodeIterator | undefined {
 export function nextSibling(iter: BooqIterator) {
     const length = isTextNode(iter.node)
         ? iter.node.length
-        : isElementNode(iter.node)
-            ? iter.node.children?.length ?? 0
-            : 0
+        : nodeChildren(iter.node)?.length ?? 0
 
     return iter.index < length - 1
         ? { ...iter, index: iter.index + 1 }

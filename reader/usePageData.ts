@@ -1,21 +1,21 @@
 import { useMemo } from 'react'
-import { BooqFragment, BooqMetadata, BooqPath, positionForPath } from '@/core'
+import { BooqChapter, BooqMetadata, BooqPath, positionForPath } from '@/core'
 import { pageForPosition } from '@/application/common'
 
 export function usePageData({
-    fragment, meta, currentPath,
+    chapter, meta, currentPath,
 }: {
-    fragment: BooqFragment,
+    chapter: BooqChapter,
     meta: BooqMetadata,
     currentPath: BooqPath,
 }) {
-    const { nodes, next } = fragment
+    const { fragment, next } = chapter
     const length = meta.length
 
     return useMemo(() => {
-        const position = positionForPath(nodes, currentPath)
+        const position = positionForPath(fragment.nodes, currentPath)
         const nextChapter = next
-            ? positionForPath(nodes, next.path)
+            ? positionForPath(fragment.nodes, next.path)
             : length
         const currentPage = pageForPosition(position) + 1
         const totalPages = pageForPosition(length)
@@ -26,5 +26,5 @@ export function usePageData({
             totalPages,
             leftPages,
         }
-    }, [nodes, next, length, currentPath])
+    }, [fragment, next, length, currentPath])
 }

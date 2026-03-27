@@ -1,14 +1,14 @@
 import { BooqNode, BooqPath } from './model'
 import { assertNever } from './misc'
-import { isElementNode, isTextNode, isStubNode } from './node'
+import { isTextNode, isStubNode, nodeChildren, isContainerNode } from './node'
 
 export function nodeLength(node: BooqNode): number {
-    if (isElementNode(node)) {
-        return nodesLength(node.children ?? [])
+    if (isContainerNode(node)) {
+        return nodesLength(node.children)
     } else if (isTextNode(node)) {
         return node.length
     } else if (isStubNode(node)) {
-        return node?.length ?? 0
+        return node?.stub ?? 0
     } else {
         assertNever(node)
         return 0
@@ -29,8 +29,9 @@ export function positionForPath(nodes: BooqNode[], path: BooqPath): number {
         position += nodeLength(nodes[idx])
     }
     const last = nodes[head]
-    if (last?.kind === 'element' && last?.children) {
-        const after = positionForPath(last.children, tail)
+    const children = nodeChildren(last)
+    if (children) {
+        const after = positionForPath(children, tail)
         return after + position
     } else {
         return position
