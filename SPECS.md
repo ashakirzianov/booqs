@@ -784,3 +784,108 @@ Schema-defined API at `/api/graphql` using graphql-yoga. Supports authentication
 - **React Context**: `AppProvider` wraps the entire app for shared state
 - **Custom Hooks**: `useCollection`, `useBooqNotes`, `useFontScale`, `useSearch`, `useControlsVisibility`, etc.
 - **Debouncing**: Search input debounced at 300ms via `useDebouncedValue`
+
+---
+
+## 20. Content Model
+
+The internal representation of book content. These structures are serialized as JSON and exposed through the GraphQL API via the `BooqNode` scalar.
+
+### 20.1 Identifiers and Paths
+
+- **BooqId**: A string of the form `{library}-{id}` (e.g., `pg-55201`, `uu-abc123`). The library prefix identifies the source (`pg` = Project Gutenberg, `uu` = user uploads).
+- **BooqPath**: An array of integers representing a position in the node tree. Each integer is a child index at that depth. For example, `[2, 0, 3]` means: 3rd child of root → 1st child → 4th child.
+- **BooqRange**: An object `{ start: BooqPath, end: BooqPath }` representing a span of content between two paths.
+
+### 20.2 Node Types
+
+Book content is a tree of `BooqNode` values. A `BooqNode` is a discriminated union of four types, distinguished by their fields:
+
+**BooqSectionNode** — A top-level structural container (typically one per XHTML file in the source document).
+| Field | Type | Description |
+|-------|------|-------------|
+| `section` | `string` | Identifier for this section (e.g., `"Text/chapter-1.xhtml"`) |
+| `styleRefs` | `string[]?` | Keys into the styles map for CSS that applies to this section |
+| `children` | `BooqNode[]` | Child nodes |
+
+**BooqElementNode** — An HTML-like element (e.g., `div`, `p`, `span`, `img`).
+| Field | Type | Description |
+|-------|------|-------------|
+| `name` | `string` | Element tag name (e.g., `"p"`, `"div"`, `"img"`) |
+| `children` | `BooqNode[]` | Child nodes |
+| `id` | `string?` | Element ID (for internal linking and anchor resolution) |
+| `attrs` | `Record<string, string>?` | HTML attributes (e.g., `src`, `href`, `class`) |
+| `ref` | `BooqPath?` | Resolved path for internal book links |
+| `pph` | `boolean?` | "Paragraph-level" flag — marks nodes that are natural content boundaries for range expansion |
+
+**BooqTextNode** — A plain string. Text nodes are represented as bare strings, not objects.
+
+**BooqStubNode** — A placeholder for content outside the current range. Either `null` (zero-length) or `{ stub: number }` where `number` is the text length of the omitted content. Used when extracting a sub-range of the tree to preserve path alignment.
+
+### 20.3 Discriminating Node Types
+
+Since the union uses structural discrimination (not a `type` field), nodes are identified by checking for distinguishing fields:
+- Has `section` → `BooqSectionNode`
+- Has `name` → `BooqElementNode`
+- Is a `string` → `BooqTextNode`
+- Is `null` or has `stub` → `BooqStubNode`
+
+### 20.4 Styles
+
+**BooqStyles** is a `Record<string, string>` — a map from style reference keys to CSS rule strings.
+
+Section nodes reference styles via `styleRefs`. At render time, CSS is hydrated by:
+1. Looking up each ref in the styles map
+2. Namespacing all selectors with the section's identifier (e.g., `.booqs-Text-chapter-1-xhtml`) to prevent cross-section style collisions
+3. Injecting `<style>` tags into the rendered output
+
+The full styles map lives on `Booq.styles`. When a chapter or fragment is built, only the styles referenced by nodes in that slice are included — this avoids sending the entire stylesheet for every fragment.
+
+### 20.5 Booq (Complete Book)
+
+The top-level book model:
+| Field | Type | Description |
+|-------|------|-------------|
+| `nodes` | `BooqNode[]` | Complete content tree |
+| `styles` | `BooqStyles` | Full deduplicated styles map |
+| `metadata` | `BooqMetadata` | Title, authors, subjects, cover, length |
+| `toc` | `TableOfContents` | Table of contents with items (title, level, path, position) |
+
+### 20.6 BooqFragment
+
+A renderable content slice with boundary paths and scoped styles:
+| Field | Type | Description |
+|-------|------|-------------|
+| `start` | `BooqPath` | Start boundary of the content |
+| `end` | `BooqPath` | End boundary of the content |
+| `nodes` | `BooqNode[]` | Content nodes (may contain stubs outside the range) |
+| `styles` | `BooqStyles` | Only styles referenced by nodes in this fragment |
+
+Used for chapter content and note surrounding fragments.
+
+### 20.7 BooqChapter
+
+A navigable unit of the book (typically a chapter or large section), used by the reader:
+| Field | Type | Description |
+|-------|------|-------------|
+| `previous` | `BooqAnchor?` | Anchor to the previous chapter |
+| `current` | `BooqAnchor` | Anchor for this chapter's start |
+| `next` | `BooqAnchor?` | Anchor to the next chapter |
+| `fragment` | `BooqFragment` | The chapter's content |
+
+**BooqAnchor** represents a navigation point:
+| Field | Type | Description |
+|-------|------|-------------|
+| `path` | `BooqPath` | Position in the node tree |
+| `title` | `string?` | Chapter/section title from the table of contents |
+| `position` | `number` | Character offset from the start of the book |
+
+Chapters are split at table-of-contents boundaries, with a minimum size of ~4500 characters to avoid very short chapters.
+
+### 20.8 Position and Length
+
+Each node has an implicit text length (the sum of its text content). **Position** is the cumulative character offset from the start of the book. Positions are used for:
+- Page numbering (via a characters-per-page formula)
+- Reading progress tracking
+- Table of contents entries
+- Anchor points in chapters
