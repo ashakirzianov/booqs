@@ -229,10 +229,10 @@ type User {
 ```
 
 ### Changes
-- [ ] Add `username` filter + pagination to `booq.notes` field
-- [ ] Replace `myNotes` with top-level `notes(username!)` query (username required to avoid unbounded queries)
-- [ ] Add `booksWithNotes` field to `User` type
-- [ ] Deprecate or remove `myNotes`
+- [x] Add `username` filter + pagination to `booq.notes` field
+- [x] Replace `myNotes` with top-level `notes(username!)` query (username required to avoid unbounded queries)
+- [x] Add `booqsWithNotes` field to `User` type
+- [x] Removed `myNotes`
 
 ### Notes
 - `booq.notes(username)` covers: all notes on a book (no username), my notes (my username), someone else's notes (their username)

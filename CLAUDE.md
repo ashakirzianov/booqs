@@ -51,6 +51,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Prefer 'function name(...) { ... }' style to 'const name = (...) => { ... }' style
 
+- In user-facing names (GraphQL schema fields/types, URL routes, UI labels), always use "booq" instead of "book" for consistency with the product name. For example: `booqsWithNotes` not `booksWithNotes`, `/booq/[id]` not `/book/[id]`. Internal variable names and backend function names may use "book" where it reads more naturally (e.g., `getBookmarks`).
+
 ## State Management
 
 - When there's multiple mutually exclusive state of the component (such as isLoading and error -- when error is not null, isLoading should be false and vice versa) try to combine them into one state object with discriminating field (such as { state: 'loading' } and { state: 'error', error })

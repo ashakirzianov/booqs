@@ -45,7 +45,7 @@ export async function notesForBooqId(booqId: string, _userId?: string): Promise<
 export async function notesWithAuthorFor({ booqId, authorId, userId: _userId, limit, offset }: {
   booqId?: BooqId,
   authorId?: string,
-  userId?: string,
+  userId: string | undefined,
   limit?: number,
   offset?: number,
 }): Promise<DbNoteWithAuthor[]> {

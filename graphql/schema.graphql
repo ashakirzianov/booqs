@@ -8,7 +8,7 @@ type Query {
     history(limit: Int, offset: Int): [BooqHistory]
     collection(name: String!): Collection
     featured(limit: Int!): [Booq]
-    myNotes(booqId: ID, limit: Int, offset: Int): [Note!]!
+    notes(username: String!, limit: Int, offset: Int): [Note!]!
     libraryBrowse(library: String!, kind: LibraryBrowseKind!, query: String!, limit: Int, offset: Int): LibraryBrowseResult!
     copilot(context: CopilotContext!): Copilot
 }
@@ -88,7 +88,7 @@ type Booq {
     subjects: [String!]
     coverSrc: String
     bookmarks: [Bookmark]
-    notes: [Note]
+    notes(username: String, limit: Int, offset: Int): [Note!]!
     preview(path: [Int!], end: [Int!], length: Int = 500): String
     chapter(path: [Int!]): BooqChapter
     expandedFragment(start: [Int!]!, end: [Int!]!): BooqFragment
@@ -114,6 +114,7 @@ type User {
     followers: [User!]!
     following: [User!]!
     isFollowing: Boolean
+    booqsWithNotes: [Booq!]!
     passkeys: [Passkey!]
 }
 

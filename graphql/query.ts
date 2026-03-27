@@ -67,13 +67,14 @@ export const queryResolver: IResolvers<unknown, ResolverContext> = {
             const booqIds: BooqId[] = await booqIdsInCollections(userId, name) as BooqId[]
             return { name, booqIds }
         },
-        async myNotes(_, { booqId, limit, offset }: {
-            booqId?: string, limit?: number, offset?: number,
+        async notes(_, { username, limit, offset }: {
+            username: string, limit?: number, offset?: number,
         }, { userId }) {
-            if (!userId) {
+            const user = await userForUsername(username)
+            if (!user) {
                 return []
             }
-            return notesWithAuthorFor({ authorId: userId, booqId: booqId as BooqId, limit, offset })
+            return notesWithAuthorFor({ authorId: user.id, userId, limit, offset })
         },
         async libraryBrowse(_, { library, kind, query, limit, offset }: {
             library: string, kind: LibraryQuery['kind'], query: string, limit?: number, offset?: number,

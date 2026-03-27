@@ -7,7 +7,8 @@ import {
     getExpandedRange, nodesForRange, collectReferencedStyles,
 } from '@/core'
 import { getBookmarks } from '@/backend/bookmarks'
-import { notesForBooqId } from '@/backend/notes'
+import { notesWithAuthorFor } from '@/backend/notes'
+import { userForUsername } from '@/backend/users'
 
 export type BooqParent = {
     kind?: 'booq' | undefined,
@@ -42,8 +43,16 @@ export const booqResolver: IResolvers<BooqParent, ResolverContext> = {
                 })
                 : []
         },
-        async notes(parent): Promise<NoteParent[]> {
-            return notesForBooqId(parent.booqId)
+        async notes(parent, { username, limit, offset }: {
+            username?: string, limit?: number, offset?: number,
+        }, { userId }): Promise<NoteParent[]> {
+            let authorId: string | undefined
+            if (username) {
+                const user = await userForUsername(username)
+                if (!user) return []
+                authorId = user.id
+            }
+            return notesWithAuthorFor({ booqId: parent.booqId, authorId, userId, limit, offset })
         },
         async preview(parent, { path, end, length }, { booqLoader }) {
             const booq = await booqLoader.load(parent.booqId)
