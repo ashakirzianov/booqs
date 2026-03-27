@@ -6,7 +6,7 @@ import { CopilotInput, CopilotParent } from './copilot'
 import { AuthorParent } from './author'
 import { booqHistoryForUser } from '@/backend/history'
 import { booqIdsInCollections } from '@/backend/collections'
-import { userForId, userForUsername } from '@/backend/users'
+import { userForUsername } from '@/backend/users'
 import { CollectionParent } from './collection'
 import { BooqId } from '@/core'
 import { booqQuery, featuredBooqIds, LibraryQuery } from '@/backend/library'
@@ -39,9 +39,9 @@ export const queryResolver: IResolvers<unknown, ResolverContext> = {
             const results = await booqQuery('pg', { kind: 'search', query, limit: limit ?? 100 })
             return results.cards
         },
-        async me(_, __, { userId }) {
+        async me(_, __, { userId, userLoader }) {
             if (userId) {
-                const user = await userForId(userId)
+                const user = await userLoader.load(userId)
                 return user ?? undefined
             } else {
                 return undefined

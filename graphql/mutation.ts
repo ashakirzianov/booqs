@@ -1,6 +1,6 @@
 import { IResolvers } from '@graphql-tools/utils'
 import { ResolverContext } from './context'
-import { deleteUserForId, userForId, updateUser, userForUsername } from '@/backend/users'
+import { deleteUserForId, updateUser, userForUsername } from '@/backend/users'
 import { addNote, removeNote, updateNote } from '@/backend/notes'
 import { initiatePasskeyLogin, initiatePasskeyRegistration, verifyPasskeyLogin, verifyPasskeyRegistration } from '@/backend/passkey'
 import { initiateSignRequest, completeSignInRequest, completeSignUp } from '@/backend/sign'
@@ -179,11 +179,11 @@ export const mutationResolver: IResolvers<any, ResolverContext> = {
             setAuthForUserId(result.user.id)
             return { token, user: result.user }
         },
-        async initPasskeyRegistration(_, __, { userId, origin }) {
+        async initPasskeyRegistration(_, __, { userId, origin, userLoader }) {
             if (!userId) {
                 return undefined
             }
-            const user = await userForId(userId)
+            const user = await userLoader.load(userId)
             if (!user) {
                 return undefined
             }

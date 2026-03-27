@@ -2,14 +2,14 @@ import { IResolvers } from '@graphql-tools/utils'
 import { BooqParent } from './booq'
 import { ResolverContext } from './context'
 import { DbNote } from '@/backend/notes'
-import { DbUser, userForId } from '@/backend/users'
+import { DbUser } from '@/backend/users'
 import { BooqId, positionForPath, textForRange } from '@/core'
 
 export type NoteParent = DbNote
 export const noteResolver: IResolvers<NoteParent, ResolverContext> = {
     Note: {
-        async author(parent): Promise<DbUser | null> {
-            return userForId(parent.author_id)
+        async author(parent, _, { userLoader }): Promise<DbUser | null> {
+            return userLoader.load(parent.author_id)
         },
         async booq(parent, _, { booqDataLoader }): Promise<BooqParent | undefined> {
             return booqDataLoader.load(parent.booq_id as BooqId)
