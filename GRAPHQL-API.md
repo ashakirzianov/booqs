@@ -225,16 +225,115 @@ The email magic link flow exists as server actions in [data/auth.ts](data/auth.t
 
 ---
 
+## 9. Redesign notes queries
+
+### What exists
+- `myNotes(booqId, limit, offset)` top-level query — returns only authenticated user's notes, optionally filtered by book
+- `booq.notes` field — returns all notes for a book, no filtering or pagination
+- `fetchBooqsWithOwnNotes()` server action — returns book IDs where user has notes (used for notes sidebar navigation)
+
+### Proposed schema
+Replace `myNotes` and the current `booq.notes` with:
+
+```graphql
+type Query {
+    # All notes by a user across all books (username required)
+    notes(username: String!, limit: Int, offset: Int): [Note!]!
+}
+
+type Booq {
+    # Notes on this book, optionally filtered by author
+    notes(username: String, limit: Int, offset: Int): [Note!]!
+}
+
+type User {
+    # Books this user has annotated (for sidebar navigation)
+    booksWithNotes: [Booq!]!
+}
+```
+
+### Changes
+- [ ] Add `username` filter + pagination to `booq.notes` field
+- [ ] Replace `myNotes` with top-level `notes(username!)` query (username required to avoid unbounded queries)
+- [ ] Add `booksWithNotes` field to `User` type
+- [ ] Deprecate or remove `myNotes`
+
+### Notes
+- `booq.notes(username)` covers: all notes on a book (no username), my notes (my username), someone else's notes (their username)
+- Top-level `notes(username)` covers the "all my annotations" page
+- `user.booksWithNotes` covers the notes sidebar navigation
+
+---
+
+## 10. Passkey management queries
+
+### What exists
+- `fetchPasskeyData()` server action — lists user's registered passkeys
+- `deletePasskeyAction(id)` server action — deletes a passkey
+- GraphQL has registration/login flows but no list/delete
+
+### Schema changes
+- [ ] Add query to `User` type:
+  ```graphql
+  type User {
+      passkeys: [Passkey!]!
+  }
+  type Passkey {
+      id: ID!
+      name: String
+      createdAt: String!
+  }
+  ```
+- [ ] Add mutation:
+  ```graphql
+  deletePasskey(id: ID!): Boolean
+  ```
+
+---
+
+## 11. History pagination
+
+### What exists
+- `history` query returns all reading history entries with no pagination
+- Server actions support `limit`/`offset` for paginated history
+
+### Schema changes
+- [ ] Add pagination parameters to `history` query:
+  ```graphql
+  history(limit: Int, offset: Int): [BooqHistory]
+  ```
+
+---
+
+## 12. Copilot streaming context fields
+
+### What exists
+- REST `/api/copilot/answer/stream` accepts optional `footnote` parameter for additional context
+- GraphQL `copilotAnswerStream` subscription only accepts `context` and `question`
+
+### Schema changes
+- [ ] Add `footnote` parameter to subscription:
+  ```graphql
+  type Subscription {
+      copilotAnswerStream(context: CopilotContext!, question: String!, footnote: String): String!
+  }
+  ```
+
+---
+
 ## Suggested Implementation Order
 
 1. **Bearer token** — smallest change, unblocks API consumers immediately
 2. **Magic link mutations** — builds on bearer token (returns token in body)
 3. **Library browse** — independent, straightforward wrapper
-4. **myNotes** — independent, needs minor backend pagination addition
+4. **Notes redesign** — replaces myNotes with more flexible query pattern
 5. **Copilot streaming** — independent, depends on subscription transport setup
 6. **Presigned upload mutations** — depends on backend presigned URL support (see [BOOK-UPLOAD.md](BOOK-UPLOAD.md))
 7. **Expose styles** — needed for styled rendering via GraphQL
 8. **Expanded fragment query** — needed for note previews with context
+9. **Passkey management** — needed for full profile management
+10. **History pagination** — needed for large reading histories
+11. **Copilot context fields** — improves AI answer quality
 
 ---
 
