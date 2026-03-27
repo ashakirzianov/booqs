@@ -1,11 +1,12 @@
 import { generateToken, userIdFromHeader, userIdFromToken } from '@/backend/token'
+import { createLoaders, GraphQLLoaders } from './loaders'
 
 export type ResolverContext = {
     userId?: string,
     origin?: string,
     setAuthForUserId(userId: string): void,
     clearAuth(): void,
-}
+} & GraphQLLoaders
 type CookieOptions = {
     httpOnly?: boolean,
     secure?: boolean,
@@ -27,6 +28,7 @@ export async function context(ctx: RequestContext): Promise<ResolverContext> {
     return {
         userId,
         origin: ctx.origin,
+        ...createLoaders(),
         setAuthForUserId(userId: string) {
             const token = generateToken(userId)
             ctx.setCookie('token', token, {

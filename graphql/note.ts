@@ -1,21 +1,21 @@
 import { IResolvers } from '@graphql-tools/utils'
 import { BooqParent } from './booq'
+import { ResolverContext } from './context'
 import { DbNote } from '@/backend/notes'
 import { DbUser, userForId } from '@/backend/users'
 import { BooqId, positionForPath, textForRange } from '@/core'
-import { booqDataForId, booqForId } from '@/backend/library'
 
 export type NoteParent = DbNote
-export const noteResolver: IResolvers<NoteParent> = {
+export const noteResolver: IResolvers<NoteParent, ResolverContext> = {
     Note: {
         async author(parent): Promise<DbUser | null> {
             return userForId(parent.author_id)
         },
-        async booq(parent): Promise<BooqParent | undefined> {
-            return booqDataForId(parent.booq_id as BooqId)
+        async booq(parent, _, { booqDataLoader }): Promise<BooqParent | undefined> {
+            return booqDataLoader.load(parent.booq_id as BooqId)
         },
-        async text(parent) {
-            const booq = await booqForId(parent.booq_id as BooqId)
+        async text(parent, _, { booqLoader }) {
+            const booq = await booqLoader.load(parent.booq_id as BooqId)
             if (booq) {
                 const text = textForRange(booq.nodes, {
                     start: parent.start_path,
@@ -25,8 +25,8 @@ export const noteResolver: IResolvers<NoteParent> = {
             }
             return '<no-booq>'
         },
-        async position(parent) {
-            const booq = await booqForId(parent.booq_id as BooqId)
+        async position(parent, _, { booqLoader }) {
+            const booq = await booqLoader.load(parent.booq_id as BooqId)
             if (!booq) {
                 return undefined
             }

@@ -9,7 +9,7 @@ import { booqIdsInCollections } from '@/backend/collections'
 import { userForId, userForUsername } from '@/backend/users'
 import { CollectionParent } from './collection'
 import { BooqId } from '@/core'
-import { booqDataForId, booqDataForIds, booqQuery, featuredBooqIds, LibraryQuery } from '@/backend/library'
+import { booqQuery, featuredBooqIds, LibraryQuery } from '@/backend/library'
 import { notesWithAuthorFor } from '@/backend/notes'
 
 type SearchResultParent = BooqParent | AuthorParent
@@ -26,8 +26,8 @@ export const queryResolver: IResolvers<unknown, ResolverContext> = {
         ping() {
             return 'pong'
         },
-        async booq(_, { id }): Promise<BooqParent | undefined> {
-            return booqDataForId(id)
+        async booq(_, { id }, { booqDataLoader }): Promise<BooqParent | undefined> {
+            return booqDataLoader.load(id)
         },
         author(_, { name }): AuthorParent {
             return { name, kind: 'author' }
@@ -86,9 +86,10 @@ export const queryResolver: IResolvers<unknown, ResolverContext> = {
             })
             return { booqs: result.cards, hasMore: result.hasMore }
         },
-        async featured(_, { limit }): Promise<Array<BooqParent | undefined>> {
+        async featured(_, { limit }, { booqDataLoader }): Promise<Array<BooqParent | undefined>> {
             const ids = await featuredBooqIds(limit)
-            return booqDataForIds(ids)
+            const results = await booqDataLoader.loadMany(ids)
+            return results.map(r => r instanceof Error ? undefined : r)
         },
         copilot(_, { context }: { context: CopilotInput }): CopilotParent {
             return context
