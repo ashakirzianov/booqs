@@ -173,26 +173,26 @@ The email magic link flow exists as server actions in [data/auth.ts](data/auth.t
 ## 7. Expose styles and restructure fragment/section types
 
 ### What was done
-- Restructured GraphQL types: `BooqFragment` (was the navigable chapter type) → `BooqSection` (with `previous`/`current`/`next` anchors + nested `BooqFragment`)
+- Restructured GraphQL types: `BooqFragment` (was the navigable chapter type) → `BooqChapter` (with `previous`/`current`/`next` anchors + nested `BooqFragment`)
 - `BooqFragment` is now a simpler type: `start`, `end`, `nodes`, `styles` — reusable for both sections and expanded fragments
 - `BooqAnchor` now includes `position` (moved from the old `BooqFragment`)
 - Added `styles` field to both `Booq` type (full map) and `BooqFragment` type (scoped subset)
-- Renamed `Booq.fragment(path)` → `Booq.section(path)` returning `BooqSection`
+- Renamed `Booq.fragment(path)` → `Booq.chapter(path)` returning `BooqChapter`
 - Added `Booq.expandedFragment(start, end)` returning `BooqFragment` for note previews
-- Renamed all related core types and functions: `buildFragment` → `buildSection`, `BooqFragment` → `BooqSection`, etc.
+- Renamed all related core types and functions: `buildFragment` → `buildChapter`, `BooqFragment` → `BooqChapter`, etc.
 - Removed unused `backend/fragment.ts` and `core/fragment.ts` (replaced by `core/section.ts`)
 
 ### Schema changes
 - [x] Add `styles` field to `Booq` type (returns full styles map)
 - [x] Add `styles` field to `BooqFragment` type (returns only styles referenced by fragment nodes)
-- [x] Restructure `BooqFragment` → `BooqSection` with nested `BooqFragment`
+- [x] Restructure `BooqFragment` → `BooqChapter` with nested `BooqFragment`
 - [x] Move `position` to `BooqAnchor`
 - [x] Add `Booq.expandedFragment(start, end)` field
-- [x] Rename `Booq.fragment(path)` → `Booq.section(path)`
+- [x] Rename `Booq.fragment(path)` → `Booq.chapter(path)`
 
 ### Resolver changes
 - [x] In `booq.ts`: resolve `styles` by returning `booq.styles`
-- [x] In `booq.ts`: section resolver returns `BooqSection` with nested `BooqFragment`
+- [x] In `booq.ts`: section resolver returns `BooqChapter` with nested `BooqFragment`
 - [x] In `booq.ts`: `expandedFragment` resolver calls `getExpandedRange` + `nodesForRange` + `collectReferencedStyles`
 
 ### Notes

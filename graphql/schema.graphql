@@ -90,7 +90,7 @@ type Booq {
     bookmarks: [Bookmark]
     notes: [Note]
     preview(path: [Int!], end: [Int!], length: Int = 500): String
-    section(path: [Int!]): BooqSection
+    chapter(path: [Int!]): BooqChapter
     expandedFragment(start: [Int!]!, end: [Int!]!): BooqFragment
     nodes: [BooqNode]
     styles: BooqNode
@@ -145,7 +145,7 @@ input BooqHistoryInput {
 
 scalar BooqNode
 
-type BooqSection {
+type BooqChapter {
     previous: BooqAnchor
     current: BooqAnchor!
     next: BooqAnchor

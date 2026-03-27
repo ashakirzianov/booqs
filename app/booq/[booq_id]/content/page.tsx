@@ -1,5 +1,5 @@
 import { BooqId, parseIdOpt, pathFromString, rangeFromString } from '@/core'
-import { fetchBooqPreview, fetchBooqSection } from '@/data/booqs'
+import { fetchBooqPreview, fetchBooqChapter } from '@/data/booqs'
 import { reportBooqHistoryAction } from '@/data/history'
 import { Reader } from '@/reader/Reader'
 import { Metadata } from 'next'
@@ -84,7 +84,7 @@ export default async function BooqPathPage({
         redirect(`/auth?return_to=${returnTo}`)
     }
     const [booqData, notes] = await Promise.all([
-        fetchBooqSection(booqId, booqPath),
+        fetchBooqChapter(booqId, booqPath),
         fetchNotes({ booqId }),
     ])
     if (!booqData)
@@ -100,7 +100,7 @@ export default async function BooqPathPage({
 
     return <Reader
         booqId={booqId}
-        section={booqData.section}
+        chapter={booqData.chapter}
         metadata={booqData.metadata}
         toc={booqData.toc}
         notes={notes}

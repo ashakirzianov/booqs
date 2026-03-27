@@ -15,20 +15,20 @@ export type BooqFragment = {
     styles: BooqStyles,
 }
 
-export type BooqSection = {
+export type BooqChapter = {
     previous?: BooqAnchor,
     current: BooqAnchor,
     next?: BooqAnchor,
     fragment: BooqFragment,
 }
 
-export function buildSection({ booq, path }: {
+export function buildChapter({ booq, path }: {
     booq: Booq,
     path?: BooqPath,
-}): BooqSection {
+}): BooqChapter {
     return path
-        ? sectionForPath(booq, path)
-        : fullBooqSection(booq)
+        ? chapterForPath(booq, path)
+        : fullBooqChapter(booq)
 }
 
 export function collectReferencedStyles(nodes: BooqNode[], allStyles: BooqStyles): BooqStyles {
@@ -49,7 +49,7 @@ export function collectReferencedStyles(nodes: BooqNode[], allStyles: BooqStyles
     return styles
 }
 
-function fullBooqSection(booq: Booq): BooqSection {
+function fullBooqChapter(booq: Booq): BooqChapter {
     return {
         previous: undefined,
         next: undefined,
@@ -67,7 +67,7 @@ function fullBooqSection(booq: Booq): BooqSection {
     }
 }
 
-function sectionForPath(booq: Booq, path: BooqPath): BooqSection {
+function chapterForPath(booq: Booq, path: BooqPath): BooqChapter {
     let previous: BooqAnchor | undefined
     let next: BooqAnchor | undefined
     let current: BooqAnchor = {
@@ -76,7 +76,7 @@ function sectionForPath(booq: Booq, path: BooqPath): BooqSection {
         position: 0,
     }
 
-    for (const anchor of generateAnchors(booq, sectionLength)) {
+    for (const anchor of generateAnchors(booq, chapterLength)) {
         if (!pathLessThan(path, anchor.path)) {
             previous = current
             current = anchor
@@ -104,7 +104,7 @@ function sectionForPath(booq: Booq, path: BooqPath): BooqSection {
     }
 }
 
-const sectionLength = 4500
+const chapterLength = 4500
 function* generateAnchors(booq: Booq, length: number) {
     let position = 0
     for (const item of booq.toc.items) {

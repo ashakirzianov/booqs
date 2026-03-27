@@ -3,7 +3,7 @@ import { BookmarkParent } from './bookmark'
 import { NoteParent } from './note'
 import { ResolverContext } from './context'
 import {
-    BooqId, buildSection, previewForPath, textForRange,
+    BooqId, buildChapter, previewForPath, textForRange,
     getExpandedRange, nodesForRange, collectReferencedStyles,
 } from '@/core'
 import { getBookmarks } from '@/backend/bookmarks'
@@ -72,12 +72,12 @@ export const booqResolver: IResolvers<BooqParent, ResolverContext> = {
                 ? booq.styles
                 : undefined
         },
-        async section(parent, { path }, { booqLoader }) {
+        async chapter(parent, { path }, { booqLoader }) {
             const booq = await booqLoader.load(parent.booqId)
             if (!booq) {
                 return undefined
             }
-            return buildSection({ booq, path })
+            return buildChapter({ booq, path })
         },
         async expandedFragment(parent, { start, end }, { booqLoader }) {
             const booq = await booqLoader.load(parent.booqId)
