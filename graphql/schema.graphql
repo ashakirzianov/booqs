@@ -90,7 +90,8 @@ type Booq {
     bookmarks: [Bookmark]
     notes: [Note]
     preview(path: [Int!], end: [Int!], length: Int = 500): String
-    fragment(path: [Int!]): BooqFragment
+    section(path: [Int!]): BooqSection
+    expandedFragment(start: [Int!]!, end: [Int!]!): BooqFragment
     nodes: [BooqNode]
     styles: BooqNode
     tableOfContents: [TocItem!]
@@ -144,11 +145,16 @@ input BooqHistoryInput {
 
 scalar BooqNode
 
-type BooqFragment {
+type BooqSection {
     previous: BooqAnchor
     current: BooqAnchor!
     next: BooqAnchor
-    position: Int!
+    fragment: BooqFragment!
+}
+
+type BooqFragment {
+    start: [Int!]!
+    end: [Int!]!
     nodes: [BooqNode]
     styles: BooqNode
 }
@@ -156,6 +162,7 @@ type BooqFragment {
 type BooqAnchor {
     title: String
     path: [Int!]!
+    position: Int!
 }
 
 type TocItem {

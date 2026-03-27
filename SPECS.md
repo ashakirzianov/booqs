@@ -360,7 +360,7 @@ On desktop: Controls are always visible in side gutters.
 
 - Book content is rendered from a tree of `BooqNode` objects (parsed from EPUB)
 - Nodes are rendered recursively with proper HTML elements
-- **CSS Handling**: Stylesheets from the EPUB are deduplicated and stored once in `Booq.styles` (a `Record<string, string>` keyed by stylesheet href or synthetic key for inline styles). Each section node stores only a `styleRefs` array of keys into this map. When a fragment is built, only the referenced styles are included in `BooqFragment.styles`. At render time, CSS is hydrated on section nodes by looking up `styleRefs` in the styles map, namespacing selectors with the section's class prefix (e.g., `.booqs-Text-chapter-xhtml`), and injecting `<style>` tags. This avoids duplicating large stylesheets across sections — in image-heavy books, this can reduce the in-memory book size from ~23MB to ~4MB.
+- **CSS Handling**: Stylesheets from the EPUB are deduplicated and stored once in `Booq.styles` (a `Record<string, string>` keyed by stylesheet href or synthetic key for inline styles). Each section node stores only a `styleRefs` array of keys into this map. When a section is built, only the referenced styles are included in the section's `BooqFragment.styles`. At render time, CSS is hydrated on section nodes by looking up `styleRefs` in the styles map, namespacing selectors with the section's class prefix (e.g., `.booqs-Text-chapter-xhtml`), and injecting `<style>` tags. This avoids duplicating large stylesheets across sections — in image-heavy books, this can reduce the in-memory book size from ~23MB to ~4MB.
 - **Augmentations** are overlaid on the content:
   - Highlight annotations (colored backgrounds matching highlight color tokens)
   - Comment indicators (transparent background but clickable)
@@ -740,7 +740,7 @@ Schema-defined API at `/api/graphql` using graphql-yoga. Supports authentication
 - `ping` — Health check
 - `me` — Current authenticated user
 - `user(username)` — Public user profile
-- `booq(id)` — Book by ID, including metadata, content nodes, styles map, fragments (with scoped styles), table of contents, bookmarks, and notes
+- `booq(id)` — Book by ID, including metadata, content nodes, styles map, sections (with scoped fragment styles), expanded fragments for note previews, table of contents, bookmarks, and notes
 - `author(name)` — Author with paginated book list
 - `search(query, limit)` — Full-text search returning books and authors
 - `libraryBrowse(library, kind, query, limit, offset)` — Browse books by author, subject, or language within a library (kind is an enum: `search`, `author`, `subject`, `language`)

@@ -2,8 +2,7 @@
 // import '@/app/wdyr'
 
 import React, { useEffect, useMemo } from 'react'
-import { BooqAnchor, BooqId, BooqMetadata, BooqPath, BooqRange, TableOfContents, pathFromString, rangeFromString } from '@/core'
-import { BooqFragment } from '@/core/fragment'
+import { BooqAnchor, BooqId, BooqMetadata, BooqPath, BooqRange, BooqSection, TableOfContents, pathFromString, rangeFromString } from '@/core'
 import { PanelButton } from '@/components/Buttons'
 import { booqContentHref, feedHref } from '@/common/href'
 import {
@@ -34,10 +33,10 @@ import { BooqNote } from '@/data/notes'
 import { AccountData } from '@/data/user'
 
 export function Reader({
-    booqId, fragment, metadata, toc, notes: initialNotes, user,
+    booqId, section, metadata, toc, notes: initialNotes, user,
 }: {
     booqId: BooqId,
-    fragment: BooqFragment,
+    section: BooqSection,
     metadata: BooqMetadata,
     toc: TableOfContents,
     notes: BooqNote[],
@@ -51,18 +50,18 @@ export function Reader({
         currentPath,
     } = useScrollHandler({
         booqId: booqId,
-        initialPath: fragment.current.path,
+        initialPath: section.current.path,
     })
     const { currentPage, leftPages, totalPages } = usePageData({
-        fragment,
+        section,
         meta: metadata,
         currentPath,
     })
 
     const range: BooqRange = useMemo(() => ({
-        start: fragment.current.path,
-        end: fragment.next?.path ?? [fragment.nodes.length],
-    }), [fragment])
+        start: section.fragment.start,
+        end: section.fragment.end,
+    }), [section])
 
     const {
         navigationOpen, navigationSelection,
@@ -252,8 +251,8 @@ export function Reader({
             fontSize: `${fontScale}%`,
         }}>
             <BooqContent
-                nodes={fragment.nodes}
-                styles={fragment.styles}
+                nodes={section.fragment.nodes}
+                styles={section.fragment.styles}
                 range={range}
                 augmentations={augmentations}
                 onAugmentationClick={onAugmentationClick}
@@ -262,12 +261,12 @@ export function Reader({
         </div>}
         PrevButton={<AnchorButton
             booqId={booqId}
-            anchor={fragment.previous}
+            anchor={section.previous}
             title='Previous'
         />}
         NextButton={<AnchorButton
             booqId={booqId}
-            anchor={fragment.next}
+            anchor={section.next}
             title='Next'
         />}
         ContextMenu={ContextMenuNode}

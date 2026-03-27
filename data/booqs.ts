@@ -1,11 +1,11 @@
 'use server'
 import {
-    BooqPath, buildFragment,
+    BooqPath, buildSection,
     BooqId,
     BooqMetadata,
     BooqStyles,
     TableOfContents,
-    BooqFragment,
+    BooqSection,
     BooqRange,
     BooqNode,
     getExpandedRange,
@@ -18,7 +18,7 @@ import { BooqData, booqDataForIds, booqForId, booqPreview, booqQuery, booqToc, f
 
 export type PartialBooqData = {
     booqId: BooqId,
-    fragment: BooqFragment,
+    section: BooqSection,
     meta: BooqMetadata,
     toc: TableOfContents,
 }
@@ -133,24 +133,24 @@ export async function booqPart({
     if (booq === undefined) {
         return undefined
     }
-    const fragment = buildFragment({ booq, path })
+    const section = buildSection({ booq, path })
 
     return {
         booqId,
-        fragment,
+        section,
         toc: booq.toc,
         meta: booq.metadata,
     } satisfies PartialBooqData
 }
 
-export async function fetchBooqFragment(booqId: BooqId, path?: BooqPath) {
+export async function fetchBooqSection(booqId: BooqId, path?: BooqPath) {
     const booq = await booqForId(booqId)
     if (!booq) {
         return undefined
     }
-    const fragment = buildFragment({ booq, path })
+    const section = buildSection({ booq, path })
     return {
-        fragment,
+        section,
         metadata: booq.metadata,
         toc: booq.toc,
     }

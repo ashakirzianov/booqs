@@ -170,54 +170,30 @@ The email magic link flow exists as server actions in [data/auth.ts](data/auth.t
 
 ---
 
-## 7. Expose styles on Booq and BooqFragment
+## 7. Expose styles and restructure fragment/section types
 
-### What exists
-- `Booq.styles` (`Record<string, string>`) contains preprocessed CSS keyed by style ref
-- `BooqSectionNode.styleRefs` references keys in this map
-- `collectReferencedStyles` in `core/fragment.ts` extracts the subset of styles needed by a fragment's nodes
-- `BooqNode` JSON scalar already exists for untyped JSON
+### What was done
+- Restructured GraphQL types: `BooqFragment` (was the navigable chapter type) → `BooqSection` (with `previous`/`current`/`next` anchors + nested `BooqFragment`)
+- `BooqFragment` is now a simpler type: `start`, `end`, `nodes`, `styles` — reusable for both sections and expanded fragments
+- `BooqAnchor` now includes `position` (moved from the old `BooqFragment`)
+- Added `styles` field to both `Booq` type (full map) and `BooqFragment` type (scoped subset)
+- Renamed `Booq.fragment(path)` → `Booq.section(path)` returning `BooqSection`
+- Added `Booq.expandedFragment(start, end)` returning `BooqFragment` for note previews
+- Renamed all related core types and functions: `buildFragment` → `buildSection`, `BooqFragment` → `BooqSection`, etc.
+- Removed unused `backend/fragment.ts` and `core/fragment.ts` (replaced by `core/section.ts`)
 
 ### Schema changes
 - [x] Add `styles` field to `Booq` type (returns full styles map)
 - [x] Add `styles` field to `BooqFragment` type (returns only styles referenced by fragment nodes)
+- [x] Restructure `BooqFragment` → `BooqSection` with nested `BooqFragment`
+- [x] Move `position` to `BooqAnchor`
+- [x] Add `Booq.expandedFragment(start, end)` field
+- [x] Rename `Booq.fragment(path)` → `Booq.section(path)`
 
 ### Resolver changes
 - [x] In `booq.ts`: resolve `styles` by returning `booq.styles`
-- [x] In `booq.ts` fragment resolver: call `collectReferencedStyles(fragment.nodes, booq.styles)` and include in response
-
-### Notes
-- Using the existing `BooqNode` JSON scalar for the styles field is simplest. A dedicated `JSON` scalar would be more semantically correct but functionally equivalent.
-- Without styles, section nodes with `styleRefs` render unstyled content.
-
----
-
-## 8. Expanded fragment query for note previews
-
-### What exists
-- `getExpandedFragments(booqId, ranges)` in `data/booqs.ts` returns nodes + styles for ranges around notes
-- `fetchExpandedFragmentForRange(booqId, range)` does the same for a single range
-- REST endpoint `GET /api/booq/[booq_id]/expanded-fragment?range=...` exposes single-range version
-- `getExpandedRange` in `core/text.ts` expands a range to include surrounding context nodes
-- Notes page uses `getExpandedFragments` to render note previews with context
-
-### Schema changes
-- [ ] Add field to `Booq` type:
-  ```graphql
-  expandedFragment(start: [Int!]!, end: [Int!]!): ExpandedFragment
-  ```
-- [ ] Add type:
-  ```graphql
-  type ExpandedFragment {
-      nodes: [BooqNode]
-      styles: BooqNode  # JSON scalar — Record<string, string>
-      start: [Int!]!
-      end: [Int!]!
-  }
-  ```
-
-### Resolver changes
-- [ ] In `booq.ts`: resolve `expandedFragment` by calling `getExpandedRange` + `nodesForRange` + `collectReferencedStyles`
+- [x] In `booq.ts`: section resolver returns `BooqSection` with nested `BooqFragment`
+- [x] In `booq.ts`: `expandedFragment` resolver calls `getExpandedRange` + `nodesForRange` + `collectReferencedStyles`
 
 ### Notes
 - The web app fetches all note fragments in a single server-side call (`getExpandedFragments` with an array of ranges). GraphQL clients would need to request each fragment separately via the `expandedFragment` field, or we could add a batch query that accepts multiple ranges.
@@ -341,3 +317,4 @@ type User {
 
 - [x] Consider typing `libraryBrowse.kind` as a GraphQL enum instead of `String!` for validation and discoverability
 - [ ] The `notesWithAuthorFor` function has a TODO for privacy filtering — this work would be a good time to address it
+- [ ] Audit REST API endpoints in `app/api/` — the Next.js app uses server actions for most operations, so many REST endpoints may be unused. Consider removing unused ones or consolidating with GraphQL. The `/api/booq/[booq_id]/expanded-fragment` endpoint still uses the old naming and may be replaceable by the GraphQL `expandedFragment` field.
