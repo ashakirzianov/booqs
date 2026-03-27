@@ -9,6 +9,7 @@ import { addToCollection, removeFromCollection } from '@/backend/collections'
 import { addBooqHistory, removeBooqHistory } from '@/backend/history'
 import { addBookmark, deleteBookmark } from '@/backend/bookmarks'
 import { followUser, unfollowUser } from '@/backend/follows'
+import { deletePasskeyCredential } from '@/backend/passkey'
 import { requestUpload, confirmUpload } from '@/backend/uu'
 
 export const mutationResolver: IResolvers<any, ResolverContext> = {
@@ -42,6 +43,12 @@ export const mutationResolver: IResolvers<any, ResolverContext> = {
         signout(_, __, { clearAuth }) {
             clearAuth()
             return true
+        },
+        async deletePasskey(_, { id }: { id: string }, { userId }) {
+            if (!userId) {
+                return false
+            }
+            return deletePasskeyCredential(userId, id)
         },
         async deleteAccount(_, __, { userId, clearAuth }) {
             if (userId) {

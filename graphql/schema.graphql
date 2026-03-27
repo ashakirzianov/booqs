@@ -47,6 +47,7 @@ type Mutation {
     requestUpload: UploadRequest
     confirmUpload(uploadId: String!): UploadResult!
 
+    deletePasskey(id: ID!): Boolean
     signout: Boolean
     deleteAccount: Boolean
     updateUser(input: UpdateUserInput!): UpdateUserResult
@@ -111,6 +112,13 @@ type User {
     followers: [User!]!
     following: [User!]!
     isFollowing: Boolean
+    passkeys: [Passkey!]
+}
+
+type Passkey {
+    id: ID!
+    label: String
+    createdAt: String!
 }
 
 union SearchResult = Booq | Author

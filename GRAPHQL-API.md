@@ -273,18 +273,18 @@ type User {
 - GraphQL has registration/login flows but no list/delete
 
 ### Schema changes
-- [ ] Add query to `User` type:
+- [x] Add `passkeys` field to `User` type (returns null for other users' profiles):
   ```graphql
   type User {
-      passkeys: [Passkey!]!
+      passkeys: [Passkey!]
   }
   type Passkey {
       id: ID!
-      name: String
+      label: String
       createdAt: String!
   }
   ```
-- [ ] Add mutation:
+- [x] Add mutation:
   ```graphql
   deletePasskey(id: ID!): Boolean
   ```

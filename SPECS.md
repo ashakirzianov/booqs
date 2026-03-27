@@ -767,6 +767,7 @@ Schema-defined API at `/api/graphql` using graphql-yoga. Supports authentication
 - `initPasskeyRegistration` / `verifyPasskeyRegistration` — WebAuthn passkey registration flow
 - `initPasskeyLogin` / `verifyPasskeyLogin` — WebAuthn passkey login flow
 - `signout` — Clear authentication
+- `deletePasskey(id)` — Delete a registered passkey
 - `deleteAccount` — Delete user account
 
 **Subscriptions (SSE):**

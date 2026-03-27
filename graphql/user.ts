@@ -1,5 +1,6 @@
 import { DbUser, usersForIds } from '@/backend/users'
 import { getFollowersCount, getFollowingCount, getFollowers, getFollowing, isFollowing } from '@/backend/follows'
+import { getUserPasskeys } from '@/backend/passkey'
 import { IResolvers } from '@graphql-tools/utils'
 import { ResolverContext } from './context'
 
@@ -34,6 +35,12 @@ export const userResolver: IResolvers<UserParent, ResolverContext> = {
                 return false
             }
             return isFollowing(userId, parent.id)
+        },
+        async passkeys(parent, _, { userId }) {
+            if (!userId || userId !== parent.id) {
+                return null
+            }
+            return getUserPasskeys(parent.id)
         },
     },
 }
