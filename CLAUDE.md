@@ -12,6 +12,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ### Planning & Scope
 - Just do it — no upfront planning unless explicitly requested.
 - Ask about ambiguity rather than guessing.
+- For non-trivial design decisions (type restructuring, naming, API shape), engage in discussion before implementing. Present concrete options with tradeoffs and a recommendation, but let the user choose. Good design often emerges from back-and-forth.
 
 ### Code Changes
 - Small incremental commits.
@@ -19,6 +20,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Propose a commit message after each change.
 - Only add tests when explicitly asked.
 - When making functional changes (new features, new API endpoints, changed behavior), update SPECS.md to reflect the change.
+- Always run `npm run build` after completing a change. Fix any errors before presenting the summary. Don't present work as done without a passing build.
 
 ### Communication Style
 - Explanatory — include reasoning behind choices.
@@ -28,6 +30,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ### Review & Iteration
 - Present approach before executing (for direct prompts), unless told otherwise.
 - Iterate on feedback immediately, unless explicitly told to add to backlog/task list.
+
+### Conventions & Documentation
+- When a new convention emerges from discussion (naming rules, architectural patterns), add it to CLAUDE.md immediately.
+- The .md files should be the authoritative source of truth — future conversations and collaborators should be able to derive all conventions from the files alone.
 
 ## Development Commands
 
