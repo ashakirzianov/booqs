@@ -226,7 +226,7 @@ export function useBooqNotes({
                 return {
                     notes: currentData.notes.map(n =>
                         n.id === noteId
-                            ? { ...n, ...body, updated_at: now }
+                            ? { ...n, ...body, updatedAt: now }
                             : n
                     ),
                 }
