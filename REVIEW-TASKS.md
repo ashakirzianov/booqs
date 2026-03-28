@@ -71,9 +71,4 @@ Ordered by priority — combining severity, effort, and dependencies. Quick secu
 
 ## Future / Low Priority
 
-- [ ] **SC6. Plan for notes table growth** — monitor index sizes; consider date-based partitioning when approaching millions of rows.
-- [ ] **SC7. Monitor Redis command budget** — track Upstash usage; plan upgrade to paid tier before hitting limits.
-- [ ] **SC8. Tune database connection pooling** — review Neon serverless defaults; consider explicit pool size and timeout configuration.
-- [ ] **S9. Harden EPUB path resolution** — `parser/path.ts`: explicitly reject `../` segments, even though in-memory ZIP prevents filesystem traversal.
-- [ ] **P8. Paginate large booq payloads** — consider streaming or chunking `Booq.nodes()` and `Booq.styles()` responses for very large books.
-- [ ] **P9. Bound table of contents responses** — add a max-items limit to TOC queries.
+All moved to BACKLOG.md — these are "do it when it matters" items with no immediate impact.

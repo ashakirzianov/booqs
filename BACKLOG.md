@@ -79,3 +79,35 @@ Currently search uses `lower(title) LIKE '%query%'` which has no ranking, no dia
 - (a) Extract token from cookie/header and verify it in the route handler before calling `handleRequest` — simple but duplicates auth logic
 - (b) Move rate limiting into a yoga plugin that runs after context creation — cleaner but more complex
 - (c) Add rate limiting at the resolver level for specific sensitive mutations only — most targeted but scattered
+
+---
+
+## Notes table partitioning
+
+**Priority**: Low
+
+- [ ] Monitor index sizes on the notes table as data grows
+- [ ] Consider date-based partitioning when approaching millions of rows
+
+Currently each note is indexed 5+ ways. No action needed until there's significant traffic.
+
+---
+
+## Large payload pagination
+
+**Priority**: Low
+
+- [ ] Consider streaming or chunking `Booq.nodes()` and `Booq.styles()` responses for very large books
+- [ ] Add a max-items limit to TOC queries
+
+For books like War and Peace, the full nodes/styles JSON can exceed 200KB. Not a problem in practice yet.
+
+---
+
+## EPUB path hardening
+
+**Priority**: Low
+
+- [ ] Explicitly reject `../` segments in `parser/path.ts`
+
+Not exploitable since ZIP entries are keyed in memory (no filesystem traversal), but could be hardened as defense-in-depth.
