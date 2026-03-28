@@ -3,9 +3,14 @@ import { createYoga, createSchema } from 'graphql-yoga'
 import { useValidationRule } from '@envelop/core'
 import { resolvers } from '@/graphql/resolvers'
 import { ResolverContext, context } from '@/graphql/context'
+import { config } from '@/backend/config'
 import { cookies, headers } from 'next/headers'
 import { NextRequest } from 'next/server'
 import { depthLimitRule } from '@/graphql/depthLimit'
+
+const allowedOrigins = new Set(
+  Object.values(config().origins).filter((o): o is string => typeof o === 'string'),
+)
 
 const schema = createSchema<ResolverContext>({
   typeDefs,
@@ -55,5 +60,9 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const origin = request.headers.get('origin')
+  if (origin && !allowedOrigins.has(origin)) {
+    return new Response('Forbidden', { status: 403 })
+  }
   return handleRequest(request, {})
 }
