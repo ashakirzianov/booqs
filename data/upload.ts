@@ -1,6 +1,10 @@
 'use server'
 
 import { requestUpload as backendRequestUpload, confirmUpload as backendConfirmUpload } from '@/backend/uu'
+import { primeAfterUpload as backendPrimeAfterUpload } from '@/backend/library'
+import { setCachedBooqFile } from '@/backend/fileCache'
+import { extractAndUploadMissingOriginals } from '@/backend/variants'
+import { BooqId } from '@/core'
 import { getCurrentUser } from './user'
 
 export async function requestUploadAction() {
@@ -12,10 +16,26 @@ export async function requestUploadAction() {
     return { success: true, ...result } as const
 }
 
-export async function confirmUploadAction(uploadId: string) {
+export type ConfirmUploadResponse =
+    | { success: true, booqId: string, title?: string, coverSrc?: string, fileBuffer: Buffer }
+    | { success: false, error: string }
+
+export async function confirmUploadAction(uploadId: string): Promise<ConfirmUploadResponse> {
     const auth = await getCurrentUser()
     if (!auth) {
-        return { success: false, error: 'Not authenticated' } as const
+        return { success: false, error: 'Not authenticated' }
     }
     return backendConfirmUpload(uploadId, auth.id)
+}
+
+export async function primeBooqFile(booqId: BooqId, fileBuffer: Buffer) {
+    setCachedBooqFile(booqId, { kind: 'epub', file: fileBuffer })
+}
+
+export async function primeAfterUpload(booqId: BooqId) {
+    await backendPrimeAfterUpload(booqId)
+}
+
+export async function uploadMissingOriginals(booqId: BooqId) {
+    await extractAndUploadMissingOriginals(booqId)
 }

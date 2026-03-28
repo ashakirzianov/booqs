@@ -112,7 +112,7 @@ export async function requestUpload() {
 }
 
 export type ConfirmUploadResult =
-    | { success: true, booqId: string, title?: string, coverSrc?: string }
+    | { success: true, booqId: BooqId, title?: string, coverSrc?: string, fileBuffer: Buffer }
     | { success: false, error: string }
 
 export async function confirmUpload(uploadId: string, userId: string): Promise<ConfirmUploadResult> {
@@ -127,12 +127,13 @@ export async function confirmUpload(uploadId: string, userId: string): Promise<C
         return { success: false, error: 'Failed to parse EPUB file' }
     }
 
-    const booqId = `uu-${result.id}`
+    const booqId: BooqId = `uu-${result.id}`
     return {
         success: true,
         booqId,
         title: result.meta.title,
         coverSrc: result.meta.coverSrc,
+        fileBuffer: buffer,
     }
 }
 

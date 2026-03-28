@@ -53,10 +53,10 @@ Ordered by priority — combining severity, effort, and dependencies. Quick secu
   - `backend/users.ts`: simplified `deleteUserForId` to rely on `ON DELETE CASCADE`, S3 cleanup is best-effort after
 - [x] **SC5. Handle concurrent upload race condition** — added `UNIQUE` constraint on `file_hash` in schema, changed insert to `ON CONFLICT (file_hash) DO UPDATE`. Also added `ON CONFLICT DO NOTHING` on uploads registry.
 - [x] **SC3. Set `maxDuration` on all long-running routes** — added to `/api/upload/confirm`, `/api/graphql`, `/api/copilot/answer`, `/api/copilot/answer/stream`, `/api/copilot/suggestions`.
-- [ ] **UPL1. Optimize post-upload experience** — after a user uploads a book:
-  - Fire image extraction via `after(() => extractAndUploadMissingOriginals(...))` like we do for variant generation
-  - Cache the parsed booq JSON to S3 via `after()` so first read doesn't trigger a parse
-  - Prime the in-memory `cachedFile` with the just-uploaded file so the first read is instant
+- [x] **UPL1. Optimize post-upload experience** — after successful upload confirmation:
+  - `primeAfterUpload` (in `backend/library.ts`): primes file LRU cache, parses booq, caches to S3, stores diagnostics
+  - `extractAndUploadMissingOriginals`: pre-extracts all images to S3
+  - Both fired via `after()` in the REST route and GraphQL mutation
 
 ## Rate Limiting
 

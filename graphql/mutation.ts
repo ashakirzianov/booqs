@@ -1,3 +1,4 @@
+import { BooqId } from '@/core'
 import { IResolvers } from '@graphql-tools/utils'
 import { ResolverContext } from './context'
 import { deleteUserForId, updateUser, userForUsername } from '@/backend/users'
@@ -11,8 +12,19 @@ import { addBookmark, deleteBookmark } from '@/backend/bookmarks'
 import { followUser, unfollowUser } from '@/backend/follows'
 import { deletePasskeyCredential } from '@/backend/passkey'
 import { requestUpload, confirmUpload } from '@/backend/uu'
+import { primeAfterUpload } from '@/backend/library'
+import { extractAndUploadMissingOriginals } from '@/backend/variants'
+import { setCachedBooqFile } from '@/backend/fileCache'
+import { after } from 'next/server'
 
 type MutationResult = { success: boolean, error?: string }
+type UploadResult = {
+    success: boolean,
+    booqId?: BooqId,
+    title?: string,
+    coverSrc?: string,
+    error?: string
+}
 
 function ok(): MutationResult {
     return { success: true }
@@ -215,11 +227,22 @@ export const mutationResolver: IResolvers<any, ResolverContext> = {
             }
             return requestUpload()
         },
-        async confirmUpload(_, { uploadId }: { uploadId: string }, { userId }) {
+        async confirmUpload(_, { uploadId }: { uploadId: string }, { userId }): Promise<UploadResult> {
             if (!userId) {
                 return { success: false, error: 'Authentication required' }
             }
-            return confirmUpload(uploadId, userId)
+            const result = await confirmUpload(uploadId, userId)
+            if (result.success) {
+                const { fileBuffer, ...response } = result
+                const booqId = result.booqId as BooqId
+                after(async () => {
+                    setCachedBooqFile(booqId, { kind: 'epub', file: fileBuffer })
+                    await primeAfterUpload(booqId)
+                    await extractAndUploadMissingOriginals(booqId)
+                })
+                return response
+            }
+            return result
         },
         async updateUser(_, { input }, { userId }) {
             if (!userId) {

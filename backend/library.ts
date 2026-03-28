@@ -2,8 +2,8 @@ import {
     Booq, BooqId, BooqMetadata, BooqPath, InLibraryId, LibraryId, pathToString, positionForPath, previewForPath, TableOfContents, textForRange, BooqRange, nodesForRange, BooqNode,
     parseId,
 } from '@/core'
-import { LRUCache } from 'lru-cache'
 import { getCachedValueForKey, cacheValueForKey } from './cache'
+import { getCachedBooqFile, setCachedBooqFile } from './fileCache'
 import { downloadAsset, uploadAsset } from './blob'
 import { storeDiagnostics } from './diagnostics'
 import { extractSingleImageFromEpub, openEpubImageLoader, parseAndPreprocessBooq } from './parse'
@@ -276,10 +276,8 @@ export async function booqImageLoader(booqId: BooqId): Promise<EpubImageLoader |
     return openEpubImageLoader(file)
 }
 
-const fileCache = new LRUCache<BooqId, BooqFile>({ max: 10 })
-
 async function booqFileForId(booqId: BooqId) {
-    const cached = fileCache.get(booqId)
+    const cached = getCachedBooqFile(booqId)
     if (cached) {
         return cached
     }
@@ -289,8 +287,20 @@ async function booqFileForId(booqId: BooqId) {
         ? await library.fileForId(id)
         : undefined
     if (file) {
-        fileCache.set(booqId, file)
+        setCachedBooqFile(booqId, file)
     }
     return file
+}
+
+export async function primeAfterUpload(booqId: BooqId): Promise<void> {
+    const file = await booqFileForId(booqId)
+    if (!file) return
+    const { booq, diags } = await parseAndPreprocessBooq(booqId, file)
+    storeDiagnostics(booqId, diags).catch(e =>
+        console.warn(`Failed to store diags for ${booqId}:`, e instanceof Error ? e.message : e)
+    )
+    if (booq) {
+        await cacheBooq(booqId, booq)
+    }
 }
 
