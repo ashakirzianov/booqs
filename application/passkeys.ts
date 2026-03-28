@@ -52,10 +52,10 @@ async function registerPasskey() {
             success: true as const,
             passkeys: verificationResult.passkeys,
         }
-    } catch (err: any) {
+    } catch (err: unknown) {
         return {
             success: false as const,
-            error: err.toString(),
+            error: err instanceof Error ? err.message : String(err),
         }
     }
 }
@@ -92,10 +92,10 @@ async function signInWithPasskey() {
             success: true as const,
             user: verificationResult.user,
         }
-    } catch (err: any) {
+    } catch (err: unknown) {
         return {
             success: false as const,
-            error: err.toString(),
+            error: err instanceof Error ? err.message : String(err),
         }
     }
 }
@@ -113,10 +113,10 @@ async function deletePasskey(id: string) {
             success: true as const,
             passkeys: result.passkeys,
         }
-    } catch (err: any) {
+    } catch (err: unknown) {
         return {
             success: false as const,
-            error: err.toString(),
+            error: err instanceof Error ? err.message : String(err),
         }
     }
 }

@@ -93,7 +93,7 @@ export async function createUser({
           RETURNING *
         `
         return { success: true, user: user as DbUser }
-    } catch (err: any) {
+    } catch (err: unknown) {
         console.error('Error creating user:', err)
         const errorResult = getReasonFromError(err, 'Failed to create user')
         return { success: false, reason: errorResult.reason }
@@ -184,7 +184,7 @@ export async function updateUser({
         }
 
         return { success: true, user: user as DbUser }
-    } catch (err: any) {
+    } catch (err: unknown) {
         console.error('Error updating user:', err)
         const errorResult = getReasonFromError(err, 'Failed to update user')
         return { success: false, reason: errorResult.reason, field: errorResult.field }
@@ -192,16 +192,20 @@ export async function updateUser({
 }
 
 
-function getReasonFromError(err: any, defaultReason: string): { reason: string, field?: string } {
+function getReasonFromError(unkownErr: unknown, defaultReason: string): { reason: string, field?: string } {
+    if (unkownErr == null || typeof unkownErr !== 'object') {
+        return { reason: defaultReason }
+    }
+    const err = unkownErr as { code?: string, constraint?: string }
     // Handle specific database errors
-    if (err.code === '23505') { // unique_violation
-        if (err.constraint === 'users_username_key') {
+    if (err.code === '23505') {
+        const constraint = err.constraint
+        if (constraint === 'users_username_key') {
             return { reason: 'Username already exists', field: 'username' }
         }
-        if (err.constraint === 'users_email_key') {
+        if (constraint === 'users_email_key') {
             return { reason: 'Email already exists', field: 'email' }
         }
-        // Generic unique constraint violation
         return { reason: 'This value is already taken' }
     }
 
