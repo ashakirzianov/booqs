@@ -24,7 +24,7 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<P
         after(() => uploadMissingOriginals(booqId))
     }
 
-    return new Response(result.buffer, {
+    return new Response(new Uint8Array(result.buffer), {
         headers: {
             'Content-Type': result.contentType,
             'Cache-Control': 'public, max-age=31536000, immutable',
