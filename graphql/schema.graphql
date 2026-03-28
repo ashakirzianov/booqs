@@ -199,24 +199,24 @@ type AuthResult {
 }
 type Bookmark {
     booq: Booq
-    id: ID
-    path: [Int!]
+    id: ID!
+    path: [Int!]!
 }
 type Note {
     author: User
     booq: Booq
-    id: ID
+    id: ID!
     start: [Int!]!
     end: [Int!]!
     kind: String
     text: String
     content: String
-    targetQuote: String
+    targetQuote: String!
     surroundingFragment: BooqFragment
     position: Int
     privacy: String
-    createdAt: String
-    updatedAt: String
+    createdAt: String!
+    updatedAt: String!
 }
 type BooqHistory {
     booq: Booq!

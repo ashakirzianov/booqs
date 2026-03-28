@@ -18,7 +18,7 @@ Ordered by priority — combining severity, effort, and dependencies. Quick secu
 - [x] **S7. Disable introspection in production** — same file: `graphiql: !isProduction`, `maskedErrors: isProduction`.
 - [x] **P2. Cap maximum query limits** — `graphql/query.ts`: added `clampLimit` helper with `MAX_LIMIT = 100`. Also applied to `/api/search/route.ts`.
 - [x] **D2. Standardize mutation error responses** — added `MutationResult` type (`{ success: Boolean!, error: String }`) and replaced all 15 `Boolean`-returning mutations. Clients can now distinguish auth failures, not-found, and operation errors.
-- [ ] **D5. Tighten GraphQL schema nullability** — review `Bookmark` and `Note` types in `graphql/schema.graphql`; make fields non-null where they are always present.
+- [x] **D5. Tighten GraphQL schema nullability** — made `Bookmark.id`, `Bookmark.path`, `Note.id`, `Note.targetQuote`, `Note.createdAt`, `Note.updatedAt` non-null. Left `kind` and `privacy` nullable (may be removed or relocated in future). Left `content`, `text`, `position`, `surroundingFragment`, `author`, `booq` nullable (genuinely optional or depend on async loading).
 
 ## Security Headers & Input Validation
 
