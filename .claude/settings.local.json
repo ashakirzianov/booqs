@@ -55,7 +55,9 @@
       "Bash(npm list:*)",
       "Bash(git fetch:*)",
       "Bash(git merge:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(node -e \"console.log\\(require\\(''/Users/ashakirzianov/repos/booqs/node_modules/next/package.json''\\).version\\)\")",
+      "WebSearch"
     ]
   },
   "enableAllProjectMcpServers": false
