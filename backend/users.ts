@@ -150,8 +150,10 @@ export async function updateUser({
             }
         }
 
+        // Build a dynamic UPDATE query: each provided field gets a positional
+        // placeholder ($1, $2, ...) and the user id is always the last parameter.
         const updates: string[] = []
-        const values: any[] = []
+        const values: unknown[] = []
         let i = 1
 
         if (name !== undefined) {

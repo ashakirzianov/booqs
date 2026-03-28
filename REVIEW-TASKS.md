@@ -33,7 +33,7 @@ Ordered by priority — combining severity, effort, and dependencies. Quick secu
 - [x] **C4. Rename `hl` → `note`** — `reader/nodes.ts`: filter callback parameter now matches collection name.
 - [x] **C5. Document magic numbers** — `core/chapter.ts`, `backend/library.ts`: added comments explaining character count units.
 - [x] **C7. Inline or document `noteFromJson`** — removed no-op passthrough function from `application/notes.ts`, replaced with direct type assertions.
-- [ ] **C3. Clarify dynamic SQL in `updateUser`** — `backend/users.ts:153-178`: add a comment block explaining the `$${i++}` placeholder counter pattern, or refactor to use Neon template literals.
+- [x] **C3. Clarify dynamic SQL in `updateUser`** — added explanatory comment, changed `values: any[]` to `unknown[]`.
 - [ ] **C6. Pick a constant naming convention** — decide between `camelCase` (used in `core/`) and `UPPER_SNAKE_CASE` (used in `backend/`) for module-level constants, then apply consistently.
 
 ## Performance Improvements
