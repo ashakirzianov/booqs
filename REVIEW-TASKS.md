@@ -44,11 +44,7 @@ Ordered by priority — combining severity, effort, and dependencies. Quick secu
 
 ## History Redesign
 
-- [ ] **P1 + SC1. Migrate reading history from Redis hash to sorted set + PostgreSQL backup** — `backend/history.ts`:
-  - Replace `hset`/`hgetall` with `ZADD` (score = timestamp) and `ZREVRANGE` (for paginated queries)
-  - Add a `reading_history` PostgreSQL table as durable storage
-  - Dual-write: write to both Redis (fast reads) and PostgreSQL (durability)
-  - Update `booqHistoryForUser` to use `ZREVRANGE` with offset/limit instead of loading everything
+- [x] **P1 + SC1. Migrate reading history** — moved to BACKLOG. Upstash Redis persists data durably; no live traffic yet and history is non-critical. The in-memory pagination issue (P1) remains but is low priority until users have very large histories.
 
 ## Database Integrity
 
