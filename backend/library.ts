@@ -4,7 +4,8 @@ import {
 } from '@/core'
 import { getCachedValueForKey, cacheValueForKey } from './cache'
 import { downloadAsset, uploadAsset } from './blob'
-import { extractSingleImageFromEpub, parseAndPreprocessBooq } from './parse'
+import { extractSingleImageFromEpub, openEpubImageLoader, parseAndPreprocessBooq } from './parse'
+import type { EpubImageLoader } from './parse'
 import groupBy from 'lodash-es/groupBy'
 import { pgLibrary } from './pg'
 import { userUploadsLibrary } from './uu'
@@ -259,6 +260,14 @@ export async function booqSingleImage(booqId: BooqId, imagePath: string): Promis
         return undefined
     }
     return extractSingleImageFromEpub(file.file, imagePath)
+}
+
+export async function booqImageLoader(booqId: BooqId): Promise<EpubImageLoader | undefined> {
+    const file = await booqFileForId(booqId)
+    if (!file) {
+        return undefined
+    }
+    return openEpubImageLoader(file)
 }
 
 async function booqFileForId(booqId: BooqId) {

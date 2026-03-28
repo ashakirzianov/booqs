@@ -146,6 +146,29 @@ export async function extractSingleImageFromEpub(epubBuffer: Buffer, imagePath: 
     return epub.loadBinaryFile(imagePath)
 }
 
+export type EpubImageLoader = {
+    srcs: string[],
+    loadImage: (src: string) => Promise<Buffer | undefined>,
+}
+
+export async function openEpubImageLoader(file: BooqFile): Promise<EpubImageLoader | undefined> {
+    if (file.kind !== 'epub') {
+        return undefined
+    }
+    const diags: Diagnoser = []
+    const epub = await openEpubFile({ fileBuffer: file.file, diags })
+    const { value: booq } = await parseEpub({ epub, diags })
+    if (!booq) {
+        return undefined
+    }
+    normalizeImageSrcsInBooq(booq)
+    const srcs = collectUniqueSrcsFromBooq(booq)
+    return {
+        srcs,
+        loadImage: (src) => epub.loadBinaryFile(src),
+    }
+}
+
 function preprocessBooq(booq: Booq, booqId: BooqId, imageDimensions: BooqImageDimensions): Booq {
     const nodes = mapNodes(booq.nodes, node => {
         if (!isElementNode(node)) {

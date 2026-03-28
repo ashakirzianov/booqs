@@ -1,7 +1,7 @@
 import { BooqId } from '@/core'
-import { booqSingleImage } from './library'
+import { booqImageLoader, booqSingleImage } from './library'
 import { generateVariant, ImageVariant } from './images'
-import { downloadAsset, IMAGES_BUCKET, uploadAsset } from './blob'
+import { downloadAsset, IMAGES_BUCKET, listAssetKeys, uploadAsset } from './blob'
 
 export async function getImageVariant(booqId: BooqId, filePathWithVariant: string): Promise<{
     buffer: Buffer,
@@ -118,4 +118,32 @@ async function downloadOriginalImage(booqId: BooqId, imageId: string): Promise<B
 async function downloadVariantImage(booqId: BooqId, variantPath: string): Promise<Buffer | undefined> {
     const s3Key = `variants/${booqId}/${variantPath}`
     return downloadAsset(IMAGES_BUCKET, s3Key)
+}
+
+const UPLOAD_BATCH_SIZE = 20
+
+export async function extractAndUploadMissingOriginals(booqId: BooqId): Promise<void> {
+    const loader = await booqImageLoader(booqId)
+    if (!loader) {
+        return
+    }
+
+    const prefix = `originals/${booqId}/`
+    const existingKeys = await listAssetKeys(IMAGES_BUCKET, prefix)
+    const existingSet = new Set(existingKeys.map(k => k.slice(prefix.length)))
+
+    const missingSrcs = loader.srcs.filter(src => !existingSet.has(src))
+    if (missingSrcs.length === 0) {
+        return
+    }
+
+    for (let i = 0; i < missingSrcs.length; i += UPLOAD_BATCH_SIZE) {
+        const batch = missingSrcs.slice(i, i + UPLOAD_BATCH_SIZE)
+        await Promise.all(batch.map(async (src) => {
+            const buffer = await loader.loadImage(src)
+            if (buffer) {
+                await uploadOriginalImage(booqId, src, buffer)
+            }
+        }))
+    }
 }
