@@ -104,6 +104,7 @@ function chapterForPath(booq: Booq, path: BooqPath): BooqChapter {
     }
 }
 
+// Minimum character count between chapter anchors (based on text node lengths)
 const chapterLength = 4500
 function* generateAnchors(booq: Booq, length: number) {
     let position = 0

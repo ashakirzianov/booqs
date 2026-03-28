@@ -106,6 +106,7 @@ export type BooqPreview = {
     coverSrc?: string,
     booqLength: number,
 }
+// Maximum character count for preview text snippets
 const PREVIEW_LENGTH = 500
 export async function booqPreview(booqId: BooqId, path: BooqPath, end?: BooqPath): Promise<BooqPreview | undefined> {
     const key = `booq:${booqId}:preview:${pathToString(path)}${end ? `:${pathToString(end)}` : ''}`
