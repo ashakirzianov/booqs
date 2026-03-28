@@ -47,9 +47,13 @@ export function createStreamingCache<In, Out>(producer: CacheProducer<In, Out>) 
         }
     }
     async function unsubscribe(input: In, listener: CacheListener<Out>) {
-        const existing = cache.get(generateCacheKey(input))
+        const key = generateCacheKey(input)
+        const existing = cache.get(key)
         if (existing) {
             existing.listeners.delete(listener)
+            if (existing.listeners.size === 0) {
+                cache.delete(key)
+            }
         }
     }
     return {

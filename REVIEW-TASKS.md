@@ -39,7 +39,7 @@ Ordered by priority — combining severity, effort, and dependencies. Quick secu
 ## Performance Improvements
 
 - [x] **P3. Add DataLoader for follower/following counts** — added batch functions in `backend/follows.ts`, created `followersCountLoader`/`followingCountLoader` in `graphql/loaders.ts`, updated resolvers.
-- [ ] **P6. Add cleanup to streaming cache** — `application/cache.ts`: add TTL-based eviction or `WeakRef`-based cleanup for idle cache entries with no listeners.
+- [x] **P6. Add cleanup to streaming cache** — `application/cache.ts`: delete cache entries when the last listener unsubscribes.
 - [ ] **P5. Cache user profiles and follow counts** — add short-TTL Redis caching (e.g. 60s) for `userForId`, `getFollowersCount`, `getFollowingCount` to avoid hitting PostgreSQL on every request.
 
 ## History Redesign
