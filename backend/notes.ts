@@ -48,7 +48,7 @@ export async function notesWithAuthorFor({ booqId, authorId, userId, limit, offs
       ${booqId !== undefined ? sql`AND booq_id = ${booqId}` : sql``}
       ${authorId !== undefined ? sql`AND n.author_id = ${authorId}` : sql``}
       AND (n.privacy = 'public'${userId !== undefined ? sql` OR n.author_id = ${userId}` : sql``})
-      ORDER BY n.created_at
+      ORDER BY n.created_at DESC
       ${limit !== undefined ? sql`LIMIT ${limit}` : sql``}
       ${offset !== undefined ? sql`OFFSET ${offset}` : sql``}
       `
