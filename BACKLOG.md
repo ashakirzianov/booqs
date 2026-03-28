@@ -62,3 +62,20 @@ Currently search only works for Project Gutenberg books via `LIKE` on `pg_metada
 - [ ] Optionally extend to content search (searching within book text, not just metadata)
 
 Currently search uses `lower(title) LIKE '%query%'` which has no ranking, no diacritic normalization, and no stemming. PostgreSQL's full-text search infrastructure (`tsvector`, `tsquery`, `ts_rank`) would provide all of these. The `unaccent` and `pg_trgm` extensions are already enabled in the schema but unused by search queries. This task is independent of the unified search table — it improves search quality regardless of whether search is per-library or unified.
+
+---
+
+## Rate limiting
+
+**Priority**: Medium
+
+- [ ] Design per-user rate limiting strategy for authenticated endpoints
+- [ ] Decide how to extract userId before GraphQL resolution (currently auth happens inside yoga's `context()` function — could extract token/cookie earlier in the route handler)
+- [ ] Implement tiered limits: strict for auth mutations (per IP), moderate for general API (per userId), tight for uploads (per userId)
+- [ ] Handle unauthenticated endpoints (search) with IP-based limiting, accepting the VPN/NAT shared-quota tradeoff
+- [ ] Consider: extracting auth before yoga would mean duplicating token verification logic or refactoring `context()` to separate auth from context creation
+
+`@upstash/ratelimit` is already installed. The key design challenge is that GraphQL auth currently happens inside the yoga context function, so the route handler doesn't know the userId before dispatching to yoga. Options:
+- (a) Extract token from cookie/header and verify it in the route handler before calling `handleRequest` — simple but duplicates auth logic
+- (b) Move rate limiting into a yoga plugin that runs after context creation — cleaner but more complex
+- (c) Add rate limiting at the resolver level for specific sensitive mutations only — most targeted but scattered

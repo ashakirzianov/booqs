@@ -60,11 +60,7 @@ Ordered by priority — combining severity, effort, and dependencies. Quick secu
 
 ## Rate Limiting
 
-- [ ] **S2. Add rate limiting** — add rate limiting middleware, starting with auth-critical endpoints:
-  - `/api/graphql` mutations: `initiateSign`, `completeSignIn`, passkey endpoints (e.g. 10 attempts/minute)
-  - `/api/search` (e.g. 30 req/minute)
-  - `/api/upload/request` (e.g. 5 req/minute)
-  - Consider `@upstash/ratelimit` since Upstash Redis is already in the stack.
+- [x] **S2. Add rate limiting** — moved to BACKLOG. Needs design work: per-user rate limiting requires extracting auth before GraphQL resolution, IP-based limiting penalizes VPN/NAT users. `@upstash/ratelimit` installed but not wired up.
 
 ## Larger Structural Work
 
