@@ -2,7 +2,7 @@
 
 import { requestUpload as backendRequestUpload, confirmUpload as backendConfirmUpload } from '@/backend/uu'
 import { primeAfterUpload as backendPrimeAfterUpload } from '@/backend/library'
-import { setCachedBooqFile } from '@/backend/fileCache'
+import { setCachedBooqFile } from '@/backend/cache'
 import { extractAndUploadMissingOriginals } from '@/backend/variants'
 import { BooqId } from '@/core'
 import { getCurrentUser } from './user'

@@ -2,7 +2,7 @@ import { BooqId, BooqRange, getQuoteAndContext } from '@/core'
 import { getExtraMetadataValues } from '@/core/meta'
 import { getResponse, getStreamingResponse } from './ai'
 import { booqForId } from './library'
-import { getCachedValueForKey, cacheValueForKey, createCachingStream } from './cache'
+import { getRedisCacheValue, setRedisCacheValue, createRedisCachingStream } from './cache'
 
 export type ReadingContext = {
     text: string,
@@ -41,7 +41,7 @@ export async function generateAnswer({ booqId, range, question }: { booqId: Booq
     const cacheKey = cacheKeyForAnswer({ booqId, range, question })
 
     // Check cache first
-    const cachedAnswer = await getCachedValueForKey<string>(cacheKey)
+    const cachedAnswer = await getRedisCacheValue<string>(cacheKey)
     if (cachedAnswer) {
         return {
             success: true as const,
@@ -65,7 +65,7 @@ export async function generateAnswer({ booqId, range, question }: { booqId: Booq
 
     // Cache successful responses
     if (result.success) {
-        await cacheValueForKey(cacheKey, result.output)
+        await setRedisCacheValue(cacheKey, result.output)
     }
 
     return result
@@ -75,7 +75,7 @@ export async function generateAnswerStreaming({ booqId, range, question, footnot
     const cacheKey = cacheKeyForAnswer({ booqId, range, question, footnote })
 
     // Check cache first
-    const cachedAnswer = await getCachedValueForKey<string>(cacheKey)
+    const cachedAnswer = await getRedisCacheValue<string>(cacheKey)
     if (cachedAnswer) {
         return {
             success: true as const,
@@ -100,7 +100,7 @@ export async function generateAnswerStreaming({ booqId, range, question, footnot
     if (result.success) {
         return {
             success: true as const,
-            stream: createCachingStream(result.stream, cacheKey),
+            stream: createRedisCachingStream(result.stream, cacheKey),
         }
     }
 

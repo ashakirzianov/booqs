@@ -2,9 +2,7 @@ import {
     Booq, BooqId, BooqMetadata, BooqPath, InLibraryId, LibraryId, pathToString, positionForPath, previewForPath, TableOfContents, textForRange, BooqRange, nodesForRange, BooqNode,
     parseId,
 } from '@/core'
-import { getCachedValueForKey, cacheValueForKey } from './cache'
-import { getCachedBooqFile, setCachedBooqFile } from './fileCache'
-import { downloadAsset, uploadAsset } from './blob'
+import { getRedisCacheValue, setRedisCacheValue, getCachedBooq, setCachedBooq, getCachedBooqFile, setCachedBooqFile } from './cache'
 import { storeDiagnostics } from './diagnostics'
 import { extractSingleImageFromEpub, openEpubImageLoader, parseAndPreprocessBooq } from './parse'
 import type { EpubImageLoader } from './parse'
@@ -58,9 +56,6 @@ const libraries: {
     lo: localLibrary,
 }
 
-const CACHE_BUCKET = 'booqs-cache'
-const CACHE_PATH = 'booqs'
-
 export async function booqForId(booqId: BooqId): Promise<Booq | undefined> {
     const [library] = parseId(booqId)
     const useCache = library !== 'lo'
@@ -79,28 +74,11 @@ export async function booqForId(booqId: BooqId): Promise<Booq | undefined> {
         console.warn(`Failed to store diags for ${booqId}:`, e instanceof Error ? e.message : e)
     )
     if (booq && useCache) {
-        cacheBooq(booqId, booq).catch(e =>
+        setCachedBooq(booqId, booq).catch(e =>
             console.warn(`Failed to cache booq ${booqId}:`, e instanceof Error ? e.message : e)
         )
     }
     return booq
-}
-
-async function getCachedBooq(booqId: BooqId): Promise<Booq | undefined> {
-    const buffer = await downloadAsset(CACHE_BUCKET, `${CACHE_PATH}/${booqId}.json`)
-    if (!buffer) {
-        return undefined
-    }
-    try {
-        return JSON.parse(buffer.toString('utf-8'))
-    } catch {
-        return undefined
-    }
-}
-
-async function cacheBooq(booqId: BooqId, booq: Booq): Promise<void> {
-    const json = JSON.stringify(booq)
-    await uploadAsset(CACHE_BUCKET, `${CACHE_PATH}/${booqId}.json`, Buffer.from(json, 'utf-8'))
 }
 
 export type BooqPreview = {
@@ -115,7 +93,7 @@ export type BooqPreview = {
 const PREVIEW_LENGTH = 500
 export async function booqPreview(booqId: BooqId, path: BooqPath, end?: BooqPath): Promise<BooqPreview | undefined> {
     const key = `booq:${booqId}:preview:${pathToString(path)}${end ? `:${pathToString(end)}` : ''}`
-    const cached = await getCachedValueForKey<BooqPreview>(key)
+    const cached = await getRedisCacheValue<BooqPreview>(key)
     if (cached) {
         return cached
     }
@@ -138,7 +116,7 @@ export async function booqPreview(booqId: BooqId, path: BooqPath, end?: BooqPath
         coverSrc: booq.metadata.coverSrc,
         booqLength,
     }
-    await cacheValueForKey(key, preview, 60 * 60) // Cache for 1 hour
+    await setRedisCacheValue(key, preview, 60 * 60) // Cache for 1 hour
     return preview
 }
 
@@ -300,7 +278,7 @@ export async function primeAfterUpload(booqId: BooqId): Promise<void> {
         console.warn(`Failed to store diags for ${booqId}:`, e instanceof Error ? e.message : e)
     )
     if (booq) {
-        await cacheBooq(booqId, booq)
+        await setCachedBooq(booqId, booq)
     }
 }
 

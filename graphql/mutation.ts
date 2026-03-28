@@ -14,7 +14,7 @@ import { deletePasskeyCredential } from '@/backend/passkey'
 import { requestUpload, confirmUpload } from '@/backend/uu'
 import { primeAfterUpload } from '@/backend/library'
 import { extractAndUploadMissingOriginals } from '@/backend/variants'
-import { setCachedBooqFile } from '@/backend/fileCache'
+import { setCachedBooqFile } from '@/backend/cache'
 import { after } from 'next/server'
 
 type MutationResult = { success: boolean, error?: string }
