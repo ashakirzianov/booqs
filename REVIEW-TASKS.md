@@ -34,7 +34,7 @@ Ordered by priority — combining severity, effort, and dependencies. Quick secu
 - [x] **C5. Document magic numbers** — `core/chapter.ts`, `backend/library.ts`: added comments explaining character count units.
 - [x] **C7. Inline or document `noteFromJson`** — removed no-op passthrough function from `application/notes.ts`, replaced with direct type assertions.
 - [x] **C3. Clarify dynamic SQL in `updateUser`** — added explanatory comment, changed `values: any[]` to `unknown[]`.
-- [ ] **C6. Pick a constant naming convention** — decide between `camelCase` (used in `core/`) and `UPPER_SNAKE_CASE` (used in `backend/`) for module-level constants, then apply consistently.
+- [x] **C6. Pick a constant naming convention** — standardized on `UPPER_SNAKE_CASE` across the codebase. Converted 4 camelCase constants in `core/path.ts` and `core/chapter.ts`.
 
 ## Performance Improvements
 
