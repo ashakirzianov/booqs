@@ -270,11 +270,20 @@ export async function booqImageLoader(booqId: BooqId): Promise<EpubImageLoader |
     return openEpubImageLoader(file)
 }
 
+let cachedFile: { booqId: BooqId, file: BooqFile } | undefined
+
 async function booqFileForId(booqId: BooqId) {
+    if (cachedFile?.booqId === booqId) {
+        return cachedFile.file
+    }
     const [prefix, id] = parseId(booqId)
     const library = libraries[prefix]
-    return library && id
-        ? library.fileForId(id)
+    const file = library && id
+        ? await library.fileForId(id)
         : undefined
+    if (file) {
+        cachedFile = { booqId, file }
+    }
+    return file
 }
 

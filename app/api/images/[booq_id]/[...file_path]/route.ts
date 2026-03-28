@@ -20,7 +20,9 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<P
         return new Response('Image not found', { status: 404 })
     }
 
-    after(() => uploadMissingOriginals(booqId))
+    if (result.extracted) {
+        after(() => uploadMissingOriginals(booqId))
+    }
 
     return new Response(result.buffer, {
         headers: {
