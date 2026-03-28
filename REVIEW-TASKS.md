@@ -52,7 +52,7 @@ Ordered by priority — combining severity, effort, and dependencies. Quick secu
   - `backend/uu.ts`: wrapped `insertRecord` + `addToRegistry` in `sql.transaction()` as `insertRecordAndRegister`
   - `backend/users.ts`: simplified `deleteUserForId` to rely on `ON DELETE CASCADE`, S3 cleanup is best-effort after
 - [x] **SC5. Handle concurrent upload race condition** — added `UNIQUE` constraint on `file_hash` in schema, changed insert to `ON CONFLICT (file_hash) DO UPDATE`. Also added `ON CONFLICT DO NOTHING` on uploads registry.
-- [ ] **SC3. Set `maxDuration` on all long-running routes** — add `export const maxDuration = 60` to `/api/upload/confirm`, `/api/graphql`, and any route that triggers EPUB parsing.
+- [x] **SC3. Set `maxDuration` on all long-running routes** — added to `/api/upload/confirm`, `/api/graphql`, `/api/copilot/answer`, `/api/copilot/answer/stream`, `/api/copilot/suggestions`.
 - [ ] **UPL1. Optimize post-upload experience** — after a user uploads a book:
   - Fire image extraction via `after(() => extractAndUploadMissingOriginals(...))` like we do for variant generation
   - Cache the parsed booq JSON to S3 via `after()` so first read doesn't trigger a parse

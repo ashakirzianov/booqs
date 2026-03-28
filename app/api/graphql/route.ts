@@ -1,3 +1,5 @@
+export const maxDuration = 60
+
 import typeDefs from '@/graphql/schema.graphql' assert { type: 'text' }
 import { createYoga, createSchema } from 'graphql-yoga'
 import { useValidationRule } from '@envelop/core'

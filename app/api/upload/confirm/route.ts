@@ -1,5 +1,7 @@
 import { confirmUploadAction } from '@/data/upload'
 
+export const maxDuration = 60
+
 export async function POST(request: Request) {
     const { uploadId } = await request.json()
 
