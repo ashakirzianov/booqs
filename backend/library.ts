@@ -4,6 +4,7 @@ import {
 } from '@/core'
 import { getCachedValueForKey, cacheValueForKey } from './cache'
 import { downloadAsset, uploadAsset } from './blob'
+import { storeDiagnostics } from './diagnostics'
 import { extractSingleImageFromEpub, openEpubImageLoader, parseAndPreprocessBooq } from './parse'
 import type { EpubImageLoader } from './parse'
 import groupBy from 'lodash-es/groupBy'
@@ -72,7 +73,10 @@ export async function booqForId(booqId: BooqId): Promise<Booq | undefined> {
     if (!file) {
         return undefined
     }
-    const booq = await parseAndPreprocessBooq(booqId, file)
+    const { booq, diags } = await parseAndPreprocessBooq(booqId, file)
+    storeDiagnostics(booqId, diags).catch(e =>
+        console.warn(`Failed to store diags for ${booqId}:`, e instanceof Error ? e.message : e)
+    )
     if (booq && useCache) {
         cacheBooq(booqId, booq).catch(e =>
             console.warn(`Failed to cache booq ${booqId}:`, e instanceof Error ? e.message : e)

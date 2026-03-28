@@ -3,9 +3,10 @@ import { ReadStream } from 'fs'
 import { inspect } from 'util'
 import type { InLibraryCard, Library } from './library'
 import { parseEpubFile } from '@/parser'
-import { Booq, BooqMetadata } from '@/core'
+import { Booq, BooqId, BooqMetadata } from '@/core'
 import { nanoid } from 'nanoid'
 import { deleteAsset, deleteAssetsWithPrefix, downloadAsset, generatePresignedUploadUrl, IMAGES_BUCKET, uploadAsset } from './blob'
+import { storeDiagnostics } from './diagnostics'
 import { sql } from './db'
 
 export const userUploadsLibrary: Library = {
@@ -97,6 +98,9 @@ async function uploadNewEpub({ buffer, hash }: File, userId: string) {
         report('Can\'t insert record to DB')
         return undefined
     }
+    const booqId: BooqId = `uu-${insertResult.id}`
+    storeDiagnostics(booqId, diags)
+        .catch(e => report(`Failed to store diags: ${e instanceof Error ? e.message : e}`))
     return convertToLibraryCard(insertResult)
 }
 

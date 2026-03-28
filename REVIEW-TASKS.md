@@ -66,7 +66,7 @@ Ordered by priority — combining severity, effort, and dependencies. Quick secu
 
 - [x] **D1. Resolve GraphQL → backend layer violation** — false positive. The original hierarchy `backend > graphql > data` already allows `graphql` to access `backend` (higher layers access lower). No violation existed; no changes needed.
 - [x] **SC4. Add S3 retry logic** — already handled: AWS SDK v3 defaults to 3 attempts with standard backoff. No changes needed.
-- [ ] **D4. Persist parser diagnostics** — store diagnostics per booq (in `uu_assets.meta` or a dedicated column) so admins can debug parse/render issues without re-parsing.
+- [x] **D4. Persist parser diagnostics** — `parseAndPreprocessBooq` now returns diags alongside the booq. Diagnostics are cached to S3 at `booqs-cache/booqs/{booqId}.diags.json` from both the cache-miss path in `library.ts` and the upload path in `uu.ts`.
 - [ ] **P4. Improve EPUB file caching** — `backend/library.ts`: replace single-file `cachedFile` variable with an LRU cache (e.g. `lru-cache` package) holding the N most recent EPUBs.
 
 ## Future / Low Priority
