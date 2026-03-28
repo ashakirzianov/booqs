@@ -6,32 +6,32 @@ Ordered by priority — combining severity, effort, and dependencies. Quick secu
 
 ## Quick Security & Correctness Fixes
 
-- [ ] **S1. Fix bookmark deletion ownership check** — `backend/bookmarks.ts`: `deleteBookmark` takes only `id`. Add `userId` param and `AND user_id = ${userId}` to the WHERE clause. Update `graphql/mutation.ts:77` to pass `userId`.
-- [ ] **S5. Throw on missing JWT secret** — `backend/config.ts:17`: replace `?? 'fake secret'` with a runtime error if `BOOQS_AUTH_SECRET` is undefined in production.
-- [ ] **S10. Whitelist image variant formats** — `backend/variants.ts`: change the variant spec regex to only accept `webp|avif|png|jpg` instead of `\w+`.
-- [ ] **C2. Fix `updated_at` → `updatedAt` in notes optimistic update** — `application/notes.ts:229`: snake_case field name doesn't match the `BooqNote` type.
-- [ ] **P7. Fix notes default sort order** — `backend/notes.ts`: change `ORDER BY created_at ASC` to `DESC` (newest-first), or confirm the frontend intentionally reverses.
+- [x] **S1. Fix bookmark deletion ownership check** — `backend/bookmarks.ts`: `deleteBookmark` takes only `id`. Add `userId` param and `AND user_id = ${userId}` to the WHERE clause. Update `graphql/mutation.ts:77` to pass `userId`.
+- [x] **S5. Throw on missing JWT secret** — `backend/config.ts:17`: replace `?? 'fake secret'` with a runtime error if `BOOQS_AUTH_SECRET` is undefined in production.
+- [x] **S10. Whitelist image variant formats** — `backend/images.ts`: `generateVariant` returns `undefined` for unsupported formats instead of passing arbitrary strings to sharp.
+- [x] **C2. Fix `updated_at` → `updatedAt` in notes optimistic update** — `application/notes.ts:229`: snake_case field name doesn't match the `BooqNote` type.
+- [x] **P7. Fix notes default sort order** — `backend/notes.ts`: changed to `ORDER BY created_at DESC` (newest-first).
 
 ## GraphQL Hardening
 
-- [ ] **S3. Add query depth and complexity limits** — `app/api/graphql/route.ts`: add `depthLimit` plugin (e.g. `graphql-depth-limit` or yoga's built-in `useDisableIntrospection`) and a max complexity rule.
-- [ ] **S7. Disable introspection in production** — same file: conditionally disable introspection when `NODE_ENV === 'production'`.
-- [ ] **P2. Cap maximum query limits** — `graphql/query.ts`: add `const MAX_LIMIT = 100` and wrap all `limit` args with `Math.min(limit ?? defaultLimit, MAX_LIMIT)`. Also apply to `/api/search/route.ts` offset/limit.
+- [x] **S3. Add query depth and complexity limits** — `app/api/graphql/route.ts`: added depth limit rule (max 10) via `@envelop/core` `useValidationRule`.
+- [x] **S7. Disable introspection in production** — same file: `graphiql: !isProduction`, `maskedErrors: isProduction`.
+- [x] **P2. Cap maximum query limits** — `graphql/query.ts`: added `clampLimit` helper with `MAX_LIMIT = 100`. Also applied to `/api/search/route.ts`.
 - [ ] **D2. Standardize mutation error responses** — replace bare `boolean` and `undefined` returns in `graphql/mutation.ts` with a consistent result shape (e.g. `{ success: boolean, error?: string }`). Update GraphQL schema accordingly.
 - [ ] **D5. Tighten GraphQL schema nullability** — review `Bookmark` and `Note` types in `graphql/schema.graphql`; make fields non-null where they are always present.
 
 ## Security Headers & Input Validation
 
-- [ ] **S4. Add security headers** — create `middleware.ts` (or configure in `next.config.js`) to set: `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Strict-Transport-Security`, `Referrer-Policy: strict-origin-when-cross-origin`. Consider a basic `Content-Security-Policy`.
-- [ ] **S6. Add Zod validation on API route inputs** — add request body schemas to: `/api/notes/[id]` (POST, PATCH), `/api/collections/[name]` (POST, DELETE), `/api/search` (limit/offset bounds), `/api/copilot/answer`. Replace unsafe `as BooqId` casts with parsed types.
-- [ ] **S8. Add CSRF protection for GraphQL mutations** — verify `Origin` header against allowed origins in the GraphQL route handler, or add `SameSite=Strict` to auth cookies.
+- [x] **S4. Add security headers** — created `proxy.ts` with X-Content-Type-Options, X-Frame-Options, HSTS, Referrer-Policy, X-DNS-Prefetch-Control.
+- [x] **S6. Add Zod validation on API route inputs** — added Zod schemas to `/api/notes/[id]`, `/api/collections/[name]`, `/api/copilot/answer`. Derived types from schemas.
+- [x] **S8. Add CSRF protection for GraphQL mutations** — added Origin header check against allowed origins on POST to `/api/graphql`.
 
 ## Code Clarity Fixes
 
-- [ ] **C8. Replace `catch (err: any)` with `catch (err: unknown)`** — in `application/passkeys.ts` (3 occurrences), `backend/users.ts`. Use `err instanceof Error ? err.message : String(err)` for message extraction.
-- [ ] **C1. Document `pph` property** — `core/model.ts:27`: add a JSDoc comment explaining what `pph` stands for and when it's set.
-- [ ] **C4. Rename `hl` → `note`** — `reader/nodes.ts:84`: the filter callback parameter should match the collection it filters.
-- [ ] **C5. Document magic numbers** — `core/chapter.ts:107` (`chapterLength = 4500`), `backend/library.ts:109` (`PREVIEW_LENGTH = 500`): add comments explaining the unit and rationale.
+- [x] **C8. Replace `catch (err: any)` with `catch (err: unknown)`** — fixed in `application/passkeys.ts`, `backend/users.ts`, `backend/blob.ts`.
+- [x] **C1. Document `pph` property** — `core/model.ts`: added JSDoc explaining paragraph marking for scroll tracking.
+- [x] **C4. Rename `hl` → `note`** — `reader/nodes.ts`: filter callback parameter now matches collection name.
+- [x] **C5. Document magic numbers** — `core/chapter.ts`, `backend/library.ts`: added comments explaining character count units.
 - [ ] **C7. Inline or document `noteFromJson`** — `data/notes.ts:247`: this no-op passthrough function either needs a comment explaining its purpose or should be inlined.
 - [ ] **C3. Clarify dynamic SQL in `updateUser`** — `backend/users.ts:153-178`: add a comment block explaining the `$${i++}` placeholder counter pattern, or refactor to use Neon template literals.
 - [ ] **C6. Pick a constant naming convention** — decide between `camelCase` (used in `core/`) and `UPPER_SNAKE_CASE` (used in `backend/`) for module-level constants, then apply consistently.
