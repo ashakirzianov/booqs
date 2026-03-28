@@ -315,5 +315,5 @@ type User {
 ## Suggestions
 
 - [x] Consider typing `libraryBrowse.kind` as a GraphQL enum instead of `String!` for validation and discoverability
-- [ ] The `notesWithAuthorFor` function has a TODO for privacy filtering — this work would be a good time to address it
-- [ ] Audit REST API endpoints in `app/api/` — the Next.js app uses server actions for most operations, so many REST endpoints may be unused. Consider removing unused ones or consolidating with GraphQL. The `/api/booq/[booq_id]/expanded-fragment` endpoint still uses the old naming and may be replaceable by the GraphQL `expandedFragment` field.
+- [x] The `notesWithAuthorFor` function has a TODO for privacy filtering — this work would be a good time to address it
+- [x] Audit REST API endpoints in `app/api/` — removed `/api/booq/[booq_id]/expanded-fragment` (zero callers, old naming) and `/api/users/[username]/follow` (web app uses server actions instead). Remaining ~10 endpoints are actively used by the web frontend.
