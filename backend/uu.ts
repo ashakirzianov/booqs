@@ -152,32 +152,27 @@ async function insertRecordAndRegister({ booq, assetId, fileHash, userId }: {
 }): Promise<DbUuCard | null> {
     const id = nanoid(10)
     const meta = booq.metadata
-    const result = await sql.transaction([
-        sql`
-          INSERT INTO uu_assets (id, asset_id, file_hash, meta)
-          VALUES (${id}, ${assetId}, ${fileHash}, ${meta})
-          ON CONFLICT (id) DO NOTHING
-          RETURNING *
-        `,
-        sql`
-          INSERT INTO uploads (upload_id, user_id)
-          VALUES (${id}, ${userId})
-        `,
-    ])
-    const [inserted] = result[0]
-    return inserted ? (inserted as DbUuCard) : null
+    // Use ON CONFLICT (file_hash) so concurrent uploads of the same file
+    // reuse the existing record instead of failing
+    const [upserted] = await sql`
+        INSERT INTO uu_assets (id, asset_id, file_hash, meta)
+        VALUES (${id}, ${assetId}, ${fileHash}, ${meta})
+        ON CONFLICT (file_hash) DO UPDATE SET meta = EXCLUDED.meta
+        RETURNING *
+    `
+    if (!upserted) return null
+    const record = upserted as DbUuCard
+    await addToRegistry({ uploadId: record.id, userId })
+    return record
 }
 
 async function addToRegistry({ uploadId, userId }: {
     uploadId: string,
     userId: string,
 }) {
-    await sql`INSERT INTO uploads (
-        upload_id, user_id
-    )
-    VALUES (
-        ${uploadId}, ${userId}
-    )`
+    await sql`INSERT INTO uploads (upload_id, user_id)
+    VALUES (${uploadId}, ${userId})
+    ON CONFLICT (user_id, upload_id) DO NOTHING`
     return true
 }
 

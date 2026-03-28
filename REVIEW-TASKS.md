@@ -51,7 +51,7 @@ Ordered by priority — combining severity, effort, and dependencies. Quick secu
 - [x] **SC2 + D3. Add transaction management for multi-step operations**:
   - `backend/uu.ts`: wrapped `insertRecord` + `addToRegistry` in `sql.transaction()` as `insertRecordAndRegister`
   - `backend/users.ts`: simplified `deleteUserForId` to rely on `ON DELETE CASCADE`, S3 cleanup is best-effort after
-- [ ] **SC5. Handle concurrent upload race condition** — `backend/uu.ts`: add `ON CONFLICT` on `file_hash` in `uu_assets` insert, or use a distributed lock so only one writer proceeds.
+- [x] **SC5. Handle concurrent upload race condition** — added `UNIQUE` constraint on `file_hash` in schema, changed insert to `ON CONFLICT (file_hash) DO UPDATE`. Also added `ON CONFLICT DO NOTHING` on uploads registry.
 - [ ] **SC3. Set `maxDuration` on all long-running routes** — add `export const maxDuration = 60` to `/api/upload/confirm`, `/api/graphql`, and any route that triggers EPUB parsing.
 - [ ] **UPL1. Optimize post-upload experience** — after a user uploads a book:
   - Fire image extraction via `after(() => extractAndUploadMissingOriginals(...))` like we do for variant generation
