@@ -1,5 +1,4 @@
 import { deleteAllBooqsForUserId } from './uu'
-import { deleteUserCredentials } from './passkey'
 import { sql } from './db'
 import { nanoid } from 'nanoid'
 import { getRandomAvatarEmoji } from '@/common/emoji'
@@ -101,28 +100,16 @@ export async function createUser({
 }
 
 export async function deleteUserForId(id: string): Promise<boolean> {
-    const deleteUserPromise = await deleteDbUserForId(id)
-    const deleteBooqsPromise = deleteAllBooqsForUserId(id)
-    const deleteCredentialsPromise = deleteUserCredentials(id)
-
-    const [
-        deleteUserResult,
-        deleteBooqsResult,
-        _deleteCredentialsResult,
-    ] = await Promise.all([
-        deleteUserPromise,
-        deleteBooqsPromise,
-        deleteCredentialsPromise,
-    ])
-    return deleteUserResult && deleteBooqsResult
-}
-
-async function deleteDbUserForId(id: string) {
+    // Cascading deletes handle: uploads, notes, collections, passkey_credentials, follows
     const result = await sql`
-    DELETE FROM users
-    WHERE id = ${id}
-  `
-    return result.length > 0
+        DELETE FROM users WHERE id = ${id}
+    `
+    if (result.length === 0) {
+        return false
+    }
+    // Best-effort cleanup of S3 assets (orphaned uu_assets files)
+    await deleteAllBooqsForUserId(id)
+    return true
 }
 
 

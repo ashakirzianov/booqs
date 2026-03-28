@@ -92,12 +92,11 @@ async function uploadNewEpub({ buffer, hash }: File, userId: string) {
         report('Can\'t upload file to blob storage')
         return undefined
     }
-    const insertResult = await insertRecord({ booq, assetId, fileHash: hash })
+    const insertResult = await insertRecordAndRegister({ booq, assetId, fileHash: hash, userId })
     if (insertResult === null) {
         report('Can\'t insert record to DB')
         return undefined
     }
-    await addToRegistry({ uploadId: insertResult.id, userId })
     return convertToLibraryCard(insertResult)
 }
 
@@ -145,30 +144,27 @@ async function cardForHash(hash: string) {
     }
 }
 
-async function insertRecord({ booq, assetId, fileHash }: {
+async function insertRecordAndRegister({ booq, assetId, fileHash, userId }: {
     booq: Booq,
     assetId: string,
     fileHash: string,
+    userId: string,
 }): Promise<DbUuCard | null> {
     const id = nanoid(10)
     const meta = booq.metadata
-    const query = sql`
-      INSERT INTO uu_assets (
-        id,
-        asset_id,
-        file_hash,
-        meta
-      )
-      VALUES (
-        ${id},
-        ${assetId},
-        ${fileHash},
-        ${meta}
-      )
-      ON CONFLICT (id) DO NOTHING
-      RETURNING *
-    `
-    const [inserted] = await query
+    const result = await sql.transaction([
+        sql`
+          INSERT INTO uu_assets (id, asset_id, file_hash, meta)
+          VALUES (${id}, ${assetId}, ${fileHash}, ${meta})
+          ON CONFLICT (id) DO NOTHING
+          RETURNING *
+        `,
+        sql`
+          INSERT INTO uploads (upload_id, user_id)
+          VALUES (${id}, ${userId})
+        `,
+    ])
+    const [inserted] = result[0]
     return inserted ? (inserted as DbUuCard) : null
 }
 

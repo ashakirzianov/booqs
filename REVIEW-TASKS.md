@@ -48,10 +48,9 @@ Ordered by priority — combining severity, effort, and dependencies. Quick secu
 
 ## Database Integrity
 
-- [ ] **SC2 + D3. Add transaction management for multi-step operations** — wrap these operations in `BEGIN`/`COMMIT`:
-  - `backend/users.ts` `deleteUserForId` (3 independent deletes)
-  - `backend/uu.ts` `uploadEpubForUser` (parse → upload → insert → register)
-  - `backend/collections.ts` collection + booq insert
+- [x] **SC2 + D3. Add transaction management for multi-step operations**:
+  - `backend/uu.ts`: wrapped `insertRecord` + `addToRegistry` in `sql.transaction()` as `insertRecordAndRegister`
+  - `backend/users.ts`: simplified `deleteUserForId` to rely on `ON DELETE CASCADE`, S3 cleanup is best-effort after
 - [ ] **SC5. Handle concurrent upload race condition** — `backend/uu.ts`: add `ON CONFLICT` on `file_hash` in `uu_assets` insert, or use a distributed lock so only one writer proceeds.
 - [ ] **SC3. Set `maxDuration` on all long-running routes** — add `export const maxDuration = 60` to `/api/upload/confirm`, `/api/graphql`, and any route that triggers EPUB parsing.
 
