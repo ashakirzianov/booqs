@@ -64,9 +64,7 @@ Ordered by priority — combining severity, effort, and dependencies. Quick secu
 
 ## Larger Structural Work
 
-- [ ] **D1. Resolve GraphQL → backend layer violation** — all GraphQL resolvers import directly from `backend/*`, violating the documented hierarchy. Decide:
-  - Option A: Route GraphQL through `data/` (consistent but creates pass-through functions)
-  - Option B: Update CLAUDE.md to acknowledge `graphql` and `data` as sibling layers above `backend` (matches reality)
+- [x] **D1. Resolve GraphQL → backend layer violation** — false positive. The original hierarchy `backend > graphql > data` already allows `graphql` to access `backend` (higher layers access lower). No violation existed; no changes needed.
 - [ ] **SC4. Add S3 retry logic** — `backend/blob.ts`: add exponential backoff with jitter for transient S3 failures (throttling, network errors). AWS SDK v3 has built-in retry — verify it's configured.
 - [ ] **D4. Persist parser diagnostics** — store diagnostics per booq (in `uu_assets.meta` or a dedicated column) so admins can debug parse/render issues without re-parsing.
 - [ ] **P4. Improve EPUB file caching** — `backend/library.ts`: replace single-file `cachedFile` variable with an LRU cache (e.g. `lru-cache` package) holding the N most recent EPUBs.
