@@ -81,7 +81,7 @@ function buildNodes({ toc, filter, notes, title }: {
         prevPath = prevPath.slice(0, prev.level)
         prevPath[prev.level] = prev
         const inside = notes.filter(
-            hl => pathInRange(hl.range.start, {
+            note => pathInRange(note.range.start, {
                 start: prev?.path ?? [0],
                 end: next.path,
             }),

@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE TABLE IF NOT EXISTS uu_assets (
   id TEXT PRIMARY KEY DEFAULT uuid_generate_v4()::TEXT,
   asset_id TEXT NOT NULL,
-  file_hash TEXT NOT NULL,
+  file_hash TEXT NOT NULL UNIQUE,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   meta JSONB NOT NULL
 );

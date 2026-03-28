@@ -16,14 +16,14 @@ type Subscription {
     copilotAnswerStream(context: CopilotContext!, question: String!, footnote: String): String!
 }
 type Mutation {
-    addBookmark(bookmark: BookmarkInput!): Boolean
-    removeBookmark(id: ID!): Boolean
-    addNote(note: NoteInput!): Boolean
-    removeNote(id: ID!): Boolean
-    updateNote(id: ID!, kind: String, content: String): Boolean
-    addBooqHistory(event: BooqHistoryInput!): Boolean
-    addToCollection(name: String!, booqId: ID!): Boolean
-    removeFromCollection(name: String!, booqId: ID!): Boolean
+    addBookmark(bookmark: BookmarkInput!): MutationResult!
+    removeBookmark(id: ID!): MutationResult!
+    addNote(note: NoteInput!): MutationResult!
+    removeNote(id: ID!): MutationResult!
+    updateNote(id: ID!, kind: String, content: String): MutationResult!
+    addBooqHistory(event: BooqHistoryInput!): MutationResult!
+    addToCollection(name: String!, booqId: ID!): MutationResult!
+    removeFromCollection(name: String!, booqId: ID!): MutationResult!
 
     initPasskeyRegistration: InitPasskeyRegistrationResponse
     verifyPasskeyRegistration(
@@ -36,21 +36,26 @@ type Mutation {
         response: WebAuthnAuthenticationResponseJSON!
     ): AuthResult
 
-    initiateSign(email: String!, returnTo: String): Boolean
+    initiateSign(email: String!, returnTo: String): MutationResult!
     completeSignIn(email: String!, secret: String!): AuthResult
     completeSignUp(email: String!, secret: String!, username: String!, name: String!, emoji: String!): AuthResult
 
-    follow(username: String!): Boolean
-    unfollow(username: String!): Boolean
-    removeHistory(booqId: ID!): Boolean
+    follow(username: String!): MutationResult!
+    unfollow(username: String!): MutationResult!
+    removeHistory(booqId: ID!): MutationResult!
 
     requestUpload: UploadRequest
     confirmUpload(uploadId: String!): UploadResult!
 
-    deletePasskey(id: ID!): Boolean
-    signout: Boolean
-    deleteAccount: Boolean
+    deletePasskey(id: ID!): MutationResult!
+    signout: MutationResult!
+    deleteAccount: MutationResult!
     updateUser(input: UpdateUserInput!): UpdateUserResult
+}
+
+type MutationResult {
+    success: Boolean!
+    error: String
 }
 
 type UploadRequest {
@@ -194,24 +199,24 @@ type AuthResult {
 }
 type Bookmark {
     booq: Booq
-    id: ID
-    path: [Int!]
+    id: ID!
+    path: [Int!]!
 }
 type Note {
     author: User
     booq: Booq
-    id: ID
+    id: ID!
     start: [Int!]!
     end: [Int!]!
     kind: String
     text: String
     content: String
-    targetQuote: String
+    targetQuote: String!
     surroundingFragment: BooqFragment
     position: Int
     privacy: String
-    createdAt: String
-    updatedAt: String
+    createdAt: String!
+    updatedAt: String!
 }
 type BooqHistory {
     booq: Booq!

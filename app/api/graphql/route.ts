@@ -1,19 +1,36 @@
+export const maxDuration = 60
+
 import typeDefs from '@/graphql/schema.graphql' assert { type: 'text' }
 import { createYoga, createSchema } from 'graphql-yoga'
+import { useValidationRule } from '@envelop/core'
 import { resolvers } from '@/graphql/resolvers'
 import { ResolverContext, context } from '@/graphql/context'
+import { config } from '@/backend/config'
 import { cookies, headers } from 'next/headers'
 import { NextRequest } from 'next/server'
+import { depthLimitRule } from '@/graphql/depthLimit'
+
+const allowedOrigins = new Set(
+  Object.values(config().origins).filter((o): o is string => typeof o === 'string'),
+)
 
 const schema = createSchema<ResolverContext>({
   typeDefs,
   resolvers,
 })
 
+const isProduction = process.env.NODE_ENV === 'production'
+
 const { handleRequest } = createYoga({
   schema,
   graphqlEndpoint: '/api/graphql',
   fetchAPI: { Request, Response },
+  maskedErrors: isProduction,
+  graphiql: !isProduction,
+  plugins: [
+    // eslint-disable-next-line react-hooks/rules-of-hooks -- envelop plugin, not a React hook
+    useValidationRule(depthLimitRule(10)),
+  ],
   async context() {
     const cookieStore = await cookies()
     const hs = await headers()
@@ -45,5 +62,9 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const origin = request.headers.get('origin')
+  if (origin && !allowedOrigins.has(origin)) {
+    return new Response('Forbidden', { status: 403 })
+  }
   return handleRequest(request, {})
 }

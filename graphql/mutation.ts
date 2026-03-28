@@ -1,3 +1,4 @@
+import { BooqId } from '@/core'
 import { IResolvers } from '@graphql-tools/utils'
 import { ResolverContext } from './context'
 import { deleteUserForId, updateUser, userForUsername } from '@/backend/users'
@@ -11,153 +12,133 @@ import { addBookmark, deleteBookmark } from '@/backend/bookmarks'
 import { followUser, unfollowUser } from '@/backend/follows'
 import { deletePasskeyCredential } from '@/backend/passkey'
 import { requestUpload, confirmUpload } from '@/backend/uu'
+import { primeAfterUpload } from '@/backend/library'
+import { extractAndUploadMissingOriginals } from '@/backend/variants'
+import { setCachedBooqFile } from '@/backend/cache'
+import { after } from 'next/server'
+
+type MutationResult = { success: boolean, error?: string }
+type UploadResult = {
+    success: boolean,
+    booqId?: BooqId,
+    title?: string,
+    coverSrc?: string,
+    error?: string
+}
+
+function ok(): MutationResult {
+    return { success: true }
+}
+
+function fail(error: string): MutationResult {
+    return { success: false, error }
+}
+
+function requireAuth(userId: string | undefined): userId is string {
+    return userId !== undefined
+}
 
 export const mutationResolver: IResolvers<any, ResolverContext> = {
     Mutation: {
-        async follow(_, { username }, { userId }): Promise<boolean> {
-            if (!userId) {
-                return false
-            }
+        async follow(_, { username }, { userId }): Promise<MutationResult> {
+            if (!requireAuth(userId)) return fail('Authentication required')
             const target = await userForUsername(username)
-            if (!target) {
-                return false
-            }
-            return followUser(userId, target.id)
+            if (!target) return fail('User not found')
+            const result = await followUser(userId, target.id)
+            return result ? ok() : fail('Failed to follow user')
         },
-        async unfollow(_, { username }, { userId }): Promise<boolean> {
-            if (!userId) {
-                return false
-            }
+        async unfollow(_, { username }, { userId }): Promise<MutationResult> {
+            if (!requireAuth(userId)) return fail('Authentication required')
             const target = await userForUsername(username)
-            if (!target) {
-                return false
-            }
-            return unfollowUser(userId, target.id)
+            if (!target) return fail('User not found')
+            const result = await unfollowUser(userId, target.id)
+            return result ? ok() : fail('Failed to unfollow user')
         },
-        async removeHistory(_, { booqId }, { userId }): Promise<boolean> {
-            if (!userId) {
-                return false
-            }
-            return removeBooqHistory(userId, booqId)
+        async removeHistory(_, { booqId }, { userId }): Promise<MutationResult> {
+            if (!requireAuth(userId)) return fail('Authentication required')
+            const result = await removeBooqHistory(userId, booqId)
+            return result ? ok() : fail('Failed to remove history')
         },
-        signout(_, __, { clearAuth }) {
+        signout(_, __, { clearAuth }): MutationResult {
             clearAuth()
-            return true
+            return ok()
         },
-        async deletePasskey(_, { id }: { id: string }, { userId }) {
-            if (!userId) {
-                return false
-            }
-            return deletePasskeyCredential(userId, id)
+        async deletePasskey(_, { id }: { id: string }, { userId }): Promise<MutationResult> {
+            if (!requireAuth(userId)) return fail('Authentication required')
+            const result = await deletePasskeyCredential(userId, id)
+            return result ? ok() : fail('Failed to delete passkey')
         },
-        async deleteAccount(_, __, { userId, clearAuth }) {
-            if (userId) {
-                clearAuth()
-                const result = await deleteUserForId(userId)
-                return result
-            } else {
-                return false
-            }
+        async deleteAccount(_, __, { userId, clearAuth }): Promise<MutationResult> {
+            if (!requireAuth(userId)) return fail('Authentication required')
+            clearAuth()
+            const result = await deleteUserForId(userId)
+            return result ? ok() : fail('Failed to delete account')
         },
-        async addBookmark(_, { bookmark }, { userId }): Promise<boolean> {
-            if (userId) {
-                await addBookmark({
-                    userId,
-                    id: bookmark.id,
-                    booqId: bookmark.booqId,
-                    path: bookmark.path,
-                })
-                return true
-            } else {
-                return false
-            }
+        async addBookmark(_, { bookmark }, { userId }): Promise<MutationResult> {
+            if (!requireAuth(userId)) return fail('Authentication required')
+            await addBookmark({
+                userId,
+                id: bookmark.id,
+                booqId: bookmark.booqId,
+                path: bookmark.path,
+            })
+            return ok()
         },
-        async removeBookmark(_, { id }, { userId }) {
-            if (userId) {
-                return deleteBookmark(id)
-            } else {
-                return false
-            }
+        async removeBookmark(_, { id }, { userId }): Promise<MutationResult> {
+            if (!requireAuth(userId)) return fail('Authentication required')
+            const result = await deleteBookmark({ id, userId })
+            return result ? ok() : fail('Bookmark not found')
         },
-        async addNote(_, { note }, { userId }): Promise<boolean> {
-            if (userId) {
-                await addNote({
-                    id: note.id,
-                    authorId: userId,
-                    booqId: note.booqId,
-                    range: {
-                        start: note.start,
-                        end: note.end,
-                    },
-                    kind: note.kind,
-                    targetQuote: note.targetQuote,
-                })
-                return true
-            } else {
-                return false
-            }
+        async addNote(_, { note }, { userId }): Promise<MutationResult> {
+            if (!requireAuth(userId)) return fail('Authentication required')
+            await addNote({
+                id: note.id,
+                authorId: userId,
+                booqId: note.booqId,
+                range: {
+                    start: note.start,
+                    end: note.end,
+                },
+                kind: note.kind,
+                targetQuote: note.targetQuote,
+            })
+            return ok()
         },
-        async removeNote(_, { id }, { userId }) {
-            if (userId) {
-                return removeNote({
-                    authorId: userId,
-                    id: id,
-                })
-            } else {
-                return false
-            }
+        async removeNote(_, { id }, { userId }): Promise<MutationResult> {
+            if (!requireAuth(userId)) return fail('Authentication required')
+            const result = await removeNote({ authorId: userId, id })
+            return result ? ok() : fail('Note not found')
         },
-        async updateNote(_, { id, kind, content }, { userId }): Promise<boolean> {
-            if (userId) {
-                await updateNote({
-                    authorId: userId,
-                    id: id,
-                    kind,
-                    content,
-                })
-                return true
-            } else {
-                return false
-            }
+        async updateNote(_, { id, kind, content }, { userId }): Promise<MutationResult> {
+            if (!requireAuth(userId)) return fail('Authentication required')
+            await updateNote({ authorId: userId, id, kind, content })
+            return ok()
         },
-        async addBooqHistory(_, { event }, { userId }): Promise<boolean> {
-            if (userId) {
-                await addBooqHistory(userId, {
-                    booqId: event.booqId,
-                    path: event.path,
-                    date: Date.now(),
-                })
-                return true
-            } else {
-                return false
-            }
+        async addBooqHistory(_, { event }, { userId }): Promise<MutationResult> {
+            if (!requireAuth(userId)) return fail('Authentication required')
+            await addBooqHistory(userId, {
+                booqId: event.booqId,
+                path: event.path,
+                date: Date.now(),
+            })
+            return ok()
         },
-        async addToCollection(_, { booqId, name }, { userId }): Promise<boolean> {
-            if (userId) {
-                return addToCollection({
-                    userId,
-                    name, booqId,
-                })
-            } else {
-                return false
-            }
+        async addToCollection(_, { booqId, name }, { userId }): Promise<MutationResult> {
+            if (!requireAuth(userId)) return fail('Authentication required')
+            const result = await addToCollection({ userId, name, booqId })
+            return result ? ok() : fail('Failed to add to collection')
         },
-        async removeFromCollection(_, { booqId, name }, { userId }): Promise<boolean> {
-            if (userId) {
-                return removeFromCollection({
-                    userId,
-                    name, booqId,
-                })
-            } else {
-                return false
-            }
+        async removeFromCollection(_, { booqId, name }, { userId }): Promise<MutationResult> {
+            if (!requireAuth(userId)) return fail('Authentication required')
+            const result = await removeFromCollection({ userId, name, booqId })
+            return result ? ok() : fail('Failed to remove from collection')
         },
-        async initiateSign(_, { email, returnTo }: { email: string, returnTo?: string }) {
+        async initiateSign(_, { email, returnTo }: { email: string, returnTo?: string }): Promise<MutationResult> {
             const result = await initiateSignRequest({
                 email,
                 from: returnTo ?? '/',
             })
-            return result.kind !== 'error'
+            return result.kind !== 'error' ? ok() : fail('Failed to send sign-in email')
         },
         async completeSignIn(_, { email, secret }: { email: string, secret: string }, { setAuthForUserId }) {
             const result = await completeSignInRequest({ email, secret })
@@ -246,11 +227,22 @@ export const mutationResolver: IResolvers<any, ResolverContext> = {
             }
             return requestUpload()
         },
-        async confirmUpload(_, { uploadId }: { uploadId: string }, { userId }) {
+        async confirmUpload(_, { uploadId }: { uploadId: string }, { userId }): Promise<UploadResult> {
             if (!userId) {
                 return { success: false, error: 'Authentication required' }
             }
-            return confirmUpload(uploadId, userId)
+            const result = await confirmUpload(uploadId, userId)
+            if (result.success) {
+                const { fileBuffer, ...response } = result
+                const booqId = result.booqId as BooqId
+                after(async () => {
+                    setCachedBooqFile(booqId, { kind: 'epub', file: fileBuffer })
+                    await primeAfterUpload(booqId)
+                    await extractAndUploadMissingOriginals(booqId)
+                })
+                return response
+            }
+            return result
         },
         async updateUser(_, { input }, { userId }) {
             if (!userId) {

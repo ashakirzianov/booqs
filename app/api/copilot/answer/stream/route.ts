@@ -1,3 +1,5 @@
+export const maxDuration = 60
+
 import { generateCopilotAnswerStream } from '@/data/copilot'
 import { BooqId, BooqPath } from '@/core'
 import { getUserIdInsideRequest } from '@/data/request'

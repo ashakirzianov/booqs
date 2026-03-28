@@ -1,5 +1,4 @@
 import { deleteAllBooqsForUserId } from './uu'
-import { deleteUserCredentials } from './passkey'
 import { sql } from './db'
 import { nanoid } from 'nanoid'
 import { getRandomAvatarEmoji } from '@/common/emoji'
@@ -93,7 +92,7 @@ export async function createUser({
           RETURNING *
         `
         return { success: true, user: user as DbUser }
-    } catch (err: any) {
+    } catch (err: unknown) {
         console.error('Error creating user:', err)
         const errorResult = getReasonFromError(err, 'Failed to create user')
         return { success: false, reason: errorResult.reason }
@@ -101,28 +100,16 @@ export async function createUser({
 }
 
 export async function deleteUserForId(id: string): Promise<boolean> {
-    const deleteUserPromise = await deleteDbUserForId(id)
-    const deleteBooqsPromise = deleteAllBooqsForUserId(id)
-    const deleteCredentialsPromise = deleteUserCredentials(id)
-
-    const [
-        deleteUserResult,
-        deleteBooqsResult,
-        _deleteCredentialsResult,
-    ] = await Promise.all([
-        deleteUserPromise,
-        deleteBooqsPromise,
-        deleteCredentialsPromise,
-    ])
-    return deleteUserResult && deleteBooqsResult
-}
-
-async function deleteDbUserForId(id: string) {
+    // Cascading deletes handle: uploads, notes, collections, passkey_credentials, follows
     const result = await sql`
-    DELETE FROM users
-    WHERE id = ${id}
-  `
-    return result.length > 0
+        DELETE FROM users WHERE id = ${id}
+    `
+    if (result.length === 0) {
+        return false
+    }
+    // Best-effort cleanup of S3 assets (orphaned uu_assets files)
+    await deleteAllBooqsForUserId(id)
+    return true
 }
 
 
@@ -150,8 +137,10 @@ export async function updateUser({
             }
         }
 
+        // Build a dynamic UPDATE query: each provided field gets a positional
+        // placeholder ($1, $2, ...) and the user id is always the last parameter.
         const updates: string[] = []
-        const values: any[] = []
+        const values: unknown[] = []
         let i = 1
 
         if (name !== undefined) {
@@ -184,7 +173,7 @@ export async function updateUser({
         }
 
         return { success: true, user: user as DbUser }
-    } catch (err: any) {
+    } catch (err: unknown) {
         console.error('Error updating user:', err)
         const errorResult = getReasonFromError(err, 'Failed to update user')
         return { success: false, reason: errorResult.reason, field: errorResult.field }
@@ -192,16 +181,20 @@ export async function updateUser({
 }
 
 
-function getReasonFromError(err: any, defaultReason: string): { reason: string, field?: string } {
+function getReasonFromError(unkownErr: unknown, defaultReason: string): { reason: string, field?: string } {
+    if (unkownErr == null || typeof unkownErr !== 'object') {
+        return { reason: defaultReason }
+    }
+    const err = unkownErr as { code?: string, constraint?: string }
     // Handle specific database errors
-    if (err.code === '23505') { // unique_violation
-        if (err.constraint === 'users_username_key') {
+    if (err.code === '23505') {
+        const constraint = err.constraint
+        if (constraint === 'users_username_key') {
             return { reason: 'Username already exists', field: 'username' }
         }
-        if (err.constraint === 'users_email_key') {
+        if (constraint === 'users_email_key') {
             return { reason: 'Email already exists', field: 'email' }
         }
-        // Generic unique constraint violation
         return { reason: 'This value is already taken' }
     }
 

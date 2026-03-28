@@ -53,7 +53,7 @@ export async function generateVariant(buffer: Buffer, variant: ImageVariant): Pr
                 pipeline = pipeline.jpeg({ quality })
                 break
             default:
-                pipeline = pipeline.toFormat(format as any, { quality })
+                return undefined
         }
         return await pipeline.toBuffer()
     } catch {

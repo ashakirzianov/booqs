@@ -77,6 +77,40 @@ export async function getFollowingCount(userId: string): Promise<number> {
   }
 }
 
+export async function getFollowersCountBatch(userIds: readonly string[]): Promise<number[]> {
+  if (userIds.length === 0) return []
+  try {
+    const results = await sql`
+      SELECT following_id, COUNT(*)::INTEGER as count
+      FROM follows
+      WHERE following_id = ANY(${userIds as string[]})
+      GROUP BY following_id
+    `
+    const countMap = new Map(results.map(r => [r.following_id, r.count]))
+    return userIds.map(id => countMap.get(id) ?? 0)
+  } catch (err) {
+    console.error('Error getting followers count batch:', err)
+    return userIds.map(() => 0)
+  }
+}
+
+export async function getFollowingCountBatch(userIds: readonly string[]): Promise<number[]> {
+  if (userIds.length === 0) return []
+  try {
+    const results = await sql`
+      SELECT follower_id, COUNT(*)::INTEGER as count
+      FROM follows
+      WHERE follower_id = ANY(${userIds as string[]})
+      GROUP BY follower_id
+    `
+    const countMap = new Map(results.map(r => [r.follower_id, r.count]))
+    return userIds.map(id => countMap.get(id) ?? 0)
+  } catch (err) {
+    console.error('Error getting following count batch:', err)
+    return userIds.map(() => 0)
+  }
+}
+
 export async function getFollowers(userId: string, limit = 50, offset = 0): Promise<string[]> {
   try {
     const results = await sql`

@@ -1,27 +1,27 @@
 import { BooqPath, BooqRange } from './model'
 
-const pathSeparator = '-'
+const PATH_SEPARATOR = '-'
 export function pathToString(path: BooqPath): string {
-    return path.join(pathSeparator)
+    return path.join(PATH_SEPARATOR)
 }
 
 export function pathFromString(pathString: string): BooqPath | undefined {
     const path = pathString
-        .split(pathSeparator)
+        .split(PATH_SEPARATOR)
         .map(c => parseInt(c, 10))
     return path.some(isNaN)
         ? undefined
         : path
 }
 
-const idPrefix = 'path:'
+const ID_PREFIX = 'path:'
 export function pathToId(path: BooqPath): string {
-    return `${idPrefix}${pathToString(path)}`
+    return `${ID_PREFIX}${pathToString(path)}`
 }
 
 export function pathFromId(id: string): BooqPath | undefined {
-    if (id.startsWith(idPrefix)) {
-        const pathString = id.substring(idPrefix.length)
+    if (id.startsWith(ID_PREFIX)) {
+        const pathString = id.substring(ID_PREFIX.length)
         return pathFromString(pathString)
     } else {
         return undefined
@@ -63,15 +63,15 @@ export function pathInRange(path: BooqPath, range: BooqRange): boolean {
         )
 }
 
-const rangeSeparator = 'to'
+const RANGE_SEPARATOR = 'to'
 export function rangeToString(range: BooqRange): string {
     return range.end
-        ? `${pathToString(range.start)}${rangeSeparator}${pathToString(range.end)}`
+        ? `${pathToString(range.start)}${RANGE_SEPARATOR}${pathToString(range.end)}`
         : pathToString(range.start)
 }
 
 export function rangeFromString(rangeString: string): BooqRange | undefined {
-    const [startPart, endPart] = rangeString.split(rangeSeparator)
+    const [startPart, endPart] = rangeString.split(RANGE_SEPARATOR)
     const start = startPart !== undefined ? pathFromString(startPart) : undefined
     const end = endPart !== undefined ? pathFromString(endPart) : undefined
     return start && end

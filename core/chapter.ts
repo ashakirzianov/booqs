@@ -76,7 +76,7 @@ function chapterForPath(booq: Booq, path: BooqPath): BooqChapter {
         position: 0,
     }
 
-    for (const anchor of generateAnchors(booq, chapterLength)) {
+    for (const anchor of generateAnchors(booq, CHAPTER_LENGTH)) {
         if (!pathLessThan(path, anchor.path)) {
             previous = current
             current = anchor
@@ -104,7 +104,8 @@ function chapterForPath(booq: Booq, path: BooqPath): BooqChapter {
     }
 }
 
-const chapterLength = 4500
+// Minimum character count between chapter anchors (based on text node lengths)
+const CHAPTER_LENGTH = 4500
 function* generateAnchors(booq: Booq, length: number) {
     let position = 0
     for (const item of booq.toc.items) {

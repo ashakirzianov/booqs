@@ -249,22 +249,6 @@ function getLanguageDisplayName(languageCode: string): string {
 
 export type ExpandedFragment = { nodes: BooqNode[], styles: BooqStyles, range: BooqRange }
 
-export async function fetchExpandedFragmentForRange(booqId: BooqId, range: BooqRange): Promise<ExpandedFragment | undefined> {
-    const booq = await booqForId(booqId)
-    if (!booq) {
-        return undefined
-    }
-
-    const expandedRange = getExpandedRange(booq.nodes, range)
-    const nodes = nodesForRange(booq.nodes, expandedRange)
-
-    return {
-        nodes,
-        styles: collectReferencedStyles(nodes, booq.styles),
-        range: expandedRange,
-    }
-}
-
 export async function getExpandedFragments(booqId: BooqId, ranges: BooqRange[]): Promise<Array<ExpandedFragment | undefined>> {
     const booq = await booqForId(booqId)
     if (!booq) {

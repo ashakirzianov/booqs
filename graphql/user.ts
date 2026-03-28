@@ -1,5 +1,5 @@
 import { DbUser, usersForIds } from '@/backend/users'
-import { getFollowersCount, getFollowingCount, getFollowers, getFollowing, isFollowing } from '@/backend/follows'
+import { getFollowers, getFollowing, isFollowing } from '@/backend/follows'
 import { getUserPasskeys } from '@/backend/passkey'
 import { getBooqsWithOwnNotes } from '@/backend/notes'
 import { BooqId } from '@/core'
@@ -20,11 +20,11 @@ export const userResolver: IResolvers<UserParent, ResolverContext> = {
         emoji(parent) {
             return parent.emoji
         },
-        async followersCount(parent) {
-            return await getFollowersCount(parent.id)
+        async followersCount(parent, _, { followersCountLoader }) {
+            return followersCountLoader.load(parent.id)
         },
-        async followingCount(parent) {
-            return await getFollowingCount(parent.id)
+        async followingCount(parent, _, { followingCountLoader }) {
+            return followingCountLoader.load(parent.id)
         },
         async followers(parent) {
             const followerIds = await getFollowers(parent.id)

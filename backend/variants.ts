@@ -1,7 +1,7 @@
 import { BooqId } from '@/core'
 import { booqImageLoader, booqSingleImage } from './library'
 import { generateVariant, ImageVariant } from './images'
-import { downloadAsset, IMAGES_BUCKET, listAssetKeys, uploadAsset } from './blob'
+import { assetExists, downloadAsset, IMAGES_BUCKET, listAssetKeys, uploadAsset } from './blob'
 
 export type ImageVariantResult = {
     buffer: Buffer,
@@ -67,8 +67,13 @@ async function getOrExtractOriginal(booqId: BooqId, filePath: string): Promise<{
         return { image: existing, extracted: false }
     }
 
+    if (await isFailedOriginal(booqId, filePath)) {
+        return undefined
+    }
+
     const image = await booqSingleImage(booqId, filePath)
     if (!image) {
+        await markFailedOriginal(booqId, filePath)
         return undefined
     }
 
@@ -87,8 +92,13 @@ async function getOrGenerateVariant(
         return existing
     }
 
+    if (await isFailedVariant(booqId, variantPath)) {
+        return undefined
+    }
+
     const generated = await generateVariant(original, variant)
     if (!generated) {
+        await markFailedVariant(booqId, variantPath)
         return undefined
     }
 
@@ -123,6 +133,32 @@ async function downloadOriginalImage(booqId: BooqId, imageId: string): Promise<B
 async function downloadVariantImage(booqId: BooqId, variantPath: string): Promise<Buffer | undefined> {
     const s3Key = `variants/${booqId}/${variantPath}`
     return downloadAsset(IMAGES_BUCKET, s3Key)
+}
+
+const FAILED_SENTINEL = Buffer.alloc(0)
+
+function failedOriginalKey(booqId: BooqId, imageId: string): string {
+    return `failed-originals/${booqId}/${imageId}`
+}
+
+function failedVariantKey(booqId: BooqId, variantPath: string): string {
+    return `failed-variants/${booqId}/${variantPath}`
+}
+
+async function isFailedOriginal(booqId: BooqId, imageId: string): Promise<boolean> {
+    return assetExists(IMAGES_BUCKET, failedOriginalKey(booqId, imageId))
+}
+
+async function markFailedOriginal(booqId: BooqId, imageId: string): Promise<void> {
+    await uploadAsset(IMAGES_BUCKET, failedOriginalKey(booqId, imageId), FAILED_SENTINEL)
+}
+
+async function isFailedVariant(booqId: BooqId, variantPath: string): Promise<boolean> {
+    return assetExists(IMAGES_BUCKET, failedVariantKey(booqId, variantPath))
+}
+
+async function markFailedVariant(booqId: BooqId, variantPath: string): Promise<void> {
+    await uploadAsset(IMAGES_BUCKET, failedVariantKey(booqId, variantPath), FAILED_SENTINEL)
 }
 
 const UPLOAD_BATCH_SIZE = 20

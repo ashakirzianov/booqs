@@ -75,12 +75,15 @@ export async function assetExists(bucket: string, assetId: string): Promise<bool
         })
         await service().send(command)
         return true
-    } catch (e: any) {
-        if (e?.name === 'NoSuchKey' || e.$metadata?.httpStatusCode === 404) {
+    } catch (e: unknown) {
+        const isNotFound = (
+            ((e as any)?.name === 'NoSuchKey')
+            || (((e as any)?.$metadata?.httpStatusCode === 404))
+        )
+        if (isNotFound) {
             return false
-        } else {
-            throw e
         }
+        throw e
     }
 }
 

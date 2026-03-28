@@ -3,9 +3,10 @@ import { ReadStream } from 'fs'
 import { inspect } from 'util'
 import type { InLibraryCard, Library } from './library'
 import { parseEpubFile } from '@/parser'
-import { Booq, BooqMetadata } from '@/core'
+import { Booq, BooqId, BooqMetadata } from '@/core'
 import { nanoid } from 'nanoid'
 import { deleteAsset, deleteAssetsWithPrefix, downloadAsset, generatePresignedUploadUrl, IMAGES_BUCKET, uploadAsset } from './blob'
+import { storeDiagnostics } from './diagnostics'
 import { sql } from './db'
 
 export const userUploadsLibrary: Library = {
@@ -92,12 +93,14 @@ async function uploadNewEpub({ buffer, hash }: File, userId: string) {
         report('Can\'t upload file to blob storage')
         return undefined
     }
-    const insertResult = await insertRecord({ booq, assetId, fileHash: hash })
+    const insertResult = await insertRecordAndRegister({ booq, assetId, fileHash: hash, userId })
     if (insertResult === null) {
         report('Can\'t insert record to DB')
         return undefined
     }
-    await addToRegistry({ uploadId: insertResult.id, userId })
+    const booqId: BooqId = `uu-${insertResult.id}`
+    storeDiagnostics(booqId, diags)
+        .catch(e => report(`Failed to store diags: ${e instanceof Error ? e.message : e}`))
     return convertToLibraryCard(insertResult)
 }
 
@@ -109,7 +112,7 @@ export async function requestUpload() {
 }
 
 export type ConfirmUploadResult =
-    | { success: true, booqId: string, title?: string, coverSrc?: string }
+    | { success: true, booqId: BooqId, title?: string, coverSrc?: string, fileBuffer: Buffer }
     | { success: false, error: string }
 
 export async function confirmUpload(uploadId: string, userId: string): Promise<ConfirmUploadResult> {
@@ -124,12 +127,13 @@ export async function confirmUpload(uploadId: string, userId: string): Promise<C
         return { success: false, error: 'Failed to parse EPUB file' }
     }
 
-    const booqId = `uu-${result.id}`
+    const booqId: BooqId = `uu-${result.id}`
     return {
         success: true,
         booqId,
         title: result.meta.title,
         coverSrc: result.meta.coverSrc,
+        fileBuffer: buffer,
     }
 }
 
@@ -145,43 +149,35 @@ async function cardForHash(hash: string) {
     }
 }
 
-async function insertRecord({ booq, assetId, fileHash }: {
+async function insertRecordAndRegister({ booq, assetId, fileHash, userId }: {
     booq: Booq,
     assetId: string,
     fileHash: string,
+    userId: string,
 }): Promise<DbUuCard | null> {
     const id = nanoid(10)
     const meta = booq.metadata
-    const query = sql`
-      INSERT INTO uu_assets (
-        id,
-        asset_id,
-        file_hash,
-        meta
-      )
-      VALUES (
-        ${id},
-        ${assetId},
-        ${fileHash},
-        ${meta}
-      )
-      ON CONFLICT (id) DO NOTHING
-      RETURNING *
+    // Use ON CONFLICT (file_hash) so concurrent uploads of the same file
+    // reuse the existing record instead of failing
+    const [upserted] = await sql`
+        INSERT INTO uu_assets (id, asset_id, file_hash, meta)
+        VALUES (${id}, ${assetId}, ${fileHash}, ${meta})
+        ON CONFLICT (file_hash) DO UPDATE SET meta = EXCLUDED.meta
+        RETURNING *
     `
-    const [inserted] = await query
-    return inserted ? (inserted as DbUuCard) : null
+    if (!upserted) return null
+    const record = upserted as DbUuCard
+    await addToRegistry({ uploadId: record.id, userId })
+    return record
 }
 
 async function addToRegistry({ uploadId, userId }: {
     uploadId: string,
     userId: string,
 }) {
-    await sql`INSERT INTO uploads (
-        upload_id, user_id
-    )
-    VALUES (
-        ${uploadId}, ${userId}
-    )`
+    await sql`INSERT INTO uploads (upload_id, user_id)
+    VALUES (${uploadId}, ${userId})
+    ON CONFLICT (user_id, upload_id) DO NOTHING`
     return true
 }
 

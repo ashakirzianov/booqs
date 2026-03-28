@@ -1,4 +1,12 @@
-import { confirmUploadAction } from '@/data/upload'
+import { confirmUploadAction, primeBooqFile, primeAfterUpload, uploadMissingOriginals } from '@/data/upload'
+import { BooqId } from '@/core'
+import { after } from 'next/server'
+
+export const maxDuration = 60
+
+type SuccessResponse = { success: true, booqId: string, title?: string, coverSrc?: string }
+type ErrorResponse = { success: false, error: string }
+export type PostResponse = SuccessResponse | ErrorResponse
 
 export async function POST(request: Request) {
     const { uploadId } = await request.json()
@@ -8,5 +16,25 @@ export async function POST(request: Request) {
     }
 
     const result = await confirmUploadAction(uploadId)
-    return Response.json(result)
+
+    if (!result.success) {
+        return Response.json({
+            success: false,
+            error: result.error,
+        } satisfies ErrorResponse)
+    }
+
+    const booqId = result.booqId as BooqId
+    after(async () => {
+        await primeBooqFile(booqId, result.fileBuffer)
+        await primeAfterUpload(booqId)
+        await uploadMissingOriginals(booqId)
+    })
+
+    return Response.json({
+        success: true,
+        booqId: result.booqId,
+        title: result.title,
+        coverSrc: result.coverSrc,
+    } satisfies SuccessResponse)
 }

@@ -2,11 +2,14 @@ import DataLoader from 'dataloader'
 import { Booq, BooqId } from '@/core'
 import { booqForId, booqDataForIds, BooqData } from '@/backend/library'
 import { DbUser, usersForIds } from '@/backend/users'
+import { getFollowersCountBatch, getFollowingCountBatch } from '@/backend/follows'
 
 export type GraphQLLoaders = {
     booqLoader: DataLoader<BooqId, Booq | undefined>,
     booqDataLoader: DataLoader<BooqId, BooqData | undefined>,
     userLoader: DataLoader<string, DbUser | null>,
+    followersCountLoader: DataLoader<string, number>,
+    followingCountLoader: DataLoader<string, number>,
 }
 
 export function createLoaders(): GraphQLLoaders {
@@ -30,5 +33,13 @@ export function createLoaders(): GraphQLLoaders {
         },
     )
 
-    return { booqLoader, booqDataLoader, userLoader }
+    const followersCountLoader = new DataLoader<string, number>(
+        async (ids) => getFollowersCountBatch(ids),
+    )
+
+    const followingCountLoader = new DataLoader<string, number>(
+        async (ids) => getFollowingCountBatch(ids),
+    )
+
+    return { booqLoader, booqDataLoader, userLoader, followersCountLoader, followingCountLoader }
 }

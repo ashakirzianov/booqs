@@ -1,23 +1,28 @@
 import { Booq, BooqId, isElementNode, visitNodes, mapNodes } from '@/core'
 import { parseEpub } from '@/parser'
 import { Epub, openEpubFile } from '@/parser/epub'
-import { Diagnoser } from 'booqs-epub'
+import { Diagnoser, Diagnostic } from 'booqs-epub'
 import { BooqImages, BooqImageDimensions, imageDimensions } from './images'
 import { BooqFile } from './library'
 import { booqImageUrl } from '@/common/href'
 
-export async function parseAndPreprocessBooq(booqId: BooqId, file: BooqFile): Promise<Booq | undefined> {
+export type ParseResult = {
+    booq: Booq | undefined,
+    diags: Diagnostic[],
+}
+
+export async function parseAndPreprocessBooq(booqId: BooqId, file: BooqFile): Promise<ParseResult> {
     try {
         return await parseAndPreprocessBooqUnsafe(booqId, file)
     } catch (e) {
         console.error(`Error parsing booq ${booqId}:`, e)
-        return undefined
+        return { booq: undefined, diags: [{ message: e instanceof Error ? e.message : String(e) }] }
     }
 }
 
-async function parseAndPreprocessBooqUnsafe(booqId: BooqId, file: BooqFile): Promise<Booq | undefined> {
+async function parseAndPreprocessBooqUnsafe(booqId: BooqId, file: BooqFile): Promise<ParseResult> {
     if (file.kind !== 'epub') {
-        return undefined
+        return { booq: undefined, diags: [{ message: 'Unsupported file kind' }] }
     }
     const diags: Diagnoser = []
     const epub = await openEpubFile({ fileBuffer: file.file, diags })
@@ -26,11 +31,11 @@ async function parseAndPreprocessBooqUnsafe(booqId: BooqId, file: BooqFile): Pro
     })
     if (!booq) {
         console.error(`Failed to parse booq for id ${booqId}`)
-        return undefined
+        return { booq: undefined, diags }
     }
     normalizeImageSrcsInBooq(booq)
     const dimensions = await loadImageDimensions(booq, epub)
-    return preprocessBooq(booq, booqId, dimensions)
+    return { booq: preprocessBooq(booq, booqId, dimensions), diags }
 }
 
 export async function parseAndLoadImagesFromFile(file: BooqFile) {

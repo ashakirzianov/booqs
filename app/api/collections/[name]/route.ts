@@ -1,6 +1,12 @@
 import { addBooqToCollection, getBooqIdsInCollection, removeBooqFromCollection } from '@/data/collections'
 import { BooqId } from '@/core'
 import { getUserIdInsideRequest } from '@/data/request'
+import { z } from 'zod'
+
+const booqIdSchema = z.string().regex(/^[a-z]+-\S+$/) as z.ZodType<BooqId>
+const booqIdBodySchema = z.object({
+    booqId: booqIdSchema,
+})
 
 type Params = { name: string }
 type CollectionResponse = {
@@ -23,9 +29,7 @@ export async function GET(request: Request, { params }: {
 }
 
 export type PostResponse = CollectionResponse
-export type PostBody = {
-    booqId: BooqId
-}
+export type PostBody = z.infer<typeof booqIdBodySchema>
 export async function POST(request: Request, { params }: {
     params: Promise<Params>,
 }) {
@@ -34,10 +38,11 @@ export async function POST(request: Request, { params }: {
         return new Response('Unauthorized', { status: 401 })
     }
     const { name } = await params
-    const { booqId }: PostBody = await request.json()
-    if (!booqId) {
+    const parsed = booqIdBodySchema.safeParse(await request.json())
+    if (!parsed.success) {
         return new Response('Bad Request', { status: 400 })
     }
+    const { booqId } = parsed.data
     await addBooqToCollection({ userId, booqId, name })
     const booqIds = await getBooqIdsInCollection(userId, name)
     const result: PostResponse = {
@@ -47,9 +52,7 @@ export async function POST(request: Request, { params }: {
 }
 
 export type DeleteResponse = CollectionResponse
-export type DeleteBody = {
-    booqId: BooqId
-}
+export type DeleteBody = z.infer<typeof booqIdBodySchema>
 export async function DELETE(request: Request, { params }: {
     params: Promise<Params>,
 }) {
@@ -58,10 +61,11 @@ export async function DELETE(request: Request, { params }: {
         return new Response('Unauthorized', { status: 401 })
     }
     const { name } = await params
-    const { booqId }: DeleteBody = await request.json()
-    if (!booqId) {
+    const parsed = booqIdBodySchema.safeParse(await request.json())
+    if (!parsed.success) {
         return new Response('Bad Request', { status: 400 })
     }
+    const { booqId } = parsed.data
     await removeBooqFromCollection({ userId, booqId, name })
     const booqIds = await getBooqIdsInCollection(userId, name)
     const result: DeleteResponse = {
