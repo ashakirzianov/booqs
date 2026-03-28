@@ -751,16 +751,18 @@ Schema-defined API at `/api/graphql` using graphql-yoga. Supports authentication
 - `copilot(context)` — AI assistant scoped to a text range, with sub-field `answer(question)` and `suggestions`
 
 **Mutations — Data:**
+Most data mutations return `MutationResult!` (`{ success: Boolean!, error: String }`) with a human-readable error on failure (e.g., `"Authentication required"`, `"Bookmark not found"`).
 - `addBookmark` / `removeBookmark` — Manage bookmarks
 - `addNote` / `removeNote` / `updateNote` — Manage highlights, notes, and comments
 - `addBooqHistory` / `removeHistory` — Record and manage reading history
 - `addToCollection` / `removeFromCollection` — Manage collections
 - `follow` / `unfollow` — Social follow/unfollow
-- `updateUser(input)` — Update profile (name, emoji, username)
-- `requestUpload` — Get a presigned S3 upload URL and upload ID
-- `confirmUpload(uploadId)` — Confirm upload, parse file, and create book record
+- `updateUser(input)` — Update profile (name, emoji, username). Returns `UpdateUserResult` with optional field-level error.
+- `requestUpload` — Get a presigned S3 upload URL and upload ID. Returns `UploadRequest`.
+- `confirmUpload(uploadId)` — Confirm upload, parse file, and create book record. Returns `UploadResult`.
 
 **Mutations — Authentication:**
+Auth mutations that initiate flows return `MutationResult!`. Completion mutations return `AuthResult` (token + user) or `undefined` on failure.
 - `initiateSign(email, returnTo)` — Send magic link email
 - `completeSignIn(email, secret)` — Complete sign-in via magic link secret, returns JWT token
 - `completeSignUp(email, secret, username, name, emoji)` — Complete registration via magic link secret, returns JWT token

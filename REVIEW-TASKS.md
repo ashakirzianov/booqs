@@ -17,7 +17,7 @@ Ordered by priority — combining severity, effort, and dependencies. Quick secu
 - [x] **S3. Add query depth and complexity limits** — `app/api/graphql/route.ts`: added depth limit rule (max 10) via `@envelop/core` `useValidationRule`.
 - [x] **S7. Disable introspection in production** — same file: `graphiql: !isProduction`, `maskedErrors: isProduction`.
 - [x] **P2. Cap maximum query limits** — `graphql/query.ts`: added `clampLimit` helper with `MAX_LIMIT = 100`. Also applied to `/api/search/route.ts`.
-- [ ] **D2. Standardize mutation error responses** — replace bare `boolean` and `undefined` returns in `graphql/mutation.ts` with a consistent result shape (e.g. `{ success: boolean, error?: string }`). Update GraphQL schema accordingly.
+- [x] **D2. Standardize mutation error responses** — added `MutationResult` type (`{ success: Boolean!, error: String }`) and replaced all 15 `Boolean`-returning mutations. Clients can now distinguish auth failures, not-found, and operation errors.
 - [ ] **D5. Tighten GraphQL schema nullability** — review `Bookmark` and `Note` types in `graphql/schema.graphql`; make fields non-null where they are always present.
 
 ## Security Headers & Input Validation
@@ -65,7 +65,7 @@ Ordered by priority — combining severity, effort, and dependencies. Quick secu
 ## Larger Structural Work
 
 - [x] **D1. Resolve GraphQL → backend layer violation** — false positive. The original hierarchy `backend > graphql > data` already allows `graphql` to access `backend` (higher layers access lower). No violation existed; no changes needed.
-- [ ] **SC4. Add S3 retry logic** — `backend/blob.ts`: add exponential backoff with jitter for transient S3 failures (throttling, network errors). AWS SDK v3 has built-in retry — verify it's configured.
+- [x] **SC4. Add S3 retry logic** — already handled: AWS SDK v3 defaults to 3 attempts with standard backoff. No changes needed.
 - [ ] **D4. Persist parser diagnostics** — store diagnostics per booq (in `uu_assets.meta` or a dedicated column) so admins can debug parse/render issues without re-parsing.
 - [ ] **P4. Improve EPUB file caching** — `backend/library.ts`: replace single-file `cachedFile` variable with an LRU cache (e.g. `lru-cache` package) holding the N most recent EPUBs.
 
