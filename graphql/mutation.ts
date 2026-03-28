@@ -74,7 +74,7 @@ export const mutationResolver: IResolvers<any, ResolverContext> = {
         },
         async removeBookmark(_, { id }, { userId }) {
             if (userId) {
-                return deleteBookmark(id)
+                return deleteBookmark({ id, userId })
             } else {
                 return false
             }

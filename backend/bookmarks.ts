@@ -42,10 +42,13 @@ export async function addBookmark({
     return row as DbBookmark
 }
 
-export async function deleteBookmark(id: string): Promise<boolean> {
+export async function deleteBookmark({ id, userId }: {
+    id: string,
+    userId: string,
+}): Promise<boolean> {
     const rows = await sql`
       DELETE FROM bookmarks
-      WHERE id = ${id}
+      WHERE id = ${id} AND user_id = ${userId}
     `
     return rows.length > 0
 }
