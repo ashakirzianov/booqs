@@ -14,6 +14,12 @@ import { notesWithAuthorFor } from '@/backend/notes'
 
 type SearchResultParent = BooqParent | AuthorParent
 
+const MAX_LIMIT = 100
+
+function clampLimit(limit: number | undefined, defaultLimit: number): number {
+    return Math.min(limit ?? defaultLimit, MAX_LIMIT)
+}
+
 export const queryResolver: IResolvers<unknown, ResolverContext> = {
     SearchResult: {
         __resolveType(parent: BooqParent | AuthorParent): 'Booq' | 'Author' {
@@ -36,7 +42,7 @@ export const queryResolver: IResolvers<unknown, ResolverContext> = {
             query: string,
             limit?: number,
         }): Promise<SearchResultParent[]> {
-            const results = await booqQuery('pg', { kind: 'search', query, limit: limit ?? 100 })
+            const results = await booqQuery('pg', { kind: 'search', query, limit: clampLimit(limit, 100) })
             return results.cards
         },
         async me(_, __, { userId, userLoader }) {
@@ -56,9 +62,8 @@ export const queryResolver: IResolvers<unknown, ResolverContext> = {
                 ? await booqHistoryForUser(userId)
                 : []
             const start = offset ?? 0
-            return limit !== undefined
-                ? result.slice(start, start + limit)
-                : result.slice(start)
+            const clamped = clampLimit(limit, MAX_LIMIT)
+            return result.slice(start, start + clamped)
         },
         async collection(_, { name }, { userId }): Promise<CollectionParent | null> {
             if (!userId) {
@@ -74,7 +79,7 @@ export const queryResolver: IResolvers<unknown, ResolverContext> = {
             if (!user) {
                 return []
             }
-            return notesWithAuthorFor({ authorId: user.id, userId, limit, offset })
+            return notesWithAuthorFor({ authorId: user.id, userId, limit: clampLimit(limit, MAX_LIMIT), offset })
         },
         async libraryBrowse(_, { library, kind, query, limit, offset }: {
             library: string, kind: LibraryQuery['kind'], query: string, limit?: number, offset?: number,
@@ -82,13 +87,13 @@ export const queryResolver: IResolvers<unknown, ResolverContext> = {
             const result = await booqQuery(library, {
                 kind,
                 query,
-                limit: limit ?? 24,
+                limit: clampLimit(limit ?? 24, MAX_LIMIT),
                 offset,
             })
             return { booqs: result.cards, hasMore: result.hasMore }
         },
         async featured(_, { limit }, { booqDataLoader }): Promise<Array<BooqParent | undefined>> {
-            const ids = await featuredBooqIds(limit)
+            const ids = await featuredBooqIds(clampLimit(limit, 24))
             const results = await booqDataLoader.loadMany(ids)
             return results.map(r => r instanceof Error ? undefined : r)
         },
