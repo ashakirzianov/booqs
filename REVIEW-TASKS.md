@@ -40,7 +40,7 @@ Ordered by priority — combining severity, effort, and dependencies. Quick secu
 
 - [x] **P3. Add DataLoader for follower/following counts** — added batch functions in `backend/follows.ts`, created `followersCountLoader`/`followingCountLoader` in `graphql/loaders.ts`, updated resolvers.
 - [x] **P6. Add cleanup to streaming cache** — `application/cache.ts`: delete cache entries when the last listener unsubscribes.
-- [ ] **P5. Cache user profiles and follow counts** — add short-TTL Redis caching (e.g. 60s) for `userForId`, `getFollowersCount`, `getFollowingCount` to avoid hitting PostgreSQL on every request.
+- [x] **P5. Cache user profiles and follow counts** — skipped: DataLoaders (P3) already solve the N+1 problem per-request. Cross-request Redis caching would add invalidation complexity for modest benefit.
 
 ## History Redesign
 
