@@ -103,6 +103,18 @@ export async function* listObjects(bucket: string) {
     }
 }
 
+export async function listAssetKeys(bucket: string, prefix: string): Promise<string[]> {
+    const keys: string[] = []
+    for await (const batch of listObjectBatches(bucket, prefix)) {
+        for (const obj of batch) {
+            if (obj.Key) {
+                keys.push(obj.Key)
+            }
+        }
+    }
+    return keys
+}
+
 export async function generatePresignedUploadUrl(bucket: string, key: string, expiresInSeconds: number = 900) {
     const command = new PutObjectCommand({
         Bucket: bucket,

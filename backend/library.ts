@@ -4,13 +4,13 @@ import {
 } from '@/core'
 import { getCachedValueForKey, cacheValueForKey } from './cache'
 import { downloadAsset, uploadAsset } from './blob'
-import { parseAndLoadImagesFromFile, parseAndPreprocessBooq } from './parse'
+import { extractSingleImageFromEpub, openEpubImageLoader, parseAndPreprocessBooq } from './parse'
+import type { EpubImageLoader } from './parse'
 import groupBy from 'lodash-es/groupBy'
 import { pgLibrary } from './pg'
 import { userUploadsLibrary } from './uu'
 import { localLibrary } from './lo'
 import { getExtraMetadataValues } from '@/core/meta'
-import { BooqImages } from './images'
 
 export type BooqData = {
     booqId: BooqId,
@@ -254,23 +254,36 @@ export async function booqFragmentForRange(booqId: BooqId, range: BooqRange): Pr
     return { nodes }
 }
 
-export async function booqImages(booqId: BooqId): Promise<BooqImages | undefined> {
+export async function booqSingleImage(booqId: BooqId, imagePath: string): Promise<Buffer | undefined> {
     const file = await booqFileForId(booqId)
     if (!file) {
         return undefined
     }
-    const booqImages = await parseAndLoadImagesFromFile(file)
-    if (!booqImages) {
-        return undefined
-    }
-    return booqImages
+    return extractSingleImageFromEpub(file.file, imagePath)
 }
 
+export async function booqImageLoader(booqId: BooqId): Promise<EpubImageLoader | undefined> {
+    const file = await booqFileForId(booqId)
+    if (!file) {
+        return undefined
+    }
+    return openEpubImageLoader(file)
+}
+
+let cachedFile: { booqId: BooqId, file: BooqFile } | undefined
+
 async function booqFileForId(booqId: BooqId) {
+    if (cachedFile?.booqId === booqId) {
+        return cachedFile.file
+    }
     const [prefix, id] = parseId(booqId)
     const library = libraries[prefix]
-    return library && id
-        ? library.fileForId(id)
+    const file = library && id
+        ? await library.fileForId(id)
         : undefined
+    if (file) {
+        cachedFile = { booqId, file }
+    }
+    return file
 }
 

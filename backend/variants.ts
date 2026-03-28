@@ -1,22 +1,26 @@
 import { BooqId } from '@/core'
-import { booqImages } from './library'
+import { booqImageLoader, booqSingleImage } from './library'
 import { generateVariant, ImageVariant } from './images'
-import { downloadAsset, IMAGES_BUCKET, uploadAsset } from './blob'
+import { downloadAsset, IMAGES_BUCKET, listAssetKeys, uploadAsset } from './blob'
 
-export async function getImageVariant(booqId: BooqId, filePathWithVariant: string): Promise<{
+export type ImageVariantResult = {
     buffer: Buffer,
     contentType: string,
-} | undefined> {
+    extracted: boolean,
+}
+
+export async function getImageVariant(booqId: BooqId, filePathWithVariant: string): Promise<ImageVariantResult | undefined> {
     const parsed = parseImagePath(filePathWithVariant)
     if (!parsed) {
         return undefined
     }
     const { originalPath, variantPath, variant } = parsed
 
-    const original = await getOrExtractOriginal(booqId, originalPath)
-    if (!original) {
+    const originalResult = await getOrExtractOriginal(booqId, originalPath)
+    if (!originalResult) {
         return undefined
     }
+    const { image: original, extracted } = originalResult
 
     const variantBuffer = await getOrGenerateVariant(booqId, variantPath, original, variant)
     if (!variantBuffer) {
@@ -26,6 +30,7 @@ export async function getImageVariant(booqId: BooqId, filePathWithVariant: strin
     return {
         buffer: variantBuffer,
         contentType: contentTypeForFormat(variant.format),
+        extracted,
     }
 }
 
@@ -56,24 +61,19 @@ function parseImagePath(filePathWithVariant: string): ParsedImagePath | undefine
     }
 }
 
-async function getOrExtractOriginal(booqId: BooqId, filePath: string): Promise<Buffer | undefined> {
+async function getOrExtractOriginal(booqId: BooqId, filePath: string): Promise<{ image: Buffer, extracted: boolean } | undefined> {
     const existing = await downloadOriginalImage(booqId, filePath)
     if (existing) {
-        return existing
+        return { image: existing, extracted: false }
     }
 
-    const images = await booqImages(booqId)
-    if (!images) {
+    const image = await booqSingleImage(booqId, filePath)
+    if (!image) {
         return undefined
     }
 
-    await Promise.all(
-        Object.entries(images.images).map(([src, buffer]) =>
-            uploadOriginalImage(booqId, src, buffer)
-        )
-    )
-
-    return images.images[filePath]
+    await uploadOriginalImage(booqId, filePath, image)
+    return { image, extracted: true }
 }
 
 async function getOrGenerateVariant(
@@ -123,4 +123,32 @@ async function downloadOriginalImage(booqId: BooqId, imageId: string): Promise<B
 async function downloadVariantImage(booqId: BooqId, variantPath: string): Promise<Buffer | undefined> {
     const s3Key = `variants/${booqId}/${variantPath}`
     return downloadAsset(IMAGES_BUCKET, s3Key)
+}
+
+const UPLOAD_BATCH_SIZE = 20
+
+export async function extractAndUploadMissingOriginals(booqId: BooqId): Promise<void> {
+    const loader = await booqImageLoader(booqId)
+    if (!loader) {
+        return
+    }
+
+    const prefix = `originals/${booqId}/`
+    const existingKeys = await listAssetKeys(IMAGES_BUCKET, prefix)
+    const existingSet = new Set(existingKeys.map(k => k.slice(prefix.length)))
+
+    const missingSrcs = loader.srcs.filter(src => !existingSet.has(src))
+    if (missingSrcs.length === 0) {
+        return
+    }
+
+    for (let i = 0; i < missingSrcs.length; i += UPLOAD_BATCH_SIZE) {
+        const batch = missingSrcs.slice(i, i + UPLOAD_BATCH_SIZE)
+        await Promise.all(batch.map(async (src) => {
+            const buffer = await loader.loadImage(src)
+            if (buffer) {
+                await uploadOriginalImage(booqId, src, buffer)
+            }
+        }))
+    }
 }
