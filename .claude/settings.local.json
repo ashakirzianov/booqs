@@ -57,7 +57,8 @@
       "Bash(git merge:*)",
       "Bash(git commit:*)",
       "Bash(node -e \"console.log\\(require\\(''/Users/ashakirzianov/repos/booqs/node_modules/next/package.json''\\).version\\)\")",
-      "WebSearch"
+      "WebSearch",
+      "Bash(node -e \"console.log\\(require\\(''/Users/ashakirzianov/repos/booqs/node_modules/lru-cache/package.json''\\).version\\)\")"
     ]
   },
   "enableAllProjectMcpServers": false

@@ -2,6 +2,7 @@ import {
     Booq, BooqId, BooqMetadata, BooqPath, InLibraryId, LibraryId, pathToString, positionForPath, previewForPath, TableOfContents, textForRange, BooqRange, nodesForRange, BooqNode,
     parseId,
 } from '@/core'
+import { LRUCache } from 'lru-cache'
 import { getCachedValueForKey, cacheValueForKey } from './cache'
 import { downloadAsset, uploadAsset } from './blob'
 import { storeDiagnostics } from './diagnostics'
@@ -275,11 +276,12 @@ export async function booqImageLoader(booqId: BooqId): Promise<EpubImageLoader |
     return openEpubImageLoader(file)
 }
 
-let cachedFile: { booqId: BooqId, file: BooqFile } | undefined
+const fileCache = new LRUCache<BooqId, BooqFile>({ max: 10 })
 
 async function booqFileForId(booqId: BooqId) {
-    if (cachedFile?.booqId === booqId) {
-        return cachedFile.file
+    const cached = fileCache.get(booqId)
+    if (cached) {
+        return cached
     }
     const [prefix, id] = parseId(booqId)
     const library = libraries[prefix]
@@ -287,7 +289,7 @@ async function booqFileForId(booqId: BooqId) {
         ? await library.fileForId(id)
         : undefined
     if (file) {
-        cachedFile = { booqId, file }
+        fileCache.set(booqId, file)
     }
     return file
 }
