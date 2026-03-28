@@ -1,13 +1,16 @@
 import { generateCopilotAnswer } from '@/data/copilot'
-import { BooqId, BooqPath } from '@/core'
+import { BooqId } from '@/core'
 import { getUserIdInsideRequest } from '@/data/request'
+import { z } from 'zod'
 
-export type PostBody = {
-    booqId: BooqId,
-    start: BooqPath,
-    end: BooqPath,
-    question: string,
-}
+const postBodySchema = z.object({
+    booqId: z.string().regex(/^[a-z]+-\S+$/) as z.ZodType<BooqId>,
+    start: z.array(z.number().int().min(0)),
+    end: z.array(z.number().int().min(0)),
+    question: z.string().min(1).max(2000),
+})
+
+export type PostBody = z.infer<typeof postBodySchema>
 
 export type PostResponse = string
 
@@ -17,14 +20,14 @@ export async function POST(request: Request) {
         return Response.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { booqId, start, end, question }: PostBody = await request.json()
-
-    if (typeof booqId !== 'string' || !Array.isArray(start) || !Array.isArray(end) || typeof question !== 'string') {
-        return Response.json({ error: 'Invalid request' }, { status: 400 })
+    const parsed = postBodySchema.safeParse(await request.json())
+    if (!parsed.success) {
+        return Response.json({ error: 'Invalid request', details: parsed.error.flatten() }, { status: 400 })
     }
+    const { booqId, start, end, question } = parsed.data
 
     const result = await generateCopilotAnswer({
-        booqId: booqId as BooqId,
+        booqId,
         range: { start, end },
         question
     })
