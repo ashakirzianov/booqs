@@ -32,7 +32,7 @@ Ordered by priority — combining severity, effort, and dependencies. Quick secu
 - [x] **C1. Document `pph` property** — `core/model.ts`: added JSDoc explaining paragraph marking for scroll tracking.
 - [x] **C4. Rename `hl` → `note`** — `reader/nodes.ts`: filter callback parameter now matches collection name.
 - [x] **C5. Document magic numbers** — `core/chapter.ts`, `backend/library.ts`: added comments explaining character count units.
-- [ ] **C7. Inline or document `noteFromJson`** — `data/notes.ts:247`: this no-op passthrough function either needs a comment explaining its purpose or should be inlined.
+- [x] **C7. Inline or document `noteFromJson`** — removed no-op passthrough function from `application/notes.ts`, replaced with direct type assertions.
 - [ ] **C3. Clarify dynamic SQL in `updateUser`** — `backend/users.ts:153-178`: add a comment block explaining the `$${i++}` placeholder counter pattern, or refactor to use Neon template literals.
 - [ ] **C6. Pick a constant naming convention** — decide between `camelCase` (used in `core/`) and `UPPER_SNAKE_CASE` (used in `backend/`) for module-level constants, then apply consistently.
 

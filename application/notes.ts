@@ -41,7 +41,7 @@ export function useBooqNotes({
     )
 
     const notes = useMemo(
-        () => data?.notes.map(noteFromJson) ?? initialNotes ?? [],
+        () => (data?.notes) ?? initialNotes ?? [],
         [data?.notes, initialNotes]
     )
 
@@ -128,7 +128,7 @@ export function useBooqNotes({
                     : { notes: [optimisticResponse] },
         })
 
-        return noteFromJson(optimisticResponse)
+        return optimisticResponse
     }
 
     const { trigger: deleteNoteTrigger } = useSWRMutation(
@@ -241,9 +241,4 @@ export function useBooqNotes({
         removeNote,
         updateNote,
     }
-}
-
-type NoteJson = GetResponse['notes'][number]
-function noteFromJson(note: NoteJson): BooqNote {
-    return note
 }
