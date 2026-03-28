@@ -1,6 +1,14 @@
 export type Config = ReturnType<typeof config>
 // TODO: ensure consistent access to config/process.env
 // TODO: mode should be its own variable
+
+function getJwtSecret(mode: string): string {
+    const secret = process.env.BOOQS_AUTH_SECRET
+    if (secret) return secret
+    if (mode === 'development') return 'dev-only-secret'
+    throw new Error('BOOQS_AUTH_SECRET environment variable is required in production')
+}
+
 export function config() {
     const mode = process.env.NODE_ENV ?? 'production'
     const protocol = mode === 'development' ? 'http' : 'https'
@@ -14,7 +22,7 @@ export function config() {
         undefined: undefined,
     }
     return {
-        jwtSecret: process.env.BOOQS_AUTH_SECRET ?? 'fake secret',
+        jwtSecret: getJwtSecret(mode),
         mongodbUri: process.env.MONGODB_URI,
         appleClientId: 'app.booqs.back',
         mode,
