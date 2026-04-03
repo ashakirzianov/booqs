@@ -37,18 +37,18 @@ export async function getCurrentUser(): Promise<AccountData | undefined> {
 }
 
 // TODO: rename to `getUserByUsername`
-export async function getUserByUsername(username: string): Promise<AccountPublicData | null> {
+export async function getUserByUsername(username: string): Promise<AccountPublicData | undefined> {
     const dbUser = await userForUsername(username)
     if (!dbUser) {
-        return null
+        return undefined
     }
     return accountPublicDataFromDbUser(dbUser)
 }
 
-export async function getUserById(userId: string): Promise<AccountPublicData | null> {
+export async function getUserById(userId: string): Promise<AccountPublicData | undefined> {
     const dbUser = await userForId(userId)
     if (!dbUser) {
-        return null
+        return undefined
     }
     return accountPublicDataFromDbUser(dbUser)
 }

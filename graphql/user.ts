@@ -1,6 +1,6 @@
 import { DbUser, usersForIds } from '@/backend/users'
 import { getFollowers, getFollowing, isFollowing } from '@/backend/follows'
-import { getUserPasskeys } from '@/backend/passkey'
+import { getUserPasskeys, DbPasskeyData } from '@/backend/passkey'
 import { getBooqsWithOwnNotes } from '@/backend/notes'
 import { BooqId } from '@/core'
 import { BooqData } from '@/backend/library'
@@ -53,6 +53,11 @@ export const userResolver: IResolvers<UserParent, ResolverContext> = {
                 return null
             }
             return getUserPasskeys(parent.id)
+        },
+    },
+    Passkey: {
+        createdAt(parent: DbPasskeyData) {
+            return parent.created_at
         },
     },
 }

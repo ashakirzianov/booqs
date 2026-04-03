@@ -2,7 +2,7 @@
 import {
     initiatePasskeyRegistration, verifyPasskeyRegistration,
     initiatePasskeyLogin, verifyPasskeyLogin,
-    getUserPasskeys, deletePasskeyCredential,
+    getUserPasskeys, deletePasskeyCredential, DbPasskeyData,
 } from '@/backend/passkey'
 import { deleteUserForId, userForId, updateUser, DbUser } from '@/backend/users'
 import { completeSignInRequest, completeSignUp, prevalidateSignup, initiateSignRequest } from '@/backend/sign'
@@ -14,8 +14,8 @@ import { getUserIdInsideRequest, setUserIdInsideRequest } from './request'
 
 export type PasskeyData = {
     id: string
-    label: string | null
-    ipAddress: string | null
+    label: string | undefined
+    ipAddress: string | undefined
     createdAt: string
     updatedAt: string
 }
@@ -69,7 +69,7 @@ export async function verifyPasskeyRegistrationAction({ id, response, label }: {
         })
         if (result.user?.id) {
             await setUserIdInsideRequest(result.user.id)
-            const updatedPasskeys = await getUserPasskeys(result.user.id)
+            const updatedPasskeys = (await getUserPasskeys(result.user.id)).map(passkeyDataFromDbPasskeyData)
             return {
                 success: true,
                 user: accountDataFromDbUser(result.user),
@@ -307,7 +307,7 @@ export async function fetchPasskeyData(): Promise<PasskeyData[]> {
     if (!userId) {
         return []
     }
-    return await getUserPasskeys(userId)
+    return (await getUserPasskeys(userId)).map(passkeyDataFromDbPasskeyData)
 }
 
 export async function deletePasskeyAction(credentialId: string): Promise<boolean> {
@@ -329,8 +329,18 @@ export async function deletePasskeyActionWithUpdatedList(credentialId: string): 
         return { success: false }
     }
 
-    const updatedPasskeys = await getUserPasskeys(userId)
+    const updatedPasskeys = (await getUserPasskeys(userId)).map(passkeyDataFromDbPasskeyData)
     return { success: true, passkeys: updatedPasskeys }
+}
+
+function passkeyDataFromDbPasskeyData(dbPasskey: DbPasskeyData): PasskeyData {
+    return {
+        id: dbPasskey.id,
+        label: dbPasskey.label ?? undefined,
+        ipAddress: dbPasskey.ip_address ?? undefined,
+        createdAt: dbPasskey.created_at,
+        updatedAt: dbPasskey.updated_at,
+    }
 }
 
 function accountDataFromDbUser(dbUser: DbUser): AccountData {

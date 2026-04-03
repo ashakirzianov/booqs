@@ -27,7 +27,7 @@ export type BooqNote = {
     author: NoteAuthorData,
     range: BooqRange,
     kind: string,
-    content?: string | null,
+    content?: string,
     targetQuote: string,
     privacy: NotePrivacy,
     createdAt: string,
@@ -105,10 +105,10 @@ export async function modifyNote({
     authorId: string,
     kind?: string,
     content?: string | null,
-}): Promise<UnresolvedBooqNote | null> {
+}): Promise<UnresolvedBooqNote | undefined> {
     const result = await updateNote({ id, authorId, kind, content })
     if (result === null) {
-        return null
+        return undefined
     }
     return unresolvedBooqNote(result)
 }
@@ -123,7 +123,7 @@ function unresolvedBooqNote(note: DbNote): UnresolvedBooqNote {
             end: note.end_path,
         },
         kind: note.kind,
-        content: note.content,
+        content: note.content ?? undefined,
         targetQuote: note.target_quote,
         privacy: note.privacy,
         createdAt: note.created_at,
@@ -156,7 +156,7 @@ function noteFromDbNoteWithAuthor(dbNote: DbNoteWithAuthor): BooqNote {
             end: dbNote.end_path,
         },
         kind: dbNote.kind,
-        content: dbNote.content,
+        content: dbNote.content ?? undefined,
         targetQuote: dbNote.target_quote,
         privacy: dbNote.privacy,
         createdAt: dbNote.created_at,
