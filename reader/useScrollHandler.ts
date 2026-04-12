@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { BooqId, BooqPath, samePath } from '@/core'
 import { useOnBooqScroll } from '@/viewer'
-import { reportBooqHistoryAction } from '@/data/history'
+import { reportBooqHistory } from '@/data/history'
 
 export function useScrollHandler({
     booqId, initialPath,
@@ -14,7 +14,7 @@ export function useScrollHandler({
     const onScroll = function (path: BooqPath) {
         if (!samePath(path, currentPath)) {
             setCurrentPath(path)
-            reportBooqHistoryAction({
+            reportBooqHistory({
                 booqId,
                 path,
             })

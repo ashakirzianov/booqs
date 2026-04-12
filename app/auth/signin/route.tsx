@@ -1,5 +1,5 @@
 import { signInErrorHref } from '@/common/href'
-import { completeSignInAction } from '@/data/auth'
+import { completeSignIn } from '@/data/auth'
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function GET(request: NextRequest) {
@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
     }
 
     try {
-        const result = await completeSignInAction({ email, secret })
+        const result = await completeSignIn({ email, secret })
 
         if (result.success) {
             // Successful sign-in, redirect to return_to

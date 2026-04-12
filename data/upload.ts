@@ -7,7 +7,7 @@ import { extractAndUploadMissingOriginals } from '@/backend/variants'
 import { BooqId } from '@/core'
 import { getCurrentUser } from './user'
 
-export async function requestUploadAction() {
+export async function requestUpload() {
     const auth = await getCurrentUser()
     if (!auth) {
         return { success: false, error: 'Not authenticated' } as const
@@ -20,7 +20,7 @@ export type ConfirmUploadResponse =
     | { success: true, booqId: string, title?: string, coverSrc?: string, fileBuffer: Buffer }
     | { success: false, error: string }
 
-export async function confirmUploadAction(uploadId: string): Promise<ConfirmUploadResponse> {
+export async function confirmUpload(uploadId: string): Promise<ConfirmUploadResponse> {
     const auth = await getCurrentUser()
     if (!auth) {
         return { success: false, error: 'Not authenticated' }

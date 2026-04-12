@@ -4,7 +4,7 @@ import React, { useState } from 'react'
 import { BooqCover } from '@/components/BooqCover'
 import { pageForPosition } from '@/application/common'
 import Link from 'next/link'
-import { DetailedReadingHistoryEntry, BriefReadingHistoryEntry, ReadingHistoryEntry, removeHistoryEntryAction } from '@/data/history'
+import { DetailedReadingHistoryEntry, BriefReadingHistoryEntry, ReadingHistoryEntry, removeHistoryEntry } from '@/data/history'
 import { BooqPath } from '@/core'
 import { booqContentHref } from '@/common/href'
 
@@ -18,7 +18,7 @@ export function HistoryEntry({ entry }: {
 
         setIsRemoved(true)
         try {
-            const result = await removeHistoryEntryAction({ booqId: entry.booqId })
+            const result = await removeHistoryEntry({ booqId: entry.booqId })
             if (!result.success) {
                 console.error('Failed to remove history entry:', result.error)
                 setIsRemoved(false)

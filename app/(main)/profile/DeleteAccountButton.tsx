@@ -3,7 +3,7 @@
 import { feedHref } from '@/common/href'
 import { Modal } from '@/components/Modal'
 import { ActionButton } from '@/components/Buttons'
-import { deleteAccountAction } from '@/data/auth'
+import { deleteAccount } from '@/data/auth'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
@@ -29,7 +29,7 @@ export function DeleteAccountButton({ account }: {
     async function performDelete() {
         setIsDeleting(true)
         try {
-            await deleteAccountAction()
+            await deleteAccount()
             push(feedHref())
         } catch {
             setIsDeleting(false)

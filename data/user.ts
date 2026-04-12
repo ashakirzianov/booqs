@@ -53,7 +53,7 @@ export async function getUserById(userId: string): Promise<AccountPublicData | u
     return accountPublicDataFromDbUser(dbUser)
 }
 
-export async function followAction(username: string): Promise<{ success: boolean; error?: string }> {
+export async function follow(username: string): Promise<{ success: boolean; error?: string }> {
     const userId = await getUserIdInsideRequest()
     if (!userId) {
         return {
@@ -84,7 +84,7 @@ export async function followAction(username: string): Promise<{ success: boolean
     }
 }
 
-export async function unfollowAction(username: string): Promise<{ success: boolean; error?: string }> {
+export async function unfollow(username: string): Promise<{ success: boolean; error?: string }> {
     const userId = await getUserIdInsideRequest()
     if (!userId) {
         return {
