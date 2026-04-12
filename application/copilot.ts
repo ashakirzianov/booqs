@@ -37,10 +37,10 @@ export function useCopilotSuggestions({
     )
 
     return {
-        loading: isLoading,
+        isLoading,
         suggestions: data ?? [],
     } satisfies {
-        loading: boolean,
+        isLoading: boolean,
         suggestions: string[],
     }
 }
@@ -76,10 +76,10 @@ export function useCopilotAnswer({
     )
 
     return {
-        loading: isLoading,
+        isLoading,
         answer: data,
     } satisfies {
-        loading: boolean,
+        isLoading: boolean,
         answer: string | undefined,
     }
 }
@@ -97,12 +97,12 @@ export function useCopilotAnswerStream({
     question: string,
     footnote?: string,
 }) {
-    const [loading, setLoading] = useState(false)
+    const [isLoading, setIsLoading] = useState(false)
     const [answer, setAnswer] = useState('')
     const [error, setError] = useState<string | null>(null)
 
     useEffect(() => {
-        setLoading(true)
+        setIsLoading(true)
         setAnswer('')
         setError(null)
         const input = { booqId, start, end, question, footnote }
@@ -111,9 +111,9 @@ export function useCopilotAnswerStream({
                 setAnswer(prev => prev + event.chunk)
             } else if (event.event === 'error') {
                 setError(event.error)
-                setLoading(false)
+                setIsLoading(false)
             } else if (event.event === 'complete') {
-                setLoading(false)
+                setIsLoading(false)
             }
         }
         streamingAnswerCache.subscribe(input, listener)
@@ -123,11 +123,11 @@ export function useCopilotAnswerStream({
     }, [booqId, question, start, end, footnote])
 
     return {
-        loading,
+        isLoading,
         answer: answer || undefined,
         error,
     } satisfies {
-        loading: boolean,
+        isLoading: boolean,
         answer: string | undefined,
         error: string | null,
     }

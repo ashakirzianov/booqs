@@ -50,7 +50,7 @@ export function useUpload() {
     }
     return {
         uploadFile,
-        loading: state.state === 'loading',
+        isLoading: state.state === 'loading',
         progress: state.state === 'loading' ? state.progress : undefined,
         result: state.state === 'success' ? state.data : undefined,
         error: state.state === 'error' ? state.error : undefined,

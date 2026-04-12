@@ -86,7 +86,7 @@ function AnswerDisplay({
     footnote?: string,
     onClose: () => void
 }) {
-    const { loading, answer, error } = useCopilotAnswerStream({
+    const { isLoading, answer, error } = useCopilotAnswerStream({
         booqId,
         start: range.start,
         end: range.end,
@@ -113,7 +113,7 @@ function AnswerDisplay({
             <div className="mb-3">
                 <div className="text-sm font-medium text-primary mb-2">Answer:</div>
                 <div className="text-sm text-primary leading-relaxed" style={{ fontFamily: 'var(--font-main)' }}>
-                    {loading ? (
+                    {isLoading ? (
                         <div className="text-dimmed">
                             {answer ? (
                                 <div className="space-y-2">
