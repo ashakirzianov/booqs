@@ -33,6 +33,16 @@
 - [x] Show reply count on `NoteCard` for comments
 - [x] Add reply list and reply form to `NoteCard` expanded view
 
+### GraphQL
+- [ ] Add `Reply` type and `replies` field on `Note` in `graphql/schema.graphql`
+- [ ] Add reply resolvers in `graphql/reply.ts`
+- [ ] Add reply mutations (`addReply`, `removeReply`, `updateReply`) to schema and `graphql/mutation.ts`
+
+### Comments Panel (Reader)
+- [ ] Show replies under each comment in `CommentsPanel`
+- [ ] Add reply form (inline) to each comment in `CommentsPanel`
+- [ ] Support edit/remove for own replies in `CommentsPanel`
+
 ### Specs
 - [x] Update SPECS.md with replies feature
 
