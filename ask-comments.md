@@ -84,17 +84,17 @@ Add an `askQuestion` mutation/subscription that mirrors the REST endpoint:
   - Reuses streaming patterns from existing `application/copilot.ts` / `application/cache.ts`
 
 ### 7. CommentsPanel: Detail Mode
-- [ ] Add `selectedCommentId` state to CommentsPanel (or lift to Reader)
-- [ ] Create `CommentDetailView` component — shows single comment with replies, "back" button
+- [x] Add `selectedCommentId` state to CommentsPanel (controlled via props from Reader)
+- [x] Create detail view inside CommentsPanel — shows single comment with replies, "back" button
   - Reuses existing `CommentItem` rendering
   - Shows `NoteReplies` for the comment
   - Accepts an optional `streamingReply` prop for the AI answer in progress
-- [ ] Add a `StreamingReply` component for rendering the in-progress AI reply
-  - Shows AI user avatar/name
-  - Renders streaming text with loading indicator
-  - Transitions to a regular reply display on completion
-- [ ] Wire list → detail navigation: clicking a comment in list mode opens detail mode
-- [ ] Wire "back" button: returns to list mode
+- [x] Add `StreamingReplyDisplay` component for rendering the in-progress AI reply
+  - Shows AI user emoji/name
+  - Renders streaming text with cursor indicator
+  - Shows "Thinking..." pulse while waiting for first chunk
+- [x] Wire list → detail navigation: clicking a comment in list mode opens detail mode
+- [x] Wire "back" button: returns to list mode
 
 ### 8. Reader Integration: Ask Flow
 - [ ] Modify the Ask flow in Reader to:
