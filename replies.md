@@ -34,9 +34,9 @@
 - [x] Add reply list and reply form to `NoteCard` expanded view
 
 ### GraphQL
-- [ ] Add `Reply` type and `replies` field on `Note` in `graphql/schema.graphql`
-- [ ] Add reply resolvers in `graphql/reply.ts`
-- [ ] Add reply mutations (`addReply`, `removeReply`, `updateReply`) to schema and `graphql/mutation.ts`
+- [x] Add `Reply` type and `replies` field on `Note` in `graphql/schema.graphql`
+- [x] Add reply resolvers in `graphql/reply.ts`
+- [x] Add reply mutations (`addReply`, `removeReply`, `updateReply`) to schema and `graphql/mutation.ts`
 
 ### Comments Panel (Reader)
 - [ ] Show replies under each comment in `CommentsPanel`

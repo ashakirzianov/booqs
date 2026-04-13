@@ -3,6 +3,7 @@ import { IResolvers } from '@graphql-tools/utils'
 import { ResolverContext } from './context'
 import { deleteUserForId, updateUser, userForUsername } from '@/backend/users'
 import { addNote, removeNote, updateNote } from '@/backend/notes'
+import { addReply, removeReply, updateReply } from '@/backend/replies'
 import { initiatePasskeyLogin, initiatePasskeyRegistration, verifyPasskeyLogin, verifyPasskeyRegistration } from '@/backend/passkey'
 import { initiateSignRequest, completeSignInRequest, completeSignUp } from '@/backend/sign'
 import { generateToken } from '@/backend/token'
@@ -113,6 +114,26 @@ export const mutationResolver: IResolvers<any, ResolverContext> = {
             if (!requireAuth(userId)) return fail('Authentication required')
             await updateNote({ authorId: userId, id, kind, content })
             return ok()
+        },
+        async addReply(_, { reply }, { userId }): Promise<MutationResult> {
+            if (!requireAuth(userId)) return fail('Authentication required')
+            await addReply({
+                id: reply.id,
+                noteId: reply.noteId,
+                authorId: userId,
+                content: reply.content,
+            })
+            return ok()
+        },
+        async removeReply(_, { id }, { userId }): Promise<MutationResult> {
+            if (!requireAuth(userId)) return fail('Authentication required')
+            const result = await removeReply({ id, authorId: userId })
+            return result ? ok() : fail('Reply not found')
+        },
+        async updateReply(_, { id, content }, { userId }): Promise<MutationResult> {
+            if (!requireAuth(userId)) return fail('Authentication required')
+            const result = await updateReply({ id, authorId: userId, content })
+            return result ? ok() : fail('Reply not found')
         },
         async addBooqHistory(_, { event }, { userId }): Promise<MutationResult> {
             if (!requireAuth(userId)) return fail('Authentication required')
