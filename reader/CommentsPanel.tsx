@@ -5,10 +5,11 @@ import { TabButton } from './TabButton'
 import { formatRelativeTime } from '@/application/common'
 import { userHref } from '@/common/href'
 import { BooqNote, NoteAuthorData } from '@/data/notes'
+import { NoteReplies } from './NoteReplies'
 
 export function CommentsPanel({ comments, currentUser, followingUserIds, isFollowingLoading }: {
     comments: BooqNote[],
-    currentUser?: { id: string },
+    currentUser?: NoteAuthorData,
     followingUserIds?: string[],
     isFollowingLoading?: boolean,
 }) {
@@ -56,7 +57,7 @@ export function CommentsPanel({ comments, currentUser, followingUserIds, isFollo
                             </div>
                         ) : (
                             filteredComments.map(note => (
-                                <CommentItem key={note.id} comment={note} />
+                                <CommentItem key={note.id} comment={note} user={currentUser} />
                             ))
                         )}
                     </div>
@@ -66,7 +67,7 @@ export function CommentsPanel({ comments, currentUser, followingUserIds, isFollo
     )
 }
 
-function CommentItem({ comment }: { comment: BooqNote }) {
+function CommentItem({ comment, user }: { comment: BooqNote, user?: NoteAuthorData }) {
     return (
         <div className='rounded-lg p-3 space-y-2 w-full max-w-md'>
 
@@ -99,6 +100,9 @@ function CommentItem({ comment }: { comment: BooqNote }) {
                     {formatRelativeTime(new Date(comment.createdAt))}
                 </div>
             </div>
+
+            {/* Replies */}
+            <NoteReplies noteId={comment.id} user={user} />
         </div>
     )
 }
