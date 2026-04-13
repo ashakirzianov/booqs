@@ -1,9 +1,8 @@
 'use client'
 
 import { BooqId, BooqPath } from '@/core'
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useCallback, useRef } from 'react'
 import { useSWRConfig } from 'swr'
-import { CacheEvent, createStreamingCache } from './cache'
 
 export type AskStatus = 'idle' | 'streaming' | 'done' | 'error'
 
@@ -15,39 +14,9 @@ export function useAskQuestion({
     const [status, setStatus] = useState<AskStatus>('idle')
     const [answer, setAnswer] = useState('')
     const [error, setError] = useState<string | undefined>()
-    const [input, setInput] = useState<AskInput | undefined>()
+    const [activeNoteId, setActiveNoteId] = useState<string | undefined>()
     const { mutate } = useSWRConfig()
-    const inputRef = useRef(input)
-    inputRef.current = input
-
-    useEffect(() => {
-        if (!input) return
-
-        setStatus('streaming')
-        setAnswer('')
-        setError(undefined)
-
-        function listener(event: CacheEvent<string>) {
-            if (event.event === 'chunk') {
-                setAnswer(prev => prev + event.chunk)
-            } else if (event.event === 'error') {
-                setError(event.error)
-                setStatus('error')
-            } else if (event.event === 'complete') {
-                setStatus('done')
-                const noteId = inputRef.current?.noteId
-                if (noteId) {
-                    mutate(`/api/replies?note_id=${noteId}`)
-                }
-                mutate(`/api/notes?booq_id=${booqId}`)
-            }
-        }
-        askStreamingCache.subscribe(input, listener)
-        return () => {
-            askStreamingCache.unsubscribe(input, listener)
-        }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [input])
+    const abortRef = useRef<AbortController | undefined>(undefined)
 
     const ask = useCallback(({ noteId, start, end, question, targetQuote }: {
         noteId: string,
@@ -56,47 +25,78 @@ export function useAskQuestion({
         question: string,
         targetQuote: string,
     }) => {
-        setInput({ noteId, booqId, start, end, question, targetQuote })
-    }, [booqId])
+        // Abort any in-flight request
+        abortRef.current?.abort()
+        const controller = new AbortController()
+        abortRef.current = controller
+
+        setActiveNoteId(noteId)
+        setStatus('streaming')
+        setAnswer('')
+        setError(undefined)
+
+        streamAnswer({
+            body: { noteId, booqId, start, end, question, targetQuote },
+            signal: controller.signal,
+            onChunk(chunk) {
+                setAnswer(prev => prev + chunk)
+            },
+            onError(err) {
+                setError(err)
+                setStatus('error')
+            },
+            onDone() {
+                setStatus('done')
+                mutate(`/api/replies?note_id=${noteId}`)
+                mutate(`/api/notes?booq_id=${booqId}`)
+            },
+        })
+    }, [booqId, mutate])
 
     return {
         ask,
         status,
         answer: answer || undefined,
         error,
-        noteId: input?.noteId,
+        noteId: activeNoteId,
     }
 }
 
-type AskInput = {
-    noteId: string,
-    booqId: BooqId,
-    start: BooqPath,
-    end: BooqPath,
-    question: string,
-    targetQuote: string,
-}
-
-const askStreamingCache = createStreamingCache(async function* (input: AskInput) {
-    const res = await fetch('/api/ask', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(input),
-    })
-    if (!res.ok) {
-        throw new Error('Failed to ask question')
-    }
-    const reader = res.body?.getReader()
-    if (!reader) {
-        throw new Error('No response body')
-    }
-    const decoder = new TextDecoder()
-    while (true) {
-        const { done, value } = await reader.read()
-        if (done) break
-        const chunk = decoder.decode(value, { stream: true })
-        if (chunk) {
-            yield chunk
+async function streamAnswer({ body, signal, onChunk, onError, onDone }: {
+    body: object,
+    signal: AbortSignal,
+    onChunk: (chunk: string) => void,
+    onError: (error: string) => void,
+    onDone: () => void,
+}) {
+    try {
+        const res = await fetch('/api/ask', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body),
+            signal,
+        })
+        if (!res.ok) {
+            onError('Failed to ask question')
+            return
         }
+        const reader = res.body?.getReader()
+        if (!reader) {
+            onError('No response body')
+            return
+        }
+        const decoder = new TextDecoder()
+        while (true) {
+            const { done, value } = await reader.read()
+            if (done) break
+            const chunk = decoder.decode(value, { stream: true })
+            if (chunk) {
+                onChunk(chunk)
+            }
+        }
+        onDone()
+    } catch (err) {
+        if (err instanceof DOMException && err.name === 'AbortError') return
+        onError(err instanceof Error ? err.message : 'Unknown error')
     }
-})
+}
