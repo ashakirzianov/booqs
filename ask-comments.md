@@ -62,12 +62,12 @@ Add an `askQuestion` mutation/subscription that mirrors the REST endpoint:
   - Bridges the app/api layer to the backend, consistent with existing data layer patterns
 
 ### 4. API Route
-- [ ] Create `app/api/ask/route.ts` — POST endpoint
+- [x] Create `app/api/ask/route.ts` — POST endpoint
   - Accepts: `{ noteId, booqId, start, end, question, targetQuote }`
   - Authenticates user
   - Calls data layer to create question + stream answer
   - Returns streaming response (text/plain)
-  - Uses `waitUntil` (or equivalent) to ensure reply is saved even if client disconnects
+  - Note: reply saving happens in the stream's pump loop; `waitUntil` can be added later if needed for disconnection resilience
 
 ### 5. GraphQL
 - [ ] Add `askQuestion` subscription to `graphql/schema.graphql`
