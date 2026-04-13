@@ -193,6 +193,42 @@ export async function fetchLanguageDisplayName(languageCode: string): Promise<st
     return getLanguageDisplayName(languageCode)
 }
 
+export type ExpandedFragment = { nodes: BooqNode[], styles: BooqStyles, range: BooqRange }
+
+export async function getExpandedFragments(booqId: BooqId, ranges: BooqRange[]): Promise<Array<ExpandedFragment | undefined>> {
+    const booq = await booqForId(booqId)
+    if (!booq) {
+        return ranges.map(() => undefined)
+    }
+
+    return ranges.map(range => {
+        const expandedRange = getExpandedRange(booq.nodes, range)
+        const nodes = nodesForRange(booq.nodes, expandedRange)
+
+        return {
+            nodes,
+            styles: collectReferencedStyles(nodes, booq.styles),
+            range: expandedRange,
+        }
+    })
+}
+
+function buildBooqCardData(data: BooqData): BooqCardData {
+    const languages: LanguageInfo[] = data.languages?.map(code => ({
+        code,
+        name: getLanguageDisplayName(code),
+    })) ?? []
+
+    return {
+        booqId: data.booqId,
+        title: data.title,
+        authors: data.authors,
+        subjects: data.subjects ?? [],
+        languages,
+        coverSrc: data.coverSrc,
+    }
+}
+
 function getLanguageDisplayName(languageCode: string): string {
     const languageNames: Record<string, string> = {
         'en': 'English',
@@ -245,40 +281,4 @@ function getLanguageDisplayName(languageCode: string): string {
     }
 
     return languageNames[languageCode.toLowerCase()] || languageCode
-}
-
-export type ExpandedFragment = { nodes: BooqNode[], styles: BooqStyles, range: BooqRange }
-
-export async function getExpandedFragments(booqId: BooqId, ranges: BooqRange[]): Promise<Array<ExpandedFragment | undefined>> {
-    const booq = await booqForId(booqId)
-    if (!booq) {
-        return ranges.map(() => undefined)
-    }
-
-    return ranges.map(range => {
-        const expandedRange = getExpandedRange(booq.nodes, range)
-        const nodes = nodesForRange(booq.nodes, expandedRange)
-
-        return {
-            nodes,
-            styles: collectReferencedStyles(nodes, booq.styles),
-            range: expandedRange,
-        }
-    })
-}
-
-function buildBooqCardData(data: BooqData): BooqCardData {
-    const languages: LanguageInfo[] = data.languages?.map(code => ({
-        code,
-        name: getLanguageDisplayName(code),
-    })) ?? []
-
-    return {
-        booqId: data.booqId,
-        title: data.title,
-        authors: data.authors,
-        subjects: data.subjects ?? [],
-        languages,
-        coverSrc: data.coverSrc,
-    }
 }

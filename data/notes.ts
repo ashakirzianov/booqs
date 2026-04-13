@@ -113,6 +113,15 @@ export async function modifyNote({
     return unresolvedBooqNote(result)
 }
 
+export async function fetchBooqsWithOwnNotes(): Promise<BooqId[]> {
+    const userId = await getUserIdInsideRequest()
+    if (!userId) {
+        return []
+    }
+    const booqIds = await getBooqsWithOwnNotes(userId)
+    return booqIds as BooqId[]
+}
+
 function unresolvedBooqNote(note: DbNote): UnresolvedBooqNote {
     return {
         id: note.id,
@@ -129,15 +138,6 @@ function unresolvedBooqNote(note: DbNote): UnresolvedBooqNote {
         createdAt: note.created_at,
         updatedAt: note.updated_at,
     }
-}
-
-export async function fetchBooqsWithOwnNotes(): Promise<BooqId[]> {
-    const userId = await getUserIdInsideRequest()
-    if (!userId) {
-        return []
-    }
-    const booqIds = await getBooqsWithOwnNotes(userId)
-    return booqIds as BooqId[]
 }
 
 function noteFromDbNoteWithAuthor(dbNote: DbNoteWithAuthor): BooqNote {
