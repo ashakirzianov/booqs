@@ -70,16 +70,16 @@ Add an `askQuestion` mutation/subscription that mirrors the REST endpoint:
   - Note: reply saving happens in the stream's pump loop; `waitUntil` can be added later if needed for disconnection resilience
 
 ### 5. GraphQL
-- [ ] Add `askQuestion` subscription to `graphql/schema.graphql`
+- [x] Add `askQuestion` subscription to `graphql/schema.graphql`
   - Input: note ID, copilot context (booqId, start, end), question, targetQuote
   - Streams answer chunks (same as `copilotAnswerStream` but also creates question + saves reply)
-- [ ] Add resolver in `graphql/copilot.ts` (or new file `graphql/ask.ts`)
+- [x] Add resolver in `graphql/copilot.ts` (or new file `graphql/ask.ts`)
   - Uses same backend orchestration as the REST endpoint
 
 ### 6. Application Layer: Streaming Hook
-- [ ] Create `application/ask.ts` with `useAskQuestion` hook
+- [x] Create `application/ask.ts` with `useAskQuestion` hook
   - Calls `/api/ask` with streaming
-  - Manages state: `{ status: 'loading' | 'streaming' | 'done' | 'error', answer: string, error?: string }`
+  - Manages state: `{ status: 'idle' | 'streaming' | 'done' | 'error', answer: string, error?: string }`
   - On completion (`'done'`), triggers SWR revalidation for both notes and replies
   - Reuses streaming patterns from existing `application/copilot.ts` / `application/cache.ts`
 

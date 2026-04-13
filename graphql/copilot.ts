@@ -1,6 +1,8 @@
 import { generateSuggestions, generateAnswer, generateAnswerStreaming } from '@/backend/copilot'
+import { askQuestion } from '@/backend/ask'
 import { BooqId } from '@/core'
 import { IResolvers } from '@graphql-tools/utils'
+import { ResolverContext } from './context'
 
 export type CopilotInput = {
     booqId: string,
@@ -48,18 +50,46 @@ export const copilotResolver: IResolvers<CopilotParent> = {
                 if (!result.success) {
                     return
                 }
-                const reader = result.stream.getReader()
-                const decoder = new TextDecoder()
-                try {
-                    while (true) {
-                        const { done, value } = await reader.read()
-                        if (done) break
-                        yield { copilotAnswerStream: decoder.decode(value) }
-                    }
-                } finally {
-                    reader.releaseLock()
+                yield* streamChunks('copilotAnswerStream', result.stream)
+            },
+        },
+        askQuestion: {
+            async *subscribe(_: unknown, { noteId, context, question, targetQuote }: {
+                noteId: string,
+                context: CopilotInput,
+                question: string,
+                targetQuote: string,
+            }, { userId }: ResolverContext) {
+                if (!userId) {
+                    return
                 }
+                const result = await askQuestion({
+                    noteId,
+                    booqId: context.booqId as BooqId,
+                    range: { start: context.start, end: context.end },
+                    question,
+                    targetQuote,
+                    authorId: userId,
+                })
+                if (!result.success) {
+                    return
+                }
+                yield* streamChunks('askQuestion', result.stream)
             },
         },
     },
+}
+
+async function* streamChunks(fieldName: string, stream: ReadableStream<Uint8Array>) {
+    const reader = stream.getReader()
+    const decoder = new TextDecoder()
+    try {
+        while (true) {
+            const { done, value } = await reader.read()
+            if (done) break
+            yield { [fieldName]: decoder.decode(value) }
+        }
+    } finally {
+        reader.releaseLock()
+    }
 }
