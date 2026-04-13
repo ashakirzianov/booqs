@@ -159,6 +159,7 @@ export function Reader({
                 'hidden': displayTarget === 'side-panel',
             })}>
                 <CommentsPanel
+                    booqId={booqId}
                     comments={comments}
                     currentUser={user}
                     followingUserIds={followingUserIds}
