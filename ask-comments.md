@@ -58,7 +58,7 @@ Add an `askQuestion` mutation/subscription that mirrors the REST endpoint:
 - [x] Ensure the stream keeps running even if the consumer disconnects (accumulate full response, save reply in a finally/completion handler)
 
 ### 3. Data Layer
-- [ ] Create `data/ask.ts` with a server action or data function that wraps `backend/ask.ts`
+- [x] Create `data/ask.ts` with a server action or data function that wraps `backend/ask.ts`
   - Bridges the app/api layer to the backend, consistent with existing data layer patterns
 
 ### 4. API Route
