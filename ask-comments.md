@@ -44,9 +44,9 @@ Add an `askQuestion` mutation/subscription that mirrors the REST endpoint:
 ## Tasks
 
 ### 1. Sentinel AI User
-- [ ] Add a migration/seed script or backend utility to ensure the AI user exists (id: `'booqs-ai'`, username: `'booqs-ai'`, name: `'Booqs AI'`, emoji: `'🤖'`)
-- [ ] Add a constant/helper in `backend/` to get the AI user ID
-- [ ] Ensure the AI user works with existing author resolution in replies (data layer, GraphQL resolvers)
+- [x] Add a migration/seed script or backend utility to ensure the AI user exists (id: `'booqs-ai'`, username: `'booqs-ai'`, name: `'Booqs AI'`, emoji: `'🤖'`)
+- [x] Add a constant/helper in `backend/` to get the AI user ID
+- [x] Ensure the AI user works with existing author resolution in replies (data layer, GraphQL resolvers)
 
 ### 2. Backend: Ask Endpoint Logic
 - [ ] Create `backend/ask.ts` with a function that orchestrates: create question note → stream AI answer → save reply on completion
