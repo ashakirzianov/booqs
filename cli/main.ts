@@ -2,6 +2,7 @@ import { cleanup } from './cleanup'
 import { parseEpubs } from './parse'
 import { pg } from './pg'
 import { temp } from './temp'
+import { ensureAiUser } from '@/backend/aiUser'
 
 main().catch((err) => {
     console.error(err)
@@ -26,9 +27,13 @@ async function main() {
         case 'temp':
             await temp(updatedOptions)
             return
+        case 'ensure-ai-user':
+            await ensureAiUser()
+            console.info('AI user ensured')
+            return
         default:
             console.info('Unknown command: ', command)
-            console.info('Available commands: parse, pg')
+            console.info('Available commands: parse, pg, cleanup, temp, ensure-ai-user')
     }
 }
 
