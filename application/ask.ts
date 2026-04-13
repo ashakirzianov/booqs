@@ -4,17 +4,18 @@ import { BooqId, BooqPath } from '@/core'
 import { useState, useCallback, useRef } from 'react'
 import { useSWRConfig } from 'swr'
 
-export type AskStatus = 'idle' | 'streaming' | 'done' | 'error'
+export type AskState =
+    | { status: 'idle' }
+    | { status: 'streaming', noteId: string, answer: string }
+    | { status: 'done', noteId: string, answer: string }
+    | { status: 'error', noteId: string, error: string }
 
 export function useAskQuestion({
     booqId,
 }: {
     booqId: BooqId,
 }) {
-    const [status, setStatus] = useState<AskStatus>('idle')
-    const [answer, setAnswer] = useState('')
-    const [error, setError] = useState<string | undefined>()
-    const [activeNoteId, setActiveNoteId] = useState<string | undefined>()
+    const [state, setState] = useState<AskState>({ status: 'idle' })
     const { mutate } = useSWRConfig()
     const abortRef = useRef<AbortController | undefined>(undefined)
 
@@ -25,28 +26,31 @@ export function useAskQuestion({
         question: string,
         targetQuote: string,
     }) => {
-        // Abort any in-flight request
         abortRef.current?.abort()
         const controller = new AbortController()
         abortRef.current = controller
 
-        setActiveNoteId(noteId)
-        setStatus('streaming')
-        setAnswer('')
-        setError(undefined)
+        setState({ status: 'streaming', noteId, answer: '' })
 
         streamAnswer({
             body: { noteId, booqId, start, end, question, targetQuote },
             signal: controller.signal,
             onChunk(chunk) {
-                setAnswer(prev => prev + chunk)
+                setState(prev =>
+                    prev.status === 'streaming'
+                        ? { ...prev, answer: prev.answer + chunk }
+                        : prev
+                )
             },
-            onError(err) {
-                setError(err)
-                setStatus('error')
+            onError(error) {
+                setState({ status: 'error', noteId, error })
             },
             onDone() {
-                setStatus('done')
+                setState(prev =>
+                    prev.status === 'streaming'
+                        ? { status: 'done', noteId: prev.noteId, answer: prev.answer }
+                        : prev
+                )
                 mutate(`/api/replies?note_id=${noteId}`)
                 mutate(`/api/notes?booq_id=${booqId}`)
             },
@@ -55,10 +59,7 @@ export function useAskQuestion({
 
     return {
         ask,
-        status,
-        answer: answer || undefined,
-        error,
-        noteId: activeNoteId,
+        state,
     }
 }
 
