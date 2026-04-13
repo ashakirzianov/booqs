@@ -15,6 +15,8 @@
     "cli": "tsx cli/index.ts"
   },
   "dependencies": {
+    "@ai-sdk/anthropic": "^3.0.69",
+    "@ai-sdk/openai": "^3.0.52",
     "@as-integrations/next": "^4.1.0",
     "@aws-sdk/client-s3": "^3.772.0",
     "@aws-sdk/s3-request-presigner": "^3.1016.0",
@@ -29,7 +31,7 @@
     "@upstash/redis": "^1.36.3",
     "@vercel/speed-insights": "^2.0.0",
     "@welldone-software/why-did-you-render": "^10.0.1",
-    "ai": "^5.0.50",
+    "ai": "^6.0.158",
     "body-parser": "^1.20.3",
     "booqs-epub": "^1.1.2",
     "clipboard-polyfill": "^4.1.1",
@@ -56,7 +58,6 @@
     "lru-cache": "^11.2.7",
     "nanoid": "^5.1.5",
     "next": "^16.1.6",
-    "openai": "^5.10.2",
     "postcss": "^8.5.3",
     "postcss-prefix-selector": "^2.1.1",
     "postcss-selector-parser": "^7.1.0",

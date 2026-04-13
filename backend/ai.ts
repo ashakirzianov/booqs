@@ -1,25 +1,36 @@
-import OpenAI from 'openai'
+import { generateText, streamText } from 'ai'
+import { createOpenAI } from '@ai-sdk/openai'
+import { createAnthropic } from '@ai-sdk/anthropic'
 
-const AI_MODEL = 'o4-mini'
+type AiProvider = 'openai' | 'anthropic'
+
+const AI_PROVIDER: AiProvider = (process.env.AI_PROVIDER as AiProvider) ?? 'openai'
+
+function getModel() {
+    switch (AI_PROVIDER) {
+        case 'anthropic': {
+            const anthropic = createAnthropic({
+                apiKey: process.env.ANTHROPIC_API_KEY,
+            })
+            return anthropic('claude-haiku-4-5')
+        }
+        case 'openai':
+        default: {
+            const openai = createOpenAI({
+                apiKey: process.env.OPENAI_API_KEY,
+            })
+            return openai('o4-mini')
+        }
+    }
+}
 
 export async function getResponse(input: string) {
-    const openai = new OpenAI({
-        apiKey: process.env.OPENAI_API_KEY,
-    })
     try {
-        const response = await openai.responses.create({
-            model: AI_MODEL,
-            input,
+        const { text } = await generateText({
+            model: getModel(),
+            prompt: input,
         })
-        if (response.error) {
-            return {
-                success: false as const,
-                error: {
-                    message: response.error.message,
-                    code: response.error.code,
-                },
-            }
-        } else if (!response.output_text) {
+        if (!text) {
             return {
                 success: false as const,
                 error: {
@@ -30,7 +41,7 @@ export async function getResponse(input: string) {
         }
         return {
             success: true as const,
-            output: response.output_text,
+            output: text,
         }
     } catch (e) {
         console.error('getResponse', e)
@@ -45,33 +56,16 @@ export async function getResponse(input: string) {
 }
 
 export async function getStreamingResponse(input: string) {
-    const openai = new OpenAI({
-        apiKey: process.env.OPENAI_API_KEY,
-    })
-
-    const response = await openai.responses.create({
-        model: AI_MODEL,
-        input,
-        stream: true,
+    const result = streamText({
+        model: getModel(),
+        prompt: input,
     })
     const encoder = new TextEncoder()
     const stream = new ReadableStream({
         async start(controller) {
             try {
-                for await (const event of response) {
-                    if (event.type === 'error') {
-                        controller.close()
-                        return
-                    }
-
-                    if (event.type === 'response.failed') {
-                        controller.close()
-                        return
-                    }
-
-                    if (event.type === 'response.output_text.delta') {
-                        controller.enqueue(encoder.encode(event.delta))
-                    }
+                for await (const delta of result.textStream) {
+                    controller.enqueue(encoder.encode(delta))
                 }
                 controller.close()
             } catch (e) {
