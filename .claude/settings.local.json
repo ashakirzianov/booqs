@@ -67,7 +67,9 @@
       "Read(//Users/ashakirzianov/repos/booqs/**)",
       "Bash(fi)",
       "Bash(while IFS= read -r file)",
-      "Bash(then if:*)"
+      "Bash(then if:*)",
+      "Bash(npm ls:*)",
+      "Bash(npm uninstall:*)"
     ]
   },
   "enableAllProjectMcpServers": false
