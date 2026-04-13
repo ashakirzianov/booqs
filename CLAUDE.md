@@ -54,6 +54,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ### General
 - Prefer `function name(...) { ... }` style to `const name = (...) => { ... }` style.
 - Always put private (non-exported) functions at the bottom of the file, after all exports.
+- Prefer pure functions. In layers where purity is expected (`core/`, `parser/`, `viewer/`, `common/`), impure functions must have a short `// Impure: <reason>` comment above the declaration. Impurity in `backend/`, `data/`, `application/`, `app/` is expected and doesn't need annotation. Note: the `parser/` layer uses a diagnostic accumulator pattern (`diags` array passed through and mutated) — this is a deliberate design choice and does not need per-function annotation.
 - In user-facing names (GraphQL schema fields/types, URL routes, UI labels), always use "booq" instead of "book" for consistency with the product name. For example: `booqsWithNotes` not `booksWithNotes`, `/booq/[id]` not `/book/[id]`. Internal variable names and backend function names may use "book" where it reads more naturally (e.g., `getBookmarks`).
 
 ### Nullability

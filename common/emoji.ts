@@ -5,6 +5,7 @@ export const AVAILABLE_EMOJIS = [
     '🐱', '🐰', '🐻', '🐼', '🐨', '🐯', '🦁', '🐸', '🐵', '🦊', '🦝', '🦄', '🐲', '🧙‍♂️', '🧙‍♀️', '🧛‍♂️', '🧛‍♀️', '🧟‍♂️', '🧟‍♀️', '🧞‍♂️', '🧞‍♀️', '🧜‍♂️', '🧜‍♀️', '🧚‍♂️', '🧚‍♀️', '🧑‍🚀', '🧑‍🎤', '🧑‍💻', '🧑‍🔬', '🧑‍🚒', '🧑‍🏫', '🧑‍🍳', '🧑‍🎨', '🧑‍✈️', '🧑‍🌾', '🧑‍🔧', '🧑‍⚕️', '🧑‍🎓', '🧑‍🏭', '🧑‍🔬'
 ]
 
+// Impure: non-deterministic (Math.random)
 export function getRandomAvatarEmoji() {
     return AVAILABLE_EMOJIS[Math.floor(Math.random() * AVAILABLE_EMOJIS.length)]
 }
