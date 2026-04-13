@@ -21,6 +21,9 @@ type Mutation {
     addNote(note: NoteInput!): MutationResult!
     removeNote(id: ID!): MutationResult!
     updateNote(id: ID!, kind: String, content: String): MutationResult!
+    addReply(reply: ReplyInput!): MutationResult!
+    removeReply(id: ID!): MutationResult!
+    updateReply(id: ID!, content: String!): MutationResult!
     addBooqHistory(event: BooqHistoryInput!): MutationResult!
     addToCollection(name: String!, booqId: ID!): MutationResult!
     removeFromCollection(name: String!, booqId: ID!): MutationResult!
@@ -217,6 +220,20 @@ type Note {
     privacy: String
     createdAt: String!
     updatedAt: String!
+    replies: [Reply!]!
+}
+type Reply {
+    id: ID!
+    noteId: ID!
+    author: User
+    content: String!
+    createdAt: String!
+    updatedAt: String!
+}
+input ReplyInput {
+    id: ID!
+    noteId: ID!
+    content: String!
 }
 type BooqHistory {
     booq: Booq!

@@ -537,6 +537,17 @@ Accepts only `.epub` files (`application/epub+zip`).
 - Shown in the Comments panel in the reader
 - Comment creation via context menu on selected text
 
+### 9.3 Replies
+
+- Replies are responses to public comments, stored in a separate `replies` table
+- Each reply has: author, content, timestamps, and a reference to the parent note
+- Replies are displayed as a flat list under the parent comment, ordered by creation date (oldest first)
+- UI supports single-level replies only (no reply-to-reply), but the data model can be extended for threading
+- Replies are shown in both the reader's note detail view and the notes page
+- Reply creation via "Reply" button on public comments
+- Reply deletion by the reply author
+- Deleting a parent note cascades to delete all its replies
+
 ---
 
 ## 10. Book Covers
@@ -717,6 +728,7 @@ All main pages are server components that fetch data directly from the data laye
 - `images/` - Image serving with size variants
 - `me/` - Current user data
 - `notes/` - Notes CRUD
+- `replies/` - Reply CRUD (replies to public comments)
 - `search/` - Search API
 - `upload/` - Presigned URL upload flow (request + confirm)
 - `users/` - User data

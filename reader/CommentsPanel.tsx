@@ -1,14 +1,19 @@
-import React from 'react'
+import React, { useState } from 'react'
 import Link from 'next/link'
-import { pathToId } from '@/core'
+import { BooqId, pathToId } from '@/core'
 import { TabButton } from './TabButton'
 import { formatRelativeTime } from '@/application/common'
 import { userHref } from '@/common/href'
 import { BooqNote, NoteAuthorData } from '@/data/notes'
+import { NoteReplies } from './NoteReplies'
+import { useBooqNotes } from '@/application/notes'
+import { PencilIcon, RemoveIcon } from '@/components/Icons'
+import { MenuButton } from './MenuButton'
 
-export function CommentsPanel({ comments, currentUser, followingUserIds, isFollowingLoading }: {
+export function CommentsPanel({ booqId, comments, currentUser, followingUserIds, isFollowingLoading }: {
+    booqId: BooqId,
     comments: BooqNote[],
-    currentUser?: { id: string },
+    currentUser?: NoteAuthorData,
     followingUserIds?: string[],
     isFollowingLoading?: boolean,
 }) {
@@ -56,7 +61,7 @@ export function CommentsPanel({ comments, currentUser, followingUserIds, isFollo
                             </div>
                         ) : (
                             filteredComments.map(note => (
-                                <CommentItem key={note.id} comment={note} />
+                                <CommentItem key={note.id} comment={note} booqId={booqId} user={currentUser} />
                             ))
                         )}
                     </div>
@@ -66,7 +71,26 @@ export function CommentsPanel({ comments, currentUser, followingUserIds, isFollo
     )
 }
 
-function CommentItem({ comment }: { comment: BooqNote }) {
+function CommentItem({ comment, booqId, user }: { comment: BooqNote, booqId: BooqId, user?: NoteAuthorData }) {
+    const isOwnComment = user?.id === comment.author.id
+    const { updateNote, removeNote } = useBooqNotes({ booqId, user })
+    const [isEditing, setIsEditing] = useState(false)
+    const [editContent, setEditContent] = useState(comment.content ?? '')
+
+    const handleSave = () => {
+        updateNote({ noteId: comment.id, content: editContent.trim() || null })
+        setIsEditing(false)
+    }
+
+    const handleCancel = () => {
+        setEditContent(comment.content ?? '')
+        setIsEditing(false)
+    }
+
+    const handleRemove = () => {
+        removeNote({ noteId: comment.id })
+    }
+
     return (
         <div className='rounded-lg p-3 space-y-2 w-full max-w-md'>
 
@@ -78,14 +102,47 @@ function CommentItem({ comment }: { comment: BooqNote }) {
             </Link>
 
             {/* Note content */}
-            {comment.content && (
-                <div className='text-sm text-primary'>
-                    {comment.content}
+            {isEditing ? (
+                <div className='flex flex-col gap-2'>
+                    <textarea
+                        className='w-full px-3 py-2 border border-dimmed rounded bg-background text-primary text-sm leading-relaxed resize-y min-h-[60px] focus:outline-none focus:border-action'
+                        style={{ fontFamily: 'var(--font-main)' }}
+                        value={editContent}
+                        onChange={(e) => setEditContent(e.target.value)}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+                                e.preventDefault()
+                                handleSave()
+                            }
+                        }}
+                        rows={2}
+                        autoFocus
+                    />
+                    <div className='flex gap-2 justify-end'>
+                        <MenuButton onClick={handleCancel}>Cancel</MenuButton>
+                        <MenuButton onClick={handleSave}>Save</MenuButton>
+                    </div>
                 </div>
+            ) : (
+                comment.content && (
+                    <div className='text-sm text-primary'>
+                        {comment.content}
+                    </div>
+                )
             )}
 
-            {/* Note metadata */}
+            {/* Note metadata and actions */}
             <div className='flex items-center justify-end gap-2 pt-1'>
+                {isOwnComment && !isEditing && (
+                    <>
+                        <MenuButton onClick={() => setIsEditing(true)}>
+                            <div className='w-4 h-4'><PencilIcon /></div>
+                        </MenuButton>
+                        <MenuButton onClick={handleRemove}>
+                            <div className='w-4 h-4'><RemoveIcon /></div>
+                        </MenuButton>
+                    </>
+                )}
                 <Link
                     href={userHref({ username: comment.author.username })}
                     className='flex items-center gap-2 hover:bg-gray-50 rounded px-1 py-0.5 transition-colors'
@@ -99,6 +156,9 @@ function CommentItem({ comment }: { comment: BooqNote }) {
                     {formatRelativeTime(new Date(comment.createdAt))}
                 </div>
             </div>
+
+            {/* Replies */}
+            <NoteReplies noteId={comment.id} user={user} />
         </div>
     )
 }
