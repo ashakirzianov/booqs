@@ -1,5 +1,5 @@
 import { BooqId } from '@/core'
-import { requestUploadAction, confirmUploadAction } from '@/data/upload'
+import { requestUpload, confirmUpload } from '@/data/upload'
 import { useState } from 'react'
 
 export type FileData = File
@@ -50,7 +50,7 @@ export function useUpload() {
     }
     return {
         uploadFile,
-        loading: state.state === 'loading',
+        isLoading: state.state === 'loading',
         progress: state.state === 'loading' ? state.progress : undefined,
         result: state.state === 'success' ? state.data : undefined,
         error: state.state === 'error' ? state.error : undefined,
@@ -60,7 +60,7 @@ export function useUpload() {
 async function uploadViaPresignedUrl(file: File, setProgress: (progress: number) => void) {
     try {
         setProgress(10)
-        const requestResult = await requestUploadAction()
+        const requestResult = await requestUpload()
         if (!requestResult.success) {
             return { success: false, error: requestResult.error } as const
         }
@@ -75,7 +75,7 @@ async function uploadViaPresignedUrl(file: File, setProgress: (progress: number)
         }
 
         setProgress(70)
-        const result = await confirmUploadAction(requestResult.uploadId)
+        const result = await confirmUpload(requestResult.uploadId)
         setProgress(100)
         return result
     } catch {

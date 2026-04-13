@@ -1,7 +1,7 @@
-import { requestUploadAction } from '@/data/upload'
+import { requestUpload } from '@/data/upload'
 
 export async function POST() {
-    const result = await requestUploadAction()
+    const result = await requestUpload()
     if (!result.success) {
         return Response.json({ error: result.error }, { status: 401 })
     }

@@ -4,9 +4,9 @@ import {
     startRegistration, startAuthentication,
 } from '@simplewebauthn/browser'
 import {
-    initPasskeyRegistrationAcion, verifyPasskeyRegistrationAction,
-    initPasskeySigninAction, verifyPasskeySigninAction,
-    deletePasskeyActionWithUpdatedList,
+    initPasskeyRegistration, verifyPasskeyRegistration,
+    initPasskeySignin, verifyPasskeySignin,
+    deletePasskeyWithUpdatedList,
 } from '@/data/auth'
 import { generatePasskeyLabel } from '@/application/utils'
 
@@ -26,7 +26,7 @@ async function registerPasskey() {
                 error: 'Your browser does not support WebAuthn',
             }
         }
-        const initResult = await initPasskeyRegistrationAcion()
+        const initResult = await initPasskeyRegistration()
         if (!initResult.success) {
             return {
                 success: false as const,
@@ -37,7 +37,7 @@ async function registerPasskey() {
             optionsJSON: initResult.options,
         })
         const label = generatePasskeyLabel()
-        const verificationResult = await verifyPasskeyRegistrationAction({
+        const verificationResult = await verifyPasskeyRegistration({
             id: initResult.id,
             response,
             label,
@@ -68,7 +68,7 @@ async function signInWithPasskey() {
                 error: 'Your browser does not support WebAuthn',
             }
         }
-        const initResult = await initPasskeySigninAction()
+        const initResult = await initPasskeySignin()
         if (!initResult.success) {
             return {
                 success: false as const,
@@ -78,7 +78,7 @@ async function signInWithPasskey() {
         const response = await startAuthentication({
             optionsJSON: initResult.options,
         })
-        const verificationResult = await verifyPasskeySigninAction({
+        const verificationResult = await verifyPasskeySignin({
             id: initResult.id,
             response,
         })
@@ -102,7 +102,7 @@ async function signInWithPasskey() {
 
 async function deletePasskey(id: string) {
     try {
-        const result = await deletePasskeyActionWithUpdatedList(id)
+        const result = await deletePasskeyWithUpdatedList(id)
         if (!result.success) {
             return {
                 success: false as const,

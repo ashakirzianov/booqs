@@ -1,4 +1,4 @@
-import { confirmUploadAction, primeBooqFile, primeAfterUpload, uploadMissingOriginals } from '@/data/upload'
+import { confirmUpload, primeBooqFile, primeAfterUpload, uploadMissingOriginals } from '@/data/upload'
 import { BooqId } from '@/core'
 import { after } from 'next/server'
 
@@ -15,7 +15,7 @@ export async function POST(request: Request) {
         return Response.json({ error: 'uploadId is required' }, { status: 400 })
     }
 
-    const result = await confirmUploadAction(uploadId)
+    const result = await confirmUpload(uploadId)
 
     if (!result.success) {
         return Response.json({

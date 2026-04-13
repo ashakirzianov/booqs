@@ -28,7 +28,7 @@ export type ReadingHistoryResult = {
     hasMore: boolean
 }
 
-export async function reportBooqHistoryAction({
+export async function reportBooqHistory({
     booqId, path,
 }: {
     booqId: BooqId,
@@ -129,7 +129,7 @@ export async function getReadingHistoryForHistoryList({
     }
 }
 
-export async function removeHistoryEntryAction({
+export async function removeHistoryEntry({
     booqId,
 }: {
     booqId: BooqId,

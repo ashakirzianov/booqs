@@ -58,7 +58,16 @@
       "Bash(git commit:*)",
       "Bash(node -e \"console.log\\(require\\(''/Users/ashakirzianov/repos/booqs/node_modules/next/package.json''\\).version\\)\")",
       "WebSearch",
-      "Bash(node -e \"console.log\\(require\\(''/Users/ashakirzianov/repos/booqs/node_modules/lru-cache/package.json''\\).version\\)\")"
+      "Bash(node -e \"console.log\\(require\\(''/Users/ashakirzianov/repos/booqs/node_modules/lru-cache/package.json''\\).version\\)\")",
+      "Bash(while read:*)",
+      "Bash(do grep:*)",
+      "Bash(done)",
+      "Bash(do if:*)",
+      "Bash(then echo:*)",
+      "Read(//Users/ashakirzianov/repos/booqs/**)",
+      "Bash(fi)",
+      "Bash(while IFS= read -r file)",
+      "Bash(then if:*)"
     ]
   },
   "enableAllProjectMcpServers": false

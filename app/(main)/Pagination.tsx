@@ -2,15 +2,13 @@ import { ActionButton } from '@/components/Buttons'
 import { BackIcon, ForwardIcon } from '@/components/Icons'
 import Link from 'next/link'
 
-type PaginationProps = {
-    currentPage: number
-    hasMore: boolean
-    total?: number
-    baseUrl: string
-    pageSize: number
-}
-
-export function Pagination({ currentPage, hasMore, total, baseUrl, pageSize }: PaginationProps) {
+export function Pagination({ currentPage, hasMore, total, baseUrl, pageSize }: {
+    currentPage: number,
+    hasMore: boolean,
+    total?: number,
+    baseUrl: string,
+    pageSize: number,
+}) {
     const hasPrevious = currentPage > 1
     const totalPages = total ? Math.ceil(total / pageSize) : undefined
 

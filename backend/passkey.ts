@@ -343,20 +343,22 @@ export async function deleteUserCredentials(userId: string) {
     return await sql`DELETE FROM passkey_credentials WHERE user_id = ${userId}`
 }
 
-export async function getUserPasskeys(userId: string) {
+export type DbPasskeyData = {
+    id: string,
+    label: string | null,
+    ip_address: string | null,
+    created_at: string,
+    updated_at: string,
+}
+
+export async function getUserPasskeys(userId: string): Promise<DbPasskeyData[]> {
     const results = await sql`
-        SELECT id, label, ip_address, created_at, updated_at 
-        FROM passkey_credentials 
+        SELECT id, label, ip_address, created_at, updated_at
+        FROM passkey_credentials
         WHERE user_id = ${userId}
         ORDER BY created_at DESC
     `
-    return results.map(row => ({
-        id: row.id,
-        label: row.label,
-        ipAddress: row.ip_address,
-        createdAt: row.created_at,
-        updatedAt: row.updated_at,
-    }))
+    return results as DbPasskeyData[]
 }
 
 export async function deletePasskeyCredential(userId: string, credentialId: string) {

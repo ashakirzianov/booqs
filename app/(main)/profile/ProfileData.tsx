@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { ProfileBadge } from '@/components/ProfilePicture'
 import { PencilIcon, SmallSpinner } from '@/components/Icons'
 import { LightButton, ActionButton } from '@/components/Buttons'
-import { updateAccountAction } from '@/data/auth'
+import { updateAccount } from '@/data/auth'
 import { AccountData } from '@/data/user'
 import { AVAILABLE_EMOJIS } from '@/common/emoji'
 import { Modal } from '@/components/Modal'
@@ -63,7 +63,7 @@ export function ProfileData({ user }: { user: AccountData }) {
         }
 
         try {
-            const result = await updateAccountAction(updates)
+            const result = await updateAccount(updates)
 
             if (result.success) {
                 setFormState({ state: 'display' })

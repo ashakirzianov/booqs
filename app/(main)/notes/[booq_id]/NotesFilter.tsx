@@ -8,13 +8,11 @@ import { NoteCard } from './NoteCard'
 import clsx from 'clsx'
 import { ExpandedNoteFragmentData } from './NoteFragment'
 
-type NotesFilterProps = {
-    data: ExpandedNoteFragmentData[]
-    booqId: BooqId
-    user: NoteAuthorData | undefined
-}
-
-export function NotesFilter({ data, booqId, user }: NotesFilterProps) {
+export function NotesFilter({ data, booqId, user }: {
+    data: ExpandedNoteFragmentData[],
+    booqId: BooqId,
+    user: NoteAuthorData | undefined,
+}) {
     const initialNotes = useMemo(() => {
         return data.map(datum => datum.note)
     }, [data])

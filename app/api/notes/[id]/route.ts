@@ -75,7 +75,7 @@ export type PatchBody = z.infer<typeof patchBodySchema>
 export type PatchResponse = {
     id: string,
     kind: string,
-    content?: string | null,
+    content?: string,
     targetQuote: string,
     createdAt: string,
     updatedAt: string,

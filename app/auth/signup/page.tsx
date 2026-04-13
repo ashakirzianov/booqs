@@ -1,5 +1,5 @@
 import { getRandomAvatarEmoji } from '@/common/emoji'
-import { prevalidateSignupAction } from '@/data/auth'
+import { prevalidateSignup } from '@/data/auth'
 import { SignUpForm } from './SignUpForm'
 import { generateRandomName } from './name'
 import { AddPasskeyPage } from './AddPasskeyPage'
@@ -42,7 +42,7 @@ export default async function SignUpPage({ searchParams }: {
     if (authData) {
         return <AddPasskeyPage returnTo={returnTo} />
     } else {
-        const validation = await prevalidateSignupAction({ email, secret })
+        const validation = await prevalidateSignup({ email, secret })
 
         if (!validation.success) {
             return (

@@ -1,6 +1,6 @@
 import { BooqId, parseIdOpt, pathFromString, rangeFromString } from '@/core'
 import { fetchBooqPreview, fetchBooqChapter } from '@/data/booqs'
-import { reportBooqHistoryAction } from '@/data/history'
+import { reportBooqHistory } from '@/data/history'
 import { Reader } from '@/reader/Reader'
 import { Metadata } from 'next'
 import { notFound, redirect } from 'next/navigation'
@@ -92,7 +92,7 @@ export default async function BooqPathPage({
 
     // Report history event before rendering the page
     if (booqPath) {
-        await reportBooqHistoryAction({
+        await reportBooqHistory({
             booqId: `${library}-${id}`,
             path: booqPath,
         })

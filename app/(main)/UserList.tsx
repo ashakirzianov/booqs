@@ -2,7 +2,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { userHref } from '@/common/href'
-import { AccountPublicData, followAction, unfollowAction } from '@/data/user'
+import { AccountPublicData, follow, unfollow } from '@/data/user'
 import { ProfileBadge } from '@/components/ProfilePicture'
 import { ActionButton } from '@/components/Buttons'
 import { SmallSpinner } from '@/components/Icons'
@@ -58,7 +58,7 @@ export function UserList({
         }))
 
         try {
-            const result = await followAction(username)
+            const result = await follow(username)
 
             if (result.success) {
                 setButtonStates(prev => ({
@@ -116,7 +116,7 @@ export function UserList({
         }))
 
         try {
-            const result = await unfollowAction(username)
+            const result = await unfollow(username)
 
             if (result.success) {
                 setButtonStates(prev => ({

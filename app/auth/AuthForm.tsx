@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation'
 import { usePasskeys } from '@/application/passkeys'
 import { PasskeyIcon, RetryIcon, SmallSpinner } from '@/components/Icons'
 import { ActionButton, LightButton } from '@/components/Buttons'
-import { initiateSignAction } from '@/data/auth'
+import { initiateSign } from '@/data/auth'
 
 export function AuthForm({ returnTo }: {
     returnTo: string,
@@ -49,7 +49,7 @@ export function AuthForm({ returnTo }: {
         setEmailState({ state: 'loading' })
 
         try {
-            const result = await initiateSignAction({ email: email.trim(), returnTo })
+            const result = await initiateSign({ email: email.trim(), returnTo })
 
             if (result.success) {
                 setEmailState({ state: 'success', kind: result.kind })

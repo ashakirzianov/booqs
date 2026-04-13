@@ -12,7 +12,7 @@ export type ResolvedNote = {
     author: NoteAuthorData,
     range: BooqRange,
     kind: string,
-    content?: string | null,
+    content?: string,
     targetQuote: string,
     privacy: NotePrivacy,
     createdAt: string,

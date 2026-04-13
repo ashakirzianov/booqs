@@ -1,11 +1,11 @@
 'use server'
 import {
-    initiatePasskeyRegistration, verifyPasskeyRegistration,
+    initiatePasskeyRegistration, verifyPasskeyRegistration as backendVerifyPasskeyRegistration,
     initiatePasskeyLogin, verifyPasskeyLogin,
-    getUserPasskeys, deletePasskeyCredential,
+    getUserPasskeys, deletePasskeyCredential, DbPasskeyData,
 } from '@/backend/passkey'
 import { deleteUserForId, userForId, updateUser, DbUser } from '@/backend/users'
-import { completeSignInRequest, completeSignUp, prevalidateSignup, initiateSignRequest } from '@/backend/sign'
+import { completeSignInRequest, completeSignUp as backendCompleteSignUp, prevalidateSignup as backendPrevalidateSignup, initiateSignRequest } from '@/backend/sign'
 import { RegistrationResponseJSON, AuthenticationResponseJSON } from '@simplewebauthn/browser'
 import { headers } from 'next/headers'
 import { revalidatePath } from 'next/cache'
@@ -14,13 +14,13 @@ import { getUserIdInsideRequest, setUserIdInsideRequest } from './request'
 
 export type PasskeyData = {
     id: string
-    label: string | null
-    ipAddress: string | null
+    label: string | undefined
+    ipAddress: string | undefined
     createdAt: string
     updatedAt: string
 }
 
-export async function initPasskeyRegistrationAcion() {
+export async function initPasskeyRegistration() {
     try {
         const origin = await getOrigin()
         const userId = await getUserIdInsideRequest()
@@ -52,7 +52,7 @@ export async function initPasskeyRegistrationAcion() {
     }
 }
 
-export async function verifyPasskeyRegistrationAction({ id, response, label }: {
+export async function verifyPasskeyRegistration({ id, response, label }: {
     id: string,
     response: RegistrationResponseJSON, // The credential JSON received from the client
     label?: string,
@@ -60,7 +60,7 @@ export async function verifyPasskeyRegistrationAction({ id, response, label }: {
     try {
         const origin = await getOrigin()
         const ipAddress = await getClientIpAddress()
-        const result = await verifyPasskeyRegistration({
+        const result = await backendVerifyPasskeyRegistration({
             id,
             response,
             origin: origin ?? undefined,
@@ -69,7 +69,7 @@ export async function verifyPasskeyRegistrationAction({ id, response, label }: {
         })
         if (result.user?.id) {
             await setUserIdInsideRequest(result.user.id)
-            const updatedPasskeys = await getUserPasskeys(result.user.id)
+            const updatedPasskeys = (await getUserPasskeys(result.user.id)).map(passkeyDataFromDbPasskeyData)
             return {
                 success: true,
                 user: accountDataFromDbUser(result.user),
@@ -87,7 +87,7 @@ export async function verifyPasskeyRegistrationAction({ id, response, label }: {
     }
 }
 
-export async function initPasskeySigninAction() {
+export async function initPasskeySignin() {
     try {
         const origin = await getOrigin()
         const { id, options, } = await initiatePasskeyLogin({
@@ -109,7 +109,7 @@ export async function initPasskeySigninAction() {
     }
 }
 
-export async function verifyPasskeySigninAction({ id, response }: {
+export async function verifyPasskeySignin({ id, response }: {
     id: string,
     response: AuthenticationResponseJSON, // The credential JSON received from the client
 }) {
@@ -140,12 +140,12 @@ export async function verifyPasskeySigninAction({ id, response }: {
     }
 }
 
-export async function signOutAction() {
+export async function signOut() {
     await setUserIdInsideRequest(undefined)
     return true
 }
 
-export async function updateAccountAction({
+export async function updateAccount({
     name,
     emoji,
     username
@@ -174,7 +174,7 @@ export async function updateAccountAction({
     return { success: true, user: accountDataFromDbUser(result.user) }
 }
 
-export async function deleteAccountAction() {
+export async function deleteAccount() {
     const userId = await getUserIdInsideRequest()
     if (!userId) {
         return false
@@ -186,7 +186,7 @@ export async function deleteAccountAction() {
     return result
 }
 
-export async function completeSignInAction({
+export async function completeSignIn({
     email,
     secret,
 }: {
@@ -212,7 +212,7 @@ export async function completeSignInAction({
     }
 }
 
-export async function completeSignUpAction({
+export async function completeSignUp({
     email,
     secret,
     username,
@@ -226,7 +226,7 @@ export async function completeSignUpAction({
     emoji?: string,
 }): Promise<{ success: true, user: AccountData } | { success: false, reason: string }> {
     try {
-        const result = await completeSignUp({
+        const result = await backendCompleteSignUp({
             email,
             secret,
             username,
@@ -250,7 +250,7 @@ export async function completeSignUpAction({
     }
 }
 
-export async function prevalidateSignupAction({
+export async function prevalidateSignup({
     email,
     secret,
 }: {
@@ -258,14 +258,14 @@ export async function prevalidateSignupAction({
     secret: string,
 }): Promise<{ success: true } | { success: false, reason: string }> {
     try {
-        return await prevalidateSignup({ email, secret })
+        return await backendPrevalidateSignup({ email, secret })
     } catch (err) {
         console.error('Error prevalidating signup:', err)
         return { success: false, reason: 'An error occurred during validation' }
     }
 }
 
-export async function initiateSignAction({
+export async function initiateSign({
     email,
     returnTo,
 }: {
@@ -307,10 +307,10 @@ export async function fetchPasskeyData(): Promise<PasskeyData[]> {
     if (!userId) {
         return []
     }
-    return await getUserPasskeys(userId)
+    return (await getUserPasskeys(userId)).map(passkeyDataFromDbPasskeyData)
 }
 
-export async function deletePasskeyAction(credentialId: string): Promise<boolean> {
+export async function deletePasskey(credentialId: string): Promise<boolean> {
     const userId = await getUserIdInsideRequest()
     if (!userId) {
         return false
@@ -318,7 +318,7 @@ export async function deletePasskeyAction(credentialId: string): Promise<boolean
     return await deletePasskeyCredential(userId, credentialId)
 }
 
-export async function deletePasskeyActionWithUpdatedList(credentialId: string): Promise<{ success: boolean, passkeys?: PasskeyData[] }> {
+export async function deletePasskeyWithUpdatedList(credentialId: string): Promise<{ success: boolean, passkeys?: PasskeyData[] }> {
     const userId = await getUserIdInsideRequest()
     if (!userId) {
         return { success: false }
@@ -329,8 +329,18 @@ export async function deletePasskeyActionWithUpdatedList(credentialId: string): 
         return { success: false }
     }
 
-    const updatedPasskeys = await getUserPasskeys(userId)
+    const updatedPasskeys = (await getUserPasskeys(userId)).map(passkeyDataFromDbPasskeyData)
     return { success: true, passkeys: updatedPasskeys }
+}
+
+function passkeyDataFromDbPasskeyData(dbPasskey: DbPasskeyData): PasskeyData {
+    return {
+        id: dbPasskey.id,
+        label: dbPasskey.label ?? undefined,
+        ipAddress: dbPasskey.ip_address ?? undefined,
+        createdAt: dbPasskey.created_at,
+        updatedAt: dbPasskey.updated_at,
+    }
 }
 
 function accountDataFromDbUser(dbUser: DbUser): AccountData {

@@ -1,6 +1,6 @@
 'use client'
 import { useState } from 'react'
-import { completeSignUpAction } from '@/data/auth'
+import { completeSignUp } from '@/data/auth'
 import { EmojiSelector } from '@/components/EmojiSelector'
 import { ActionButton } from '@/components/Buttons'
 import { SmallSpinner } from '@/components/Icons'
@@ -69,7 +69,7 @@ export function SignUpForm({
         setSignUpState({ state: 'loading-signup' })
 
         try {
-            const result = await completeSignUpAction({
+            const result = await completeSignUp({
                 email,
                 secret,
                 username: formData.username.trim(),

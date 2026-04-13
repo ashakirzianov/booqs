@@ -1,6 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react'
-import { followAction, unfollowAction } from '@/data/user'
+import { follow, unfollow } from '@/data/user'
 import { ActionButton } from '@/components/Buttons'
 import { SmallSpinner } from '@/components/Icons'
 
@@ -26,8 +26,8 @@ export function FollowButton({ username, initialFollowStatus }: {
 
         try {
             const result = previousState
-                ? await unfollowAction(username)
-                : await followAction(username)
+                ? await unfollow(username)
+                : await follow(username)
 
             if (result.success) {
                 // Update with server response

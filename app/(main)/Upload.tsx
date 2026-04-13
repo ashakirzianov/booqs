@@ -38,7 +38,7 @@ function UploadModalContent({ closeModal }: {
         file, openDialog, dialogContent, clearFile,
     } = useSelectFileDialog({ accept: 'application/epub+zip' })
     const {
-        uploadFile, loading, progress, result, error,
+        uploadFile, isLoading, progress, result, error,
     } = useUpload()
     function closeAndClear() {
         closeModal()
@@ -82,7 +82,7 @@ function UploadModalContent({ closeModal }: {
                 onClick={closeAndClear}
             />
         </>
-    } else if (loading) {
+    } else if (isLoading) {
         return <>
             <ModalLabel text={`Uploading ${file.name}...`} />
             <UploadProgressBar progress={progress ?? 0} />

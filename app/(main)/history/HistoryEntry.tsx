@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { booqContentHref } from '@/common/href'
 import { BooqCover } from '@/components/BooqCover'
 import { RemoveButton } from '@/components/Buttons'
-import { removeHistoryEntryAction, BriefReadingHistoryEntry } from '@/data/history'
+import { removeHistoryEntry, BriefReadingHistoryEntry } from '@/data/history'
 import Link from 'next/link'
 
 export function HistoryEntry({
@@ -21,7 +21,7 @@ export function HistoryEntry({
 
         setIsRemoving(true)
         try {
-            const result = await removeHistoryEntryAction({ booqId })
+            const result = await removeHistoryEntry({ booqId })
             if (result.success) {
                 setIsRemoved(true)
             } else {

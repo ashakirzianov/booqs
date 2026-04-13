@@ -51,17 +51,31 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Coding preferences
 
-- Always put private functions to the bottom of the public functions
-
-- Do not access backend/* files directly from frontend code. Instead, create an indirection layer in data/* directory to abstract backend functionality.
-
-Prefer 'function name(...) { ... }' style to 'const name = (...) => { ... }' style
-
+### General
+- Prefer `function name(...) { ... }` style to `const name = (...) => { ... }` style.
+- Always put private (non-exported) functions at the bottom of the file, after all exports.
+- Prefer pure functions. In layers where purity is expected (`core/`, `parser/`, `viewer/`, `common/`), impure functions must have a short `// Impure: <reason>` comment above the declaration. Impurity in `backend/`, `data/`, `application/`, `app/` is expected and doesn't need annotation. Note: the `parser/` layer uses a diagnostic accumulator pattern (`diags` array passed through and mutated) — this is a deliberate design choice and does not need per-function annotation.
 - In user-facing names (GraphQL schema fields/types, URL routes, UI labels), always use "booq" instead of "book" for consistency with the product name. For example: `booqsWithNotes` not `booksWithNotes`, `/booq/[id]` not `/book/[id]`. Internal variable names and backend function names may use "book" where it reads more naturally (e.g., `getBookmarks`).
+
+### Nullability
+- The data layer (`data/`) should expose `undefined` for absent values, never `null`. Convert `null` to `undefined` at the data layer boundary using `?? undefined`.
+- Backend `Db*` types may use `null` to match SQL column semantics. The conversion happens in `*FromDb*` converter functions in the data layer.
+
+### Naming
+- Use `isLoading` (not `loading`) for boolean loading state in hooks and return values.
+- Do not add an `Action` suffix to data layer server action functions. The `'use server'` directive and the function name are sufficient.
+- Backend database row types use `Db` prefix and snake_case fields matching the DB columns (e.g., `DbUser`, `DbNote`). Data layer types use camelCase.
+
+### Types
+- Inline prop/parameter types unless the type is referenced from other places. Extract a named type only when it's used in multiple locations (e.g., composed via intersection, passed as a generic argument).
+
+### Data layer
+- Do not access `backend/*`, `parser/*`, or `graphql/*` files directly from frontend code. Instead, create an indirection layer in `data/*` directory to abstract backend functionality.
+- Data layer converter functions follow the pattern `fooFromDbFoo` (e.g., `accountDataFromDbUser`, `passkeyDataFromDbPasskeyData`).
 
 ## State Management
 
-- When there's multiple mutually exclusive state of the component (such as isLoading and error -- when error is not null, isLoading should be false and vice versa) try to combine them into one state object with discriminating field (such as { state: 'loading' } and { state: 'error', error })
+- When there's multiple mutually exclusive state of the component (such as isLoading and error -- when error is not null, isLoading should be false and vice versa) try to combine them into one state object with discriminating field (such as `{ state: 'loading' }` and `{ state: 'error', error }`). Exception: when using SWR, exposing its raw `isLoading`/`error` fields directly is fine since SWR manages the state consistency.
 
 ## CSS and Styling
 

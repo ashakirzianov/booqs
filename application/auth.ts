@@ -1,8 +1,8 @@
 'use client'
 import {
-    signOutAction,
-    deleteAccountAction,
-    updateAccountAction,
+    signOut as signOutData,
+    deleteAccount as deleteAccountData,
+    updateAccount as updateAccountData,
 } from '@/data/auth'
 import useSWR from 'swr'
 import { GetResponse } from '@/app/api/me/route'
@@ -23,7 +23,7 @@ export function useAuth() {
 
     async function signOut() {
         const result = await mutate(async function () {
-            const result = await signOutAction()
+            const result = await signOutData()
             if (result) {
                 return {
                     user: null,
@@ -39,7 +39,7 @@ export function useAuth() {
     }
     async function deleteAccount() {
         mutate(async function () {
-            const result = await deleteAccountAction()
+            const result = await deleteAccountData()
             if (result) {
                 return {
                     user: null,
@@ -59,7 +59,7 @@ export function useAuth() {
         }
 
         const result = await mutate(async function () {
-            const updateResult = await updateAccountAction({ name, emoji })
+            const updateResult = await updateAccountData({ name, emoji })
             if (updateResult.success) {
                 return {
                     user: updateResult.user,
