@@ -11,29 +11,29 @@
 ## Tasks
 
 ### Database & Backend
-- [ ] Add `replies` table to `backend/schema.sql`
-- [ ] Create `backend/replies.ts` with DB types and query functions (`repliesForNotes`, `addReply`, `removeReply`, `updateReply`)
+- [x] Add `replies` table to `backend/schema.sql`
+- [x] Create `backend/replies.ts` with DB types and query functions (`repliesForNotes`, `addReply`, `removeReply`, `updateReply`)
 
 ### Data Layer
-- [ ] Create `data/replies.ts` with types (`BooqReply`, `UnresolvedBooqReply`) and server actions (`fetchReplies`, `createReply`, `deleteReply`, `modifyReply`)
+- [x] Create `data/replies.ts` with types (`BooqReply`, `UnresolvedBooqReply`) and server actions (`fetchReplies`, `createReply`, `deleteReply`, `modifyReply`)
 
 ### API Routes
-- [ ] Create `app/api/replies/route.ts` — GET replies by `note_id`
-- [ ] Create `app/api/replies/[id]/route.ts` — POST, PATCH, DELETE
+- [x] Create `app/api/replies/route.ts` — GET replies by `note_id`
+- [x] Create `app/api/replies/[id]/route.ts` — POST, PATCH, DELETE
 
 ### Application Layer
-- [ ] Create `application/replies.ts` — `useNoteReplies` SWR hook with optimistic updates
+- [x] Create `application/replies.ts` — `useNoteReplies` SWR hook with optimistic updates
 
 ### Reader UI
-- [ ] Add "Reply" button to `NoteTargetMenu` for public comments
-- [ ] Create reply list component to display replies under a comment
-- [ ] Create reply form component (textarea + Post/Cancel)
+- [x] Add "Reply" button to `NoteTargetMenu` for public comments
+- [x] Create reply list component to display replies under a comment
+- [x] Create reply form component (textarea + Post/Cancel)
 
 ### Notes Page UI
-- [ ] Show reply count on `NoteCard` for comments
-- [ ] Add reply list and reply form to `NoteCard` expanded view
+- [x] Show reply count on `NoteCard` for comments
+- [x] Add reply list and reply form to `NoteCard` expanded view
 
 ### Specs
-- [ ] Update SPECS.md with replies feature
+- [x] Update SPECS.md with replies feature
 
 ## Suggestions

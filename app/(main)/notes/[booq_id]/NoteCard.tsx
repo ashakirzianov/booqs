@@ -7,6 +7,7 @@ import { useBooqNotes } from '@/application/notes'
 import { ActionButton, LightButton } from '@/components/Buttons'
 import { ExpandedNoteFragmentData, NoteFragment } from './NoteFragment'
 import { RetryIcon } from '@/components/Icons'
+import { NoteReplies } from '@/reader/NoteReplies'
 
 export function NoteCard({
     noteFragmentData, user, onColorChange,
@@ -130,6 +131,12 @@ export function NoteCard({
                         onClick={handleEditToggle}
                     >
                         {note.content || <span className="text-dimmed">Add note…</span>}
+                    </div>
+                )}
+
+                {note.privacy === 'public' && note.kind === 'comment' && (
+                    <div className="px-3">
+                        <NoteReplies noteId={note.id} user={user} />
                     </div>
                 )}
             </div>

@@ -8,6 +8,7 @@ import { formatRelativeTime } from '@/application/common'
 import { HIGHLIGHT_KINDS, useBooqNotes } from '@/application/notes'
 import { ProfileBadge } from '@/components/ProfilePicture'
 import { CommentIcon, RemoveIcon, QuestionMarkIcon, ShareIcon } from '@/components/Icons'
+import { NoteReplies } from './NoteReplies'
 import { generateQuote } from './ContextMenuItems'
 import { NoteAuthorData } from '@/data/notes'
 import { userHref } from '@/common/href'
@@ -183,6 +184,11 @@ export function NoteTargetMenu({
                                 </MenuButton>
                             )}
                         </div>
+
+                        {/* Replies - shown for public comments */}
+                        {note.privacy === 'public' && note.kind === 'comment' && (
+                            <NoteReplies noteId={note.id} user={user} />
+                        )}
 
                         {/* Author info and date */}
                         {!isOwnNote && (<span className="text-xs text-dimmed flex flex-row items-center justify-start flex-wrap">

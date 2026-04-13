@@ -119,6 +119,19 @@ CREATE INDEX IF NOT EXISTS notes_created_at_idx ON notes(created_at);
 CREATE INDEX IF NOT EXISTS notes_privacy_idx ON notes(privacy);
 CREATE INDEX IF NOT EXISTS notes_booq_id_privacy_idx ON notes(booq_id, privacy);
 
+-- Replies
+CREATE TABLE IF NOT EXISTS replies (
+  id TEXT PRIMARY KEY DEFAULT uuid_generate_v4()::TEXT,
+  note_id TEXT NOT NULL REFERENCES notes(id) ON DELETE CASCADE,
+  author_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  content TEXT NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS replies_note_id_idx ON replies(note_id);
+CREATE INDEX IF NOT EXISTS replies_author_id_idx ON replies(author_id);
+CREATE INDEX IF NOT EXISTS replies_created_at_idx ON replies(created_at);
+
 -- Passkey credentials
 CREATE TABLE IF NOT EXISTS passkey_credentials (
   id TEXT PRIMARY KEY DEFAULT uuid_generate_v4()::TEXT,
