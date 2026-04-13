@@ -49,13 +49,13 @@ Add an `askQuestion` mutation/subscription that mirrors the REST endpoint:
 - [x] Ensure the AI user works with existing author resolution in replies (data layer, GraphQL resolvers)
 
 ### 2. Backend: Ask Endpoint Logic
-- [ ] Create `backend/ask.ts` with a function that orchestrates: create question note → stream AI answer → save reply on completion
+- [x] Create `backend/ask.ts` with a function that orchestrates: create question note → stream AI answer → save reply on completion
   - Accepts: `{ noteId, booqId, start, end, question, targetQuote, authorId }`
   - Creates the note via existing `addNote()` from `backend/notes.ts`
   - Generates AI answer stream via existing `generateAnswerStreaming()` from `backend/copilot.ts`
   - On stream completion: saves reply via `addReply()` from `backend/replies.ts` with AI user as author
   - Returns the stream to the caller
-- [ ] Ensure the stream keeps running even if the consumer disconnects (accumulate full response, save reply in a finally/completion handler)
+- [x] Ensure the stream keeps running even if the consumer disconnects (accumulate full response, save reply in a finally/completion handler)
 
 ### 3. Data Layer
 - [ ] Create `data/ask.ts` with a server action or data function that wraps `backend/ask.ts`
