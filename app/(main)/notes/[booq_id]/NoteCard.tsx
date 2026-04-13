@@ -8,17 +8,15 @@ import { ActionButton, LightButton } from '@/components/Buttons'
 import { ExpandedNoteFragmentData, NoteFragment } from './NoteFragment'
 import { RetryIcon } from '@/components/Icons'
 
-type NoteCardProps = {
-    noteFragmentData: ExpandedNoteFragmentData,
-    user: NoteAuthorData | undefined
-    expandedFragment?: { nodes: BooqNode[], range: BooqRange } | undefined
-    overlappingNotes?: BooqNote[]
-    onColorChange?: (noteId: string, newKind: string) => void
-}
-
 export function NoteCard({
     noteFragmentData, user, onColorChange,
-}: NoteCardProps) {
+}: {
+    noteFragmentData: ExpandedNoteFragmentData,
+    user: NoteAuthorData | undefined,
+    expandedFragment?: { nodes: BooqNode[], range: BooqRange } | undefined,
+    overlappingNotes?: BooqNote[],
+    onColorChange?: (noteId: string, newKind: string) => void,
+}) {
     const { note, overlapping, nodes, range } = noteFragmentData
     const { booqId } = note
     const [isEditing, setIsEditing] = useState(false)
