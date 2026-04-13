@@ -136,10 +136,10 @@ function CommentItem({ comment, booqId, user }: { comment: BooqNote, booqId: Boo
                 {isOwnComment && !isEditing && (
                     <>
                         <MenuButton onClick={() => setIsEditing(true)}>
-                            <div className='w-3 h-3'><PencilIcon /></div>
+                            <div className='w-4 h-4'><PencilIcon /></div>
                         </MenuButton>
                         <MenuButton onClick={handleRemove}>
-                            <div className='w-3 h-3'><RemoveIcon /></div>
+                            <div className='w-4 h-4'><RemoveIcon /></div>
                         </MenuButton>
                     </>
                 )}

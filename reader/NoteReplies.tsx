@@ -34,11 +34,11 @@ export function NoteReplies({
     return (
         <div className="flex flex-col gap-2">
             {replies.length > 0 && (
-                <div className="flex flex-col gap-2 border-l-2 border-dimmed/30 pl-3">
+                <div className="flex flex-col gap-3">
                     {replies.map(reply => (
                         <div key={reply.id} className="flex flex-col gap-1">
-                            <div className="text-sm text-primary">{reply.content}</div>
-                            <div className="flex items-center gap-2 text-xs text-dimmed">
+                            <div className="border-l-2 border-dimmed/30 px-3 text-sm text-primary">{reply.content}</div>
+                            <div className="flex items-center gap-2 text-xs text-dimmed px-3">
                                 <Link
                                     href={userHref({ username: reply.author.username })}
                                     className="flex items-center gap-0 hover:text-highlight min-w-0 max-w-[120px]"
@@ -55,7 +55,7 @@ export function NoteReplies({
                                 <span className="whitespace-nowrap">{formatRelativeTime(new Date(reply.createdAt))}</span>
                                 {user?.id === reply.author.id && (
                                     <MenuButton onClick={() => removeReply({ replyId: reply.id })}>
-                                        <div className="w-3 h-3"><RemoveIcon /></div>
+                                        <div className="w-4 h-4"><RemoveIcon /></div>
                                     </MenuButton>
                                 )}
                             </div>
