@@ -137,9 +137,7 @@ Add an `askQuestion` mutation/subscription that mirrors the REST endpoint:
   - Need to thread this through: `AskTarget` → `QuestionAskedTarget` → `/api/ask` → `generateAnswerStreaming`
 
 ### 15. UI Polish
-- [ ] Style question comments differently from regular comments (e.g., "?" badge or different icon)
-- [ ] Style AI replies differently from user replies (e.g., subtle background, AI badge)
-- [ ] Handle edge cases: user not authenticated (Ask menu item already gated), empty question, stream error
+- [-] Skipped for now
 
 ### 16. Cleanup
 - [ ] Remove or deprecate the standalone `copilotAnswerStream` subscription if fully replaced
