@@ -31,8 +31,9 @@ export function CommentsPanel({ booqId, comments, currentUser, followingUserIds,
     React.useEffect(() => {
         if (questionToGenerate) {
             ask(questionToGenerate)
+            setTarget({ kind: 'comment', commentId: questionToGenerate })
         }
-    }, [questionToGenerate, ask])
+    }, [questionToGenerate, ask, setTarget])
 
     const streamingReply = useMemo((): StreamingReply | undefined => {
         if (askState.status === 'streaming') {

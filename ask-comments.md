@@ -117,10 +117,7 @@ Add an `askQuestion` mutation/subscription that mirrors the REST endpoint:
 - [x] Clicking the button when a comment target is active clears the target to dismiss the panel
 
 ### 11. Fix: prevent duplicate `/generate-reply` calls on remounts
-- [ ] Ensure `useAskQuestion.ask()` is not called multiple times for the same question
-  - Current `askedRef` guard resets if CommentsPanel unmounts and remounts (e.g., panel close/open)
-  - Consider transitioning target from `question-asked` to `comment` after the call starts, so the effect only fires once
-  - Or track the asked key at module level instead of ref level
+- [x] After calling `ask()`, transition target from `question-asked` to `comment` — the effect only fires once, and remounts see `comment` instead of re-triggering
 
 ### 12. Fix: backend idempotency for AI reply generation
 - [ ] In `generateAiReply` / `askQuestion`, check if an AI reply already exists for the note before generating
