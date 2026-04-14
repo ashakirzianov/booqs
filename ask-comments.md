@@ -112,40 +112,45 @@ Add an `askQuestion` mutation/subscription that mirrors the REST endpoint:
   - Returns true for targets that should be replaced by a new text selection (empty, selection, ask, comment, question-asked)
   - Returns false for targets that need user interaction to dismiss (note, create-comment, quote)
 
-### 10. Fix: prevent duplicate `/generate-reply` calls on remounts
+### 10. Fix: Comments button not highlighted and can't dismiss panel after ask
+- [ ] After asking a question, the right panel opens via `hasCommentTarget` but `commentsPanelOpen` stays false — so the Comments button isn't highlighted
+- [ ] Clicking the Comments button toggles `commentsPanelOpen` but doesn't clear the comment/question-asked target, so the panel stays open
+- [ ] Fix: when `hasCommentTarget` is true, the Comments button should appear selected, and clicking it should clear the target (set to `empty`) to dismiss the panel
+
+### 11. Fix: prevent duplicate `/generate-reply` calls on remounts
 - [ ] Ensure `useAskQuestion.ask()` is not called multiple times for the same question
   - Current `askedRef` guard resets if CommentsPanel unmounts and remounts (e.g., panel close/open)
   - Consider transitioning target from `question-asked` to `comment` after the call starts, so the effect only fires once
   - Or track the asked key at module level instead of ref level
 
-### 11. Fix: backend idempotency for AI reply generation
+### 12. Fix: backend idempotency for AI reply generation
 - [ ] In `generateAiReply` / `askQuestion`, check if an AI reply already exists for the note before generating
   - Query `replies` table for `note_id` + `author_id = AI_USER_ID`
   - If found, return a stream of the existing reply content (or skip generation)
   - Prevents duplicate AI replies if the endpoint is called multiple times
 
-### 12. Refactor: consistent note CRUD return types
+### 13. Refactor: consistent note CRUD return types
 - [ ] Decide: either revert `addNote` to return just optimistic data (the `posted` promise is no longer used by any caller), or make `removeNote` and `updateNote` also return `{ optimistic, posted }` for consistency
   - `addNote` currently returns `{ optimistic, posted }` but no caller uses `posted`
   - `removeNote` returns `boolean`, `updateNote` returns `undefined`
 
-### 13. Restore: footnote context for AI questions from notes
+### 14. Restore: footnote context for AI questions from notes
 - [ ] The old Ask flow passed `note.content` as a `footnote` to the AI prompt when asking from `NoteTargetMenu` (ask about a highlighted/commented passage)
   - This gave the AI extra context: "The user has provided this note about the selected passage: ..."
   - `buildPromptForAnswer` in `backend/copilot.ts` still supports the `footnote` parameter
   - Need to thread this through: `AskTarget` → `QuestionAskedTarget` → `/api/ask` → `generateAnswerStreaming`
 
-### 14. UI Polish
+### 15. UI Polish
 - [ ] Style question comments differently from regular comments (e.g., "?" badge or different icon)
 - [ ] Style AI replies differently from user replies (e.g., subtle background, AI badge)
 - [ ] Handle edge cases: user not authenticated (Ask menu item already gated), empty question, stream error
 
-### 15. Cleanup
+### 16. Cleanup
 - [ ] Remove or deprecate the standalone `copilotAnswerStream` subscription if fully replaced
 - [ ] Remove `AnswerDisplay` component from `AskTargetMenu` (answer phase moves to CommentsPanel)
 - [ ] Update SPECS.md with the new Ask + Comments behavior
 
-### 16. Naming
+### 17. Naming
 - [ ] Rename `ContextMenuTarget` → `ReaderTarget` (or similar) — it now represents general reader interaction state, not just context menu targets
 - [ ] Rename `useAskQuestion` → `useGenerateReply` (or similar) — it generates a reply for a given noteId, not the full "ask" flow
 - [ ] Rename related types/functions to match
