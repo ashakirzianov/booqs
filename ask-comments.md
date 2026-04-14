@@ -131,7 +131,7 @@ Add an `askQuestion` mutation/subscription that mirrors the REST endpoint:
   - `updateNote` returns `{ optimistic: { noteId, ...body }, posted: Promise }`
 
 ### 14. Restore: footnote context for AI questions from notes
-- [ ] The old Ask flow passed `note.content` as a `footnote` to the AI prompt when asking from `NoteTargetMenu` (ask about a highlighted/commented passage)
+- [-] The old Ask flow passed `note.content` as a `footnote` to the AI prompt when asking from `NoteTargetMenu` (ask about a highlighted/commented passage)
   - This gave the AI extra context: "The user has provided this note about the selected passage: ..."
   - `buildPromptForAnswer` in `backend/copilot.ts` still supports the `footnote` parameter
   - Need to thread this through: `AskTarget` → `QuestionAskedTarget` → `/api/ask` → `generateAnswerStreaming`
