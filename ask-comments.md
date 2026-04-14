@@ -125,9 +125,10 @@ Add an `askQuestion` mutation/subscription that mirrors the REST endpoint:
 - [x] `saveAiReply` checks again before inserting — safety net for concurrent requests
 
 ### 13. Refactor: consistent note CRUD return types
-- [ ] Decide: either revert `addNote` to return just optimistic data (the `posted` promise is no longer used by any caller), or make `removeNote` and `updateNote` also return `{ optimistic, posted }` for consistency
-  - `addNote` currently returns `{ optimistic, posted }` but no caller uses `posted`
-  - `removeNote` returns `boolean`, `updateNote` returns `undefined`
+- [x] All three note CRUD functions now return `{ optimistic, posted }` or `undefined`
+  - `addNote` returns `{ optimistic: PostResponse, posted: Promise }`
+  - `removeNote` returns `{ optimistic: { noteId }, posted: Promise }`
+  - `updateNote` returns `{ optimistic: { noteId, ...body }, posted: Promise }`
 
 ### 14. Restore: footnote context for AI questions from notes
 - [ ] The old Ask flow passed `note.content` as a `footnote` to the AI prompt when asking from `NoteTargetMenu` (ask about a highlighted/commented passage)
