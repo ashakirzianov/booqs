@@ -28,6 +28,18 @@ export async function repliesForNotes(noteIds: string[]): Promise<DbReplyWithAut
   return rows as DbReplyWithAuthor[]
 }
 
+export async function hasReplyFromAuthor({ noteId, authorId }: {
+  noteId: string,
+  authorId: string,
+}): Promise<boolean> {
+  const rows = await sql`
+    SELECT 1 FROM replies
+    WHERE note_id = ${noteId} AND author_id = ${authorId}
+    LIMIT 1
+  `
+  return rows.length > 0
+}
+
 export async function addReply({
   id,
   noteId,

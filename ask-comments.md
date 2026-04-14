@@ -120,10 +120,9 @@ Add an `askQuestion` mutation/subscription that mirrors the REST endpoint:
 - [x] After calling `ask()`, transition target from `question-asked` to `comment` — the effect only fires once, and remounts see `comment` instead of re-triggering
 
 ### 12. Fix: backend idempotency for AI reply generation
-- [ ] In `generateAiReply` / `askQuestion`, check if an AI reply already exists for the note before generating
-  - Query `replies` table for `note_id` + `author_id = AI_USER_ID`
-  - If found, return a stream of the existing reply content (or skip generation)
-  - Prevents duplicate AI replies if the endpoint is called multiple times
+- [x] Added `hasReplyFromAuthor` query in `backend/replies.ts`
+- [x] `generateAiReply` checks before starting generation — returns `ALREADY_EXISTS` error if AI reply exists
+- [x] `saveAiReply` checks again before inserting — safety net for concurrent requests
 
 ### 13. Refactor: consistent note CRUD return types
 - [ ] Decide: either revert `addNote` to return just optimistic data (the `posted` promise is no longer used by any caller), or make `removeNote` and `updateNote` also return `{ optimistic, posted }` for consistency

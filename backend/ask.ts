@@ -1,6 +1,6 @@
 import { BooqId } from '@/core'
 import { nanoid } from 'nanoid'
-import { addReply } from './replies'
+import { addReply, hasReplyFromAuthor } from './replies'
 import { generateAnswerStreaming } from './copilot'
 import { noteForId } from './notes'
 import { AI_USER_ID, ensureAiUser } from './aiUser'
@@ -16,6 +16,11 @@ export async function generateAiReply(noteId: string): Promise<GenerateAiReplyRe
     }
     if (!note.content) {
         return { success: false, error: { message: 'Note has no content', code: 'NO_CONTENT' } }
+    }
+
+    const alreadyReplied = await hasReplyFromAuthor({ noteId, authorId: AI_USER_ID })
+    if (alreadyReplied) {
+        return { success: false, error: { message: 'AI reply already exists', code: 'ALREADY_EXISTS' } }
     }
 
     const result = await generateAnswerStreaming({
@@ -75,6 +80,8 @@ function createReplySavingStream(
 async function saveAiReply(noteId: string, content: string): Promise<void> {
     try {
         await ensureAiUser()
+        const alreadyReplied = await hasReplyFromAuthor({ noteId, authorId: AI_USER_ID })
+        if (alreadyReplied) return
         await addReply({
             id: nanoid(10),
             noteId,
