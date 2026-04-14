@@ -9,17 +9,17 @@ import { NoteReplies } from './NoteReplies'
 import { useBooqNotes } from '@/application/notes'
 import { BackIcon, PencilIcon, RemoveIcon } from '@/components/Icons'
 import { MenuButton } from './MenuButton'
-import { ContextMenuTarget } from './ContextMenuContent'
+import { MenuState } from './ContextMenuContent'
 import { useAskQuestion } from '@/application/ask'
 
-export function CommentsPanel({ booqId, comments, currentUser, followingUserIds, isFollowingLoading, target, setTarget }: {
+export function CommentsPanel({ booqId, comments, currentUser, followingUserIds, isFollowingLoading, target, setMenuState }: {
     booqId: BooqId,
     comments: BooqNote[],
     currentUser?: NoteAuthorData,
     followingUserIds?: string[],
     isFollowingLoading?: boolean,
-    target: ContextMenuTarget,
-    setTarget: (target: ContextMenuTarget) => void,
+    target: MenuState,
+    setMenuState: (target: MenuState) => void,
 }) {
     const selectedCommentId = target.kind === 'comment' ? target.commentId
         : target.kind === 'question-asked' ? target.commentId
@@ -31,9 +31,9 @@ export function CommentsPanel({ booqId, comments, currentUser, followingUserIds,
     React.useEffect(() => {
         if (questionToGenerate) {
             ask(questionToGenerate)
-            setTarget({ kind: 'comment', commentId: questionToGenerate })
+            setMenuState({ kind: 'comment', commentId: questionToGenerate })
         }
-    }, [questionToGenerate, ask, setTarget])
+    }, [questionToGenerate, ask, setMenuState])
 
     const streamingReply = useMemo((): StreamingReply | undefined => {
         if (askState.status === 'streaming') {
@@ -48,7 +48,7 @@ export function CommentsPanel({ booqId, comments, currentUser, followingUserIds,
             comments={comments}
             selectedCommentId={selectedCommentId}
             currentUser={currentUser}
-            onBack={() => setTarget({ kind: 'empty' })}
+            onBack={() => setMenuState({ kind: 'empty' })}
             streamingReply={streamingReply}
         />
     }
@@ -59,7 +59,7 @@ export function CommentsPanel({ booqId, comments, currentUser, followingUserIds,
         currentUser={currentUser}
         followingUserIds={followingUserIds}
         isFollowingLoading={isFollowingLoading}
-        onSelectComment={(commentId) => setTarget({ kind: 'comment', commentId })}
+        onSelectComment={(commentId) => setMenuState({ kind: 'comment', commentId })}
     />
 }
 

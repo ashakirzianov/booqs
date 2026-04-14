@@ -5,16 +5,16 @@ import {
     VirtualElement,
 } from '@/viewer'
 import { useFloater } from '@/components/Floater'
-import { ContextMenuTargetSetter } from './useContextMenuState'
-import { isTargetDismissable } from './ContextMenuContent'
+import { MenuStateSetter } from './useMenuState'
+import { isStateDismissable } from './ContextMenuContent'
 
 export function useContextMenuFloater({
     anchor, Content,
-    setTarget,
+    setMenuState,
 }: {
     anchor?: VirtualElement,
     Content: React.ReactNode,
-    setTarget: ContextMenuTargetSetter,
+    setMenuState: MenuStateSetter,
 }) {
     const [locked, setLocked] = useState(false)
     const isOpen = !locked && (Content !== null) && (anchor !== undefined)
@@ -23,7 +23,7 @@ export function useContextMenuFloater({
         isOpen,
         setIsOpen(open: boolean) {
             if (!open) {
-                setTarget({ kind: 'empty' })
+                setMenuState({ kind: 'empty' })
             }
         },
         Content,
@@ -37,8 +37,8 @@ export function useContextMenuFloater({
 
     useEffect(() => {
         function handleSelectionChange() {
-            setTarget(prev => {
-                if (isTargetDismissable(prev)) {
+            setMenuState(prev => {
+                if (isStateDismissable(prev)) {
                     const selection = getBooqSelection()
                     if (selection) {
                         return { kind: 'selection', selection }
@@ -79,7 +79,7 @@ export function useContextMenuFloater({
             window.document.removeEventListener('touchcancel', unlock)
             window.document.removeEventListener('selectionchange', handleSelectionChange)
         }
-    }, [setTarget, setLocked, floating])
+    }, [setMenuState, setLocked, floating])
 
     return {
         ContextMenuNode: FloaterNode,

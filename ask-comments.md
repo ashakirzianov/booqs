@@ -149,8 +149,10 @@ Add an `askQuestion` mutation/subscription that mirrors the REST endpoint:
 - [x] Updated SPECS.md
 
 ### 17. Naming
-- [ ] Rename `ContextMenuTarget` → `ReaderTarget` (or similar) — it now represents general reader interaction state, not just context menu targets
+- [x] Renamed `ContextMenuTarget` → `MenuState`, `ContextMenuTargetSetter` → `MenuStateSetter`
+- [x] Renamed `useContextMenuState` → `useMenuState`, file `useContextMenuState.ts` → `useMenuState.ts`
+- [x] Renamed `setTarget`/`setMenuTarget` → `setMenuState`, `menuTarget` → `menuState` throughout
+- [x] Renamed `isTargetDismissable` → `isStateDismissable`
 - [ ] Rename `useAskQuestion` → `useGenerateReply` (or similar) — it generates a reply for a given noteId, not the full "ask" flow
-- [ ] Rename related types/functions to match
 
 ## Suggestions

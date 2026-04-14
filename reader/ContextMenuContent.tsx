@@ -50,12 +50,12 @@ export type QuestionAskedTarget = {
     kind: 'question-asked',
     commentId: string,
 }
-export type ContextMenuTarget =
+export type MenuState =
     | EmptyTarget | SelectionTarget | QuoteTarget | NoteTarget | CreateCommentTarget | AskTarget
     | CommentTarget | QuestionAskedTarget
 
-export function isTargetDismissable(target: ContextMenuTarget): boolean {
-    switch (target.kind) {
+export function isStateDismissable(state: MenuState): boolean {
+    switch (state.kind) {
         case 'empty':
         case 'selection':
         case 'ask':
@@ -68,61 +68,61 @@ export function isTargetDismissable(target: ContextMenuTarget): boolean {
 }
 
 export function ContextMenuContent({
-    target, booqId, user, setTarget,
+    target, booqId, user, setMenuState,
 }: {
-    target: ContextMenuTarget,
+    target: MenuState,
     booqId: BooqId,
     user: NoteAuthorData | undefined,
-    setTarget: (target: ContextMenuTarget) => void,
+    setMenuState: (target: MenuState) => void,
 }) {
     switch (target.kind) {
         case 'selection':
-            return <SelectionTargetMenu target={target} booqId={booqId} user={user} setTarget={setTarget} />
+            return <SelectionTargetMenu target={target} booqId={booqId} user={user} setMenuState={setMenuState} />
         case 'quote':
-            return <QuoteTargetMenu target={target} booqId={booqId} user={user} setTarget={setTarget} />
+            return <QuoteTargetMenu target={target} booqId={booqId} user={user} setMenuState={setMenuState} />
         case 'note':
-            return <NoteTargetMenu target={target} booqId={booqId} user={user} setTarget={setTarget} />
+            return <NoteTargetMenu target={target} booqId={booqId} user={user} setMenuState={setMenuState} />
         case 'create-comment':
-            return <CreateCommentTargetMenu target={target} booqId={booqId} user={user} setTarget={setTarget} />
+            return <CreateCommentTargetMenu target={target} booqId={booqId} user={user} setMenuState={setMenuState} />
         case 'ask':
-            return <AskTargetMenu booqId={booqId} target={target} setTarget={setTarget} user={user} />
+            return <AskTargetMenu booqId={booqId} target={target} setMenuState={setMenuState} user={user} />
         default:
             return null
     }
 }
 
 function SelectionTargetMenu({
-    target, booqId, user, setTarget
+    target, booqId, user, setMenuState
 }: {
     target: SelectionTarget,
     booqId: BooqId,
     user: NoteAuthorData | undefined,
-    setTarget: (target: ContextMenuTarget) => void,
+    setMenuState: (target: MenuState) => void,
 }) {
     const { selection } = target
     useCopyQuote(booqId, selection)
     return <>
-        <AddHighlightItem booqId={booqId} user={user} setTarget={setTarget} selection={selection} />
-        <AddCommentItem target={target} user={user} setTarget={setTarget} />
-        <AskMenuItem target={target} user={user} setTarget={setTarget} />
-        <CopyQuoteItem selection={selection} booqId={booqId} setTarget={setTarget} />
+        <AddHighlightItem booqId={booqId} user={user} setMenuState={setMenuState} selection={selection} />
+        <AddCommentItem target={target} user={user} setMenuState={setMenuState} />
+        <AskMenuItem target={target} user={user} setMenuState={setMenuState} />
+        <CopyQuoteItem selection={selection} booqId={booqId} setMenuState={setMenuState} />
     </>
 }
 
 function QuoteTargetMenu({
-    target, booqId, user, setTarget
+    target, booqId, user, setMenuState
 }: {
     target: QuoteTarget,
     booqId: BooqId,
     user: NoteAuthorData | undefined,
-    setTarget: (target: ContextMenuTarget) => void,
+    setMenuState: (target: MenuState) => void,
 }) {
     const { selection } = target
     return <>
-        <AddHighlightItem booqId={booqId} user={user} setTarget={setTarget} selection={selection} />
-        <AddCommentItem target={target} user={user} setTarget={setTarget} />
-        <AskMenuItem target={target} user={user} setTarget={setTarget} />
-        <CopyTextItem selection={selection} booqId={booqId} setTarget={setTarget} />
+        <AddHighlightItem booqId={booqId} user={user} setMenuState={setMenuState} selection={selection} />
+        <AddCommentItem target={target} user={user} setMenuState={setMenuState} />
+        <AskMenuItem target={target} user={user} setMenuState={setMenuState} />
+        <CopyTextItem selection={selection} booqId={booqId} setMenuState={setMenuState} />
     </>
 }
 

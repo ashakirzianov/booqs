@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { useMemo, useState } from 'react'
 import * as clipboard from 'clipboard-polyfill'
 import { BooqId } from '@/core'
-import type { ContextMenuTarget, NoteTarget } from './ContextMenuContent'
+import type { MenuState, NoteTarget } from './ContextMenuContent'
 import { ColorPicker } from '@/components/ColorPicker'
 import { formatRelativeTime } from '@/application/common'
 import { HIGHLIGHT_KINDS, useBooqNotes } from '@/application/notes'
@@ -15,12 +15,12 @@ import { userHref } from '@/common/href'
 import { MenuButton } from './MenuButton'
 
 export function NoteTargetMenu({
-    target, booqId, user, setTarget
+    target, booqId, user, setMenuState
 }: {
     target: NoteTarget,
     booqId: BooqId,
     user: NoteAuthorData | undefined,
-    setTarget: (target: ContextMenuTarget) => void,
+    setMenuState: (target: MenuState) => void,
 }) {
     const { noteId, editMode } = target
     const { notes, updateNote, removeNote } = useBooqNotes({ booqId, user })
@@ -41,12 +41,12 @@ export function NoteTargetMenu({
     const handleRemoveNote = () => {
         if (note) {
             removeNote({ noteId: note.id })
-            setTarget({ kind: 'empty' })
+            setMenuState({ kind: 'empty' })
         }
     }
 
     const handleEditNote = () => {
-        setTarget({
+        setMenuState({
             ...target,
             editMode: true,
         })
@@ -54,7 +54,7 @@ export function NoteTargetMenu({
 
     const handleSaveNote = () => {
         updateNote({ noteId, content: editContent })
-        setTarget({
+        setMenuState({
             ...target,
             editMode: false,
         })
@@ -62,14 +62,14 @@ export function NoteTargetMenu({
 
     const handleCancelEdit = () => {
         setEditContent(note.content ?? '')
-        setTarget({
+        setMenuState({
             ...target,
             editMode: false,
         })
     }
 
     const handleAskQuestion = () => {
-        setTarget({
+        setMenuState({
             kind: 'ask',
             selection: target.selection,
         })
@@ -78,7 +78,7 @@ export function NoteTargetMenu({
     const handleShareNote = () => {
         const quote = generateQuote(booqId, target.selection.text, target.selection.range)
         clipboard.writeText(quote)
-        setTarget({ kind: 'empty' })
+        setMenuState({ kind: 'empty' })
     }
 
     return (

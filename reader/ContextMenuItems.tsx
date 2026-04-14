@@ -9,7 +9,7 @@ import { ProfileBadge } from '@/components/ProfilePicture'
 import { ColorPicker } from '@/components/ColorPicker'
 import { useBooqNotes } from '@/application/notes'
 import { CommentIcon, CopyIcon, LinkIcon, RemoveIcon, ShareIcon, QuestionMarkIcon, SmallSpinner } from '@/components/Icons'
-import type { ContextMenuTarget, SelectionTarget, QuoteTarget, NoteTarget } from './ContextMenuContent'
+import type { MenuState, SelectionTarget, QuoteTarget, NoteTarget } from './ContextMenuContent'
 import { BooqNote, NoteAuthorData } from '@/data/notes'
 import { ReactNode } from 'react'
 
@@ -44,12 +44,12 @@ export function AuthorItem({ name, pictureUrl, emoji, username }: {
 }
 
 export function AddHighlightItem({
-    selection, booqId, user, setTarget,
+    selection, booqId, user, setMenuState,
 }: {
     selection: BooqSelection,
     booqId: BooqId,
     user: NoteAuthorData | undefined,
-    setTarget: (target: ContextMenuTarget) => void,
+    setMenuState: (target: MenuState) => void,
 }) {
     const { addNote } = useBooqNotes({ booqId, user })
     if (!user?.id) {
@@ -63,7 +63,7 @@ export function AddHighlightItem({
             targetQuote: selection.text,
         })
         if (result) {
-            setTarget({
+            setMenuState({
                 kind: 'note',
                 noteId: result.optimistic.id,
                 selection: selection,
@@ -83,11 +83,11 @@ export function AddHighlightItem({
 }
 
 export function AddCommentItem({
-    target, user, setTarget,
+    target, user, setMenuState,
 }: {
     target: SelectionTarget | QuoteTarget | NoteTarget,
     user: NoteAuthorData | undefined,
-    setTarget: (target: ContextMenuTarget) => void,
+    setMenuState: (target: MenuState) => void,
 }) {
     if (!user?.id) {
         return null
@@ -96,7 +96,7 @@ export function AddCommentItem({
         text='Add comment'
         icon={<ContextMenuIcon><CommentIcon /></ContextMenuIcon>}
         callback={() => {
-            setTarget({
+            setMenuState({
                 kind: 'create-comment',
                 parent: target,
             })
@@ -105,12 +105,12 @@ export function AddCommentItem({
 }
 
 export function RemoveNoteItem({
-    note, booqId, setTarget, user,
+    note, booqId, setMenuState, user,
 }: {
     note: BooqNote,
     booqId: BooqId,
     user: NoteAuthorData | undefined,
-    setTarget: (target: ContextMenuTarget) => void,
+    setMenuState: (target: MenuState) => void,
 }) {
     const { removeNote } = useBooqNotes({ booqId, user })
     return <MenuItem
@@ -118,17 +118,17 @@ export function RemoveNoteItem({
         icon={<ContextMenuIcon><RemoveIcon /></ContextMenuIcon>}
         callback={() => {
             removeNote({ noteId: note.id })
-            setTarget({ kind: 'empty' })
+            setMenuState({ kind: 'empty' })
         }}
     />
 }
 
 export function CopyQuoteItem({
-    selection, booqId, setTarget,
+    selection, booqId, setMenuState,
 }: {
     selection: BooqSelection,
     booqId: BooqId,
-    setTarget: (target: ContextMenuTarget) => void,
+    setMenuState: (target: MenuState) => void,
 }) {
     const { prefetch } = useRouter()
     return <MenuItem
@@ -141,7 +141,7 @@ export function CopyQuoteItem({
             prefetch(quoteHref({
                 booqId, range: selection.range,
             }))
-            setTarget({ kind: 'empty' })
+            setMenuState({ kind: 'empty' })
         }}
     />
 }
@@ -152,11 +152,11 @@ export function generateQuote(booqId: BooqId, text: string, range: BooqRange) {
 }
 
 export function CopyTextItem({
-    selection, setTarget,
+    selection, setMenuState,
 }: {
     selection: BooqSelection,
     booqId: BooqId,
-    setTarget: (target: ContextMenuTarget) => void,
+    setMenuState: (target: MenuState) => void,
 }) {
     return <MenuItem
         text='Copy text'
@@ -165,17 +165,17 @@ export function CopyTextItem({
             const text = selection.text
             clipboard.writeText(text)
             removeSelection()
-            setTarget({ kind: 'empty' })
+            setMenuState({ kind: 'empty' })
         }}
     />
 }
 
 export function CopyLinkItem({
-    selection, booqId, setTarget,
+    selection, booqId, setMenuState,
 }: {
     selection: BooqSelection,
     booqId: BooqId,
-    setTarget: (target: ContextMenuTarget) => void,
+    setMenuState: (target: MenuState) => void,
 }) {
     const { prefetch } = useRouter()
     return <MenuItem
@@ -188,7 +188,7 @@ export function CopyLinkItem({
             prefetch(quoteHref({
                 booqId, range: selection.range,
             }))
-            setTarget({ kind: 'empty' })
+            setMenuState({ kind: 'empty' })
         }}
     />
 }
@@ -200,11 +200,11 @@ function ContextMenuIcon({ children }: {
 }
 
 export function AskMenuItem({
-    target, user, setTarget,
+    target, user, setMenuState,
 }: {
     target: SelectionTarget | QuoteTarget,
     user: NoteAuthorData | undefined,
-    setTarget: (target: ContextMenuTarget) => void,
+    setMenuState: (target: MenuState) => void,
 }) {
     if (!user?.id) {
         return null
@@ -213,7 +213,7 @@ export function AskMenuItem({
         text='Ask question'
         icon={<ContextMenuIcon><QuestionMarkIcon /></ContextMenuIcon>}
         callback={() => {
-            setTarget({
+            setMenuState({
                 kind: 'ask',
                 selection: target.selection,
             })

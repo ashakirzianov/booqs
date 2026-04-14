@@ -1,6 +1,6 @@
 'use client'
 import { useState } from 'react'
-import type { AskTarget, ContextMenuTarget } from './ContextMenuContent'
+import type { AskTarget, MenuState } from './ContextMenuContent'
 import type { BooqId } from '@/core/model'
 import { AskIcon, RemoveIcon } from '@/components/Icons'
 import { MenuButton } from './MenuButton'
@@ -8,11 +8,11 @@ import { useBooqNotes, QUESTION_KIND } from '@/application/notes'
 import { NoteAuthorData } from '@/data/notes'
 
 export function AskTargetMenu({
-    target, setTarget, booqId, user,
+    target, setMenuState, booqId, user,
 }: {
     booqId: BooqId,
     target: AskTarget,
-    setTarget: (target: ContextMenuTarget) => void,
+    setMenuState: (target: MenuState) => void,
     user: NoteAuthorData | undefined,
 }) {
     const [question, setQuestion] = useState('')
@@ -32,7 +32,7 @@ export function AskTargetMenu({
 
         if (result) {
             const posted = await result.posted
-            setTarget({ kind: 'question-asked', commentId: posted.id })
+            setMenuState({ kind: 'question-asked', commentId: posted.id })
         }
     }
 
@@ -58,7 +58,7 @@ export function AskTargetMenu({
                     <div className="w-4 h-4"><AskIcon /></div>
                     Ask
                 </MenuButton>
-                <MenuButton onClick={() => setTarget({ kind: 'empty' })}>
+                <MenuButton onClick={() => setMenuState({ kind: 'empty' })}>
                     <div className="w-4 h-4"><RemoveIcon /></div>
                     Cancel
                 </MenuButton>

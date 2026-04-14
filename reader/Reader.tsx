@@ -24,7 +24,7 @@ import { useScrollToQuote } from './useScrollToQuote'
 import { useScrollHandler } from './useScrollHandler'
 import { useControlsVisibility } from './useControlsVisibility'
 import { useAugmentations } from './useAugmentations'
-import { useContextMenuState } from './useContextMenuState'
+import { useMenuState } from './useMenuState'
 import { ContextMenuContent } from './ContextMenuContent'
 import { usePageData } from './usePageData'
 import { useNavigationState } from './useNavigationState'
@@ -97,16 +97,16 @@ export function Reader({
 
     const [commentsPanelOpen, setCommentsPanelOpen] = React.useState(false)
 
-    const { anchor, menuTarget, setMenuTarget, contextMenuAugmentations, displayTarget } = useContextMenuState()
-    const hasCommentTarget = menuTarget.kind === 'comment' || menuTarget.kind === 'question-asked'
+    const { anchor, menuState, setMenuState, contextMenuAugmentations, displayTarget } = useMenuState()
+    const hasCommentTarget = menuState.kind === 'comment' || menuState.kind === 'question-asked'
     const ContextMenuContentNode = useMemo(() => {
         return <ContextMenuContent
             booqId={booqId}
             user={user}
-            target={menuTarget}
-            setTarget={setMenuTarget}
+            target={menuState}
+            setMenuState={setMenuState}
         />
-    }, [booqId, user, menuTarget, setMenuTarget])
+    }, [booqId, user, menuState, setMenuState])
 
     const FloaterMenuContent = useMemo(() => {
         if (displayTarget !== 'floater') {
@@ -120,7 +120,7 @@ export function Reader({
     } = useContextMenuFloater({
         Content: FloaterMenuContent,
         anchor: anchor,
-        setTarget: setMenuTarget,
+        setMenuState: setMenuState,
     })
 
     const NavigationContent = <NavigationPanel
@@ -144,7 +144,7 @@ export function Reader({
     const isCommentsPanelVisible = commentsPanelOpen || hasCommentTarget
     const toggleCommentsPanel = () => {
         if (hasCommentTarget) {
-            setMenuTarget({ kind: 'empty' })
+            setMenuState({ kind: 'empty' })
             setCommentsPanelOpen(false)
         } else {
             setCommentsPanelOpen(prev => !prev)
@@ -173,8 +173,8 @@ export function Reader({
                     currentUser={user}
                     followingUserIds={followingUserIds}
                     isFollowingLoading={isFollowingLoading}
-                    target={menuTarget}
-                    setTarget={setMenuTarget}
+                    target={menuState}
+                    setMenuState={setMenuState}
                 />
             </div>
         </>
@@ -196,10 +196,10 @@ export function Reader({
         return (id: string) => {
             const next = menuTargetForAugmentation(id)
             if (next) {
-                setMenuTarget(next)
+                setMenuState(next)
             }
         }
-    }, [menuTargetForAugmentation, setMenuTarget])
+    }, [menuTargetForAugmentation, setMenuState])
 
     const { visible } = useControlsVisibility()
     const isControlsVisible = (FloaterMenuContent === null) && visible
