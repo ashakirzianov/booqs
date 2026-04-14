@@ -36,10 +36,7 @@ export function CommentsPanel({ booqId, comments, currentUser, followingUserIds,
 
     const streamingReply = useMemo((): StreamingReply | undefined => {
         if (askState.status === 'streaming') {
-            return { noteId: askState.noteId, answer: askState.answer, isStreaming: true }
-        }
-        if (askState.status === 'done') {
-            return { noteId: askState.noteId, answer: askState.answer, isStreaming: false }
+            return { noteId: askState.noteId, answer: askState.answer }
         }
         return undefined
     }, [askState])
@@ -68,7 +65,6 @@ export function CommentsPanel({ booqId, comments, currentUser, followingUserIds,
 type StreamingReply = {
     noteId: string,
     answer: string,
-    isStreaming: boolean,
 }
 
 function CommentsList({ booqId, comments, currentUser, followingUserIds, isFollowingLoading, onSelectComment }: {
@@ -280,10 +276,7 @@ function CommentItem({ comment, booqId, user, streamingReply }: {
 
             {/* Streaming AI reply */}
             {showStreamingReply && (
-                <StreamingReplyDisplay
-                    answer={streamingReply.answer}
-                    isStreaming={streamingReply.isStreaming}
-                />
+                <StreamingReplyDisplay answer={streamingReply.answer} />
             )}
 
             {/* Replies */}
@@ -292,9 +285,8 @@ function CommentItem({ comment, booqId, user, streamingReply }: {
     )
 }
 
-function StreamingReplyDisplay({ answer, isStreaming }: {
+function StreamingReplyDisplay({ answer }: {
     answer: string,
-    isStreaming: boolean,
 }) {
     return (
         <div className="flex flex-col gap-1">
@@ -302,7 +294,7 @@ function StreamingReplyDisplay({ answer, isStreaming }: {
                 {answer || (
                     <span className="text-dimmed animate-pulse">Thinking...</span>
                 )}
-                {isStreaming && answer && (
+                {answer && (
                     <span className="inline-block w-1.5 h-3.5 bg-action/50 ml-0.5 animate-pulse" />
                 )}
             </div>
