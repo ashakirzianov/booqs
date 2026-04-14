@@ -106,27 +106,21 @@ The email magic link flow exists as server actions in [data/auth.ts](data/auth.t
 
 ---
 
-## 5. Copilot Answer Streaming Subscription
+## 5. AI Reply Generation Subscription
 
-### What exists
-- `/api/copilot/answer/stream` streams AI answers as text chunks for the web app
-- `copilot(context).answer(question)` returns the full response in one shot
-- graphql-yoga supports subscriptions out of the box (WebSocket via graphql-ws, or SSE)
+### Schema
+```graphql
+type Subscription {
+    generateReply(noteId: ID!): String!
+}
+```
 
-### Schema changes
-- [x] Add `Subscription` type:
-  ```graphql
-  type Subscription {
-      copilotAnswerStream(context: CopilotContext!, question: String!): String!
-  }
-  ```
-
-### Resolver changes
-- [x] Implement subscription resolver that wraps the existing streaming AI call and yields text chunks as they arrive
-- [x] Configure graphql-yoga subscription transport (WebSocket/SSE) — graphql-yoga supports SSE out of the box, no extra config needed
-
-### Notes
-- Each event yields the next text chunk (or accumulated text — either works). The Flutter side will subscribe over WebSocket and display text incrementally.
+### What it does
+- Looks up the note by ID, extracts booqId/range/question from it
+- Generates an AI answer via streaming
+- Saves the reply on completion (authored by sentinel AI user `booqs-ai`)
+- Yields text chunks as they arrive
+- The web app uses `/api/generate-reply/[noteId]` REST endpoint instead
 
 ---
 
@@ -280,19 +274,6 @@ type User {
 
 ---
 
-## 12. Copilot streaming context fields
-
-### What exists
-- REST `/api/copilot/answer/stream` accepts optional `footnote` parameter for additional context
-- GraphQL `copilotAnswerStream` subscription only accepts `context` and `question`
-
-### Schema changes
-- [x] Add `footnote` parameter to subscription:
-  ```graphql
-  type Subscription {
-      copilotAnswerStream(context: CopilotContext!, question: String!, footnote: String): String!
-  }
-  ```
 
 ---
 
@@ -302,13 +283,12 @@ type User {
 2. **Magic link mutations** — builds on bearer token (returns token in body)
 3. **Library browse** — independent, straightforward wrapper
 4. **Notes redesign** — replaces myNotes with more flexible query pattern
-5. **Copilot streaming** — independent, depends on subscription transport setup
+5. **AI reply subscription** — independent, depends on subscription transport setup
 6. **Presigned upload mutations** — depends on backend presigned URL support (see [BOOK-UPLOAD.md](BOOK-UPLOAD.md))
 7. **Expose styles** — needed for styled rendering via GraphQL
 8. **Expanded fragment query** — needed for note previews with context
 9. **Passkey management** — needed for full profile management
 10. **History pagination** — needed for large reading histories
-11. **Copilot context fields** — improves AI answer quality
 
 ---
 

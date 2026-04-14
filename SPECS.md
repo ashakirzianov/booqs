@@ -719,7 +719,7 @@ All main pages are server components that fetch data directly from the data laye
 - `auth/` - Authentication endpoints (magic link, passkey, sign-up completion)
 - `booq/` - Book data endpoints
 - `collections/` - Collection management
-- `copilot/` - AI answer generation
+- `ai.ts` - AI answer generation
 - `graphql/` - GraphQL API endpoint (graphql-yoga)
 - `images/` - Image serving with size variants
 - `me/` - Current user data

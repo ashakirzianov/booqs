@@ -9,7 +9,7 @@ import { bookmarkResolver } from './bookmark'
 import { noteResolver } from './note'
 import { replyResolver } from './reply'
 import { userResolver } from './user'
-import { copilotResolver } from './copilot'
+import { aiResolver } from './ai'
 import { authorResolver } from './author'
 import { GraphQLScalarType } from 'graphql'
 
@@ -24,7 +24,7 @@ export const resolvers: IResolvers = {
     ...noteResolver,
     ...replyResolver,
     ...userResolver,
-    ...copilotResolver,
+    ...aiResolver,
     BooqNode: namedJsonScalar('BooqNode'),
     WebAtuhnCredentialCreationOptions: namedJsonScalar('WebAtuhnCredentialCreationOptions'),
     WebAtuhnCredentialRequestOptions: namedJsonScalar('WebAtuhnCredentialRequestOptions'),

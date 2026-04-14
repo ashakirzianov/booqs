@@ -2,7 +2,7 @@ import { generateAiReply } from '@/backend/ask'
 import { IResolvers } from '@graphql-tools/utils'
 import { ResolverContext } from './context'
 
-export const copilotResolver: IResolvers = {
+export const aiResolver: IResolvers = {
     Subscription: {
         generateReply: {
             async *subscribe(_: unknown, { noteId }: {

@@ -2,7 +2,7 @@
 import { useState } from 'react'
 import type { AskTarget, ContextMenuTarget } from './ContextMenuContent'
 import type { BooqId } from '@/core/model'
-import { CopilotIcon, RemoveIcon } from '@/components/Icons'
+import { AskIcon, RemoveIcon } from '@/components/Icons'
 import { MenuButton } from './MenuButton'
 import { useBooqNotes, QUESTION_KIND } from '@/application/notes'
 import { NoteAuthorData } from '@/data/notes'
@@ -55,7 +55,7 @@ export function AskTargetMenu({
             />
             <div className="flex flex-row justify-start gap-4">
                 <MenuButton onClick={handleAsk}>
-                    <div className="w-4 h-4"><CopilotIcon /></div>
+                    <div className="w-4 h-4"><AskIcon /></div>
                     Ask
                 </MenuButton>
                 <MenuButton onClick={() => setTarget({ kind: 'empty' })}>

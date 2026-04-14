@@ -1,7 +1,7 @@
 import { BooqId } from '@/core'
 import { nanoid } from 'nanoid'
 import { addReply, hasReplyFromAuthor } from './replies'
-import { generateAnswerStreaming } from './copilot'
+import { generateAnswerStreaming } from './ai'
 import { noteForId } from './notes'
 import { AI_USER_ID, ensureAiUser } from './aiUser'
 
