@@ -71,9 +71,7 @@ export function NoteTargetMenu({
     const handleAskQuestion = () => {
         setTarget({
             kind: 'ask',
-            question: undefined,
             selection: target.selection,
-            footnote: note.content || undefined,
         })
     }
 

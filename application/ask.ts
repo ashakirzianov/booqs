@@ -1,6 +1,6 @@
 'use client'
 
-import { BooqId, BooqPath } from '@/core'
+import { BooqId } from '@/core'
 import { useState, useCallback, useRef } from 'react'
 import { useSWRConfig } from 'swr'
 
@@ -19,12 +19,7 @@ export function useAskQuestion({
     const { mutate } = useSWRConfig()
     const abortRef = useRef<AbortController | undefined>(undefined)
 
-    const ask = useCallback(({ noteId, start, end, question }: {
-        noteId: string,
-        start: BooqPath,
-        end: BooqPath,
-        question: string,
-    }) => {
+    const ask = useCallback((noteId: string) => {
         abortRef.current?.abort()
         const controller = new AbortController()
         abortRef.current = controller
@@ -32,7 +27,7 @@ export function useAskQuestion({
         setState({ status: 'streaming', noteId, answer: '' })
 
         streamAnswer({
-            body: { noteId, booqId, start, end, question },
+            noteId,
             signal: controller.signal,
             onChunk(chunk) {
                 setState(prev =>
@@ -62,22 +57,20 @@ export function useAskQuestion({
     }
 }
 
-async function streamAnswer({ body, signal, onChunk, onError, onDone }: {
-    body: object,
+async function streamAnswer({ noteId, signal, onChunk, onError, onDone }: {
+    noteId: string,
     signal: AbortSignal,
     onChunk: (chunk: string) => void,
     onError: (error: string) => void,
     onDone: () => void,
 }) {
     try {
-        const res = await fetch('/api/generate-reply', {
+        const res = await fetch(`/api/generate-reply/${noteId}`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(body),
             signal,
         })
         if (!res.ok) {
-            onError('Failed to ask question')
+            onError('Failed to generate reply')
             return
         }
         const reader = res.body?.getReader()

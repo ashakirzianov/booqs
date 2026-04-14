@@ -77,7 +77,7 @@ function sameTarget(a: ContextMenuTarget, b: ContextMenuTarget) {
         }
     }
     if (a.kind === 'ask' && b.kind === 'ask') {
-        if (a.selection.text === b.selection.text && a.question === b.question && a.hidden === b.hidden) {
+        if (a.selection.text === b.selection.text) {
             return true
         }
     }
@@ -116,13 +116,7 @@ function displayTargetForMenuTarget(menuTarget: ContextMenuTarget): DisplayTarge
         case 'empty':
             return 'none'
         case 'ask':
-            if (menuTarget.hidden) {
-                return 'none'
-            } else if (menuTarget.question !== undefined) {
-                return 'side-panel'
-            } else {
-                return 'floater'
-            }
+            return 'floater'
         default:
             return 'floater'
     }

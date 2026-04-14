@@ -13,6 +13,7 @@ export const HIGHLIGHT_KINDS = [
     'highlight-0', 'highlight-1', 'highlight-2', 'highlight-3', 'highlight-4',
 ]
 export const COMMENT_KIND = 'comment'
+export const QUESTION_KIND = 'question'
 
 export function useBooqNotes({
     booqId, user, initialNotes,

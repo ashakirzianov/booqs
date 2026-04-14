@@ -54,20 +54,13 @@ export const copilotResolver: IResolvers<CopilotParent> = {
             },
         },
         generateReply: {
-            async *subscribe(_: unknown, { noteId, context, question }: {
+            async *subscribe(_: unknown, { noteId }: {
                 noteId: string,
-                context: CopilotInput,
-                question: string,
             }, { userId }: ResolverContext) {
                 if (!userId) {
                     return
                 }
-                const result = await generateAiReply({
-                    noteId,
-                    booqId: context.booqId as BooqId,
-                    range: { start: context.start, end: context.end },
-                    question,
-                })
+                const result = await generateAiReply(noteId)
                 if (!result.success) {
                     return
                 }

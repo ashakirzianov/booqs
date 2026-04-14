@@ -119,3 +119,6 @@ Add an `askQuestion` mutation/subscription that mirrors the REST endpoint:
 - [ ] Update SPECS.md with the new Ask + Comments behavior
 
 ## Suggestions
+- Rename `ContextMenuTarget` → `ReaderTarget` (or similar) — it now represents general reader interaction state, not just context menu targets
+- Rename `useAskQuestion` → `useGenerateReply` (or similar) — it now just generates a reply for a given noteId, not the full "ask" flow
+- The generate-reply endpoint may fail if it arrives before the note creation POST completes (race condition with optimistic updates) — add retry logic or wait-for-note if this becomes an issue in practice

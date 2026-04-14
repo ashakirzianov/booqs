@@ -40,16 +40,22 @@ export type CreateCommentTarget = {
 }
 export type AskTarget = {
     kind: 'ask',
-    question: string | undefined,
     selection: BooqSelection,
-    hidden?: boolean,
-    footnote?: string,
+}
+export type CommentTarget = {
+    kind: 'comment',
+    commentId: string,
+}
+export type QuestionAskedTarget = {
+    kind: 'question-asked',
+    commentId: string,
 }
 export type ContextMenuTarget =
     | EmptyTarget | SelectionTarget | QuoteTarget | NoteTarget | CreateCommentTarget | AskTarget
+    | CommentTarget | QuestionAskedTarget
 
 export function ContextMenuContent({
-    target, booqId, user, setTarget
+    target, booqId, user, setTarget,
 }: {
     target: ContextMenuTarget,
     booqId: BooqId,
@@ -66,7 +72,7 @@ export function ContextMenuContent({
         case 'create-comment':
             return <CreateCommentTargetMenu target={target} booqId={booqId} user={user} setTarget={setTarget} />
         case 'ask':
-            return <AskTargetMenu booqId={booqId} target={target} setTarget={setTarget} />
+            return <AskTargetMenu booqId={booqId} target={target} setTarget={setTarget} user={user} />
         default:
             return null
     }

@@ -1,27 +1,28 @@
-import { BooqId, BooqRange } from '@/core'
+import { BooqId } from '@/core'
 import { nanoid } from 'nanoid'
 import { addReply } from './replies'
 import { generateAnswerStreaming } from './copilot'
+import { noteForId } from './notes'
 import { AI_USER_ID, ensureAiUser } from './aiUser'
-
-export type GenerateAiReplyParams = {
-    noteId: string,
-    booqId: BooqId,
-    range: BooqRange,
-    question: string,
-}
 
 export type GenerateAiReplyResult =
     | { success: true, stream: ReadableStream<Uint8Array> }
     | { success: false, error: { message: string, code: string } }
 
-export async function generateAiReply({
-    noteId,
-    booqId,
-    range,
-    question,
-}: GenerateAiReplyParams): Promise<GenerateAiReplyResult> {
-    const result = await generateAnswerStreaming({ booqId, range, question })
+export async function generateAiReply(noteId: string): Promise<GenerateAiReplyResult> {
+    const note = await noteForId(noteId)
+    if (!note) {
+        return { success: false, error: { message: 'Note not found', code: 'NOT_FOUND' } }
+    }
+    if (!note.content) {
+        return { success: false, error: { message: 'Note has no content', code: 'NO_CONTENT' } }
+    }
+
+    const result = await generateAnswerStreaming({
+        booqId: note.booq_id as BooqId,
+        range: { start: note.start_path, end: note.end_path },
+        question: note.content,
+    })
     if (!result.success) {
         return result
     }

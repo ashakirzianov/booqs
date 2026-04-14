@@ -18,7 +18,7 @@ import { useNotesData } from './useNotesData'
 import { useFollowingData } from './useFollowingData'
 import { AccountButton } from '@/components/AccountButton'
 import { usePathname, useSearchParams } from 'next/navigation'
-import { BackIcon, TocIcon, CommentIcon, QuestionMarkIcon } from '@/components/Icons'
+import { BackIcon, TocIcon, CommentIcon } from '@/components/Icons'
 import Link from 'next/link'
 import { useScrollToQuote } from './useScrollToQuote'
 import { useScrollHandler } from './useScrollHandler'
@@ -164,6 +164,8 @@ export function Reader({
                     currentUser={user}
                     followingUserIds={followingUserIds}
                     isFollowingLoading={isFollowingLoading}
+                    target={menuTarget}
+                    setTarget={setMenuTarget}
                 />
             </div>
         </>
@@ -192,31 +194,8 @@ export function Reader({
 
     const { visible } = useControlsVisibility()
     const isControlsVisible = (FloaterMenuContent === null) && visible
-    // Auto-open right panel when context menu should be displayed in side panel and not hidden
-    const shouldShowRightPanel = commentsPanelOpen || (displayTarget === 'side-panel')
-
-    const toggleAskVisibility = useMemo(() => {
-        return () => {
-            setMenuTarget(menuTarget => {
-                if (menuTarget.kind === 'ask') {
-                    return {
-                        ...menuTarget,
-                        hidden: menuTarget.hidden === true ? false : true,
-                    }
-                }
-                return menuTarget
-            })
-        }
-    }, [setMenuTarget])
-    const showAskButton = menuTarget.kind === 'ask' && menuTarget.question !== undefined
-    const AskButton = showAskButton ? (
-        <PanelButton
-            onClick={toggleAskVisibility}
-            selected={menuTarget.hidden !== true}
-        >
-            <QuestionMarkIcon />
-        </PanelButton>
-    ) : null
+    const hasCommentTarget = menuTarget.kind === 'comment' || menuTarget.kind === 'question-asked'
+    const shouldShowRightPanel = commentsPanelOpen || hasCommentTarget || (displayTarget === 'side-panel')
 
     const LeftButtons = <>
         <Link href={feedHref()}>
@@ -229,7 +208,6 @@ export function Reader({
 
     const showLoadingIndicator = useIsLoading()
     const RightButtons = <>
-        {AskButton}
         {CommentsButton}
         <ThemerButton />
         <AccountButton

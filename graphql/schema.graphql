@@ -14,7 +14,7 @@ type Query {
 }
 type Subscription {
     copilotAnswerStream(context: CopilotContext!, question: String!, footnote: String): String!
-    generateReply(noteId: ID!, context: CopilotContext!, question: String!): String!
+    generateReply(noteId: ID!): String!
 }
 type Mutation {
     addBookmark(bookmark: BookmarkInput!): MutationResult!

@@ -215,7 +215,6 @@ export function AskMenuItem({
         callback={() => {
             setTarget({
                 kind: 'ask',
-                question: undefined,
                 selection: target.selection,
             })
         }}

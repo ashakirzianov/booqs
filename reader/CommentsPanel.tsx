@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import Link from 'next/link'
 import { BooqId, pathToId } from '@/core'
 import { TabButton } from './TabButton'
@@ -9,30 +9,48 @@ import { NoteReplies } from './NoteReplies'
 import { useBooqNotes } from '@/application/notes'
 import { BackIcon, PencilIcon, RemoveIcon } from '@/components/Icons'
 import { MenuButton } from './MenuButton'
-export type StreamingReply = {
-    noteId: string,
-    answer: string,
-    isStreaming: boolean,
-}
+import { ContextMenuTarget } from './ContextMenuContent'
+import { useAskQuestion } from '@/application/ask'
 
-export function CommentsPanel({ booqId, comments, currentUser, followingUserIds, isFollowingLoading, selectedCommentId, onSelectComment, onBack, streamingReply }: {
+export function CommentsPanel({ booqId, comments, currentUser, followingUserIds, isFollowingLoading, target, setTarget }: {
     booqId: BooqId,
     comments: BooqNote[],
     currentUser?: NoteAuthorData,
     followingUserIds?: string[],
     isFollowingLoading?: boolean,
-    selectedCommentId?: string,
-    onSelectComment?: (commentId: string) => void,
-    onBack?: () => void,
-    streamingReply?: StreamingReply,
+    target: ContextMenuTarget,
+    setTarget: (target: ContextMenuTarget) => void,
 }) {
+    const selectedCommentId = target.kind === 'comment' ? target.commentId
+        : target.kind === 'question-asked' ? target.commentId
+        : undefined
+
+    const { ask, state: askState } = useAskQuestion({ booqId })
+
+    const questionToGenerate = target.kind === 'question-asked' ? target.commentId : undefined
+    React.useEffect(() => {
+        if (questionToGenerate) {
+            ask(questionToGenerate)
+        }
+    }, [questionToGenerate, ask])
+
+    const streamingReply = useMemo((): StreamingReply | undefined => {
+        if (askState.status === 'streaming') {
+            return { noteId: askState.noteId, answer: askState.answer, isStreaming: true }
+        }
+        if (askState.status === 'done') {
+            return { noteId: askState.noteId, answer: askState.answer, isStreaming: false }
+        }
+        return undefined
+    }, [askState])
+
     if (selectedCommentId) {
         return <CommentDetail
             booqId={booqId}
             comments={comments}
             selectedCommentId={selectedCommentId}
             currentUser={currentUser}
-            onBack={onBack}
+            onBack={() => setTarget({ kind: 'empty' })}
             streamingReply={streamingReply}
         />
     }
@@ -43,8 +61,14 @@ export function CommentsPanel({ booqId, comments, currentUser, followingUserIds,
         currentUser={currentUser}
         followingUserIds={followingUserIds}
         isFollowingLoading={isFollowingLoading}
-        onSelectComment={onSelectComment}
+        onSelectComment={(commentId) => setTarget({ kind: 'comment', commentId })}
     />
+}
+
+type StreamingReply = {
+    noteId: string,
+    answer: string,
+    isStreaming: boolean,
 }
 
 function CommentsList({ booqId, comments, currentUser, followingUserIds, isFollowingLoading, onSelectComment }: {
@@ -53,7 +77,7 @@ function CommentsList({ booqId, comments, currentUser, followingUserIds, isFollo
     currentUser?: NoteAuthorData,
     followingUserIds?: string[],
     isFollowingLoading?: boolean,
-    onSelectComment?: (commentId: string) => void,
+    onSelectComment: (commentId: string) => void,
 }) {
     const [commentsFilter, setCommentsFilter] = React.useState<'all' | 'following'>('all')
 
@@ -101,8 +125,8 @@ function CommentsList({ booqId, comments, currentUser, followingUserIds, isFollo
                         ) : (
                             filteredComments.map(note => (
                                 <div key={note.id}
-                                    onClick={() => onSelectComment?.(note.id)}
-                                    className={onSelectComment ? 'cursor-pointer hover:bg-dimmed/5 rounded-lg transition-colors' : ''}
+                                    onClick={() => onSelectComment(note.id)}
+                                    className='cursor-pointer hover:bg-dimmed/5 rounded-lg transition-colors'
                                 >
                                     <CommentItem comment={note} booqId={booqId} user={currentUser} />
                                 </div>
@@ -120,7 +144,7 @@ function CommentDetail({ booqId, comments, selectedCommentId, currentUser, onBac
     comments: BooqNote[],
     selectedCommentId: string,
     currentUser?: NoteAuthorData,
-    onBack?: () => void,
+    onBack: () => void,
     streamingReply?: StreamingReply,
 }) {
     const selectedComment = comments.find(c => c.id === selectedCommentId)
@@ -132,16 +156,14 @@ function CommentDetail({ booqId, comments, selectedCommentId, currentUser, onBac
             <div className='flex flex-1 flex-col text-dimmed max-h-full text-sm'>
                 <div className='flex flex-col flex-1 overflow-auto mt-lg'>
                     <div className='flex flex-col xl:py-0 xl:px-4 space-y-3'>
-                        {onBack && (
-                            <button
-                                onClick={onBack}
-                                className='flex items-center gap-1 text-dimmed hover:text-primary transition-colors bg-transparent border-none cursor-pointer self-start'
-                                style={{ fontFamily: 'var(--font-main)' }}
-                            >
-                                <div className='w-4 h-4'><BackIcon /></div>
-                                <span className='text-sm'>All comments</span>
-                            </button>
-                        )}
+                        <button
+                            onClick={onBack}
+                            className='flex items-center gap-1 text-dimmed hover:text-primary transition-colors bg-transparent border-none cursor-pointer self-start'
+                            style={{ fontFamily: 'var(--font-main)' }}
+                        >
+                            <div className='w-4 h-4'><BackIcon /></div>
+                            <span className='text-sm'>All comments</span>
+                        </button>
                     </div>
                     <div className='flex flex-col flex-1 xl:py-0 xl:px-4 space-y-6'>
                         {selectedComment ? (

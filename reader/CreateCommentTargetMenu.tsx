@@ -31,7 +31,7 @@ export function CreateCommentTargetMenu({
         })
 
         if (note) {
-            setTarget({ kind: 'empty' })
+            setTarget({ kind: 'comment', commentId: note.id })
             removeSelection()
         }
     }

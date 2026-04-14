@@ -1,40 +1,38 @@
 'use client'
 import { useState } from 'react'
 import type { AskTarget, ContextMenuTarget } from './ContextMenuContent'
-import { useCopilotAnswerStream } from '@/application/copilot'
-import type { BooqId, BooqRange } from '@/core/model'
-import { CopilotIcon, CloseIcon, RemoveIcon } from '@/components/Icons'
+import type { BooqId } from '@/core/model'
+import { CopilotIcon, RemoveIcon } from '@/components/Icons'
 import { MenuButton } from './MenuButton'
+import { useBooqNotes, QUESTION_KIND } from '@/application/notes'
+import { NoteAuthorData } from '@/data/notes'
 
 export function AskTargetMenu({
-    target, setTarget, booqId
+    target, setTarget, booqId, user,
 }: {
     booqId: BooqId,
     target: AskTarget,
     setTarget: (target: ContextMenuTarget) => void,
+    user: NoteAuthorData | undefined,
 }) {
-    const [question, setQuestion] = useState(target.question || '')
+    const [question, setQuestion] = useState('')
+    const { addNote } = useBooqNotes({ booqId, user })
 
     function handleAsk() {
-        if (question.trim()) {
-            setTarget({
-                ...target,
-                question: question.trim()
-            })
-        }
-    }
+        if (!question.trim() || !user) return
 
-    // If there's already a question set, show the answer display
-    if (target.question !== undefined) {
-        return (
-            <AnswerDisplay
-                booqId={booqId}
-                question={target.question}
-                range={target.selection.range}
-                footnote={target.footnote}
-                onClose={() => setTarget({ kind: 'empty' })}
-            />
-        )
+        const selection = target.selection
+        const note = addNote({
+            kind: QUESTION_KIND,
+            range: selection.range,
+            content: question.trim(),
+            privacy: 'public',
+            targetQuote: selection.text,
+        })
+
+        if (note) {
+            setTarget({ kind: 'question-asked', commentId: note.id })
+        }
     }
 
     return (
@@ -44,7 +42,6 @@ export function AskTargetMenu({
                 onChange={(e) => setQuestion(e.target.value)}
                 onKeyDown={(e) => {
                     if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
-                        // Cmd/Ctrl+Enter submits the form
                         e.preventDefault()
                         handleAsk()
                     }
@@ -56,90 +53,13 @@ export function AskTargetMenu({
                 autoFocus
             />
             <div className="flex flex-row justify-start gap-4">
-                <MenuButton
-                    onClick={handleAsk}
-                >
+                <MenuButton onClick={handleAsk}>
                     <div className="w-4 h-4"><CopilotIcon /></div>
                     Ask
                 </MenuButton>
-                <MenuButton
-                    onClick={() => setTarget({ kind: 'empty' })}
-                >
+                <MenuButton onClick={() => setTarget({ kind: 'empty' })}>
                     <div className="w-4 h-4"><RemoveIcon /></div>
                     Cancel
-                </MenuButton>
-            </div>
-        </div>
-    )
-}
-
-function AnswerDisplay({
-    booqId,
-    question,
-    range,
-    footnote,
-    onClose
-}: {
-    booqId: BooqId,
-    question: string,
-    range: BooqRange,
-    footnote?: string,
-    onClose: () => void
-}) {
-    const { isLoading, answer, error } = useCopilotAnswerStream({
-        booqId,
-        start: range.start,
-        end: range.end,
-        question,
-        footnote,
-    })
-
-    return (
-        <div className="px-3 py-3 gap-3 flex flex-col bg-background">
-            <div className="mb-3">
-                <div className="text-sm font-medium text-primary mb-2">Question:</div>
-                <div className="text-sm text-dimmed italic">&ldquo;{question}&rdquo;</div>
-            </div>
-
-            {footnote && (
-                <div className="mb-3">
-                    <div className="text-sm font-medium text-primary mb-2">Note:</div>
-                    <div className="text-sm text-dimmed bg-subtle p-2 rounded border-l-2 border-action">
-                        {footnote}
-                    </div>
-                </div>
-            )}
-
-            <div className="mb-3">
-                <div className="text-sm font-medium text-primary mb-2">Answer:</div>
-                <div className="text-sm text-primary leading-relaxed" style={{ fontFamily: 'var(--font-main)' }}>
-                    {isLoading ? (
-                        <div className="text-dimmed">
-                            {answer ? (
-                                <div className="space-y-2">
-                                    <div>{answer}</div>
-                                    <div className="text-xs text-dimmed animate-pulse">...</div>
-                                </div>
-                            ) : (
-                                <div>Loading answer...</div>
-                            )}
-                        </div>
-                    ) : error ? (
-                        <div className="text-alert">Error: {error}</div>
-                    ) : answer ? (
-                        <div className="space-y-2">
-                            {answer}
-                        </div>
-                    ) : (
-                        <div className="text-dimmed">No answer available.</div>
-                    )}
-                </div>
-            </div>
-
-            <div className="flex flex-row justify-start">
-                <MenuButton onClick={onClose}>
-                    <div className="w-4 h-4"><CloseIcon /></div>
-                    Close
                 </MenuButton>
             </div>
         </div>

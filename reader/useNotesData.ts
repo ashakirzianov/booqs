@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { BooqId, BooqRange, pathInRange, pathLessThan } from '@/core'
-import { HIGHLIGHT_KINDS, COMMENT_KIND, useBooqNotes } from '@/application/notes'
+import { HIGHLIGHT_KINDS, COMMENT_KIND, QUESTION_KIND, useBooqNotes } from '@/application/notes'
 import { BooqNote, NoteAuthorData } from '@/data/notes'
 
 export function useNotesData({
@@ -52,7 +52,7 @@ export function useNotesData({
     const comments = useMemo(() => {
         if (!currentRange) return []
         return sortedNotes.filter(note =>
-            note.kind === COMMENT_KIND
+            (note.kind === COMMENT_KIND || note.kind === QUESTION_KIND)
             && pathInRange(note.range.start, currentRange)
             && note.content
             && note.content.trim()?.length > 0
