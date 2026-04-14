@@ -3,7 +3,6 @@
 import { BooqId, BooqPath } from '@/core'
 import { useState, useCallback, useRef } from 'react'
 import { useSWRConfig } from 'swr'
-import { nanoid } from 'nanoid'
 
 export type AskState =
     | { status: 'idle' }
@@ -20,21 +19,20 @@ export function useAskQuestion({
     const { mutate } = useSWRConfig()
     const abortRef = useRef<AbortController | undefined>(undefined)
 
-    const ask = useCallback(({ start, end, question, targetQuote }: {
+    const ask = useCallback(({ noteId, start, end, question }: {
+        noteId: string,
         start: BooqPath,
         end: BooqPath,
         question: string,
-        targetQuote: string,
     }) => {
         abortRef.current?.abort()
         const controller = new AbortController()
         abortRef.current = controller
 
-        const noteId = nanoid(10)
         setState({ status: 'streaming', noteId, answer: '' })
 
         streamAnswer({
-            body: { noteId, booqId, start, end, question, targetQuote },
+            body: { noteId, booqId, start, end, question },
             signal: controller.signal,
             onChunk(chunk) {
                 setState(prev =>
@@ -56,8 +54,6 @@ export function useAskQuestion({
                 mutate(`/api/notes?booq_id=${booqId}`)
             },
         })
-
-        return noteId
     }, [booqId, mutate])
 
     return {
@@ -74,7 +70,7 @@ async function streamAnswer({ body, signal, onChunk, onError, onDone }: {
     onDone: () => void,
 }) {
     try {
-        const res = await fetch('/api/ask', {
+        const res = await fetch('/api/generate-reply', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(body),

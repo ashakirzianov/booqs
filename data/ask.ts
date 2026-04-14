@@ -1,14 +1,12 @@
 'use server'
 import { BooqId, BooqRange } from '@/core'
-import { askQuestion, AskQuestionResult } from '@/backend/ask'
+import { generateAiReply, GenerateAiReplyResult } from '@/backend/ask'
 
-export async function askBooqQuestion({ noteId, booqId, range, question, targetQuote, authorId }: {
+export async function generateAiReplyForQuestion({ noteId, booqId, range, question }: {
     noteId: string,
     booqId: BooqId,
     range: BooqRange,
     question: string,
-    targetQuote: string,
-    authorId: string,
-}): Promise<AskQuestionResult> {
-    return askQuestion({ noteId, booqId, range, question, targetQuote, authorId })
+}): Promise<GenerateAiReplyResult> {
+    return generateAiReply({ noteId, booqId, range, question })
 }

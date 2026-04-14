@@ -1,7 +1,7 @@
 export const maxDuration = 60
 
 import { BooqId, BooqPath } from '@/core'
-import { askBooqQuestion } from '@/data/ask'
+import { generateAiReplyForQuestion } from '@/data/ask'
 import { getUserIdInsideRequest } from '@/data/request'
 
 type PostBody = {
@@ -10,7 +10,6 @@ type PostBody = {
     start: BooqPath,
     end: BooqPath,
     question: string,
-    targetQuote: string,
 }
 
 export async function POST(request: Request) {
@@ -19,7 +18,7 @@ export async function POST(request: Request) {
         return Response.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { noteId, booqId, start, end, question, targetQuote }: PostBody = await request.json()
+    const { noteId, booqId, start, end, question }: PostBody = await request.json()
 
     if (
         typeof noteId !== 'string'
@@ -27,18 +26,15 @@ export async function POST(request: Request) {
         || !Array.isArray(start)
         || !Array.isArray(end)
         || typeof question !== 'string'
-        || typeof targetQuote !== 'string'
     ) {
         return Response.json({ error: 'Invalid request' }, { status: 400 })
     }
 
-    const result = await askBooqQuestion({
+    const result = await generateAiReplyForQuestion({
         noteId,
         booqId: booqId as BooqId,
         range: { start, end },
         question,
-        targetQuote,
-        authorId: userId,
     })
 
     if (!result.success) {

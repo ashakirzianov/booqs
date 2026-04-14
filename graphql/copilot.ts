@@ -1,5 +1,5 @@
 import { generateSuggestions, generateAnswer, generateAnswerStreaming } from '@/backend/copilot'
-import { askQuestion } from '@/backend/ask'
+import { generateAiReply } from '@/backend/ask'
 import { BooqId } from '@/core'
 import { IResolvers } from '@graphql-tools/utils'
 import { ResolverContext } from './context'
@@ -53,28 +53,25 @@ export const copilotResolver: IResolvers<CopilotParent> = {
                 yield* streamChunks('copilotAnswerStream', result.stream)
             },
         },
-        askQuestion: {
-            async *subscribe(_: unknown, { noteId, context, question, targetQuote }: {
+        generateReply: {
+            async *subscribe(_: unknown, { noteId, context, question }: {
                 noteId: string,
                 context: CopilotInput,
                 question: string,
-                targetQuote: string,
             }, { userId }: ResolverContext) {
                 if (!userId) {
                     return
                 }
-                const result = await askQuestion({
+                const result = await generateAiReply({
                     noteId,
                     booqId: context.booqId as BooqId,
                     range: { start: context.start, end: context.end },
                     question,
-                    targetQuote,
-                    authorId: userId,
                 })
                 if (!result.success) {
                     return
                 }
-                yield* streamChunks('askQuestion', result.stream)
+                yield* streamChunks('generateReply', result.stream)
             },
         },
     },

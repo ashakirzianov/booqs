@@ -1,50 +1,31 @@
 import { BooqId, BooqRange } from '@/core'
 import { nanoid } from 'nanoid'
-import { addNote } from './notes'
 import { addReply } from './replies'
 import { generateAnswerStreaming } from './copilot'
 import { AI_USER_ID, ensureAiUser } from './aiUser'
 
-export type AskQuestionParams = {
+export type GenerateAiReplyParams = {
     noteId: string,
     booqId: BooqId,
     range: BooqRange,
     question: string,
-    targetQuote: string,
-    authorId: string,
 }
 
-export type AskQuestionResult =
+export type GenerateAiReplyResult =
     | { success: true, stream: ReadableStream<Uint8Array> }
     | { success: false, error: { message: string, code: string } }
 
-export async function askQuestion({
+export async function generateAiReply({
     noteId,
     booqId,
     range,
     question,
-    targetQuote,
-    authorId,
-}: AskQuestionParams): Promise<AskQuestionResult> {
-    // 1. Create the question note
-    await addNote({
-        id: noteId,
-        authorId,
-        booqId,
-        range,
-        kind: 'question',
-        content: question,
-        targetQuote,
-        privacy: 'public',
-    })
-
-    // 2. Generate the AI answer stream
+}: GenerateAiReplyParams): Promise<GenerateAiReplyResult> {
     const result = await generateAnswerStreaming({ booqId, range, question })
     if (!result.success) {
         return result
     }
 
-    // 3. Wrap the stream to save the reply on completion
     const stream = createReplySavingStream(result.stream, noteId)
     return { success: true, stream }
 }

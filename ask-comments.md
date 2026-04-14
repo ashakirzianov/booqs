@@ -97,13 +97,15 @@ Add an `askQuestion` mutation/subscription that mirrors the REST endpoint:
 - [x] Wire "back" button: returns to list mode
 
 ### 8. Reader Integration: Ask Flow
-- [ ] Modify the Ask flow in Reader to:
+- [x] Modify the Ask flow in Reader to:
   1. Keep existing question input UI (floater with textarea)
   2. On question submit: create optimistic comment note, open CommentsPanel in detail mode for that note, start streaming via `useAskQuestion`
   3. Remove the current `AskTargetMenu` answer display phase — the CommentsPanel detail view handles it now
-- [ ] Update `useContextMenuState` — Ask target no longer needs `'side-panel'` display for the answer phase
-- [ ] Auto-open CommentsPanel (right panel) when Ask flow starts streaming
-- [ ] Ensure the question input floater still works as before (positioning near selection)
+- [x] Update `useContextMenuState` — Ask target no longer needs `'side-panel'` display for the answer phase
+- [x] Auto-open CommentsPanel (right panel) when Ask flow starts streaming
+- [x] Ensure the question input floater still works as before (positioning near selection)
+- [x] Simplify `AskTarget` type — removed `question`, `hidden`, `footnote` fields (no longer needed)
+- [x] Add `QUESTION_KIND` constant and update `useNotesData` to include questions in the comments list
 
 ### 9. UI Polish
 - [ ] Style question comments differently from regular comments (e.g., "?" badge or different icon)
