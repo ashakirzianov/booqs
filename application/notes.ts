@@ -119,7 +119,7 @@ export function useBooqNotes({
             privacy,
         }
 
-        postNoteTrigger({
+        const posted = postNoteTrigger({
             body: postBody,
             noteId,
         }, {
@@ -129,7 +129,7 @@ export function useBooqNotes({
                     : { notes: [optimisticResponse] },
         })
 
-        return optimisticResponse
+        return { optimistic: optimisticResponse, posted }
     }
 
     const { trigger: deleteNoteTrigger } = useSWRMutation(

@@ -57,15 +57,15 @@ export function AddHighlightItem({
     }
 
     const handleColorChange = (kind: string) => {
-        const note = addNote({
+        const result = addNote({
             kind,
             range: selection.range,
             targetQuote: selection.text,
         })
-        if (note) {
+        if (result) {
             setTarget({
                 kind: 'note',
-                noteId: note.id,
+                noteId: result.optimistic.id,
                 selection: selection,
             })
             window.getSelection()?.empty()

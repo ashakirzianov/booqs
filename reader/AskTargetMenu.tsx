@@ -18,11 +18,11 @@ export function AskTargetMenu({
     const [question, setQuestion] = useState('')
     const { addNote } = useBooqNotes({ booqId, user })
 
-    function handleAsk() {
+    async function handleAsk() {
         if (!question.trim() || !user) return
 
         const selection = target.selection
-        const note = addNote({
+        const result = addNote({
             kind: QUESTION_KIND,
             range: selection.range,
             content: question.trim(),
@@ -30,8 +30,9 @@ export function AskTargetMenu({
             targetQuote: selection.text,
         })
 
-        if (note) {
-            setTarget({ kind: 'question-asked', commentId: note.id })
+        if (result) {
+            const posted = await result.posted
+            setTarget({ kind: 'question-asked', commentId: posted.id })
         }
     }
 

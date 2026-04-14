@@ -22,7 +22,7 @@ export function CreateCommentTargetMenu({
     const handlePost = () => {
         if (!user?.id || !comment.trim()) return
 
-        const note = addNote({
+        const result = addNote({
             kind: 'comment',
             range: selection.range,
             content: comment.trim(),
@@ -30,8 +30,8 @@ export function CreateCommentTargetMenu({
             targetQuote: selection.text,
         })
 
-        if (note) {
-            setTarget({ kind: 'comment', commentId: note.id })
+        if (result) {
+            setTarget({ kind: 'comment', commentId: result.optimistic.id })
             removeSelection()
         }
     }
