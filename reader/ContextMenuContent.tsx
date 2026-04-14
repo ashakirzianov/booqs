@@ -54,6 +54,19 @@ export type ContextMenuTarget =
     | EmptyTarget | SelectionTarget | QuoteTarget | NoteTarget | CreateCommentTarget | AskTarget
     | CommentTarget | QuestionAskedTarget
 
+export function isTargetDismissable(target: ContextMenuTarget): boolean {
+    switch (target.kind) {
+        case 'empty':
+        case 'selection':
+        case 'ask':
+        case 'comment':
+        case 'question-asked':
+            return true
+        default:
+            return false
+    }
+}
+
 export function ContextMenuContent({
     target, booqId, user, setTarget,
 }: {

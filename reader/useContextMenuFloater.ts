@@ -6,6 +6,7 @@ import {
 } from '@/viewer'
 import { useFloater } from '@/components/Floater'
 import { ContextMenuTargetSetter } from './useContextMenuState'
+import { isTargetDismissable } from './ContextMenuContent'
 
 export function useContextMenuFloater({
     anchor, Content,
@@ -37,7 +38,7 @@ export function useContextMenuFloater({
     useEffect(() => {
         function handleSelectionChange() {
             setTarget(prev => {
-                if (prev.kind === 'empty' || prev.kind === 'selection' || prev.kind === 'ask') {
+                if (isTargetDismissable(prev)) {
                     const selection = getBooqSelection()
                     if (selection) {
                         return { kind: 'selection', selection }

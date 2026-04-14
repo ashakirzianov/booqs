@@ -108,9 +108,9 @@ Add an `askQuestion` mutation/subscription that mirrors the REST endpoint:
 - [x] Add `QUESTION_KIND` constant and update `useNotesData` to include questions in the comments list
 
 ### 9. Fix: context menu broken after asking question
-- [ ] Add `isTargetDismissable` (or similar) function to `useContextMenuState`
-  - Currently `useContextMenuFloater.ts` line 40 hardcodes `prev.kind === 'empty' || prev.kind === 'selection' || prev.kind === 'ask'` — new text selections are ignored when target is `question-asked` or `comment`
-  - The function should return true for any target that should be replaced by a new text selection (empty, selection, ask, comment, question-asked)
+- [x] Add `isTargetDismissable` function to `ContextMenuContent` and use it in `useContextMenuFloater`
+  - Returns true for targets that should be replaced by a new text selection (empty, selection, ask, comment, question-asked)
+  - Returns false for targets that need user interaction to dismiss (note, create-comment, quote)
 
 ### 10. Fix: prevent duplicate `/generate-reply` calls on remounts
 - [ ] Ensure `useAskQuestion.ask()` is not called multiple times for the same question
