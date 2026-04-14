@@ -96,9 +96,9 @@ export function Reader({
     const { followingUserIds, isLoading: isFollowingLoading } = useFollowingData({ user })
 
     const [commentsPanelOpen, setCommentsPanelOpen] = React.useState(false)
-    const toggleCommentsPanelOpen = () => setCommentsPanelOpen(prev => !prev)
 
     const { anchor, menuTarget, setMenuTarget, contextMenuAugmentations, displayTarget } = useContextMenuState()
+    const hasCommentTarget = menuTarget.kind === 'comment' || menuTarget.kind === 'question-asked'
     const ContextMenuContentNode = useMemo(() => {
         return <ContextMenuContent
             booqId={booqId}
@@ -141,9 +141,18 @@ export function Reader({
         <TocIcon />
     </PanelButton>
 
+    const isCommentsPanelVisible = commentsPanelOpen || hasCommentTarget
+    const toggleCommentsPanel = () => {
+        if (hasCommentTarget) {
+            setMenuTarget({ kind: 'empty' })
+            setCommentsPanelOpen(false)
+        } else {
+            setCommentsPanelOpen(prev => !prev)
+        }
+    }
     const CommentsButton = <PanelButton
-        onClick={toggleCommentsPanelOpen}
-        selected={commentsPanelOpen}
+        onClick={toggleCommentsPanel}
+        selected={isCommentsPanelVisible}
     >
         <CommentIcon />
     </PanelButton>
@@ -194,8 +203,7 @@ export function Reader({
 
     const { visible } = useControlsVisibility()
     const isControlsVisible = (FloaterMenuContent === null) && visible
-    const hasCommentTarget = menuTarget.kind === 'comment' || menuTarget.kind === 'question-asked'
-    const shouldShowRightPanel = commentsPanelOpen || hasCommentTarget || (displayTarget === 'side-panel')
+    const shouldShowRightPanel = isCommentsPanelVisible || (displayTarget === 'side-panel')
 
     const LeftButtons = <>
         <Link href={feedHref()}>

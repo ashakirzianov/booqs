@@ -113,9 +113,8 @@ Add an `askQuestion` mutation/subscription that mirrors the REST endpoint:
   - Returns false for targets that need user interaction to dismiss (note, create-comment, quote)
 
 ### 10. Fix: Comments button not highlighted and can't dismiss panel after ask
-- [ ] After asking a question, the right panel opens via `hasCommentTarget` but `commentsPanelOpen` stays false — so the Comments button isn't highlighted
-- [ ] Clicking the Comments button toggles `commentsPanelOpen` but doesn't clear the comment/question-asked target, so the panel stays open
-- [ ] Fix: when `hasCommentTarget` is true, the Comments button should appear selected, and clicking it should clear the target (set to `empty`) to dismiss the panel
+- [x] Comments button now reflects both `commentsPanelOpen` and comment target state via `isCommentsPanelVisible`
+- [x] Clicking the button when a comment target is active clears the target to dismiss the panel
 
 ### 11. Fix: prevent duplicate `/generate-reply` calls on remounts
 - [ ] Ensure `useAskQuestion.ask()` is not called multiple times for the same question
