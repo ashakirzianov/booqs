@@ -39,14 +39,14 @@ export function useAskQuestion({
             onError(error) {
                 setState({ status: 'error', noteId, error })
             },
-            onDone() {
+            async onDone() {
+                await mutate(`/api/replies?note_id=${noteId}`)
+                mutate(`/api/notes?booq_id=${booqId}`)
                 setState(prev =>
                     prev.status === 'streaming'
                         ? { status: 'done', noteId: prev.noteId, answer: prev.answer }
                         : prev
                 )
-                mutate(`/api/replies?note_id=${noteId}`)
-                mutate(`/api/notes?booq_id=${booqId}`)
             },
         })
     }, [booqId, mutate])
