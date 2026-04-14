@@ -339,8 +339,7 @@ On desktop: Controls are always visible in side gutters.
 - Table of Contents button (TOC icon, toggles left navigation panel)
 
 **Right buttons**:
-- Ask button (question mark icon, only shown when AI answer is active, toggles answer visibility)
-- Comments button (comment icon, toggles right comments panel)
+- Comments button (comment icon, toggles right comments panel — also opens when a question is asked or a comment is created)
 - Theme button (font icon, opens font size popover)
 - Account button (profile badge or sign-in icon)
 
@@ -438,17 +437,14 @@ When clicking an existing highlight/note:
 
 ### 5.13 AI Ask Feature
 
-Two-step flow:
+Integrated with the comments system:
 
-1. **Question input**: Textarea "Ask a question about this quote..." with Ask/Cancel buttons (Cmd/Ctrl+Enter submits)
-2. **Answer display**:
-   - Shows the question
-   - Shows the note (if asking from a note context) as a styled footnote
-   - Shows the streaming answer from AI (with "..." pulse animation during loading)
-   - Close button
-   - Error state display
+1. **Question input**: Textarea floater "Ask a question about this quote..." with Ask/Cancel buttons (Cmd/Ctrl+Enter submits)
+2. **Question posted as comment**: The question is saved as a public note with `kind: 'question'` and shown in the comments panel detail view
+3. **AI reply streams**: The AI-generated answer streams in real-time in the comments panel, then is persisted as a reply from the sentinel AI user (`booqs-ai`)
+4. **Replies visible to all**: The question and AI reply appear in the comments panel like any other comment with replies
 
-The answer streams in real-time from the backend copilot service.
+The `/api/generate-reply/[noteId]` endpoint generates and streams the AI answer, saving it as a reply on completion. A GraphQL `generateReply` subscription provides the same functionality for native clients.
 
 ### 5.14 Scroll & History Tracking
 
@@ -723,7 +719,7 @@ All main pages are server components that fetch data directly from the data laye
 - `auth/` - Authentication endpoints (magic link, passkey, sign-up completion)
 - `booq/` - Book data endpoints
 - `collections/` - Collection management
-- `copilot/` - AI question answering (streaming)
+- `copilot/` - AI answer generation
 - `graphql/` - GraphQL API endpoint (graphql-yoga)
 - `images/` - Image serving with size variants
 - `me/` - Current user data
@@ -760,7 +756,6 @@ Schema-defined API at `/api/graphql` using graphql-yoga. Supports authentication
 - `history(limit, offset)` — Current user's reading history with pagination
 - `collection(name)` — Named collection (e.g., `reading_list`) for current user
 - `featured(limit)` — Featured books
-- `copilot(context)` — AI assistant scoped to a text range, with sub-field `answer(question)` and `suggestions`
 
 **Mutations — Data:**
 Most data mutations return `MutationResult!` (`{ success: Boolean!, error: String }`) with a human-readable error on failure (e.g., `"Authentication required"`, `"Bookmark not found"`).
@@ -785,7 +780,7 @@ Auth mutations that initiate flows return `MutationResult!`. Completion mutation
 - `deleteAccount` — Delete user account
 
 **Subscriptions (SSE):**
-- `copilotAnswerStream(context, question, footnote)` — Streams AI answer text chunks as they are generated, with optional footnote for additional context
+- `generateReply(noteId)` — Streams the AI-generated reply for a question note, saving it on completion
 
 ---
 

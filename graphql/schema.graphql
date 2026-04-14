@@ -10,10 +10,8 @@ type Query {
     featured(limit: Int!): [Booq]
     notes(username: String!, limit: Int, offset: Int): [Note!]!
     libraryBrowse(library: String!, kind: LibraryBrowseKind!, query: String!, limit: Int, offset: Int): LibraryBrowseResult!
-    copilot(context: CopilotContext!): Copilot
 }
 type Subscription {
-    copilotAnswerStream(context: CopilotContext!, question: String!, footnote: String): String!
     generateReply(noteId: ID!): String!
 }
 type Mutation {
@@ -245,16 +243,6 @@ type BooqHistory {
 type Collection {
     name: String!
     booqs: [Booq!]
-}
-
-input CopilotContext {
-    booqId: ID!
-    start: [Int!]!
-    end: [Int!]!
-}
-type Copilot {
-    suggestions: [String!]
-    answer(question: String!): String
 }
 
 input UpdateUserInput {

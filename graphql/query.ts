@@ -2,7 +2,6 @@ import { IResolvers } from '@graphql-tools/utils'
 import { ResolverContext } from './context'
 import { BooqParent } from './booq'
 import { BooqHistoryParent } from './history'
-import { CopilotInput, CopilotParent } from './copilot'
 import { AuthorParent } from './author'
 import { booqHistoryForUser } from '@/backend/history'
 import { booqIdsInCollections } from '@/backend/collections'
@@ -96,9 +95,6 @@ export const queryResolver: IResolvers<unknown, ResolverContext> = {
             const ids = await featuredBooqIds(clampLimit(limit, 24))
             const results = await booqDataLoader.loadMany(ids)
             return results.map(r => r instanceof Error ? undefined : r)
-        },
-        copilot(_, { context }: { context: CopilotInput }): CopilotParent {
-            return context
         },
     },
 }

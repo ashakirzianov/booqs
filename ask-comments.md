@@ -140,9 +140,13 @@ Add an `askQuestion` mutation/subscription that mirrors the REST endpoint:
 - [-] Skipped for now
 
 ### 16. Cleanup
-- [ ] Remove or deprecate the standalone `copilotAnswerStream` subscription if fully replaced
-- [ ] Remove `AnswerDisplay` component from `AskTargetMenu` (answer phase moves to CommentsPanel)
-- [ ] Update SPECS.md with the new Ask + Comments behavior
+- [x] Removed `application/copilot.ts` and `application/cache.ts` (no consumers)
+- [x] Removed `data/copilot.ts` (no consumers)
+- [x] Removed `/api/copilot/answer`, `/api/copilot/suggestions`, `/api/copilot/answer/stream` routes (no consumers)
+- [x] Removed `copilotAnswerStream` subscription and `copilot` query from GraphQL schema and resolvers
+- [x] Removed `Copilot` and `CopilotContext` types from GraphQL schema
+- [x] Cleaned up `backend/copilot.ts` — kept only `generateAnswerStreaming` and its dependencies
+- [x] Updated SPECS.md
 
 ### 17. Naming
 - [ ] Rename `ContextMenuTarget` → `ReaderTarget` (or similar) — it now represents general reader interaction state, not just context menu targets
