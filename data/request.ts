@@ -1,10 +1,9 @@
 'use server'
-import { generateAccessToken, issueRefreshToken, revokeRefreshToken, userIdFromToken } from '@/backend/token'
+import { issueTokenPair, ACCESS_TOKEN_TTL, REFRESH_TOKEN_TTL, revokeRefreshToken, userIdFromToken } from '@/backend/token'
 import { cookies } from 'next/headers'
 
 const ACCESS_COOKIE = 'access_token'
 const REFRESH_COOKIE = 'refresh_token'
-const REFRESH_MAX_AGE = 60 * 60 * 24 * 30 // 30 days
 
 export async function getUserIdInsideRequest() {
     const token = await getAccessToken()
@@ -17,17 +16,16 @@ export async function getUserIdInsideRequest() {
 export async function setUserIdInsideRequest(userId: string | undefined) {
     const cookieStore = await cookies()
     if (userId) {
-        const accessToken = generateAccessToken(userId)
-        const refreshToken = await issueRefreshToken(userId)
+        const { accessToken, refreshToken } = await issueTokenPair(userId)
         cookieStore.set(ACCESS_COOKIE, accessToken, {
             httpOnly: true,
             secure: true,
-            maxAge: 60, // match access token expiry
+            maxAge: ACCESS_TOKEN_TTL,
         })
         cookieStore.set(REFRESH_COOKIE, refreshToken, {
             httpOnly: true,
             secure: true,
-            maxAge: REFRESH_MAX_AGE,
+            maxAge: REFRESH_TOKEN_TTL,
         })
         return accessToken
     } else {
