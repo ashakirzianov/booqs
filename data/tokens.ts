@@ -7,7 +7,7 @@ export type { TokenPair } from '@/backend/token'
 
 export { ACCESS_TOKEN_TTL, REFRESH_TOKEN_TTL }
 
-export function userIdFromAccessToken(token: string) {
+export async function userIdFromAccessToken(token: string) {
     return userIdFromAccessTokenBackend(token)
 }
 

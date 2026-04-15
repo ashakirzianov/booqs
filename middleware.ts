@@ -9,7 +9,7 @@ export async function middleware(request: NextRequest) {
     const refreshToken = request.cookies.get(REFRESH_COOKIE)?.value
 
     // Access token still valid or no refresh token — pass through
-    if ((accessToken && userIdFromAccessToken(accessToken)) || !refreshToken) {
+    if ((accessToken && await userIdFromAccessToken(accessToken)) || !refreshToken) {
         return NextResponse.next()
     }
 

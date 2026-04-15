@@ -31,7 +31,7 @@ export async function context(ctx: RequestContext): Promise<ResolverContext> {
     // Cookie-based rotation is handled by middleware before this runs
     const accessToken = ctx.getHeader('x-access-token')
         ?? ctx.getCookie('access_token')
-    const userId = accessToken ? userIdFromAccessToken(accessToken) : undefined
+    const userId = accessToken ? await userIdFromAccessToken(accessToken) : undefined
 
     return {
         userId,

@@ -1,4 +1,4 @@
-import { sign, verify } from 'jsonwebtoken'
+import { SignJWT, jwtVerify } from 'jose'
 import { nanoid } from 'nanoid'
 import { config } from './config'
 import { redis } from './db'
@@ -11,7 +11,7 @@ const REFRESH_TOKEN_PREFIX = 'refresh:'
 export type TokenPair = { accessToken: string, refreshToken: string }
 
 export async function issueTokenPair(userId: string): Promise<TokenPair> {
-    const accessToken = issueAccessToken(userId)
+    const accessToken = await issueAccessToken(userId)
     const refreshToken = await issueRefreshToken(userId)
     return { accessToken, refreshToken }
 }
@@ -25,10 +25,11 @@ export async function rotateTokenPair(oldRefreshToken: string): Promise<TokenPai
     return issueTokenPair(userId)
 }
 
-export function userIdFromAccessToken(token: string) {
+export async function userIdFromAccessToken(token: string): Promise<string | undefined> {
     try {
-        const { userId } = verify(token, config().jwtSecret, { issuer }) as any
-        return userId as string
+        const secret = new TextEncoder().encode(config().jwtSecret)
+        const { payload } = await jwtVerify(token, secret, { issuer })
+        return payload.userId as string
     } catch {
         return undefined
     }
@@ -38,8 +39,13 @@ export async function revokeRefreshToken(token: string): Promise<void> {
     await redis.del(`${REFRESH_TOKEN_PREFIX}${token}`)
 }
 
-function issueAccessToken(userId: string): string {
-    return sign({ userId }, config().jwtSecret, { issuer, expiresIn: ACCESS_TOKEN_TTL })
+async function issueAccessToken(userId: string): Promise<string> {
+    const secret = new TextEncoder().encode(config().jwtSecret)
+    return new SignJWT({ userId })
+        .setProtectedHeader({ alg: 'HS256' })
+        .setIssuer(issuer)
+        .setExpirationTime(`${ACCESS_TOKEN_TTL}s`)
+        .sign(secret)
 }
 
 async function issueRefreshToken(userId: string): Promise<string> {

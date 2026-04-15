@@ -11,7 +11,7 @@ export async function getUserIdInsideRequest() {
     if (!accessToken) {
         return undefined
     }
-    return userIdFromAccessToken(accessToken)
+    return await userIdFromAccessToken(accessToken)
 }
 
 export async function setUserIdInsideRequest(userId: string | undefined) {
