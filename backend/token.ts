@@ -25,7 +25,7 @@ export async function rotateTokenPair(oldRefreshToken: string): Promise<TokenPai
     return issueTokenPair(userId)
 }
 
-export function userIdFromToken(token: string) {
+export function userIdFromAccessToken(token: string) {
     try {
         const { userId } = verify(token, config().jwtSecret, { issuer }) as any
         return userId as string

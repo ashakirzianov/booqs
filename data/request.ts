@@ -1,5 +1,5 @@
 'use server'
-import { issueTokenPair, revokeRefreshToken, userIdFromToken, ACCESS_TOKEN_TTL, REFRESH_TOKEN_TTL } from '@/backend/token'
+import { issueTokenPair, revokeRefreshToken, userIdFromAccessToken, ACCESS_TOKEN_TTL, REFRESH_TOKEN_TTL } from '@/backend/token'
 import { cookies } from 'next/headers'
 
 const ACCESS_COOKIE = 'access_token'
@@ -11,7 +11,7 @@ export async function getUserIdInsideRequest() {
     if (!accessToken) {
         return undefined
     }
-    return userIdFromToken(accessToken)
+    return userIdFromAccessToken(accessToken)
 }
 
 export async function setUserIdInsideRequest(userId: string | undefined) {

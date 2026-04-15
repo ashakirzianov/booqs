@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { rotateTokenPair, userIdFromToken, ACCESS_TOKEN_TTL, REFRESH_TOKEN_TTL } from '@/backend/token'
+import { rotateTokenPair, userIdFromAccessToken, ACCESS_TOKEN_TTL, REFRESH_TOKEN_TTL } from '@/data/tokens'
 
 const ACCESS_COOKIE = 'access_token'
 const REFRESH_COOKIE = 'refresh_token'
@@ -9,7 +9,7 @@ export async function middleware(request: NextRequest) {
     const refreshToken = request.cookies.get(REFRESH_COOKIE)?.value
 
     // Access token still valid or no refresh token — pass through
-    if ((accessToken && userIdFromToken(accessToken)) || !refreshToken) {
+    if ((accessToken && userIdFromAccessToken(accessToken)) || !refreshToken) {
         return NextResponse.next()
     }
 

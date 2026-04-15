@@ -1,4 +1,4 @@
-import { issueTokenPair, TokenPair, ACCESS_TOKEN_TTL, REFRESH_TOKEN_TTL, revokeRefreshToken, userIdFromToken } from '@/backend/token'
+import { issueTokenPair, TokenPair, ACCESS_TOKEN_TTL, REFRESH_TOKEN_TTL, revokeRefreshToken, userIdFromAccessToken } from '@/backend/token'
 import { createLoaders, GraphQLLoaders } from './loaders'
 
 export type AuthResult = {
@@ -31,7 +31,7 @@ export async function context(ctx: RequestContext): Promise<ResolverContext> {
     // Cookie-based rotation is handled by middleware before this runs
     const accessToken = ctx.getHeader('x-access-token')
         ?? ctx.getCookie('access_token')
-    const userId = accessToken ? userIdFromToken(accessToken) : undefined
+    const userId = accessToken ? userIdFromAccessToken(accessToken) : undefined
 
     return {
         userId,
