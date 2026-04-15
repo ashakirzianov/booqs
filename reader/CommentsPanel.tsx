@@ -10,7 +10,7 @@ import { useBooqNotes } from '@/application/notes'
 import { BackIcon, PencilIcon, RemoveIcon } from '@/components/Icons'
 import { MenuButton } from './MenuButton'
 import { MenuState } from './ContextMenuContent'
-import { useAskQuestion } from '@/application/ask'
+import { useGenerateReply } from '@/application/ask'
 
 export function CommentsPanel({ booqId, comments, currentUser, followingUserIds, isFollowingLoading, target, setMenuState }: {
     booqId: BooqId,
@@ -25,22 +25,22 @@ export function CommentsPanel({ booqId, comments, currentUser, followingUserIds,
         : target.kind === 'question-asked' ? target.commentId
         : undefined
 
-    const { ask, state: askState } = useAskQuestion({ booqId })
+    const { generateReply, state: replyState } = useGenerateReply({ booqId })
 
     const questionToGenerate = target.kind === 'question-asked' ? target.commentId : undefined
     React.useEffect(() => {
         if (questionToGenerate) {
-            ask(questionToGenerate)
+            generateReply(questionToGenerate)
             setMenuState({ kind: 'comment', commentId: questionToGenerate })
         }
-    }, [questionToGenerate, ask, setMenuState])
+    }, [questionToGenerate, generateReply, setMenuState])
 
     const streamingReply = useMemo((): StreamingReply | undefined => {
-        if (askState.status === 'streaming') {
-            return { noteId: askState.noteId, answer: askState.answer }
+        if (replyState.status === 'streaming') {
+            return { noteId: replyState.noteId, answer: replyState.answer }
         }
         return undefined
-    }, [askState])
+    }, [replyState])
 
     if (selectedCommentId) {
         return <CommentDetail

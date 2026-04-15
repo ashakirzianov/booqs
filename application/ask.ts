@@ -4,22 +4,22 @@ import { BooqId } from '@/core'
 import { useState, useCallback, useRef } from 'react'
 import { useSWRConfig } from 'swr'
 
-export type AskState =
+export type GenerateReplyState =
     | { status: 'idle' }
     | { status: 'streaming', noteId: string, answer: string }
     | { status: 'done', noteId: string, answer: string }
     | { status: 'error', noteId: string, error: string }
 
-export function useAskQuestion({
+export function useGenerateReply({
     booqId,
 }: {
     booqId: BooqId,
 }) {
-    const [state, setState] = useState<AskState>({ status: 'idle' })
+    const [state, setState] = useState<GenerateReplyState>({ status: 'idle' })
     const { mutate } = useSWRConfig()
     const abortRef = useRef<AbortController | undefined>(undefined)
 
-    const ask = useCallback((noteId: string) => {
+    const generateReply = useCallback((noteId: string) => {
         abortRef.current?.abort()
         const controller = new AbortController()
         abortRef.current = controller
@@ -52,7 +52,7 @@ export function useAskQuestion({
     }, [booqId, mutate])
 
     return {
-        ask,
+        generateReply,
         state,
     }
 }

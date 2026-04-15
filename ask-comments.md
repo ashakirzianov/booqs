@@ -153,6 +153,6 @@ Add an `askQuestion` mutation/subscription that mirrors the REST endpoint:
 - [x] Renamed `useContextMenuState` → `useMenuState`, file `useContextMenuState.ts` → `useMenuState.ts`
 - [x] Renamed `setTarget`/`setMenuTarget` → `setMenuState`, `menuTarget` → `menuState` throughout
 - [x] Renamed `isTargetDismissable` → `isStateDismissable`
-- [ ] Rename `useAskQuestion` → `useGenerateReply` (or similar) — it generates a reply for a given noteId, not the full "ask" flow
+- [x] Renamed `useAskQuestion` → `useGenerateReply`, `AskState` → `GenerateReplyState`, `ask` → `generateReply`
 
 ## Suggestions
