@@ -1,5 +1,5 @@
 'use server'
-import { issueTokenPair, rotateTokenPair, revokeRefreshToken, userIdFromToken, ACCESS_TOKEN_TTL, REFRESH_TOKEN_TTL } from '@/backend/token'
+import { issueTokenPair, revokeRefreshToken, userIdFromToken, ACCESS_TOKEN_TTL, REFRESH_TOKEN_TTL } from '@/backend/token'
 import { cookies } from 'next/headers'
 
 const ACCESS_COOKIE = 'access_token'
@@ -8,34 +8,10 @@ const REFRESH_COOKIE = 'refresh_token'
 export async function getUserIdInsideRequest() {
     const cookieStore = await cookies()
     const accessToken = cookieStore.get(ACCESS_COOKIE)?.value
-    const userId = accessToken ? userIdFromToken(accessToken) : undefined
-    if (userId) {
-        return userId
-    }
-
-    // Access token expired/missing — try rotating via refresh token
-    const refreshToken = cookieStore.get(REFRESH_COOKIE)?.value
-    if (!refreshToken) {
+    if (!accessToken) {
         return undefined
     }
-    const result = await rotateTokenPair(refreshToken)
-    if (!result) {
-        // Refresh token invalid — clear stale cookies
-        cookieStore.delete(ACCESS_COOKIE)
-        cookieStore.delete(REFRESH_COOKIE)
-        return undefined
-    }
-    cookieStore.set(ACCESS_COOKIE, result.accessToken, {
-        httpOnly: true,
-        secure: true,
-        maxAge: ACCESS_TOKEN_TTL,
-    })
-    cookieStore.set(REFRESH_COOKIE, result.refreshToken, {
-        httpOnly: true,
-        secure: true,
-        maxAge: REFRESH_TOKEN_TTL,
-    })
-    return userIdFromToken(result.accessToken)
+    return userIdFromToken(accessToken)
 }
 
 export async function setUserIdInsideRequest(userId: string | undefined) {

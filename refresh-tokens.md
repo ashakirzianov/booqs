@@ -34,10 +34,12 @@ Currently the app uses a single JWT with no expiration, stored in an httpOnly co
 - [x] `setAuthForUserId` → set both cookies (access + refresh)
 - [x] `clearAuth` → clear both cookies + revoke refresh token
 
-### 4. Implicit rotation at access points (replaces middleware)
-- [x] `getUserIdInsideRequest()` — rotate via cookie when access token expired
-- [x] `context()` — rotate via cookie when access token expired; native apps use `X-Access-Token` header
-- [x] Remove `setHeader` from `RequestContext` — native apps use explicit `refreshTokens` mutation
+### 4. Middleware for cookie-based rotation (`middleware.ts`)
+- [x] On every request: check `access_token` cookie
+- [x] If expired/missing but `refresh_token` present → rotate tokens, set new cookies on response
+- [x] If both missing/invalid → proceed unauthenticated (clear stale cookies)
+- [x] `getUserIdInsideRequest()` — simple read-only (no rotation, middleware handles it)
+- [x] `context()` — simple read from header or cookie (no rotation, middleware handles it)
 
 ### 5. GraphQL schema + `refreshTokens` mutation
 - [x] `AuthResult` type updated: `accessToken`, `refreshToken`, `accessTokenExpiresAt`, `refreshTokenExpiresAt`, `user`

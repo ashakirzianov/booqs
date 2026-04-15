@@ -608,14 +608,16 @@ All auth operations that issue tokens return a `TokenPair` containing `accessTok
 ### 13.2 Token Rotation
 
 **Web clients (cookie-based, implicit):**
-When a server action or GraphQL request finds an expired/missing access token but a valid `refresh_token` cookie, rotation happens automatically:
-1. Validate refresh token against Redis
-2. Revoke old refresh token
-3. Issue new access + refresh token pair
-4. Set updated cookies on the response
-5. Proceed with the request as authenticated
+Next.js middleware intercepts every request and checks the `access_token` cookie. If expired/missing but a valid `refresh_token` cookie is present, the middleware rotates tokens and sets updated cookies on the response before the request reaches the page or API handler. This ensures Server Components (which cannot write cookies) always see a fresh access token.
 
-This happens transparently in `getUserIdInsideRequest()` (server actions) and `context()` (GraphQL).
+Flow:
+1. Middleware reads `access_token` cookie, validates JWT
+2. If valid → pass through
+3. If expired/missing → read `refresh_token` cookie
+4. Validate refresh token against Redis, revoke old one
+5. Issue new access + refresh token pair
+6. Set updated cookies on the response
+7. Request proceeds with fresh tokens
 
 **Native clients (header-based, explicit):**
 Native apps send `X-Access-Token` header for authentication. When the access token expires, the client must explicitly call the `refreshTokens` GraphQL mutation:

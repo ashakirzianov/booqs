@@ -1,4 +1,4 @@
-import { issueTokenPair, rotateTokenPair, TokenPair, ACCESS_TOKEN_TTL, REFRESH_TOKEN_TTL, revokeRefreshToken, userIdFromToken } from '@/backend/token'
+import { issueTokenPair, TokenPair, ACCESS_TOKEN_TTL, REFRESH_TOKEN_TTL, revokeRefreshToken, userIdFromToken } from '@/backend/token'
 import { createLoaders, GraphQLLoaders } from './loaders'
 
 export type AuthResult = {
@@ -27,7 +27,11 @@ type RequestContext = {
     clearCookie(name: string, options?: CookieOptions): void,
 }
 export async function context(ctx: RequestContext): Promise<ResolverContext> {
-    const userId = await resolveUserId(ctx)
+    // Try access token from header (native) or cookie (web)
+    // Cookie-based rotation is handled by middleware before this runs
+    const accessToken = ctx.getHeader('x-access-token')
+        ?? ctx.getCookie('access_token')
+    const userId = accessToken ? userIdFromToken(accessToken) : undefined
 
     return {
         userId,
@@ -35,7 +39,16 @@ export async function context(ctx: RequestContext): Promise<ResolverContext> {
         ...createLoaders(),
         async setAuthForUserId(userId: string) {
             const tokenPair = await issueTokenPair(userId)
-            setTokenCookies(ctx, tokenPair)
+            ctx.setCookie('access_token', tokenPair.accessToken, {
+                httpOnly: true,
+                secure: true,
+                maxAge: ACCESS_TOKEN_TTL,
+            })
+            ctx.setCookie('refresh_token', tokenPair.refreshToken, {
+                httpOnly: true,
+                secure: true,
+                maxAge: REFRESH_TOKEN_TTL,
+            })
             return authResultFromTokenPair(tokenPair)
         },
         async clearAuth() {
@@ -56,43 +69,4 @@ export function authResultFromTokenPair(tokenPair: TokenPair): AuthResult {
         accessTokenExpiresAt: now + ACCESS_TOKEN_TTL * 1000,
         refreshTokenExpiresAt: now + REFRESH_TOKEN_TTL * 1000,
     }
-}
-
-async function resolveUserId(ctx: RequestContext): Promise<string | undefined> {
-    // Try access token from header (native) or cookie (web)
-    const accessToken = ctx.getHeader('x-access-token')
-        ?? ctx.getCookie('access_token')
-    const userId = accessToken ? userIdFromToken(accessToken) : undefined
-    if (userId) {
-        return userId
-    }
-
-    // Access token expired/missing — try cookie-based rotation (web only)
-    // Native apps should use the refreshTokens mutation explicitly
-    const refreshToken = ctx.getCookie('refresh_token')
-    if (!refreshToken) {
-        return undefined
-    }
-    const result = await rotateTokenPair(refreshToken)
-    if (!result) {
-        ctx.clearCookie('access_token', { httpOnly: true })
-        ctx.clearCookie('refresh_token', { httpOnly: true })
-        return undefined
-    }
-
-    setTokenCookies(ctx, result)
-    return userIdFromToken(result.accessToken)
-}
-
-function setTokenCookies(ctx: RequestContext, tokenPair: TokenPair) {
-    ctx.setCookie('access_token', tokenPair.accessToken, {
-        httpOnly: true,
-        secure: true,
-        maxAge: ACCESS_TOKEN_TTL,
-    })
-    ctx.setCookie('refresh_token', tokenPair.refreshToken, {
-        httpOnly: true,
-        secure: true,
-        maxAge: REFRESH_TOKEN_TTL,
-    })
 }
