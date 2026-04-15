@@ -8,9 +8,8 @@
 
 ### 1.1 Typography
 
-- **UI Font (--font-main)**: Lato (sans-serif), weights: 100, 300, 400, 700. Used for all interface elements, navigation, buttons, and labels.
+- **UI Font (--font-main)**: Nunito Sans (sans-serif), variable font (all weights), subsets: latin, cyrillic. Used for all interface elements, navigation, buttons, and labels. Font weights use standard Tailwind classes (font-medium=500, font-semibold=600, font-bold=700).
 - **Book Font (--font-book)**: Lora (serif), weights: 400, 700, subsets: latin-ext, cyrillic-ext. Used for rendering book content in the reader.
-- Font weight mapping: light=100, normal=300, bold=400, extrabold=700.
 
 ### 1.2 Color Palette
 

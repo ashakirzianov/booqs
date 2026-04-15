@@ -24,11 +24,6 @@
   --font-main: var(--font-main), sans-serif;
   --font-book: var(--font-book), serif;
 
-  --font-weight-light: 100;
-  --font-weight-normal: 300;
-  --font-weight-bold: 400;
-  --font-weight-extrabold: 700;
-
   --spacing-xs: 0.125rem;
   --spacing-sm: 0.25rem;
   --spacing-base: 0.5rem;

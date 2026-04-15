@@ -1,14 +1,13 @@
 import '@/app/globals.css'
 import { Metadata, Viewport } from 'next'
 
-import { Lato, Lora } from 'next/font/google'
+import { Nunito_Sans, Lora } from 'next/font/google'
 import { AppProvider } from '@/application/provider'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 
-const lato = Lato({
-    subsets: ['latin'],
+const nunitoSans = Nunito_Sans({
+    subsets: ['latin', 'cyrillic'],
     display: 'swap',
-    weight: ['100', '300', '400', '700'],
     variable: '--font-main',
 })
 
@@ -34,7 +33,7 @@ export default function RootLayout({
 }) {
     return (
         <html lang="en">
-            <body className={`${lato.variable} ${lora.variable}`}>
+            <body className={`${nunitoSans.variable} ${lora.variable}`}>
                 <main>
                     <AppProvider>
                         {children}
