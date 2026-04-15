@@ -4,7 +4,7 @@ import { rotateTokenPair, userIdFromAccessToken, ACCESS_TOKEN_TTL, REFRESH_TOKEN
 const ACCESS_COOKIE = 'access_token'
 const REFRESH_COOKIE = 'refresh_token'
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
     const accessToken = request.cookies.get(ACCESS_COOKIE)?.value
     const refreshToken = request.cookies.get(REFRESH_COOKIE)?.value
 
