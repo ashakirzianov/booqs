@@ -55,8 +55,8 @@ Currently the app uses a single JWT with no expiration, stored in an httpOnly co
 - [x] SPECS.md section 18.4 — updated GraphQL API auth docs
 
 ### 8. Verification
-- [ ] `npm run build` passes
-- [ ] Manual: sign in → both cookies set
-- [ ] Manual: wait >1 min → access token rotates silently on next request
-- [ ] Manual: sign out → both cookies cleared, refresh token deleted from Redis
-- [ ] Change access token expiry from `1m` to `15m`
+- [x] `npm run build` passes
+- [x] Manual: sign in → both cookies set
+- [x] Manual: wait >1 min → access token rotates silently on next request
+- [x] Manual: sign out → both cookies cleared, refresh token deleted from Redis
+- [x] Change access token expiry from `1m` to `15m`

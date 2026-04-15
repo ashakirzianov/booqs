@@ -4,7 +4,7 @@ import { config } from './config'
 import { redis } from './db'
 
 const issuer = 'booqs'
-export const ACCESS_TOKEN_TTL = 1 * 60 // TODO: change to '15 * 60' after verification
+export const ACCESS_TOKEN_TTL = 15 * 60 // 15 minutes in seconds
 export const REFRESH_TOKEN_TTL = 60 * 60 * 24 * 30 // 30 days in seconds
 const REFRESH_TOKEN_PREFIX = 'refresh:'
 
