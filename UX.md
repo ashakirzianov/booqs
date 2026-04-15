@@ -9,7 +9,7 @@
 ### 1.1 Typography
 
 - **UI Font (--font-main)**: Nunito Sans (sans-serif), variable font (all weights), subsets: latin, cyrillic. Used for all interface elements, navigation, buttons, and labels. Font weights use standard Tailwind classes (font-medium=500, font-semibold=600, font-bold=700).
-- **Book Font (--font-book)**: Lora (serif), weights: 400, 700, subsets: latin-ext, cyrillic-ext. Used for rendering book content in the reader.
+- **Book Font (--font-book)**: Lora (serif), variable font (all weights), subsets: latin-ext, cyrillic-ext. Used for rendering book content in the reader.
 
 ### 1.2 Color Palette
 
