@@ -1,41 +1,41 @@
 'use server'
-import { generateToken, userIdFromToken } from '@/backend/token'
+import { issueTokenPair, revokeRefreshToken, userIdFromAccessToken, ACCESS_TOKEN_TTL, REFRESH_TOKEN_TTL } from '@/backend/token'
 import { cookies } from 'next/headers'
 
+const ACCESS_COOKIE = 'access_token'
+const REFRESH_COOKIE = 'refresh_token'
+
 export async function getUserIdInsideRequest() {
-    const token = await getAuthToken()
-    if (!token) {
+    const cookieStore = await cookies()
+    const accessToken = cookieStore.get(ACCESS_COOKIE)?.value
+    if (!accessToken) {
         return undefined
     }
-    return userIdFromToken(token)
+    return await userIdFromAccessToken(accessToken)
 }
 
 export async function setUserIdInsideRequest(userId: string | undefined) {
+    const cookieStore = await cookies()
     if (userId) {
-        const token = generateToken(userId)
-        await setAuthToken(token)
-        return token
-    } else {
-        await setAuthToken(undefined)
-        return undefined
-    }
-}
-
-async function getAuthToken() {
-    const cookieStore = await cookies()
-    const token = cookieStore.get('token')
-    return token?.value
-}
-
-async function setAuthToken(token: string | undefined) {
-    const cookieStore = await cookies()
-    if (token) {
-        cookieStore.set('token', token, {
+        const { accessToken, refreshToken } = await issueTokenPair(userId)
+        cookieStore.set(ACCESS_COOKIE, accessToken, {
             httpOnly: true,
             secure: true,
-            maxAge: 60 * 60 * 24 * 30,
+            maxAge: ACCESS_TOKEN_TTL,
         })
+        cookieStore.set(REFRESH_COOKIE, refreshToken, {
+            httpOnly: true,
+            secure: true,
+            maxAge: REFRESH_TOKEN_TTL,
+        })
+        return accessToken
     } else {
-        cookieStore.delete('token')
+        const oldRefreshToken = cookieStore.get(REFRESH_COOKIE)?.value
+        if (oldRefreshToken) {
+            await revokeRefreshToken(oldRefreshToken)
+        }
+        cookieStore.delete(ACCESS_COOKIE)
+        cookieStore.delete(REFRESH_COOKIE)
+        return undefined
     }
 }

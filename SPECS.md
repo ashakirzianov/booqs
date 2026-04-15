@@ -587,20 +587,59 @@ Hover effect: border transitions to highlight color. Border is optional (shown o
 
 ## 13. Authentication Flow
 
-### 13.1 Email Magic Link
+### 13.1 Token Architecture
+
+Authentication uses a dual-token system with short-lived access tokens and long-lived refresh tokens.
+
+**Access Token:**
+- JWT signed with `BOOQS_AUTH_SECRET`, contains `userId`
+- TTL: 15 minutes (currently 1 minute for testing)
+- Stored in `access_token` httpOnly secure cookie (web) or managed by client (native)
+
+**Refresh Token:**
+- Opaque 64-character random string stored in Redis
+- TTL: 30 days
+- Stored in `refresh_token` httpOnly secure cookie (web) or managed by client (native)
+- Single-use: each rotation issues a new refresh token and revokes the old one
+
+**Token Pair:**
+All auth operations that issue tokens return a `TokenPair` containing `accessToken`, `refreshToken`, `accessTokenExpiresAt`, and `refreshTokenExpiresAt` (absolute timestamps in milliseconds).
+
+### 13.2 Token Rotation
+
+**Web clients (cookie-based, implicit):**
+Next.js middleware intercepts every request and checks the `access_token` cookie. If expired/missing but a valid `refresh_token` cookie is present, the middleware rotates tokens and sets updated cookies on the response before the request reaches the page or API handler. This ensures Server Components (which cannot write cookies) always see a fresh access token.
+
+Flow:
+1. Middleware reads `access_token` cookie, validates JWT
+2. If valid → pass through
+3. If expired/missing → read `refresh_token` cookie
+4. Validate refresh token against Redis, revoke old one
+5. Issue new access + refresh token pair
+6. Set updated cookies on the response
+7. Request proceeds with fresh tokens
+
+**Native clients (header-based, explicit):**
+Native apps send `X-Access-Token` header for authentication. When the access token expires, the client must explicitly call the `refreshTokens` GraphQL mutation:
+1. Client detects expiry (via `accessTokenExpiresAt` or a failed request)
+2. Client calls `refreshTokens(refreshToken)` mutation
+3. Server validates and rotates, returning a new `TokenPair`
+4. Client stores the new tokens and retries the original request
+
+### 13.3 Email Magic Link
 
 1. User enters email on `/auth`
 2. Server sends magic link email (valid for 1 hour)
 3. If email matches existing account: link goes to `/auth/signin` (auto-signs in)
 4. If new email: link goes to `/auth/signup` (complete registration form)
 
-### 13.2 Passkey (WebAuthn)
+### 13.4 Passkey (WebAuthn)
 
 - **Sign in**: "Sign in with Passkey" button triggers browser WebAuthn prompt
 - **Registration**: After sign-up, user is prompted to register a passkey
 - **Management**: Profile page allows adding/removing passkeys
 
-### 13.3 Protected Routes
+### 13.5 Protected Routes
 
 Routes requiring auth redirect to `/auth?return_to=[current_url]`:
 - `/booq/[id]/content` (reader)
@@ -742,7 +781,7 @@ Used for mutations from client components:
 
 ### 18.4 GraphQL API
 
-Schema-defined API at `/api/graphql` using graphql-yoga. Supports authentication via `Authorization: Bearer <jwt>` header or `token` cookie.
+Schema-defined API at `/api/graphql` using graphql-yoga. Supports authentication via `X-Access-Token` header (native apps) or `access_token` cookie (web). When the access token expires, web clients get automatic rotation via cookies; native clients must call the `refreshTokens` mutation explicitly.
 
 **Queries:**
 - `ping` — Health check
@@ -769,15 +808,25 @@ Most data mutations return `MutationResult!` (`{ success: Boolean!, error: Strin
 - `confirmUpload(uploadId)` — Confirm upload, parse file, and create book record. Returns `UploadResult`.
 
 **Mutations — Authentication:**
-Auth mutations that initiate flows return `MutationResult!`. Completion mutations return `AuthResult` (token + user) or `undefined` on failure.
+Auth mutations that initiate flows return `MutationResult!`. Completion mutations return `AuthResult` or `null` on failure.
+
+`AuthResult` contains:
+- `accessToken: String!` — Short-lived JWT
+- `refreshToken: String!` — Opaque refresh token
+- `accessTokenExpiresAt: Float!` — Absolute expiry timestamp (ms since epoch)
+- `refreshTokenExpiresAt: Float!` — Absolute expiry timestamp (ms since epoch)
+- `user: User` — Authenticated user
+
+Mutations:
 - `initiateSign(email, returnTo)` — Send magic link email
-- `completeSignIn(email, secret)` — Complete sign-in via magic link secret, returns JWT token
-- `completeSignUp(email, secret, username, name, emoji)` — Complete registration via magic link secret, returns JWT token
+- `completeSignIn(email, secret)` — Complete sign-in via magic link secret
+- `completeSignUp(email, secret, username, name, emoji)` — Complete registration via magic link secret
 - `initPasskeyRegistration` / `verifyPasskeyRegistration` — WebAuthn passkey registration flow
 - `initPasskeyLogin` / `verifyPasskeyLogin` — WebAuthn passkey login flow
-- `signout` — Clear authentication
+- `refreshTokens(refreshToken)` — Exchange a valid refresh token for a new token pair. The old refresh token is revoked. For use by native clients that manage tokens explicitly.
+- `signout` — Clear authentication (revokes refresh token)
 - `deletePasskey(id)` — Delete a registered passkey
-- `deleteAccount` — Delete user account
+- `deleteAccount` — Delete user account (revokes refresh token)
 
 **Subscriptions (SSE):**
 - `generateReply(noteId)` — Streams the AI-generated reply for a question note, saving it on completion

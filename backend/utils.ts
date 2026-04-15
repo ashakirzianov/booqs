@@ -26,11 +26,3 @@ export async function* makeBatches<T>(generator: AsyncGenerator<T>, size: number
         yield batch
     }
 }
-
-export function afterPrefix(str: string, prefix: string): string | undefined {
-    if (str.startsWith(prefix)) {
-        return str.substring(prefix.length)
-    } else {
-        return undefined
-    }
-}

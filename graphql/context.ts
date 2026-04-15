@@ -1,11 +1,18 @@
-import { generateToken, userIdFromHeader, userIdFromToken } from '@/backend/token'
+import { issueTokenPair, TokenPair, ACCESS_TOKEN_TTL, REFRESH_TOKEN_TTL, revokeRefreshToken, userIdFromAccessToken } from '@/backend/token'
 import { createLoaders, GraphQLLoaders } from './loaders'
+
+export type AuthResult = {
+    accessToken: string,
+    refreshToken: string,
+    accessTokenExpiresAt: number,
+    refreshTokenExpiresAt: number,
+}
 
 export type ResolverContext = {
     userId?: string,
     origin?: string,
-    setAuthForUserId(userId: string): void,
-    clearAuth(): void,
+    setAuthForUserId(userId: string): Promise<AuthResult>,
+    clearAuth(): Promise<void>,
 } & GraphQLLoaders
 type CookieOptions = {
     httpOnly?: boolean,
@@ -20,28 +27,46 @@ type RequestContext = {
     clearCookie(name: string, options?: CookieOptions): void,
 }
 export async function context(ctx: RequestContext): Promise<ResolverContext> {
-    const authHeader = ctx.getHeader('authorization')
-    const userId = authHeader
-        ? userIdFromHeader(authHeader)
-        : userIdFromToken(ctx.getCookie('token') ?? '')
+    // Try access token from header (native) or cookie (web)
+    // Cookie-based rotation is handled by middleware before this runs
+    const accessToken = ctx.getHeader('x-access-token')
+        ?? ctx.getCookie('access_token')
+    const userId = accessToken ? await userIdFromAccessToken(accessToken) : undefined
 
     return {
         userId,
         origin: ctx.origin,
         ...createLoaders(),
-        setAuthForUserId(userId: string) {
-            const token = generateToken(userId)
-            ctx.setCookie('token', token, {
+        async setAuthForUserId(userId: string) {
+            const tokenPair = await issueTokenPair(userId)
+            ctx.setCookie('access_token', tokenPair.accessToken, {
                 httpOnly: true,
                 secure: true,
-                maxAge: 60 * 60 * 24 * 30,
+                maxAge: ACCESS_TOKEN_TTL,
             })
-        },
-        clearAuth() {
-            ctx.clearCookie('token', {
+            ctx.setCookie('refresh_token', tokenPair.refreshToken, {
                 httpOnly: true,
+                secure: true,
+                maxAge: REFRESH_TOKEN_TTL,
             })
+            return authResultFromTokenPair(tokenPair)
+        },
+        async clearAuth() {
+            const oldRefreshToken = ctx.getCookie('refresh_token')
+            if (oldRefreshToken) {
+                await revokeRefreshToken(oldRefreshToken)
+            }
+            ctx.clearCookie('access_token', { httpOnly: true })
+            ctx.clearCookie('refresh_token', { httpOnly: true })
         },
     }
 }
 
+export function authResultFromTokenPair(tokenPair: TokenPair): AuthResult {
+    const now = Date.now()
+    return {
+        ...tokenPair,
+        accessTokenExpiresAt: now + ACCESS_TOKEN_TTL * 1000,
+        refreshTokenExpiresAt: now + REFRESH_TOKEN_TTL * 1000,
+    }
+}
