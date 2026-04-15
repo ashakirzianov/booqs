@@ -24,10 +24,10 @@ Currently the app uses a single JWT with no expiration, stored in an httpOnly co
 - [x] Add `rotateRefreshToken(oldToken): Promise<{ accessToken, refreshToken } | undefined>` — validate old, revoke old, issue new pair
 
 ### 2. Data layer: dual cookie management (`data/request.ts`)
-- [ ] Replace single `token` cookie with `access_token` and `refresh_token` cookies
-- [ ] Update `setUserIdInsideRequest(userId)` to set both cookies
-- [ ] Update `setUserIdInsideRequest(undefined)` to delete both cookies and revoke refresh token
-- [ ] Update `getUserIdInsideRequest()` to read `access_token` cookie
+- [x] Replace single `token` cookie with `access_token` and `refresh_token` cookies
+- [x] Update `setUserIdInsideRequest(userId)` to set both cookies
+- [x] Update `setUserIdInsideRequest(undefined)` to delete both cookies and revoke refresh token
+- [x] Update `getUserIdInsideRequest()` to read `access_token` cookie
 
 ### 3. GraphQL context (`graphql/context.ts`)
 - [ ] Read `access_token` cookie instead of `token`
