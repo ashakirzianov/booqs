@@ -1,5 +1,5 @@
 'use server'
-import { generateToken, userIdFromToken } from '@/backend/token'
+import { generateAccessToken, userIdFromToken } from '@/backend/token'
 import { cookies } from 'next/headers'
 
 export async function getUserIdInsideRequest() {
@@ -12,7 +12,7 @@ export async function getUserIdInsideRequest() {
 
 export async function setUserIdInsideRequest(userId: string | undefined) {
     if (userId) {
-        const token = generateToken(userId)
+        const token = generateAccessToken(userId)
         await setAuthToken(token)
         return token
     } else {

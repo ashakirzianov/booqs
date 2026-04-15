@@ -6,7 +6,7 @@ import { addNote, removeNote, updateNote } from '@/backend/notes'
 import { addReply, removeReply, updateReply } from '@/backend/replies'
 import { initiatePasskeyLogin, initiatePasskeyRegistration, verifyPasskeyLogin, verifyPasskeyRegistration } from '@/backend/passkey'
 import { initiateSignRequest, completeSignInRequest, completeSignUp } from '@/backend/sign'
-import { generateToken } from '@/backend/token'
+import { generateAccessToken } from '@/backend/token'
 import { addToCollection, removeFromCollection } from '@/backend/collections'
 import { addBooqHistory, removeBooqHistory } from '@/backend/history'
 import { addBookmark, deleteBookmark } from '@/backend/bookmarks'
@@ -166,7 +166,7 @@ export const mutationResolver: IResolvers<any, ResolverContext> = {
             if (!result.success) {
                 return undefined
             }
-            const token = generateToken(result.user.id)
+            const token = generateAccessToken(result.user.id)
             setAuthForUserId(result.user.id)
             return { token, user: result.user }
         },
@@ -177,7 +177,7 @@ export const mutationResolver: IResolvers<any, ResolverContext> = {
             if (!result.success) {
                 return undefined
             }
-            const token = generateToken(result.user.id)
+            const token = generateAccessToken(result.user.id)
             setAuthForUserId(result.user.id)
             return { token, user: result.user }
         },

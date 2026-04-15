@@ -1,4 +1,4 @@
-import { generateToken, userIdFromHeader, userIdFromToken } from '@/backend/token'
+import { generateAccessToken, userIdFromHeader, userIdFromToken } from '@/backend/token'
 import { createLoaders, GraphQLLoaders } from './loaders'
 
 export type ResolverContext = {
@@ -30,7 +30,7 @@ export async function context(ctx: RequestContext): Promise<ResolverContext> {
         origin: ctx.origin,
         ...createLoaders(),
         setAuthForUserId(userId: string) {
-            const token = generateToken(userId)
+            const token = generateAccessToken(userId)
             ctx.setCookie('token', token, {
                 httpOnly: true,
                 secure: true,

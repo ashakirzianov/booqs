@@ -17,11 +17,11 @@ Currently the app uses a single JWT with no expiration, stored in an httpOnly co
 ## Tasks
 
 ### 1. Backend: refresh token functions (`backend/token.ts`)
-- [ ] Add `expiresIn: '1m'` to `generateToken()` (rename to `generateAccessToken`)
-- [ ] Add `generateRefreshToken(userId): Promise<string>` — nanoid, store in Redis as `refresh:{token}` → `userId` with 30-day TTL
-- [ ] Add `validateRefreshToken(token): Promise<string | undefined>` — lookup in Redis, return userId
-- [ ] Add `revokeRefreshToken(token): Promise<void>` — delete from Redis
-- [ ] Add `rotateRefreshToken(oldToken): Promise<{ accessToken, refreshToken } | undefined>` — validate old, revoke old, issue new pair
+- [x] Add `expiresIn: '1m'` to `generateToken()` (rename to `generateAccessToken`)
+- [x] Add `generateRefreshToken(userId): Promise<string>` — nanoid, store in Redis as `refresh:{token}` → `userId` with 30-day TTL
+- [x] Add `validateRefreshToken(token): Promise<string | undefined>` — lookup in Redis, return userId
+- [x] Add `revokeRefreshToken(token): Promise<void>` — delete from Redis
+- [x] Add `rotateRefreshToken(oldToken): Promise<{ accessToken, refreshToken } | undefined>` — validate old, revoke old, issue new pair
 
 ### 2. Data layer: dual cookie management (`data/request.ts`)
 - [ ] Replace single `token` cookie with `access_token` and `refresh_token` cookies
