@@ -4,7 +4,7 @@ import { config } from './config'
 import { redis } from './db'
 
 const issuer = 'booqs'
-export const ACCESS_TOKEN_TTL = 15 * 60 // 15 minutes in seconds
+export const ACCESS_TOKEN_TTL = 15 * 1 // 15 minutes in seconds
 export const REFRESH_TOKEN_TTL = 60 * 60 * 24 * 30 // 30 days in seconds
 const REFRESH_TOKEN_PREFIX = 'refresh:'
 
@@ -21,8 +21,16 @@ export async function rotateTokenPair(oldRefreshToken: string): Promise<TokenPai
     if (!userId) {
         return undefined
     }
-    await revokeRefreshToken(oldRefreshToken)
-    return issueTokenPair(userId)
+    // Pipeline: revoke old + store new refresh token in one round trip
+    const newRefreshToken = nanoid(64)
+    const pipeline = redis.pipeline()
+    pipeline.del(`${REFRESH_TOKEN_PREFIX}${oldRefreshToken}`)
+    pipeline.set(`${REFRESH_TOKEN_PREFIX}${newRefreshToken}`, userId, { ex: REFRESH_TOKEN_TTL })
+    const [accessToken] = await Promise.all([
+        issueAccessToken(userId),
+        pipeline.exec(),
+    ])
+    return { accessToken, refreshToken: newRefreshToken }
 }
 
 export async function userIdFromAccessToken(token: string): Promise<string | undefined> {
