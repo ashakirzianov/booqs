@@ -50,6 +50,7 @@ type Mutation {
     confirmUpload(uploadId: String!): UploadResult!
 
     deletePasskey(id: ID!): MutationResult!
+    refreshTokens(refreshToken: String!): AuthResult
     signout: MutationResult!
     deleteAccount: MutationResult!
     updateUser(input: UpdateUserInput!): UpdateUserResult
@@ -196,7 +197,10 @@ type LibraryBrowseResult {
 }
 
 type AuthResult {
-    token: String
+    accessToken: String!
+    refreshToken: String!
+    accessTokenExpiresAt: Float!
+    refreshTokenExpiresAt: Float!
     user: User
 }
 type Bookmark {

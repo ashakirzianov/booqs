@@ -30,21 +30,31 @@ Currently the app uses a single JWT with no expiration, stored in an httpOnly co
 - [x] Update `getUserIdInsideRequest()` to read `access_token` cookie
 
 ### 3. GraphQL context (`graphql/context.ts`)
-- [ ] Read `access_token` cookie instead of `token`
-- [ ] `setAuthForUserId` → set both cookies (access + refresh)
-- [ ] `clearAuth` → clear both cookies + revoke refresh token
+- [x] Read `access_token` cookie instead of `token`
+- [x] `setAuthForUserId` → set both cookies (access + refresh)
+- [x] `clearAuth` → clear both cookies + revoke refresh token
 
-### 4. Middleware (`middleware.ts` — new file)
-- [ ] On every request: check `access_token` cookie
-- [ ] If expired/missing but `refresh_token` present → rotate tokens, set new cookies on response
-- [ ] If both missing/invalid → proceed unauthenticated
+### 4. Implicit rotation at access points (replaces middleware)
+- [x] `getUserIdInsideRequest()` — rotate via cookie when access token expired
+- [x] `context()` — rotate via cookie when access token expired; native apps use `X-Access-Token` header
+- [x] Remove `setHeader` from `RequestContext` — native apps use explicit `refreshTokens` mutation
 
-### 5. Auth flow updates
-- [ ] Verify all `setUserIdInsideRequest` and `setAuthForUserId` callers work with the new dual-cookie logic (should be minimal since the abstraction handles it)
+### 5. GraphQL schema + `refreshTokens` mutation
+- [x] `AuthResult` type updated: `accessToken`, `refreshToken`, `accessTokenExpiresAt`, `refreshTokenExpiresAt`, `user`
+- [x] New `refreshTokens(refreshToken)` mutation for native clients
+- [x] All auth mutations return full `AuthResult` with token pair and expiry timestamps
 
-### 6. Verification
+### 6. Auth flow updates
+- [x] All `setAuthForUserId` callers updated to use new `AuthResult` shape
+- [x] `clearAuth` revokes refresh token from Redis
+
+### 7. Documentation
+- [x] SPECS.md section 13 — token architecture, rotation flows (web vs native)
+- [x] SPECS.md section 18.4 — updated GraphQL API auth docs
+
+### 8. Verification
 - [ ] `npm run build` passes
 - [ ] Manual: sign in → both cookies set
-- [ ] Manual: wait >1 min → middleware refreshes silently (new cookies appear)
+- [ ] Manual: wait >1 min → access token rotates silently on next request
 - [ ] Manual: sign out → both cookies cleared, refresh token deleted from Redis
-- [ ] Change access token expiry from `'1m'` to `'15m'`
+- [ ] Change access token expiry from `1m` to `15m`

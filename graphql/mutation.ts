@@ -1,6 +1,7 @@
 import { BooqId } from '@/core'
 import { IResolvers } from '@graphql-tools/utils'
-import { ResolverContext } from './context'
+import { authResultFromTokenPair, ResolverContext } from './context'
+import { rotateTokenPair } from '@/backend/token'
 import { deleteUserForId, updateUser, userForUsername } from '@/backend/users'
 import { addNote, removeNote, updateNote } from '@/backend/notes'
 import { addReply, removeReply, updateReply } from '@/backend/replies'
@@ -58,6 +59,13 @@ export const mutationResolver: IResolvers<any, ResolverContext> = {
             if (!requireAuth(userId)) return fail('Authentication required')
             const result = await removeBooqHistory(userId, booqId)
             return result ? ok() : fail('Failed to remove history')
+        },
+        async refreshTokens(_, { refreshToken }: { refreshToken: string }) {
+            const result = await rotateTokenPair(refreshToken)
+            if (!result) {
+                return undefined
+            }
+            return authResultFromTokenPair(result)
         },
         async signout(_, __, { clearAuth }): Promise<MutationResult> {
             await clearAuth()
@@ -165,8 +173,8 @@ export const mutationResolver: IResolvers<any, ResolverContext> = {
             if (!result.success) {
                 return undefined
             }
-            const { accessToken: token } = await setAuthForUserId(result.user.id)
-            return { token, user: result.user }
+            const authResult = await setAuthForUserId(result.user.id)
+            return { ...authResult, user: result.user }
         },
         async completeSignUp(_, { email, secret, username, name, emoji }: {
             email: string, secret: string, username: string, name: string, emoji: string,
@@ -175,8 +183,8 @@ export const mutationResolver: IResolvers<any, ResolverContext> = {
             if (!result.success) {
                 return undefined
             }
-            const { accessToken: token } = await setAuthForUserId(result.user.id)
-            return { token, user: result.user }
+            const authResult = await setAuthForUserId(result.user.id)
+            return { ...authResult, user: result.user }
         },
         async initPasskeyRegistration(_, __, { userId, origin, userLoader }) {
             if (!userId) {
@@ -206,9 +214,8 @@ export const mutationResolver: IResolvers<any, ResolverContext> = {
                 origin,
             })
             if (result.success) {
-                const user = result.user
-                await setAuthForUserId(user.id)
-                return { user }
+                const authResult = await setAuthForUserId(result.user.id)
+                return { ...authResult, user: result.user }
             }
             return undefined
         },
@@ -231,9 +238,8 @@ export const mutationResolver: IResolvers<any, ResolverContext> = {
                     id, response, origin,
                 })
                 if (result.success) {
-                    const user = result.user
-                    await setAuthForUserId(user.id)
-                    return { user }
+                    const authResult = await setAuthForUserId(result.user.id)
+                    return { ...authResult, user: result.user }
                 }
             }
 
