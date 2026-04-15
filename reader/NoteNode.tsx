@@ -31,7 +31,7 @@ export function NoteNodeComp({ booqId, note, user }: {
                     <ContextMenuContent
                         booqId={booqId}
                         user={user}
-                        setTarget={() => undefined}
+                        setMenuState={() => undefined}
                         target={{
                             kind: 'note',
                             noteId: note.id,

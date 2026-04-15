@@ -1,70 +1,69 @@
 'use client'
 import { useCallback, useMemo, useState } from 'react'
 import { getAugmentationElement, getSelectionElement, VirtualElement } from '@/viewer'
-import { ContextMenuTarget } from './ContextMenuContent'
+import { MenuState } from './ContextMenuContent'
 import { noteAugmentationId, quoteAugmentationId, TemporaryAugmentation, temporaryAugmentationId } from './useAugmentations'
 
-export type ContextMenuTargetSetter = (setterOrValue: ContextMenuTarget | ((prev: ContextMenuTarget) => ContextMenuTarget)) => void
+export type MenuStateSetter = (setterOrValue: MenuState | ((prev: MenuState) => MenuState)) => void
 export type DisplayTarget = 'floater' | 'side-panel' | 'none'
 
 const CREATE_COMMENT_ID = 'create-comment'
 const ASK_ID = 'ask'
 
-export function useContextMenuState() {
+export function useMenuState() {
     const [anchor, setAnchor] = useState<VirtualElement | undefined>(undefined)
-    const [target, setTarget] = useState<ContextMenuTarget>({ kind: 'empty' })
+    const [state, setState] = useState<MenuState>({ kind: 'empty' })
 
-    const setMenuTarget = useCallback<ContextMenuTargetSetter>(function (setterOrValue) {
-        setTarget(prev => {
+    const setMenuState = useCallback<MenuStateSetter>(function (setterOrValue) {
+        setState(prev => {
             const next =
                 typeof setterOrValue === 'function' ? setterOrValue(prev) : setterOrValue
-            if (sameTarget(prev, next)) {
+            if (sameState(prev, next)) {
                 return prev
             }
-            const newAnchor = getAnchorForTarget(next)
+            const newAnchor = getAnchorForState(next)
             if (newAnchor === undefined && (next.kind === 'note' || next.kind === 'create-comment' || next.kind === 'ask')) {
                 setTimeout(() => {
-                    setAnchor(getAnchorForTarget(next))
+                    setAnchor(getAnchorForState(next))
                 }, 0)
             } else {
                 setAnchor(newAnchor)
             }
             return next
         })
-    }, [setTarget])
+    }, [setState])
 
     const contextMenuAugmentations = useMemo<TemporaryAugmentation[]>(() => {
         const augmentations: TemporaryAugmentation[] = []
-        if (target.kind === 'create-comment') {
+        if (state.kind === 'create-comment') {
             augmentations.push({
-                // Get the range from the parent target
-                range: target.parent.selection.range,
+                range: state.parent.selection.range,
                 name: CREATE_COMMENT_ID,
                 underline: 'dashed',
             })
         }
-        if (target.kind === 'ask') {
+        if (state.kind === 'ask') {
             augmentations.push({
-                range: target.selection.range,
+                range: state.selection.range,
                 name: ASK_ID,
                 color: 'var(--color-selection)',
             })
         }
         return augmentations
-    }, [target])
+    }, [state])
 
-    const displayTarget = useMemo(() => displayTargetForMenuTarget(target), [target])
+    const displayTarget = useMemo(() => displayTargetForState(state), [state])
 
     return {
-        menuTarget: target,
-        setMenuTarget,
+        menuState: state,
+        setMenuState,
         anchor,
         contextMenuAugmentations,
         displayTarget,
     }
 }
 
-function sameTarget(a: ContextMenuTarget, b: ContextMenuTarget) {
+function sameState(a: MenuState, b: MenuState) {
     if (a === b) {
         return true
     }
@@ -77,21 +76,21 @@ function sameTarget(a: ContextMenuTarget, b: ContextMenuTarget) {
         }
     }
     if (a.kind === 'ask' && b.kind === 'ask') {
-        if (a.selection.text === b.selection.text && a.question === b.question && a.hidden === b.hidden) {
+        if (a.selection.text === b.selection.text) {
             return true
         }
     }
     return false
 }
 
-function getAnchorForTarget(target: ContextMenuTarget): VirtualElement | undefined {
-    switch (target.kind) {
+function getAnchorForState(state: MenuState): VirtualElement | undefined {
+    switch (state.kind) {
         case 'empty':
             return undefined
         case 'selection':
             return getSelectionElement()
         case 'note': {
-            const augmentationId = noteAugmentationId(target.noteId)
+            const augmentationId = noteAugmentationId(state.noteId)
             return getAugmentationElement(augmentationId)
         }
         case 'quote': {
@@ -111,18 +110,12 @@ function getAnchorForTarget(target: ContextMenuTarget): VirtualElement | undefin
     }
 }
 
-function displayTargetForMenuTarget(menuTarget: ContextMenuTarget): DisplayTarget {
-    switch (menuTarget.kind) {
+function displayTargetForState(state: MenuState): DisplayTarget {
+    switch (state.kind) {
         case 'empty':
             return 'none'
         case 'ask':
-            if (menuTarget.hidden) {
-                return 'none'
-            } else if (menuTarget.question !== undefined) {
-                return 'side-panel'
-            } else {
-                return 'floater'
-            }
+            return 'floater'
         default:
             return 'floater'
     }

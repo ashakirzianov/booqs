@@ -2,16 +2,16 @@ import { useBooqNotes } from '@/application/notes'
 import { BooqId } from '@/core'
 import { BooqSelection } from '@/viewer'
 import { useState } from 'react'
-import type { CreateCommentTarget, ContextMenuTarget } from './ContextMenuContent'
+import type { CreateCommentTarget, MenuState } from './ContextMenuContent'
 import { NoteAuthorData } from '@/data/notes'
 
 export function CreateCommentTargetMenu({
-    target: { parent }, booqId, user, setTarget,
+    target: { parent }, booqId, user, setMenuState,
 }: {
     target: CreateCommentTarget,
     booqId: BooqId,
     user: NoteAuthorData | undefined,
-    setTarget: (target: ContextMenuTarget) => void,
+    setMenuState: (target: MenuState) => void,
 }) {
     const [comment, setComment] = useState('')
     const { addNote } = useBooqNotes({ booqId, user })
@@ -22,7 +22,7 @@ export function CreateCommentTargetMenu({
     const handlePost = () => {
         if (!user?.id || !comment.trim()) return
 
-        const note = addNote({
+        const result = addNote({
             kind: 'comment',
             range: selection.range,
             content: comment.trim(),
@@ -30,14 +30,14 @@ export function CreateCommentTargetMenu({
             targetQuote: selection.text,
         })
 
-        if (note) {
-            setTarget({ kind: 'empty' })
+        if (result) {
+            setMenuState({ kind: 'comment', commentId: result.optimistic.id })
             removeSelection()
         }
     }
 
     const handleCancel = () => {
-        setTarget(parent)
+        setMenuState(parent)
     }
 
     return <div className='flex flex-col gap-3 p-4'>

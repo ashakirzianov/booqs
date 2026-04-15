@@ -18,13 +18,13 @@ import { useNotesData } from './useNotesData'
 import { useFollowingData } from './useFollowingData'
 import { AccountButton } from '@/components/AccountButton'
 import { usePathname, useSearchParams } from 'next/navigation'
-import { BackIcon, TocIcon, CommentIcon, QuestionMarkIcon } from '@/components/Icons'
+import { BackIcon, TocIcon, CommentIcon } from '@/components/Icons'
 import Link from 'next/link'
 import { useScrollToQuote } from './useScrollToQuote'
 import { useScrollHandler } from './useScrollHandler'
 import { useControlsVisibility } from './useControlsVisibility'
 import { useAugmentations } from './useAugmentations'
-import { useContextMenuState } from './useContextMenuState'
+import { useMenuState } from './useMenuState'
 import { ContextMenuContent } from './ContextMenuContent'
 import { usePageData } from './usePageData'
 import { useNavigationState } from './useNavigationState'
@@ -96,17 +96,17 @@ export function Reader({
     const { followingUserIds, isLoading: isFollowingLoading } = useFollowingData({ user })
 
     const [commentsPanelOpen, setCommentsPanelOpen] = React.useState(false)
-    const toggleCommentsPanelOpen = () => setCommentsPanelOpen(prev => !prev)
 
-    const { anchor, menuTarget, setMenuTarget, contextMenuAugmentations, displayTarget } = useContextMenuState()
+    const { anchor, menuState, setMenuState, contextMenuAugmentations, displayTarget } = useMenuState()
+    const hasCommentTarget = menuState.kind === 'comment' || menuState.kind === 'question-asked'
     const ContextMenuContentNode = useMemo(() => {
         return <ContextMenuContent
             booqId={booqId}
             user={user}
-            target={menuTarget}
-            setTarget={setMenuTarget}
+            target={menuState}
+            setMenuState={setMenuState}
         />
-    }, [booqId, user, menuTarget, setMenuTarget])
+    }, [booqId, user, menuState, setMenuState])
 
     const FloaterMenuContent = useMemo(() => {
         if (displayTarget !== 'floater') {
@@ -120,7 +120,7 @@ export function Reader({
     } = useContextMenuFloater({
         Content: FloaterMenuContent,
         anchor: anchor,
-        setTarget: setMenuTarget,
+        setMenuState: setMenuState,
     })
 
     const NavigationContent = <NavigationPanel
@@ -141,9 +141,18 @@ export function Reader({
         <TocIcon />
     </PanelButton>
 
+    const isCommentsPanelVisible = commentsPanelOpen || hasCommentTarget
+    const toggleCommentsPanel = () => {
+        if (hasCommentTarget) {
+            setMenuState({ kind: 'empty' })
+            setCommentsPanelOpen(false)
+        } else {
+            setCommentsPanelOpen(prev => !prev)
+        }
+    }
     const CommentsButton = <PanelButton
-        onClick={toggleCommentsPanelOpen}
-        selected={commentsPanelOpen}
+        onClick={toggleCommentsPanel}
+        selected={isCommentsPanelVisible}
     >
         <CommentIcon />
     </PanelButton>
@@ -164,6 +173,8 @@ export function Reader({
                     currentUser={user}
                     followingUserIds={followingUserIds}
                     isFollowingLoading={isFollowingLoading}
+                    target={menuState}
+                    setMenuState={setMenuState}
                 />
             </div>
         </>
@@ -185,38 +196,14 @@ export function Reader({
         return (id: string) => {
             const next = menuTargetForAugmentation(id)
             if (next) {
-                setMenuTarget(next)
+                setMenuState(next)
             }
         }
-    }, [menuTargetForAugmentation, setMenuTarget])
+    }, [menuTargetForAugmentation, setMenuState])
 
     const { visible } = useControlsVisibility()
     const isControlsVisible = (FloaterMenuContent === null) && visible
-    // Auto-open right panel when context menu should be displayed in side panel and not hidden
-    const shouldShowRightPanel = commentsPanelOpen || (displayTarget === 'side-panel')
-
-    const toggleAskVisibility = useMemo(() => {
-        return () => {
-            setMenuTarget(menuTarget => {
-                if (menuTarget.kind === 'ask') {
-                    return {
-                        ...menuTarget,
-                        hidden: menuTarget.hidden === true ? false : true,
-                    }
-                }
-                return menuTarget
-            })
-        }
-    }, [setMenuTarget])
-    const showAskButton = menuTarget.kind === 'ask' && menuTarget.question !== undefined
-    const AskButton = showAskButton ? (
-        <PanelButton
-            onClick={toggleAskVisibility}
-            selected={menuTarget.hidden !== true}
-        >
-            <QuestionMarkIcon />
-        </PanelButton>
-    ) : null
+    const shouldShowRightPanel = isCommentsPanelVisible || (displayTarget === 'side-panel')
 
     const LeftButtons = <>
         <Link href={feedHref()}>
@@ -229,7 +216,6 @@ export function Reader({
 
     const showLoadingIndicator = useIsLoading()
     const RightButtons = <>
-        {AskButton}
         {CommentsButton}
         <ThemerButton />
         <AccountButton

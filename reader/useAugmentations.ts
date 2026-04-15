@@ -1,7 +1,7 @@
 import { useMemo, useCallback } from 'react'
 import { getAugmentationText, Augmentation } from '@/viewer'
 import { BooqRange } from '@/core'
-import { ContextMenuTarget } from './ContextMenuContent'
+import { MenuState } from './ContextMenuContent'
 import { BooqNote } from '@/data/notes'
 
 export type TemporaryAugmentation = {
@@ -65,7 +65,7 @@ export function useAugmentations({
 
         return result
     }, [quote, highlights, comments, temporaryAugmentations])
-    const menuTargetForAugmentation = useCallback(function (augmentationId: string): ContextMenuTarget | undefined {
+    const menuTargetForAugmentation = useCallback(function (augmentationId: string): MenuState | undefined {
         const [kind, id] = augmentationId.split('/')
         switch (kind) {
             case 'quote':

@@ -13,6 +13,7 @@ export const HIGHLIGHT_KINDS = [
     'highlight-0', 'highlight-1', 'highlight-2', 'highlight-3', 'highlight-4',
 ]
 export const COMMENT_KIND = 'comment'
+export const QUESTION_KIND = 'question'
 
 export function useBooqNotes({
     booqId, user, initialNotes,
@@ -118,7 +119,7 @@ export function useBooqNotes({
             privacy,
         }
 
-        postNoteTrigger({
+        const posted = postNoteTrigger({
             body: postBody,
             noteId,
         }, {
@@ -128,7 +129,7 @@ export function useBooqNotes({
                     : { notes: [optimisticResponse] },
         })
 
-        return optimisticResponse
+        return { optimistic: optimisticResponse, posted }
     }
 
     const { trigger: deleteNoteTrigger } = useSWRMutation(
@@ -157,14 +158,16 @@ export function useBooqNotes({
     )
 
     function removeNote({ noteId }: { noteId: string }) {
-        if (!user || !data) return false
-        deleteNoteTrigger(noteId, {
+        if (!user || !data) return undefined
+
+        const posted = deleteNoteTrigger(noteId, {
             optimisticData: (currentData: GetResponse | undefined): GetResponse =>
                 currentData
                     ? { notes: currentData.notes.filter(n => n.id !== noteId) }
                     : { notes: [] },
         })
-        return true
+
+        return { optimistic: { noteId }, posted }
     }
 
     const { trigger: updateNoteTrigger } = useSWRMutation(
@@ -217,7 +220,7 @@ export function useBooqNotes({
         if (kind !== undefined) body.kind = kind
         if (content !== undefined) body.content = content
 
-        updateNoteTrigger({ noteId, body }, {
+        const posted = updateNoteTrigger({ noteId, body }, {
             optimisticData: (currentData: GetResponse | undefined): GetResponse => {
                 if (!currentData) {
                     return { notes: [] }
@@ -232,6 +235,8 @@ export function useBooqNotes({
                 }
             },
         })
+
+        return { optimistic: { noteId, ...body }, posted }
     }
 
     return {

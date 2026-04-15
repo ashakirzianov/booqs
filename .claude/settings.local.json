@@ -69,7 +69,9 @@
       "Bash(while IFS= read -r file)",
       "Bash(then if:*)",
       "Bash(npm ls:*)",
-      "Bash(npm uninstall:*)"
+      "Bash(npm uninstall:*)",
+      "Bash(mkdir -p /Users/ashakirzianov/repos/booqs/app/api/generate-reply/[noteId])",
+      "Bash(mv /Users/ashakirzianov/repos/booqs/app/api/generate-reply/route.ts /Users/ashakirzianov/repos/booqs/app/api/generate-reply/[noteId]/route.ts)"
     ]
   },
   "enableAllProjectMcpServers": false

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import Link from 'next/link'
 import { BooqId, pathToId } from '@/core'
 import { TabButton } from './TabButton'
@@ -7,15 +7,74 @@ import { userHref } from '@/common/href'
 import { BooqNote, NoteAuthorData } from '@/data/notes'
 import { NoteReplies } from './NoteReplies'
 import { useBooqNotes } from '@/application/notes'
-import { PencilIcon, RemoveIcon } from '@/components/Icons'
+import { BackIcon, PencilIcon, RemoveIcon } from '@/components/Icons'
 import { MenuButton } from './MenuButton'
+import { MenuState } from './ContextMenuContent'
+import { useGenerateReply } from '@/application/ask'
 
-export function CommentsPanel({ booqId, comments, currentUser, followingUserIds, isFollowingLoading }: {
+export function CommentsPanel({ booqId, comments, currentUser, followingUserIds, isFollowingLoading, target, setMenuState }: {
     booqId: BooqId,
     comments: BooqNote[],
     currentUser?: NoteAuthorData,
     followingUserIds?: string[],
     isFollowingLoading?: boolean,
+    target: MenuState,
+    setMenuState: (target: MenuState) => void,
+}) {
+    const selectedCommentId = target.kind === 'comment' ? target.commentId
+        : target.kind === 'question-asked' ? target.commentId
+        : undefined
+
+    const { generateReply, state: replyState } = useGenerateReply({ booqId })
+
+    const questionToGenerate = target.kind === 'question-asked' ? target.commentId : undefined
+    React.useEffect(() => {
+        if (questionToGenerate) {
+            generateReply(questionToGenerate)
+            setMenuState({ kind: 'comment', commentId: questionToGenerate })
+        }
+    }, [questionToGenerate, generateReply, setMenuState])
+
+    const streamingReply = useMemo((): StreamingReply | undefined => {
+        if (replyState.status === 'streaming') {
+            return { noteId: replyState.noteId, answer: replyState.answer }
+        }
+        return undefined
+    }, [replyState])
+
+    if (selectedCommentId) {
+        return <CommentDetail
+            booqId={booqId}
+            comments={comments}
+            selectedCommentId={selectedCommentId}
+            currentUser={currentUser}
+            onBack={() => setMenuState({ kind: 'empty' })}
+            streamingReply={streamingReply}
+        />
+    }
+
+    return <CommentsList
+        booqId={booqId}
+        comments={comments}
+        currentUser={currentUser}
+        followingUserIds={followingUserIds}
+        isFollowingLoading={isFollowingLoading}
+        onSelectComment={(commentId) => setMenuState({ kind: 'comment', commentId })}
+    />
+}
+
+type StreamingReply = {
+    noteId: string,
+    answer: string,
+}
+
+function CommentsList({ booqId, comments, currentUser, followingUserIds, isFollowingLoading, onSelectComment }: {
+    booqId: BooqId,
+    comments: BooqNote[],
+    currentUser?: NoteAuthorData,
+    followingUserIds?: string[],
+    isFollowingLoading?: boolean,
+    onSelectComment: (commentId: string) => void,
 }) {
     const [commentsFilter, setCommentsFilter] = React.useState<'all' | 'following'>('all')
 
@@ -29,6 +88,7 @@ export function CommentsPanel({ booqId, comments, currentUser, followingUserIds,
             followingUserIds.includes(comment.author.id)
         )
     }, [comments, commentsFilter, currentUser, followingUserIds])
+
     return (
         <div className='flex flex-1' style={{
             padding: '0 env(safe-area-inset-right) 0 env(safe-area-inset-left)',
@@ -61,7 +121,12 @@ export function CommentsPanel({ booqId, comments, currentUser, followingUserIds,
                             </div>
                         ) : (
                             filteredComments.map(note => (
-                                <CommentItem key={note.id} comment={note} booqId={booqId} user={currentUser} />
+                                <div key={note.id}
+                                    onClick={() => onSelectComment(note.id)}
+                                    className='cursor-pointer hover:bg-dimmed/5 rounded-lg transition-colors'
+                                >
+                                    <CommentItem comment={note} booqId={booqId} user={currentUser} />
+                                </div>
                             ))
                         )}
                     </div>
@@ -71,7 +136,58 @@ export function CommentsPanel({ booqId, comments, currentUser, followingUserIds,
     )
 }
 
-function CommentItem({ comment, booqId, user }: { comment: BooqNote, booqId: BooqId, user?: NoteAuthorData }) {
+function CommentDetail({ booqId, comments, selectedCommentId, currentUser, onBack, streamingReply }: {
+    booqId: BooqId,
+    comments: BooqNote[],
+    selectedCommentId: string,
+    currentUser?: NoteAuthorData,
+    onBack: () => void,
+    streamingReply?: StreamingReply,
+}) {
+    const selectedComment = comments.find(c => c.id === selectedCommentId)
+
+    return (
+        <div className='flex flex-1' style={{
+            padding: '0 env(safe-area-inset-right) 0 env(safe-area-inset-left)',
+        }}>
+            <div className='flex flex-1 flex-col text-dimmed max-h-full text-sm'>
+                <div className='flex flex-col flex-1 overflow-auto mt-lg'>
+                    <div className='flex flex-col xl:py-0 xl:px-4 space-y-3'>
+                        <button
+                            onClick={onBack}
+                            className='flex items-center gap-1 text-dimmed hover:text-primary transition-colors bg-transparent border-none cursor-pointer self-start'
+                            style={{ fontFamily: 'var(--font-main)' }}
+                        >
+                            <div className='w-4 h-4'><BackIcon /></div>
+                            <span className='text-sm'>All comments</span>
+                        </button>
+                    </div>
+                    <div className='flex flex-col flex-1 xl:py-0 xl:px-4 space-y-6'>
+                        {selectedComment ? (
+                            <CommentItem
+                                comment={selectedComment}
+                                booqId={booqId}
+                                user={currentUser}
+                                streamingReply={streamingReply}
+                            />
+                        ) : (
+                            <div className='text-center py-8'>
+                                Loading...
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </div>
+        </div>
+    )
+}
+
+function CommentItem({ comment, booqId, user, streamingReply }: {
+    comment: BooqNote,
+    booqId: BooqId,
+    user?: NoteAuthorData,
+    streamingReply?: StreamingReply,
+}) {
     const isOwnComment = user?.id === comment.author.id
     const { updateNote, removeNote } = useBooqNotes({ booqId, user })
     const [isEditing, setIsEditing] = useState(false)
@@ -90,6 +206,8 @@ function CommentItem({ comment, booqId, user }: { comment: BooqNote, booqId: Boo
     const handleRemove = () => {
         removeNote({ noteId: comment.id })
     }
+
+    const showStreamingReply = streamingReply && streamingReply.noteId === comment.id
 
     return (
         <div className='rounded-lg p-3 space-y-2 w-full max-w-md'>
@@ -157,8 +275,34 @@ function CommentItem({ comment, booqId, user }: { comment: BooqNote, booqId: Boo
                 </div>
             </div>
 
+            {/* Streaming AI reply */}
+            {showStreamingReply && (
+                <StreamingReplyDisplay answer={streamingReply.answer} />
+            )}
+
             {/* Replies */}
             <NoteReplies noteId={comment.id} user={user} />
+        </div>
+    )
+}
+
+function StreamingReplyDisplay({ answer }: {
+    answer: string,
+}) {
+    return (
+        <div className="flex flex-col gap-1">
+            <div className="border-l-2 border-action/30 px-3 text-sm text-primary">
+                {answer || (
+                    <span className="text-dimmed animate-pulse">Thinking...</span>
+                )}
+                {answer && (
+                    <span className="inline-block w-1.5 h-3.5 bg-action/50 ml-0.5 animate-pulse" />
+                )}
+            </div>
+            <div className="flex items-center gap-2 text-xs text-dimmed px-3">
+                <span>🤖</span>
+                <span>Booqs AI</span>
+            </div>
         </div>
     )
 }
