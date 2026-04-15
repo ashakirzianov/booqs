@@ -4,9 +4,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Collaboration Workflow
 
+### Documentation Organization
+- Three top-level `.md` files: `CLAUDE.md`, `BACKLOG.md`, `SPECS.md`.
+- Per-feature design docs and task files live in `docs/`, using lowercase kebab-case names (e.g., `docs/book-upload.md`).
+
 ### Task Management
 - Work is driven through a combination of direct prompts and task files.
-- Task files live at the project root as `.md` files using checklist format, optionally divided into categories.
+- Task files live in `docs/` as `.md` files using checklist format, optionally divided into categories.
 - Tasks in a file are pre-approved — execute them without presenting the approach first.
 
 ### Planning & Scope
