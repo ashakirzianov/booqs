@@ -116,7 +116,7 @@ export default async function NotesPage({ params }: {
 
     return (
         <main className="flex flex-row justify-center min-h-screen bg-background">
-            <div className="flex flex-col max-w-4xl w-full">
+            <div className="flex flex-col max-w-4xl w-full px-0">
                 <div className="mb-6">
                     <h1 className="text-3xl font-bold text-primary mb-2">
                         Notes for{' '}

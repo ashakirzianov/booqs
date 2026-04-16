@@ -104,7 +104,7 @@ export function NoteFragment({
 
             {/* Fragment content */}
             {isExpanded && nodes ? (
-                <div className="rounded shadow-sm p-3 bg-background overflow-y-auto font-book text-primary">
+                <div className="rounded shadow-sm py-3 px-12 bg-background overflow-y-auto font-book text-primary">
                     <BooqContent
                         nodes={nodes}
                         styles={styles ?? {}}
