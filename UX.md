@@ -196,7 +196,7 @@ Each note card has three sections stacked vertically:
 
 **2. Control Row** (visible when expanded)
 - **Left**: Collapse button
-- **Right**: Color picker (5 color swatches to change the note's highlight color; selected color has a top border) + Remove button (trash icon)
+- **Right**: Color picker (5 color swatches to change the note's highlight color; selected color has a top border; hidden for comments and questions) + Remove button (trash icon)
 
 **3. Note Content (inline edit)**
 - **View mode**: Shows note text in italic. If empty, shows "Add note…" placeholder in dimmed color. Click to enter edit mode.

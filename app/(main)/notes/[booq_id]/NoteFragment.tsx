@@ -9,6 +9,7 @@ import { LightButton, RemoveButton } from '@/components/Buttons'
 import { ColorPicker } from '@/components/ColorPicker'
 import { booqContentHref } from '@/common/href'
 import { BooqNote } from '@/data/notes'
+import { COMMENT_KIND, QUESTION_KIND } from '@/application/notes'
 
 type NoteFragmentProps = ExpandedNoteFragmentData & {
     onColorChange: (kind: string) => void,
@@ -91,12 +92,14 @@ export function NoteFragment({
                                     isRemoving={false}
                                 />
                             )}
-                            <div className='w-32 h-6 shadow-md rounded overflow-clip'>
-                                <ColorPicker
-                                    selectedKind={note.kind}
-                                    onColorChange={onColorChange}
-                                />
-                            </div>
+                            {!isCommentOrQuestion(note.kind) && (
+                                <div className='w-32 h-6 shadow-md rounded overflow-clip'>
+                                    <ColorPicker
+                                        selectedKind={note.kind}
+                                        onColorChange={onColorChange}
+                                    />
+                                </div>
+                            )}
                         </>
                     )}
                 </div>
@@ -128,4 +131,8 @@ export function NoteFragment({
             )}
         </>
     )
+}
+
+function isCommentOrQuestion(kind: string): boolean {
+    return kind === COMMENT_KIND || kind === QUESTION_KIND
 }
