@@ -107,7 +107,8 @@
 
 **Left Panel** (fixed sidebar, below header, in left gutter):
 - Navigation menu (signed-in users only) with links: Feed, Notes, Collections, Followers, History, Profile
-- Each menu item has an icon and label
+- Each menu item has an icon (1.5rem, centered in a 2rem container matching the logo size) and label
+- Icons are visually aligned with the logo above
 - Active item indicated by highlight color
 
 **Main Content** (center column, 780px max): Page-specific content
@@ -198,8 +199,8 @@ Each note card has three sections stacked vertically:
 - **Right**: Color picker (5 color swatches to change the note's highlight color; selected color has a top border) + Remove button (trash icon)
 
 **3. Note Content (inline edit)**
-- **View mode**: Shows note text in italic. If empty, shows "Add note..." placeholder in dimmed color. Click to enter edit mode.
-- **Edit mode**: Textarea (3 rows min, vertically resizable) with Save (primary) and Cancel (secondary) buttons. Allows empty content (clears the note text).
+- **View mode**: Shows note text in italic. If empty, shows "Add note…" placeholder in dimmed color. Click to enter edit mode.
+- **Edit mode**: Textarea (3 rows min, auto-focused) with Save (primary) and Cancel (secondary) buttons. Allows empty content (clears the note text). Keyboard shortcuts: Enter to save, Cmd/Ctrl+Enter for newline, Escape to cancel.
 
 **4. Replies** (public comments only)
 - Flat list of replies, each showing: content with dimmed left border, author badge + name (linked to profile) + relative timestamp, delete button (own replies only)
@@ -497,7 +498,7 @@ Triggered by:
 
 ### 8.2 Header Search
 
-Small search input (w-40) styled as a read-only input with `Cmd+K` keyboard hint badge. Clicking opens the search modal.
+Compact search input (w-36, text-sm) styled as a read-only input with subtle border and `⌘K` keyboard hint badge. Clicking opens the search modal.
 
 Only shown if user has reading history (i.e., returning users).
 
