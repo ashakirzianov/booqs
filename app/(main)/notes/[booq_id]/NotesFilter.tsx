@@ -8,6 +8,7 @@ import { NoteCard } from './NoteCard'
 import clsx from 'clsx'
 import { ExpandedNoteFragmentData } from './NoteFragment'
 import { CommentIcon } from '@/components/Icons'
+import { LightButton } from '@/components/Buttons'
 
 type FilterGroup = {
     key: string,
@@ -31,6 +32,7 @@ export function NotesFilter({ data, booqId, user }: {
     })
 
     const [selectedFilter, setSelectedFilter] = useState<string>('all')
+    const [expandedNotes, setExpandedNotes] = useState<Set<string>>(new Set())
 
     // Merge server data with SWR-updated notes
     const mergedNoteData = useMemo(() => {
@@ -71,6 +73,28 @@ export function NotesFilter({ data, booqId, user }: {
         ? mergedNoteData
         : mergedNoteData.filter(d => filterKeyForKind(d.note.kind) === selectedFilter), [mergedNoteData, selectedFilter])
 
+    const hasAnyExpanded = filteredNotes.some(d => expandedNotes.has(d.note.id))
+
+    function handleToggleAll() {
+        if (hasAnyExpanded) {
+            setExpandedNotes(new Set())
+        } else {
+            setExpandedNotes(new Set(filteredNotes.map(d => d.note.id)))
+        }
+    }
+
+    function handleToggleNote(noteId: string) {
+        setExpandedNotes(prev => {
+            const next = new Set(prev)
+            if (next.has(noteId)) {
+                next.delete(noteId)
+            } else {
+                next.add(noteId)
+            }
+            return next
+        })
+    }
+
     function handleNoteColorChange(_noteId: string, newKind: string) {
         if (selectedFilter === 'all') return
         if (filterKeyForKind(newKind) !== selectedFilter) {
@@ -80,7 +104,7 @@ export function NotesFilter({ data, booqId, user }: {
 
     return (
         <>
-            {/* Filter selector */}
+            {/* Notes controls row */}
             <div className="bg-background flex flex-row items-center gap-3 my-3">
                 <h3 className="text-md font-medium text-dimmed whitespace-nowrap">Show notes:</h3>
                 <div className='h-10 shadow-md rounded overflow-clip' style={{
@@ -104,6 +128,13 @@ export function NotesFilter({ data, booqId, user }: {
                         ))}
                     </div>
                 </div>
+                <div className="ml-auto">
+                    <LightButton
+                        text={hasAnyExpanded ? 'Collapse All' : 'Expand All'}
+                        onClick={handleToggleAll}
+                        size="small"
+                    />
+                </div>
             </div>
 
             {/* Notes list */}
@@ -113,6 +144,8 @@ export function NotesFilter({ data, booqId, user }: {
                         key={datum.note.id}
                         noteFragmentData={datum}
                         user={user}
+                        isExpanded={expandedNotes.has(datum.note.id)}
+                        onToggle={() => handleToggleNote(datum.note.id)}
                         onColorChange={handleNoteColorChange}
                     />
                 )) : (

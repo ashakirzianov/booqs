@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useMemo } from 'react'
 import { ExternalLinkIcon } from '@/components/Icons'
 import { BooqNode, BooqStyles, BooqRange } from '@/core'
 import { Augmentation, BooqContent } from '@/viewer'
@@ -11,6 +11,8 @@ import { BooqNote } from '@/data/notes'
 import { COMMENT_KIND, QUESTION_KIND } from '@/application/notes'
 
 type NoteFragmentProps = ExpandedNoteFragmentData & {
+    isExpanded: boolean,
+    onToggle: () => void,
     onColorChange: (kind: string) => void,
     onRemove?: () => void,
 }
@@ -24,10 +26,9 @@ export type ExpandedNoteFragmentData = {
 
 export function NoteFragment({
     note, nodes, styles, range,
+    isExpanded, onToggle,
     onColorChange, onRemove,
 }: NoteFragmentProps) {
-    const [isExpanded, setIsExpanded] = useState(false)
-
     const augmentationColor = `hsl(from var(--color-${note.kind}) h s l / 40%)`
 
     const isComment = isCommentOrQuestion(note.kind)
@@ -45,10 +46,6 @@ export function NoteFragment({
     }, [nodes, note.id, note.range, augmentationColor, isComment])
 
     const viewInBooqHref = booqContentHref({ booqId: note.booqId, path: range.start })
-
-    function handleToggle() {
-        setIsExpanded(!isExpanded)
-    }
 
     return (
         <>
@@ -91,7 +88,7 @@ export function NoteFragment({
             {isExpanded && nodes ? (
                 <div
                     className="rounded shadow-sm py-3 px-12 bg-background overflow-y-auto font-book text-primary cursor-pointer"
-                    onClick={handleToggle}
+                    onClick={onToggle}
                 >
                     <BooqContent
                         nodes={nodes}
@@ -103,7 +100,7 @@ export function NoteFragment({
             ) : (
                 <div
                     className="rounded shadow-sm py-3 px-12 cursor-pointer hover:opacity-80 transition-opacity bg-background font-book text-primary"
-                    onClick={handleToggle}
+                    onClick={onToggle}
                     title='Click to expand'
                 >
                     <span className="m-0" style={{

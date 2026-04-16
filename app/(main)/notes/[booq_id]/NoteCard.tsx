@@ -9,10 +9,12 @@ import { RetryIcon } from '@/components/Icons'
 import { NoteReplies } from '@/reader/NoteReplies'
 
 export function NoteCard({
-    noteFragmentData, user, onColorChange,
+    noteFragmentData, user, isExpanded, onToggle, onColorChange,
 }: {
     noteFragmentData: ExpandedNoteFragmentData,
     user: NoteAuthorData | undefined,
+    isExpanded: boolean,
+    onToggle: () => void,
     onColorChange?: (noteId: string, newKind: string) => void,
 }) {
     const { note, nodes, range } = noteFragmentData
@@ -97,6 +99,8 @@ export function NoteCard({
                     note={note}
                     nodes={nodes}
                     range={range}
+                    isExpanded={isExpanded}
+                    onToggle={onToggle}
                     onColorChange={handleColorChange}
                     onRemove={handleRemove}
                 />
