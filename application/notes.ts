@@ -199,7 +199,7 @@ export function useBooqNotes({
                 return {
                     notes: currentData.notes.map(n =>
                         n.id === patchResponse.id
-                            ? { ...n, ...patchResponse }
+                            ? { ...n, ...patchResponse, content: patchResponse.content }
                             : n
                     ),
                 }
