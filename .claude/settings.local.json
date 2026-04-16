@@ -71,7 +71,8 @@
       "Bash(npm ls:*)",
       "Bash(npm uninstall:*)",
       "Bash(mkdir -p /Users/ashakirzianov/repos/booqs/app/api/generate-reply/[noteId])",
-      "Bash(mv /Users/ashakirzianov/repos/booqs/app/api/generate-reply/route.ts /Users/ashakirzianov/repos/booqs/app/api/generate-reply/[noteId]/route.ts)"
+      "Bash(mv /Users/ashakirzianov/repos/booqs/app/api/generate-reply/route.ts /Users/ashakirzianov/repos/booqs/app/api/generate-reply/[noteId]/route.ts)",
+      "Bash(git diff:*)"
     ]
   },
   "enableAllProjectMcpServers": false

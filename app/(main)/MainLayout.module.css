@@ -1,7 +1,6 @@
 .layout {
     --content-width: 780px;
     --header-height: 4rem;
-    --panel-width: 300px;
     --spacing-regular: 0.5rem;
     --spacing-large: 1rem;
 }
@@ -9,48 +8,38 @@
 .layout {
     display: grid;
     grid-template-columns: 1fr var(--content-width) 1fr;
-    grid-template-rows: auto 1fr;
+    grid-template-rows: var(--header-height) 1fr;
     grid-template-areas:
         "left-header  main-content  right-header"
         "left-panel   main-content  right-panel";
     min-height: 100vh;
-    width: 100vw;
-    overflow-x: hidden;
 }
 
 .leftHeader {
     grid-area: left-header;
-    position: fixed;
+    position: sticky;
     top: 0;
-    left: 0;
-    width: calc((100vw - var(--content-width)) / 2);
-    height: var(--header-height);
     display: flex;
     align-items: center;
     justify-content: flex-start;
     padding: 0 var(--spacing-large);
     gap: var(--spacing-large);
     background: var(--color-background);
-    z-index: 10;
-    box-sizing: border-box;
+    z-index: 1;
     overflow: hidden;
 }
 
 .rightHeader {
     grid-area: right-header;
-    position: fixed;
+    position: sticky;
     top: 0;
-    right: 0;
-    width: calc((100vw - var(--content-width)) / 2);
-    height: var(--header-height);
     display: flex;
     align-items: center;
     justify-content: flex-end;
     padding: 0 var(--spacing-large);
     gap: var(--spacing-regular);
     background: var(--color-background);
-    z-index: 10;
-    box-sizing: border-box;
+    z-index: 1;
     overflow: hidden;
 }
 
@@ -58,92 +47,60 @@
     grid-area: main-content;
     display: flex;
     flex-direction: column;
-    background: var(--color-background);
     padding: var(--spacing-large) var(--spacing-regular) var(--spacing-regular);
-    box-sizing: border-box;
     overflow-x: hidden;
-    width: var(--content-width);
 }
-
 
 .leftPanel {
     grid-area: left-panel;
-    position: fixed;
+    position: sticky;
     top: var(--header-height);
-    left: 0;
-    width: calc((100vw - var(--content-width)) / 2);
-    bottom: 0;
-    background: var(--color-background);
+    height: calc(100vh - var(--header-height));
     padding: var(--spacing-regular) 0;
     overflow-y: auto;
     overflow-x: hidden;
-    box-sizing: border-box;
 }
 
 .rightPanel {
     grid-area: right-panel;
-    position: fixed;
+    position: sticky;
     top: var(--header-height);
-    right: 0;
-    width: calc((100vw - var(--content-width)) / 2);
-    bottom: 0;
-    background: var(--color-background);
+    height: calc(100vh - var(--header-height));
     padding: var(--spacing-regular);
     overflow-y: auto;
     overflow-x: hidden;
-    box-sizing: border-box;
 }
 
 /* Mobile responsive breakpoint */
 @media (max-width: 1024px) {
     .layout {
         grid-template-columns: 1fr;
-        grid-template-rows: var(--header-height) auto;
+        grid-template-rows: var(--header-height) 1fr;
         grid-template-areas:
             "header"
             "main-content";
-        min-height: 100vh;
     }
 
     .leftHeader {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        display: flex;
+        grid-area: header;
         justify-content: space-between;
-        padding: 0 var(--spacing-large);
+        z-index: 1;
     }
 
     .rightHeader {
-        position: fixed;
-        top: 0;
-        right: 0;
-        width: auto;
-        height: var(--header-height);
+        grid-area: header;
         background: transparent;
         justify-content: flex-end;
-        z-index: 11;
+        z-index: 2;
     }
 
     .mainContent {
-        margin-left: 0;
-        margin-right: 0;
-        padding-top: var(--header-height);
-        width: 100vw;
-        box-sizing: border-box;
-        overflow-x: hidden;
+        padding: var(--spacing-large) var(--spacing-large) 0;
     }
 
     .leftPanel,
     .rightPanel {
         display: none;
-    }
-
-    .mainContent {
-        padding: var(--header-height) var(--spacing-large) 0;
-        box-sizing: border-box;
-        overflow-x: hidden;
     }
 }
 
