@@ -14,7 +14,7 @@ interface MenuLinkProps {
 
 export function MenuLink({ href, icon, children }: MenuLinkProps) {
     const pathname = usePathname()
-    const isActive = pathname === href
+    const isActive = pathname === href || pathname.startsWith(href + '/')
 
     return (
         <Link
