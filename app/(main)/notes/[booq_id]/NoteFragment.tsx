@@ -25,7 +25,7 @@ export type ExpandedNoteFragmentData = {
 }
 
 export function NoteFragment({
-    note, overlapping, nodes, styles, range,
+    note, nodes, styles, range,
     onColorChange, onRemove,
 }: NoteFragmentProps) {
     const [isExpanded, setIsExpanded] = useState(false)
@@ -33,31 +33,16 @@ export function NoteFragment({
 
     const augmentationColor = `hsl(from var(--color-${note.kind}) h s l / 40%)`
 
-    // Create augmentations for the current note and all overlapping notes
     const noteAugmentations = useMemo<Augmentation[]>(() => {
         if (!nodes) {
             return []
         }
-
-        const augmentations: Augmentation[] = []
-        augmentations.push({
+        return [{
             id: `note-${note.id}`,
             range: note.range,
             color: augmentationColor,
-        })
-
-        // Add augmentations for all overlapping notes
-        overlapping.forEach((overlappingNote) => {
-            const overlappingColor = `hsl(from var(--color-${overlappingNote.kind}) h s l / 40%)`
-            augmentations.push({
-                id: `note-${overlappingNote.id}`,
-                range: overlappingNote.range,
-                color: overlappingColor,
-            })
-        })
-
-        return augmentations
-    }, [nodes, overlapping, note.id, note.range, augmentationColor])
+        }]
+    }, [nodes, note.id, note.range, augmentationColor])
 
     function handleExpand() {
         setIsExpanded(!isExpanded)
@@ -135,4 +120,29 @@ export function NoteFragment({
 
 function isCommentOrQuestion(kind: string): boolean {
     return kind === COMMENT_KIND || kind === QUESTION_KIND
+}
+
+// Builds augmentations for a note and its overlapping neighbors.
+// Can be used to show all nearby highlights in the expanded note preview,
+// e.g. to give the reader context about other annotations in the same passage.
+// Currently unused — kept for future use if we want to restore overlapping highlights.
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function buildAugmentationsWithOverlapping(
+    note: BooqNote,
+    overlapping: BooqNote[],
+): Augmentation[] {
+    const color = `hsl(from var(--color-${note.kind}) h s l / 40%)`
+    const augmentations: Augmentation[] = [{
+        id: `note-${note.id}`,
+        range: note.range,
+        color,
+    }]
+    overlapping.forEach((overlappingNote) => {
+        augmentations.push({
+            id: `note-${overlappingNote.id}`,
+            range: overlappingNote.range,
+            color: `hsl(from var(--color-${overlappingNote.kind}) h s l / 40%)`,
+        })
+    })
+    return augmentations
 }
