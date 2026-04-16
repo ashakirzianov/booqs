@@ -9,7 +9,7 @@
 .layout {
     display: grid;
     grid-template-columns: 1fr var(--content-width) 1fr;
-    grid-template-rows: var(--header-height) auto;
+    grid-template-rows: auto 1fr;
     grid-template-areas:
         "left-header  main-content  right-header"
         "left-panel   main-content  right-panel";
