@@ -8,8 +8,18 @@
 
 ### 1.1 Typography
 
-- **UI Font (--font-main)**: Nunito Sans (sans-serif), variable font (all weights), subsets: latin, cyrillic. Used for all interface elements, navigation, buttons, and labels. Font weights use standard Tailwind classes (font-medium=500, font-semibold=600, font-bold=700).
-- **Book Font (--font-book)**: Lora (serif), variable font (all weights), subsets: latin-ext, cyrillic-ext. Used for rendering book content in the reader.
+- **UI Font (--font-main)**: Nunito Sans (sans-serif), variable font, subsets: latin, cyrillic. Used for all interface elements, navigation, buttons, and labels.
+- **Book Font (--font-book)**: Lora (serif), variable font, subsets: latin-ext, cyrillic-ext. Used for rendering book content in the reader.
+
+**Font Weights** (defined in globals.css, overriding Tailwind defaults):
+
+| Tailwind class | CSS variable | Value | Usage |
+|---|---|---|---|
+| `font-normal` | `--font-weight-normal` | 200 | Body text, labels, controls, buttons, menu items |
+| `font-medium` | `--font-weight-medium` | 250 | Sub-headings (h2, h3 section titles) |
+| `font-bold` | `--font-weight-bold` | 300 | Main headings (h1, page titles) |
+
+Only these three weight classes are used. To adjust the overall weight feel, change the three values in `globals.css`.
 
 ### 1.2 Color Palette
 

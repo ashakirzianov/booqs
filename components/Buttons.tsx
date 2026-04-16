@@ -92,7 +92,7 @@ export function ActionButton({
         onClick={onClick}
         disabled={disabled}
         className={clsx(
-            'rounded-md font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center content-center cursor-pointer',
+            'rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center content-center cursor-pointer',
             {
                 'bg-action text-white hover:bg-highlight': variant === 'primary',
                 'border border-dimmed text-dimmed hover:bg-dimmed/10': variant === 'secondary',

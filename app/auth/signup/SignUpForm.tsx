@@ -92,7 +92,7 @@ export function SignUpForm({
             <form onSubmit={handleSubmit} className='flex flex-col gap-6'>
                 {/* Email field (non-editable) */}
                 <div className='flex flex-col gap-2'>
-                    <label className='text-sm font-medium text-secondary'>Email</label>
+                    <label className='text-sm text-secondary'>Email</label>
                     <input
                         type='email'
                         value={email}
@@ -103,7 +103,7 @@ export function SignUpForm({
 
                 {/* Username field */}
                 <div className='flex flex-col gap-2'>
-                    <label className='text-sm font-medium text-secondary'>Username</label>
+                    <label className='text-sm text-secondary'>Username</label>
                     <input
                         type='text'
                         value={formData.username}
@@ -123,7 +123,7 @@ export function SignUpForm({
 
                 {/* Name field */}
                 <div className='flex flex-col gap-2'>
-                    <label className='text-sm font-medium text-secondary'>
+                    <label className='text-sm text-secondary'>
                         Name <span className='text-alert'>*</span>
                     </label>
                     <input
@@ -145,7 +145,7 @@ export function SignUpForm({
 
                 {/* Emoji selector */}
                 <div className='flex flex-col gap-2'>
-                    <label className='text-sm font-medium text-secondary'>Profile Emoji</label>
+                    <label className='text-sm text-secondary'>Profile Emoji</label>
                     <div className='flex items-center gap-3'>
                         <button
                             onClick={() => setFormData(prev => ({ ...prev, showEmojiSelector: true }))}

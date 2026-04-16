@@ -106,7 +106,7 @@ export function NotesFilter({ data, booqId, user }: {
         <>
             {/* Notes controls row */}
             <div className="bg-background flex flex-row items-center gap-3 my-3">
-                <h3 className="text-md font-medium text-dimmed whitespace-nowrap">Show notes:</h3>
+                <h3 className="text-md text-dimmed whitespace-nowrap">Show notes:</h3>
                 <div className='h-10 shadow-md rounded overflow-clip' style={{
                     width: `calc(var(--spacing) * ${(filterGroups.length + 1) * 10})`,
                 }}>
@@ -176,7 +176,7 @@ function FilterButton({
             onClick={onClick}
             title={label}
             className={clsx(
-                'flex items-center justify-center text-xs font-medium transition-colors duration-200 border-b-5 h-full w-full',
+                'flex items-center justify-center text-xs transition-colors duration-200 border-b-5 h-full w-full',
                 !color && !icon && 'text-dimmed',
                 icon && 'text-dimmed',
             )}

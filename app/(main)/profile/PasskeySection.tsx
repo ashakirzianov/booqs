@@ -45,7 +45,7 @@ export function PasskeySection({ initialPasskeys }: { initialPasskeys: PasskeyDa
     return (
         <div className="bg-background shadow-lg rounded-lg p-6">
             <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-semibold text-primary">Passkeys</h2>
+                <h2 className="text-xl font-medium text-primary">Passkeys</h2>
             </div>
 
             <p className="text-sm text-dimmed mb-4">
@@ -69,7 +69,7 @@ export function PasskeySection({ initialPasskeys }: { initialPasskeys: PasskeyDa
                                     <PasskeyIcon />
                                 </div>
                                 <div>
-                                    <p className="font-medium text-primary">
+                                    <p className="text-primary">
                                         {passkey.label || 'Unnamed Passkey'}
                                     </p>
                                     <p className="text-sm text-dimmed">

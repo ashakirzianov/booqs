@@ -132,7 +132,7 @@ export default async function NotesPage({ params }: {
                     <p className="text-dimmed mb-6">Start reading and add notes to see them here</p>
                     <Link
                         href={booqContentHref({ booqId, path: [0] })}
-                        className="bg-action hover:bg-highlight text-light px-6 py-3 rounded-lg font-semibold transition-colors duration-200"
+                        className="bg-action hover:bg-highlight text-light px-6 py-3 rounded-lg transition-colors duration-200"
                     >
                         Start Reading
                     </Link>

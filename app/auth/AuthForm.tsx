@@ -120,7 +120,7 @@ export function AuthForm({ returnTo }: {
 
                 <form onSubmit={handleEmailSubmit} className='space-y-4'>
                     <div className='space-y-2'>
-                        <label htmlFor='email' className='block text-sm font-medium text-secondary'>
+                        <label htmlFor='email' className='block text-sm text-secondary'>
                             Email address
                         </label>
                         <input

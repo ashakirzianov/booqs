@@ -78,7 +78,7 @@ export function HistoryEntry({
                     </div>
                     <a
                         href={booqContentHref({ booqId, path: entry.path })}
-                        className="inline-block mt-2 text-action hover:text-highlight text-sm font-medium"
+                        className="inline-block mt-2 text-action hover:text-highlight text-sm"
                     >
                         Continue Reading
                     </a>

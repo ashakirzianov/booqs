@@ -57,10 +57,10 @@ export function DeleteAccountButton({ account }: {
 
                     <div className='bg-background border border-dimmed rounded-md p-4'>
                         <p className='text-sm text-dimmed'>
-                            <span className='font-medium'>Account:</span> {account.name || 'Anonymous User'}
+                            <span>Account:</span> {account.name || 'Anonymous User'}
                         </p>
                         <p className='text-sm text-dimmed'>
-                            <span className='font-medium'>Member since:</span> {formatDate(account.joinedAt)}
+                            <span>Member since:</span> {formatDate(account.joinedAt)}
                         </p>
                     </div>
 

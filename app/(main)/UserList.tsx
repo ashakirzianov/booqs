@@ -160,7 +160,7 @@ export function UserList({
     if (usersList.length === 0) {
         return (
             <div className="space-y-4">
-                <h3 className="text-lg font-semibold">{title} (0)</h3>
+                <h3 className="text-lg font-medium">{title} (0)</h3>
                 <div className="text-center py-8 text-dimmed">
                     <p>{emptyMessage}</p>
                     {emptySubMessage && <p className="text-sm mt-1">{emptySubMessage}</p>}
@@ -171,7 +171,7 @@ export function UserList({
 
     return (
         <div className="space-y-4">
-            <h3 className="text-lg font-semibold">{title} ({usersList.length})</h3>
+            <h3 className="text-lg font-medium">{title} ({usersList.length})</h3>
             <div className="space-y-3">
                 {usersList.map(user => {
                     const buttonState = buttonStates[user.username] || { state: 'idle' }
@@ -191,7 +191,7 @@ export function UserList({
                                 <div>
                                     <Link
                                         href={userHref({ username: user.username })}
-                                        className="font-medium hover:text-action transition-colors"
+                                        className="hover:text-action transition-colors"
                                     >
                                         {user.name}
                                     </Link>

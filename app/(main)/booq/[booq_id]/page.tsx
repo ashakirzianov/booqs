@@ -130,7 +130,7 @@ export default async function Page({ params }: {
                         <div className="flex gap-4 items-center">
                             <Link
                                 href={history ? booqContentHref({ booqId, path: history.path }) : booqContentHref({ booqId, path: [0] })}
-                                className="bg-action hover:bg-highlight text-light px-6 py-3 rounded-lg font-semibold text-lg transition-colors duration-200 shadow-md hover:shadow-lg"
+                                className="bg-action hover:bg-highlight text-light px-6 py-3 rounded-lg text-lg transition-colors duration-200 shadow-md hover:shadow-lg"
                             >
                                 {history ? 'Continue Reading' : 'Start Reading'}
                             </Link>
