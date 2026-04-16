@@ -33,6 +33,8 @@ export function NoteFragment({
 
     const augmentationColor = `hsl(from var(--color-${note.kind}) h s l / 40%)`
 
+    const isComment = isCommentOrQuestion(note.kind)
+
     const noteAugmentations = useMemo<Augmentation[]>(() => {
         if (!nodes) {
             return []
@@ -40,9 +42,10 @@ export function NoteFragment({
         return [{
             id: `note-${note.id}`,
             range: note.range,
-            color: augmentationColor,
+            color: isComment ? undefined : augmentationColor,
+            underline: isComment ? 'dashed' as const : undefined,
         }]
-    }, [nodes, note.id, note.range, augmentationColor])
+    }, [nodes, note.id, note.range, augmentationColor, isComment])
 
     function handleExpand() {
         setIsExpanded(!isExpanded)
@@ -108,7 +111,9 @@ export function NoteFragment({
                     title='Click to expand'
                 >
                     <span className="font-book text-primary m-0" style={{
-                        backgroundColor: augmentationColor,
+                        backgroundColor: isComment ? undefined : augmentationColor,
+                        textDecoration: isComment ? 'underline' : undefined,
+                        textDecorationStyle: isComment ? 'dashed' : undefined,
                     }}>
                         {note.targetQuote}
                     </span>
