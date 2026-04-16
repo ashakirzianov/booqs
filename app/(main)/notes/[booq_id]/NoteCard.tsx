@@ -143,11 +143,9 @@ export function NoteCard({
                     </div>
                 )}
 
-                {note.privacy === 'public' && note.kind === 'comment' && (
-                    <div className="px-3">
-                        <NoteReplies noteId={note.id} user={user} />
-                    </div>
-                )}
+                <div className="px-3">
+                    <NoteReplies noteId={note.id} user={user} collapsible />
+                </div>
             </div>
         </div>
     )
