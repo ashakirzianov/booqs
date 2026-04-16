@@ -103,11 +103,11 @@ export function NoteFragment({
                 </div>
             ) : (
                 <div
-                    className="rounded shadow-sm py-3 px-12 cursor-pointer hover:opacity-80 transition-opacity bg-background"
+                    className="rounded shadow-sm py-3 px-12 cursor-pointer hover:opacity-80 transition-opacity bg-background font-book text-primary"
                     onClick={handleToggle}
                     title='Click to expand'
                 >
-                    <span className="font-book text-primary m-0" style={{
+                    <span className="m-0" style={{
                         backgroundColor: isComment ? undefined : augmentationColor,
                         textDecoration: isComment ? 'underline' : undefined,
                         textDecorationStyle: isComment ? 'dashed' : undefined,
