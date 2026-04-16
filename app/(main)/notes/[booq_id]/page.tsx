@@ -1,5 +1,5 @@
 import { fetchNotes } from '@/data/notes'
-import { parseIdOpt, type BooqId, comparePaths, isOverlapping } from '@/core'
+import { parseIdOpt, type BooqId, comparePaths } from '@/core'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { booqContentHref, authorHref, booqImageUrl } from '@/common/href'
@@ -82,31 +82,14 @@ export default async function NotesPage({ params }: {
     const noteRanges = sortedNotes.map(note => note.range)
     const expandedFragments = await getExpandedFragments(booqId, noteRanges)
 
-    // Calculate overlapping notes for each expanded fragment
     const noteFragmentData: ExpandedNoteFragmentData[] = expandedFragments.map((fragment, index) => {
         const note = sortedNotes[index]
-        if (!note || !fragment) return undefined
-        if (!fragment) return {
-            note: sortedNotes[index],
-            overlapping: [],
-            nodes: undefined,
-            range: note.range,
-        }
-
-        // Find all notes that overlap with the expanded range
-        const overlapping = sortedNotes.filter((note, noteIndex) => {
-            // Don't include the note itself
-            if (noteIndex === index) return false
-
-            // Check if the note's range overlaps with the expanded range
-            return isOverlapping(note.range, fragment.range)
-        })
+        if (!note) return undefined
         return {
-            note: sortedNotes[index],
-            overlapping,
-            nodes: fragment.nodes,
-            styles: fragment.styles,
-            range: fragment.range,
+            note,
+            nodes: fragment?.nodes,
+            styles: fragment?.styles,
+            range: fragment?.range ?? note.range,
         }
     }).filter(datum => datum !== undefined)
 

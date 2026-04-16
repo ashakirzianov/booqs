@@ -17,7 +17,6 @@ type NoteFragmentProps = ExpandedNoteFragmentData & {
 
 export type ExpandedNoteFragmentData = {
     note: BooqNote,
-    overlapping: BooqNote[],
     nodes?: BooqNode[],
     styles?: BooqStyles,
     range: BooqRange,
@@ -124,27 +123,3 @@ function isCommentOrQuestion(kind: string): boolean {
     return kind === COMMENT_KIND || kind === QUESTION_KIND
 }
 
-// Builds augmentations for a note and its overlapping neighbors.
-// Can be used to show all nearby highlights in the expanded note preview,
-// e.g. to give the reader context about other annotations in the same passage.
-// Currently unused — kept for future use if we want to restore overlapping highlights.
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function buildAugmentationsWithOverlapping(
-    note: BooqNote,
-    overlapping: BooqNote[],
-): Augmentation[] {
-    const color = `hsl(from var(--color-${note.kind}) h s l / 40%)`
-    const augmentations: Augmentation[] = [{
-        id: `note-${note.id}`,
-        range: note.range,
-        color,
-    }]
-    overlapping.forEach((overlappingNote) => {
-        augmentations.push({
-            id: `note-${overlappingNote.id}`,
-            range: overlappingNote.range,
-            color: `hsl(from var(--color-${overlappingNote.kind}) h s l / 40%)`,
-        })
-    })
-    return augmentations
-}

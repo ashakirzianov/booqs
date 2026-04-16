@@ -8,6 +8,12 @@ import { NoteCard } from './NoteCard'
 import clsx from 'clsx'
 import { ExpandedNoteFragmentData } from './NoteFragment'
 
+type FilterGroup = {
+    key: string,
+    label: string,
+    color?: string,
+}
+
 export function NotesFilter({ data, booqId, user }: {
     data: ExpandedNoteFragmentData[],
     booqId: BooqId,
@@ -22,67 +28,52 @@ export function NotesFilter({ data, booqId, user }: {
         initialNotes,
     })
 
-    // Merge current notes with initial data, preferring current notes for updates
-    const mergedData = useMemo(() => {
+    const [selectedFilter, setSelectedFilter] = useState<string>('all')
+
+    // Merge server data with SWR-updated notes
+    const mergedNoteData = useMemo(() => {
         return data.map(datum => {
             const currentNote = currentNotes.find(n => n.id === datum.note.id)
-            // Also update overlapping notes with current data
-            const updatedOverlapping = datum.overlapping.map(overlappingNote => {
-                return currentNotes.find(n => n.id === overlappingNote.id)
-            }).filter(overlappingNote => {
-                // Only include overlapping notes that still exist
-                return overlappingNote !== undefined
-            })
-
             return {
                 ...datum,
                 note: currentNote ?? datum.note,
-                overlapping: updatedOverlapping
             }
         })
     }, [data, currentNotes])
-    const [selectedFilter, setSelectedFilter] = useState<string>('all')
 
-    // Build filter groups in canonical order: highlights 0–4, then comments (merged comment+question)
+    // Build filter groups in canonical order
     const filterGroups = useMemo(() => {
-        const presentKinds = new Set(mergedData.map(datum => datum.note.kind))
-        const groups: { key: string, label: string, color?: string, match: (kind: string) => boolean }[] = []
+        const presentKinds = new Set(mergedNoteData.map(d => d.note.kind))
+        const filterGroups: FilterGroup[] = []
         for (const kind of HIGHLIGHT_KINDS) {
             if (presentKinds.has(kind)) {
-                groups.push({
+                filterGroups.push({
                     key: kind,
-                    label: getKindLabel(kind),
+                    label: `Highlight ${HIGHLIGHT_KINDS.indexOf(kind) + 1}`,
                     color: `var(--color-${kind})`,
-                    match: (k) => k === kind,
                 })
             }
         }
-        const hasComments = presentKinds.has(COMMENT_KIND) || presentKinds.has(QUESTION_KIND)
-        if (hasComments) {
-            groups.push({
+        if (presentKinds.has(COMMENT_KIND) || presentKinds.has(QUESTION_KIND)) {
+            filterGroups.push({
                 key: 'comments',
                 label: 'Comments',
-                match: isCommentOrQuestion,
             })
         }
-        return groups
-    }, [mergedData])
 
-    // Handle note color changes and adjust filter if necessary
-    function handleNoteColorChange(noteId: string, newKind: string) {
+        return filterGroups
+    }, [mergedNoteData])
+
+    const filteredNotes = useMemo(() => selectedFilter === 'all'
+        ? mergedNoteData
+        : mergedNoteData.filter(d => filterKeyForKind(d.note.kind) === selectedFilter), [mergedNoteData, selectedFilter])
+
+    function handleNoteColorChange(_noteId: string, newKind: string) {
         if (selectedFilter === 'all') return
-        const currentGroup = filterGroups.find(g => g.key === selectedFilter)
-        if (currentGroup && !currentGroup.match(newKind)) {
-            const newGroup = filterGroups.find(g => g.match(newKind))
-            setSelectedFilter(newGroup?.key ?? 'all')
+        if (filterKeyForKind(newKind) !== selectedFilter) {
+            setSelectedFilter(filterKeyForKind(newKind))
         }
     }
-
-    // Filter notes based on selected filter
-    const activeGroup = filterGroups.find(g => g.key === selectedFilter)
-    const filteredNotes = selectedFilter === 'all'
-        ? mergedData
-        : mergedData.filter(datum => activeGroup?.match(datum.note.kind))
 
     return (
         <>
@@ -97,37 +88,30 @@ export function NotesFilter({ data, booqId, user }: {
                             active={selectedFilter === 'all'}
                             onClick={() => setSelectedFilter('all')}
                             label="All"
-                            count={mergedData.length}
                         />
-                        {filterGroups.map(group => {
-                            const count = mergedData.filter(datum => group.match(datum.note.kind)).length
-                            return (
-                                <FilterButton
-                                    key={group.key}
-                                    active={selectedFilter === group.key}
-                                    onClick={() => setSelectedFilter(group.key)}
-                                    label={group.label}
-                                    count={count}
-                                    color={group.color}
-                                />
-                            )
-                        })}
+                        {filterGroups.map(group => (
+                            <FilterButton
+                                key={group.key}
+                                active={selectedFilter === group.key}
+                                onClick={() => setSelectedFilter(group.key)}
+                                label={group.label}
+                                color={group.color}
+                            />
+                        ))}
                     </div>
                 </div>
             </div>
 
             {/* Notes list */}
             <div className="space-y-6">
-                {filteredNotes.length > 0 ? filteredNotes.map((datum) => {
-                    return (
-                        <NoteCard
-                            key={datum.note.id}
-                            noteFragmentData={datum}
-                            user={user}
-                            onColorChange={handleNoteColorChange}
-                        />
-                    )
-                }) : (
+                {filteredNotes.length > 0 ? filteredNotes.map((datum) => (
+                    <NoteCard
+                        key={datum.note.id}
+                        noteFragmentData={datum}
+                        user={user}
+                        onColorChange={handleNoteColorChange}
+                    />
+                )) : (
                     <div className="text-center text-dimmed">
                         No notes of selected color.
                     </div>
@@ -141,13 +125,12 @@ function FilterButton({
     label,
     active,
     onClick,
-    color
+    color,
 }: {
-    active: boolean
-    onClick: () => void
-    label?: string
-    count: number
-    color?: string
+    active: boolean,
+    onClick: () => void,
+    label: string,
+    color?: string,
 }) {
     return (
         <button
@@ -165,18 +148,9 @@ function FilterButton({
     )
 }
 
-
-function getKindLabel(kind: string): string {
-    if (isCommentOrQuestion(kind)) {
-        return 'Comments'
-    }
-    const highlightIndex = HIGHLIGHT_KINDS.indexOf(kind)
-    if (highlightIndex !== -1) {
-        return `Highlight ${highlightIndex + 1}`
+function filterKeyForKind(kind: string): string {
+    if (kind === COMMENT_KIND || kind === QUESTION_KIND) {
+        return 'comments'
     }
     return kind
-}
-
-function isCommentOrQuestion(kind: string): boolean {
-    return kind === COMMENT_KIND || kind === QUESTION_KIND
 }
