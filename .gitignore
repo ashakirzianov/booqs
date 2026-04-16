@@ -38,3 +38,6 @@ certificates
 
 # local epub files
 public/epubs
+
+# Scratchpad
+SCRATCHPAD.md
