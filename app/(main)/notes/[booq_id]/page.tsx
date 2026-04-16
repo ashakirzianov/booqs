@@ -115,58 +115,59 @@ export default async function NotesPage({ params }: {
     }
 
     return (
-        <main className="flex flex-row justify-center min-h-screen bg-background">
-            <div className="flex flex-col max-w-4xl w-full px-0">
-                <div className="mb-6">
-                    <h1 className="text-3xl font-bold text-primary mb-2">
-                        Notes for{' '}
-                        <Link
-                            href={booqContentHref({ booqId, path: [0] })}
-                            className="hover:text-highlight hover:underline"
-                        >
-                            {bookData.title}
-                        </Link>
-                        {' '}by{' '}
-                        {bookData.authors.map((author, index) => (
-                            <span key={author}>
-                                <Link
-                                    href={authorHref({ name: author, libraryId: library })}
-                                    className="hover:text-highlight hover:underline"
-                                >
-                                    {author}
-                                </Link>
-                                {index < bookData.authors.length - 1 && ', '}
-                            </span>
-                        ))}
-                    </h1>
-                </div>
-
-                {userNotes.length === 0 ? (
-                    <div className="text-center">
-                        <p className="text-dimmed text-lg mb-4">No notes yet</p>
-                        <p className="text-dimmed mb-6">Start reading and add notes to see them here</p>
-                        <Link
-                            href={booqContentHref({ booqId, path: [0] })}
-                            className="bg-action hover:bg-highlight text-light px-6 py-3 rounded-lg font-semibold transition-colors duration-200"
-                        >
-                            Start Reading
-                        </Link>
-                    </div>
-                ) : (
-                    <NotesFilter
-                        data={noteFragmentData}
-                        booqId={booqId}
-                        user={currentUser ? {
-                            id: currentUser.id,
-                            username: currentUser.username,
-                            name: currentUser.name,
-                            emoji: currentUser.emoji,
-                            profilePictureURL: currentUser.profilePictureURL,
-                        } : undefined}
-                    />
-                )}
+        <>
+            <div className="mb-6">
+                <h1 className="text-3xl font-bold text-primary mb-2">
+                    <Link
+                        href={booqContentHref({ booqId, path: [0] })}
+                        className="hover:text-highlight hover:underline"
+                    >
+                        {bookData.title}
+                    </Link>
+                    {bookData.authors.length > 0 && (
+                        <>
+                            {' '}by{' '}
+                            {bookData.authors.map((author, index) => (
+                                <span key={author}>
+                                    <Link
+                                        href={authorHref({ name: author, libraryId: library })}
+                                        className="hover:text-highlight hover:underline"
+                                    >
+                                        {author}
+                                    </Link>
+                                    {index < bookData.authors.length - 1 && ', '}
+                                </span>
+                            ))}
+                        </>
+                    )}
+                </h1>
             </div>
-        </main>
+
+            {userNotes.length === 0 ? (
+                <div className="text-center">
+                    <p className="text-dimmed text-lg mb-4">No notes yet</p>
+                    <p className="text-dimmed mb-6">Start reading and add notes to see them here</p>
+                    <Link
+                        href={booqContentHref({ booqId, path: [0] })}
+                        className="bg-action hover:bg-highlight text-light px-6 py-3 rounded-lg font-semibold transition-colors duration-200"
+                    >
+                        Start Reading
+                    </Link>
+                </div>
+            ) : (
+                <NotesFilter
+                    data={noteFragmentData}
+                    booqId={booqId}
+                    user={currentUser ? {
+                        id: currentUser.id,
+                        username: currentUser.username,
+                        name: currentUser.name,
+                        emoji: currentUser.emoji,
+                        profilePictureURL: currentUser.profilePictureURL,
+                    } : undefined}
+                />
+            )}
+        </>
     )
 }
 
