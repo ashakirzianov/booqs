@@ -149,7 +149,7 @@ function FilterButton({
             )}
             style={{
                 backgroundColor: color,
-                borderColor: active ? `hsl(from ${color ?? 'var(--color-primary)'} h s l / 100%)` : 'transparent',
+                borderColor: active ? `hsl(from ${color ?? 'var(--color-dimmed)'} h s l / 100%)` : 'transparent',
             }}
         >
             {icon ? <div className="w-5 h-5">{icon}</div>
