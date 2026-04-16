@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react'
 import { NoteAuthorData } from '@/data/notes'
 import { BooqId } from '@/core'
-import { HIGHLIGHT_KINDS, COMMENT_KIND, useBooqNotes } from '@/application/notes'
+import { HIGHLIGHT_KINDS, COMMENT_KIND, QUESTION_KIND, useBooqNotes } from '@/application/notes'
 import { NoteCard } from './NoteCard'
 import clsx from 'clsx'
 import { ExpandedNoteFragmentData } from './NoteFragment'
@@ -43,21 +43,46 @@ export function NotesFilter({ data, booqId, user }: {
     }, [data, currentNotes])
     const [selectedFilter, setSelectedFilter] = useState<string>('all')
 
-    const allKinds = Array.from(new Set(mergedData.map(datum => datum.note.kind)))
+    // Build filter groups in canonical order: highlights 0–4, then comments (merged comment+question)
+    const filterGroups = useMemo(() => {
+        const presentKinds = new Set(mergedData.map(datum => datum.note.kind))
+        const groups: { key: string, label: string, color?: string, match: (kind: string) => boolean }[] = []
+        for (const kind of HIGHLIGHT_KINDS) {
+            if (presentKinds.has(kind)) {
+                groups.push({
+                    key: kind,
+                    label: getKindLabel(kind),
+                    color: `var(--color-${kind})`,
+                    match: (k) => k === kind,
+                })
+            }
+        }
+        const hasComments = presentKinds.has(COMMENT_KIND) || presentKinds.has(QUESTION_KIND)
+        if (hasComments) {
+            groups.push({
+                key: 'comments',
+                label: 'Comments',
+                match: isCommentOrQuestion,
+            })
+        }
+        return groups
+    }, [mergedData])
 
     // Handle note color changes and adjust filter if necessary
     function handleNoteColorChange(noteId: string, newKind: string) {
-        // If current filter is not 'all' and the note would be filtered out,
-        // switch to the new color filter to keep the note visible
-        if (selectedFilter !== 'all' && selectedFilter !== newKind) {
-            setSelectedFilter(newKind)
+        if (selectedFilter === 'all') return
+        const currentGroup = filterGroups.find(g => g.key === selectedFilter)
+        if (currentGroup && !currentGroup.match(newKind)) {
+            const newGroup = filterGroups.find(g => g.match(newKind))
+            setSelectedFilter(newGroup?.key ?? 'all')
         }
     }
 
     // Filter notes based on selected filter
+    const activeGroup = filterGroups.find(g => g.key === selectedFilter)
     const filteredNotes = selectedFilter === 'all'
         ? mergedData
-        : mergedData.filter(datum => datum.note.kind === selectedFilter)
+        : mergedData.filter(datum => activeGroup?.match(datum.note.kind))
 
     return (
         <>
@@ -65,7 +90,7 @@ export function NotesFilter({ data, booqId, user }: {
             <div className="bg-background flex flex-row items-center gap-3 my-3">
                 <h3 className="text-md font-medium text-dimmed whitespace-nowrap">Show notes:</h3>
                 <div className='h-10 shadow-md rounded overflow-clip' style={{
-                    width: `calc(var(--spacing) * ${(allKinds.length + 1) * 10})`,
+                    width: `calc(var(--spacing) * ${(filterGroups.length + 1) * 10})`,
                 }}>
                     <div className="flex flex-row h-full items-stretch justify-between">
                         <FilterButton
@@ -74,16 +99,16 @@ export function NotesFilter({ data, booqId, user }: {
                             label="All"
                             count={mergedData.length}
                         />
-                        {allKinds.map(kind => {
-                            const count = mergedData.filter(datum => datum.note.kind === kind).length
+                        {filterGroups.map(group => {
+                            const count = mergedData.filter(datum => group.match(datum.note.kind)).length
                             return (
                                 <FilterButton
-                                    key={kind}
-                                    active={selectedFilter === kind}
-                                    onClick={() => setSelectedFilter(kind)}
-                                    label={getKindLabel(kind)}
+                                    key={group.key}
+                                    active={selectedFilter === group.key}
+                                    onClick={() => setSelectedFilter(group.key)}
+                                    label={group.label}
                                     count={count}
-                                    color={`var(--color-${kind})`}
+                                    color={group.color}
                                 />
                             )
                         })}
@@ -142,7 +167,7 @@ function FilterButton({
 
 
 function getKindLabel(kind: string): string {
-    if (kind === COMMENT_KIND) {
+    if (isCommentOrQuestion(kind)) {
         return 'Comments'
     }
     const highlightIndex = HIGHLIGHT_KINDS.indexOf(kind)
@@ -150,4 +175,8 @@ function getKindLabel(kind: string): string {
         return `Highlight ${highlightIndex + 1}`
     }
     return kind
+}
+
+function isCommentOrQuestion(kind: string): boolean {
+    return kind === COMMENT_KIND || kind === QUESTION_KIND
 }
