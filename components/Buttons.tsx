@@ -1,5 +1,6 @@
 import clsx from 'clsx'
 import React from 'react'
+import Link from 'next/link'
 import { TrashIcon } from './Icons'
 
 export function LightButton({
@@ -32,6 +33,39 @@ export function LightButton({
 
         {text}
     </button>
+}
+
+export function LightLink({
+    icon, iconPosition = 'left', text, href,
+    size = 'normal',
+}: {
+    text: string,
+    href: string,
+    icon?: React.ReactNode,
+    iconPosition?: 'left' | 'right',
+    size?: 'small' | 'normal' | 'large',
+}) {
+    return <Link
+        href={href}
+        className={clsx(
+            'flex items-center text-action hover:text-highlight transition-colors',
+            {
+                'gap-1 text-sm': size === 'small',
+                'gap-1': size === 'normal',
+                'gap-3 text-lg': size === 'large',
+            },
+        )}
+    >
+        {icon && iconPosition === 'left' && <div className="w-4 h-4">
+            {icon}
+        </div>}
+
+        {text}
+
+        {icon && iconPosition === 'right' && <div className="w-4 h-4">
+            {icon}
+        </div>}
+    </Link>
 }
 
 export function ActionButton({

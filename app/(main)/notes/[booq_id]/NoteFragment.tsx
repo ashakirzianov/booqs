@@ -1,11 +1,10 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import { useRouter } from 'next/navigation'
+import { ExternalLinkIcon } from '@/components/Icons'
 import { BooqNode, BooqStyles, BooqRange } from '@/core'
-import { CollapseIcon } from '@/components/Icons'
 import { Augmentation, BooqContent } from '@/viewer'
-import { LightButton, RemoveButton } from '@/components/Buttons'
+import { LightLink, RemoveButton } from '@/components/Buttons'
 import { ColorPicker } from '@/components/ColorPicker'
 import { booqContentHref } from '@/common/href'
 import { BooqNote } from '@/data/notes'
@@ -29,7 +28,6 @@ export function NoteFragment({
     onColorChange, onRemove,
 }: NoteFragmentProps) {
     const [isExpanded, setIsExpanded] = useState(false)
-    const router = useRouter()
 
     const augmentationColor = `hsl(from var(--color-${note.kind}) h s l / 40%)`
 
@@ -47,26 +45,23 @@ export function NoteFragment({
         }]
     }, [nodes, note.id, note.range, augmentationColor, isComment])
 
-    function handleExpand() {
-        setIsExpanded(!isExpanded)
-    }
+    const viewInBooqHref = booqContentHref({ booqId: note.booqId, path: range.start })
 
-    function handleAugmentationClick(_id: string) {
-        // Navigate to the note's range start position in the booq
-        const href = booqContentHref({ booqId: note.booqId, path: range.start })
-        router.push(href)
+    function handleToggle() {
+        setIsExpanded(!isExpanded)
     }
 
     return (
         <>
-            {/* Control row - shows collapse button and controls when expanded */}
+            {/* Control row */}
             <div className="flex justify-between items-center min-h-[24px] gap-4">
                 <div>
-                    {isExpanded && nodes && (
-                        <LightButton
-                            text="Collapse"
-                            icon={<CollapseIcon />}
-                            onClick={handleExpand}
+                    {isExpanded && (
+                        <LightLink
+                            text="View in booq"
+                            icon={<ExternalLinkIcon />}
+                            iconPosition="right"
+                            href={viewInBooqHref}
                         />
                     )}
                 </div>
@@ -93,21 +88,23 @@ export function NoteFragment({
                 </div>
             </div>
 
-            {/* Fragment content */}
+            {/* Fragment content — click to expand/collapse */}
             {isExpanded && nodes ? (
-                <div className="rounded shadow-sm py-3 px-12 bg-background overflow-y-auto font-book text-primary">
+                <div
+                    className="rounded shadow-sm py-3 px-12 bg-background overflow-y-auto font-book text-primary cursor-pointer"
+                    onClick={handleToggle}
+                >
                     <BooqContent
                         nodes={nodes}
                         styles={styles ?? {}}
                         range={range}
                         augmentations={noteAugmentations}
-                        onAugmentationClick={handleAugmentationClick}
                     />
                 </div>
             ) : (
                 <div
                     className="rounded shadow-sm py-3 px-12 cursor-pointer hover:opacity-80 transition-opacity bg-background"
-                    onClick={handleExpand}
+                    onClick={handleToggle}
                     title='Click to expand'
                 >
                     <span className="font-book text-primary m-0" style={{
