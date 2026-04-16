@@ -111,6 +111,14 @@ export function NoteCard({
                             autoFocus
                             value={editContent}
                             onChange={(e) => setEditContent(e.target.value)}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter' && !e.metaKey && !e.ctrlKey) {
+                                    e.preventDefault()
+                                    handleEditToggle()
+                                } else if (e.key === 'Escape') {
+                                    handleCancel()
+                                }
+                            }}
                             placeholder="Add your note content..."
                             className="w-full p-3 border border-gray-300 rounded resize-none focus:outline-none focus:ring-2 focus:ring-action"
                             rows={3}
