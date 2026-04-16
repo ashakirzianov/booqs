@@ -7,11 +7,13 @@ import { HIGHLIGHT_KINDS, COMMENT_KIND, QUESTION_KIND, useBooqNotes } from '@/ap
 import { NoteCard } from './NoteCard'
 import clsx from 'clsx'
 import { ExpandedNoteFragmentData } from './NoteFragment'
+import { CommentIcon } from '@/components/Icons'
 
 type FilterGroup = {
     key: string,
     label: string,
     color?: string,
+    icon?: React.ReactNode,
 }
 
 export function NotesFilter({ data, booqId, user }: {
@@ -58,6 +60,7 @@ export function NotesFilter({ data, booqId, user }: {
             filterGroups.push({
                 key: 'comments',
                 label: 'Comments',
+                icon: <CommentIcon />,
             })
         }
 
@@ -96,6 +99,7 @@ export function NotesFilter({ data, booqId, user }: {
                                 onClick={() => setSelectedFilter(group.key)}
                                 label={group.label}
                                 color={group.color}
+                                icon={group.icon}
                             />
                         ))}
                     </div>
@@ -126,24 +130,30 @@ function FilterButton({
     active,
     onClick,
     color,
+    icon,
 }: {
     active: boolean,
     onClick: () => void,
     label: string,
     color?: string,
+    icon?: React.ReactNode,
 }) {
     return (
         <button
             onClick={onClick}
+            title={label}
             className={clsx(
-                'flex items-center justify-center text-xs font-medium transition-colors duration-200 border-b-5 h-full w-full'
+                'flex items-center justify-center text-xs font-medium transition-colors duration-200 border-b-5 h-full w-full',
+                !color && !icon && 'text-dimmed',
+                icon && 'text-dimmed',
             )}
             style={{
                 backgroundColor: color,
                 borderColor: active ? `hsl(from ${color ?? 'var(--color-primary)'} h s l / 100%)` : 'transparent',
             }}
         >
-            {color === undefined ? label : null}
+            {icon ? <div className="w-5 h-5">{icon}</div>
+                : color === undefined ? label : null}
         </button>
     )
 }
