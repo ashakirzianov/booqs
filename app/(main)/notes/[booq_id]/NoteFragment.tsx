@@ -54,7 +54,7 @@ export function NoteFragment({
     return (
         <>
             {/* Control row */}
-            <div className="flex justify-between items-center min-h-[24px] gap-4">
+            <div className="flex justify-between items-center h-6 gap-4">
                 <div>
                     {isExpanded && (
                         <LightLink
