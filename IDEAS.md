@@ -24,9 +24,11 @@
 - Journaling feature (complex)
     * Prompt questions after each chapter
     * Skip feature for this book or disable entirely (make sure to let know how to re-enable)
+    * Remind to answer question later
     * Highlights-based prompting?
     * AI-generated questions and user-generated questions
     * Up/down voting per-question
+    * How are we going to design journaling -- as a special kind of note? As a separate entity?
 
 - Comments up/down voting
 
