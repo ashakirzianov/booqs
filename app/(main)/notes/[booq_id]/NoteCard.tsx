@@ -108,6 +108,7 @@ export function NoteCard({
                 {isEditing ? (
                     <div className="flex flex-col gap-2">
                         <textarea
+                            autoFocus
                             value={editContent}
                             onChange={(e) => setEditContent(e.target.value)}
                             placeholder="Add your note content..."
