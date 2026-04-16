@@ -62,9 +62,9 @@ export function NotesFilter({ data, booqId, user }: {
     return (
         <>
             {/* Filter selector */}
-            <div className="bg-background">
-                <h3 className="flex text-sm font-medium text-dimmed mb-3">Show notes:</h3>
-                <div className='h-10 my-3 shadow-md rounded overflow-clip' style={{
+            <div className="bg-background flex flex-row items-center gap-3 my-3">
+                <h3 className="text-md font-medium text-dimmed whitespace-nowrap">Show notes:</h3>
+                <div className='h-10 shadow-md rounded overflow-clip' style={{
                     width: `calc(var(--spacing) * ${(allKinds.length + 1) * 10})`,
                 }}>
                     <div className="flex flex-row h-full items-stretch justify-between">
