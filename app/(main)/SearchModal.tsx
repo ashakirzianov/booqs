@@ -101,6 +101,7 @@ export function SearchModal({
                             {authors.map((result, idx) => <SearchResultItem
                                 key={idx}
                                 selected={selected === idx}
+                                onClick={closeModal}
                             >
                                 <AuthorSearchResultContent
                                     result={result}
@@ -117,6 +118,7 @@ export function SearchModal({
                             {booqs.map((result, idx) => <SearchResultItem
                                 key={idx}
                                 selected={selected === (idx + authors.length)}
+                                onClick={closeModal}
                             >
                                 <BooqSearchResultContent
                                     result={result}
@@ -140,8 +142,9 @@ export function SearchModal({
     </Modal>
 }
 
-function SearchResultItem({ selected, children }: {
+function SearchResultItem({ selected, onClick, children }: {
     selected?: boolean,
+    onClick?: () => void,
     children: ReactNode,
 }) {
     const ref = useRef<HTMLLIElement>(null)
@@ -154,7 +157,7 @@ function SearchResultItem({ selected, children }: {
             })
         }
     }, [selected])
-    return <li ref={ref} className='flex text-base transition-all duration-300 cursor-pointer p-base hover:bg-highlight hover:text-background' style={{
+    return <li ref={ref} onClick={onClick} className='flex text-base transition-all duration-300 cursor-pointer p-base hover:bg-highlight hover:text-background' style={{
         background: selected ? 'var(--color-highlight)' : undefined,
         color: selected ? 'var(--color-background)' : undefined,
     }}>
