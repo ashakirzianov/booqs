@@ -1,6 +1,6 @@
 .layout {
     --button-size: 64px;
-    --content-width: 720px;
+    --content-width: var(--width-content-reader);
 }
 
 .layout {

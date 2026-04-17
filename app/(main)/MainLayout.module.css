@@ -1,5 +1,5 @@
 .layout {
-    --content-width: 780px;
+    --content-width: var(--width-content-main);
 }
 
 .layout {

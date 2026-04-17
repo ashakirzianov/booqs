@@ -26,8 +26,7 @@ Root defines `--header-height: 3rem`, but MainLayout overrides it to `4rem`. Rea
 
 MainLayout uses `--content-width: 780px`, ReaderLayout uses `--content-width: 720px`. These are intentionally different (app content vs. reading column), but both are locally scoped with the same variable name.
 
-- [ ] Move both to globals.css as distinct named variables (e.g., `--content-width-main: 780px`, `--content-width-reader: 720px`) so the intent is documented in one place
-- [ ] Update both CSS modules to reference the global variables
+- [x] Moved to globals.css as `--width-content-main: 780px` and `--width-content-reader: 720px`; both modules now reference the global tokens via local `--content-width` alias
 
 ## Reader Grid Area Naming
 
