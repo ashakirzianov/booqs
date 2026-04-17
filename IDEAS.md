@@ -2,13 +2,11 @@
 
 - Consider markdown support in comments
 
-- Infinite scroll
+- Infinite scroll in Reader
 
-- Page view
+- Page view in Reader
 
 - Rethink AI prompts (it seems like it artificially limits the responses)
-
-- It looks like taogd is missing styles or something — let’s investigate 
 
 - I used to see a lot of bot traffic on my prod before I made auth required on all or most pages. This is not ideal. Are there other ways to deal with bots? I thought I disallowed them in my robots.txt, but I might be confused
 
