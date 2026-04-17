@@ -1,7 +1,7 @@
 import { useMemo, useCallback } from 'react'
 import { getAugmentationText, Augmentation } from '@/viewer'
 import { BooqRange } from '@/core'
-import { augmentationForNote } from '@/application/notes'
+import { augmentationForNote, COMMENT_KIND, QUESTION_KIND } from '@/application/notes'
 import { MenuState } from './ContextMenuContent'
 import { BooqNote } from '@/data/notes'
 
@@ -59,16 +59,21 @@ export function useAugmentations({
                     : undefined
             case 'note': {
                 const note = notes.find(function (n) { return n.id === id })
-                return note
-                    ? {
-                        kind: 'note',
-                        noteId: note.id,
-                        selection: {
-                            range: note.range,
-                            text: note.targetQuote,
-                        },
+                if (!note) return undefined
+                if (note.kind === COMMENT_KIND || note.kind === QUESTION_KIND) {
+                    return {
+                        kind: 'comment',
+                        commentId: note.id,
                     }
-                    : undefined
+                }
+                return {
+                    kind: 'note',
+                    noteId: note.id,
+                    selection: {
+                        range: note.range,
+                        text: note.targetQuote,
+                    },
+                }
             }
             case 'temp': {
                 const temp = temporaryAugmentations.find(function (ta) { return ta.name === id })
