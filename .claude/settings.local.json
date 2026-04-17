@@ -114,7 +114,25 @@
       "Bash(python3 -c \"import json,sys; items=json.load\\(sys.stdin\\); [print\\(i[''''name'''']\\) for i in items]\")",
       "Bash(curl -sL \"https://raw.githubusercontent.com/shadcn-ui/ui/main/apps/v4/app/globals.css\")",
       "Bash(curl -sL \"https://raw.githubusercontent.com/shadcn-ui/ui/main/apps/v4/lib/utils.ts\")",
-      "Bash(curl -sL \"https://raw.githubusercontent.com/shadcn-ui/ui/main/apps/v4/components.json\")"
+      "Bash(curl -sL \"https://raw.githubusercontent.com/shadcn-ui/ui/main/apps/v4/components.json\")",
+      "Bash(curl -sL --max-time 15 \"https://vercel.com/geist/grid\")",
+      "Bash(curl -sL --max-time 15 \"https://vercel.com/geist/layout\")",
+      "Bash(curl -sL --max-time 15 \"https://vercel.com/geist/spacing\")",
+      "Bash(curl -sL --max-time 15 \"https://vercel.com/geist/breakpoints\")",
+      "Bash(curl -sL --max-time 15 \"https://vercel.com/geist/components/grid\")",
+      "Bash(curl -sL --max-time 15 \"https://vercel.com/geist/components/stack\")",
+      "Bash(curl -sL --max-time 15 \"https://vercel.com/geist/components/container\")",
+      "WebFetch(domain:www.npmjs.com)",
+      "Bash(tr ';' '\\\\n')",
+      "Bash(tr '{}' '\\\\n')",
+      "Bash(curl -sL --max-time 15 \"https://vercel.com/vc-ap-b3331f/_next/static/chunks/19zgqmrvcyy1v.css?dpl=dpl_4kxr2Rd9sPRbr9xDXXPRoErNfQVF\")",
+      "Bash(tr '}' '\\\\n')",
+      "Bash(curl -sL --max-time 15 \"https://vercel.com/vc-ap-b3331f/_next/static/chunks/2-ay1r1vud8ys.css?dpl=dpl_4kxr2Rd9sPRbr9xDXXPRoErNfQVF\")",
+      "Bash(for css_file in \"19zgqmrvcyy1v\" \"1guf8al0alb0s\" \"2-2tj_gmx_yo0\" \"2-ay1r1vud8ys\" \"3px522afyjp2-\")",
+      "Bash(do echo:*)",
+      "Bash(curl -sL --max-time 10 \"https://vercel.com/vc-ap-b3331f/_next/static/chunks/$css_file.css?dpl=dpl_4kxr2Rd9sPRbr9xDXXPRoErNfQVF\")",
+      "Bash(curl -sL --max-time 15 \"https://vercel.com/vc-ap-b3331f/_next/static/chunks/3px522afyjp2-.css?dpl=dpl_4kxr2Rd9sPRbr9xDXXPRoErNfQVF\")",
+      "Bash(curl -sL --max-time 15 \"https://vercel.com/vc-ap-b3331f/_next/static/chunks/1guf8al0alb0s.css?dpl=dpl_4kxr2Rd9sPRbr9xDXXPRoErNfQVF\")"
     ]
   },
   "enableAllProjectMcpServers": false

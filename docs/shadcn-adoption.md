@@ -137,6 +137,31 @@ Could adopt Geist Sans for UI chrome (navigation, menus, controls) while keeping
 - `Badge` for tags, `Skeleton` for loading states
 - Consistent focus ring and animation patterns
 
+## Geist Grid — Not Applicable
+
+Investigated Geist Grid separately. **Not worth adopting** for Booqs.
+
+### What It Is
+
+A presentational CSS Grid system for marketing/landing pages. Key traits:
+- **Visual guide lines are a design element** — dashed lines between cells and cross marks at intersections render as part of the UI (the Vercel marketing aesthetic)
+- **Explicit row/column counts** — you declare exactly how many, not a 12-column system. Responsive via prop objects like `columns={{sm: 1, md: 2, lg: 4}}`
+- **No gap/gutter concept** — spacing is cell padding; cells are edge-to-edge with guide lines as separators
+- **Not publicly available** — Vercel-internal, documented as reference only
+
+### Why It Doesn't Fit
+
+Booqs has two **application layouts**, not content grids:
+
+1. **Main Layout** — 3-column CSS Grid with sticky header + sticky sidebars + scrollable center. Classic app shell. Geist Grid doesn't address sticky positioning, sidebar scrolling, or header/panel interaction.
+2. **Reader Layout** — Flex container + fixed overlay grid with transform-based panel animations and JS-driven auto-hide. Geist Grid has no concept of overlay grids, pointer-events management, or transform animations.
+
+Both use named grid areas, sticky positioning, and responsive reflow — none of which Geist Grid provides or improves.
+
+### Layout Inconsistencies Worth Fixing
+
+The investigation did surface real inconsistencies in the current layouts (see task list below), but these are naming/consistency issues — a different grid system wouldn't address them.
+
 ## Decision
 
 **Recommendation: adopt incrementally.** Rationale:
