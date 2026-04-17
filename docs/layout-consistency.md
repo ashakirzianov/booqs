@@ -20,9 +20,7 @@ Three different spacing scales exist for the same values:
 
 Root defines `--header-height: 3rem`, but MainLayout overrides it to `4rem`. ReaderLayout uses `var(--header-height)` (gets root 3rem). This means the main app and reader have different header heights.
 
-- [ ] Decide on a single header height (likely 3rem — the reader's value) or intentionally document the difference
-- [ ] If unifying: remove the `--header-height: 4rem` override from MainLayout.module.css and update `:root` if needed
-- [ ] If keeping both: rename one (e.g., `--reader-header-height`) so the intent is explicit, not an accidental override
+- [x] Unified to 3rem — removed `--header-height: 4rem` override from MainLayout.module.css; both layouts now use the root value
 
 ## Content Width
 
