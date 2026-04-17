@@ -66,6 +66,7 @@
     padding: var(--spacing-base);
     overflow-y: auto;
     overflow-x: hidden;
+    justify-self: start;
 }
 
 /* Mobile responsive breakpoint */
