@@ -29,11 +29,11 @@ export function NotesNavigationItem({ booqId, card }: NotesNavigationItemProps) 
                 size={60}
             />
             <div className="min-w-0 flex-1">
-                <div className={clsx('text-sm line-clamp-2', isSelected ? 'text-highlight' : 'text-dimmed')}>
+                <div className={clsx('text-md line-clamp-2', isSelected ? 'text-highlight' : 'text-dimmed')}>
                     {card.title}
                 </div>
                 {card.authors.length > 0 && (
-                    <div className="text-xs mt-1 text-dimmed">
+                    <div className="text-sm mt-1 text-dimmed">
                         {card.authors.join(', ')}
                     </div>
                 )}
