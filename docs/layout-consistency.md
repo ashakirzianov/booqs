@@ -12,9 +12,9 @@ Three different spacing scales exist for the same values:
 | 1rem | `--spacing-lg` | `--spacing-large` | `--meter-large` |
 | 4rem | `--spacing-2xl` | *(not defined)* | `--meter-xxlarge` |
 
-- [ ] Remove `--spacing-regular` / `--spacing-large` from MainLayout.module.css; use globals `--spacing-base` / `--spacing-lg` instead
-- [ ] Remove `--meter-regular` / `--meter-large` / `--meter-xxlarge` from ReaderLayout.module.css; use globals `--spacing-base` / `--spacing-lg` / `--spacing-2xl` instead
-- [ ] Audit both files for any remaining local spacing variables; all spacing should come from the global scale
+- [x] Remove `--spacing-regular` / `--spacing-large` from MainLayout.module.css; use globals `--spacing-base` / `--spacing-lg` instead
+- [x] Remove `--meter-regular` / `--meter-large` / `--meter-xxlarge` from ReaderLayout.module.css; use globals `--spacing-base` / `--spacing-lg` / `--spacing-2xl` instead
+- [x] Audit both files for any remaining local spacing variables; all spacing should come from the global scale
 
 ## Header Height
 

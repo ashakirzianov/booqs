@@ -1,8 +1,6 @@
 .layout {
     --content-width: 780px;
     --header-height: 4rem;
-    --spacing-regular: 0.5rem;
-    --spacing-large: 1rem;
 }
 
 .layout {
@@ -22,8 +20,8 @@
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    padding: 0 var(--spacing-large);
-    gap: var(--spacing-large);
+    padding: 0 var(--spacing-lg);
+    gap: var(--spacing-lg);
     background: var(--color-background);
     z-index: 1;
     overflow: hidden;
@@ -36,8 +34,8 @@
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    padding: 0 var(--spacing-large);
-    gap: var(--spacing-regular);
+    padding: 0 var(--spacing-lg);
+    gap: var(--spacing-base);
     background: var(--color-background);
     z-index: 1;
     overflow: hidden;
@@ -47,7 +45,7 @@
     grid-area: main-content;
     display: flex;
     flex-direction: column;
-    padding: var(--spacing-large) var(--spacing-regular) var(--spacing-regular);
+    padding: var(--spacing-lg) var(--spacing-base) var(--spacing-base);
     overflow-x: hidden;
 }
 
@@ -56,7 +54,7 @@
     position: sticky;
     top: var(--header-height);
     height: calc(100vh - var(--header-height));
-    padding: var(--spacing-regular) 0;
+    padding: var(--spacing-base) 0;
     overflow-y: auto;
     overflow-x: hidden;
 }
@@ -66,7 +64,7 @@
     position: sticky;
     top: var(--header-height);
     height: calc(100vh - var(--header-height));
-    padding: var(--spacing-regular);
+    padding: var(--spacing-base);
     overflow-y: auto;
     overflow-x: hidden;
 }
@@ -95,7 +93,7 @@
     }
 
     .mainContent {
-        padding: var(--spacing-large) var(--spacing-large) 0;
+        padding: var(--spacing-lg) var(--spacing-lg) 0;
     }
 
     .leftPanel,
