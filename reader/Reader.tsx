@@ -181,8 +181,7 @@ export function Reader({
 
 
     const { augmentations, menuTargetForAugmentation } = useAugmentations({
-        highlights: filteredHighlights,
-        comments: comments,
+        notes: [...filteredHighlights, ...comments],
         quote: quote,
         temporaryAugmentations: contextMenuAugmentations,
     })

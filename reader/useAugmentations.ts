@@ -1,6 +1,7 @@
 import { useMemo, useCallback } from 'react'
 import { getAugmentationText, Augmentation } from '@/viewer'
 import { BooqRange } from '@/core'
+import { augmentationForNote } from '@/application/notes'
 import { MenuState } from './ContextMenuContent'
 import { BooqNote } from '@/data/notes'
 
@@ -12,22 +13,14 @@ export type TemporaryAugmentation = {
 }
 
 export function useAugmentations({
-    quote, highlights, comments = [], temporaryAugmentations = [],
+    quote, notes, temporaryAugmentations = [],
 }: {
-    highlights: BooqNote[] | undefined,
-    comments?: BooqNote[],
+    notes: BooqNote[],
     quote?: BooqRange,
     temporaryAugmentations?: TemporaryAugmentation[],
 }) {
     const augmentations = useMemo(function () {
-        const noteArray = highlights ?? []
-        const noteAugmentations = noteArray.map<Augmentation>(function (note) {
-            return {
-                id: noteAugmentationId(note.id),
-                range: note.range,
-                color: `var(--color-${note.kind})`,
-            }
-        })
+        const noteAugmentations = notes.map<Augmentation>(augmentationForNote)
 
         const tempAugmentations = temporaryAugmentations.map<Augmentation>(function (temp) {
             return {
@@ -38,21 +31,7 @@ export function useAugmentations({
             }
         })
 
-        // Create a Set of note IDs for efficient lookup
-        const noteIds = new Set(noteArray.map(note => note.id))
-
-        // Generate dashed augmentations for comments not present in notes
-        const commentAugmentations = comments
-            .filter(comment => !noteIds.has(comment.id))
-            .map<Augmentation>(function (comment) {
-                return {
-                    id: noteAugmentationId(comment.id),
-                    range: comment.range,
-                    underline: 'dashed',
-                }
-            })
-
-        let result = [...noteAugmentations, ...commentAugmentations, ...tempAugmentations]
+        let result = [...noteAugmentations, ...tempAugmentations]
 
         if (quote) {
             const quoteAugmentation: Augmentation = {
@@ -64,7 +43,7 @@ export function useAugmentations({
         }
 
         return result
-    }, [quote, highlights, comments, temporaryAugmentations])
+    }, [quote, notes, temporaryAugmentations])
     const menuTargetForAugmentation = useCallback(function (augmentationId: string): MenuState | undefined {
         const [kind, id] = augmentationId.split('/')
         switch (kind) {
@@ -79,8 +58,7 @@ export function useAugmentations({
                     }
                     : undefined
             case 'note': {
-                const note = highlights?.find(function (hl) { return hl.id === id }) ||
-                    comments.find(function (hl) { return hl.id === id })
+                const note = notes.find(function (n) { return n.id === id })
                 return note
                     ? {
                         kind: 'note',
@@ -107,7 +85,7 @@ export function useAugmentations({
             default:
                 return undefined
         }
-    }, [quote, highlights, comments, temporaryAugmentations])
+    }, [quote, notes, temporaryAugmentations])
     return {
         augmentations,
         menuTargetForAugmentation,

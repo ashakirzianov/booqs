@@ -3,12 +3,12 @@
 import { useMemo } from 'react'
 import { ExternalLinkIcon } from '@/components/Icons'
 import { BooqNode, BooqStyles, BooqRange } from '@/core'
-import { Augmentation, BooqContent } from '@/viewer'
+import { BooqContent } from '@/viewer'
 import { LightLink, RemoveButton } from '@/components/Buttons'
 import { ColorPicker } from '@/components/ColorPicker'
 import { booqContentHref } from '@/common/href'
 import { BooqNote } from '@/data/notes'
-import { COMMENT_KIND, QUESTION_KIND } from '@/application/notes'
+import { COMMENT_KIND, QUESTION_KIND, augmentationForNote } from '@/application/notes'
 
 type NoteFragmentProps = ExpandedNoteFragmentData & {
     isExpanded: boolean,
@@ -29,21 +29,12 @@ export function NoteFragment({
     isExpanded, onToggle,
     onColorChange, onRemove,
 }: NoteFragmentProps) {
-    const augmentationColor = `hsl(from var(--color-${note.kind}) h s l / 40%)`
-
-    const isComment = isCommentOrQuestion(note.kind)
-
-    const noteAugmentations = useMemo<Augmentation[]>(() => {
+    const noteAugmentations = useMemo(() => {
         if (!nodes) {
             return []
         }
-        return [{
-            id: `note-${note.id}`,
-            range: note.range,
-            color: isComment ? undefined : augmentationColor,
-            underline: isComment ? 'dashed' as const : undefined,
-        }]
-    }, [nodes, note.id, note.range, augmentationColor, isComment])
+        return [augmentationForNote(note)]
+    }, [nodes, note])
 
     const viewInBooqHref = booqContentHref({ booqId: note.booqId, path: range.start })
 
@@ -103,11 +94,7 @@ export function NoteFragment({
                     onClick={onToggle}
                     title='Click to expand'
                 >
-                    <span className="m-0" style={{
-                        backgroundColor: isComment ? undefined : augmentationColor,
-                        textDecoration: isComment ? 'underline' : undefined,
-                        textDecorationStyle: isComment ? 'dashed' : undefined,
-                    }}>
+                    <span className="m-0" style={collapsedStyleForNote(note)}>
                         {note.targetQuote}
                     </span>
                 </div>
@@ -118,5 +105,14 @@ export function NoteFragment({
 
 function isCommentOrQuestion(kind: string): boolean {
     return kind === COMMENT_KIND || kind === QUESTION_KIND
+}
+
+function collapsedStyleForNote(note: BooqNote): React.CSSProperties {
+    const aug = augmentationForNote(note)
+    return {
+        backgroundColor: aug.color,
+        textDecoration: aug.underline ? 'underline' : undefined,
+        textDecorationStyle: aug.underline,
+    }
 }
 
