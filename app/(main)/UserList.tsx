@@ -172,12 +172,12 @@ export function UserList({
     return (
         <div className="space-y-4">
             <h3 className="text-lg font-medium">{title} ({usersList.length})</h3>
-            <div className="space-y-3">
+            <div className="shadow-sm rounded-lg">
                 {usersList.map(user => {
                     const buttonState = buttonStates[user.username] || { state: 'idle' }
 
                     return (
-                        <div key={user.id} className="flex items-center justify-between p-3 shadow-sm rounded-lg">
+                        <div key={user.id} className="flex items-center justify-between p-3">
                             <div className="flex items-center gap-3">
                                 <Link href={userHref({ username: user.username })}>
                                     <ProfileBadge
