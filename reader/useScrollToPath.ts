@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { BooqPath, BooqRange, pathToId } from '@/core'
+import { BooqPath, pathToId } from '@/core'
 
 export function useScrollToPath(path?: BooqPath) {
     useEffect(() => {
@@ -15,8 +15,4 @@ export function useScrollToPath(path?: BooqPath) {
             }
         })
     }, [path])
-}
-
-export function useScrollToQuote(quote?: BooqRange) {
-    useScrollToPath(quote?.start)
 }

@@ -20,7 +20,7 @@ import { AccountButton } from '@/components/AccountButton'
 import { usePathname, useSearchParams } from 'next/navigation'
 import { BackIcon, TocIcon, CommentIcon } from '@/components/Icons'
 import Link from 'next/link'
-import { useScrollToQuote, useScrollToPath } from './useScrollToQuote'
+import { useScrollToPath } from './useScrollToPath'
 import { useScrollHandler } from './useScrollHandler'
 import { useControlsVisibility } from './useControlsVisibility'
 import { useAugmentations } from './useAugmentations'
@@ -45,8 +45,7 @@ export function Reader({
     const { quote, path } = useBooqSearchParams()
     const pathname = usePathname()
     const fontScale = useFontScale()
-    useScrollToQuote(quote)
-    useScrollToPath(path)
+    useScrollToPath(quote?.start ?? path)
     const {
         currentPath,
     } = useScrollHandler({
