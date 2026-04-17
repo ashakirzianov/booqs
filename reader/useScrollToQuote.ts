@@ -1,18 +1,22 @@
-import { useEffect, useRef } from 'react'
-import { BooqRange, pathToId } from '@/core'
+import { useEffect } from 'react'
+import { BooqPath, BooqRange, pathToId } from '@/core'
 
-export function useScrollToQuote(quote?: BooqRange) {
-    const quoteRef = useRef(quote)
-    
+export function useScrollToPath(path?: BooqPath) {
     useEffect(() => {
-        if (quoteRef.current) {
-            const id = pathToId(quoteRef.current.start)
+        if (!path) return
+        const id = pathToId(path)
+        // Delay to ensure the content is rendered before scrolling
+        requestAnimationFrame(() => {
             const element = document.getElementById(id)
             if (element) {
                 element.scrollIntoView({
                     behavior: 'instant',
                 })
             }
-        }
-    }, [quoteRef])
+        })
+    }, [path])
+}
+
+export function useScrollToQuote(quote?: BooqRange) {
+    useScrollToPath(quote?.start)
 }

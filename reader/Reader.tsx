@@ -20,7 +20,7 @@ import { AccountButton } from '@/components/AccountButton'
 import { usePathname, useSearchParams } from 'next/navigation'
 import { BackIcon, TocIcon, CommentIcon } from '@/components/Icons'
 import Link from 'next/link'
-import { useScrollToQuote } from './useScrollToQuote'
+import { useScrollToQuote, useScrollToPath } from './useScrollToQuote'
 import { useScrollHandler } from './useScrollHandler'
 import { useControlsVisibility } from './useControlsVisibility'
 import { useAugmentations } from './useAugmentations'
@@ -42,10 +42,11 @@ export function Reader({
     notes: BooqNote[],
     user: AccountData | undefined,
 }) {
-    const { quote } = useBooqSearchParams()
+    const { quote, path } = useBooqSearchParams()
     const pathname = usePathname()
     const fontScale = useFontScale()
     useScrollToQuote(quote)
+    useScrollToPath(path)
     const {
         currentPath,
     } = useScrollHandler({
@@ -286,7 +287,7 @@ function useBooqSearchParams() {
             : undefined
         return {
             quote,
-            path: path ?? [0],
+            path,
         }
     }, [quoteParam, pathParam])
 }
