@@ -8,7 +8,7 @@ export function Search() {
     return <>
         <div className='relative flex items-center cursor-pointer' onClick={openModal}>
             <input
-                className='font-normal text-sm rounded px-3 py-1.5 w-36 bg-background text-primary cursor-pointer
+                className='font-normal text-base rounded px-3 py-1.5 w-36 bg-background text-primary cursor-pointer
                 border border-border
                 focus:max-w-auto focus:outline-hidden focus:ring-0
                 placeholder:text-dimmed'
