@@ -22,12 +22,8 @@ export default async function NotesPage() {
     }
 
     return (
-        <main className="flex flex-row justify-center min-h-screen bg-background">
-            <div className="flex flex-col max-w-4xl w-full p-6">
-                <div className="flex items-center justify-center h-64">
-                    <p className="text-dimmed text-lg">No notes found. Start reading a book to create notes.</p>
-                </div>
-            </div>
-        </main>
+        <div className="flex items-center justify-center h-64">
+            <p className="text-dimmed text-lg">No notes found. Start reading a book to create notes.</p>
+        </div>
     )
 }

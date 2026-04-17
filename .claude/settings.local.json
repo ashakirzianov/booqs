@@ -132,7 +132,9 @@
       "Bash(do echo:*)",
       "Bash(curl -sL --max-time 10 \"https://vercel.com/vc-ap-b3331f/_next/static/chunks/$css_file.css?dpl=dpl_4kxr2Rd9sPRbr9xDXXPRoErNfQVF\")",
       "Bash(curl -sL --max-time 15 \"https://vercel.com/vc-ap-b3331f/_next/static/chunks/3px522afyjp2-.css?dpl=dpl_4kxr2Rd9sPRbr9xDXXPRoErNfQVF\")",
-      "Bash(curl -sL --max-time 15 \"https://vercel.com/vc-ap-b3331f/_next/static/chunks/1guf8al0alb0s.css?dpl=dpl_4kxr2Rd9sPRbr9xDXXPRoErNfQVF\")"
+      "Bash(curl -sL --max-time 15 \"https://vercel.com/vc-ap-b3331f/_next/static/chunks/1guf8al0alb0s.css?dpl=dpl_4kxr2Rd9sPRbr9xDXXPRoErNfQVF\")",
+      "Bash(grep -n \"max-w\\\\|width:\" /Users/ashakirzianov/repos/booqs/app/\\\\\\(main\\\\\\)/notes/[booq_id]/*.tsx)",
+      "Bash(ls -la /Users/ashakirzianov/repos/booqs/app/\\\\\\(main\\\\\\)/notes/)"
     ]
   },
   "enableAllProjectMcpServers": false
