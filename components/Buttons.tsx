@@ -19,10 +19,10 @@ export function LightButton({
         onClick={onClick}
         disabled={disabled}
         className={clsx(
-            'flex items-center text-action font-medium hover:text-highlight transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer',
+            'flex items-center text-action hover:text-highlight transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer',
             {
                 'gap-1 text-sm': size === 'small',
-                'gap-1': size === 'normal',
+                'gap-1 text-md': size === 'normal',
                 'gap-3 text-lg': size === 'large',
             },
         )}
@@ -48,7 +48,7 @@ export function LightLink({
     return <Link
         href={href}
         className={clsx(
-            'flex items-center text-action font-medium hover:text-highlight transition-colors',
+            'flex items-center text-action hover:text-highlight transition-colors',
             {
                 'gap-1 text-sm': size === 'small',
                 'gap-1': size === 'normal',

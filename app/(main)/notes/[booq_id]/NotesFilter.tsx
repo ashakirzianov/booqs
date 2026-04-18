@@ -105,36 +105,35 @@ export function NotesFilter({ data, booqId, user }: {
     return (
         <>
             {/* Notes controls row */}
-            <div className="bg-background flex flex-row items-center gap-3 my-3">
-                <h3 className="text-md text-dimmed whitespace-nowrap font-medium">Show notes:</h3>
-                <div className='h-10 shadow-md rounded overflow-clip' style={{
-                    width: `calc(var(--spacing) * ${(filterGroups.length + 1) * 10})`,
-                }}>
-                    <div className="flex flex-row h-full items-stretch justify-between">
-                        <FilterButton
-                            active={selectedFilter === 'all'}
-                            onClick={() => setSelectedFilter('all')}
-                            label="All"
-                        />
-                        {filterGroups.map(group => (
+            <div className="bg-background flex flex-row justify-between">
+                <div className='flex flex-row items-center gap-3 my-3'>
+                    <h3 className="text-md text-dimmed whitespace-nowrap font-medium">Show notes:</h3>
+                    <div className='h-10 shadow-md rounded overflow-clip' style={{
+                        width: `calc(var(--spacing) * ${(filterGroups.length + 1) * 10})`,
+                    }}>
+                        <div className="flex flex-row h-full items-stretch justify-between">
                             <FilterButton
-                                key={group.key}
-                                active={selectedFilter === group.key}
-                                onClick={() => setSelectedFilter(group.key)}
-                                label={group.label}
-                                color={group.color}
-                                icon={group.icon}
+                                active={selectedFilter === 'all'}
+                                onClick={() => setSelectedFilter('all')}
+                                label="All"
                             />
-                        ))}
+                            {filterGroups.map(group => (
+                                <FilterButton
+                                    key={group.key}
+                                    active={selectedFilter === group.key}
+                                    onClick={() => setSelectedFilter(group.key)}
+                                    label={group.label}
+                                    color={group.color}
+                                    icon={group.icon}
+                                />
+                            ))}
+                        </div>
                     </div>
                 </div>
-                <div className="ml-auto">
-                    <LightButton
-                        text={hasAnyExpanded ? 'Collapse All' : 'Expand All'}
-                        onClick={handleToggleAll}
-                        size="small"
-                    />
-                </div>
+                <LightButton
+                    text={hasAnyExpanded ? 'Collapse All' : 'Expand All'}
+                    onClick={handleToggleAll}
+                />
             </div>
 
             {/* Notes list */}
