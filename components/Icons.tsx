@@ -1,4 +1,8 @@
-const STROKE_WIDTH = 0.75
+// Make icons thicker (or thinner) in a specific context:
+// <div style={{ '--icon-stroke-width': '1.5' } as React.CSSProperties}>
+//    <SettingsIcon />
+// </div>
+const STROKE_WIDTH = 'var(--icon-stroke-width, 0.75)'
 
 export function LargeSpinner() {
     return <div className="w-6 h-6 border-2 border-current border-t-transparent animate-spin rounded-full" />
