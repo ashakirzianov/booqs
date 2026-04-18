@@ -95,10 +95,8 @@ export function Reader({
 
     const { followingUserIds, isLoading: isFollowingLoading } = useFollowingData({ user })
 
-    const [commentsPanelOpen, setCommentsPanelOpen] = React.useState(false)
-
     const { anchor, menuState, setMenuState, contextMenuAugmentations, displayTarget } = useMenuState()
-    const hasCommentTarget = menuState.kind === 'comment' || menuState.kind === 'question-asked'
+    const isCommentsPanelVisible = menuState.kind === 'comments-list' || menuState.kind === 'comment' || menuState.kind === 'question-asked'
     const ContextMenuContentNode = useMemo(() => {
         return <ContextMenuContent
             booqId={booqId}
@@ -141,13 +139,11 @@ export function Reader({
         <TocIcon />
     </PanelButton>
 
-    const isCommentsPanelVisible = commentsPanelOpen || hasCommentTarget
     const toggleCommentsPanel = () => {
-        if (hasCommentTarget) {
+        if (isCommentsPanelVisible) {
             setMenuState({ kind: 'empty' })
-            setCommentsPanelOpen(false)
         } else {
-            setCommentsPanelOpen(prev => !prev)
+            setMenuState({ kind: 'comments-list' })
         }
     }
     const CommentsButton = <PanelButton

@@ -48,7 +48,7 @@ export function CommentsPanel({ booqId, comments, currentUser, followingUserIds,
             comments={comments}
             selectedCommentId={selectedCommentId}
             currentUser={currentUser}
-            onBack={() => setMenuState({ kind: 'empty' })}
+            onBack={() => setMenuState({ kind: 'comments-list' })}
             streamingReply={streamingReply}
         />
     }
