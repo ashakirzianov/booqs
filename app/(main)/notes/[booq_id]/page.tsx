@@ -1,6 +1,7 @@
 import { fetchNotes } from '@/data/notes'
 import { parseIdOpt, type BooqId, comparePaths } from '@/core'
-import { notFound } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
+import { authHref } from '@/common/href'
 import Link from 'next/link'
 import { booqContentHref, authorHref, booqImageUrl } from '@/common/href'
 import { getUserIdInsideRequest } from '@/data/request'
@@ -70,7 +71,7 @@ export default async function NotesPage({ params }: {
 
     const userId = await getUserIdInsideRequest()
     if (!userId) {
-        notFound()
+        redirect(authHref({}))
     }
 
     const userNotes = await fetchNotes({ booqId, authorId: userId })

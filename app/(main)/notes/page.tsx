@@ -1,6 +1,5 @@
-import { getCurrentUser } from '@/data/user'
 import { fetchBooqsWithOwnNotes } from '@/data/notes'
-import { notFound, redirect } from 'next/navigation'
+import { redirect } from 'next/navigation'
 import { Metadata } from 'next'
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -11,11 +10,6 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function NotesPage() {
-    const user = await getCurrentUser()
-    if (!user) {
-        notFound()
-    }
-
     const booqsWithNotes = await fetchBooqsWithOwnNotes()
     if (booqsWithNotes.length > 0) {
         redirect(`/notes/${booqsWithNotes[0]}`)
