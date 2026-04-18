@@ -1,4 +1,4 @@
-const STROKE_WIDTH = 1
+const STROKE_WIDTH = 0.75
 
 export function LargeSpinner() {
     return <div className="w-6 h-6 border-2 border-current border-t-transparent animate-spin rounded-full" />
