@@ -3,6 +3,7 @@ import { Search } from '@/app/(main)/Search'
 import { UploadButton } from '@/app/(main)/Upload'
 import { Logo } from '@/components/Logo'
 import { MainMenu } from '@/app/(main)/MainMenu'
+import { BottomTabBar } from '@/app/(main)/BottomTabBar'
 import { getCurrentUser } from '@/data/user'
 import { hasReadingHistory } from '@/data/history'
 import Link from 'next/link'
@@ -35,5 +36,6 @@ export default async function MainLayout({
             {user && <MainMenu />}
         </aside>
 
+        {user && <BottomTabBar />}
     </div>
 }

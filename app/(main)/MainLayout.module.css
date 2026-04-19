@@ -69,14 +69,21 @@
     justify-self: start;
 }
 
+/* Bottom tab bar: hidden on large screens */
+.bottomTabBar {
+    display: none;
+}
+
 /* Mobile responsive breakpoint */
 @media (max-width: 1024px) {
     .layout {
+        --tab-bar-height: 3.5rem;
         grid-template-columns: 1fr auto;
-        grid-template-rows: var(--header-height) 1fr;
+        grid-template-rows: var(--header-height) 1fr var(--tab-bar-height);
         grid-template-areas:
             "left-header  right-header"
-            "main-content main-content";
+            "main-content main-content"
+            "tab-bar      tab-bar";
     }
 
     .leftHeader {
@@ -93,6 +100,41 @@
     .leftPanel,
     .rightPanel {
         display: none;
+    }
+
+    .bottomTabBar {
+        grid-area: tab-bar;
+        position: sticky;
+        bottom: 0;
+        display: flex;
+        align-items: stretch;
+        justify-content: space-around;
+        background: var(--color-background);
+        border-top: 1px solid var(--color-border);
+        z-index: 10;
+        padding-bottom: env(safe-area-inset-bottom);
+    }
+
+    .tab {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        flex: 1;
+        gap: 2px;
+        padding: 6px 0;
+        color: var(--color-dimmed);
+        text-decoration: none;
+        transition: color 150ms;
+    }
+
+    .tabActive {
+        color: var(--color-action);
+    }
+
+    .tabIcon {
+        width: 1.5rem;
+        height: 1.5rem;
     }
 }
 
