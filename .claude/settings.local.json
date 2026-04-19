@@ -41,7 +41,8 @@
       "WebFetch(domain:ui.shadcn.com)",
       "WebFetch(domain:www.npmjs.com)",
       "WebFetch(domain:platform.openai.com)",
-      "WebFetch(domain:help.openai.com)"
+      "WebFetch(domain:help.openai.com)",
+      "Bash(git checkout:*)"
     ]
   },
   "enableAllProjectMcpServers": false
