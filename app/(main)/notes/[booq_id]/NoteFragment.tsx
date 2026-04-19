@@ -63,7 +63,7 @@ export function NoteFragment({
                                 />
                             )}
                             {!isCommentOrQuestion(note.kind) && (
-                                <div className='w-32 h-6 shadow-md rounded overflow-clip'>
+                                <div className='w-32 h-6 shadow rounded overflow-clip'>
                                     <ColorPicker
                                         selectedKind={note.kind}
                                         onColorChange={onColorChange}
@@ -78,7 +78,7 @@ export function NoteFragment({
             {/* Fragment content — click to expand/collapse */}
             {isExpanded && nodes ? (
                 <div
-                    className="rounded shadow-sm py-3 px-12 bg-background overflow-y-auto font-book text-primary cursor-pointer"
+                    className="rounded shadow py-3 px-12 bg-background overflow-y-auto font-book text-primary cursor-pointer"
                     onClick={onToggle}
                 >
                     <BooqContent
@@ -90,7 +90,7 @@ export function NoteFragment({
                 </div>
             ) : (
                 <div
-                    className="rounded shadow-sm py-3 px-12 cursor-pointer hover:opacity-80 transition-opacity bg-background font-book text-primary"
+                    className="rounded shadow py-3 px-12 cursor-pointer hover:opacity-80 transition-opacity bg-background font-book text-primary"
                     onClick={onToggle}
                     title='Click to expand'
                 >

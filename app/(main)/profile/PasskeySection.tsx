@@ -43,7 +43,7 @@ export function PasskeySection({ initialPasskeys }: { initialPasskeys: PasskeyDa
     }
 
     return (
-        <div className="bg-background shadow-lg rounded-lg p-6">
+        <div className="bg-background shadow rounded-lg p-6">
             <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl font-medium text-primary">Passkeys</h2>
             </div>

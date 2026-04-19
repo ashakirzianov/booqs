@@ -83,7 +83,7 @@ export default async function UserPage({
         <main className={styles.mainContent}>
             <div className="space-y-8">
                 {/* Public Profile Section */}
-                <div className="bg-background shadow-md rounded-lg p-6">
+                <div className="bg-background shadow rounded-lg p-6">
                     <div className="flex items-center gap-4">
                         <ProfileBadge
                             name={user.name}

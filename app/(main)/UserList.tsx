@@ -172,7 +172,7 @@ export function UserList({
     return (
         <div className="space-y-4">
             <h3 className="text-lg font-medium">{title} ({usersList.length})</h3>
-            <div className="shadow-sm rounded-lg">
+            <div className="shadow rounded-lg">
                 {usersList.map(user => {
                     const buttonState = buttonStates[user.username] || { state: 'idle' }
 
