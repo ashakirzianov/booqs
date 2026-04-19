@@ -100,7 +100,7 @@ export default async function NotesPage({ params }: {
 
     return (
         <>
-            <div className="mb-6">
+            <div className="mb-6 text-center">
                 <h1 className="text-3xl font-bold text-primary mb-2">
                     <Link
                         href={booqContentHref({ booqId, path: [0] })}
