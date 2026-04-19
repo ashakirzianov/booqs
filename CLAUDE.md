@@ -23,7 +23,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - The user makes all commits — do NOT commit unless explicitly asked.
 - Propose a commit message after each change.
 - Only add tests when explicitly asked.
-- When making functional changes (new features, new API endpoints, changed behavior), update SPECS.md to reflect the change. When making visual/layout changes, update UX.md.
+- When making functional changes (new features, new API endpoints, changed behavior), update SPECS.md to reflect the change. When making visual/layout changes, update UX.md. **Do not skip this** — these files are the source of truth for what the app looks like and does.
 - Always run `npm run build` after completing a change. Fix any errors before presenting the summary. Don't present work as done without a passing build.
 
 ### Communication Style
