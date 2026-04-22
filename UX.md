@@ -92,9 +92,9 @@ All icons use a CSS custom property `--icon-stroke-width` (default `0.75`) for s
 ### 1.7 Responsive Breakpoints
 
 Breakpoints are derived from content width (780px) + panel space requirements:
-- **Large** (>= 1140px): Full 3-column layout, side panels with icons + labels. Threshold: 780px content + ~180px per side panel.
-- **Medium** (880–1139px): 3-column layout, side panels with icons only (no labels). Threshold: 780px content + ~48px per side panel.
-- **Small** (< 880px): Single column, side panels hidden, bottom tab bar for navigation, header splits into two non-overlapping columns.
+- **Large** (>= 1200px): Full 3-column layout, side panels with icons + labels. Threshold: 780px content + ~180px per side panel.
+- **Medium** (< 1200px and >= 950px): 3-column layout, side panels with icons only (no labels). Threshold: 780px content + ~48px per side panel.
+- **Small** (< 950px): Single column, side panels hidden, bottom tab bar for navigation, header splits into two non-overlapping columns.
 - Mobile devices with max-device-width 1024px get 120% base font size
 
 ### 1.8 Theme Viewport
