@@ -1,7 +1,6 @@
 'use client'
 
 import { useSearchModalState, useSearchHotkey, SearchModal } from './SearchModal'
-import { SearchIcon } from '@/components/Icons'
 import styles from './MainLayout.module.css'
 
 export function Search() {
@@ -22,13 +21,6 @@ export function Search() {
                 ⌘K
             </kbd>
         </div>
-        <button
-            className={`${styles.searchIcon} items-center justify-center w-8 h-8 p-0.5 text-dimmed hover:text-highlight transition duration-150 cursor-pointer bg-transparent border-none`}
-            onClick={openModal}
-            aria-label="Search"
-        >
-            <SearchIcon />
-        </button>
         <SearchModal
             isOpen={isOpen}
             closeModal={closeModal}

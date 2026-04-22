@@ -75,12 +75,13 @@
     display: inline;
 }
 
-/* Search box: visible by default, icon hidden */
+/* Search box: visible by default */
 .searchBox {
     display: flex;
 }
 
-.searchIcon {
+/* Panel search: hidden by default, shown on medium */
+.panelSearch {
     display: none;
 }
 
@@ -89,7 +90,7 @@
     display: none;
 }
 
-/* Medium (< 1140px): icon-only panels, search icon instead of box */
+/* Medium (< 1140px): icon-only panels, search moves to panel */
 @media (max-width: 1140px) {
     .menuLabel {
         display: none;
@@ -99,8 +100,8 @@
         display: none;
     }
 
-    .searchIcon {
-        display: flex;
+    .panelSearch {
+        display: block;
     }
 }
 

@@ -33,9 +33,9 @@ export default async function MainLayout({
         {children}
 
         <aside className={styles.leftPanel}>
-            {user && <MainMenu />}
+            {user && <MainMenu showSearch={showHeaderSearch} />}
         </aside>
 
-        {user && <BottomTabBar />}
+        {user && <BottomTabBar showSearch={showHeaderSearch} />}
     </div>
 }

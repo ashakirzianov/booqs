@@ -3,7 +3,8 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { feedHref, notesHref, collectionsHref, historyHref, profileHref } from '@/common/href'
-import { BookIcon, NotesIcon, CollectionIcon, HistoryIcon, ProfileIcon } from '@/components/Icons'
+import { BookIcon, NotesIcon, CollectionIcon, HistoryIcon, ProfileIcon, SearchIcon } from '@/components/Icons'
+import { useSearchModalState, useSearchHotkey, SearchModal } from './SearchModal'
 import styles from './MainLayout.module.css'
 
 const tabs = [
@@ -14,8 +15,10 @@ const tabs = [
     { label: 'Profile', href: profileHref(), icon: <ProfileIcon /> },
 ]
 
-export function BottomTabBar() {
+export function BottomTabBar({ showSearch }: { showSearch?: boolean }) {
     const pathname = usePathname()
+    const { isOpen, openModal, closeModal } = useSearchModalState()
+    useSearchHotkey({ isOpen, openModal, closeModal })
 
     return <nav className={styles.bottomTabBar}>
         {tabs.map(({ label, href, icon }) => {
@@ -29,5 +32,15 @@ export function BottomTabBar() {
                 <div className={`${styles.tabIcon} p-0.5`}>{icon}</div>
             </Link>
         })}
+        {showSearch && <>
+            <button
+                className={`${styles.tab} bg-transparent border-none cursor-pointer`}
+                onClick={openModal}
+                aria-label="Search"
+            >
+                <div className={`${styles.tabIcon} p-0.5`}><SearchIcon /></div>
+            </button>
+            <SearchModal isOpen={isOpen} closeModal={closeModal} />
+        </>}
     </nav>
 }
