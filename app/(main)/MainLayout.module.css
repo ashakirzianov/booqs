@@ -2,6 +2,7 @@
     --content-width: var(--width-content-main);
 }
 
+/* Large (>= 1140px): full 3-column layout with icon+label panels */
 .layout {
     display: grid;
     grid-template-columns: 1fr var(--content-width) 1fr;
@@ -69,13 +70,25 @@
     justify-self: start;
 }
 
-/* Bottom tab bar: hidden on large screens */
+/* Menu label: visible by default, hidden on medium screens */
+.menuLabel {
+    display: inline;
+}
+
+/* Bottom tab bar: hidden on large/medium screens */
 .bottomTabBar {
     display: none;
 }
 
-/* Mobile responsive breakpoint */
-@media (max-width: 1024px) {
+/* Medium (< 1140px): icon-only panels */
+@media (max-width: 1140px) {
+    .menuLabel {
+        display: none;
+    }
+}
+
+/* Small (< 880px): single column + bottom tab bar */
+@media (max-width: 880px) {
     .layout {
         --tab-bar-height: 3.5rem;
         grid-template-columns: 1fr auto;
@@ -135,12 +148,5 @@
     .tabIcon {
         width: 1.5rem;
         height: 1.5rem;
-    }
-}
-
-/* Tablet breakpoint */
-@media (max-width: 1280px) and (min-width: 1025px) {
-    .layout {
-        grid-template-columns: 1fr var(--content-width) 1fr;
     }
 }

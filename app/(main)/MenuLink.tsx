@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { ReactNode } from 'react'
+import styles from './MainLayout.module.css'
 
 const menuIconSize = '1.5rem' // 24px — tweak this to resize menu icons
 
@@ -27,7 +28,7 @@ export function MenuLink({ href, icon, children }: MenuLinkProps) {
             <div className="w-8 h-8 flex items-center justify-center shrink-0">
                 <div style={{ width: menuIconSize, height: menuIconSize }}>{icon}</div>
             </div>
-            <span>{children}</span>
+            <span className={styles.menuLabel}>{children}</span>
         </Link>
     )
 }
