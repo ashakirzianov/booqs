@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation'
 import { ReactNode } from 'react'
 import styles from './MainLayout.module.css'
 
-const menuIconSize = '1.5rem' // 24px — tweak this to resize menu icons
+const menuIconSize = '2rem' // 32px — matches logo and app bar icon sizes
 
 interface MenuLinkProps {
     href: string
@@ -25,8 +25,8 @@ export function MenuLink({ href, icon, children }: MenuLinkProps) {
                 : 'text-dimmed hover:text-action hover:bg-background-secondary'
                 }`}
         >
-            <div className="w-8 h-8 flex items-center justify-center shrink-0">
-                <div style={{ width: menuIconSize, height: menuIconSize }}>{icon}</div>
+            <div className="shrink-0 p-0.5" style={{ width: menuIconSize, height: menuIconSize }}>
+                {icon}
             </div>
             <span className={styles.menuLabel}>{children}</span>
         </Link>

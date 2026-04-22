@@ -26,7 +26,7 @@ export function BottomTabBar() {
                 className={`${styles.tab} ${isActive ? styles.tabActive : ''}`}
                 aria-label={label}
             >
-                <div className={styles.tabIcon}>{icon}</div>
+                <div className={`${styles.tabIcon} p-0.5`}>{icon}</div>
             </Link>
         })}
     </nav>

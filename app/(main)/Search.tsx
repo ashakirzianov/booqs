@@ -23,7 +23,7 @@ export function Search() {
             </kbd>
         </div>
         <button
-            className={`${styles.searchIcon} items-center justify-center w-8 h-8 text-dimmed hover:text-highlight transition duration-150 cursor-pointer bg-transparent border-none p-0`}
+            className={`${styles.searchIcon} items-center justify-center w-8 h-8 p-0.5 text-dimmed hover:text-highlight transition duration-150 cursor-pointer bg-transparent border-none`}
             onClick={openModal}
             aria-label="Search"
         >
