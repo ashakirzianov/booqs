@@ -6,6 +6,7 @@ import clsx from 'clsx'
 import { BooqId } from '@/core'
 import { BooqCover } from '@/components/BooqCover'
 import { BooqCardData } from '@/data/booqs'
+import styles from '@/app/(main)/MainLayout.module.css'
 
 interface NotesNavigationItemProps {
     booqId: BooqId
@@ -19,7 +20,10 @@ export function NotesNavigationItem({ booqId, card }: NotesNavigationItemProps) 
     return (
         <Link
             href={`/notes/${booqId}`}
-            className="flex items-start gap-3 p-2 rounded-lg transition-colors duration-200 hover:opacity-80"
+            className={clsx(
+                'flex items-start gap-3 p-2 rounded-lg transition-colors duration-200 hover:opacity-80',
+                isSelected && 'border border-highlight',
+            )}
         >
             <BooqCover
                 booqId={booqId}
@@ -28,7 +32,7 @@ export function NotesNavigationItem({ booqId, card }: NotesNavigationItemProps) 
                 author={card.authors.join(', ')}
                 size={60}
             />
-            <div className="min-w-0 flex-1">
+            <div className={`${styles.menuLabel} min-w-0 flex-1`}>
                 <div className={clsx('text-md line-clamp-2', isSelected ? 'text-highlight' : 'text-dimmed')}>
                     {card.title}
                 </div>
