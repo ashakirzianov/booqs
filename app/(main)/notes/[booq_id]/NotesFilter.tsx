@@ -105,10 +105,9 @@ export function NotesFilter({ data, booqId, user }: {
     return (
         <>
             {/* Notes controls row */}
-            <div className="bg-background flex flex-row justify-between">
-                <div className='flex flex-row items-center gap-3 my-3'>
-                    <h3 className="text-md text-dimmed whitespace-nowrap font-medium">Show notes:</h3>
-                    <div className='h-10 shadow rounded overflow-clip' style={{
+            <div className="bg-background flex flex-row flex-wrap items-center justify-between gap-3 my-3">
+                <div className='flex flex-row items-center gap-3'>
+                    <div className='h-10 shadow rounded overflow-clip max-w-full' style={{
                         width: `calc(var(--spacing) * ${(filterGroups.length + 1) * 10})`,
                     }}>
                         <div className="flex flex-row h-full items-stretch justify-between">
