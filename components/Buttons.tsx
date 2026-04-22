@@ -125,7 +125,7 @@ export function PanelButton({
     selected?: boolean,
 }) {
     return <button
-        className={clsx('button flex text-dimmed text-2xl cursor-pointer transition duration-150 bg-transparent hover:text-highlight focus:outline-hidden w-8 h-8 p-0.5 justify-center items-center', {
+        className={clsx('button flex shrink-0 text-dimmed text-2xl cursor-pointer transition duration-150 bg-transparent hover:text-highlight focus:outline-hidden w-8 h-8 p-0.5 justify-center items-center', {
             'text-highlight': selected,
             'text-dimmed': !selected,
         })}

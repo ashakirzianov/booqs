@@ -19,7 +19,7 @@ export default async function MainLayout({
     const showHeaderSearch = await hasReadingHistory(user?.id)
     return <div className={`${styles.layout} font-normal font-main`}>
         <header className={styles.leftHeader}>
-            <Link href={feedHref()}>
+            <Link href={feedHref()} className="shrink-0">
                 <Logo />
             </Link>
             {showHeaderSearch && <Search />}
