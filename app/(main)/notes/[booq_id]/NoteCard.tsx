@@ -1,8 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { BooqNote, NoteAuthorData } from '@/data/notes'
-import { BooqNode, BooqRange } from '@/core'
+import { NoteAuthorData } from '@/data/notes'
 import { useBooqNotes } from '@/application/notes'
 import { ActionButton, LightButton } from '@/components/Buttons'
 import { ExpandedNoteFragmentData, NoteFragment } from './NoteFragment'
@@ -10,19 +9,19 @@ import { RetryIcon } from '@/components/Icons'
 import { NoteReplies } from '@/reader/NoteReplies'
 
 export function NoteCard({
-    noteFragmentData, user, onColorChange,
+    noteFragmentData, user, isExpanded, onToggle, onColorChange,
 }: {
     noteFragmentData: ExpandedNoteFragmentData,
     user: NoteAuthorData | undefined,
-    expandedFragment?: { nodes: BooqNode[], range: BooqRange } | undefined,
-    overlappingNotes?: BooqNote[],
+    isExpanded: boolean,
+    onToggle: () => void,
     onColorChange?: (noteId: string, newKind: string) => void,
 }) {
-    const { note, overlapping, nodes, range } = noteFragmentData
+    const { note, nodes, range } = noteFragmentData
     const { booqId } = note
     const [isEditing, setIsEditing] = useState(false)
     const [editContent, setEditContent] = useState(note.content || '')
-    const [removedNote, setRemovedNote] = useState<BooqNote | null>(null)
+    const [removedNote, setRemovedNote] = useState<typeof note | null>(null)
     const { updateNote, removeNote, addNote } = useBooqNotes({ booqId, user })
 
     const isNoteRemoved = removedNote !== null
@@ -80,7 +79,7 @@ export function NoteCard({
     // Show removal message if note was removed
     if (isNoteRemoved) {
         return (
-            <div className="bg-background p-6 transition-shadow duration-200">
+            <div className="bg-background py-6 transition-shadow duration-200">
                 <div className="mb-4">
                     <div className="text-dimmed mb-4">Note was removed</div>
                     <LightButton
@@ -94,13 +93,14 @@ export function NoteCard({
     }
 
     return (
-        <div className="bg-background p-6 transition-shadow duration-200">
+        <div className="bg-background py-6 transition-shadow duration-200">
             <div className="mb-4 flex flex-col gap-3">
                 <NoteFragment
                     note={note}
-                    overlapping={overlapping}
                     nodes={nodes}
                     range={range}
+                    isExpanded={isExpanded}
+                    onToggle={onToggle}
                     onColorChange={handleColorChange}
                     onRemove={handleRemove}
                 />
@@ -108,8 +108,17 @@ export function NoteCard({
                 {isEditing ? (
                     <div className="flex flex-col gap-2">
                         <textarea
+                            autoFocus
                             value={editContent}
                             onChange={(e) => setEditContent(e.target.value)}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter' && !e.metaKey && !e.ctrlKey) {
+                                    e.preventDefault()
+                                    handleEditToggle()
+                                } else if (e.key === 'Escape') {
+                                    handleCancel()
+                                }
+                            }}
                             placeholder="Add your note content..."
                             className="w-full p-3 border border-gray-300 rounded resize-none focus:outline-none focus:ring-2 focus:ring-action"
                             rows={3}
@@ -134,11 +143,9 @@ export function NoteCard({
                     </div>
                 )}
 
-                {note.privacy === 'public' && note.kind === 'comment' && (
-                    <div className="px-3">
-                        <NoteReplies noteId={note.id} user={user} />
-                    </div>
-                )}
+                <div className="px-3">
+                    <NoteReplies noteId={note.id} user={user} collapsible />
+                </div>
             </div>
         </div>
     )

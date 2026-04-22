@@ -1,5 +1,6 @@
 import clsx from 'clsx'
 import React from 'react'
+import Link from 'next/link'
 import { TrashIcon } from './Icons'
 
 export function LightButton({
@@ -21,7 +22,7 @@ export function LightButton({
             'flex items-center text-action hover:text-highlight transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer',
             {
                 'gap-1 text-sm': size === 'small',
-                'gap-1': size === 'normal',
+                'gap-1 text-md': size === 'normal',
                 'gap-3 text-lg': size === 'large',
             },
         )}
@@ -32,6 +33,39 @@ export function LightButton({
 
         {text}
     </button>
+}
+
+export function LightLink({
+    icon, iconPosition = 'left', text, href,
+    size = 'normal',
+}: {
+    text: string,
+    href: string,
+    icon?: React.ReactNode,
+    iconPosition?: 'left' | 'right',
+    size?: 'small' | 'normal' | 'large',
+}) {
+    return <Link
+        href={href}
+        className={clsx(
+            'flex items-center text-action hover:text-highlight transition-colors',
+            {
+                'gap-1 text-sm': size === 'small',
+                'gap-1': size === 'normal',
+                'gap-3 text-lg': size === 'large',
+            },
+        )}
+    >
+        {icon && iconPosition === 'left' && <div className="w-4 h-4">
+            {icon}
+        </div>}
+
+        {text}
+
+        {icon && iconPosition === 'right' && <div className="w-4 h-4">
+            {icon}
+        </div>}
+    </Link>
 }
 
 export function ActionButton({
@@ -58,7 +92,7 @@ export function ActionButton({
         onClick={onClick}
         disabled={disabled}
         className={clsx(
-            'rounded-md font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center content-center cursor-pointer',
+            'rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center content-center cursor-pointer',
             {
                 'bg-action text-white hover:bg-highlight': variant === 'primary',
                 'border border-dimmed text-dimmed hover:bg-dimmed/10': variant === 'secondary',
@@ -91,7 +125,7 @@ export function PanelButton({
     selected?: boolean,
 }) {
     return <button
-        className={clsx('button flex text-dimmed text-2xl cursor-pointer transition duration-150 bg-transparent hover:text-highlight focus:outline-hidden w-8 h-8 justify-center items-center', {
+        className={clsx('button flex shrink-0 text-dimmed text-2xl cursor-pointer transition duration-150 bg-transparent hover:text-highlight focus:outline-hidden w-8 h-8 p-0.5 justify-center items-center', {
             'text-highlight': selected,
             'text-dimmed': !selected,
         })}

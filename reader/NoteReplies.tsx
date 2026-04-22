@@ -10,14 +10,16 @@ import { userHref } from '@/common/href'
 import { MenuButton } from './MenuButton'
 
 export function NoteReplies({
-    noteId, user,
+    noteId, user, collapsible = false,
 }: {
     noteId: string,
     user: NoteAuthorData | undefined,
+    collapsible?: boolean,
 }) {
     const { replies, addReply, removeReply } = useNoteReplies({ noteId, user })
     const [showForm, setShowForm] = useState(false)
     const [replyContent, setReplyContent] = useState('')
+    const [isExpanded, setIsExpanded] = useState(false)
 
     const handlePost = () => {
         if (!replyContent.trim()) return
@@ -31,8 +33,34 @@ export function NoteReplies({
         setShowForm(false)
     }
 
+    // In collapsible mode with no replies, show nothing
+    if (collapsible && replies.length === 0) {
+        return null
+    }
+
+    // In collapsible mode, show toggle when collapsed
+    if (collapsible && !isExpanded) {
+        return (
+            <button
+                onClick={() => setIsExpanded(true)}
+                className="text-sm text-dimmed hover:text-highlight cursor-pointer transition-colors"
+            >
+                Show {replies.length} {replies.length === 1 ? 'reply' : 'replies'}
+            </button>
+        )
+    }
+
     return (
         <div className="flex flex-col gap-2">
+            {collapsible && replies.length > 0 && (
+                <button
+                    onClick={() => { setIsExpanded(false); setShowForm(false) }}
+                    className="text-sm text-dimmed hover:text-highlight cursor-pointer transition-colors self-start"
+                >
+                    Hide replies
+                </button>
+            )}
+
             {replies.length > 0 && (
                 <div className="flex flex-col gap-3">
                     {replies.map(reply => (

@@ -41,7 +41,7 @@ export function EmojiSelector({ isOpen, onClose, currentEmoji, onSelect }: {
 
                 <div className="flex gap-3 pt-4 mt-4 border-t border-dimmed">
                     <button
-                        className="flex-1 px-4 py-2 text-dimmed font-medium border border-dimmed rounded-md hover:bg-dimmed/10 transition-colors duration-200"
+                        className="flex-1 px-4 py-2 text-dimmed border border-dimmed rounded-md hover:bg-dimmed/10 transition-colors duration-200"
                         onClick={onClose}
                     >
                         Cancel

@@ -1,56 +1,43 @@
 .layout {
-    --content-width: 780px;
-    --header-height: 4rem;
-    --panel-width: 300px;
-    --spacing-regular: 0.5rem;
-    --spacing-large: 1rem;
+    --content-width: var(--width-content-main);
 }
 
+/* Large (>= 1140px): full 3-column layout with icon+label panels */
 .layout {
     display: grid;
     grid-template-columns: 1fr var(--content-width) 1fr;
-    grid-template-rows: var(--header-height) auto;
+    grid-template-rows: var(--header-height) 1fr;
     grid-template-areas:
         "left-header  main-content  right-header"
         "left-panel   main-content  right-panel";
     min-height: 100vh;
-    width: 100vw;
-    overflow-x: hidden;
 }
 
 .leftHeader {
     grid-area: left-header;
-    position: fixed;
+    position: sticky;
     top: 0;
-    left: 0;
-    width: calc((100vw - var(--content-width)) / 2);
-    height: var(--header-height);
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    padding: 0 var(--spacing-large);
-    gap: var(--spacing-large);
+    padding: 0 var(--spacing-lg);
+    gap: var(--spacing-lg);
     background: var(--color-background);
-    z-index: 10;
-    box-sizing: border-box;
+    z-index: 1;
     overflow: hidden;
 }
 
 .rightHeader {
     grid-area: right-header;
-    position: fixed;
+    position: sticky;
     top: 0;
-    right: 0;
-    width: calc((100vw - var(--content-width)) / 2);
-    height: var(--header-height);
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    padding: 0 var(--spacing-large);
-    gap: var(--spacing-regular);
+    padding: 0 var(--spacing-lg);
+    gap: var(--spacing-base);
     background: var(--color-background);
-    z-index: 10;
-    box-sizing: border-box;
+    z-index: 1;
     overflow: hidden;
 }
 
@@ -58,81 +45,56 @@
     grid-area: main-content;
     display: flex;
     flex-direction: column;
-    background: var(--color-background);
-    padding: var(--header-height) var(--spacing-regular) var(--spacing-regular) var(--spacing-regular);
-    box-sizing: border-box;
+    padding: var(--spacing-lg) var(--spacing-base) var(--spacing-base);
     overflow-x: hidden;
-    width: var(--content-width);
 }
-
 
 .leftPanel {
     grid-area: left-panel;
-    position: fixed;
+    position: sticky;
     top: var(--header-height);
-    left: 0;
-    width: calc((100vw - var(--content-width)) / 2);
-    bottom: 0;
-    background: var(--color-background);
-    padding: var(--spacing-regular);
+    height: calc(100vh - var(--header-height));
+    padding: var(--spacing-base) 0;
     overflow-y: auto;
     overflow-x: hidden;
-    box-sizing: border-box;
 }
 
 .rightPanel {
     grid-area: right-panel;
-    position: fixed;
+    position: sticky;
     top: var(--header-height);
-    right: 0;
-    width: calc((100vw - var(--content-width)) / 2);
-    bottom: 0;
-    background: var(--color-background);
-    padding: var(--spacing-regular);
+    height: calc(100vh - var(--header-height));
+    padding: var(--spacing-base);
     overflow-y: auto;
     overflow-x: hidden;
-    box-sizing: border-box;
+    justify-self: start;
 }
 
-/* Mobile responsive breakpoint */
-@media (max-width: 1024px) {
+/* Bottom tab bar: hidden on medium/large screens */
+.bottomTabBar {
+    display: none;
+}
+
+/* Small (< 880px): single column + bottom tab bar */
+@media (max-width: 950px) {
     .layout {
-        grid-template-columns: 1fr;
-        grid-template-rows: var(--header-height) auto;
+        --tab-bar-height: 3.5rem;
+        grid-template-columns: 1fr auto;
+        grid-template-rows: var(--header-height) 1fr var(--tab-bar-height);
         grid-template-areas:
-            "header"
-            "main-content";
-        min-height: 100vh;
+            "left-header  right-header"
+            "main-content main-content"
+            "tab-bar      tab-bar";
     }
 
     .leftHeader {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        display: flex;
-        justify-content: space-between;
-        padding: 0 var(--spacing-large);
+        justify-content: flex-start;
     }
 
-    .rightHeader {
-        position: fixed;
-        top: 0;
-        right: 0;
-        width: auto;
-        height: var(--header-height);
-        background: transparent;
-        justify-content: flex-end;
-        z-index: 11;
-    }
+    .rightHeader {}
 
     .mainContent {
-        margin-left: 0;
-        margin-right: 0;
-        padding-top: var(--header-height);
-        width: 100vw;
-        box-sizing: border-box;
-        overflow-x: hidden;
+        padding: var(--spacing-lg) var(--spacing-lg) 0;
     }
 
     .leftPanel,
@@ -140,16 +102,38 @@
         display: none;
     }
 
-    .mainContent {
-        padding: var(--header-height) var(--spacing-large) 0;
-        box-sizing: border-box;
-        overflow-x: hidden;
+    .bottomTabBar {
+        grid-area: tab-bar;
+        position: sticky;
+        bottom: 0;
+        display: flex;
+        align-items: stretch;
+        justify-content: space-around;
+        background: var(--color-background);
+        border-top: 1px solid var(--color-border);
+        z-index: 10;
+        padding-bottom: env(safe-area-inset-bottom);
     }
-}
 
-/* Tablet breakpoint */
-@media (max-width: 1280px) and (min-width: 1025px) {
-    .layout {
-        grid-template-columns: 1fr var(--content-width) 1fr;
+    .tab {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        flex: 1;
+        gap: 2px;
+        padding: 6px 0;
+        color: var(--color-dimmed);
+        text-decoration: none;
+        transition: color 150ms;
+    }
+
+    .tabActive {
+        color: var(--color-action);
+    }
+
+    .tabIcon {
+        width: 2rem;
+        height: 2rem;
     }
 }

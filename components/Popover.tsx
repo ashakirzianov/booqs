@@ -82,10 +82,8 @@ export function Popover({
                 >
                     <div
                         ref={refs.setFloating}
-                        style={{
-                            ...floatingStyles,
-                            filter: 'drop-shadow(0 0 2px var(--color-border))',
-                        }}
+                        className='shadow-lg'
+                        style={floatingStyles}
                         aria-labelledby={headingId}
                         {...getFloatingProps()}
                     >

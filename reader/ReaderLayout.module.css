@@ -1,9 +1,6 @@
 .layout {
     --button-size: 64px;
-    --content-width: 720px;
-    --meter-regular: 0.5rem;
-    --meter-large: 1rem;
-    --meter-xxlarge: 4rem;
+    --content-width: var(--width-content-reader);
 }
 
 .layout {
@@ -58,7 +55,7 @@
     display: flex;
     flex: 1 1;
     grid-area: 2 / 1 / 4 / 2;
-    padding: var(--meter-regular) 0 0 0;
+    padding: var(--spacing-base) 0 0 0;
     pointer-events: auto;
     overflow: hidden;
     align-self: stretch;
@@ -77,10 +74,10 @@
 .leftButtons,
 .rightButtons {
     pointer-events: auto;
-    padding: 0 var(--meter-large);
+    padding: 0 var(--spacing-lg);
     display: flex;
     align-items: center;
-    gap: var(--meter-regular);
+    gap: var(--spacing-base);
 }
 
 .leftButtons {
@@ -98,13 +95,13 @@
 .leftFooter {
     grid-area: left-footer;
     justify-self: start;
-    padding: var(--meter-large);
+    padding: var(--spacing-lg);
 }
 
 .rightFooter {
     grid-area: right-footer;
     justify-self: end;
-    padding: var(--meter-large);
+    padding: var(--spacing-lg);
 }
 
 .backTop,
@@ -125,7 +122,7 @@
     display: flex;
     flex: 1 1;
     grid-area: 2 / 3 / 4 / 4;
-    padding: var(--meter-regular) 0 0 0;
+    padding: var(--spacing-base) 0 0 0;
     pointer-events: auto;
     overflow: hidden;
     align-self: stretch;
@@ -155,12 +152,12 @@
 
     .leftPanelc {
         grid-area: 2 / 1 / 4 / 3;
-        padding: var(--meter-regular) var(--meter-large) 0 var(--meter-large);
+        padding: var(--spacing-base) var(--spacing-lg) 0 var(--spacing-lg);
     }
 
     .rightPanelc {
         grid-area: 2 / 1 / 4 / 3;
-        padding: var(--meter-regular) var(--meter-large) 0 var(--meter-large);
+        padding: var(--spacing-base) var(--spacing-lg) 0 var(--spacing-lg);
     }
 
     .backTop,
@@ -170,7 +167,7 @@
         align-self: stretch;
         justify-self: stretch;
         background: var(--color-background);
-        box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 1px 3px 0 rgba(0,0,0,.1), 0 1px 2px -1px rgba(0,0,0,.1);
     }
 
     .backTop {
@@ -182,11 +179,11 @@
     }
 
     .booq {
-        padding: 0 var(--meter-large);
+        padding: 0 var(--spacing-lg);
     }
 
     .layout {
-        padding: var(--meter-xxlarge) 0;
+        padding: var(--spacing-2xl) 0;
     }
 
     .leftButtons,

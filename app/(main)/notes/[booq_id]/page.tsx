@@ -1,6 +1,7 @@
 import { fetchNotes } from '@/data/notes'
-import { parseIdOpt, type BooqId, comparePaths, isOverlapping } from '@/core'
-import { notFound } from 'next/navigation'
+import { parseIdOpt, type BooqId, comparePaths } from '@/core'
+import { notFound, redirect } from 'next/navigation'
+import { authHref } from '@/common/href'
 import Link from 'next/link'
 import { booqContentHref, authorHref, booqImageUrl } from '@/common/href'
 import { getUserIdInsideRequest } from '@/data/request'
@@ -70,7 +71,7 @@ export default async function NotesPage({ params }: {
 
     const userId = await getUserIdInsideRequest()
     if (!userId) {
-        notFound()
+        redirect(authHref({}))
     }
 
     const userNotes = await fetchNotes({ booqId, authorId: userId })
@@ -82,31 +83,14 @@ export default async function NotesPage({ params }: {
     const noteRanges = sortedNotes.map(note => note.range)
     const expandedFragments = await getExpandedFragments(booqId, noteRanges)
 
-    // Calculate overlapping notes for each expanded fragment
     const noteFragmentData: ExpandedNoteFragmentData[] = expandedFragments.map((fragment, index) => {
         const note = sortedNotes[index]
-        if (!note || !fragment) return undefined
-        if (!fragment) return {
-            note: sortedNotes[index],
-            overlapping: [],
-            nodes: undefined,
-            range: note.range,
-        }
-
-        // Find all notes that overlap with the expanded range
-        const overlapping = sortedNotes.filter((note, noteIndex) => {
-            // Don't include the note itself
-            if (noteIndex === index) return false
-
-            // Check if the note's range overlaps with the expanded range
-            return isOverlapping(note.range, fragment.range)
-        })
+        if (!note) return undefined
         return {
-            note: sortedNotes[index],
-            overlapping,
-            nodes: fragment.nodes,
-            styles: fragment.styles,
-            range: fragment.range,
+            note,
+            nodes: fragment?.nodes,
+            styles: fragment?.styles,
+            range: fragment?.range ?? note.range,
         }
     }).filter(datum => datum !== undefined)
 
@@ -115,58 +99,59 @@ export default async function NotesPage({ params }: {
     }
 
     return (
-        <main className="flex flex-row justify-center min-h-screen bg-background">
-            <div className="flex flex-col max-w-4xl w-full">
-                <div className="mb-6">
-                    <h1 className="text-3xl font-bold text-primary mb-2">
-                        Notes for{' '}
-                        <Link
-                            href={booqContentHref({ booqId, path: [0] })}
-                            className="hover:text-highlight hover:underline"
-                        >
-                            {bookData.title}
-                        </Link>
-                        {' '}by{' '}
-                        {bookData.authors.map((author, index) => (
-                            <span key={author}>
-                                <Link
-                                    href={authorHref({ name: author, libraryId: library })}
-                                    className="hover:text-highlight hover:underline"
-                                >
-                                    {author}
-                                </Link>
-                                {index < bookData.authors.length - 1 && ', '}
-                            </span>
-                        ))}
-                    </h1>
-                </div>
-
-                {userNotes.length === 0 ? (
-                    <div className="text-center">
-                        <p className="text-dimmed text-lg mb-4">No notes yet</p>
-                        <p className="text-dimmed mb-6">Start reading and add notes to see them here</p>
-                        <Link
-                            href={booqContentHref({ booqId, path: [0] })}
-                            className="bg-action hover:bg-highlight text-light px-6 py-3 rounded-lg font-semibold transition-colors duration-200"
-                        >
-                            Start Reading
-                        </Link>
-                    </div>
-                ) : (
-                    <NotesFilter
-                        data={noteFragmentData}
-                        booqId={booqId}
-                        user={currentUser ? {
-                            id: currentUser.id,
-                            username: currentUser.username,
-                            name: currentUser.name,
-                            emoji: currentUser.emoji,
-                            profilePictureURL: currentUser.profilePictureURL,
-                        } : undefined}
-                    />
-                )}
+        <>
+            <div className="mb-6 text-center">
+                <h1 className="text-3xl font-bold text-primary mb-2">
+                    <Link
+                        href={booqContentHref({ booqId, path: [0] })}
+                        className="hover:text-highlight hover:underline"
+                    >
+                        {bookData.title}
+                    </Link>
+                    {bookData.authors.length > 0 && (
+                        <>
+                            {' '}by{' '}
+                            {bookData.authors.map((author, index) => (
+                                <span key={author}>
+                                    <Link
+                                        href={authorHref({ name: author, libraryId: library })}
+                                        className="hover:text-highlight hover:underline"
+                                    >
+                                        {author}
+                                    </Link>
+                                    {index < bookData.authors.length - 1 && ', '}
+                                </span>
+                            ))}
+                        </>
+                    )}
+                </h1>
             </div>
-        </main>
+
+            {userNotes.length === 0 ? (
+                <div className="text-center">
+                    <p className="text-dimmed text-lg mb-4">No notes yet</p>
+                    <p className="text-dimmed mb-6">Start reading and add notes to see them here</p>
+                    <Link
+                        href={booqContentHref({ booqId, path: [0] })}
+                        className="bg-action hover:bg-highlight text-light px-6 py-3 rounded-lg transition-colors duration-200"
+                    >
+                        Start Reading
+                    </Link>
+                </div>
+            ) : (
+                <NotesFilter
+                    data={noteFragmentData}
+                    booqId={booqId}
+                    user={currentUser ? {
+                        id: currentUser.id,
+                        username: currentUser.username,
+                        name: currentUser.name,
+                        emoji: currentUser.emoji,
+                        profilePictureURL: currentUser.profilePictureURL,
+                    } : undefined}
+                />
+            )}
+        </>
     )
 }
 

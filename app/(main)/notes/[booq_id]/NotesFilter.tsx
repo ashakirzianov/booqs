@@ -3,10 +3,19 @@
 import { useState, useMemo } from 'react'
 import { NoteAuthorData } from '@/data/notes'
 import { BooqId } from '@/core'
-import { HIGHLIGHT_KINDS, COMMENT_KIND, useBooqNotes } from '@/application/notes'
+import { HIGHLIGHT_KINDS, COMMENT_KIND, QUESTION_KIND, useBooqNotes } from '@/application/notes'
 import { NoteCard } from './NoteCard'
 import clsx from 'clsx'
 import { ExpandedNoteFragmentData } from './NoteFragment'
+import { CommentIcon } from '@/components/Icons'
+import { LightButton } from '@/components/Buttons'
+
+type FilterGroup = {
+    key: string,
+    label: string,
+    color?: string,
+    icon?: React.ReactNode,
+}
 
 export function NotesFilter({ data, booqId, user }: {
     data: ExpandedNoteFragmentData[],
@@ -22,87 +31,122 @@ export function NotesFilter({ data, booqId, user }: {
         initialNotes,
     })
 
-    // Merge current notes with initial data, preferring current notes for updates
-    const mergedData = useMemo(() => {
+    const [selectedFilter, setSelectedFilter] = useState<string>('all')
+    const [expandedNotes, setExpandedNotes] = useState<Set<string>>(new Set())
+
+    // Merge server data with SWR-updated notes
+    const mergedNoteData = useMemo(() => {
         return data.map(datum => {
             const currentNote = currentNotes.find(n => n.id === datum.note.id)
-            // Also update overlapping notes with current data
-            const updatedOverlapping = datum.overlapping.map(overlappingNote => {
-                return currentNotes.find(n => n.id === overlappingNote.id)
-            }).filter(overlappingNote => {
-                // Only include overlapping notes that still exist
-                return overlappingNote !== undefined
-            })
-
             return {
                 ...datum,
                 note: currentNote ?? datum.note,
-                overlapping: updatedOverlapping
             }
         })
     }, [data, currentNotes])
-    const [selectedFilter, setSelectedFilter] = useState<string>('all')
 
-    const allKinds = Array.from(new Set(mergedData.map(datum => datum.note.kind)))
+    // Build filter groups in canonical order
+    const filterGroups = useMemo(() => {
+        const presentKinds = new Set(mergedNoteData.map(d => d.note.kind))
+        const filterGroups: FilterGroup[] = []
+        for (const kind of HIGHLIGHT_KINDS) {
+            if (presentKinds.has(kind)) {
+                filterGroups.push({
+                    key: kind,
+                    label: `Highlight ${HIGHLIGHT_KINDS.indexOf(kind) + 1}`,
+                    color: `var(--color-${kind})`,
+                })
+            }
+        }
+        if (presentKinds.has(COMMENT_KIND) || presentKinds.has(QUESTION_KIND)) {
+            filterGroups.push({
+                key: 'comments',
+                label: 'Comments',
+                icon: <CommentIcon />,
+            })
+        }
 
-    // Handle note color changes and adjust filter if necessary
-    function handleNoteColorChange(noteId: string, newKind: string) {
-        // If current filter is not 'all' and the note would be filtered out,
-        // switch to the new color filter to keep the note visible
-        if (selectedFilter !== 'all' && selectedFilter !== newKind) {
-            setSelectedFilter(newKind)
+        return filterGroups
+    }, [mergedNoteData])
+
+    const filteredNotes = useMemo(() => selectedFilter === 'all'
+        ? mergedNoteData
+        : mergedNoteData.filter(d => filterKeyForKind(d.note.kind) === selectedFilter), [mergedNoteData, selectedFilter])
+
+    const hasAnyExpanded = filteredNotes.some(d => expandedNotes.has(d.note.id))
+
+    function handleToggleAll() {
+        if (hasAnyExpanded) {
+            setExpandedNotes(new Set())
+        } else {
+            setExpandedNotes(new Set(filteredNotes.map(d => d.note.id)))
         }
     }
 
-    // Filter notes based on selected filter
-    const filteredNotes = selectedFilter === 'all'
-        ? mergedData
-        : mergedData.filter(datum => datum.note.kind === selectedFilter)
+    function handleToggleNote(noteId: string) {
+        setExpandedNotes(prev => {
+            const next = new Set(prev)
+            if (next.has(noteId)) {
+                next.delete(noteId)
+            } else {
+                next.add(noteId)
+            }
+            return next
+        })
+    }
+
+    function handleNoteColorChange(_noteId: string, newKind: string) {
+        if (selectedFilter === 'all') return
+        if (filterKeyForKind(newKind) !== selectedFilter) {
+            setSelectedFilter(filterKeyForKind(newKind))
+        }
+    }
 
     return (
         <>
-            {/* Filter selector */}
-            <div className="bg-background">
-                <h3 className="flex text-sm font-medium text-dimmed mb-3">Show notes:</h3>
-                <div className='h-10 my-3 shadow-md rounded overflow-clip' style={{
-                    width: `calc(var(--spacing) * ${(allKinds.length + 1) * 10})`,
-                }}>
-                    <div className="flex flex-row h-full items-stretch justify-between">
-                        <FilterButton
-                            active={selectedFilter === 'all'}
-                            onClick={() => setSelectedFilter('all')}
-                            label="All"
-                            count={mergedData.length}
-                        />
-                        {allKinds.map(kind => {
-                            const count = mergedData.filter(datum => datum.note.kind === kind).length
-                            return (
+            {/* Notes controls row */}
+            <div className="bg-background flex flex-row flex-wrap items-center justify-between gap-3 my-3">
+                <div className='flex flex-row items-center gap-3'>
+                    <div className='h-10 shadow rounded overflow-clip max-w-full' style={{
+                        width: `calc(var(--spacing) * ${(filterGroups.length + 1) * 10})`,
+                    }}>
+                        <div className="flex flex-row h-full items-stretch justify-between">
+                            <FilterButton
+                                active={selectedFilter === 'all'}
+                                onClick={() => setSelectedFilter('all')}
+                                label="All"
+                            />
+                            {filterGroups.map(group => (
                                 <FilterButton
-                                    key={kind}
-                                    active={selectedFilter === kind}
-                                    onClick={() => setSelectedFilter(kind)}
-                                    label={getKindLabel(kind)}
-                                    count={count}
-                                    color={`var(--color-${kind})`}
+                                    key={group.key}
+                                    active={selectedFilter === group.key}
+                                    onClick={() => setSelectedFilter(group.key)}
+                                    label={group.label}
+                                    color={group.color}
+                                    icon={group.icon}
                                 />
-                            )
-                        })}
+                            ))}
+                        </div>
                     </div>
                 </div>
+                <LightButton
+                    text={hasAnyExpanded ? 'Collapse All' : 'Expand All'}
+                    onClick={handleToggleAll}
+                />
             </div>
 
             {/* Notes list */}
             <div className="space-y-6">
-                {filteredNotes.length > 0 ? filteredNotes.map((datum) => {
-                    return (
-                        <NoteCard
-                            key={datum.note.id}
-                            noteFragmentData={datum}
-                            user={user}
-                            onColorChange={handleNoteColorChange}
-                        />
-                    )
-                }) : (
+                {filteredNotes.length > 0 ? filteredNotes.map((datum) => (
+                    <NoteCard
+                        key={datum.note.id}
+                        noteFragmentData={datum}
+                        user={user}
+                        isExpanded={expandedNotes.has(datum.note.id)}
+                        onToggle={() => handleToggleNote(datum.note.id)}
+                        onColorChange={handleNoteColorChange}
+                    />
+                )) : (
                     <div className="text-center text-dimmed">
                         No notes of selected color.
                     </div>
@@ -116,38 +160,38 @@ function FilterButton({
     label,
     active,
     onClick,
-    color
+    color,
+    icon,
 }: {
-    active: boolean
-    onClick: () => void
-    label?: string
-    count: number
-    color?: string
+    active: boolean,
+    onClick: () => void,
+    label: string,
+    color?: string,
+    icon?: React.ReactNode,
 }) {
     return (
         <button
             onClick={onClick}
+            title={label}
             className={clsx(
-                'flex items-center justify-center text-xs font-medium transition-colors duration-200 border-b-5 h-full w-full'
+                'flex items-center justify-center text-xs font-medium transition-colors duration-200 border-b-5 h-full w-full',
+                !color && !icon && 'text-dimmed',
+                icon && 'text-dimmed',
             )}
             style={{
                 backgroundColor: color,
-                borderColor: active ? `hsl(from ${color ?? 'var(--color-primary)'} h s l / 100%)` : 'transparent',
+                borderColor: active ? `hsl(from ${color ?? 'var(--color-dimmed)'} h s l / 100%)` : 'transparent',
             }}
         >
-            {color === undefined ? label : null}
+            {icon ? <div className="w-5 h-5">{icon}</div>
+                : color === undefined ? label : null}
         </button>
     )
 }
 
-
-function getKindLabel(kind: string): string {
-    if (kind === COMMENT_KIND) {
-        return 'Comments'
-    }
-    const highlightIndex = HIGHLIGHT_KINDS.indexOf(kind)
-    if (highlightIndex !== -1) {
-        return `Highlight ${highlightIndex + 1}`
+function filterKeyForKind(kind: string): string {
+    if (kind === COMMENT_KIND || kind === QUESTION_KIND) {
+        return 'comments'
     }
     return kind
 }

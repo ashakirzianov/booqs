@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import clsx from 'clsx'
 import { BooqId } from '@/core'
 import { BooqCover } from '@/components/BooqCover'
 import { BooqCardData } from '@/data/booqs'
@@ -18,10 +19,10 @@ export function NotesNavigationItem({ booqId, card }: NotesNavigationItemProps) 
     return (
         <Link
             href={`/notes/${booqId}`}
-            className={`flex items-start gap-3 p-2 rounded-lg transition-colors duration-200 border hover:border-highlight ${isSelected
-                ? 'border-highlight'
-                : 'border-dimmed'
-                }`}
+            className={clsx(
+                'flex items-start gap-3 p-2 rounded-lg transition-colors duration-200 hover:opacity-80',
+                isSelected && 'border border-highlight',
+            )}
         >
             <BooqCover
                 booqId={booqId}
@@ -30,14 +31,12 @@ export function NotesNavigationItem({ booqId, card }: NotesNavigationItemProps) 
                 author={card.authors.join(', ')}
                 size={60}
             />
-            <div className="min-w-0 flex-1">
-                <div className={`font-medium text-sm line-clamp-2 ${isSelected ? 'text-highlight' : 'text-primary'
-                    }`}>
+            <div className="hidden large:block min-w-0 flex-1">
+                <div className={clsx('text-md line-clamp-2', isSelected ? 'text-highlight' : 'text-dimmed')}>
                     {card.title}
                 </div>
                 {card.authors.length > 0 && (
-                    <div className={`text-xs mt-1 ${isSelected ? 'text-highlight' : 'text-dimmed'
-                        }`}>
+                    <div className="text-sm mt-1 text-dimmed">
                         {card.authors.join(', ')}
                     </div>
                 )}

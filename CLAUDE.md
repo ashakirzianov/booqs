@@ -5,12 +5,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Collaboration Workflow
 
 ### Documentation Organization
-- Four top-level `.md` files: `CLAUDE.md`, `BACKLOG.md`, `SPECS.md`, `UX.md`.
-- Per-feature design docs and task files live in `docs/`, using lowercase kebab-case names (e.g., `docs/book-upload.md`).
+- Top-level `.md` files: `CLAUDE.md`, `IDEAS.md`, `SCRATCHPAD.md`.
+- `CLAUDE.md` — conventions and guidance for Claude Code (this file).
+- `IDEAS.md` — medium to long-term ideas.
+- `SCRATCHPAD.md` — untracked scratch space for drafting prompts and half-formed ideas. Do not act on its contents unless explicitly asked.
+- `docs/` — project documentation: specs (`docs/specs.md`), UX (`docs/ux.md`), design docs, and reference material. Lowercase kebab-case names.
+- `tasks/` — task lists and checklists. Lowercase kebab-case names. Includes `tasks/backlog.md`.
 
 ### Task Management
 - Work is driven through a combination of direct prompts and task files.
-- Task files live in `docs/` as `.md` files using checklist format, optionally divided into categories.
+- Task files live in `tasks/` as `.md` files using checklist format, optionally divided into categories.
 - Tasks in a file are pre-approved — execute them without presenting the approach first.
 
 ### Planning & Scope
@@ -23,7 +27,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - The user makes all commits — do NOT commit unless explicitly asked.
 - Propose a commit message after each change.
 - Only add tests when explicitly asked.
-- When making functional changes (new features, new API endpoints, changed behavior), update SPECS.md to reflect the change. When making visual/layout changes, update UX.md.
+- When making functional changes (new features, new API endpoints, changed behavior), update `docs/specs.md` to reflect the change. When making visual/layout changes, update `docs/ux.md`. **Do not skip this** — these files are the source of truth for what the app looks like and does.
 - Always run `npm run build` after completing a change. Fix any errors before presenting the summary. Don't present work as done without a passing build.
 
 ### Communication Style

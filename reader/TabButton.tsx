@@ -15,7 +15,7 @@ export function TabButton({
             className={`
                 px-3 py-2 text-xs transition-colors cursor-pointer
                 hover:text-primary relative
-                ${selected ? 'text-primary font-medium' : 'text-dimmed'}
+                ${selected ? 'text-primary' : 'text-dimmed'}
             `}
         >
             <span>{text}</span>

@@ -20,7 +20,7 @@ import { AccountButton } from '@/components/AccountButton'
 import { usePathname, useSearchParams } from 'next/navigation'
 import { BackIcon, TocIcon, CommentIcon } from '@/components/Icons'
 import Link from 'next/link'
-import { useScrollToQuote } from './useScrollToQuote'
+import { useScrollToPath } from './useScrollToPath'
 import { useScrollHandler } from './useScrollHandler'
 import { useControlsVisibility } from './useControlsVisibility'
 import { useAugmentations } from './useAugmentations'
@@ -42,10 +42,10 @@ export function Reader({
     notes: BooqNote[],
     user: AccountData | undefined,
 }) {
-    const { quote } = useBooqSearchParams()
+    const { quote, path } = useBooqSearchParams()
     const pathname = usePathname()
     const fontScale = useFontScale()
-    useScrollToQuote(quote)
+    useScrollToPath(quote?.start ?? path)
     const {
         currentPath,
     } = useScrollHandler({
@@ -95,10 +95,8 @@ export function Reader({
 
     const { followingUserIds, isLoading: isFollowingLoading } = useFollowingData({ user })
 
-    const [commentsPanelOpen, setCommentsPanelOpen] = React.useState(false)
-
     const { anchor, menuState, setMenuState, contextMenuAugmentations, displayTarget } = useMenuState()
-    const hasCommentTarget = menuState.kind === 'comment' || menuState.kind === 'question-asked'
+    const isCommentsPanelVisible = menuState.kind === 'comments-list' || menuState.kind === 'comment' || menuState.kind === 'question-asked'
     const ContextMenuContentNode = useMemo(() => {
         return <ContextMenuContent
             booqId={booqId}
@@ -141,13 +139,11 @@ export function Reader({
         <TocIcon />
     </PanelButton>
 
-    const isCommentsPanelVisible = commentsPanelOpen || hasCommentTarget
     const toggleCommentsPanel = () => {
-        if (hasCommentTarget) {
+        if (isCommentsPanelVisible) {
             setMenuState({ kind: 'empty' })
-            setCommentsPanelOpen(false)
         } else {
-            setCommentsPanelOpen(prev => !prev)
+            setMenuState({ kind: 'comments-list' })
         }
     }
     const CommentsButton = <PanelButton
@@ -181,8 +177,7 @@ export function Reader({
 
 
     const { augmentations, menuTargetForAugmentation } = useAugmentations({
-        highlights: filteredHighlights,
-        comments: comments,
+        notes: [...filteredHighlights, ...comments],
         quote: quote,
         temporaryAugmentations: contextMenuAugmentations,
     })
@@ -287,7 +282,7 @@ function useBooqSearchParams() {
             : undefined
         return {
             quote,
-            path: path ?? [0],
+            path,
         }
     }, [quoteParam, pathParam])
 }
@@ -301,7 +296,7 @@ function AnchorButton({ booqId, anchor, title }: {
         return null
     }
     return <Link href={booqContentHref({ booqId, path: anchor.path })} className='flex items-center h-header'>
-        <div className='flex items-center h-header rounded border border-dimmed text-dimmed p-2 hover:text-primary hover:border-primary transition-colors'>
+        <div className='flex items-center max-h-header rounded border border-dimmed text-dimmed px-2 hover:text-primary hover:border-primary transition-colors'>
             {anchor.title ?? title}
         </div>
     </Link>

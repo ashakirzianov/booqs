@@ -83,7 +83,7 @@ export default async function UserPage({
         <main className={styles.mainContent}>
             <div className="space-y-8">
                 {/* Public Profile Section */}
-                <div className="bg-background shadow-md rounded-lg p-6">
+                <div className="bg-background shadow rounded-lg p-6">
                     <div className="flex items-center gap-4">
                         <ProfileBadge
                             name={user.name}
@@ -100,10 +100,10 @@ export default async function UserPage({
                                     </h1>
                                     <div className="space-y-1 text-dimmed">
                                         <p className="text-sm">
-                                            <span className="font-medium">Username:</span> {user.username}
+                                            <span>Username:</span> {user.username}
                                         </p>
                                         <p className="text-sm">
-                                            <span className="font-medium">Member since:</span> {formatDate(user.joinedAt)}
+                                            <span>Member since:</span> {formatDate(user.joinedAt)}
                                         </p>
                                     </div>
                                 </div>

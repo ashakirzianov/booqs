@@ -7,7 +7,7 @@ export function MenuButton({
 }) {
     return (
         <button
-            className="flex items-center gap-1 text-sm font-bold cursor-pointer text-dimmed hover:text-highlight hover:underline"
+            className="flex items-start gap-1 text-sm cursor-pointer text-dimmed hover:text-highlight hover:underline"
             onClick={onClick}
             onMouseDown={e => e.preventDefault()}
         >

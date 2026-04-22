@@ -24,10 +24,9 @@
   --font-main: var(--font-main), sans-serif;
   --font-book: var(--font-book), serif;
 
-  --font-weight-light: 100;
-  --font-weight-normal: 300;
+  --font-weight-normal: 200;
+  --font-weight-medium: 300;
   --font-weight-bold: 400;
-  --font-weight-extrabold: 700;
 
   --spacing-xs: 0.125rem;
   --spacing-sm: 0.25rem;
@@ -38,9 +37,11 @@
   --spacing-header: var(--header-height);
   --spacing-panel: var(--panel-width);
 
-  --shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
-  --shadow-hover: 0px 5px 15px rgba(0, 0, 0, 0.1);
-  --shadow-button: 0px 3px 5px rgba(0, 0, 0, 0.1);
+  --width-content-main: 780px;
+  --width-content-reader: 720px;
+
+  --breakpoint-medium: 950px;
+  --breakpoint-large: 1200px;
 }
 
 /* TODO: remove this? */

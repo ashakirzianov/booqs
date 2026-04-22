@@ -42,6 +42,9 @@ export type AskTarget = {
     kind: 'ask',
     selection: BooqSelection,
 }
+export type CommentsListTarget = {
+    kind: 'comments-list',
+}
 export type CommentTarget = {
     kind: 'comment',
     commentId: string,
@@ -52,13 +55,14 @@ export type QuestionAskedTarget = {
 }
 export type MenuState =
     | EmptyTarget | SelectionTarget | QuoteTarget | NoteTarget | CreateCommentTarget | AskTarget
-    | CommentTarget | QuestionAskedTarget
+    | CommentsListTarget | CommentTarget | QuestionAskedTarget
 
 export function isStateDismissable(state: MenuState): boolean {
     switch (state.kind) {
         case 'empty':
         case 'selection':
         case 'ask':
+        case 'comments-list':
         case 'comment':
         case 'question-asked':
             return true

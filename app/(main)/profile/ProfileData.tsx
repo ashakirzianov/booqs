@@ -109,7 +109,7 @@ export function ProfileData({ user }: { user: AccountData }) {
         currentData.username !== user.username
 
     return (
-        <div className="bg-background shadow-lg rounded-lg p-6 flex flex-col">
+        <div className="bg-background shadow rounded-lg p-6 flex flex-col">
             <div className="flex items-center gap-4">
                 <div
                     className="relative cursor-pointer"
@@ -123,7 +123,7 @@ export function ProfileData({ user }: { user: AccountData }) {
                         border={true}
                     />
                     <div className="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
-                        <span className="text-white text-xs font-medium">Edit</span>
+                        <span className="text-white text-xs">Edit</span>
                     </div>
                 </div>
                 <div className="flex-1">
@@ -135,7 +135,7 @@ export function ProfileData({ user }: { user: AccountData }) {
                                 </div>
                             )}
                             <div>
-                                <label htmlFor="name" className="block text-sm font-medium text-primary mb-1">
+                                <label htmlFor="name" className="block text-sm text-primary mb-1">
                                     Display Name
                                 </label>
                                 <input
@@ -148,7 +148,7 @@ export function ProfileData({ user }: { user: AccountData }) {
                                 />
                             </div>
                             <div>
-                                <label htmlFor="username" className="block text-sm font-medium text-primary mb-1">
+                                <label htmlFor="username" className="block text-sm text-primary mb-1">
                                     Username
                                 </label>
                                 <input
@@ -189,13 +189,13 @@ export function ProfileData({ user }: { user: AccountData }) {
                             </h1>
                             <div className="space-y-1 text-dimmed">
                                 <p className="text-sm">
-                                    <span className="font-medium">Username:</span> {user.username}
+                                    <span>Username:</span> {user.username}
                                 </p>
                                 <p className="text-sm">
-                                    <span className="font-medium">Email:</span> {user.email}
+                                    <span>Email:</span> {user.email}
                                 </p>
                                 <p className="text-sm">
-                                    <span className="font-medium">Member since:</span> {formatDate(user.joinedAt)}
+                                    <span>Member since:</span> {formatDate(user.joinedAt)}
                                 </p>
                             </div>
                         </>

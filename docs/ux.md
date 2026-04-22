@@ -8,9 +8,18 @@
 
 ### 1.1 Typography
 
-- **UI Font (--font-main)**: Lato (sans-serif), weights: 100, 300, 400, 700. Used for all interface elements, navigation, buttons, and labels.
-- **Book Font (--font-book)**: Lora (serif), weights: 400, 700, subsets: latin-ext, cyrillic-ext. Used for rendering book content in the reader.
-- Font weight mapping: light=100, normal=300, bold=400, extrabold=700.
+- **UI Font (--font-main)**: Nunito Sans (sans-serif), variable font, subsets: latin, cyrillic. Used for all interface elements, navigation, buttons, and labels.
+- **Book Font (--font-book)**: Lora (serif), variable font, subsets: latin-ext, cyrillic-ext. Used for rendering book content in the reader.
+
+**Font Weights** (defined in globals.css, overriding Tailwind defaults):
+
+| Tailwind class | CSS variable | Value | Usage |
+|---|---|---|---|
+| `font-normal` | `--font-weight-normal` | 200 | Body text, labels, controls, buttons, menu items |
+| `font-medium` | `--font-weight-medium` | 250 | Sub-headings (h2, h3 section titles) |
+| `font-bold` | `--font-weight-bold` | 300 | Main headings (h1, page titles) |
+
+Only these three weight classes are used. To adjust the overall weight feel, change the three values in `globals.css`.
 
 ### 1.2 Color Palette
 
@@ -64,23 +73,31 @@
 
 ### 1.4 Shadows
 
-- Default: `0px 0px 5px rgba(0, 0, 0, 0.1)`
-- Hover: `0px 5px 15px rgba(0, 0, 0, 0.1)`
-- Button: `0px 3px 5px rgba(0, 0, 0, 0.1)`
+Two levels, using Tailwind's built-in shadows:
+- **`shadow`**: Cards, panels, containers (default elevation)
+- **`shadow-lg`**: Modals, floating overlays, hover states (elevated)
 
 ### 1.5 Animations
 
 - `fade-in`: 0.3s ease-out, translateY(-8px) to 0 with opacity 0 to 1.
 - Transitions: most interactive elements use 150-300ms transitions on color, opacity, transform.
 
-### 1.6 Responsive Breakpoints
+### 1.6 Icons
 
-- **Desktop** (>1280px): Full 3-column layout with side panels
-- **Tablet** (1025-1280px): Narrower side columns
-- **Mobile** (<=1024px): Single column, side panels hidden, header spans full width
+All icons use a CSS custom property `--icon-stroke-width` (default `0.75`) for stroke width. Override from any parent to adjust icon weight in context:
+```css
+<div style="--icon-stroke-width: 1.5"><SettingsIcon /></div>
+```
+
+### 1.7 Responsive Breakpoints
+
+Breakpoints are derived from content width (780px) + panel space requirements:
+- **Large** (>= 1200px): Full 3-column layout, side panels with icons + labels. Threshold: 780px content + ~180px per side panel.
+- **Medium** (< 1200px and >= 950px): 3-column layout, side panels with icons only (no labels). Threshold: 780px content + ~48px per side panel.
+- **Small** (< 950px): Single column, side panels hidden, bottom tab bar for navigation, header splits into two non-overlapping columns.
 - Mobile devices with max-device-width 1024px get 120% base font size
 
-### 1.7 Theme Viewport
+### 1.8 Theme Viewport
 
 - Light mode theme-color: `#FFA500` (orange)
 - Dark mode theme-color: `#000000` (black)
@@ -108,14 +125,22 @@
 
 **Left Panel** (fixed sidebar, below header, in left gutter):
 - Navigation menu (signed-in users only) with links: Feed, Notes, Collections, Followers, History, Profile
-- Each menu item has an icon and label
+- Each menu item has an icon (1.5rem, centered in a 2rem container matching the logo size) and label
+- Icons are visually aligned with the logo above
 - Active item indicated by highlight color
 
 **Main Content** (center column, 780px max): Page-specific content
 
 **Right Panel** (fixed sidebar, in right gutter): Used on notes pages for book navigation
 
-**Mobile** (<=1024px): Single column, full-width header, no side panels.
+**Bottom Tab Bar** (mobile only, signed-in users):
+- Fixed at bottom of viewport, icon-only (no labels)
+- Tabs: Feed, Notes, Collections, History, Profile
+- Icon size: 1.5rem. Active tab in action color, inactive in dimmed
+- Respects `safe-area-inset-bottom` for notched devices
+- Hidden on large screens
+
+**Mobile** (<=1024px): Single column, header splits into left (logo + search) and right (upload + account) non-overlapping columns, side panels hidden, bottom tab bar for navigation.
 
 ---
 
@@ -196,11 +221,11 @@ Each note card has three sections stacked vertically:
 
 **2. Control Row** (visible when expanded)
 - **Left**: Collapse button
-- **Right**: Color picker (5 color swatches to change the note's highlight color; selected color has a top border) + Remove button (trash icon)
+- **Right**: Color picker (5 color swatches to change the note's highlight color; selected color has a top border; hidden for comments and questions) + Remove button (trash icon)
 
 **3. Note Content (inline edit)**
-- **View mode**: Shows note text in italic. If empty, shows "Add note..." placeholder in dimmed color. Click to enter edit mode.
-- **Edit mode**: Textarea (3 rows min, vertically resizable) with Save (primary) and Cancel (secondary) buttons. Allows empty content (clears the note text).
+- **View mode**: Shows note text in italic. If empty, shows "Add note…" placeholder in dimmed color. Click to enter edit mode.
+- **Edit mode**: Textarea (3 rows min, auto-focused) with Save (primary) and Cancel (secondary) buttons. Allows empty content (clears the note text). Keyboard shortcuts: Enter to save, Cmd/Ctrl+Enter for newline, Escape to cancel.
 
 **4. Replies** (public comments only)
 - Flat list of replies, each showing: content with dimmed left border, author badge + name (linked to profile) + relative timestamp, delete button (own replies only)
@@ -320,10 +345,11 @@ On desktop: Controls are always visible in side gutters.
 - **CSS Handling**: Stylesheets from the EPUB are deduplicated and stored once in `Booq.styles` (a `Record<string, string>` keyed by stylesheet href or synthetic key for inline styles). Each section node stores only a `styleRefs` array of keys into this map. When a section is built, only the referenced styles are included in the section's `BooqFragment.styles`. At render time, CSS is hydrated on section nodes by looking up `styleRefs` in the styles map, namespacing selectors with the section's class prefix (e.g., `.booqs-Text-chapter-xhtml`), and injecting `<style>` tags. This avoids duplicating large stylesheets across sections — in image-heavy books, this can reduce the in-memory book size from ~23MB to ~4MB.
 - **Augmentations** are overlaid on the content:
   - Highlight annotations (colored backgrounds matching highlight color tokens)
-  - Comment indicators (transparent background but clickable)
+  - Comment/question indicators (dashed underline, no background color)
   - Quote highlights (orange tint)
   - Selection highlight (blue tint)
-- Clicking an augmentation opens the context menu for that note/highlight
+- Clicking a highlight augmentation opens the context menu for that note
+- Clicking a comment/question augmentation opens the comments panel directly (no context menu)
 - Internal book links are converted to navigation links within the reader
 - Images within books are rendered inline
 
@@ -351,13 +377,20 @@ Contents:
 
 Slides in from the right. Shows either:
 
-**Comments Panel**:
+**Comments Panel** (two views):
+
+*Comments list*:
 - "COMMENTS" heading
 - Filter tabs: "All" / "Following" (only if signed in)
 - Comment items, each showing:
   - Referenced text as an italic blockquote with orange left border, clickable to scroll to position
   - Comment content text
   - Author info: emoji avatar, name (linked to profile), relative timestamp
+- Click a comment to see its detail view
+
+*Comment detail*:
+- "All comments" back button (navigates to comments list, not close)
+- Single comment with full content, edit/delete actions (own comments), and replies
 
 **Context Menu Detail Panel**:
 - When a note/highlight is clicked and screen is wide enough for side panel, the note detail shows here instead of a floater
@@ -498,7 +531,7 @@ Triggered by:
 
 ### 8.2 Header Search
 
-Small search input (w-40) styled as a read-only input with `Cmd+K` keyboard hint badge. Clicking opens the search modal.
+Compact search input (w-36, text-sm) styled as a read-only input with subtle border and `⌘K` keyboard hint badge. Clicking opens the search modal.
 
 Only shown if user has reading history (i.e., returning users).
 

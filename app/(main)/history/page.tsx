@@ -48,7 +48,7 @@ export default async function HistoryPage({
     return (
         <main className={styles.mainContent}>
             <div className="space-y-4">
-                <h1 className="text-2xl font-semibold mb-6">Reading History</h1>
+                <h1 className="text-2xl font-medium mb-6">Reading History</h1>
                 <div className="space-y-3">
                     {result.entries.map((entry, index) => (
                         <HistoryEntry

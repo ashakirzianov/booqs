@@ -3,6 +3,7 @@ import { Search } from '@/app/(main)/Search'
 import { UploadButton } from '@/app/(main)/Upload'
 import { Logo } from '@/components/Logo'
 import { MainMenu } from '@/app/(main)/MainMenu'
+import { BottomTabBar } from '@/app/(main)/BottomTabBar'
 import { getCurrentUser } from '@/data/user'
 import { hasReadingHistory } from '@/data/history'
 import Link from 'next/link'
@@ -18,7 +19,7 @@ export default async function MainLayout({
     const showHeaderSearch = await hasReadingHistory(user?.id)
     return <div className={`${styles.layout} font-normal font-main`}>
         <header className={styles.leftHeader}>
-            <Link href={feedHref()}>
+            <Link href={feedHref()} className="shrink-0">
                 <Logo />
             </Link>
             {showHeaderSearch && <Search />}
@@ -32,8 +33,9 @@ export default async function MainLayout({
         {children}
 
         <aside className={styles.leftPanel}>
-            {user && <MainMenu />}
+            {user && <MainMenu showSearch={showHeaderSearch} />}
         </aside>
 
+        {user && <BottomTabBar showSearch={showHeaderSearch} />}
     </div>
 }

@@ -45,7 +45,7 @@ export function HistoryEntry({
     }
 
     return (
-        <div className="border shadow-sm rounded-lg p-4 hover:bg-secondary transition-colors">
+        <div className="border shadow rounded-lg p-4 hover:bg-secondary transition-colors">
             <div className="flex items-start gap-4">
                 <BooqCover
                     booqId={booqId}
@@ -78,7 +78,7 @@ export function HistoryEntry({
                     </div>
                     <a
                         href={booqContentHref({ booqId, path: entry.path })}
-                        className="inline-block mt-2 text-action hover:text-highlight text-sm font-medium"
+                        className="inline-block mt-2 text-action hover:text-highlight text-sm"
                     >
                         Continue Reading
                     </a>

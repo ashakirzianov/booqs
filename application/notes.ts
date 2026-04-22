@@ -15,6 +15,23 @@ export const HIGHLIGHT_KINDS = [
 export const COMMENT_KIND = 'comment'
 export const QUESTION_KIND = 'question'
 
+export type NoteAugmentation = {
+    id: string,
+    range: BooqRange,
+    color?: string,
+    underline?: 'solid' | 'dashed',
+}
+
+export function augmentationForNote(note: BooqNote): NoteAugmentation {
+    const isCommentOrQuestion = note.kind === COMMENT_KIND || note.kind === QUESTION_KIND
+    return {
+        id: `note/${note.id}`,
+        range: note.range,
+        color: isCommentOrQuestion ? undefined : `var(--color-${note.kind})`,
+        underline: isCommentOrQuestion ? 'dashed' : undefined,
+    }
+}
+
 export function useBooqNotes({
     booqId, user, initialNotes,
 }: {
@@ -199,7 +216,7 @@ export function useBooqNotes({
                 return {
                     notes: currentData.notes.map(n =>
                         n.id === patchResponse.id
-                            ? { ...n, ...patchResponse }
+                            ? { ...n, ...patchResponse, content: patchResponse.content }
                             : n
                     ),
                 }

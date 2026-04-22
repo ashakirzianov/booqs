@@ -2,7 +2,7 @@
 
 > "Your personal reading assistant" - A web application for reading, annotating, and collecting ebooks.
 
-> Visual design, layout, and component details are in [UX.md](UX.md).
+> Visual design, layout, and component details are in [UX](ux.md).
 
 ## 1. Overview
 
@@ -25,7 +25,7 @@ Displays book metadata (cover, title, authors, tags), action buttons ("Start Rea
 
 **Access**: Requires authentication (redirects to `/auth` with return URL).
 
-Full-screen reading interface with highlights, notes, comments, AI questions, font scaling, and chapter navigation. See [UX.md §4](UX.md) for detailed layout and interaction design.
+Full-screen reading interface with highlights, notes, comments, AI questions, font scaling, and chapter navigation. See [UX §4](ux.md) for detailed layout and interaction design.
 
 ### 2.4 Search Results (`/search/[query]`)
 

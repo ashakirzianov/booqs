@@ -7,10 +7,10 @@ export function ExploreSearch() {
     useSearchHotkey({ isOpen, openModal, closeModal })
     return <>
         <input
-            className='font-normal text-2xl shadow-lg rounded-lg p-6 w-96 max-w-[90vw] bg-background text-primary cursor-pointer
+            className='font-normal text-2xl shadow rounded-lg p-6 w-96 max-w-[90vw] bg-background text-primary cursor-pointer
             border border-border
             focus:max-w-auto focus:outline-hidden focus:ring-0
-            placeholder:text-dimmed transition-shadow hover:shadow-xl dark:shadow-slate-700 dark:hover:shadow-slate-700'
+            placeholder:text-dimmed transition-shadow hover:shadow-lg'
             type="text"
             placeholder="Search for books..."
             onClick={openModal}
