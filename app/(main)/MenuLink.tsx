@@ -3,7 +3,6 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { ReactNode } from 'react'
-import styles from './MainLayout.module.css'
 
 const menuIconSize = '2rem' // 32px — matches logo and app bar icon sizes
 
@@ -28,7 +27,7 @@ export function MenuLink({ href, icon, children }: MenuLinkProps) {
             <div className="shrink-0 p-0.5" style={{ width: menuIconSize, height: menuIconSize }}>
                 {icon}
             </div>
-            <span className={styles.menuLabel}>{children}</span>
+            <span className="hidden large:inline">{children}</span>
         </Link>
     )
 }

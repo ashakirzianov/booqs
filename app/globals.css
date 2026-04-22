@@ -40,6 +40,8 @@
   --width-content-main: 780px;
   --width-content-reader: 720px;
 
+  --breakpoint-medium: 950px;
+  --breakpoint-large: 1200px;
 }
 
 /* TODO: remove this? */

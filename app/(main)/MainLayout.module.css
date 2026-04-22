@@ -70,39 +70,9 @@
     justify-self: start;
 }
 
-/* Menu label: visible by default, hidden on medium/small screens */
-.menuLabel {
-    display: inline;
-}
-
-/* Search box: visible by default */
-.searchBox {
-    display: flex;
-}
-
-/* Panel search: hidden by default, shown on medium */
-.panelSearch {
-    display: none;
-}
-
-/* Bottom tab bar: hidden on large/medium screens */
+/* Bottom tab bar: hidden on medium/large screens */
 .bottomTabBar {
     display: none;
-}
-
-/* Medium (< 1140px): icon-only panels, search moves to panel */
-@media (max-width: 1200px) {
-    .menuLabel {
-        display: none;
-    }
-
-    .searchBox {
-        display: none;
-    }
-
-    .panelSearch {
-        display: block;
-    }
 }
 
 /* Small (< 880px): single column + bottom tab bar */

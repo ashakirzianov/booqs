@@ -3,7 +3,6 @@ import { feedHref, collectionsHref, followersHref, historyHref, notesHref, profi
 import { BookIcon, CollectionIcon, UsersIcon, HistoryIcon, NotesIcon, ProfileIcon, SearchIcon } from '@/components/Icons'
 import { MenuLink } from './MenuLink'
 import { useSearchModalState, useSearchHotkey, SearchModal } from './SearchModal'
-import styles from './MainLayout.module.css'
 
 const menuIconSize = '2rem'
 
@@ -30,7 +29,7 @@ export function MainMenu({ showSearch }: { showSearch?: boolean }) {
 function SearchMenuButton() {
     const { isOpen, openModal, closeModal } = useSearchModalState()
     useSearchHotkey({ isOpen, openModal, closeModal })
-    return <div className={styles.panelSearch}>
+    return <div className="hidden medium:block large:hidden">
         <button
             onClick={openModal}
             className="flex items-center gap-3 px-lg py-1 rounded-md transition-colors text-dimmed hover:text-action hover:bg-background-secondary w-full cursor-pointer bg-transparent border-none"
@@ -39,7 +38,7 @@ function SearchMenuButton() {
             <div className="shrink-0 p-0.5" style={{ width: menuIconSize, height: menuIconSize }}>
                 <SearchIcon />
             </div>
-            <span className={styles.menuLabel}>Search</span>
+            <span className="hidden large:inline">Search</span>
         </button>
         <SearchModal isOpen={isOpen} closeModal={closeModal} />
     </div>

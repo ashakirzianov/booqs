@@ -1,13 +1,12 @@
 'use client'
 
 import { useSearchModalState, useSearchHotkey, SearchModal } from './SearchModal'
-import styles from './MainLayout.module.css'
 
 export function Search() {
     const { isOpen, openModal, closeModal } = useSearchModalState()
     useSearchHotkey({ isOpen, openModal, closeModal })
     return <>
-        <div className={`${styles.searchBox} relative items-center cursor-pointer`} onClick={openModal}>
+        <div className="hidden large:flex relative items-center cursor-pointer" onClick={openModal}>
             <input
                 className='font-normal text-base rounded px-3 py-1.5 w-36 bg-background text-primary cursor-pointer
                 border border-border
