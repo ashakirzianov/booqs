@@ -70,9 +70,18 @@
     justify-self: start;
 }
 
-/* Menu label: visible by default, hidden on medium screens */
+/* Menu label: visible by default, hidden on medium/small screens */
 .menuLabel {
     display: inline;
+}
+
+/* Search box: visible by default, icon hidden */
+.searchBox {
+    display: flex;
+}
+
+.searchIcon {
+    display: none;
 }
 
 /* Bottom tab bar: hidden on large/medium screens */
@@ -80,10 +89,18 @@
     display: none;
 }
 
-/* Medium (< 1140px): icon-only panels */
+/* Medium (< 1140px): icon-only panels, search icon instead of box */
 @media (max-width: 1140px) {
     .menuLabel {
         display: none;
+    }
+
+    .searchBox {
+        display: none;
+    }
+
+    .searchIcon {
+        display: flex;
     }
 }
 
