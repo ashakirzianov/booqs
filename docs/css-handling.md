@@ -1,0 +1,153 @@
+# EPUB CSS Handling — Design Discussion
+
+## Context
+
+Current pipeline for rendering EPUB content:
+
+1. Backend pre-processes EPUB, converts to JSON format with minor tweaks
+2. Backend pre-processes CSS, adding a disambiguation selector (`.booqs-content`) so rules only target EPUB content
+3. Client receives JSON spine elements + CSS, injects CSS into a `<style>` element
+4. Client pre-processes spine elements to add annotations
+5. For fragments, backend extracts only CSS relevant to the fragment being sent
+
+Primary target: Next.js frontend. Native rendering is planned separately.
+
+Requirements:
+- Cross-spine / cross-element selection (for highlights spanning chapters)
+- Theming (dark mode, font size, line height) that flows into EPUB content
+- Fragment rendering (partial spine items, full documents)
+
+## Approaches Considered
+
+### 1. Current approach — selector rewriting preprocessor
+
+Rewrite every EPUB selector to be prefixed with `.booqs-content`, inject as a single stylesheet.
+
+- **Pros:** Works today. Selection works natively (one document). Events just work. Theming trivial. Broad browser support.
+- **Cons:** Preprocessor is complex, especially around `:is()`, `:where()`, `:has()`, complex combinators, pseudo-classes on root. Hard to debug (DevTools show rewritten selectors). Per-spine-item isolation is awkward.
+
+### 2. iframe per fragment
+
+Render each spine item (or fragment) in its own iframe.
+
+- **Pros:** True style and JS isolation. No preprocessing needed for containment. Matches how traditional EPUB renderers work.
+- **Cons (significant for a reader):**
+  - **Selection cannot cross iframe boundaries** — browser hard limit. Killer for cross-spine highlighting.
+  - Manual height measurement (ResizeObserver + postMessage).
+  - Event bridging via postMessage.
+  - CSS custom properties don't cross iframe boundaries — theming has to be pushed through explicitly.
+  - Multiple iframes compound every problem.
+  - Extra layer of nesting on mobile WebView (latency + memory).
+  - Accessibility: screen readers treat iframes as separate documents.
+
+**Verdict:** iframes solve a problem we don't really have (isolation) while breaking something we need (cross-boundary selection).
+
+### 3. Shadow DOM (open mode)
+
+Inject EPUB content + CSS inside a shadow root.
+
+- **Pros:** Scoped styles without a separate document. Events bubble (retargeted). CSS custom properties inherit through — theming works.
+- **Cons:** Selection across shadow roots still has issues (same root cause as iframes, less severe). Only worth considering if cross-boundary selection isn't essential — which it is for us.
+
+### 4. Native `@scope` CSS rule — **recommended**
+
+Use `@scope (.booqs-content) { /* original rules */ }` instead of selector rewriting.
+
+- **Pros:**
+  - Selection works normally (one document, no boundaries).
+  - Deletes the gnarliest part of the preprocessor (selector rewriting).
+  - DevTools show original selectors — much easier to debug.
+  - Donut scoping (`@scope (.booqs-content) to (.booqs-annotation)`) naturally excludes annotation UI from EPUB styles.
+  - Enables clean per-spine-item isolation.
+- **Cons / caveats:**
+  - **Specificity differs subtly.** Preprocessor made `h1 { }` into `.booqs-content h1 { }` (specificity 0,1,1). `@scope` keeps it at 0,0,1; scope only adds *scope proximity* as a tiebreaker, not specificity. App-level rules like `h1 { }` or global typography resets can now override EPUB rules where they didn't before. Mitigated if app CSS is well-namespaced (Tailwind, CSS modules).
+  - **Root-level selectors still need rewriting.** EPUBs commonly style `html`, `body`, `:root`. Inside `@scope (.booqs-content)`, `body { }` matches a `<body>` descendant of `.booqs-content` — which doesn't exist. Needs a preprocessing pass to rewrite to `:scope` or strip.
+  - **URL resolution still needs handling** (`url(./cover.jpg)` etc.) — same as today.
+  - **Less arbitrary control** than a full preprocessor — `@scope` only solves containment, not sanitization / `@import` stripping / `@font-face` deduping / unit normalization.
+- **Browser support (2026):** Chrome/Edge 118 (Oct 2023), Safari 17.4 (March 2024), Firefox 128 (July 2024). Fine for Next.js.
+
+## Recommended Architecture
+
+**Hybrid: slim preprocessor + `@scope`**
+
+Keep the preprocessor but drop its most fragile responsibility. The preprocessor handles:
+
+1. **Root-selector rewriting** — rewrite `html`, `body`, `:root` to `:scope` or strip, since `@scope` can't handle these.
+2. **`url()` normalization** — resolve EPUB-relative URLs.
+3. **Sanitization** — strip `@import`, dangerous properties, etc.
+4. **`@font-face` deduping** — across multiple stylesheets in a book.
+5. **Fragment-relevant CSS extraction** — existing optimization, orthogonal to containment.
+6. **Wrap remaining rules in `@scope (.booqs-content) { ... }`** — replaces the selector-rewriting logic.
+
+What we gain:
+- Less code (the selector-rewriting step is the trickiest part of the preprocessor).
+- More robust against unusual selectors (`:has()`, complex combinators, etc.).
+- Better debugging (original selectors visible in DevTools).
+- Donut scoping available for annotation UI nested inside content.
+- Easier per-spine-item isolation if desired.
+
+What to verify:
+- Grep global CSS for naked tag selectors (`h1`, `p`, `a`, etc.) — the cascade-specificity change is the one thing that could surprise us.
+
+## Handling EPUB `<style>` Elements and `style` Attributes
+
+Two different problems.
+
+### `<style>` elements (embedded stylesheets)
+
+Wrap contents in `@scope` — same treatment as external CSS:
+
+```html
+<style>@scope (.booqs-content) { /* original rules verbatim */ }</style>
+```
+
+Same caveats: root selectors still need rewriting, `url()` resolution still needs handling.
+
+**Opportunity — per-spine-item isolation:**
+
+If multiple spine items render in one document, each `<style>` normally affects *all* spine content. With `@scope`, each item's styles can be isolated to that item:
+
+```html
+<div class="booqs-spine-item" data-idx="3">
+  <style>@scope (.booqs-spine-item[data-idx="3"]) { ... }</style>
+  ...
+</div>
+```
+
+Chapter 3's embedded styles can't bleed into chapter 4. Much harder to achieve cleanly with selector rewriting.
+
+Alternative: hoist all `<style>` contents into the main scoped stylesheet during preprocessing. Simpler, but loses per-item isolation. Depends on how much real-world EPUBs rely on conflicting per-chapter styles (usually not much).
+
+### `style` attributes (inline)
+
+`@scope` doesn't apply — it wraps rulesets, not attributes. Inline styles win the cascade (specificity 1,0,0,0), beaten only by `!important`.
+
+The real problem is theming: `<p style="color: #000">` stays black in dark mode regardless of scoping.
+
+Options, ranked:
+
+1. **Strip theme-affecting properties during preprocessing.** Parse each `style` attribute, remove `color`, `background`, `background-color`, maybe `font-family`. Keep the rest (margins, alignment). **Recommended** — pairs naturally with the slim preprocessor we're already keeping.
+2. **Leave them alone** — fine only if we don't care about themes overriding author intent.
+3. **`!important` in theme CSS** — works but escalates a war we'll keep fighting. Avoid.
+4. **Rewrite inline styles into classes during preprocessing** — over-engineered.
+
+## Summary
+
+- **Containment mechanism:** migrate from selector rewriting to native `@scope`.
+- **Preprocessor role:** shrinks, doesn't disappear. Handles root selectors, URLs, sanitization, font-face deduping, fragment extraction, `@scope` wrapping, and inline-style property stripping.
+- **`<style>` elements:** wrap in `@scope`, optionally per-spine-item for isolation.
+- **`style=""` attributes:** strip theme-affecting properties (`color`, `background`, etc.) during preprocessing.
+- **iframes:** rejected — cross-boundary selection is a hard requirement, theming is harder, and we're already in a WebView on native.
+- **Shadow DOM:** rejected for the same selection reason, with less severity.
+
+## Open Questions / Future Work
+
+- Verify no global naked tag selectors in app CSS before the specificity change bites.
+- Decide whether per-spine-item `@scope` isolation is worth the extra structure, or whether hoisting all `<style>` content into one stylesheet is good enough in practice.
+- Enumerate which EPUB CSS properties actually need sanitizing for Next.js (may be a different list than for native).
+
+## See also
+
+- [booqs-locator-design.md](booqs-locator-design.md) — locator and annotation design (cross-references CSS handling).
+- [css-custom-highlights.md](css-custom-highlights.md) — highlight rendering investigation.
+- [../../docs/roadmap.md](../../docs/roadmap.md) — "Technical decisions standing" records the EPUB CSS handling commitment.
