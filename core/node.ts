@@ -35,14 +35,20 @@ export function visitNodes(nodes: BooqNode[], visitor: (node: BooqNode) => void)
     }
 }
 
-export function mapNodes(nodes: BooqNode[], transform: (node: BooqNode) => BooqNode): BooqNode[] {
+export function mapDocumentNodes(documents: BooqDocument[], transform: (node: BooqChildNode) => BooqChildNode): BooqDocument[] {
+    return documents.map(doc => ({
+        ...doc,
+        children: mapChildNodes(doc.children, transform),
+    }))
+}
+
+function mapChildNodes(nodes: BooqChildNode[], transform: (node: BooqChildNode) => BooqChildNode): BooqChildNode[] {
     return nodes.map(node => {
         const mapped = transform(node)
         if (mapped?.children) {
-            const mappedChildren = mapNodes(mapped.children, transform) as BooqChildNode[]
             return {
                 ...mapped,
-                children: mappedChildren,
+                children: mapChildNodes(mapped.children, transform),
             }
         }
         return mapped

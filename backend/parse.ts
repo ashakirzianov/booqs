@@ -1,4 +1,4 @@
-import { Booq, BooqId, isElementNode, visitNodes, mapNodes, BooqDocument } from '@/core'
+import { Booq, BooqId, isElementNode, visitNodes, mapDocumentNodes } from '@/core'
 import { parseEpub } from '@/parser'
 import { Epub, openEpubFile } from '@/parser/epub'
 import { Diagnoser, Diagnostic } from 'booqs-epub'
@@ -175,7 +175,7 @@ export async function openEpubImageLoader(file: BooqFile): Promise<EpubImageLoad
 }
 
 function preprocessBooq(booq: Booq, booqId: BooqId, imageDimensions: BooqImageDimensions): Booq {
-    const documents = mapNodes(booq.documents, node => {
+    const documents = mapDocumentNodes(booq.documents, node => {
         if (!isElementNode(node)) {
             return node
         }
@@ -207,6 +207,6 @@ function preprocessBooq(booq: Booq, booqId: BooqId, imageDimensions: BooqImageDi
             }
         }
         return node
-    }) as BooqDocument[]
+    })
     return { ...booq, documents }
 }

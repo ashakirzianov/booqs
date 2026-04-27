@@ -1,9 +1,9 @@
-import { BooqNode } from '../core'
+import { BooqDocument } from '../core'
 import { resolveRefs } from './refs'
 import { markParagraphs } from './pph'
 
-export function preprocess(nodes: BooqNode[]): BooqNode[] {
-    const resolved = resolveRefs(nodes)
+export function preprocess(documents: BooqDocument[]): BooqDocument[] {
+    const resolved = resolveRefs(documents)
     const marked = markParagraphs(resolved)
     return marked
 }
