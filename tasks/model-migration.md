@@ -25,7 +25,7 @@ What this phase achieves:
 - In-book navigation uses browser-native `#id` with scoped IDs (no `BooqPath`-based link resolution)
 - All custom data attributes use `data-booqs-` prefix
 
-Detailed task list: `tasks/phase-1-ir.md` (to be created)
+Detailed task list: [model-migration-phase-1-ir.md](model-migration-phase-1-ir.md)
 
 ## Phase 2: CSS `@scope` migration
 
@@ -42,7 +42,7 @@ What this phase achieves:
 
 See [css-handling.md](../docs/css-handling.md) for full design.
 
-Detailed task list: `tasks/phase-2-css.md` (to be created)
+Detailed task list: `model-migration-phase-2-css.md` (to be created)
 
 ## Phase 3: Locator migration
 
@@ -58,7 +58,7 @@ What this phase achieves:
 
 See [booqs-locator-design.md](../docs/booqs-locator-design.md) for full design.
 
-Detailed task list: `tasks/phase-3-locators.md` (to be created)
+Detailed task list: `model-migration-phase-3-locators.md` (to be created)
 
 ## Phase 4: Documentation
 
