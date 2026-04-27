@@ -10,71 +10,79 @@ Purely structural rename — no behavior change. The app does exactly the same t
 
 ### Types (`core/model.ts`)
 
-- [ ] Define `BooqDocument` type (with `fileName`, `children: BooqElement[]`, optional `error` field; always has `children`, empty on error)
-- [ ] Define `BooqElement` type (with `name`, `id?`, `attributes?`, `children: BooqChildNode[]`)
-- [ ] Define `BooqChildNode = BooqElement | BooqTextNode | BooqStub`
-- [ ] Define `BooqTextNode = string`
-- [ ] Define `BooqStub = null`
-- [ ] Define `BooqNode = { children: BooqChildNode[] }` as shared interface (both `BooqDocument` and `BooqElement` satisfy this)
-- [ ] Define `BooqElementAttributes = Record<string, string | undefined>`
-- [ ] Update `Booq`: `nodes` → `documents: BooqDocument[]`
-- [ ] Remove old types: `BooqSectionNode`, `BooqElementNode`, `BooqTextNode` (old shape), `BooqStubNode`, `BooqNodeAttrs`
+- [x] Define `BooqDocument` type (with `fileName`, `children: BooqChildNode[]`, optional `error` field; always has `children`, empty on error)
+- [x] Define `BooqElement` type (with `name`, `id?`, `attributes?`, `children: BooqChildNode[]`)
+- [x] Define `BooqChildNode = BooqElement | BooqTextNode | BooqStub`
+- [x] Define `BooqTextNode = string`
+- [x] Define `BooqStub = null`
+- [x] Define `BooqNode = BooqDocument | BooqChildNode` (union; both `BooqDocument` and `BooqElement` have `children` via `?: undefined` discriminant fields)
+- [x] Define `BooqElementAttributes = Record<string, string | undefined>`
+- [x] Update `Booq`: `nodes` → `content: BooqDocument[]`
+- [x] Remove old types: `BooqSectionNode`, `BooqElementNode`, `BooqTextNode` (old shape), `BooqStubNode`, `BooqNodeAttrs`
 
 ### Core utilities (`core/node.ts`, `core/position.ts`, `core/iterator.ts`, `core/text.ts`, `core/chapter.ts`)
 
-- [ ] Update type guards: `isElementNode`, `isTextNode`, `isStubNode` for new type shapes
-- [ ] Replace `isSectionNode` with `isDocumentNode` (checks `fileName` property)
-- [ ] Replace `isContainerNode` — `BooqNode` interface means both documents and elements have `children`
-- [ ] Update `nodeChildren()`, `visitNodes()`, `mapNodes()` for `BooqChildNode`
-- [ ] Update `nodeForPath()`, `nodesForRange()`, `findPathForId()`
-- [ ] Update `stubNode()`, `textNode()` factories
-- [ ] Update `nodeLength()`, `nodesLength()`, `positionForPath()` — text via `.length`, stub via `=== null`
-- [ ] Update iterator functions (`iteratorAtPath`, `firstLeafNode`, etc.)
-- [ ] Update text functions (`nodeText`, `textForRange`, `previewForPath`, `getQuoteAndContext`, `getExpandedRange`)
-- [ ] Update `buildChapter()`, `collectReferencedStyles()` — use `isDocumentNode` instead of `isSectionNode`
-- [ ] Rename `attrs` → `attributes` in all core code that accesses element attributes
+- [x] Update type guards: `isElementNode`, `isTextNode`, `isStubNode` for new type shapes
+- [x] Replace `isSectionNode` with `isDocumentNode` (checks `fileName` property)
+- [x] Keep `isContainerNode` — checks for `children` property
+- [x] Update `nodeChildren()`, `visitNodes()` for `BooqChildNode`
+- [x] Replace `mapNodes()` with `mapDocumentNodes()` — transformer operates on `BooqChildNode`, preserves `BooqDocument[]` return type
+- [x] Update `nodeForPath()`, `nodesForRange()`, `findPathForId()`
+- [x] Update `stubNode()`, `textNode()` factories
+- [x] Update `nodeLength()`, `nodesLength()`, `positionForPath()`
+- [x] Update iterator functions (`iteratorAtPath`, `firstLeafNode`, etc.)
+- [x] Update text functions (`nodeText`, `textForRange`, `previewForPath`, `getQuoteAndContext`, `getExpandedRange`)
+- [x] Update `buildChapter()`, `collectReferencedStyles()` — use `isDocumentNode` instead of `isSectionNode`
+- [x] Rename `attrs` → `attributes` in all core code that accesses element attributes
 
 ### Parser (`parser/`)
 
-- [ ] Update `parseSection()` / `processSectionContent()` to produce `BooqDocument` instead of section node
-- [ ] Rename `attrs` → `attributes` in `processRegularXml()`, `processAttributes()`
-- [ ] Update `processEpub()` in `book.ts`: collect into `documents: BooqDocument[]`
-- [ ] Update `pph.ts`: access `node.attributes` instead of `node.attrs`
-- [ ] Update `refs.ts`: access `node.attributes` instead of `node.attrs`
+- [x] Rename `parseSection()` → `parseDocument()`, return `BooqDocument`
+- [x] Rename `attrs` → `attributes` in `processRegularXml()`, `processAttributes()`
+- [x] Update `processEpub()` in `book.ts`: collect into `BooqDocument[]`, set `Booq.content`
+- [x] Update `pph.ts`: use `mapDocumentNodes`, take/return `BooqDocument[]`
+- [x] Update `refs.ts`: use `mapDocumentNodes`, take/return `BooqDocument[]`
+- [x] Update `preprocess.ts`: take/return `BooqDocument[]`
 
 ### Backend (`backend/parse.ts`)
 
-- [ ] Update `normalizeImageSrcsInBooq()`: access `node.attributes` instead of `node.attrs`
-- [ ] Update `collectUniqueSrcsFromBooq()`: access `node.attributes` instead of `node.attrs`
-- [ ] Update `preprocessBooq()`: work with `Booq.documents`
+- [x] Update `normalizeImageSrcsInBooq()`: access `node.attributes`, use `booq.content`
+- [x] Update `collectUniqueSrcsFromBooq()`: access `node.attributes`, use `booq.content`
+- [x] Update `preprocessBooq()`: use `mapDocumentNodes`, no cast needed
 
 ### Viewer/Renderer (`viewer/render.ts`, `viewer/BooqContent.tsx`)
 
-- [ ] Update `renderNode()`: use `isDocumentNode` instead of `isSectionNode`
-- [ ] Update `renderSectionNode()` → render document nodes (still renders as `<section>` with style injection for now)
-- [ ] Update `getProps()`: access `node.attributes` instead of `node.attrs`
-- [ ] Rename `node.attrs` → `node.attributes` throughout renderer
+- [x] Update `renderNode()`: use `isDocumentNode` instead of `isSectionNode`
+- [x] Rename `renderSectionNode()` → `renderDocumentNode()` (still renders as `<section>` with style injection for now)
+- [x] Update `getProps()`: access `node.attributes` instead of `node.attrs`
 
 ### Data layer (`data/booqs.ts`)
 
-- [ ] Update chapter building and note range expansion to use `Booq.documents`
+- [x] Update chapter building and note range expansion to use `Booq.content`
 
-### GraphQL (`graphql/resolvers.ts`)
+### GraphQL
 
-- [ ] Update `BooqNode` scalar handling if needed (likely transparent since it's JSON)
+- [x] Update all resolvers to use `booq.content` instead of `booq.nodes`
 
 ### Tests (`tests/`)
 
-- [ ] Update `tests/core/iterator.test.ts` for new type shapes
-- [ ] Update `tests/core/text.test.ts` for new type shapes
+- [x] Update `tests/core/iterator.test.ts` for new type shapes
+- [x] Update `tests/core/text.test.ts` for new type shapes
 
 ### Verify
 
-- [ ] `npm run build` passes
-- [ ] Load PG book, navigate chapters, verify rendering
-- [ ] Load user-uploaded book, verify rendering
-- [ ] Verify notes/highlights display correctly
-- [ ] Verify internal links work
+- [x] `npm run build` passes
+- [x] `npm run test` passes (148/148)
+- [x] Load PG book, navigate chapters, verify rendering
+- [x] Load user-uploaded book, verify rendering
+- [x] Verify notes/highlights display correctly
+- [x] Verify internal links work
+
+### Conventions established
+
+- [x] Document union discriminant fields convention in CLAUDE.md
+- [x] Document `as` type assertion comment requirement in CLAUDE.md
+- [x] Disable booq-level cache during migration (remember to re-enable after)
 
 ---
 
