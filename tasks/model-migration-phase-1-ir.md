@@ -125,26 +125,25 @@ Parser preserves these elements. Renderer maps them during rendering.
 
 ### Parser (`parser/section.ts`)
 
-- [ ] Stop renaming `<body>` to `<div>` in `processSectionContent()`
-- [ ] Keep `<html>` element in the tree (stop extracting children of `<html>` and processing them separately — instead, process `<html>` as a regular element)
-- [ ] Adjust `processSectionContent()` structure: parse the full XML tree as-is, wrapping in `BooqDocument`
+- [x] Stop renaming `<body>` to `<div>` — `<body>` preserved as-is
+- [x] Keep `<html>` element in the tree — `processSectionContent` wraps children in an `<html>` element (preserving its attributes)
+- [x] `BooqDocument.children` now contains a single `<html>` element
 
 ### Viewer/Renderer (`viewer/render.ts`)
 
-- [ ] Add element mapping: `<body>` → render as `<div>`
-- [ ] Add element mapping: `<html>` → render as `<div>` or skip (render children only)
-- [ ] Ensure these mappings work within `renderNode()` / `getProps()`
+- [x] Add `mapElementName()` function: `<html>` → `<div>`, `<body>` → `<div>`, `<a>` within anchor → `<span>`
+- [x] Refactored element name mapping out of inline ternary
 
 ### Core utilities
 
-- [ ] Verify tree traversal functions handle the deeper nesting (paths now go through `<html>` and `<body>` elements)
-- [ ] Update any hardcoded path assumptions if they exist
+- [x] Tree traversal functions work unchanged — paths now go through `<html>` and `<body>` elements, no hardcoded assumptions found
 
 ### Verify
 
-- [ ] `npm run build` passes
-- [ ] Verify rendering looks identical (body/html mapping produces same visual output)
-- [ ] Verify BooqPath values work correctly with the new tree depth
+- [x] `npm run build` passes
+- [x] `npm run test` passes (148/148)
+- [x] Verify rendering looks identical (body/html mapping produces same visual output)
+- [x] Verify BooqPath values work correctly with the new tree depth
 
 ---
 

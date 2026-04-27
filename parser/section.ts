@@ -1,12 +1,10 @@
-import { BooqElement, BooqChildNode, textNode, isElementNode, BooqDocument } from '../core'
+import { BooqElement, BooqChildNode, textNode, BooqDocument } from '../core'
 import {
-    xmlStringParser, XmlElement, xml2string, childrenOf, nameOf, attributesOf, textOf, asObject,
-    findByName,
+    xmlStringParser, XmlElement, xml2string, nameOf, attributesOf, textOf, asObject,
 } from './xmlTree'
 import { Epub } from './epub'
 import { transformHref } from './parserUtils'
 import { resolveRelativePath } from './path'
-import { isComment } from 'domutils'
 import { Diagnoser } from 'booqs-epub'
 import { preprocessCss } from './css'
 
@@ -47,51 +45,7 @@ type Env = {
 
 async function processSectionContent(content: string, env: Env): Promise<BooqDocument> {
     const document = xmlStringParser(content)
-    const html = findByName(document.childNodes, 'html')
-    if (!html) {
-        env.diags.push({
-            message: 'missing html element',
-            data: { xml: xml2string(document) },
-        })
-        return {
-            fileName: env.fileName,
-            children: [],
-        }
-    }
-    const elements = childrenOf(html)
-    const children: BooqChildNode[] = []
-    for (const element of elements) {
-        let child: BooqChildNode = stub()
-        const name = nameOf(element)
-        switch (name) {
-            case 'html':
-                break
-            case 'head':
-                child = await processHead(element, env)
-                break
-            case 'body':
-                child = await processXml(element, env)
-                if (isElementNode(child)) {
-                    child.name = 'div'
-                }
-                else {
-                    env.diags.push({
-                        message: 'unexpected body node',
-                        data: { xml: xml2string(element) },
-                    })
-                }
-                break
-            default:
-                if (!isEmptyText(element) && !isComment(element)) {
-                    env.diags.push({
-                        message: `unexpected node: ${name}`,
-                        data: { xml: xml2string(element) },
-                    })
-                }
-                break
-        }
-        children.push(child)
-    }
+    const children = await processXmls(document.childNodes, env)
     if (env.css.length > 0) {
         const key = generateSelectorPrefix(`inline-${env.id}`)
         env.styles[key] = preprocessCss(env.css, { prefix: key })
@@ -104,39 +58,6 @@ async function processSectionContent(content: string, env: Env): Promise<BooqDoc
     }
 }
 
-async function processHead(head: XmlElement, env: Env): Promise<BooqChildNode> {
-    const children: BooqChildNode[] = []
-    for (const childElement of childrenOf(head)) {
-        let child: BooqChildNode = stub()
-        switch (nameOf(childElement)) {
-            case 'link': {
-                child = await processLink(childElement, env)
-                break
-            }
-            case 'style': {
-                child = await processXml(childElement, env)
-                break
-            }
-            case 'title':
-            case 'meta':
-            case 'script':
-                // TODO: handle ?
-                break
-            default:
-                if (!(isEmptyText(childElement) || isComment(childElement))) {
-                    env.diags.push({
-                        message: 'unexpected head node',
-                        data: { xml: xml2string(childElement) },
-                    })
-                }
-        }
-        children.push(child)
-    }
-    return {
-        name: 'div',
-        children,
-    }
-}
 
 async function processLink(link: XmlElement, env: Env): Promise<BooqChildNode> {
     const { rel, href, type } = attributesOf(link)
@@ -206,14 +127,9 @@ async function processXml(element: XmlElement, env: Env): Promise<BooqChildNode>
 
     const name = nameOf(element)
     switch (name) {
-        case 'head':
         case 'link':
-            env.diags.push({
-                message: `unexpected node in body content: ${name}`,
-                data: { xml: xml2string(element) },
-            })
-            return stub()
-        case 'script': // Remove all script tags
+            return processLink(element, env)
+        case 'script':
             env.diags.push({
                 message: `script node in epub`,
                 severity: 'info',
@@ -314,8 +230,3 @@ function processId(id: string | undefined, env: Env) {
 }
 
 
-function isEmptyText(xml: XmlElement) {
-    const text = textOf(xml)
-    return text !== undefined && text.match(/^\s*$/)
-        ? true : false
-}

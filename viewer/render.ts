@@ -46,10 +46,12 @@ function renderNode(node: BooqNode, ctx: RenderContext): ReactNode {
     } else if (isDocumentNode(node)) {
         return renderDocumentNode(node, ctx)
     } else if (isElementNode(node)) {
+        const mappedName = mapElementName(node.name, ctx)
+        if (mappedName === null) {
+            return null
+        }
         return createElement(
-            node.name === 'a' && ctx.withinAnchor
-                ? 'span' // Do not nest anchors
-                : node.name,
+            mappedName,
             getProps(node, ctx),
             getChildren(node, ctx),
         )
@@ -159,6 +161,15 @@ function getProps(node: BooqElement, {
 }
 
 // Converts XML attribute names to React prop names at render time.
+function mapElementName(name: string, ctx: RenderContext): string | null {
+    switch (name) {
+        case 'head': case 'link': case 'script': case 'meta': case 'title': return null
+        case 'html': case 'body': return 'div'
+        case 'a': return ctx.withinAnchor ? 'span' : 'a'
+        default: return name
+    }
+}
+
 const attributeNameMap: Record<string, string> = {
     'class': 'className',
     'colspan': 'colSpan',
