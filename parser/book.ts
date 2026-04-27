@@ -1,6 +1,6 @@
 import { BooqNode, BooqStyles, Booq, nodesLength, BooqDocument } from '../core'
 import { Epub } from './epub'
-import { EpubSection, parseSection } from './section'
+import { EpubSection, parseDocument } from './section'
 import { buildToc } from './toc'
 import { preprocess } from './preprocess'
 import { extactBooqMeta } from './metadata'
@@ -28,7 +28,7 @@ export async function processEpub(epub: Epub, diags: Diagnoser): Promise<Booq | 
             fileName: href,
             content: loaded.content,
         }
-        const document = await parseSection({ section, file: epub, styles, diags })
+        const document = await parseDocument({ section, file: epub, styles, diags })
         documents.push(document)
     }
 

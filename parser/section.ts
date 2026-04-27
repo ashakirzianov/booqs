@@ -15,7 +15,7 @@ export type EpubSection = {
     id: string,
     content: string,
 }
-export async function parseSection({ section, file, styles, diags }: {
+export async function parseDocument({ section, file, styles, diags }: {
     section: EpubSection,
     file: Epub,
     styles: Record<string, string>,
