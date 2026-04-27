@@ -1,4 +1,4 @@
-import { BooqNode, BooqElementNode, textNode, isElementNode } from '../core'
+import { BooqElement, BooqChildNode, textNode, isElementNode, BooqDocument } from '../core'
 import {
     xmlStringParser, XmlElement, xml2string, childrenOf, nameOf, attributesOf, textOf, asObject, XmlAttributes,
     findByName,
@@ -20,7 +20,7 @@ export async function parseSection({ section, file, styles, diags }: {
     file: Epub,
     styles: Record<string, string>,
     diags: Diagnoser,
-}): Promise<BooqNode> {
+}): Promise<BooqDocument> {
     return processSectionContent(section.content, {
         id: section.id,
         fileName: section.fileName,
@@ -45,7 +45,7 @@ type Env = {
     resolveTextFile: (href: string) => Promise<string | undefined>,
 }
 
-async function processSectionContent(content: string, env: Env): Promise<BooqNode> {
+async function processSectionContent(content: string, env: Env): Promise<BooqDocument> {
     const document = xmlStringParser(content)
     const html = findByName(document.childNodes, 'html')
     if (!html) {
@@ -54,14 +54,14 @@ async function processSectionContent(content: string, env: Env): Promise<BooqNod
             data: { xml: xml2string(document) },
         })
         return {
-            section: env.fileName,
+            fileName: env.fileName,
             children: [],
         }
     }
     const elements = childrenOf(html)
-    const children: BooqNode[] = []
+    const children: BooqChildNode[] = []
     for (const element of elements) {
-        let child: BooqNode = stub()
+        let child: BooqChildNode = stub()
         const name = nameOf(element)
         switch (name) {
             case 'html':
@@ -98,16 +98,16 @@ async function processSectionContent(content: string, env: Env): Promise<BooqNod
         env.styleRefs.push(key)
     }
     return {
-        section: env.fileName,
+        fileName: env.fileName,
         styleRefs: env.styleRefs.length > 0 ? env.styleRefs : undefined,
         children,
     }
 }
 
-async function processHead(head: XmlElement, env: Env): Promise<BooqNode> {
-    const children: BooqNode[] = []
+async function processHead(head: XmlElement, env: Env): Promise<BooqChildNode> {
+    const children: BooqChildNode[] = []
     for (const childElement of childrenOf(head)) {
-        let child: BooqNode = stub()
+        let child: BooqChildNode = stub()
         switch (nameOf(childElement)) {
             case 'link': {
                 child = await processLink(childElement, env)
@@ -138,7 +138,7 @@ async function processHead(head: XmlElement, env: Env): Promise<BooqNode> {
     }
 }
 
-async function processLink(link: XmlElement, env: Env): Promise<BooqNode> {
+async function processLink(link: XmlElement, env: Env): Promise<BooqChildNode> {
     const { rel, href, type } = attributesOf(link)
     switch (rel?.toLowerCase()) {
         case 'stylesheet':
@@ -198,7 +198,7 @@ async function processXmls(xmls: XmlElement[], env: Env) {
     return Promise.all(xmls.map(n => processXml(n, env)))
 }
 
-async function processXml(element: XmlElement, env: Env): Promise<BooqNode> {
+async function processXml(element: XmlElement, env: Env): Promise<BooqChildNode> {
     const text = textOf(element)
     if (text !== undefined) {
         return textNode(text)
@@ -230,7 +230,7 @@ async function processXml(element: XmlElement, env: Env): Promise<BooqNode> {
 
 }
 
-async function processRegularXml(element: XmlElement, env: Env): Promise<BooqNode> {
+async function processRegularXml(element: XmlElement, env: Env): Promise<BooqChildNode> {
     const {
         name, children, attributes,
     } = asObject(element)
@@ -242,10 +242,10 @@ async function processRegularXml(element: XmlElement, env: Env): Promise<BooqNod
         return stub()
     }
     const { id, ...rest } = attributes ?? {}
-    const result: BooqElementNode = {
+    const result: BooqElement = {
         name,
         id: processId(id, env),
-        attrs: processAttributes(rest, env),
+        attributes: processAttributes(rest, env),
         children: children?.length
             ? await processXmls(children, env)
             : [],
@@ -253,7 +253,7 @@ async function processRegularXml(element: XmlElement, env: Env): Promise<BooqNod
     return result
 }
 
-async function processStyleXml(element: XmlElement, env: Env): Promise<BooqNode> {
+async function processStyleXml(element: XmlElement, env: Env): Promise<BooqChildNode> {
     const {
         children,
         attributes,
@@ -299,7 +299,7 @@ function generateSelectorPrefix(id: string) {
     return `booqs-${id.replace(/[^a-zA-Z0-9]/g, '-')}`
 }
 
-function stub(): BooqNode {
+function stub(): BooqChildNode {
     return null
 }
 

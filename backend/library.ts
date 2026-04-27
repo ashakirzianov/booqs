@@ -57,8 +57,9 @@ const libraries: {
 }
 
 export async function booqForId(booqId: BooqId): Promise<Booq | undefined> {
-    const [library] = parseId(booqId)
-    const useCache = library !== 'lo'
+    // const [library] = parseId(booqId)
+    // const useCache = library !== 'lo'
+    const useCache = false
     if (useCache) {
         const cached = await getCachedBooq(booqId)
         if (cached) {
@@ -102,10 +103,10 @@ export async function booqPreview(booqId: BooqId, path: BooqPath, end?: BooqPath
         return undefined
     }
     const full = end
-        ? textForRange(booq.nodes, { start: path, end })
-        : previewForPath(booq.nodes, path, PREVIEW_LENGTH)
+        ? textForRange(booq.documents, { start: path, end })
+        : previewForPath(booq.documents, path, PREVIEW_LENGTH)
     const text = full?.trim()?.substring(0, PREVIEW_LENGTH) ?? ''
-    const position = positionForPath(booq.nodes, path)
+    const position = positionForPath(booq.documents, path)
     const authors = booq.metadata.authors.map(author => author.name)
     const booqLength = booq.metadata.length
     const preview: BooqPreview = {
@@ -233,7 +234,7 @@ export async function booqFragmentForRange(booqId: BooqId, range: BooqRange): Pr
         return undefined
     }
 
-    const nodes = nodesForRange(booq.nodes, range, true)
+    const nodes = nodesForRange(booq.documents, range, true)
 
     return { nodes }
 }

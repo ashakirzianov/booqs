@@ -1,8 +1,8 @@
-import { BooqElementNode, BooqSectionNode, BooqNode, BooqPath, BooqTextNode } from './model'
+import { BooqElement, BooqDocument, BooqNode, BooqPath, BooqTextNode } from './model'
 import { isContainerNode, isTextNode, nodeChildren } from './node'
 import { pathLessThan } from './path'
 
-type BooqContainerNode = BooqElementNode | BooqSectionNode
+type BooqContainerNode = BooqElement | BooqDocument
 
 export type BooqIterator = BooqContainerIterator | BooqTextIterator
 export type BooqContainerIterator = {
@@ -62,7 +62,7 @@ export function iteratorAtPath(nodes: BooqNode[], path: BooqPath): BooqIterator 
     return iteratorAtPathImpl({
         name: 'root',
         children: nodes,
-    }, path, undefined)
+    } as BooqElement, path, undefined)
 }
 
 export function iteratorsPath(iter: BooqIterator): BooqPath {
@@ -83,7 +83,7 @@ export function firstLeafNode(iter: BooqContainerIterator): BooqContainerIterato
         return firstLeafNode({
             parent: iter,
             index: 0,
-            node,
+            node: node
         })
     } else {
         return iter
@@ -96,7 +96,7 @@ export function lastLeafNode(iter: BooqContainerIterator): BooqContainerIterator
         return lastLeafNode({
             parent: iter,
             index: node.children.length - 1,
-            node,
+            node: node,
         })
     } else {
         return iter

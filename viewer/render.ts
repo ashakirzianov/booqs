@@ -1,8 +1,8 @@
 import { ReactNode, createElement } from 'react'
 import {
-    BooqElementNode, BooqSectionNode, BooqNode, BooqStyles, pathToString,
+    BooqElement, BooqDocument, BooqNode, BooqStyles, pathToString,
     pathInRange, samePath, pathLessThan, BooqPath, BooqRange, pathToId,
-    assertNever, isTextNode, isStubNode, isElementNode, isSectionNode,
+    assertNever, isTextNode, isStubNode, isElementNode, isDocumentNode,
 } from '@/core'
 
 export type Augmentation = {
@@ -16,7 +16,7 @@ type RenderContext = {
     path: BooqPath,
     range: BooqRange,
     styles: BooqStyles,
-    parent?: BooqElementNode,
+    parent?: BooqElement,
     withinAnchor?: boolean,
     augmentations: Augmentation[],
     onAugmentationClick?: (id: string) => void,
@@ -43,8 +43,8 @@ function renderNode(node: BooqNode, ctx: RenderContext): ReactNode {
         }
     } else if (isStubNode(node)) {
         return null
-    } else if (isSectionNode(node)) {
-        return renderSectionNode(node, ctx)
+    } else if (isDocumentNode(node)) {
+        return renderDocumentNode(node, ctx)
     } else if (isElementNode(node)) {
         return createElement(
             node.name === 'a' && ctx.withinAnchor
@@ -59,7 +59,7 @@ function renderNode(node: BooqNode, ctx: RenderContext): ReactNode {
     }
 }
 
-function renderSectionNode(node: BooqSectionNode, ctx: RenderContext): ReactNode {
+function renderDocumentNode(node: BooqDocument, ctx: RenderContext): ReactNode {
     const children = node.children ? renderNodes(node.children, {
         ...ctx,
         parent: undefined,
@@ -133,31 +133,31 @@ function renderTextNode(text: string, {
     )
 }
 
-function getProps(node: BooqElementNode, {
+function getProps(node: BooqElement, {
     path, range, hrefForPath,
 }: RenderContext) {
     const className = node.pph
-        ? (node.attrs?.className ? `booqs-pph ${node.attrs.className}` : 'booqs-pph')
-        : node.attrs?.className
+        ? (node.attributes?.className ? `booqs-pph ${node.attributes.className}` : 'booqs-pph')
+        : node.attributes?.className
     return {
-        ...node.attrs,
+        ...node.attributes,
         id: pathToId(path),
         className,
         key: pathToString(path),
-        style: node.attrs?.style ? parseInlineStyle(node.attrs.style) : undefined,
+        style: node.attributes?.style ? parseInlineStyle(node.attributes.style) : undefined,
         href: node.ref
             ? (
                 pathInRange(node.ref, range)
                     ? `#${pathToId(node.ref)}`
                     : hrefForPath ?
                         hrefForPath(node.ref)
-                        : node.attrs?.href
+                        : node.attributes?.href
             )
-            : node.attrs?.href,
+            : node.attributes?.href,
     }
 }
 
-function getChildren(node: BooqElementNode, ctx: RenderContext) {
+function getChildren(node: BooqElement, ctx: RenderContext) {
     const children = node.children && renderNodes(node.children, {
         ...ctx,
         parent: node,

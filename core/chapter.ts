@@ -1,5 +1,5 @@
 import {
-    BooqNode, BooqStyles, Booq, BooqPath, nodesForRange, pathLessThan, isSectionNode, visitNodes,
+    BooqNode, BooqStyles, Booq, BooqPath, nodesForRange, pathLessThan, isDocumentNode, visitNodes,
 } from '@/core'
 
 export type BooqAnchor = {
@@ -34,7 +34,7 @@ export function buildChapter({ booq, path }: {
 export function collectReferencedStyles(nodes: BooqNode[], allStyles: BooqStyles): BooqStyles {
     const refs = new Set<string>()
     visitNodes(nodes, node => {
-        if (isSectionNode(node) && node.styleRefs) {
+        if (isDocumentNode(node) && node.styleRefs) {
             for (const ref of node.styleRefs) {
                 refs.add(ref)
             }
@@ -60,8 +60,8 @@ function fullBooqChapter(booq: Booq): BooqChapter {
         },
         fragment: {
             start: [0],
-            end: [booq.nodes.length],
-            nodes: booq.nodes,
+            end: [booq.documents.length],
+            nodes: booq.documents,
             styles: booq.styles,
         },
     }
@@ -86,8 +86,8 @@ function chapterForPath(booq: Booq, path: BooqPath): BooqChapter {
         }
     }
 
-    const end = next?.path ?? [booq.nodes.length]
-    const nodes = nodesForRange(booq.nodes, {
+    const end = next?.path ?? [booq.documents.length]
+    const nodes = nodesForRange(booq.documents, {
         start: current.path,
         end,
     })

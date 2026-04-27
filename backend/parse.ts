@@ -1,4 +1,4 @@
-import { Booq, BooqId, isElementNode, visitNodes, mapNodes } from '@/core'
+import { Booq, BooqId, isElementNode, visitNodes, mapNodes, BooqDocument } from '@/core'
 import { parseEpub } from '@/parser'
 import { Epub, openEpubFile } from '@/parser/epub'
 import { Diagnoser, Diagnostic } from 'booqs-epub'
@@ -113,13 +113,13 @@ function normalizeImageSrc(src: string): string {
 }
 
 function normalizeImageSrcsInBooq(booq: Booq): void {
-    visitNodes(booq.nodes, node => {
+    visitNodes(booq.documents, node => {
         if (isElementNode(node)) {
-            if (node.attrs?.src) {
-                node.attrs.src = normalizeImageSrc(node.attrs.src)
+            if (node.attributes?.src) {
+                node.attributes.src = normalizeImageSrc(node.attributes.src)
             }
-            if (node.attrs?.xlinkHref) {
-                node.attrs.xlinkHref = normalizeImageSrc(node.attrs.xlinkHref)
+            if (node.attributes?.xlinkHref) {
+                node.attributes.xlinkHref = normalizeImageSrc(node.attributes.xlinkHref)
             }
         }
     })
@@ -130,13 +130,13 @@ function normalizeImageSrcsInBooq(booq: Booq): void {
 
 function collectUniqueSrcsFromBooq(booq: Booq): string[] {
     const srcs = new Set<string>()
-    visitNodes(booq.nodes, node => {
+    visitNodes(booq.documents, node => {
         if (isElementNode(node)) {
-            if (node.attrs?.src) {
-                srcs.add(node.attrs.src)
+            if (node.attributes?.src) {
+                srcs.add(node.attributes.src)
             }
-            if (node.attrs?.xlinkHref) {
-                srcs.add(node.attrs.xlinkHref)
+            if (node.attributes?.xlinkHref) {
+                srcs.add(node.attributes.xlinkHref)
             }
         }
     })
@@ -175,31 +175,31 @@ export async function openEpubImageLoader(file: BooqFile): Promise<EpubImageLoad
 }
 
 function preprocessBooq(booq: Booq, booqId: BooqId, imageDimensions: BooqImageDimensions): Booq {
-    const nodes = mapNodes(booq.nodes, node => {
+    const documents = mapNodes(booq.documents, node => {
         if (!isElementNode(node)) {
             return node
         }
-        if (node.attrs?.src) {
-            const resolved = imageDimensions[node.attrs.src]
+        if (node.attributes?.src) {
+            const resolved = imageDimensions[node.attributes.src]
             if (resolved) {
                 return {
                     ...node,
-                    attrs: {
-                        ...node.attrs,
-                        src: booqImageUrl({ booqId, imageId: node.attrs.src }),
+                    attributes: {
+                        ...node.attributes,
+                        src: booqImageUrl({ booqId, imageId: node.attributes.src }),
                         width: resolved.width.toString(),
                         height: resolved.height.toString(),
                     },
                 }
             }
-        } else if (node.attrs?.xlinkHref) {
-            const resolved = imageDimensions[node.attrs.xlinkHref]
+        } else if (node.attributes?.xlinkHref) {
+            const resolved = imageDimensions[node.attributes.xlinkHref]
             if (resolved) {
                 return {
                     ...node,
-                    attrs: {
-                        ...node.attrs,
-                        xlinkHref: booqImageUrl({ booqId, imageId: node.attrs.xlinkHref }),
+                    attributes: {
+                        ...node.attributes,
+                        xlinkHref: booqImageUrl({ booqId, imageId: node.attributes.xlinkHref }),
                         width: resolved.width.toString(),
                         height: resolved.height.toString(),
                     },
@@ -207,6 +207,6 @@ function preprocessBooq(booq: Booq, booqId: BooqId, imageDimensions: BooqImageDi
             }
         }
         return node
-    })
-    return { ...booq, nodes }
+    }) as BooqDocument[]
+    return { ...booq, documents }
 }

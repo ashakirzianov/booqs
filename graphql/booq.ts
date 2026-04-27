@@ -59,19 +59,19 @@ export const booqResolver: IResolvers<BooqParent, ResolverContext> = {
                 return undefined
             }
             if (end) {
-                const preview = textForRange(booq.nodes, { start: path ?? [], end })?.trim()
+                const preview = textForRange(booq.documents, { start: path ?? [], end })?.trim()
                 return length
                     ? preview?.substring(0, length)
                     : preview
             } else {
-                const preview = previewForPath(booq.nodes, path ?? [], length)
+                const preview = previewForPath(booq.documents, path ?? [], length)
                 return preview?.trim()?.substring(0, length)
             }
         },
         async nodes(parent, _, { booqLoader }) {
             const booq = await booqLoader.load(parent.booqId)
             return booq
-                ? booq.nodes
+                ? booq.documents
                 : undefined
         },
         async styles(parent, _, { booqLoader }) {

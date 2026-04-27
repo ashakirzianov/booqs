@@ -1,4 +1,4 @@
-import { BooqNode, BooqStyles, Booq, nodesLength } from '../core'
+import { BooqNode, BooqStyles, Booq, nodesLength, BooqDocument } from '../core'
 import { Epub } from './epub'
 import { EpubSection, parseSection } from './section'
 import { buildToc } from './toc'
@@ -8,19 +8,19 @@ import { Diagnoser } from 'booqs-epub'
 
 // TODO: make sync again
 export async function processEpub(epub: Epub, diags: Diagnoser): Promise<Booq | undefined> {
-    const nodes: BooqNode[] = []
+    const documents: BooqDocument[] = []
     const styles: BooqStyles = {}
     const spine = await epub.spine() ?? []
     for (const { manifestItem } of spine) {
         const id = manifestItem['@id']
         const href = manifestItem['@href']
         if (!id || !href) {
-            nodes.push(null)
+            documents.push({ fileName: href ?? '', children: [], error: 'missing id or href' })
             continue
         }
         const loaded = await epub.loadItem(manifestItem)
         if (!loaded || typeof loaded.content !== 'string') {
-            nodes.push(null)
+            documents.push({ fileName: href, children: [], error: 'failed to load' })
             continue
         }
         const section: EpubSection = {
@@ -28,22 +28,23 @@ export async function processEpub(epub: Epub, diags: Diagnoser): Promise<Booq | 
             fileName: href,
             content: loaded.content,
         }
-        const node = await parseSection({ section, file: epub, styles, diags })
-        nodes.push(node)
+        const document = await parseSection({ section, file: epub, styles, diags })
+        documents.push(document)
     }
 
-    const length = nodesLength(nodes)
+    const allNodes: BooqNode[] = documents
+    const length = nodesLength(allNodes)
     const metaFromMetadata = await extactBooqMeta(epub, diags)
     const meta = {
         ...metaFromMetadata,
         length,
     }
-    const toc = await buildToc(nodes, epub, diags)
+    const toc = await buildToc(allNodes, epub, diags)
 
-    const prepocessed = preprocess(nodes)
+    const preprocessed = preprocess(allNodes)
 
     return {
-        nodes: prepocessed,
+        documents: preprocessed as BooqDocument[],
         styles,
         metadata: meta,
         toc: toc ?? {

@@ -1,27 +1,27 @@
-import { BooqNode, BooqRange, BooqPath, BooqTextNode, BooqElementNode, BooqSectionNode, BooqStubNode } from './model'
+import { BooqNode, BooqRange, BooqPath, BooqTextNode, BooqElement, BooqDocument, BooqStub, BooqChildNode } from './model'
 import { nodeLength } from './position'
 
 export function isTextNode(node: BooqNode | undefined): node is BooqTextNode {
     return typeof node === 'string'
 }
 
-export function isStubNode(node: BooqNode | undefined): node is BooqStubNode {
+export function isStubNode(node: BooqNode | undefined): node is BooqStub {
     return node === null || node?.stub !== undefined
 }
 
-export function isSectionNode(node: BooqNode | undefined): node is BooqSectionNode {
-    return node?.section !== undefined
+export function isDocumentNode(node: BooqNode | undefined): node is BooqDocument {
+    return node?.fileName !== undefined
 }
 
-export function isElementNode(node: BooqNode | undefined): node is BooqElementNode {
+export function isElementNode(node: BooqNode | undefined): node is BooqElement {
     return node?.name !== undefined
 }
 
-export function isContainerNode(node: BooqNode | undefined): node is BooqElementNode | BooqSectionNode {
+export function isContainerNode(node: BooqNode | undefined): node is BooqElement | BooqDocument {
     return node?.children !== undefined
 }
 
-export function nodeChildren(node: BooqNode): BooqNode[] | undefined {
+export function nodeChildren(node: BooqNode): BooqChildNode[] | undefined {
     return node?.children
 }
 
@@ -39,7 +39,7 @@ export function mapNodes(nodes: BooqNode[], transform: (node: BooqNode) => BooqN
     return nodes.map(node => {
         const mapped = transform(node)
         if (mapped?.children) {
-            const mappedChildren = mapNodes(mapped.children, transform)
+            const mappedChildren = mapNodes(mapped.children, transform) as BooqChildNode[]
             return {
                 ...mapped,
                 children: mappedChildren,
@@ -76,13 +76,13 @@ export function nodesForRange(nodes: BooqNode[], range: BooqRange, emptyStubs?: 
         } else if (idx === actualStart) {
             if (children) {
                 result.push({
-                    ...node as (BooqElementNode | BooqSectionNode),
+                    ...(node as BooqElement | BooqDocument),
                     children: nodesForRange(children, {
                         start: startTail,
                         end: actualEnd === idx && endTail.length > 0
                             ? endTail
                             : [children.length],
-                    }),
+                    }) as BooqChildNode[],
                 })
             } else {
                 result.push(node)
@@ -92,11 +92,11 @@ export function nodesForRange(nodes: BooqNode[], range: BooqRange, emptyStubs?: 
         } else if (idx === actualEnd && endTail.length) {
             if (children) {
                 result.push({
-                    ...node as (BooqElementNode | BooqSectionNode),
+                    ...(node as BooqElement | BooqDocument),
                     children: nodesForRange(children, {
                         start: [0],
                         end: endTail,
-                    }),
+                    }) as BooqChildNode[],
                 })
             } else {
                 result.push(node)

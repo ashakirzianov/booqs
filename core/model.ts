@@ -8,41 +8,43 @@ export type BooqRange = {
     end: BooqPath,
 }
 
-export type BooqNodeAttrs = {
+export type BooqElementAttributes = {
     [name in string]?: string;
 }
-export type BooqSectionNode = {
-    section: string,
+export type BooqDocument = {
+    fileName: string,
     styleRefs?: string[],
-    children: BooqNode[],
+    children: BooqChildNode[],
+    error?: string,
     name?: undefined,
     stub?: undefined,
 }
-export type BooqElementNode = {
+export type BooqElement = {
     name: string,
     id?: string,
-    children: BooqNode[],
-    attrs?: BooqNodeAttrs,
+    children: BooqChildNode[],
+    attributes?: BooqElementAttributes,
     ref?: BooqPath,
     /** Marks this node as a paragraph. Set by the parser's markParagraphs pass.
      * The viewer uses it to add a `booqs-pph` CSS class for scroll position tracking. */
     pph?: boolean,
-    section?: undefined,
+    fileName?: undefined,
     stub?: undefined,
 }
 export type BooqTextNode = string & {
     children?: undefined,
-    section?: undefined,
     name?: undefined,
+    fileName?: undefined,
     stub?: undefined,
 }
-export type BooqStubNode = {
+export type BooqStub = {
     stub: number,
     children?: undefined,
-    section?: undefined,
+    fileName?: undefined,
     name?: undefined,
 } | null
-export type BooqNode = BooqSectionNode | BooqElementNode | BooqTextNode | BooqStubNode
+export type BooqChildNode = BooqElement | BooqTextNode | BooqStub
+export type BooqNode = BooqDocument | BooqChildNode
 
 export type TableOfContentsItem = {
     title: string | undefined,
@@ -76,7 +78,7 @@ export type BooqMetadata = {
 }
 export type BooqStyles = Record<string, string>
 export type Booq = {
-    nodes: BooqNode[],
+    documents: BooqDocument[],
     styles: BooqStyles,
     metadata: BooqMetadata,
     toc: TableOfContents,

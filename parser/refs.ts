@@ -5,13 +5,13 @@ export function resolveRefs(nodes: BooqNode[]): BooqNode[] {
         if (!isElementNode(node)) {
             return node
         }
-        const { href, ...rest } = node.attrs ?? {}
+        const { href, ...rest } = node.attributes ?? {}
         const ref = href?.startsWith('#') ? findPathForId(nodes, href.substring(1))
             : href !== undefined ? findPathForId(nodes, href)
                 : undefined
-        const attrs = ref
+        const attributes = ref
             ? (Object.keys(rest).length > 0 ? rest : undefined)
-            : node.attrs
-        return { ...node, attrs, ref }
+            : node.attributes
+        return { ...node, attributes, ref }
     })
 }
