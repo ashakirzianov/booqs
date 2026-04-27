@@ -1,6 +1,6 @@
 import { BooqElement, BooqChildNode, textNode, isElementNode, BooqDocument } from '../core'
 import {
-    xmlStringParser, XmlElement, xml2string, childrenOf, nameOf, attributesOf, textOf, asObject, XmlAttributes,
+    xmlStringParser, XmlElement, xml2string, childrenOf, nameOf, attributesOf, textOf, asObject,
     findByName,
 } from './xmlTree'
 import { Epub } from './epub'
@@ -241,11 +241,15 @@ async function processRegularXml(element: XmlElement, env: Env): Promise<BooqChi
         })
         return stub()
     }
-    const { id, ...rest } = attributes ?? {}
+    const { id, href, ...rest } = attributes ?? {}
+    const processedAttrs = {
+        ...rest,
+        ...(href !== undefined ? { href: transformHref(href) } : {}),
+    }
     const result: BooqElement = {
         name,
         id: processId(id, env),
-        attributes: processAttributes(rest, env),
+        attributes: Object.keys(processedAttrs).length > 0 ? processedAttrs : undefined,
         children: children?.length
             ? await processXmls(children, env)
             : [],
@@ -306,40 +310,6 @@ function stub(): BooqChildNode {
 function processId(id: string | undefined, env: Env) {
     return id
         ? `${env.fileName}/${id}`
-        : undefined
-}
-
-function processAttributes(attrs: XmlAttributes, _env: Env) {
-    const entries = Object
-        .entries(attrs)
-        .map(([key, value]): [string, string | undefined] => {
-            switch (key) {
-                case 'xml:space':
-                    return ['xmlSpace', value]
-                case 'xml:lang':
-                    return ['xmlLang', value]
-                case 'xmlns:xlink':
-                    return ['xmlnsXlink', value]
-                case 'xlink:href':
-                    return ['xlinkHref', value]
-                case 'colspan':
-                    return ['colSpan', value]
-                case 'rowspan':
-                    return ['rowSpan', value]
-                case 'href':
-                    return ['href', value ? transformHref(value) : undefined]
-                case 'cellspacing':
-                    return ['cellSpacing', value]
-                case 'cellpadding':
-                    return ['cellPadding', value]
-                case 'class':
-                    return ['className', value]
-                default:
-                    return [key, value]
-            }
-        })
-    return entries.length
-        ? Object.fromEntries(entries)
         : undefined
 }
 

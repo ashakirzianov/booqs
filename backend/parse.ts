@@ -118,8 +118,8 @@ function normalizeImageSrcsInBooq(booq: Booq): void {
             if (node.attributes?.src) {
                 node.attributes.src = normalizeImageSrc(node.attributes.src)
             }
-            if (node.attributes?.xlinkHref) {
-                node.attributes.xlinkHref = normalizeImageSrc(node.attributes.xlinkHref)
+            if (node.attributes?.['xlink:href']) {
+                node.attributes['xlink:href'] = normalizeImageSrc(node.attributes['xlink:href'])
             }
         }
     })
@@ -135,8 +135,8 @@ function collectUniqueSrcsFromBooq(booq: Booq): string[] {
             if (node.attributes?.src) {
                 srcs.add(node.attributes.src)
             }
-            if (node.attributes?.xlinkHref) {
-                srcs.add(node.attributes.xlinkHref)
+            if (node.attributes?.['xlink:href']) {
+                srcs.add(node.attributes['xlink:href'])
             }
         }
     })
@@ -192,14 +192,15 @@ function preprocessBooq(booq: Booq, booqId: BooqId, imageDimensions: BooqImageDi
                     },
                 }
             }
-        } else if (node.attributes?.xlinkHref) {
-            const resolved = imageDimensions[node.attributes.xlinkHref]
+        } else if (node.attributes?.['xlink:href']) {
+            const xlinkHref = node.attributes['xlink:href']
+            const resolved = imageDimensions[xlinkHref]
             if (resolved) {
                 return {
                     ...node,
                     attributes: {
                         ...node.attributes,
-                        xlinkHref: booqImageUrl({ booqId, imageId: node.attributes.xlinkHref }),
+                        'xlink:href': booqImageUrl({ booqId, imageId: xlinkHref }),
                         width: resolved.width.toString(),
                         height: resolved.height.toString(),
                     },

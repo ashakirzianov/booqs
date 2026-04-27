@@ -136,11 +136,12 @@ function renderTextNode(text: string, {
 function getProps(node: BooqElement, {
     path, range, hrefForPath,
 }: RenderContext) {
+    const normalized = normalizeAttributes(node.attributes)
     const className = node.pph
-        ? (node.attributes?.className ? `booqs-pph ${node.attributes.className}` : 'booqs-pph')
-        : node.attributes?.className
+        ? (normalized?.className ? `booqs-pph ${normalized.className}` : 'booqs-pph')
+        : normalized?.className
     return {
-        ...node.attributes,
+        ...normalized,
         id: pathToId(path),
         className,
         key: pathToString(path),
@@ -155,6 +156,28 @@ function getProps(node: BooqElement, {
             )
             : node.attributes?.href,
     }
+}
+
+// Converts XML attribute names to React prop names at render time.
+const attributeNameMap: Record<string, string> = {
+    'class': 'className',
+    'colspan': 'colSpan',
+    'rowspan': 'rowSpan',
+    'cellspacing': 'cellSpacing',
+    'cellpadding': 'cellPadding',
+    'xml:space': 'xmlSpace',
+    'xml:lang': 'xmlLang',
+    'xmlns:xlink': 'xmlnsXlink',
+    'xlink:href': 'xlinkHref',
+}
+
+function normalizeAttributes(attributes: BooqElement['attributes']): Record<string, string | undefined> | undefined {
+    if (!attributes) return undefined
+    const entries = Object.entries(attributes).map(([key, value]) => {
+        const reactKey = attributeNameMap[key] ?? key
+        return [reactKey, value]
+    })
+    return Object.fromEntries(entries)
 }
 
 function getChildren(node: BooqElement, ctx: RenderContext) {
