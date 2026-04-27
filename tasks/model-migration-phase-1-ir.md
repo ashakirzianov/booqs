@@ -92,29 +92,30 @@ Parser stores XML attributes as-is. Renderer normalizes for React.
 
 ### Parser (`parser/section.ts`)
 
-- [ ] Remove camelCase conversions from `processAttributes()`: stop converting `class` → `className`, `colspan` → `colSpan`, `rowspan` → `rowSpan`, `cellspacing` → `cellSpacing`, `cellpadding` → `cellPadding`, `xml:space` → `xmlSpace`, `xml:lang` → `xmlLang`, `xmlns:xlink` → `xmlnsXlink`, `xlink:href` → `xlinkHref`
-- [ ] Keep `href` transformation for now (handled in Stage 6)
+- [x] Remove camelCase conversions — `processAttributes()` removed entirely, href handling inlined into `processRegularXml()`
+- [x] Keep `href` transformation for now (handled in Stage 6)
 
 ### Backend (`backend/parse.ts`)
 
-- [ ] Update image src access: `node.attributes?.src` stays as-is, but `node.attributes?.xlinkHref` → `node.attributes?.['xlink:href']`
+- [x] Update image src access: `node.attributes?.xlinkHref` → `node.attributes?.['xlink:href']`
 
 ### Viewer/Renderer (`viewer/render.ts`)
 
-- [ ] Add `normalizeAttributes()` function that converts XML attribute names to React props at render time
-- [ ] Handle `class` → `className`, `colspan` → `colSpan`, `rowspan` → `rowSpan`, `cellspacing` → `cellSpacing`, `cellpadding` → `cellPadding`
-- [ ] Handle `xml:space` → `xmlSpace`, `xml:lang` → `xmlLang`, `xmlns:xlink` → `xmlnsXlink`, `xlink:href` → `xlinkHref`
-- [ ] Update `getProps()` to use `normalizeAttributes()`
+- [x] Add `normalizeAttributes()` function with `attributeNameMap` table
+- [x] Handle `class` → `className`, `colspan` → `colSpan`, `rowspan` → `rowSpan`, `cellspacing` → `cellSpacing`, `cellpadding` → `cellPadding`
+- [x] Handle `xml:space` → `xmlSpace`, `xml:lang` → `xmlLang`, `xmlns:xlink` → `xmlnsXlink`, `xlink:href` → `xlinkHref`
+- [x] Update `getProps()` to use `normalizeAttributes()`
 
 ### Core utilities
 
-- [ ] Update `getExpandedRange()` in `core/text.ts` if it accesses `node.attributes?.className` (now `node.attributes?.class`)
+- [x] `getExpandedRange()` in `core/text.ts` — no change needed, doesn't access `className`
 
 ### Verify
 
-- [ ] `npm run build` passes
-- [ ] Verify CSS classes apply correctly (class → className mapping works)
-- [ ] Verify tables render correctly (colspan/rowspan mapping works)
+- [x] `npm run build` passes
+- [x] `npm run test` passes (148/148)
+- [x] Verify CSS classes apply correctly (class → className mapping works)
+- [-] Verify tables render correctly (colspan/rowspan mapping works)
 
 ---
 
