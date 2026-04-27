@@ -59,6 +59,7 @@ export function iteratorAtPath(nodes: BooqNode[], path: BooqPath): BooqIterator 
             return undefined
         }
     }
+    // as BooqElement: synthetic root node to start traversal — not a real EPUB element
     return iteratorAtPathImpl({
         name: 'root',
         children: nodes,

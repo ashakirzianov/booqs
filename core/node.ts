@@ -76,18 +76,18 @@ export function nodesForRange(nodes: BooqNode[], range: BooqRange, emptyStubs?: 
     const result: BooqNode[] = []
     for (let idx = 0; idx < nodes.length; idx++) {
         const node = nodes[idx]
-        const children = nodeChildren(node)
         if (idx < actualStart) {
             result.push(stubNode(emptyStubs ? 0 : nodeLength(node)))
         } else if (idx === actualStart) {
-            if (children) {
+            if (isContainerNode(node)) {
                 result.push({
-                    ...(node as BooqElement | BooqDocument),
-                    children: nodesForRange(children, {
+                    ...node,
+                    // as BooqChildNode[]: children never contain BooqDocument nodes
+                    children: nodesForRange(node.children, {
                         start: startTail,
                         end: actualEnd === idx && endTail.length > 0
                             ? endTail
-                            : [children.length],
+                            : [node.children.length],
                     }) as BooqChildNode[],
                 })
             } else {
@@ -96,10 +96,11 @@ export function nodesForRange(nodes: BooqNode[], range: BooqRange, emptyStubs?: 
         } else if (idx < actualEnd) {
             result.push(node)
         } else if (idx === actualEnd && endTail.length) {
-            if (children) {
+            if (isContainerNode(node)) {
                 result.push({
-                    ...(node as BooqElement | BooqDocument),
-                    children: nodesForRange(children, {
+                    ...node,
+                    // as BooqChildNode[]: children never contain BooqDocument nodes
+                    children: nodesForRange(node.children, {
                         start: [0],
                         end: endTail,
                     }) as BooqChildNode[],

@@ -77,6 +77,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ### Types
 - Inline prop/parameter types unless the type is referenced from other places. Extract a named type only when it's used in multiple locations (e.g., composed via intersection, passed as a generic argument).
 - **Union discriminant fields**: when a union has members that share some fields but not others (e.g., `BooqElement` has `name` but `BooqDocument` does not), add `fieldName?: undefined` to the members that lack the field. This allows safe property access without type assertions (e.g., `node.name` works on any `BooqNode` — it's `string` for elements, `undefined` for documents/text/stubs). Apply this pattern to all fields used for discrimination in the union.
+- **Type assertions (`as`)**: every `as Type` cast must have a comment on the preceding line explaining why the cast is necessary and why it's safe. Prefer type guards, narrowing, or restructuring over casts. If a cast keeps recurring, consider whether the types can be redesigned to eliminate it.
 
 ### Data layer
 - Do not access `backend/*`, `parser/*`, or `graphql/*` files directly from frontend code. Instead, create an indirection layer in `data/*` directory to abstract backend functionality.
