@@ -20,7 +20,7 @@ export const noteResolver: IResolvers<NoteParent, ResolverContext> = {
         async text(parent, _, { booqLoader }) {
             const booq = await booqLoader.load(parent.booq_id as BooqId)
             if (booq) {
-                const text = textForRange(booq.documents, {
+                const text = textForRange(booq.content, {
                     start: parent.start_path,
                     end: parent.end_path,
                 })
@@ -33,11 +33,11 @@ export const noteResolver: IResolvers<NoteParent, ResolverContext> = {
             if (!booq) {
                 return undefined
             }
-            const expandedRange = getExpandedRange(booq.documents, {
+            const expandedRange = getExpandedRange(booq.content, {
                 start: parent.start_path,
                 end: parent.end_path,
             })
-            const nodes = nodesForRange(booq.documents, expandedRange)
+            const nodes = nodesForRange(booq.content, expandedRange)
             const styles = collectReferencedStyles(nodes, booq.styles)
             return {
                 start: expandedRange.start,
@@ -51,7 +51,7 @@ export const noteResolver: IResolvers<NoteParent, ResolverContext> = {
             if (!booq) {
                 return undefined
             }
-            const position = positionForPath(booq.documents, parent.start_path)
+            const position = positionForPath(booq.content, parent.start_path)
             return position
         },
         start(parent) {

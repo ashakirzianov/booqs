@@ -202,8 +202,8 @@ export async function getExpandedFragments(booqId: BooqId, ranges: BooqRange[]):
     }
 
     return ranges.map(range => {
-        const expandedRange = getExpandedRange(booq.documents, range)
-        const nodes = nodesForRange(booq.documents, expandedRange)
+        const expandedRange = getExpandedRange(booq.content, range)
+        const nodes = nodesForRange(booq.content, expandedRange)
 
         return {
             nodes,

@@ -78,7 +78,7 @@ export type BooqMetadata = {
 }
 export type BooqStyles = Record<string, string>
 export type Booq = {
-    documents: BooqDocument[],
+    content: BooqDocument[],
     styles: BooqStyles,
     metadata: BooqMetadata,
     toc: TableOfContents,

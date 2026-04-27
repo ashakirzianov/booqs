@@ -60,8 +60,8 @@ function fullBooqChapter(booq: Booq): BooqChapter {
         },
         fragment: {
             start: [0],
-            end: [booq.documents.length],
-            nodes: booq.documents,
+            end: [booq.content.length],
+            nodes: booq.content,
             styles: booq.styles,
         },
     }
@@ -86,8 +86,8 @@ function chapterForPath(booq: Booq, path: BooqPath): BooqChapter {
         }
     }
 
-    const end = next?.path ?? [booq.documents.length]
-    const nodes = nodesForRange(booq.documents, {
+    const end = next?.path ?? [booq.content.length]
+    const nodes = nodesForRange(booq.content, {
         start: current.path,
         end,
     })

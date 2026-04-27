@@ -15,7 +15,7 @@ export const booqHistoryResolver: IResolvers<BooqHistoryParent, ResolverContext>
             if (!booq) {
                 return undefined
             }
-            const preview = previewForPath(booq.documents, parent.path, length)
+            const preview = previewForPath(booq.content, parent.path, length)
             return preview?.trim()?.substring(0, length)
         },
         async position(parent, _, { booqLoader }) {
@@ -23,7 +23,7 @@ export const booqHistoryResolver: IResolvers<BooqHistoryParent, ResolverContext>
             if (!booq) {
                 return undefined
             }
-            const position = positionForPath(booq.documents, parent.path)
+            const position = positionForPath(booq.content, parent.path)
             return position
         },
     },

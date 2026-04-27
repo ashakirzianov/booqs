@@ -126,7 +126,7 @@ async function buildReadingContext(booqId: BooqId, range: BooqRange): Promise<Re
     if (!booq) {
         return undefined
     }
-    const { quote, contextBefore, contextAfter } = getQuoteAndContext(booq.documents, range, 2000)
+    const { quote, contextBefore, contextAfter } = getQuoteAndContext(booq.content, range, 2000)
     if (!quote) {
         return undefined
     }

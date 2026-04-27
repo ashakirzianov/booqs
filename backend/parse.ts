@@ -113,7 +113,7 @@ function normalizeImageSrc(src: string): string {
 }
 
 function normalizeImageSrcsInBooq(booq: Booq): void {
-    visitNodes(booq.documents, node => {
+    visitNodes(booq.content, node => {
         if (isElementNode(node)) {
             if (node.attributes?.src) {
                 node.attributes.src = normalizeImageSrc(node.attributes.src)
@@ -130,7 +130,7 @@ function normalizeImageSrcsInBooq(booq: Booq): void {
 
 function collectUniqueSrcsFromBooq(booq: Booq): string[] {
     const srcs = new Set<string>()
-    visitNodes(booq.documents, node => {
+    visitNodes(booq.content, node => {
         if (isElementNode(node)) {
             if (node.attributes?.src) {
                 srcs.add(node.attributes.src)
@@ -175,7 +175,7 @@ export async function openEpubImageLoader(file: BooqFile): Promise<EpubImageLoad
 }
 
 function preprocessBooq(booq: Booq, booqId: BooqId, imageDimensions: BooqImageDimensions): Booq {
-    const documents = mapDocumentNodes(booq.documents, node => {
+    const documents = mapDocumentNodes(booq.content, node => {
         if (!isElementNode(node)) {
             return node
         }
@@ -208,5 +208,5 @@ function preprocessBooq(booq: Booq, booqId: BooqId, imageDimensions: BooqImageDi
         }
         return node
     })
-    return { ...booq, documents }
+    return { ...booq, content: documents }
 }

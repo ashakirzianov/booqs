@@ -103,10 +103,10 @@ export async function booqPreview(booqId: BooqId, path: BooqPath, end?: BooqPath
         return undefined
     }
     const full = end
-        ? textForRange(booq.documents, { start: path, end })
-        : previewForPath(booq.documents, path, PREVIEW_LENGTH)
+        ? textForRange(booq.content, { start: path, end })
+        : previewForPath(booq.content, path, PREVIEW_LENGTH)
     const text = full?.trim()?.substring(0, PREVIEW_LENGTH) ?? ''
-    const position = positionForPath(booq.documents, path)
+    const position = positionForPath(booq.content, path)
     const authors = booq.metadata.authors.map(author => author.name)
     const booqLength = booq.metadata.length
     const preview: BooqPreview = {
@@ -234,7 +234,7 @@ export async function booqFragmentForRange(booqId: BooqId, range: BooqRange): Pr
         return undefined
     }
 
-    const nodes = nodesForRange(booq.documents, range, true)
+    const nodes = nodesForRange(booq.content, range, true)
 
     return { nodes }
 }
