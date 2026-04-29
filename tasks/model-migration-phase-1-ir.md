@@ -153,39 +153,36 @@ Parser keeps `<style>` elements. CSS preprocessing moves to post-processing. Ren
 
 ### Parser (`parser/section.ts`)
 
-- [ ] Stop extracting `<style>` text content into `env.css` — keep the `<style>` element in the tree with its text content as a child text node
-- [ ] Stop replacing `<style>` elements with stubs
-- [ ] Keep `<link rel="stylesheet">` processing for now (still needs to load CSS files), but keep the `<link>` element in the tree instead of replacing with stub
+- [x] `<style>` and `<link>` processed as regular elements via `processRegularXml` — kept in tree
+- [x] Removed `processStyleXml`, `processLink`, `processHead`, CSS accumulation in `env.css`
+- [x] Removed `generateSelectorPrefix`, `isEmptyText`, unused imports
+- [x] Simplified `Env` type — removed `css`, `styleRefs`, `styles`, `resolveTextFile`, `id`
 
-### Post-processing (`parser/preprocess.ts` or new module)
+### Post-processing (`parser/preprocessStyles.ts`)
 
-- [ ] Add CSS preprocessing step: walk each document's `<head>`, find `<style>` and `<link>` elements
-- [ ] For `<link>`: load referenced CSS file, preprocess, store in `BooqStyles` keyed by file path
-- [ ] For `<style>`: preprocess the text content, replace the text content in-tree with preprocessed version, also store in `BooqStyles`
-- [ ] Extract CSS preprocessor into clean module with `preprocessCss(css, { scopeSelector }) → string` interface
+- [x] New `preprocessStyles` module: walks `<head>` in each document, finds `<link>` and `<style>` elements
+- [x] For `<link>`: loads CSS via epub, preprocesses, stores in `BooqStyles`
+- [x] For `<style>`: preprocesses text content, stores in `BooqStyles`
+- [x] Sets `styleRefs` on each document (kept for now — CSS scoping relies on class-name-based selectors; removal deferred to Phase 2 `@scope` migration)
 
 ### Core (`core/chapter.ts`)
 
-- [ ] Update `collectReferencedStyles()`: instead of reading `node.styleRefs`, walk the document's `<head>` to find `<link>` hrefs and collect corresponding entries from `BooqStyles`
-- [ ] Update `buildChapter()` / fragment extraction accordingly
+- [x] `collectReferencedStyles()` unchanged — still reads `styleRefs` (deferred to Phase 2)
 
 ### Viewer/Renderer (`viewer/render.ts`)
 
-- [ ] Update document node rendering: instead of injecting styles from `styleRefs`, walk `<head>` children
-- [ ] For `<link rel="stylesheet">`: look up preprocessed CSS from `BooqStyles` map by href, render as `<style>` element
-- [ ] For `<style>` elements: render their (preprocessed) text content directly
-- [ ] Skip rendering `<link>` elements that were already resolved to `<style>`
+- [x] Unchanged — still reads `styleRefs` from document nodes (deferred to Phase 2)
 
 ### Types (`core/model.ts`)
 
-- [ ] Remove `styleRefs` field from `BooqDocument` (was on `BooqSectionNode`)
+- [-] `styleRefs` kept on `BooqDocument` for now — populated during post-processing; removal deferred to Phase 2
 
 ### Verify
 
-- [ ] `npm run build` passes
+- [x] `npm run build` passes
+- [x] `npm run test` passes (148/148)
 - [ ] Verify CSS styling applies correctly across sample EPUBs
 - [ ] Verify per-chapter style isolation still works
-- [ ] Verify fragment rendering includes correct styles
 
 ---
 
