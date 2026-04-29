@@ -1,18 +1,25 @@
 import { BooqDocument, BooqChildNode, BooqPath, isElementNode, pathToString, mapChildNodes } from '../core'
 import { resolveRelativePath } from './path'
 
-export function scopeIdsAndResolveHrefs(documents: BooqDocument[]): BooqDocument[] {
-    // Build path lookup using original (unscoped) IDs — must happen before scoping
-    const pathMap = buildPathMap(documents)
+// Maps "fileName#id" → BooqPath. Built from original unscoped IDs.
+export type HrefToPathMap = Map<string, BooqPath>
 
-    return documents.map((doc, index) => {
+export type ScopeIdsResult = {
+    documents: BooqDocument[],
+    hrefToPathMap: HrefToPathMap,
+}
+
+export function scopeIdsAndResolveHrefs(documents: BooqDocument[]): ScopeIdsResult {
+    const hrefToPathMap = buildHrefToPathMap(documents)
+
+    const scoped = documents.map((doc, index) => {
         const prefix = scopePrefix(index, doc.fileName)
         return {
             ...doc,
             children: mapChildNodes(doc.children, node => {
                 if (!isElementNode(node)) return node
                 const scopedId = node.id ? `${prefix}--${node.id}` : undefined
-                const refPathAttr = resolveHrefToRefPath(node.attributes?.href, doc.fileName, pathMap)
+                const refPathAttr = resolveHrefToRefPath(node.attributes?.href, doc.fileName, hrefToPathMap)
                 return {
                     ...node,
                     id: scopedId ?? node.id,
@@ -23,12 +30,14 @@ export function scopeIdsAndResolveHrefs(documents: BooqDocument[]): BooqDocument
             }),
         }
     })
+
+    return { documents: scoped, hrefToPathMap }
 }
 
-// Build lookup table mapping "fileName#id" → BooqPath.
-// Uses original unscoped IDs. Also used by TOC resolution.
-export function buildPathMap(documents: BooqDocument[]): Map<string, BooqPath> {
-    const map = new Map<string, BooqPath>()
+// --- private ---
+
+function buildHrefToPathMap(documents: BooqDocument[]): HrefToPathMap {
+    const map: HrefToPathMap = new Map()
     for (let docIndex = 0; docIndex < documents.length; docIndex++) {
         const doc = documents[docIndex]
         collectIdPaths(doc.children, [docIndex], doc.fileName, map)
@@ -36,7 +45,7 @@ export function buildPathMap(documents: BooqDocument[]): Map<string, BooqPath> {
     return map
 }
 
-function collectIdPaths(nodes: BooqChildNode[], basePath: BooqPath, fileName: string, map: Map<string, BooqPath>): void {
+function collectIdPaths(nodes: BooqChildNode[], basePath: BooqPath, fileName: string, map: HrefToPathMap): void {
     for (let i = 0; i < nodes.length; i++) {
         const node = nodes[i]
         if (!isElementNode(node)) continue
@@ -54,12 +63,12 @@ function collectIdPaths(nodes: BooqChildNode[], basePath: BooqPath, fileName: st
 function resolveHrefToRefPath(
     href: string | undefined,
     fileName: string,
-    pathMap: Map<string, BooqPath>,
+    hrefToPathMap: HrefToPathMap,
 ): string | undefined {
     if (!href) return undefined
     const key = resolveToKey(href, fileName)
     if (!key) return undefined
-    const path = pathMap.get(key)
+    const path = hrefToPathMap.get(key)
     if (!path) return undefined
     return pathToString(path)
 }

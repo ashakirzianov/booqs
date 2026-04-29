@@ -3,9 +3,9 @@ import { Epub } from './epub'
 import { EpubSection, parseDocument } from './section'
 import { buildToc } from './toc'
 import { preprocess } from './preprocess'
-import { preprocessStyles } from './preprocessStyles'
 import { extactBooqMeta } from './metadata'
 import { Diagnoser } from 'booqs-epub'
+
 
 // TODO: make sync again
 export async function processEpub(epub: Epub, diags: Diagnoser): Promise<Booq | undefined> {
@@ -32,17 +32,15 @@ export async function processEpub(epub: Epub, diags: Diagnoser): Promise<Booq | 
         documents.push(document)
     }
 
-    const styles = await preprocessStyles(documents, epub, diags)
+    const { documents: preprocessed, styles, hrefToPathMap } = await preprocess(documents, epub, diags)
 
-    const length = nodesLength(documents)
+    const length = nodesLength(preprocessed)
     const metaFromMetadata = await extactBooqMeta(epub, diags)
     const meta = {
         ...metaFromMetadata,
         length,
     }
-    const toc = await buildToc(documents, epub, diags)
-
-    const preprocessed = preprocess(documents)
+    const toc = await buildToc(preprocessed, epub, hrefToPathMap, diags)
 
     return {
         content: preprocessed,
