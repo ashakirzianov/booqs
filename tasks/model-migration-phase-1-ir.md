@@ -217,45 +217,66 @@ Move ID scoping and href resolution from parser to post-processing. Use new scop
 
 ### Post-processing (`parser/scopeIds.ts`)
 
-- [x] New `scopeIdsAndResolveHrefs` step: scopes IDs using `booqs-{spineIndex}-{basename}--{originalId}` scheme
-- [x] Builds transient `"fileName#id" → BooqPath` map
-- [x] Adds `data-booqs-ref-path` attribute on elements with internal `href` targets
-- [x] Handles same-file (`#id`) and cross-file (`file.xhtml#id`) references
-- [x] Integrated into `preprocess.ts` pipeline (replaces `resolveRefs`)
+- [x] `scopeIdsAndResolveHrefs`: scopes IDs using `booqs-{spineIndex}-{basename}--{originalId}` scheme
+- [x] Builds transient `HrefToPathMap` (`"fileName#id" → BooqPath`), returned alongside documents
+- [x] Rewrites internal `href` to `#scopedId` for browser-native in-range scroll
+- [x] Adds `data-booqs-ref-path` attribute for renderer to decide in-range vs out-of-range
+- [x] Uses `fileName → docIndex` map to compute scoped IDs deterministically (no separate scopedId map needed)
+
+### Href resolution (`parser/href.ts`)
+
+- [x] New `resolveHref(href, baseFileName)` utility — canonical resolution for all EPUB-internal hrefs
+- [x] Handles `#id`, `file.xhtml#id`, `../file.xhtml#id`, proper `../` traversal at any depth
+- [x] Replaces `resolveRelativePath` (deleted `parser/path.ts`) and ad-hoc heuristics in `toc.ts`
+- [x] `hrefToKey()` produces canonical map keys
+
+### Preprocessing pipeline (`parser/process.ts`)
+
+- [x] Unified `processDocuments()` returns `{ documents, styles, hrefToPathMap }`
+- [x] `hrefToPathMap` built once, shared between `scopeIdsAndResolveHrefs` and `buildToc`
 
 ### TOC (`parser/toc.ts`)
 
-- [x] Uses `buildHrefToPathMap` from `scopeIds.ts` for href → path resolution
-- [x] No longer depends on `transformHref` or `findPathForId`
+- [x] Uses shared `hrefToPathMap` from preprocessing (no duplicate tree walk)
+- [x] Stores scoped `id` on TOC items (for future ID-based navigation)
+- [x] TOC href resolution via `resolveHref` — TODO for proper base path from `booqs-epub` (backlog item added)
 
 ### Viewer/Renderer (`viewer/render.ts`)
 
-- [x] `getProps()` reads `data-booqs-ref-path` attribute, parses to `BooqPath`
-- [x] Same in-range vs out-of-range logic: in-range → `#pathToId`, out-of-range → `hrefForPath`
-- [x] `hrefForPath` callback kept — still needed for cross-chapter navigation
+- [x] Elements get `data-booqs-path` for path tracking, preserve scoped `id` from EPUB attributes
+- [x] Augmentation spans get both `data-booqs-path` and `id=pathToId`
+- [x] In-range links use already-rewritten `href="#scopedId"` (browser-native scroll)
+- [x] Out-of-range links use `hrefForPath` callback (cross-chapter navigation)
+- [x] `mapElementName()` skips `<head>`, `<link>`, `<script>`, `<meta>`, `<title>` during rendering
+
+### Selection and scroll (`viewer/selection.ts`, `viewer/scroll.ts`, `viewer/misc.ts`)
+
+- [x] Selection reads `data-booqs-path` via `dataset` instead of `pathFromId(id)`
+- [x] Scroll tracking reads `data-booqs-path` from paragraph elements
+- [x] `useScrollToPath` uses `querySelector('[data-booqs-path="..."]')` instead of `getElementById`
 
 ### Core
 
 - [x] Removed `ref` field from `BooqElement` type
-- [x] `findPathForId` kept — still used by `scopeIds.ts` (could be optimized later)
+- [x] Removed `id` field from `BooqElement` — id is now just an attribute
+- [x] Exported `mapChildNodes` from `core/node.ts`
+- [x] New `core/attributes.ts` — single source of truth for all custom `data-*` attribute names
+- [x] Convention documented in CLAUDE.md
 
 ### Parser cleanup
 
-- [x] Deleted `parserUtils.ts` (`transformHref`)
-- [x] Deleted `refs.ts` (`resolveRefs`)
-- [x] Updated `preprocess.ts` — uses `scopeIdsAndResolveHrefs` instead of `resolveRefs`
-
-### Design note
-
-Browser-native `#id` navigation doesn't work for cross-chapter links in a paginated reader (target ID not on page). Kept path-based approach via `data-booqs-ref-path` attribute. Design doc updated to reflect this.
+- [x] Deleted `parserUtils.ts`, `refs.ts`, `path.ts`
+- [x] Renamed `preprocess.ts` → `process.ts`, `preprocessStyles.ts` → `styles.ts`
+- [x] Simplified `section.ts` — `processAttributes` removed, `processId` removed
 
 ### Verify
 
 - [x] `npm run build` passes
 - [x] `npm run test` passes (148/148)
-- [ ] Verify in-book links navigate correctly
-- [ ] Verify TOC navigation works
-- [ ] Verify no ID collisions across chapters
+- [x] Selection works
+- [x] In-book links navigate correctly
+- [x] TOC navigation works
+- [ ] Verify no ID collisions across chapters (manual check with book that has repeated IDs)
 
 ---
 
