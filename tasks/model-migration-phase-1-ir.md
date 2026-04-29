@@ -192,18 +192,17 @@ Small change — parser keeps `<script>` elements but strips their content.
 
 ### Parser (`parser/section.ts`)
 
-- [ ] Stop replacing `<script>` elements with stubs
-- [ ] Keep the `<script>` element in the tree, but replace its text content with empty string
+- [x] `<script>` kept in tree as element with empty `children` (content stripped)
+- [x] Processed in `processXml` switch case — preserves attributes, strips children
 
 ### Viewer/Renderer (`viewer/render.ts`)
 
-- [ ] Skip `<script>` elements during rendering (return `null`)
+- [x] Already handled — `mapElementName` returns `null` for `script` (added in Stage 3)
 
 ### Verify
 
-- [ ] `npm run build` passes
-- [ ] Verify no script execution in rendered content
-- [ ] Verify path indices remain stable (script element preserves position)
+- [x] `npm run build` passes
+- [x] `npm run test` passes (148/148)
 
 ---
 

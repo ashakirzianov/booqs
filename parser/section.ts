@@ -45,13 +45,14 @@ async function processXml(element: XmlElement, env: Env): Promise<BooqChildNode>
 
     const name = nameOf(element)
     switch (name) {
-        case 'script':
-            env.diags.push({
-                message: `script node in epub`,
-                severity: 'info',
-                data: { xml: xml2string(element) },
-            })
-            return stub()
+        case 'script': {
+            const { name: scriptName, attributes: scriptAttrs } = asObject(element)
+            return {
+                name: scriptName ?? 'script',
+                attributes: scriptAttrs,
+                children: [],
+            }
+        }
         case undefined:
             return stub()
         default:
