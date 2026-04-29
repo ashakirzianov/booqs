@@ -140,10 +140,65 @@ Options, ranked:
 - **iframes:** rejected — cross-boundary selection is a hard requirement, theming is harder, and we're already in a WebView on native.
 - **Shadow DOM:** rejected for the same selection reason, with less severity.
 
+## Decided Architecture (Phase 2)
+
+Decisions made during Phase 2 planning, superseding the "Recommended Architecture" section above where they differ.
+
+### CSS processing pipeline
+
+Terminology: "processing" (not "pre/post-processing") — consistent with Phase 1 conventions.
+
+**Server-side (`parser/styles.ts` + `parser/css.ts`):**
+
+1. Walk each document's `<head>` elements.
+2. For `<link rel="stylesheet">`: load CSS from EPUB, process it (root selector rewriting, color stripping, `@scope` wrapping), store in `BooqStyles` keyed by **canonical fileName** (e.g., `OEBPS/styles/main.css`). Rewrite the `<link>`'s `href` attribute to the canonical fileName so the client can look it up.
+3. For inline `<style>` elements: process the text content in-place through the same pipeline (root selectors, color stripping, `@scope` wrapping). Leave the element in the tree.
+4. `styleRefs` removed from `BooqDocument` — the `<head>` elements are the references.
+
+**CSS processing (`parser/css.ts`):**
+
+- `postcss-prefix-selector` replaced with `@scope` wrapping.
+- Root selector rewriting: `html`, `body`, `:root` → `:scope`.
+- Color stripping stays (same `rewriteColorsPlugin` behavior — strip `color`, `background`, `background-color` from non-global selectors).
+
+**Client-side rendering (`viewer/render.ts`):**
+
+- `<head>` maps to `<div>` instead of being skipped.
+- Inside `<head>`, most children still skipped (`<meta>`, `<title>`, `<script>`).
+- `<link rel="stylesheet">` rendered as a `<style>` element with content looked up from `BooqStyles[href]`.
+- Inline `<style>` elements rendered as-is (already processed and `@scope`-wrapped on the server).
+- Document `<section>` wrappers no longer need class names from `styleRefs`.
+
+### Per-document style isolation
+
+Each document in a fragment gets its own `<section>` wrapper with a spine-index-based identifier (e.g., `data-doc="3"`). All CSS for that document — both linked and inline — is wrapped in `@scope ([data-doc="3"])` so styles from Doc A don't bleed into Doc B when a fragment spans multiple documents.
+
+This replaces the current class-name-based isolation (where each `<section>` gets a generated class like `booqs-ref-styles-main-css` and CSS is prefixed with `.booqs-ref-styles-main-css`).
+
+### Shared stylesheet deduplication
+
+`BooqStyles` is keyed by canonical fileName, so a `book.css` referenced by 30 chapters is stored once. However, it is **rendered once per document** that references it (each with a different `@scope` selector targeting that document's wrapper).
+
+For the normal case (fragment with 1-3 chapters), this is negligible. For full-book rendering (30+ chapters), it's wasteful but unlikely to be a bottleneck — EPUB stylesheets are small (5-20KB), and `@scope` limits style matching to each document's subtree.
+
+**Future optimization** (not implemented now): when multiple documents reference the same CSS file, emit it once with a combined scope selector: `@scope ([data-doc="0"]), ([data-doc="1"]), ([data-doc="2"]) { ... }`.
+
+### Color stripping strategy
+
+Colors are stripped from EPUB CSS rules (non-global selectors) and from inline `style` attributes. This is necessary for dark mode — CSS custom properties can't help when the EPUB explicitly sets `background: #fff` or `color: #333`. The theme's colors flow through where author colors are stripped.
+
+Inline `style` attribute sanitization: strip `color`, `background`, `background-color` (and potentially `font-family`) during processing. Keep layout properties (margins, alignment, etc.).
+
+### What changes from the "Recommended Architecture" section
+
+- **`BooqStyles` stays** — keyed by canonical fileName instead of generated prefix. Design doc suggested it could potentially be eliminated; we keep it to avoid bloating the tree with duplicated CSS for shared stylesheets.
+- **Per-document `@scope` isolation** — the design doc left this as an open question. We're doing it, scoped by spine index.
+- **`<head>` rendered as `<div>`** — instead of being skipped entirely. This lets the renderer discover `<link>` and `<style>` references by walking the tree.
+- **Color stripping preserved** — the design doc focused on inline style sanitization. We also keep CSS rule color stripping (existing behavior).
+
 ## Open Questions / Future Work
 
 - Verify no global naked tag selectors in app CSS before the specificity change bites.
-- Decide whether per-spine-item `@scope` isolation is worth the extra structure, or whether hoisting all `<style>` content into one stylesheet is good enough in practice.
 - Enumerate which EPUB CSS properties actually need sanitizing for Next.js (may be a different list than for native).
 
 ## See also
