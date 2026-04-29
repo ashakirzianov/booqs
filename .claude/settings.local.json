@@ -42,7 +42,8 @@
       "WebFetch(domain:www.npmjs.com)",
       "WebFetch(domain:platform.openai.com)",
       "WebFetch(domain:help.openai.com)",
-      "Bash(git checkout:*)"
+      "Bash(git checkout:*)",
+      "Bash(npx jest:*)"
     ]
   },
   "enableAllProjectMcpServers": false

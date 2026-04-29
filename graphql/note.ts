@@ -5,7 +5,7 @@ import { DbNote } from '@/backend/notes'
 import { DbUser } from '@/backend/users'
 import {
     BooqId, positionForPath, textForRange,
-    getExpandedRange, nodesForRange, collectReferencedStyles,
+    getExpandedRange, buildFragment,
 } from '@/core'
 
 export type NoteParent = DbNote
@@ -37,14 +37,7 @@ export const noteResolver: IResolvers<NoteParent, ResolverContext> = {
                 start: parent.start_path,
                 end: parent.end_path,
             })
-            const nodes = nodesForRange(booq.content, expandedRange)
-            const styles = collectReferencedStyles(nodes, booq.styles)
-            return {
-                start: expandedRange.start,
-                end: expandedRange.end,
-                nodes,
-                styles,
-            }
+            return buildFragment(booq.content, booq.styles, expandedRange)
         },
         async position(parent, _, { booqLoader }) {
             const booq = await booqLoader.load(parent.booq_id as BooqId)

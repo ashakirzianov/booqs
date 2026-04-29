@@ -1,18 +1,12 @@
 import {
-    BooqNode, BooqStyles, Booq, BooqPath, nodesForRange, pathLessThan,
+    Booq, BooqPath, pathLessThan,
 } from '@/core'
+import { BooqFragment, buildFragment } from './fragment'
 
 export type BooqAnchor = {
     path: BooqPath,
     title: string | undefined,
     position: number,
-}
-
-export type BooqFragment = {
-    start: BooqPath,
-    end: BooqPath,
-    nodes: BooqNode[],
-    styles: BooqStyles,
 }
 
 export type BooqChapter = {
@@ -31,11 +25,6 @@ export function buildChapter({ booq, path }: {
         : fullBooqChapter(booq)
 }
 
-// TODO: Phase 2 Stage 2 — walk <head> for <link> elements, collect by canonical fileName
-export function collectReferencedStyles(_nodes: BooqNode[], allStyles: BooqStyles): BooqStyles {
-    return allStyles
-}
-
 function fullBooqChapter(booq: Booq): BooqChapter {
     return {
         previous: undefined,
@@ -45,12 +34,10 @@ function fullBooqChapter(booq: Booq): BooqChapter {
             title: undefined,
             position: 0,
         },
-        fragment: {
+        fragment: buildFragment(booq.content, booq.styles, {
             start: [0],
             end: [booq.content.length],
-            nodes: booq.content,
-            styles: booq.styles,
-        },
+        }),
     }
 }
 
@@ -74,20 +61,13 @@ function chapterForPath(booq: Booq, path: BooqPath): BooqChapter {
     }
 
     const end = next?.path ?? [booq.content.length]
-    const nodes = nodesForRange(booq.content, {
-        start: current.path,
-        end,
-    })
-    const styles = collectReferencedStyles(nodes, booq.styles)
 
     return {
         previous, current, next,
-        fragment: {
+        fragment: buildFragment(booq.content, booq.styles, {
             start: current.path,
             end,
-            nodes,
-            styles,
-        },
+        }),
     }
 }
 

@@ -1,6 +1,6 @@
 'use server'
 import {
-    BooqPath, buildChapter,
+    BooqPath, buildChapter, buildFragment,
     BooqId,
     BooqMetadata,
     BooqStyles,
@@ -9,8 +9,6 @@ import {
     BooqRange,
     BooqNode,
     getExpandedRange,
-    nodesForRange,
-    collectReferencedStyles,
 } from '@/core'
 import { userForId } from '@/backend/users'
 import { booqIdsInCollections } from '@/backend/collections'
@@ -203,11 +201,11 @@ export async function getExpandedFragments(booqId: BooqId, ranges: BooqRange[]):
 
     return ranges.map(range => {
         const expandedRange = getExpandedRange(booq.content, range)
-        const nodes = nodesForRange(booq.content, expandedRange)
+        const fragment = buildFragment(booq.content, booq.styles, expandedRange)
 
         return {
-            nodes,
-            styles: collectReferencedStyles(nodes, booq.styles),
+            nodes: fragment.nodes,
+            styles: fragment.styles,
             range: expandedRange,
         }
     })
