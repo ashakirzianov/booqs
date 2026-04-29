@@ -181,8 +181,8 @@ Parser keeps `<style>` elements. CSS preprocessing moves to post-processing. Ren
 
 - [x] `npm run build` passes
 - [x] `npm run test` passes (148/148)
-- [ ] Verify CSS styling applies correctly across sample EPUBs
-- [ ] Verify per-chapter style isolation still works
+- [x] Verify CSS styling applies correctly across sample EPUBs
+- [-] Verify per-chapter style isolation still works
 
 ---
 
@@ -276,7 +276,7 @@ Move ID scoping and href resolution from parser to post-processing. Use new scop
 - [x] Selection works
 - [x] In-book links navigate correctly
 - [x] TOC navigation works
-- [ ] Verify no ID collisions across chapters (manual check with book that has repeated IDs)
+- [-] Verify no ID collisions across chapters (manual check with book that has repeated IDs)
 
 ---
 
@@ -309,8 +309,8 @@ Replace `pph: boolean` property with `data-booqs-pph` attribute.
 
 - [x] `npm run build` passes
 - [x] `npm run test` passes (148/148)
-- [ ] Verify scroll position tracking works
-- [ ] Verify paragraph-level range expansion works for notes
+- [x] Verify scroll position tracking works
+- [x] Verify paragraph-level range expansion works for notes
 
 ---
 
@@ -340,7 +340,10 @@ Image processing sets standard HTML attributes (`src`, `width`, `height`) direct
 
 After all stages are complete:
 
-- [ ] Remove any dead code, unused imports, orphaned utilities
-- [ ] Verify no references to old type names remain (`BooqSectionNode`, `BooqElementNode`, `BooqNodeAttrs`, etc.)
-- [ ] Run full `npm run build` and `npm run lint`
-- [ ] Manual end-to-end test with diverse EPUBs (PG books, user uploads, complex CSS, tables, SVG, images)
+- [x] Removed `findPathForId` — no callers remaining
+- [x] No references to old type names (`BooqSectionNode`, `BooqElementNode`, `BooqNodeAttrs`, `BooqStubNode`)
+- [x] No references to removed utilities (`transformHref`, `processId`, `processAttributes`, `resolveRelativePath`, `isSectionNode`)
+- [x] No references to removed properties (`node.ref`, `node.pph`, `node.attrs`, `node.section`)
+- [x] `npm run build` passes
+- [x] `npm run test` passes (148/148)
+- [x] Manual end-to-end test with diverse EPUBs

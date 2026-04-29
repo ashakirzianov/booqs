@@ -120,22 +120,6 @@ export function nodesForRange(nodes: BooqNode[], range: BooqRange, emptyStubs?: 
     return result
 }
 
-export function findPathForId(nodes: BooqNode[], targetId: string): BooqPath | undefined {
-    for (let idx = 0; idx < nodes.length; idx++) {
-        const node = nodes[idx]
-        if (isElementNode(node) && node.attributes?.id === targetId) {
-            return [idx]
-        }
-        const children = nodeChildren(node)
-        if (children) {
-            const path = findPathForId(children, targetId)
-            if (path) {
-                return [idx, ...path]
-            }
-        }
-    }
-    return undefined
-}
 
 export function stubNode(length: number): BooqNode {
     return length > 0
