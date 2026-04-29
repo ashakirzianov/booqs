@@ -10,7 +10,7 @@ import { flatten } from 'lodash'
 import { XmlElement, attributesOf } from './xmlTree'
 import { Diagnoser } from 'booqs-epub'
 
-export function preprocessCss(cssString: string, options: {
+export function processCss(cssString: string, options: {
     prefix: string,
 }) {
     return postcss()

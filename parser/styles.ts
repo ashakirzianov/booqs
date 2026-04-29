@@ -4,7 +4,7 @@ import { resolveRelativePath } from './path'
 import { processCss } from './css'
 import { Diagnoser } from 'booqs-epub'
 
-export async function preprocessStyles(documents: BooqDocument[], epub: Epub, diags: Diagnoser): Promise<BooqStyles> {
+export async function processStyles(documents: BooqDocument[], epub: Epub, diags: Diagnoser): Promise<BooqStyles> {
     const styles: BooqStyles = {}
     for (const doc of documents) {
         const styleRefs: string[] = []
