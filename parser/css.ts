@@ -3,22 +3,36 @@ import {
 } from 'css'
 import { compile, is } from 'css-select'
 import postcss, { Plugin } from 'postcss'
-import prefixer from 'postcss-prefix-selector'
 import { selectorSpecificity, compare } from '@csstools/selector-specificity'
 import selectorParser from 'postcss-selector-parser'
 import { flatten } from 'lodash'
 import { XmlElement, attributesOf } from './xmlTree'
 import { Diagnoser } from 'booqs-epub'
 
-export function processCss(cssString: string, options: {
-    prefix: string,
-}) {
+export function processCss(cssString: string) {
     return postcss()
         .use(rewriteColorsPlugin())
-        .use(prefixer({
-            prefix: `.${options.prefix}`,
-        }))
+        .use(rewriteRootSelectorsPlugin())
         .process(cssString).css
+}
+
+function rewriteRootSelectorsPlugin(): Plugin {
+    const rootSelectors = ['html', 'body', ':root']
+    return {
+        postcssPlugin: 'rewrite-root-selectors',
+        Rule(rule) {
+            if (!rule.selectors) return
+            rule.selectors = rule.selectors.map(selector => {
+                for (const root of rootSelectors) {
+                    if (selector === root) return ':scope'
+                    if (selector.startsWith(root + ' ')) {
+                        return ':scope' + selector.slice(root.length)
+                    }
+                }
+                return selector
+            })
+        },
+    }
 }
 
 function rewriteColorsPlugin(): Plugin {
@@ -30,9 +44,10 @@ function rewriteColorsPlugin(): Plugin {
             }
             const parent = decl.parent
             if (parent?.type === 'rule') {
-                const rule = parent as Rule
+                // postcss Rule type — safe to access selectors
+                const rule = parent as postcss.Rule
                 const isGlobal = rule.selectors?.some(
-                    selector => ['*', 'html', 'body'].includes(selector),
+                    selector => ['*', ':scope'].includes(selector),
                 )
                 if (!isGlobal) {
                     decl.remove()

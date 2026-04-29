@@ -13,7 +13,6 @@ export type BooqElementAttributes = {
 }
 export type BooqDocument = {
     fileName: string,
-    styleRefs?: string[],
     children: BooqChildNode[],
     error?: string,
     name?: undefined,

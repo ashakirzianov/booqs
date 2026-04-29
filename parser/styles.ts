@@ -1,97 +1,79 @@
-import { BooqDocument, BooqStyles, BooqChildNode } from '../core'
+import { BooqDocument, BooqStyles, BooqChildNode, isElementNode, mapChildNodesAsync } from '../core'
 import { Epub } from './epub'
 import { resolveHref } from './href'
 import { processCss } from './css'
 import { Diagnoser } from 'booqs-epub'
 
-export async function processStyles(documents: BooqDocument[], epub: Epub, diags: Diagnoser): Promise<BooqStyles> {
+export type ProcessStylesResult = {
+    documents: BooqDocument[],
+    styles: BooqStyles,
+}
+
+export async function processStyles(documents: BooqDocument[], epub: Epub, diags: Diagnoser): Promise<ProcessStylesResult> {
     const styles: BooqStyles = {}
-    for (const doc of documents) {
-        const styleRefs: string[] = []
-        const head = findHead(doc)
-        if (head) {
-            for (const child of head.children) {
-                if (typeof child === 'string' || child === null || !child.name) continue
-                if (child.name === 'link') {
-                    const key = await processLinkElement(child, doc.fileName, styles, epub, diags)
-                    if (key) styleRefs.push(key)
-                } else if (child.name === 'style') {
-                    const key = processStyleElement(child, doc.fileName, styles, diags)
-                    if (key) styleRefs.push(key)
-                }
-            }
-        }
-        if (styleRefs.length > 0) {
-            doc.styleRefs = styleRefs
-        }
-    }
-    return styles
+    const transformed = await Promise.all(documents.map(async doc => ({
+        ...doc,
+        children: await mapChildNodesAsync(doc.children, node => transformStyleNode(node, doc.fileName, styles, epub, diags)),
+    })))
+    return { documents: transformed, styles }
 }
 
-function findHead(doc: BooqDocument): { children: BooqChildNode[] } | undefined {
-    for (const child of doc.children) {
-        if (typeof child === 'string' || child === null) continue
-        if (child.name === 'html') {
-            for (const htmlChild of child.children) {
-                if (typeof htmlChild === 'string' || htmlChild === null) continue
-                if (htmlChild.name === 'head') return htmlChild
-            }
-        }
-        if (child.name === 'head') return child
+async function transformStyleNode(node: BooqChildNode, docFileName: string, styles: BooqStyles, epub: Epub, diags: Diagnoser): Promise<BooqChildNode> {
+    if (!isElementNode(node)) return node
+
+    if (node.name === 'link') {
+        return transformLinkElement(node, docFileName, styles, epub, diags)
     }
-    return undefined
+    if (node.name === 'style') {
+        return transformStyleElement(node, docFileName, diags)
+    }
+    return node
 }
 
-async function processLinkElement(
-    link: { attributes?: Record<string, string | undefined> },
-    fileName: string,
+async function transformLinkElement(
+    link: BooqChildNode & { name: string },
+    docFileName: string,
     styles: BooqStyles,
     epub: Epub,
     diags: Diagnoser,
-): Promise<string | undefined> {
+): Promise<BooqChildNode> {
     const rel = link.attributes?.rel
-    if (rel?.toLowerCase() !== 'stylesheet') return undefined
+    if (rel?.toLowerCase() !== 'stylesheet') return link
 
     const href = link.attributes?.href
     if (!href) {
         diags.push({ message: 'missing href on stylesheet link' })
-        return undefined
+        return link
     }
 
-    const resolved = resolveHref(href, fileName)
-    if (!resolved) return undefined
-    const key = generateSelectorPrefix(`ref-${resolved.fileName}`)
-    if (!(key in styles)) {
-        const content = await epub.loadTextFile(resolved.fileName)
+    const resolved = resolveHref(href, docFileName)
+    if (!resolved) return link
+    const canonicalFileName = resolved.fileName
+
+    if (!(canonicalFileName in styles)) {
+        const content = await epub.loadTextFile(canonicalFileName)
         if (!content) {
             diags.push({ message: `couldn't load css: ${href}` })
-            return undefined
+            return link
         }
-        styles[key] = processCss(content, { prefix: key })
+        styles[canonicalFileName] = processCss(content)
     }
-    return key
+
+    return { ...link, attributes: { ...link.attributes, href: canonicalFileName } }
 }
 
-function processStyleElement(
-    style: { children: BooqChildNode[] },
-    fileName: string,
-    styles: BooqStyles,
+function transformStyleElement(
+    style: BooqChildNode & { name: string; children: BooqChildNode[] },
+    docFileName: string,
     diags: Diagnoser,
-): string | undefined {
+): BooqChildNode {
     const text = typeof style.children[0] === 'string' ? style.children[0] : undefined
     if (!text) {
-        diags.push({ message: `empty or missing text in <style> element in ${fileName}` })
-        return undefined
+        diags.push({ message: `empty or missing text in <style> element in ${docFileName}` })
+        return style
     }
-    const key = generateSelectorPrefix(`inline-${fileName}`)
-    if (key in styles) {
-        styles[key] += '\n' + processCss(text, { prefix: key })
-    } else {
-        styles[key] = processCss(text, { prefix: key })
+    if (style.children.length > 1) {
+        diags.push({ message: `<style> element with multiple children in ${docFileName} - only the first child will be processed` })
     }
-    return key
-}
-
-function generateSelectorPrefix(id: string) {
-    return `booqs-${id.replace(/[^a-zA-Z0-9]/g, '-')}`
+    return { ...style, children: [processCss(text)] }
 }

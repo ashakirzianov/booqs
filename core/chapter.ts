@@ -1,5 +1,5 @@
 import {
-    BooqNode, BooqStyles, Booq, BooqPath, nodesForRange, pathLessThan, isDocumentNode, visitNodes,
+    BooqNode, BooqStyles, Booq, BooqPath, nodesForRange, pathLessThan,
 } from '@/core'
 
 export type BooqAnchor = {
@@ -31,22 +31,9 @@ export function buildChapter({ booq, path }: {
         : fullBooqChapter(booq)
 }
 
-export function collectReferencedStyles(nodes: BooqNode[], allStyles: BooqStyles): BooqStyles {
-    const refs = new Set<string>()
-    visitNodes(nodes, node => {
-        if (isDocumentNode(node) && node.styleRefs) {
-            for (const ref of node.styleRefs) {
-                refs.add(ref)
-            }
-        }
-    })
-    const styles: BooqStyles = {}
-    for (const ref of refs) {
-        if (allStyles[ref] !== undefined) {
-            styles[ref] = allStyles[ref]
-        }
-    }
-    return styles
+// TODO: Phase 2 Stage 2 — walk <head> for <link> elements, collect by canonical fileName
+export function collectReferencedStyles(_nodes: BooqNode[], allStyles: BooqStyles): BooqStyles {
+    return allStyles
 }
 
 function fullBooqChapter(booq: Booq): BooqChapter {

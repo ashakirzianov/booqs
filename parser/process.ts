@@ -11,8 +11,8 @@ export type ProcessResult = {
 }
 
 export async function processDocuments(documents: BooqDocument[], epub: Epub, diags: Diagnoser): Promise<ProcessResult> {
-    const styles = await processStyles(documents, epub, diags)
-    const { documents: scoped, hrefToPathMap } = scopeIdsAndResolveHrefs(documents)
+    const { documents: styled, styles } = await processStyles(documents, epub, diags)
+    const { documents: scoped, hrefToPathMap } = scopeIdsAndResolveHrefs(styled)
     const marked = markParagraphs(scoped)
     return {
         documents: marked,

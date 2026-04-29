@@ -60,6 +60,19 @@ export function mapChildNodes(nodes: BooqChildNode[], transform: (node: BooqChil
     })
 }
 
+export async function mapChildNodesAsync(nodes: BooqChildNode[], transform: (node: BooqChildNode) => Promise<BooqChildNode>): Promise<BooqChildNode[]> {
+    return Promise.all(nodes.map(async node => {
+        const mapped = await transform(node)
+        if (mapped?.children) {
+            return {
+                ...mapped,
+                children: await mapChildNodesAsync(mapped.children, transform),
+            }
+        }
+        return mapped
+    }))
+}
+
 export function nodeForPath(nodes: BooqNode[], path: BooqPath): BooqNode | undefined {
     const [head, ...tail] = path
     if (head === undefined || head >= nodes.length || head < 0) {

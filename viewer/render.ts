@@ -64,28 +64,20 @@ function renderNode(node: BooqNode, ctx: RenderContext): ReactNode {
     }
 }
 
+// TODO: Phase 2 Stage 2 — add data-booqs-doc, render <head> as <div>,
+// resolve <link> stylesheets from BooqStyles, wrap in @scope
 function renderDocumentNode(node: BooqDocument, ctx: RenderContext): ReactNode {
     const children = node.children ? renderNodes(node.children, {
         ...ctx,
         parent: undefined,
     }) : null
-    const styleNodes = (node.styleRefs ?? [])
-        .map((ref: string) => ctx.styles[ref])
-        .filter(Boolean)
-        .map((css: string, i: number) => createElement(
-            'style',
-            { key: `${pathToString(ctx.path)}-style-${i}` },
-            css,
-        ))
-    const className = node.styleRefs?.join(' ')
     return createElement(
         'section',
         {
             key: pathToString(ctx.path),
             [DATA_PATH]: pathToString(ctx.path),
-            className,
         },
-        [...styleNodes, ...(children ?? [])],
+        children,
     )
 }
 
