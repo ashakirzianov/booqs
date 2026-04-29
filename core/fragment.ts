@@ -1,4 +1,4 @@
-import { BooqDocument, BooqChildNode, BooqNode, BooqRange, BooqPath, BooqStyles, BooqElement } from './model'
+import { BooqDocument, BooqChildNode, BooqNode, BooqRange, BooqPath, BooqStyles, BooqElement, Booq } from './model'
 import { isElementNode, isContainerNode, stubNode, isStubNode } from './node'
 import { nodeLength } from './position'
 
@@ -9,15 +9,15 @@ export type BooqFragment = {
     styles: BooqStyles,
 }
 
-export function buildFragment(documents: BooqDocument[], allStyles: BooqStyles, range: BooqRange): BooqFragment {
+export function buildFragment({ content, styles }: Pick<Booq, 'content' | 'styles'>, range: BooqRange): BooqFragment {
     const [startDoc, ...startTail] = range.start
     const [endDoc, ...endTail] = range.end
     const actualStart = startDoc ?? 0
-    const actualEnd = endDoc ?? documents.length
+    const actualEnd = endDoc ?? content.length
 
     const nodes: BooqNode[] = []
-    for (let idx = 0; idx < documents.length; idx++) {
-        const doc = documents[idx]
+    for (let idx = 0; idx < content.length; idx++) {
+        const doc = content[idx]
         const beforeRange = idx < actualStart
         const afterRange = endTail.length > 0 ? idx > actualEnd : idx >= actualEnd
         const atStart = idx === actualStart
@@ -39,8 +39,13 @@ export function buildFragment(documents: BooqDocument[], allStyles: BooqStyles, 
         }
     }
 
-    const styles = collectStyles(nodes, allStyles)
-    return { start: range.start, end: range.end, nodes, styles }
+    const referencedStyles = collectStyles(nodes, styles)
+    return {
+        start: range.start,
+        end: range.end,
+        nodes,
+        styles: referencedStyles,
+    }
 }
 
 // Recursively slice children, preserving structurally important nodes

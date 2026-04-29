@@ -58,7 +58,7 @@ describe('buildFragment', () => {
                 htmlDoc('ch2.xhtml', [link('styles.css')], [el('p', [text('Chapter 2')])]),
             ]
             const allStyles: BooqStyles = { 'styles.css': 'p { margin: 0; }' }
-            const fragment = buildFragment(documents, allStyles, {
+            const fragment = buildFragment({ content: documents, styles: allStyles }, {
                 start: [0],
                 end: [2],
             })
@@ -77,7 +77,7 @@ describe('buildFragment', () => {
                 htmlDoc('ch2.xhtml', [], [el('p', [text('Chapter 2')])]),
                 htmlDoc('ch3.xhtml', [], [el('p', [text('Chapter 3')])]),
             ]
-            const fragment = buildFragment(documents, {}, {
+            const fragment = buildFragment({ content: documents, styles: {} }, {
                 start: [1],
                 end: [2],
             })
@@ -99,7 +99,7 @@ describe('buildFragment', () => {
                 htmlDoc('ch1.xhtml', [], [el('p', [text('Chapter 1')])]),
                 htmlDoc('ch2.xhtml', [], [el('p', [text('Chapter 2')])]),
             ]
-            const fragment = buildFragment(documents, {}, {
+            const fragment = buildFragment({ content: documents, styles: {} }, {
                 start: [0],
                 end: [1],
             })
@@ -115,7 +115,7 @@ describe('buildFragment', () => {
                 htmlDoc('ch2.xhtml', [link('styles.css')], [el('p', [text('Chapter 2')])]),
             ]
             const allStyles: BooqStyles = { 'styles.css': 'p {}' }
-            const fragment = buildFragment(documents, allStyles, {
+            const fragment = buildFragment({ content: documents, styles: allStyles }, {
                 start: [0],
                 end: [1],
             })
@@ -139,7 +139,7 @@ describe('buildFragment', () => {
             const allStyles: BooqStyles = { 'styles.css': 'p { margin: 0; }' }
 
             // Range starts at the third <p> — head is before range
-            const fragment = buildFragment(documents, allStyles, {
+            const fragment = buildFragment({ content: documents, styles: allStyles }, {
                 start: [0, 0, 1, 2],
                 end: [1],
             })
@@ -172,7 +172,7 @@ describe('buildFragment', () => {
                 ),
             ]
 
-            const fragment = buildFragment(documents, {}, {
+            const fragment = buildFragment({ content: documents, styles: {} }, {
                 start: [0, 0, 1, 1],
                 end: [1],
             })
@@ -198,7 +198,7 @@ describe('buildFragment', () => {
             ]
 
             // Range starts at the second <p> — <style> is before range
-            const fragment = buildFragment(documents, {}, {
+            const fragment = buildFragment({ content: documents, styles: {} }, {
                 start: [0, 0, 1, 2],
                 end: [1],
             })
@@ -225,7 +225,7 @@ describe('buildFragment', () => {
                 'c.css': '.c {}',
             }
 
-            const fragment = buildFragment(documents, allStyles, {
+            const fragment = buildFragment({ content: documents, styles: allStyles }, {
                 start: [1],
                 end: [2],
             })
@@ -245,7 +245,7 @@ describe('buildFragment', () => {
             ]
             const allStyles: BooqStyles = { 'shared.css': 'body { margin: 0; }' }
 
-            const fragment = buildFragment(documents, allStyles, {
+            const fragment = buildFragment({ content: documents, styles: allStyles }, {
                 start: [0],
                 end: [2],
             })
@@ -265,7 +265,7 @@ describe('buildFragment', () => {
 
             // Start at second <p> (path: [0, 0, 1, 1])
             // doc[0] -> html[0] -> body[1] -> p[1]
-            const fragment = buildFragment(documents, {}, {
+            const fragment = buildFragment({ content: documents, styles: {} }, {
                 start: [0, 0, 1, 1],
                 end: [1],
             })
@@ -288,7 +288,7 @@ describe('buildFragment', () => {
             ]
 
             // End at second <p> (path: [0, 0, 1, 1])
-            const fragment = buildFragment(documents, {}, {
+            const fragment = buildFragment({ content: documents, styles: {} }, {
                 start: [0],
                 end: [0, 0, 1, 1],
             })
@@ -316,7 +316,7 @@ describe('buildFragment', () => {
                 'c.css': '.c {}',
             }
 
-            const fragment = buildFragment(documents, allStyles, {
+            const fragment = buildFragment({ content: documents, styles: allStyles }, {
                 start: [0],
                 end: [2],
             })
@@ -343,7 +343,7 @@ describe('buildFragment', () => {
                 doc('ch1.xhtml', [el('html', [el('body', [el('p', [text('content')])])])]),
             ]
 
-            const fragment = buildFragment(documents, {}, {
+            const fragment = buildFragment({ content: documents, styles: {} }, {
                 start: [0],
                 end: [1],
             })
@@ -357,7 +357,7 @@ describe('buildFragment', () => {
                 htmlDoc('ch1.xhtml', [link('missing.css')], [el('p', [text('content')])]),
             ]
 
-            const fragment = buildFragment(documents, {}, {
+            const fragment = buildFragment({ content: documents, styles: {} }, {
                 start: [0],
                 end: [1],
             })

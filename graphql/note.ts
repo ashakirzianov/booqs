@@ -37,7 +37,7 @@ export const noteResolver: IResolvers<NoteParent, ResolverContext> = {
                 start: parent.start_path,
                 end: parent.end_path,
             })
-            return buildFragment(booq.content, booq.styles, expandedRange)
+            return buildFragment(booq, expandedRange)
         },
         async position(parent, _, { booqLoader }) {
             const booq = await booqLoader.load(parent.booq_id as BooqId)

@@ -34,7 +34,7 @@ function fullBooqChapter(booq: Booq): BooqChapter {
             title: undefined,
             position: 0,
         },
-        fragment: buildFragment(booq.content, booq.styles, {
+        fragment: buildFragment(booq, {
             start: [0],
             end: [booq.content.length],
         }),
@@ -64,7 +64,7 @@ function chapterForPath(booq: Booq, path: BooqPath): BooqChapter {
 
     return {
         previous, current, next,
-        fragment: buildFragment(booq.content, booq.styles, {
+        fragment: buildFragment(booq, {
             start: current.path,
             end,
         }),
