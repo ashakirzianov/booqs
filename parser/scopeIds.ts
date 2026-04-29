@@ -11,6 +11,7 @@ export type ScopeIdsResult = {
 
 export function scopeIdsAndResolveHrefs(documents: BooqDocument[]): ScopeIdsResult {
     const hrefToPathMap = buildHrefToPathMap(documents)
+    const fileNameToIndex = new Map(documents.map((doc, i) => [doc.fileName, i]))
 
     const scoped = documents.map((doc, index) => {
         const prefix = scopePrefix(index, doc.fileName)
@@ -20,13 +21,16 @@ export function scopeIdsAndResolveHrefs(documents: BooqDocument[]): ScopeIdsResu
                 if (!isElementNode(node)) return node
                 const originalId = node.attributes?.id
                 const scopedId = originalId ? `${prefix}--${originalId}` : undefined
-                const refPathAttr = resolveHrefToRefPath(node.attributes?.href, doc.fileName, hrefToPathMap)
+                const hrefResult = resolveInternalHref(node.attributes?.href, doc.fileName, hrefToPathMap, fileNameToIndex)
                 return {
                     ...node,
                     attributes: {
                         ...node.attributes,
                         ...(scopedId ? { id: scopedId } : {}),
-                        ...(refPathAttr ? { 'data-booqs-ref-path': refPathAttr } : {}),
+                        ...(hrefResult ? {
+                            href: `#${hrefResult.scopedId}`,
+                            'data-booqs-ref-path': hrefResult.path,
+                        } : {}),
                     },
                 }
             }),
@@ -63,17 +67,22 @@ function collectIdPaths(nodes: BooqChildNode[], basePath: BooqPath, fileName: st
     }
 }
 
-function resolveHrefToRefPath(
+function resolveInternalHref(
     href: string | undefined,
     fileName: string,
     hrefToPathMap: HrefToPathMap,
-): string | undefined {
+    fileNameToIndex: Map<string, number>,
+): { path: string, scopedId: string } | undefined {
     if (!href) return undefined
     const resolved = resolveHref(href, fileName)
-    if (!resolved) return undefined
-    const path = hrefToPathMap.get(hrefToKey(resolved))
+    if (!resolved || !resolved.id) return undefined
+    const key = hrefToKey(resolved)
+    const path = hrefToPathMap.get(key)
     if (!path) return undefined
-    return pathToString(path)
+    const targetDocIndex = fileNameToIndex.get(resolved.fileName)
+    if (targetDocIndex === undefined) return undefined
+    const scopedId = `${scopePrefix(targetDocIndex, resolved.fileName)}--${resolved.id}`
+    return { path: pathToString(path), scopedId }
 }
 
 function scopePrefix(docIndex: number, fileName: string): string {
