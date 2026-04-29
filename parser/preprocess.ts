@@ -1,9 +1,9 @@
 import { BooqDocument } from '../core'
-import { resolveRefs } from './refs'
+import { scopeIdsAndResolveHrefs } from './scopeIds'
 import { markParagraphs } from './pph'
 
 export function preprocess(documents: BooqDocument[]): BooqDocument[] {
-    const resolved = resolveRefs(documents)
-    const marked = markParagraphs(resolved)
+    const scoped = scopeIdsAndResolveHrefs(documents)
+    const marked = markParagraphs(scoped)
     return marked
 }

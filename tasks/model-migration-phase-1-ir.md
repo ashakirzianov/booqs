@@ -212,43 +212,50 @@ Move ID scoping and href resolution from parser to post-processing. Use new scop
 
 ### Parser (`parser/section.ts`)
 
-- [ ] Stop scoping IDs in `processId()` — store original `id` values as-is
-- [ ] Stop rewriting `href` via `transformHref()` — store original `href` values as-is
+- [x] Removed `processId()` — IDs stored as-is from XML
+- [x] Removed `transformHref()` — hrefs stored as-is from XML
 
-### Post-processing (new or expanded module)
+### Post-processing (`parser/scopeIds.ts`)
 
-- [ ] Implement ID scoping step: walk all documents, rewrite `id` attributes using `booqs-{spineIndex}-{basename}--{originalId}` scheme
-- [ ] Build transient lookup table: `"fileName#id"` → scoped ID string
-- [ ] Implement href resolution step: walk all documents, rewrite internal `href` attributes to `#scopedId` using the lookup table
-- [ ] Handle edge cases: href to a file without fragment (`chapter2.xhtml` without `#id`), relative paths
+- [x] New `scopeIdsAndResolveHrefs` step: scopes IDs using `booqs-{spineIndex}-{basename}--{originalId}` scheme
+- [x] Builds transient `"fileName#id" → BooqPath` map
+- [x] Adds `data-booqs-ref-path` attribute on elements with internal `href` targets
+- [x] Handles same-file (`#id`) and cross-file (`file.xhtml#id`) references
+- [x] Integrated into `preprocess.ts` pipeline (replaces `resolveRefs`)
 
 ### TOC (`parser/toc.ts`)
 
-- [ ] Update TOC construction to use the transient lookup table for resolving entry hrefs to scoped IDs
-- [ ] TOC items still store `BooqPath` — lookup table maps `fileName#id` → path as before
+- [x] Uses `buildHrefToPathMap` from `scopeIds.ts` for href → path resolution
+- [x] No longer depends on `transformHref` or `findPathForId`
 
 ### Viewer/Renderer (`viewer/render.ts`)
 
-- [ ] Remove `node.ref` handling from `getProps()` — links now use plain `href="#scopedId"` which browsers handle natively
-- [ ] Remove `hrefForPath` callback — no longer needed
+- [x] `getProps()` reads `data-booqs-ref-path` attribute, parses to `BooqPath`
+- [x] Same in-range vs out-of-range logic: in-range → `#pathToId`, out-of-range → `hrefForPath`
+- [x] `hrefForPath` callback kept — still needed for cross-chapter navigation
 
 ### Core
 
-- [ ] Remove `ref` field from `BooqElement` type (or verify it was never added to new type)
-- [ ] Remove or repurpose `findPathForId()` if no longer needed post-migration
+- [x] Removed `ref` field from `BooqElement` type
+- [x] `findPathForId` kept — still used by `scopeIds.ts` (could be optimized later)
 
 ### Parser cleanup
 
-- [ ] Remove `transformHref()` from `parserUtils.ts`
-- [ ] Remove `resolveRefs()` from `refs.ts`
-- [ ] Update `preprocess.ts` to remove `resolveRefs` from the pipeline
+- [x] Deleted `parserUtils.ts` (`transformHref`)
+- [x] Deleted `refs.ts` (`resolveRefs`)
+- [x] Updated `preprocess.ts` — uses `scopeIdsAndResolveHrefs` instead of `resolveRefs`
+
+### Design note
+
+Browser-native `#id` navigation doesn't work for cross-chapter links in a paginated reader (target ID not on page). Kept path-based approach via `data-booqs-ref-path` attribute. Design doc updated to reflect this.
 
 ### Verify
 
-- [ ] `npm run build` passes
-- [ ] Verify in-book links navigate correctly (click footnote ref → scrolls to footnote)
+- [x] `npm run build` passes
+- [x] `npm run test` passes (148/148)
+- [ ] Verify in-book links navigate correctly
 - [ ] Verify TOC navigation works
-- [ ] Verify no ID collisions across chapters (check a book with repeated IDs)
+- [ ] Verify no ID collisions across chapters
 
 ---
 

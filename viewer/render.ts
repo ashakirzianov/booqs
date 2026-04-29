@@ -1,6 +1,6 @@
 import { ReactNode, createElement } from 'react'
 import {
-    BooqElement, BooqDocument, BooqNode, BooqStyles, pathToString,
+    BooqElement, BooqDocument, BooqNode, BooqStyles, pathToString, pathFromString,
     pathInRange, samePath, pathLessThan, BooqPath, BooqRange, pathToId,
     assertNever, isTextNode, isStubNode, isElementNode, isDocumentNode,
 } from '@/core'
@@ -142,18 +142,20 @@ function getProps(node: BooqElement, {
     const className = node.pph
         ? (normalized?.className ? `booqs-pph ${normalized.className}` : 'booqs-pph')
         : normalized?.className
+    const refPath = parseRefPath(node.attributes?.['data-booqs-ref-path'])
     return {
         ...normalized,
         id: pathToId(path),
         className,
         key: pathToString(path),
         style: node.attributes?.style ? parseInlineStyle(node.attributes.style) : undefined,
-        href: node.ref
+        'data-booqs-ref-path': undefined,
+        href: refPath
             ? (
-                pathInRange(node.ref, range)
-                    ? `#${pathToId(node.ref)}`
+                pathInRange(refPath, range)
+                    ? `#${pathToId(refPath)}`
                     : hrefForPath ?
-                        hrefForPath(node.ref)
+                        hrefForPath(refPath)
                         : node.attributes?.href
             )
             : node.attributes?.href,
@@ -286,6 +288,11 @@ function breakPath(path: BooqPath) {
     const head = path.slice(0, path.length - 1)
     const tail = path[path.length - 1]
     return [head, tail] as const
+}
+
+function parseRefPath(value: string | undefined): BooqPath | undefined {
+    if (!value) return undefined
+    return pathFromString(value)
 }
 
 function parseInlineStyle(style: string): Record<string, string> {

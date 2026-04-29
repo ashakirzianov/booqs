@@ -2,7 +2,6 @@ import { BooqElement, BooqChildNode, textNode, BooqDocument } from '../core'
 import {
     xmlStringParser, XmlElement, xml2string, nameOf, textOf, asObject,
 } from './xmlTree'
-import { transformHref } from './parserUtils'
 import { Diagnoser } from 'booqs-epub'
 
 export type EpubSection = {
@@ -72,15 +71,11 @@ async function processRegularXml(element: XmlElement, env: Env): Promise<BooqChi
         })
         return stub()
     }
-    const { id, href, ...rest } = attributes ?? {}
-    const processedAttrs = {
-        ...rest,
-        ...(href !== undefined ? { href: transformHref(href) } : {}),
-    }
+    const { id, ...rest } = attributes ?? {}
     const result: BooqElement = {
         name,
-        id: processId(id, env),
-        attributes: Object.keys(processedAttrs).length > 0 ? processedAttrs : undefined,
+        id,
+        attributes: Object.keys(rest).length > 0 ? rest : undefined,
         children: children?.length
             ? await processXmls(children, env)
             : [],
@@ -92,11 +87,4 @@ async function processRegularXml(element: XmlElement, env: Env): Promise<BooqChi
 function stub(): BooqChildNode {
     return null
 }
-
-function processId(id: string | undefined, env: Env) {
-    return id
-        ? `${env.fileName}/${id}`
-        : undefined
-}
-
 
