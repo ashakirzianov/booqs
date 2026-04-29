@@ -171,7 +171,7 @@ Terminology: "processing" (not "pre/post-processing") — consistent with Phase 
 
 ### Per-document style isolation
 
-Each document in a fragment gets its own `<section>` wrapper with a spine-index-based identifier (e.g., `data-doc="3"`). All CSS for that document — both linked and inline — is wrapped in `@scope ([data-doc="3"])` so styles from Doc A don't bleed into Doc B when a fragment spans multiple documents.
+Each document in a fragment gets its own `<section>` wrapper with a spine-index-based identifier (e.g., `data-booqs-doc="3"`). All CSS for that document — both linked and inline — is wrapped in `@scope ([data-booqs-doc="3"])` so styles from Doc A don't bleed into Doc B when a fragment spans multiple documents.
 
 This replaces the current class-name-based isolation (where each `<section>` gets a generated class like `booqs-ref-styles-main-css` and CSS is prefixed with `.booqs-ref-styles-main-css`).
 
@@ -181,7 +181,7 @@ This replaces the current class-name-based isolation (where each `<section>` get
 
 For the normal case (fragment with 1-3 chapters), this is negligible. For full-book rendering (30+ chapters), it's wasteful but unlikely to be a bottleneck — EPUB stylesheets are small (5-20KB), and `@scope` limits style matching to each document's subtree.
 
-**Future optimization** (not implemented now): when multiple documents reference the same CSS file, emit it once with a combined scope selector: `@scope ([data-doc="0"]), ([data-doc="1"]), ([data-doc="2"]) { ... }`.
+**Future optimization** (not implemented now): when multiple documents reference the same CSS file, emit it once with a combined scope selector: `@scope ([data-booqs-doc="0"]), ([data-booqs-doc="1"]), ([data-booqs-doc="2"]) { ... }`.
 
 ### Color stripping strategy
 
