@@ -1,7 +1,7 @@
 'use client'
 import { useEffect } from 'react'
 import { DATASET_PATH } from '@/core'
-import { BooqContentID } from './BooqContent'
+import { BOOQ_CONTENT_ID } from './BooqContent'
 
 // TODO: remove this
 export function useOnBooqClick(callback?: () => void) {
@@ -25,5 +25,5 @@ function isEventOnContent(event: Event): boolean {
     if (target.dataset?.[DATASET_PATH]) {
         return true
     }
-    return target.id === BooqContentID
+    return target.id === BOOQ_CONTENT_ID
 }

@@ -13,6 +13,8 @@ export type Augmentation = {
     underline?: 'solid' | 'dashed',
 }
 
+export const PARAGRAPH_CLASS = 'booqs-pph'
+
 type RenderContext = {
     path: BooqPath,
     range: BooqRange,
@@ -142,7 +144,7 @@ function getProps(node: BooqElement, {
 }: RenderContext) {
     const normalized = normalizeAttributes(node.attributes)
     const className = isMarkedAsParagraph(node)
-        ? (normalized?.className ? `booqs-pph ${normalized.className}` : 'booqs-pph')
+        ? (normalized?.className ? `${PARAGRAPH_CLASS} ${normalized.className}` : PARAGRAPH_CLASS)
         : normalized?.className
     const refPath = parseRefPath(node.attributes?.[DATA_REF_PATH])
     return {

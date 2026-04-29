@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import { Augmentation, renderNodes } from './render'
 import { BooqNode, BooqStyles, BooqPath, BooqRange } from '@/core'
 
-export const BooqContentID = 'booq-root'
+export const BOOQ_CONTENT_ID = 'booqs-content-container'
 export default function BooqContent({
     nodes, styles, range, augmentations,
     onAugmentationClick, hrefForPath,
@@ -15,7 +15,7 @@ export default function BooqContent({
     hrefForPath?: (path: BooqPath) => string,
 }) {
     return useMemo(function () {
-        return <div id={BooqContentID} className='container'>
+        return <div id={BOOQ_CONTENT_ID} className='container'>
             {
                 renderNodes(nodes, {
                     path: [],
