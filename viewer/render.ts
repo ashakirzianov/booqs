@@ -3,6 +3,7 @@ import {
     BooqElement, BooqDocument, BooqNode, BooqStyles, pathToString, pathFromString,
     pathInRange, samePath, pathLessThan, BooqPath, BooqRange, pathToId,
     assertNever, isTextNode, isStubNode, isElementNode, isDocumentNode,
+    DATA_PATH, DATA_REF_PATH, DATA_AUGMENTATION_ID,
 } from '@/core'
 
 export type Augmentation = {
@@ -79,7 +80,7 @@ function renderDocumentNode(node: BooqDocument, ctx: RenderContext): ReactNode {
         'section',
         {
             key: pathToString(ctx.path),
-            'data-booqs-path': pathToString(ctx.path),
+            [DATA_PATH]: pathToString(ctx.path),
             className,
         },
         [...styleNodes, ...(children ?? [])],
@@ -104,12 +105,12 @@ function renderTextNode(text: string, {
         'span',
         {
             key: pathToId(path),
-            'data-booqs-path': pathToString(path),
+            [DATA_PATH]: pathToString(path),
         },
         spans.map(span => {
             const augmentationId = span.id
             const augmentationProps = augmentationId ? {
-                'data-augmentation-id': augmentationId,
+                [DATA_AUGMENTATION_ID]: augmentationId,
                 style: {
                     background: span.color,
                     cursor: 'pointer',
@@ -127,7 +128,7 @@ function renderTextNode(text: string, {
                 {
                     key: pathToId(span.path),
                     id: pathToId(span.path),
-                    'data-booqs-path': pathToString(span.path),
+                    [DATA_PATH]: pathToString(span.path),
                     ...augmentationProps,
                 },
                 span.text,
@@ -143,11 +144,11 @@ function getProps(node: BooqElement, {
     const className = node.pph
         ? (normalized?.className ? `booqs-pph ${normalized.className}` : 'booqs-pph')
         : normalized?.className
-    const refPath = parseRefPath(node.attributes?.['data-booqs-ref-path'])
+    const refPath = parseRefPath(node.attributes?.[DATA_REF_PATH])
     return {
         ...normalized,
-        'data-booqs-path': pathToString(path),
-        'data-booqs-ref-path': undefined,
+        [DATA_PATH]: pathToString(path),
+        [DATA_REF_PATH]: undefined,
         className,
         key: pathToString(path),
         style: node.attributes?.style ? parseInlineStyle(node.attributes.style) : undefined,

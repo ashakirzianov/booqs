@@ -1,4 +1,4 @@
-import { BooqDocument, BooqChildNode, BooqPath, isElementNode, pathToString, mapChildNodes } from '../core'
+import { BooqDocument, BooqChildNode, BooqPath, isElementNode, pathToString, mapChildNodes, DATA_REF_PATH } from '../core'
 import { resolveHref, hrefToKey } from './href'
 
 // Maps "fileName#id" → BooqPath. Built from original unscoped IDs.
@@ -29,7 +29,7 @@ export function scopeIdsAndResolveHrefs(documents: BooqDocument[]): ScopeIdsResu
                         ...(scopedId ? { id: scopedId } : {}),
                         ...(hrefResult ? {
                             href: `#${hrefResult.scopedId}`,
-                            'data-booqs-ref-path': hrefResult.path,
+                            [DATA_REF_PATH]: hrefResult.path,
                         } : {}),
                     },
                 }

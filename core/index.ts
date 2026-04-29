@@ -1,4 +1,5 @@
 export * from './chapter'
+export * from './attributes'
 export * from './misc'
 export * from './model'
 export * from './node'

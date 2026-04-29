@@ -1,4 +1,4 @@
-import { BooqRange, pathLessThan, pathFromString } from '@/core'
+import { BooqRange, pathLessThan, pathFromString, DATASET_PATH, DATA_AUGMENTATION_ID } from '@/core'
 
 export type BooqSelection = {
     range: BooqRange,
@@ -47,7 +47,7 @@ export function getSelectionElement(): VirtualElement | undefined {
 }
 
 export function getAugmentationElement(augmentationId: string): VirtualElement | undefined {
-    const elementsList = window.document.querySelectorAll(`span[data-augmentation-id='${augmentationId}']`)
+    const elementsList = window.document.querySelectorAll(`span[${DATA_AUGMENTATION_ID}='${augmentationId}']`)
     const elements = Array.from(elementsList)
     if (elements.length === 0) {
         return undefined
@@ -69,7 +69,7 @@ export function getAugmentationElement(augmentationId: string): VirtualElement |
 }
 
 export function getAugmentationText(augmentationId: string): string {
-    const elements = Array.from(window.document.querySelectorAll(`span[data-augmentation-id='${augmentationId}']`))
+    const elements = Array.from(window.document.querySelectorAll(`span[${DATA_AUGMENTATION_ID}='${augmentationId}']`))
     let text = ''
     for (const element of elements) {
         text += element.textContent
@@ -102,14 +102,14 @@ export function getBooqSelection(): BooqSelection | undefined {
 }
 
 function getSelectionPath(node: Node, offset: number) {
-    const pathAttr = (node as HTMLElement).dataset?.booqsPath
+    const pathAttr = (node as HTMLElement).dataset?.[DATASET_PATH]
     if (pathAttr) {
         const path = pathFromString(pathAttr)
         if (path) {
             return [...path, offset, 0]
         }
     } else if (node.parentElement) {
-        const parentPathAttr = node.parentElement.dataset?.booqsPath
+        const parentPathAttr = node.parentElement.dataset?.[DATASET_PATH]
         if (parentPathAttr) {
             const path = pathFromString(parentPathAttr)
             if (path) {
