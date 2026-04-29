@@ -318,29 +318,21 @@ Replace `pph: boolean` property with `data-booqs-pph` attribute.
 
 Move image dimension probing and CDN URL resolution to the post-processing pipeline with data attributes.
 
+### Decision: keep current approach
+
+Image processing sets standard HTML attributes (`src`, `width`, `height`) directly — no data attributes needed. These are standard attributes that any renderer needs, and moving them to data attributes would add a render-time step with no benefit. Image `src` is rewritten to CDN URL, `width`/`height` set from probed dimensions. This happens in `backend/parse.ts` after parsing.
+
 ### Backend (`backend/parse.ts`)
 
-- [ ] Refactor `normalizeImageSrcsInBooq()` into a post-processing step
-- [ ] For internal images: resolve path to CDN URL, store original path in `data-booqs-original-src`, store CDN URL in `src`
-- [ ] Probe image dimensions via `sharp`, store as `data-booqs-width` and `data-booqs-height` attributes
-- [ ] For external images (absolute URLs): leave `src` as-is, no data attributes
-
-### Viewer/Renderer (`viewer/render.ts`)
-
-- [ ] Read `data-booqs-width` and `data-booqs-height` to set image dimensions
-- [ ] Handle external vs internal images if needed
-
-### Post-processing pipeline
-
-- [ ] Integrate image processing into the post-processing pipeline alongside CSS, ID scoping, paragraph marking
-- [ ] Ensure image processing runs after ID scoping (image elements may have IDs)
+- [x] Replace `normalizeImageSrc` (hacky `../` stripping) with `resolveHref` per document — proper path resolution relative to each document's fileName
+- [-] Data attributes for dimensions — not needed, `width`/`height` are standard HTML attributes
+- [-] `data-booqs-original-src` — not needed for now
 
 ### Verify
 
-- [ ] `npm run build` passes
-- [ ] Verify images display with correct dimensions
-- [ ] Verify cover images load correctly
-- [ ] Verify SVG images with `xlink:href` work
+- [x] `npm run build` passes
+- [x] Verify images display with correct dimensions
+- [x] Verify cover images load correctly
 
 ---
 

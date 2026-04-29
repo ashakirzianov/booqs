@@ -1,6 +1,7 @@
 import { Booq, BooqId, isElementNode, visitNodes, mapDocumentNodes } from '@/core'
 import { parseEpub } from '@/parser'
 import { Epub, openEpubFile } from '@/parser/epub'
+import { resolveHref } from '@/parser/href'
 import { Diagnoser, Diagnostic } from 'booqs-epub'
 import { BooqImages, BooqImageDimensions, imageDimensions } from './images'
 import { BooqFile } from './library'
@@ -100,31 +101,31 @@ async function loadImages(booq: Booq, epub: Epub): Promise<BooqImages> {
     }
 }
 
-// Epub image srcs are relative to the XHTML file (e.g., "../Images/fig.jpg" from "Text/chapter.xhtml").
-// booqs-epub's resolveHref just concatenates basePath + href without resolving "..", so we strip
-// the prefix here. This works for the standard epub layout where all content lives under one root
-// directory (e.g., OEBPS/). It would break for deeply nested structures where "../" traverses
-// multiple levels — but that's uncommon in practice.
-function normalizeImageSrc(src: string): string {
-    while (src.startsWith('../')) {
-        src = src.substring('../'.length)
-    }
-    return src
-}
-
+// Resolve image srcs relative to each document's fileName using resolveHref.
 function normalizeImageSrcsInBooq(booq: Booq): void {
-    visitNodes(booq.content, node => {
-        if (isElementNode(node)) {
-            if (node.attributes?.src) {
-                node.attributes.src = normalizeImageSrc(node.attributes.src)
+    for (const doc of booq.content) {
+        visitNodes(doc.children, node => {
+            if (isElementNode(node)) {
+                if (node.attributes?.src) {
+                    const resolved = resolveHref(node.attributes.src, doc.fileName)
+                    if (resolved) {
+                        node.attributes.src = resolved.fileName
+                    }
+                }
+                if (node.attributes?.['xlink:href']) {
+                    const resolved = resolveHref(node.attributes['xlink:href'], doc.fileName)
+                    if (resolved) {
+                        node.attributes['xlink:href'] = resolved.fileName
+                    }
+                }
             }
-            if (node.attributes?.['xlink:href']) {
-                node.attributes['xlink:href'] = normalizeImageSrc(node.attributes['xlink:href'])
-            }
-        }
-    })
+        })
+    }
     if (booq.metadata.coverSrc) {
-        booq.metadata.coverSrc = normalizeImageSrc(booq.metadata.coverSrc)
+        const resolved = resolveHref(booq.metadata.coverSrc, '')
+        if (resolved) {
+            booq.metadata.coverSrc = resolved.fileName
+        }
     }
 }
 
