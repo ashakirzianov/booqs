@@ -50,6 +50,7 @@ export type TableOfContentsItem = {
     level: number,
     path: BooqPath,
     position: number,
+    id?: string,
 }
 export type TableOfContents = {
     title: string | undefined,

@@ -1,6 +1,6 @@
 import { Diagnoser } from 'booqs-epub'
 import {
-    BooqDocument, BooqPath, TableOfContentsItem, TableOfContents, positionForPath,
+    BooqDocument, BooqPath, TableOfContentsItem, TableOfContents, positionForPath, nodeForPath, isElementNode,
 } from '../core'
 import { Epub } from './epub'
 import { resolveHref, hrefToKey } from './href'
@@ -15,11 +15,14 @@ export async function buildToc(documents: BooqDocument[], file: Epub, hrefToPath
         if (epubTocItem.href) {
             const path = resolveTocHref(epubTocItem.href, hrefToPathMap)
             if (path) {
+                const node = nodeForPath(documents, path)
+                const id = isElementNode(node) ? node.id : undefined
                 items.push({
                     title: epubTocItem.label,
                     level: epubTocItem.level ?? 0,
                     position: positionForPath(documents, path),
                     path,
+                    id,
                 })
             } else {
                 diags.push({
