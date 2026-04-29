@@ -1,6 +1,6 @@
 import { BooqDocument, BooqStyles, BooqChildNode } from '../core'
 import { Epub } from './epub'
-import { resolveRelativePath } from './path'
+import { resolveHref } from './href'
 import { processCss } from './css'
 import { Diagnoser } from 'booqs-epub'
 
@@ -58,10 +58,11 @@ async function processLinkElement(
         return undefined
     }
 
-    const resolved = resolveRelativePath(href, fileName)
-    const key = generateSelectorPrefix(`ref-${resolved}`)
+    const resolved = resolveHref(href, fileName)
+    if (!resolved) return undefined
+    const key = generateSelectorPrefix(`ref-${resolved.fileName}`)
     if (!(key in styles)) {
-        const content = await epub.loadTextFile(resolved)
+        const content = await epub.loadTextFile(resolved.fileName)
         if (!content) {
             diags.push({ message: `couldn't load css: ${href}` })
             return undefined

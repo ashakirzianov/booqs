@@ -3,6 +3,7 @@ import {
     BooqDocument, BooqPath, TableOfContentsItem, TableOfContents, positionForPath,
 } from '../core'
 import { Epub } from './epub'
+import { hrefToKey } from './href'
 
 export async function buildToc(documents: BooqDocument[], file: Epub, hrefToPathMap: Map<string, BooqPath>, diags: Diagnoser): Promise<TableOfContents> {
     const items: TableOfContentsItem[] = []
@@ -12,7 +13,7 @@ export async function buildToc(documents: BooqDocument[], file: Epub, hrefToPath
     }
     for (const epubTocItem of toc) {
         if (epubTocItem.href) {
-            const path = resolveHrefToPath(epubTocItem.href, file, hrefToPathMap)
+            const path = resolveTocHref(epubTocItem.href, hrefToPathMap)
             if (path) {
                 items.push({
                     title: epubTocItem.label,
@@ -37,28 +38,18 @@ export async function buildToc(documents: BooqDocument[], file: Epub, hrefToPath
     }
 }
 
-function resolveHrefToPath(href: string, file: Epub, hrefToPathMap: Map<string, BooqPath>): BooqPath | undefined {
-    // TOC hrefs are relative to the epub root, not to a specific document.
-    // Try resolving as-is first (for absolute-ish paths), then try common patterns.
+// TOC hrefs are relative to the EPUB package root — same coordinate
+// space as document fileNames. Direct key lookup should work.
+function resolveTocHref(href: string, hrefToPathMap: Map<string, BooqPath>): BooqPath | undefined {
     const hashIndex = href.indexOf('#')
     if (hashIndex >= 0) {
-        const filePart = href.substring(0, hashIndex)
+        const fileName = href.substring(0, hashIndex)
         const id = href.substring(hashIndex + 1)
-        // Try the href file path directly as a key
-        const key = `${filePart}#${id}`
-        if (hrefToPathMap.has(key)) return hrefToPathMap.get(key)
-        // TOC hrefs might need resolution relative to epub base
-        // Try without leading path separators
-        const cleaned = filePart.replace(/^\/+/, '')
-        const cleanedKey = `${cleaned}#${id}`
-        if (hrefToPathMap.has(cleanedKey)) return hrefToPathMap.get(cleanedKey)
-    } else {
-        // No fragment — try to find the document itself
-        // This is a reference to the start of a document, not to a specific ID
-        // Look for any path that starts with this file
-        for (const [key, path] of hrefToPathMap) {
-            if (key.startsWith(`${href}#`)) return path
-        }
+        return hrefToPathMap.get(hrefToKey({ fileName, id }))
+    }
+    // No fragment — find the first ID in this document
+    for (const [key, path] of hrefToPathMap) {
+        if (key.startsWith(`${href}#`)) return path
     }
     return undefined
 }

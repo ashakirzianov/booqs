@@ -1,5 +1,5 @@
 import { BooqDocument, BooqChildNode, BooqPath, isElementNode, pathToString, mapChildNodes } from '../core'
-import { resolveRelativePath } from './path'
+import { resolveHref, hrefToKey } from './href'
 
 // Maps "fileName#id" → BooqPath. Built from original unscoped IDs.
 export type HrefToPathMap = Map<string, BooqPath>
@@ -66,28 +66,11 @@ function resolveHrefToRefPath(
     hrefToPathMap: HrefToPathMap,
 ): string | undefined {
     if (!href) return undefined
-    const key = resolveToKey(href, fileName)
-    if (!key) return undefined
-    const path = hrefToPathMap.get(key)
+    const resolved = resolveHref(href, fileName)
+    if (!resolved) return undefined
+    const path = hrefToPathMap.get(hrefToKey(resolved))
     if (!path) return undefined
     return pathToString(path)
-}
-
-function resolveToKey(href: string, currentFileName: string): string | undefined {
-    if (href.startsWith('http://') || href.startsWith('https://') || href.startsWith('mailto:')) {
-        return undefined
-    }
-    const hashIndex = href.indexOf('#')
-    if (hashIndex === 0) {
-        return `${currentFileName}${href}`
-    }
-    if (hashIndex > 0) {
-        const file = href.substring(0, hashIndex)
-        const id = href.substring(hashIndex + 1)
-        const resolved = resolveRelativePath(file, currentFileName)
-        return `${resolved}#${id}`
-    }
-    return undefined
 }
 
 function scopePrefix(docIndex: number, fileName: string): string {
