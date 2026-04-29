@@ -16,7 +16,7 @@ export async function buildToc(documents: BooqDocument[], file: Epub, hrefToPath
             const path = resolveTocHref(epubTocItem.href, hrefToPathMap)
             if (path) {
                 const node = nodeForPath(documents, path)
-                const id = isElementNode(node) ? node.id : undefined
+                const id = isElementNode(node) ? node.attributes?.id : undefined
                 items.push({
                     title: epubTocItem.label,
                     level: epubTocItem.level ?? 0,

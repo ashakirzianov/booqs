@@ -18,14 +18,16 @@ export function scopeIdsAndResolveHrefs(documents: BooqDocument[]): ScopeIdsResu
             ...doc,
             children: mapChildNodes(doc.children, node => {
                 if (!isElementNode(node)) return node
-                const scopedId = node.id ? `${prefix}--${node.id}` : undefined
+                const originalId = node.attributes?.id
+                const scopedId = originalId ? `${prefix}--${originalId}` : undefined
                 const refPathAttr = resolveHrefToRefPath(node.attributes?.href, doc.fileName, hrefToPathMap)
                 return {
                     ...node,
-                    id: scopedId ?? node.id,
-                    attributes: refPathAttr
-                        ? { ...node.attributes, 'data-booqs-ref-path': refPathAttr }
-                        : node.attributes,
+                    attributes: {
+                        ...node.attributes,
+                        ...(scopedId ? { id: scopedId } : {}),
+                        ...(refPathAttr ? { 'data-booqs-ref-path': refPathAttr } : {}),
+                    },
                 }
             }),
         }
@@ -50,8 +52,9 @@ function collectIdPaths(nodes: BooqChildNode[], basePath: BooqPath, fileName: st
         const node = nodes[i]
         if (!isElementNode(node)) continue
         const currentPath = [...basePath, i]
-        if (node.id) {
-            const key = `${fileName}#${node.id}`
+        const id = node.attributes?.id
+        if (id) {
+            const key = `${fileName}#${id}`
             if (!map.has(key)) {
                 map.set(key, currentPath)
             }

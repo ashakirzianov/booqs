@@ -21,7 +21,6 @@ export type BooqDocument = {
 }
 export type BooqElement = {
     name: string,
-    id?: string,
     children: BooqChildNode[],
     attributes?: BooqElementAttributes,
     /** Marks this node as a paragraph. Set by the parser's markParagraphs pass.

@@ -71,11 +71,9 @@ async function processRegularXml(element: XmlElement, env: Env): Promise<BooqChi
         })
         return stub()
     }
-    const { id, ...rest } = attributes ?? {}
     const result: BooqElement = {
         name,
-        id,
-        attributes: Object.keys(rest).length > 0 ? rest : undefined,
+        attributes: attributes && Object.keys(attributes).length > 0 ? attributes : undefined,
         children: children?.length
             ? await processXmls(children, env)
             : [],
