@@ -148,16 +148,18 @@ Decisions made during Phase 2 planning, superseding the "Recommended Architectur
 
 Terminology: "processing" (not "pre/post-processing") — consistent with Phase 1 conventions.
 
-**Server-side (`parser/styles.ts` + `parser/css.ts`):**
+**Server-side processing (`parser/styles.ts` + `parser/css.ts`):**
 
 1. Walk each document's `<head>` elements.
-2. For `<link rel="stylesheet">`: load CSS from EPUB, process it (root selector rewriting, color stripping, `@scope` wrapping), store in `BooqStyles` keyed by **canonical fileName** (e.g., `OEBPS/styles/main.css`). Rewrite the `<link>`'s `href` attribute to the canonical fileName so the client can look it up.
-3. For inline `<style>` elements: process the text content in-place through the same pipeline (root selectors, color stripping, `@scope` wrapping). Leave the element in the tree.
+2. For `<link rel="stylesheet">`: load CSS from EPUB, process it (root selector rewriting, color stripping — but **not** `@scope` wrapping), store in `BooqStyles` keyed by **canonical fileName** (e.g., `OEBPS/styles/main.css`). Rewrite the `<link>`'s `href` attribute to the canonical fileName so the client can look it up.
+3. For inline `<style>` elements: process the text content in-place (root selectors, color stripping — but **not** `@scope` wrapping). Leave the element in the tree.
 4. `styleRefs` removed from `BooqDocument` — the `<head>` elements are the references.
+
+`@scope` wrapping does **not** happen server-side because the scope selector is per-document (`[data-booqs-doc="N"]`) and `BooqStyles` stores CSS once per file (shared across documents).
 
 **CSS processing (`parser/css.ts`):**
 
-- `postcss-prefix-selector` replaced with `@scope` wrapping.
+- `postcss-prefix-selector` removed entirely.
 - Root selector rewriting: `html`, `body`, `:root` → `:scope`.
 - Color stripping stays (same `rewriteColorsPlugin` behavior — strip `color`, `background`, `background-color` from non-global selectors).
 
@@ -165,8 +167,8 @@ Terminology: "processing" (not "pre/post-processing") — consistent with Phase 
 
 - `<head>` maps to `<div>` instead of being skipped.
 - Inside `<head>`, most children still skipped (`<meta>`, `<title>`, `<script>`).
-- `<link rel="stylesheet">` rendered as a `<style>` element with content looked up from `BooqStyles[href]`.
-- Inline `<style>` elements rendered as-is (already processed and `@scope`-wrapped on the server).
+- `<link rel="stylesheet">` rendered as a `<style>` element: content looked up from `BooqStyles[href]` and wrapped in `@scope ([data-booqs-doc="N"]) { ... }`.
+- Inline `<style>` elements rendered wrapped in `@scope ([data-booqs-doc="N"]) { ... }` (content already processed on server, scoping added at render time).
 - Document `<section>` wrappers no longer need class names from `styleRefs`.
 
 ### Per-document style isolation

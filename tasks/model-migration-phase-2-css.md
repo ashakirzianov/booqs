@@ -4,24 +4,26 @@ Detailed task list for Phase 2 of the [Big Model Migration](model-migration.md).
 
 Each stage is an end-to-end change. The app must function on localhost after each stage. Test by loading EPUBs with varying CSS complexity, checking dark mode, and verifying style isolation.
 
-## Stage 1: Replace selector prefixing with `@scope` wrapping
+Key design point: `@scope` wrapping happens **client-side at render time**, not during server-side processing. This is because `BooqStyles` stores CSS once per file (shared across documents), but the `@scope` selector is per-document (`[data-booqs-doc="N"]`).
 
-Replace `postcss-prefix-selector` with `@scope` wrapping. Per-document isolation via spine-index-based scope selector.
+## Stage 1: Server-side CSS processing changes
+
+Replace `postcss-prefix-selector` with root selector rewriting and color stripping only. Change `BooqStyles` keys to canonical fileNames. Process inline `<style>` in-place. Remove `styleRefs`.
 
 ### CSS processing (`parser/css.ts`)
 
-- [ ] Replace `postcss-prefix-selector` call with `@scope` wrapping — wrap processed CSS in `@scope ([data-booqs-doc="{spineIndex}"]) { ... }`
+- [ ] Remove `postcss-prefix-selector` — no more selector rewriting
 - [ ] Add root selector rewriting: `html`, `body`, `:root` → `:scope` (as a postcss plugin or string transform)
-- [ ] Update `processCss` signature — accept `spineIndex: number` instead of `prefix: string`
+- [ ] Update `processCss` signature — no longer needs `prefix` parameter
 - [ ] Keep `rewriteColorsPlugin` unchanged
 
 ### Style processing (`parser/styles.ts`)
 
 - [ ] Key `BooqStyles` by canonical fileName (e.g., `OEBPS/styles/main.css`) instead of generated prefix
-- [ ] Pass spine index (document index) to `processCss` for the `@scope` selector
 - [ ] Rewrite `<link>` element's `href` attribute to canonical fileName in the document tree
-- [ ] For inline `<style>` elements: process text content in-place (root selectors, color stripping, `@scope` wrapping), leave in tree
+- [ ] For inline `<style>` elements: process text content in-place (root selectors, color stripping), leave in tree
 - [ ] Stop setting `styleRefs` on `BooqDocument`
+- [ ] Remove `generateSelectorPrefix` function
 
 ### Types (`core/model.ts`)
 
@@ -30,29 +32,32 @@ Replace `postcss-prefix-selector` with `@scope` wrapping. Per-document isolation
 ### Verify
 
 - [ ] `npm run build` passes
-- [ ] Verify CSS styling applies correctly (styles still scoped properly)
-- [ ] Verify dark mode works (color stripping still active)
+- [ ] (App will not display styles correctly until Stage 2 — renderer still reads `styleRefs`)
 
 ---
 
-## Stage 2: Update renderer to use `@scope` styles
+## Stage 2: Client-side `@scope` rendering
 
-Update the renderer to resolve styles from `<head>` elements instead of `styleRefs`, and render `<head>` as a container.
+Update the renderer to resolve styles from `<head>` elements, wrap in `@scope` at render time, and render `<head>` as a container.
 
 ### Viewer/Renderer (`viewer/render.ts`)
 
 - [ ] `renderDocumentNode`: remove `styleRefs`-based style injection
-- [ ] `renderDocumentNode`: add `data-booqs-doc="{spineIndex}"` attribute to `<section>` wrapper (where spineIndex is derived from the document's position in `ctx.path`)
+- [ ] `renderDocumentNode`: add `data-booqs-doc="{spineIndex}"` attribute to `<section>` wrapper (spineIndex derived from document's position in `ctx.path`)
 - [ ] `renderDocumentNode`: remove `className` from `<section>` wrapper (no longer needed for scoping)
 - [ ] Update `mapElementName`: map `<head>` to `<div>` instead of `null` (so its children are rendered)
 - [ ] Inside `<head>`, keep skipping `<meta>`, `<title>`, `<script>` (already skipped)
-- [ ] Render `<link rel="stylesheet">` as `<style>` element with content from `BooqStyles[href]`
-- [ ] Render inline `<style>` elements as-is (already processed on server)
+- [ ] Render `<link rel="stylesheet">` as `<style>` element: look up content from `BooqStyles[href]`, wrap in `@scope ([data-booqs-doc="N"]) { ... }`
+- [ ] Render inline `<style>` elements: wrap content in `@scope ([data-booqs-doc="N"]) { ... }` (content already processed on server)
 
 ### Core (`core/chapter.ts`)
 
 - [ ] Update `collectReferencedStyles` — walk `<head>` for `<link>` elements, collect by canonical fileName instead of `styleRefs`
 - [ ] Remove references to `styleRefs`
+
+### Core (`core/attributes.ts`)
+
+- [ ] Add `DATA_BOOQS_DOC` constant for `data-booqs-doc`
 
 ### Verify
 
@@ -85,13 +90,11 @@ Strip theme-affecting properties from inline `style` attributes during processin
 
 ## Stage 4: Cleanup and specificity audit
 
-Remove unused code, verify no regressions from specificity changes.
+Remove unused dependencies, verify no regressions from specificity changes.
 
 ### Cleanup
 
 - [ ] Remove `postcss-prefix-selector` dependency from `package.json`
-- [ ] Remove unused `prefix` parameter plumbing from CSS processing
-- [ ] Remove `generateSelectorPrefix` function from `parser/styles.ts`
 - [ ] Clean up any dead code paths related to old selector rewriting
 
 ### Specificity audit
