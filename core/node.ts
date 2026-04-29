@@ -42,7 +42,7 @@ export function mapDocumentNodes(documents: BooqDocument[], transform: (node: Bo
     }))
 }
 
-function mapChildNodes(nodes: BooqChildNode[], transform: (node: BooqChildNode) => BooqChildNode): BooqChildNode[] {
+export function mapChildNodes(nodes: BooqChildNode[], transform: (node: BooqChildNode) => BooqChildNode): BooqChildNode[] {
     return nodes.map(node => {
         const mapped = transform(node)
         if (mapped?.children) {

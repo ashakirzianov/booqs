@@ -1,4 +1,4 @@
-import { BooqDocument, BooqChildNode, BooqPath, isElementNode, pathToString } from '../core'
+import { BooqDocument, BooqChildNode, BooqPath, isElementNode, pathToString, mapChildNodes } from '../core'
 import { resolveRelativePath } from './path'
 
 export function scopeIdsAndResolveHrefs(documents: BooqDocument[]): BooqDocument[] {
@@ -9,7 +9,18 @@ export function scopeIdsAndResolveHrefs(documents: BooqDocument[]): BooqDocument
         const prefix = scopePrefix(index, doc.fileName)
         return {
             ...doc,
-            children: processChildren(doc.children, prefix, doc.fileName, pathMap),
+            children: mapChildNodes(doc.children, node => {
+                if (!isElementNode(node)) return node
+                const scopedId = node.id ? `${prefix}--${node.id}` : undefined
+                const refPathAttr = resolveHrefToRefPath(node.attributes?.href, doc.fileName, pathMap)
+                return {
+                    ...node,
+                    id: scopedId ?? node.id,
+                    attributes: refPathAttr
+                        ? { ...node.attributes, 'data-booqs-ref-path': refPathAttr }
+                        : node.attributes,
+                }
+            }),
         }
     })
 }
@@ -21,7 +32,6 @@ export function buildHrefToPathMap(documents: BooqDocument[]): Map<string, BooqP
 
 // --- private ---
 
-// Maps "fileName#id" → BooqPath by walking all documents.
 function buildPathMap(documents: BooqDocument[]): Map<string, BooqPath> {
     const map = new Map<string, BooqPath>()
     for (let docIndex = 0; docIndex < documents.length; docIndex++) {
@@ -46,55 +56,23 @@ function collectIdPaths(nodes: BooqChildNode[], basePath: BooqPath, fileName: st
     }
 }
 
-function processChildren(
-    nodes: BooqChildNode[],
-    prefix: string,
-    fileName: string,
-    pathMap: Map<string, BooqPath>,
-): BooqChildNode[] {
-    return nodes.map(node => {
-        if (typeof node === 'string' || node === null) return node
-        if (!isElementNode(node)) return node
-
-        const scopedId = node.id ? `${prefix}--${node.id}` : undefined
-        const hrefAttrs = resolveHrefAttributes(node.attributes?.href, fileName, pathMap)
-
-        return {
-            ...node,
-            id: scopedId ?? node.id,
-            attributes: hrefAttrs
-                ? { ...node.attributes, ...hrefAttrs }
-                : node.attributes,
-            children: processChildren(node.children, prefix, fileName, pathMap),
-        }
-    })
-}
-
-function resolveHrefAttributes(
+function resolveHrefToRefPath(
     href: string | undefined,
     fileName: string,
     pathMap: Map<string, BooqPath>,
-): { 'data-booqs-ref-path': string } | undefined {
+): string | undefined {
     if (!href) return undefined
-
     const key = resolveToKey(href, fileName)
     if (!key) return undefined
-
     const path = pathMap.get(key)
     if (!path) return undefined
-
-    return {
-        'data-booqs-ref-path': pathToString(path),
-    }
+    return pathToString(path)
 }
 
-// Resolve href to a "fileName#id" lookup key.
-// Returns undefined for external links.
 function resolveToKey(href: string, currentFileName: string): string | undefined {
     if (href.startsWith('http://') || href.startsWith('https://') || href.startsWith('mailto:')) {
         return undefined
     }
-
     const hashIndex = href.indexOf('#')
     if (hashIndex === 0) {
         return `${currentFileName}${href}`
