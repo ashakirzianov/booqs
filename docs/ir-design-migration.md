@@ -19,120 +19,116 @@ The current IR (`BooqNode`) is a 4-way discriminated union (`BooqSectionNode | B
 - CSS preprocessed with selector rewriting via `postcss-prefix-selector`
 - Colors stripped from non-global CSS selectors
 
-## Target State
+## Implemented State
 
-See [ir-design.md](ir-design.md) for the full target design. Summary:
+### Type model
 
-- `BooqDocument` (one per spine item) with `fileName` and `children: BooqElement[]`
-- `BooqElement` stores original XML attributes unmodified
-- `BooqChildNode = BooqElement | BooqTextNode | BooqStub` (where `BooqTextNode = string`)
-- `BooqNode = { children: BooqChildNode[] }` as shared interface for utilities
-- `<html>`, `<head>`, `<body>`, `<style>`, `<script>` preserved in tree
-- `<script>` content stripped server-side
-- `<style>` content preprocessed server-side (in post-processing pipeline)
-- IDs scoped server-side in post-processing (for browser-native `#id` navigation)
-- In-book `href` values rewritten server-side to match scoped IDs
-- Paragraph marking via `data-booqs-pph` attribute
-- Image dimensions stored in data attributes; internal images resolved to CDN URLs
-- React-specific transforms (attribute normalization, element mapping) happen at render time
-- All data attributes use `data-booqs-` prefix to avoid collisions with EPUB content
+- `BooqDocument` (one per spine item) with `fileName` and `children: BooqChildNode[]`
+- `BooqElement` with `name`, `attributes?`, `children: BooqChildNode[]` — no custom fields (`id`, `ref`, `pph` all removed)
+- `BooqChildNode = BooqElement | BooqTextNode | BooqStub` (where `BooqTextNode = string`, `BooqStub = null | { stub: number }`)
+- `BooqNode = BooqDocument | BooqChildNode` (union type, not an interface)
+- All union members have `?: undefined` discriminant fields for safe property access without type assertions
+- `Booq.content: BooqDocument[]` (was `Booq.nodes: BooqNode[]`)
 
-## What Changes
+### Parser
 
-### Parser simplification
+The parser is minimal — it converts XHTML to `BooqDocument`/`BooqElement` with almost no transformation:
+- All XML elements processed uniformly via `processXml` — no special-casing of `<html>`, `<head>`, `<body>`
+- `<script>` elements kept in tree with content stripped (empty `children`)
+- `<style>` and `<link>` elements kept in tree as regular elements
+- Attributes stored as-is from XML (no camelCasing, no ID scoping, no href rewriting)
+- `id` is just an attribute — no separate field on `BooqElement`
 
-The parser becomes minimal — it converts XHTML to `BooqDocument`/`BooqElement` with almost no transformation.
+### Post-processing pipeline (`parser/process.ts`)
 
-| Transformation | Current | New |
-|---------------|---------|-----|
-| `<html>` | Stripped | Preserved |
-| `<body>` | Renamed to `<div>` | Preserved |
-| `<head>` | Processed, children replaced with stubs | Preserved |
-| `<style>` elements | Extracted to `BooqStyles`, replaced with stubs | Kept in tree; content preprocessed during post-processing |
-| `<script>` elements | Replaced with stubs | Kept in tree, text content stripped |
-| Attributes | camelCased | Stored as-is from XML |
-| IDs | Scoped during parsing (`fileName/id`) | Stored as-is during parsing; scoped during post-processing |
-| `href` | Rewritten via `transformHref` during parsing | Stored as-is during parsing; rewritten during post-processing |
-| `ref: BooqPath` on elements | Set during `resolveRefs` pass | Removed — browser-native `#id` navigation instead |
-| `pph: boolean` | Custom property on element | `data-booqs-pph` attribute via post-processing |
+Single `processDocuments()` function returns `{ documents, styles, hrefToPathMap }`:
 
-### Server-side post-processing pipeline
-
-The post-processing step runs after document parsing and handles everything that needs cross-document knowledge or should happen once (not per augmentation change):
-
-1. **CSS preprocessing**: walk each document's `<head>`, find `<link>` and `<style>` elements, preprocess CSS (color rewriting + scope containment), store in `BooqStyles` map, replace `<style>` element text content with preprocessed version
-
-2. **ID scoping and href resolution**: scope element `id` values to avoid collisions across spine items, and rewrite in-book `href` values to match. This enables browser-native `#id` navigation for in-book links — no custom client-side link resolution needed.
-
-   Scoped ID format: `booqs-{spineIndex}-{basename}--{originalId}`
-   - `spineIndex`: document's position in the spine (disambiguates)
-   - `basename`: filename without path prefix and extension (readability)
-   - `--` delimiter: separates our prefix from the original ID (original ID is always recoverable by splitting on `--`)
-   - `booqs-` prefix: ensures no collision with app IDs
-
-   Example: `id="section5"` in `Text/chapter02.xhtml` (spine index 3) → `id="booqs-3-chapter02--section5"`
-
-   Implementation:
-   - Walk all documents, rewrite `id` attributes using the scoping scheme
-   - Build transient lookup table: `"fileName#id"` → scoped ID string
-   - Walk all documents, rewrite `href` attributes that point to internal targets: `"chapter02.xhtml#section5"` → `"#booqs-3-chapter02--section5"`
-   - Use same lookup table to resolve TOC entry hrefs
-   - Discard lookup table after post-processing
-
-3. **Paragraph marking**: add `data-booqs-pph=""` to leaf `<p>`/`<div>` element attributes
-
-4. **Image processing**: resolve internal image paths to CDN URLs, probe dimensions, store in data attributes (`data-booqs-original-src`, `data-booqs-width`, `data-booqs-height`); leave external image references as-is for client to handle
+1. **CSS preprocessing** (`parser/styles.ts`): walks `<head>` elements, loads CSS files for `<link>`, preprocesses all CSS, stores in `BooqStyles`, sets `styleRefs` on documents
+2. **ID scoping and href resolution** (`parser/scopeIds.ts`): scopes IDs using `booqs-{spineIndex}-{basename}--{originalId}` scheme, rewrites internal `href` to `#scopedId`, adds `data-booqs-ref-path` attribute with serialized BooqPath for renderer to decide in-range vs out-of-range
+3. **Paragraph marking**: adds `data-booqs-paragraph` attribute to leaf `<p>`/`<div>` elements
+4. **Image processing** (`backend/parse.ts`): resolves image paths relative to document fileName via `resolveHref`, rewrites `src` to CDN URLs, sets `width`/`height` directly (standard HTML attributes, not data attributes)
 
 ### Client-side rendering
 
-The renderer receives `BooqFragment` (as today). Its new responsibilities are limited to React-specific transforms:
+- `data-booqs-path` on all rendered elements for path tracking (selection, scroll)
+- Elements preserve their scoped `id` from EPUB attributes (for `#scopedId` navigation)
+- Augmentation spans get both `data-booqs-path` and `id=pathToId`
+- Attribute normalization at render time (`class` → `className`, `colspan` → `colSpan`, etc.) via `normalizeAttributes()`
+- Element mapping at render time via `mapElementName()`: `<html>`/`<body>` → `<div>`, `<head>`/`<link>`/`<script>`/`<meta>`/`<title>` → skip
+- In-range links use already-rewritten `href="#scopedId"` (browser-native scroll)
+- Out-of-range links use `hrefForPath` callback (cross-chapter page navigation)
 
-**Attribute normalization** (React-specific):
-- `class` → `className`
-- `colspan` → `colSpan`, `rowspan` → `rowSpan`, etc.
-- `xml:space` → `xmlSpace`, `xml:lang` → `xmlLang`
-- `xlink:href` → `xlinkHref`
-- `style` string → parsed React style object
+### Href resolution (`parser/href.ts`)
 
-**Element mapping** (React-specific):
-- `<body>` → `<div>` (or other wrapper as appropriate)
-- `<html>` → skip or map to wrapper
-- `<script>` → skip during rendering
-- Nested `<a>` → `<span>` (existing behavior, stays)
+Single `resolveHref(href, baseFileName)` utility for all EPUB-internal href resolution. Handles `#id`, `file.xhtml#id`, `../file.xhtml#id` with proper `../` traversal. Used by ID scoping, TOC construction, image path normalization, and CSS file loading.
 
-**Style resolution**:
-- Walk `<head>` children to find `<link rel="stylesheet">` elements
-- Look up preprocessed CSS from `BooqStyles` map using the `href` value
-- Render as `<style>` elements
-- For inline `<style>` elements, render their preprocessed content directly
+### Custom data attributes (`core/attributes.ts`)
 
-**Data attribute handling**:
-- `data-booqs-pph` → add `booqs-pph` CSS class
-- `data-booqs-width` / `data-booqs-height` → set image dimensions
-- `data-booqs-original-src` → handle as needed (CDN URLs already resolved server-side for internal images)
+All custom `data-*` attributes defined in one file:
+- `data-booqs-path` — BooqPath for selection and scroll tracking
+- `data-booqs-ref-path` — resolved BooqPath for internal link targets
+- `data-booqs-paragraph` — marks leaf paragraph elements
+- `data-booqs-augmentation-id` — augmentation click targeting
 
-**In-book links**: no custom handling needed — `href="#booqs-3-chapter02--section5"` and `id="booqs-3-chapter02--section5"` work via browser-native `#id` navigation.
+## Divergences from Original Design
 
-**Augmentations**: unchanged — highlight/annotation rendering via DOM wrapping, applied on top of the preprocessed content.
+### `BooqNode` is a union, not an interface
 
-### Rendering pipeline order
+**Design**: `BooqNode = { children: BooqChildNode[] }` as a shared interface for utilities.
+**Implemented**: `BooqNode = BooqDocument | BooqChildNode` as a union type. Both `BooqDocument` and `BooqElement` have `children` via `?: undefined` discriminant fields, making property access safe without assertions. Utility functions take `BooqNode[]` which accepts both `BooqDocument[]` and `BooqChildNode[]` due to union subtyping.
+**Why**: A union is simpler to work with in TypeScript — type guards and discriminant fields handle everything the interface would, without needing the `BooqNode` interface to be satisfied by text nodes and stubs (which have no children).
 
-```
-BooqFragment (from server, already post-processed)
-  → Rendering preprocess (attribute normalization, element mapping, style resolution)
-  → Augmentation embedding (highlights, notes)
-  → React render
-```
+### `Booq.content` instead of `Booq.documents`
 
-Rendering preprocessing happens once per content load. Augmentation embedding can change dynamically without re-running the preprocessing step.
+**Design**: `Booq.documents: BooqDocument[]`.
+**Implemented**: `Booq.content: BooqDocument[]`.
+**Why**: `content` is more concise and reads better at call sites.
 
-### No backward compatibility
+### `styleRefs` kept on `BooqDocument`
 
-We don't have valuable user data. All stored paths (bookmarks, history, notes) can break. This is one reason to do the migration now.
+**Design**: remove `styleRefs`, renderer resolves styles from `<head>` elements.
+**Implemented**: `styleRefs` kept, populated during post-processing instead of parsing.
+**Why**: the current CSS scoping mechanism uses the style key as both a class name on the `<section>` wrapper and a selector prefix in CSS rules. Removing `styleRefs` requires changing the CSS scoping approach, which is Phase 2 (`@scope` migration).
+
+### `data-booqs-ref-path` instead of browser-native `#id` navigation
+
+**Design**: browser-native `#id` navigation for in-book links, no custom client-side link resolution.
+**Implemented**: `href` rewritten to `#scopedId` for in-range scroll, but `data-booqs-ref-path` with BooqPath still needed for out-of-range detection. Renderer checks `pathInRange` to decide scroll vs page navigation.
+**Why**: in a paginated reader, cross-chapter link targets are not on the current page. The renderer needs the path to determine which chapter to navigate to. Browser-native `#id` only works for same-page scroll.
+
+### `id` removed from `BooqElement` type
+
+**Design**: keep `id` as a field on `BooqElement`.
+**Implemented**: `id` is just an attribute in `attributes` map. Accessed via `node.attributes?.id`.
+**Why**: `id` is a standard XML attribute — having it as a separate field was redundant. Makes the model more faithful to XML.
+
+### Image dimensions as standard attributes, not data attributes
+
+**Design**: store dimensions in `data-booqs-width` / `data-booqs-height`, original src in `data-booqs-original-src`.
+**Implemented**: `width` and `height` set directly as standard HTML attributes. `src` rewritten to CDN URL in place.
+**Why**: `width`, `height`, and `src` are standard HTML attributes that any renderer needs. Data attributes would add an unnecessary render-time step.
+
+### Paragraph attribute renamed
+
+**Design**: `data-booqs-pph`.
+**Implemented**: `data-booqs-paragraph`.
+**Why**: `pph` abbreviation was cryptic. Full word is clearer.
+
+### `mapNodes` replaced with `mapDocumentNodes` + `mapChildNodes`
+
+**Design**: keep `mapNodes` working on `BooqNode[]`.
+**Implemented**: `mapDocumentNodes(documents, transform)` where transform operates on `BooqChildNode`. `mapChildNodes` exported for use when document-level iteration is handled manually.
+**Why**: `BooqDocument` should not be passed to the transform function — transformers only operate on child nodes (elements, text, stubs). The split makes the type signatures correct without casts.
+
+### TOC items store scoped `id`
+
+**Design**: not specified.
+**Implemented**: `TableOfContentsItem.id?: string` stores the scoped element ID.
+**Why**: prepares for future ID-based navigation without needing another tree walk.
 
 ## Migration Order
 
-Detailed task list in [../tasks/model-migration.md](../tasks/model-migration.md).
+Detailed task list in [../tasks/model-migration-phase-1-ir.md](../tasks/model-migration-phase-1-ir.md).
 
 ## See Also
 
