@@ -7,6 +7,7 @@ import {
   getExpandedRange,
 } from '../../core/text'
 import { BooqNode, BooqElement, BooqTextNode, BooqRange, BooqChildNode } from '../../core/model'
+import { DATA_PARAGRAPH } from '../../core/attributes'
 
 describe('core/text', () => {
   // Test data setup helpers
@@ -20,7 +21,7 @@ describe('core/text', () => {
   const createParagraph = (name: string, children?: BooqChildNode[]): BooqElement => ({
     name,
     children: children ?? [],
-    pph: true,
+    attributes: { [DATA_PARAGRAPH]: '' },
   })
 
   // Test data structures

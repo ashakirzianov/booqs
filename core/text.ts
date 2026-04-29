@@ -12,7 +12,7 @@ import {
     iteratorsNode,
 } from './iterator'
 import { assertNever } from './misc'
-import { isContainerNode, isElementNode, isStubNode, isTextNode, nodeForPath } from './node'
+import { isContainerNode, isStubNode, isTextNode, nodeForPath, isMarkedAsParagraph } from './node'
 
 export function nodeText(node: BooqNode): string {
     if (isContainerNode(node)) {
@@ -176,7 +176,7 @@ export function getExpandedRange(nodes: BooqNode[], range: BooqRange): BooqRange
 function getExpandedStartPath(nodes: BooqNode[], startPath: BooqPath): BooqPath {
     // Check if the start element itself has pph=true
     const startNode = nodeForPath(nodes, startPath)
-    if (isElementNode(startNode) && startNode.pph === true) {
+    if (isMarkedAsParagraph(startNode)) {
         return startPath
     }
 
@@ -184,7 +184,7 @@ function getExpandedStartPath(nodes: BooqNode[], startPath: BooqPath): BooqPath 
     for (let depth = startPath.length - 1; depth > 0; depth--) {
         const parentPath = startPath.slice(0, depth)
         const parentNode = nodeForPath(nodes, parentPath)
-        if (isElementNode(parentNode) && parentNode.pph === true) {
+        if (isMarkedAsParagraph(parentNode)) {
             return parentPath
         }
     }
@@ -201,7 +201,7 @@ function getExpandedEndPath(nodes: BooqNode[], endPath: BooqPath, expandedStart:
 
     // Check if the end element itself has pph=true
     const endNode = nodeForPath(nodes, endPath)
-    if (isElementNode(endNode) && endNode.pph === true) {
+    if (isMarkedAsParagraph(endNode)) {
         // Return next sibling of the end element
         const nextSiblingPath = [...endPath]
         nextSiblingPath[nextSiblingPath.length - 1] += 1
@@ -213,7 +213,7 @@ function getExpandedEndPath(nodes: BooqNode[], endPath: BooqPath, expandedStart:
     for (let depth = endPath.length - 1; depth > 0; depth--) {
         const parentPath = endPath.slice(0, depth)
         const parentNode = nodeForPath(nodes, parentPath)
-        if (isElementNode(parentNode) && parentNode.pph === true) {
+        if (isMarkedAsParagraph(parentNode)) {
             parentWithPph = parentPath
             break
         }

@@ -3,7 +3,7 @@ import {
     BooqElement, BooqDocument, BooqNode, BooqStyles, pathToString, pathFromString,
     pathInRange, samePath, pathLessThan, BooqPath, BooqRange, pathToId,
     assertNever, isTextNode, isStubNode, isElementNode, isDocumentNode,
-    DATA_PATH, DATA_REF_PATH, DATA_AUGMENTATION_ID,
+    DATA_PATH, DATA_REF_PATH, DATA_AUGMENTATION_ID, isMarkedAsParagraph,
 } from '@/core'
 
 export type Augmentation = {
@@ -141,7 +141,7 @@ function getProps(node: BooqElement, {
     path, range, hrefForPath,
 }: RenderContext) {
     const normalized = normalizeAttributes(node.attributes)
-    const className = node.pph
+    const className = isMarkedAsParagraph(node)
         ? (normalized?.className ? `booqs-pph ${normalized.className}` : 'booqs-pph')
         : normalized?.className
     const refPath = parseRefPath(node.attributes?.[DATA_REF_PATH])

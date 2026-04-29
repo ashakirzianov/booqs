@@ -286,24 +286,30 @@ Replace `pph: boolean` property with `data-booqs-pph` attribute.
 
 ### Parser (`parser/pph.ts`)
 
-- [ ] Update `markParagraphs()`: instead of setting `pph: true`, add `'data-booqs-pph': ''` to `node.attributes`
+- [x] `markParagraphs()` adds `[DATA_PPH]: ''` to element attributes
+- [x] `DATA_PPH` constant in `core/attributes.ts`
 
 ### Core (`core/text.ts`)
 
-- [ ] Update `getExpandedRange()`: check `node.attributes?.['data-booqs-pph']` instead of `node.pph`
+- [x] `getExpandedRange()` checks `node.attributes?.[DATA_PPH]` instead of `node.pph`
 
 ### Viewer/Renderer (`viewer/render.ts`)
 
-- [ ] Update `getProps()`: detect `data-booqs-pph` attribute → add `booqs-pph` to CSS class list (instead of checking `node.pph`)
+- [x] `getProps()` checks `node.attributes?.[DATA_PPH]` → adds `booqs-pph` CSS class
 
 ### Types (`core/model.ts`)
 
-- [ ] Remove `pph` field from `BooqElement` type (or verify it was never added to new type)
+- [x] Removed `pph` field from `BooqElement`
+
+### Tests
+
+- [x] Updated `createParagraph` helper to use `DATA_PPH` attribute
 
 ### Verify
 
-- [ ] `npm run build` passes
-- [ ] Verify scroll position tracking works (paragraph anchoring)
+- [x] `npm run build` passes
+- [x] `npm run test` passes (148/148)
+- [ ] Verify scroll position tracking works
 - [ ] Verify paragraph-level range expansion works for notes
 
 ---

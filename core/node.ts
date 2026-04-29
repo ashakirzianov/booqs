@@ -1,4 +1,5 @@
 import { BooqNode, BooqRange, BooqPath, BooqTextNode, BooqElement, BooqDocument, BooqStub, BooqChildNode } from './model'
+import { DATA_PARAGRAPH } from './attributes'
 import { nodeLength } from './position'
 
 export function isTextNode(node: BooqNode | undefined): node is BooqTextNode {
@@ -19,6 +20,10 @@ export function isElementNode(node: BooqNode | undefined): node is BooqElement {
 
 export function isContainerNode(node: BooqNode | undefined): node is BooqElement | BooqDocument {
     return node?.children !== undefined
+}
+
+export function isMarkedAsParagraph(node: BooqNode | undefined): boolean {
+    return isElementNode(node) && node.attributes?.[DATA_PARAGRAPH] !== undefined
 }
 
 export function nodeChildren(node: BooqNode): BooqChildNode[] | undefined {

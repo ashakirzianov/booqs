@@ -23,9 +23,6 @@ export type BooqElement = {
     name: string,
     children: BooqChildNode[],
     attributes?: BooqElementAttributes,
-    /** Marks this node as a paragraph. Set by the parser's markParagraphs pass.
-     * The viewer uses it to add a `booqs-pph` CSS class for scroll position tracking. */
-    pph?: boolean,
     fileName?: undefined,
     stub?: undefined,
 }
