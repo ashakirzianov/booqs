@@ -3,7 +3,7 @@ import {
     BooqDocument, BooqPath, TableOfContentsItem, TableOfContents, positionForPath,
 } from '../core'
 import { Epub } from './epub'
-import { hrefToKey } from './href'
+import { resolveHref, hrefToKey } from './href'
 
 export async function buildToc(documents: BooqDocument[], file: Epub, hrefToPathMap: Map<string, BooqPath>, diags: Diagnoser): Promise<TableOfContents> {
     const items: TableOfContentsItem[] = []
@@ -38,18 +38,19 @@ export async function buildToc(documents: BooqDocument[], file: Epub, hrefToPath
     }
 }
 
-// TOC hrefs are relative to the EPUB package root — same coordinate
-// space as document fileNames. Direct key lookup should work.
+// TOC hrefs are relative to the TOC file, but booqs-epub doesn't expose the TOC
+// file location. For now we assume TOC hrefs are in the same coordinate space as
+// document fileNames (works for most EPUBs). See backlog for proper fix.
 function resolveTocHref(href: string, hrefToPathMap: Map<string, BooqPath>): BooqPath | undefined {
-    const hashIndex = href.indexOf('#')
-    if (hashIndex >= 0) {
-        const fileName = href.substring(0, hashIndex)
-        const id = href.substring(hashIndex + 1)
-        return hrefToPathMap.get(hrefToKey({ fileName, id }))
+    // TODO: pass actual TOC file path as base once booqs-epub exposes it
+    const resolved = resolveHref(href, '')
+    if (!resolved) return undefined
+    if (resolved.id) {
+        return hrefToPathMap.get(hrefToKey(resolved))
     }
     // No fragment — find the first ID in this document
     for (const [key, path] of hrefToPathMap) {
-        if (key.startsWith(`${href}#`)) return path
+        if (key.startsWith(`${resolved.fileName}#`)) return path
     }
     return undefined
 }

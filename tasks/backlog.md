@@ -4,6 +4,17 @@ Low-priority improvements and technical debt.
 
 ---
 
+## TOC href resolution: proper base path
+
+**Priority**: Medium
+
+- [ ] Expose TOC file location from `booqs-epub` (NCX path or nav document path)
+- [ ] Pass TOC file path as base to `resolveHref` in `toc.ts` instead of empty string
+
+TOC hrefs are relative to the TOC file's own location, not the EPUB root or the OPF. Currently we assume they're in the same coordinate space as document fileNames, which works for most EPUBs (where TOC is in the same directory as content). Breaks when the TOC file is in a different directory (e.g., `OEBPS/nav/toc.ncx` referencing `../Text/ch1.xhtml`). Additional considerations: percent-decode paths before matching, handle absolute paths starting with `/`, consider case-insensitive matching for malformed EPUBs.
+
+---
+
 ## Epub relative path resolution
 
 **Priority**: Low
