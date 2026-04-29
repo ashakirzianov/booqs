@@ -25,14 +25,9 @@ export function scopeIdsAndResolveHrefs(documents: BooqDocument[]): BooqDocument
     })
 }
 
-// Build lookup table for TOC resolution. Uses original unscoped IDs.
-export function buildHrefToPathMap(documents: BooqDocument[]): Map<string, BooqPath> {
-    return buildPathMap(documents)
-}
-
-// --- private ---
-
-function buildPathMap(documents: BooqDocument[]): Map<string, BooqPath> {
+// Build lookup table mapping "fileName#id" → BooqPath.
+// Uses original unscoped IDs. Also used by TOC resolution.
+export function buildPathMap(documents: BooqDocument[]): Map<string, BooqPath> {
     const map = new Map<string, BooqPath>()
     for (let docIndex = 0; docIndex < documents.length; docIndex++) {
         const doc = documents[docIndex]

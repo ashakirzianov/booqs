@@ -3,11 +3,11 @@ import {
     BooqDocument, BooqPath, TableOfContentsItem, TableOfContents, positionForPath,
 } from '../core'
 import { Epub } from './epub'
-import { buildHrefToPathMap } from './scopeIds'
+import { buildPathMap } from './scopeIds'
 
 export async function buildToc(documents: BooqDocument[], file: Epub, diags: Diagnoser): Promise<TableOfContents> {
     const items: TableOfContentsItem[] = []
-    const pathMap = buildHrefToPathMap(documents)
+    const pathMap = buildPathMap(documents)
     const { items: toc, title } = await file.toc() ?? {
         title: undefined,
         items: [],
