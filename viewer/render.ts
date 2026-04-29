@@ -79,7 +79,7 @@ function renderDocumentNode(node: BooqDocument, ctx: RenderContext): ReactNode {
         'section',
         {
             key: pathToString(ctx.path),
-            id: pathToId(ctx.path),
+            'data-booqs-path': pathToString(ctx.path),
             className,
         },
         [...styleNodes, ...(children ?? [])],
@@ -104,7 +104,7 @@ function renderTextNode(text: string, {
         'span',
         {
             key: pathToId(path),
-            id: pathToId(path),
+            'data-booqs-path': pathToString(path),
         },
         spans.map(span => {
             const augmentationId = span.id
@@ -127,6 +127,7 @@ function renderTextNode(text: string, {
                 {
                     key: pathToId(span.path),
                     id: pathToId(span.path),
+                    'data-booqs-path': pathToString(span.path),
                     ...augmentationProps,
                 },
                 span.text,
@@ -145,15 +146,15 @@ function getProps(node: BooqElement, {
     const refPath = parseRefPath(node.attributes?.['data-booqs-ref-path'])
     return {
         ...normalized,
-        id: pathToId(path),
+        'data-booqs-path': pathToString(path),
+        'data-booqs-ref-path': undefined,
         className,
         key: pathToString(path),
         style: node.attributes?.style ? parseInlineStyle(node.attributes.style) : undefined,
-        'data-booqs-ref-path': undefined,
         href: refPath
             ? (
                 pathInRange(refPath, range)
-                    ? `#${pathToId(refPath)}`
+                    ? normalized?.href
                     : hrefForPath ?
                         hrefForPath(refPath)
                         : node.attributes?.href

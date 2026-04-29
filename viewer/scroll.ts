@@ -1,6 +1,6 @@
 'use client'
 import { useEffect } from 'react'
-import { BooqPath, pathFromId } from '@/core'
+import { BooqPath, pathFromString } from '@/core'
 
 export type BooqScrollContext = {
     getCurrentPath?: () => BooqPath | undefined,
@@ -29,7 +29,7 @@ function getCurrentPath() {
     const root = window.document.getElementById('booq-root')
     const current = root && getCurrent(root)
     return current
-        ? pathFromId(current.id)
+        ? pathFromString((current as HTMLElement).dataset?.booqsPath ?? '')
         : undefined
 }
 

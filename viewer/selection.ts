@@ -1,4 +1,4 @@
-import { BooqRange, pathLessThan, pathFromId } from '@/core'
+import { BooqRange, pathLessThan, pathFromString } from '@/core'
 
 export type BooqSelection = {
     range: BooqRange,
@@ -102,17 +102,20 @@ export function getBooqSelection(): BooqSelection | undefined {
 }
 
 function getSelectionPath(node: Node, offset: number) {
-    // Note: hackie
-    if ((node as any).id) {
-        const path = pathFromId((node as any).id)
+    const pathAttr = (node as HTMLElement).dataset?.booqsPath
+    if (pathAttr) {
+        const path = pathFromString(pathAttr)
         if (path) {
             return [...path, offset, 0]
         }
     } else if (node.parentElement) {
-        const path = pathFromId(node.parentElement.id)
-        if (path) {
-            path[path.length - 1] += offset
-            return path
+        const parentPathAttr = node.parentElement.dataset?.booqsPath
+        if (parentPathAttr) {
+            const path = pathFromString(parentPathAttr)
+            if (path) {
+                path[path.length - 1] += offset
+                return path
+            }
         }
     }
     return undefined
