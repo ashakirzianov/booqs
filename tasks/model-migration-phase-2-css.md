@@ -103,10 +103,8 @@ Remove unused dependencies, verify no regressions from specificity changes.
 
 ---
 
-## Deferred / Future work
+## Deferred items
 
-- [ ] Per-spine-item isolation granularity — current per-document isolation may be insufficient if chapters within a single spine item have conflicting styles. Revisit if real-world EPUBs surface this issue.
-- [ ] Shared stylesheet deduplication optimization — emit shared CSS once with combined scope selector instead of once per document. Revisit if full-book rendering shows measurable slowness.
-- [ ] Donut scoping — `@scope (.booqs-content) to (.booqs-annotation)` to exclude annotation UI from EPUB styles. Consider when annotation rendering is revisited.
-- [ ] Re-enable booq-level cache (`backend/library.ts`, `useCache = false` since Phase 1). The cache stores serialized `Booq` objects — must be invalidated/rebuilt after migration.
-- [ ] Enumerate full list of EPUB CSS properties to sanitize for Next.js (beyond color stripping).
+Moved to appropriate locations:
+- **Cache re-enable** → [phase-1-handoff.md](phase-1-handoff.md) "Booq-level cache disabled" (applies to both Phase 1 and Phase 2 changes)
+- **Per-spine-item isolation**, **shared stylesheet dedup**, **donut scoping**, **CSS sanitization list** → [backlog.md](backlog.md)

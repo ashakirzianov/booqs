@@ -115,6 +115,46 @@ For books like War and Peace, the full nodes/styles JSON can exceed 200KB. Not a
 
 ---
 
+## Per-spine-item style isolation
+
+**Priority**: Low
+
+- [ ] Investigate whether per-document `@scope` isolation is sufficient or if per-spine-item isolation is needed
+
+Current per-document `@scope ([data-booqs-doc="N"])` isolation may be insufficient if chapters within a single spine item have conflicting styles. Revisit if real-world EPUBs surface this issue.
+
+---
+
+## Shared stylesheet deduplication
+
+**Priority**: Low
+
+- [ ] Emit shared CSS once with combined scope selector instead of once per document
+
+When multiple documents reference the same CSS file (e.g., `book.css`), it's currently rendered once per document with different `@scope` selectors. For full-book rendering (30+ chapters), this is wasteful. Optimization: `@scope ([data-booqs-doc="0"]), ([data-booqs-doc="1"]) { ... }`. Only worth doing if full-book rendering shows measurable slowness.
+
+---
+
+## Donut scoping for annotation UI
+
+**Priority**: Low
+
+- [ ] Use `@scope (.booqs-content) to (.booqs-annotation)` to exclude annotation UI from EPUB styles
+
+Would prevent EPUB styles from affecting annotation overlays nested inside content. Consider when annotation rendering is revisited.
+
+---
+
+## EPUB CSS sanitization list
+
+**Priority**: Low
+
+- [ ] Enumerate full list of EPUB CSS properties to sanitize for Next.js (beyond color stripping)
+
+Currently only `color`, `background`, `background-color` are stripped from global selectors. Other properties may need sanitization (e.g., `position: fixed`, `z-index`, `overflow` on global selectors). May differ for native rendering.
+
+---
+
 ## EPUB path hardening
 
 **Priority**: Low

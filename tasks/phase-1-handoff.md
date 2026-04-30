@@ -43,10 +43,10 @@ Phase 1 (8 stages) is complete. The IR has been migrated from the old `BooqNode`
 ## Deferred / known issues
 
 ### Booq-level cache disabled
-Cache in `backend/library.ts` is disabled during migration (`useCache = false`). Must be re-enabled after migration completes. The cache stores serialized `Booq` objects — the new type shape differs from cached data.
+Cache in `backend/library.ts` is disabled during migration (`useCache = false`). Must be re-enabled after migration completes. The cache stores serialized `Booq` objects — the new type shape differs from cached data. This applies to both Phase 1 and Phase 2 changes (`styleRefs` removal, `BooqFragment.content` rename, `BooqStyles` key format change).
 
-### `styleRefs` still on `BooqDocument`
-CSS scoping relies on class-name-based selectors. `styleRefs` is populated during post-processing (not parsing), but removing it requires changing the CSS scoping approach. This is Phase 2 work.
+### ~~`styleRefs` still on `BooqDocument`~~ — resolved in Phase 2
+`styleRefs` removed. Styles now resolved from `<head>` elements at render time.
 
 ### TOC href resolution base path
 TOC hrefs should resolve relative to the TOC file's location, but `booqs-epub` doesn't expose the TOC file path. Currently assumes TOC hrefs are in the same coordinate space as document fileNames. Backlog item added in `tasks/backlog.md`.
@@ -54,21 +54,12 @@ TOC hrefs should resolve relative to the TOC file's location, but `booqs-epub` d
 ### CommentsPanel link scrolling
 `reader/CommentsPanel.tsx` uses `#pathToId(comment.range.start)` for links to comment locations. With the new model, elements no longer have path-based IDs. The link sets a URL hash that `useHashPath` could pick up, but `useHashPath` is not connected to `useScrollToPath` in the reader. Needs fixing.
 
-### Per-chapter style isolation
-Not verified. Currently all styles are passed to every fragment via `collectReferencedStyles` which reads `styleRefs`. This should work but hasn't been tested with books that have conflicting per-chapter styles.
+### ~~Per-chapter style isolation~~ — resolved in Phase 2
+Per-document `@scope` isolation via `[data-booqs-doc="N"]` ensures styles from one document don't bleed into another. `buildFragment` preserves `<link>` and `<style>` elements in partially-sliced documents.
 
-## Phase 2: CSS `@scope` migration
+## Phase 2: CSS `@scope` migration — COMPLETE
 
-See [../docs/css-handling.md](../docs/css-handling.md) for the full design. Key tasks:
-
-- Replace `postcss-prefix-selector` with `@scope (.booqs-content) { ... }` wrapping
-- Root selector rewriting (`html`, `body`, `:root` → `:scope`)
-- Inline `style` attribute sanitization for theming
-- Remove `styleRefs` from `BooqDocument` — styles resolved from `<head>` elements
-- Remove class-name-based scoping on `<section>` wrappers
-- Verify specificity changes don't break styling
-
-Phase 2 task list to be created at `tasks/model-migration-phase-2-css.md`.
+See [model-migration-phase-2-css.md](model-migration-phase-2-css.md) for completed task list.
 
 ## Files changed in Phase 1
 
