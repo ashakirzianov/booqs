@@ -44,17 +44,24 @@ See [css-handling.md](../docs/css-handling.md) for full design.
 
 Detailed task list: `model-migration-phase-2-css.md` (to be created)
 
-## Phase 3: Locator migration
+## Phase 3: Locator & annotation migration
 
-Goal: introduce `BooqLocator` with text context for resilient annotations.
+Goal: introduce `BooqLocator` with text context, migrate from `BooqNote` to `BooqAnnotation`.
 
 Depends on: Phase 1 (stable new path scheme).
 
 What this phase achieves:
-- `BooqLocator` type with `before`/`highlight`/`after` context fields
-- Server-side and client-side healing for drifted annotations
-- Stateless quote-sharing URLs
-- Clipboard enrichment (rich paste)
+- `BooqLocator` type with `prefix`/`text`/`suffix` context fields
+- Rename `BooqNote` → `BooqAnnotation` across all layers
+- New `annotations` table (replaces `notes`, all old data dropped)
+- Kind/color split: `highlight` kind + separate semantic color field
+- Client-side locator construction (context extraction on selection)
+- Healing design doc (algorithm sketch, infrastructure needs — no implementation)
+
+What this phase does NOT do (deferred to backlog):
+- Healing implementation
+- New quote URL format with embedded locator
+- Bookmark migration to BooqLocator
 
 See [booqs-locator-design.md](../docs/booqs-locator-design.md) for full design.
 
