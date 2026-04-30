@@ -6,6 +6,7 @@ export const DATA_PATH = 'data-booqs-path'
 export const DATA_REF_PATH = 'data-booqs-ref-path'
 export const DATA_AUGMENTATION_ID = 'data-booqs-augmentation-id'
 export const DATA_PARAGRAPH = 'data-booqs-paragraph'
+export const DATA_DOC = 'data-booqs-doc'
 
 // Dataset property names (for element.dataset access).
 export const DATASET_PATH = 'booqsPath'

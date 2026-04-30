@@ -3,7 +3,7 @@ import {
     BooqElement, BooqDocument, BooqNode, BooqStyles, pathToString, pathFromString,
     pathInRange, samePath, pathLessThan, BooqPath, BooqRange, pathToId,
     assertNever, isTextNode, isStubNode, isElementNode, isDocumentNode,
-    DATA_PATH, DATA_REF_PATH, DATA_AUGMENTATION_ID, isMarkedAsParagraph,
+    DATA_PATH, DATA_REF_PATH, DATA_AUGMENTATION_ID, DATA_DOC, isMarkedAsParagraph,
 } from '@/core'
 
 export type Augmentation = {
@@ -19,6 +19,7 @@ type RenderContext = {
     path: BooqPath,
     range: BooqRange,
     styles: BooqStyles,
+    spineIndex?: number,
     parent?: BooqElement,
     withinAnchor?: boolean,
     augmentations: Augmentation[],
@@ -49,6 +50,8 @@ function renderNode(node: BooqNode, ctx: RenderContext): ReactNode {
     } else if (isDocumentNode(node)) {
         return renderDocumentNode(node, ctx)
     } else if (isElementNode(node)) {
+        const scopedStyle = renderScopedStyle(node, ctx)
+        if (scopedStyle !== undefined) return scopedStyle
         const mappedName = mapElementName(node.name, ctx)
         if (mappedName === null) {
             return null
@@ -64,11 +67,11 @@ function renderNode(node: BooqNode, ctx: RenderContext): ReactNode {
     }
 }
 
-// TODO: Phase 2 Stage 2 — add data-booqs-doc, render <head> as <div>,
-// resolve <link> stylesheets from BooqStyles, wrap in @scope
 function renderDocumentNode(node: BooqDocument, ctx: RenderContext): ReactNode {
+    const spineIndex = ctx.path[0] ?? 0
     const children = node.children ? renderNodes(node.children, {
         ...ctx,
+        spineIndex,
         parent: undefined,
     }) : null
     return createElement(
@@ -76,6 +79,7 @@ function renderDocumentNode(node: BooqDocument, ctx: RenderContext): ReactNode {
         {
             key: pathToString(ctx.path),
             [DATA_PATH]: pathToString(ctx.path),
+            [DATA_DOC]: String(spineIndex),
         },
         children,
     )
@@ -161,8 +165,8 @@ function getProps(node: BooqElement, {
 // Converts XML attribute names to React prop names at render time.
 function mapElementName(name: string, ctx: RenderContext): string | null {
     switch (name) {
-        case 'head': case 'link': case 'script': case 'meta': case 'title': return null
-        case 'html': case 'body': return 'div'
+        case 'script': case 'meta': case 'title': return null
+        case 'html': case 'head': case 'body': return 'div'
         case 'a': return ctx.withinAnchor ? 'span' : 'a'
         default: return name
     }
@@ -289,6 +293,43 @@ function breakPath(path: BooqPath) {
 function parseRefPath(value: string | undefined): BooqPath | undefined {
     if (!value) return undefined
     return pathFromString(value)
+}
+
+// Renders <link rel="stylesheet"> and <style> elements as scoped <style> elements.
+// Returns undefined for elements that aren't style-related.
+function renderScopedStyle(node: BooqElement, ctx: RenderContext): ReactNode | undefined {
+    const spineIndex = ctx.spineIndex
+    if (spineIndex === undefined) return undefined
+
+    const scopeSelector = `[${DATA_DOC}="${spineIndex}"]`
+
+    if (node.name === 'link' && node.attributes?.rel?.toLowerCase() === 'stylesheet') {
+        const href = node.attributes?.href
+        if (!href) return null
+        const css = ctx.styles[href]
+        if (!css) return null
+        return createElement(
+            'style',
+            { key: `${pathToString(ctx.path)}-link-style` },
+            wrapInScope(css, scopeSelector),
+        )
+    }
+
+    if (node.name === 'style') {
+        const text = typeof node.children[0] === 'string' ? node.children[0] : undefined
+        if (!text) return null
+        return createElement(
+            'style',
+            { key: `${pathToString(ctx.path)}-inline-style` },
+            wrapInScope(text, scopeSelector),
+        )
+    }
+
+    return undefined
+}
+
+function wrapInScope(css: string, scopeSelector: string): string {
+    return `@scope (${scopeSelector}) { ${css} }`
 }
 
 function parseInlineStyle(style: string): Record<string, string> {
