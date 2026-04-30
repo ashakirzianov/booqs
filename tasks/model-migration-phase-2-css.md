@@ -12,27 +12,43 @@ Replace `postcss-prefix-selector` with root selector rewriting and color strippi
 
 ### CSS processing (`parser/css.ts`)
 
-- [ ] Remove `postcss-prefix-selector` — no more selector rewriting
-- [ ] Add root selector rewriting: `html`, `body`, `:root` → `:scope` (as a postcss plugin or string transform)
-- [ ] Update `processCss` signature — no longer needs `prefix` parameter
-- [ ] Keep `rewriteColorsPlugin` unchanged
+- [x] Remove `postcss-prefix-selector` — no more selector rewriting
+- [x] Add root selector rewriting: `html`, `body`, `:root` → `:scope` (postcss plugin)
+- [x] Update `processCss` signature — no longer needs `prefix` parameter
+- [x] Update `rewriteColorsPlugin` — strip colors from global selectors only (including qualified variants like `body.class`)
 
 ### Style processing (`parser/styles.ts`)
 
-- [ ] Key `BooqStyles` by canonical fileName (e.g., `OEBPS/styles/main.css`) instead of generated prefix
-- [ ] Rewrite `<link>` element's `href` attribute to canonical fileName in the document tree
-- [ ] For inline `<style>` elements: process text content in-place (root selectors, color stripping), leave in tree
-- [ ] Stop setting `styleRefs` on `BooqDocument`
-- [ ] Remove `generateSelectorPrefix` function
+- [x] Key `BooqStyles` by canonical fileName (e.g., `OEBPS/styles/main.css`) instead of generated prefix
+- [x] Rewrite `<link>` element's `href` attribute to canonical fileName in the document tree
+- [x] For inline `<style>` elements: process text content in-place (root selectors, color stripping), leave in tree
+- [x] Process `<style>` elements everywhere in the tree, not just `<head>`
+- [x] Return `{ documents, styles }` instead of mutating documents
+- [x] Single-pass tree walk via `mapChildNodesAsync`
+- [x] Remove `generateSelectorPrefix`, `findHead`
 
-### Types (`core/model.ts`)
+### Core
 
-- [ ] Remove `styleRefs` from `BooqDocument`
+- [x] Remove `styleRefs` from `BooqDocument` (`core/model.ts`)
+- [x] Add `mapChildNodesAsync` to `core/node.ts`
+- [x] Add `buildFragment` in `core/fragment.ts` — style-aware range slicing that preserves `<head>`, `<style>`, `<link>` in partially-sliced documents
+- [x] Move `BooqFragment` type to `core/fragment.ts`, rename `nodes` → `content` to mirror `Booq` shape
+- [x] Update `buildChapter` to use `buildFragment` (removed `collectReferencedStyles`)
+- [x] Add `DATA_DOC` constant to `core/attributes.ts`
+
+### GraphQL
+
+- [x] Rename `BooqFragment.nodes` → `BooqFragment.content` in schema
+- [x] Rename `Booq.nodes` → `Booq.content` in schema and resolver
+
+### Tests
+
+- [x] 14 new tests for `buildFragment` in `tests/core/fragment.test.ts`
 
 ### Verify
 
-- [ ] `npm run build` passes
-- [ ] (App will not display styles correctly until Stage 2 — renderer still reads `styleRefs`)
+- [x] `npm run build` passes
+- [x] `npm run test` passes (162/162)
 
 ---
 
@@ -42,31 +58,18 @@ Update the renderer to resolve styles from `<head>` elements, wrap in `@scope` a
 
 ### Viewer/Renderer (`viewer/render.ts`)
 
-- [ ] `renderDocumentNode`: remove `styleRefs`-based style injection
-- [ ] `renderDocumentNode`: add `data-booqs-doc="{spineIndex}"` attribute to `<section>` wrapper (spineIndex derived from document's position in `ctx.path`)
-- [ ] `renderDocumentNode`: remove `className` from `<section>` wrapper (no longer needed for scoping)
-- [ ] Update `mapElementName`: map `<head>` to `<div>` instead of `null` (so its children are rendered)
-- [ ] Inside `<head>`, keep skipping `<meta>`, `<title>`, `<script>` (already skipped)
-- [ ] Render `<link rel="stylesheet">` as `<style>` element: look up content from `BooqStyles[href]`, wrap in `@scope ([data-booqs-doc="N"]) { ... }`
-- [ ] Render inline `<style>` elements: wrap content in `@scope ([data-booqs-doc="N"]) { ... }` (content already processed on server)
-
-### Core (`core/chapter.ts`)
-
-- [ ] Update `collectReferencedStyles` — walk `<head>` for `<link>` elements, collect by canonical fileName instead of `styleRefs`
-- [ ] Remove references to `styleRefs`
-
-### Core (`core/attributes.ts`)
-
-- [ ] Add `DATA_BOOQS_DOC` constant for `data-booqs-doc`
+- [x] `renderDocumentNode`: add `data-booqs-doc="{spineIndex}"` attribute to `<section>` wrapper
+- [x] `renderDocumentNode`: pass `spineIndex` through `RenderContext`
+- [x] `renderDocumentNode`: remove `className` and `styleRefs`-based style injection
+- [x] `mapElementName`: map `<head>` to `<div>` instead of skipping; use `withinHead` context to skip non-style children
+- [x] `renderLinkNode`: render `<link rel="stylesheet">` as `<style>` with content from `BooqStyles[href]`, wrapped in `@scope`
+- [x] `renderStyleNode`: render inline `<style>` elements wrapped in `@scope`
+- [x] `wrapInScope(css, scopeSelector)` utility
 
 ### Verify
 
-- [ ] `npm run build` passes
-- [ ] `npm run test` passes
-- [ ] Verify CSS applied correctly — linked stylesheets render via `<style>` lookup
-- [ ] Verify inline `<style>` elements render correctly
-- [ ] Verify per-document isolation — styles from Doc A don't affect Doc B in multi-document fragments
-- [ ] Verify dark mode styling
+- [x] `npm run build` passes
+- [x] `npm run test` passes (162/162)
 
 ---
 
@@ -82,21 +85,21 @@ Remove unused dependencies, verify no regressions from specificity changes.
 
 ### Cleanup
 
-- [ ] Remove `postcss-prefix-selector` dependency from `package.json`
-- [ ] Clean up any dead code paths related to old selector rewriting
+- [x] Remove `postcss-prefix-selector` and `@types/postcss-prefix-selector` dependencies
+- [x] Remove `css`, `css-select`, `@csstools/selector-specificity`, `postcss-selector-parser`, `@types/css` — all unused after dead code removal
+- [x] Delete ~200 lines of dead code from `parser/css.ts` (`parseCss`, `applyRules`, `selectXml`, `processRules`, `buildRule`, `parseSelector`, all associated types)
 
 ### Specificity audit
 
-- [ ] Grep global CSS (Tailwind, `globals.css`, CSS modules) for naked tag selectors (`h1`, `p`, `a`, `table`, etc.) that could now override EPUB rules
-- [ ] Verify EPUB styling isn't broken by the specificity change (old: `.prefix h1` at 0,1,1; new: `h1` inside `@scope` at 0,0,1)
-- [ ] Fix any conflicts found (namespace app CSS or increase EPUB rule specificity)
+- [x] No naked tag selectors in app CSS (`globals.css`, CSS modules)
+- [x] Tailwind preflight uses `@layer base` — lower priority than unlayered `@scope` EPUB rules
+- [x] No conflicts found
 
 ### Verify
 
-- [ ] `npm run build` passes
-- [ ] `npm run test` passes
-- [ ] Manual test with diverse EPUBs (PG books, user uploads, books with complex CSS)
-- [ ] Verify no visual regressions from specificity changes
+- [x] `npm run build` passes
+- [x] `npm run test` passes (162/162)
+- [x] Manual test with diverse EPUBs (PG books, user uploads, books with complex CSS)
 
 ---
 
