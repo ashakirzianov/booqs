@@ -70,21 +70,9 @@ Update the renderer to resolve styles from `<head>` elements, wrap in `@scope` a
 
 ---
 
-## Stage 3: Inline style attribute sanitization
+## ~~Stage 3: Inline style attribute sanitization~~ — skipped
 
-Strip theme-affecting properties from inline `style` attributes during processing.
-
-### Processing (`parser/process.ts` or `parser/styles.ts`)
-
-- [ ] Add inline style sanitization step: walk all elements, strip `color`, `background`, `background-color` from `style` attributes
-- [ ] Keep layout properties (margins, padding, alignment, etc.)
-- [ ] Decide where this lives — either in `processDocuments` pipeline or as part of `processStyles`
-
-### Verify
-
-- [ ] `npm run build` passes
-- [ ] Verify elements with inline `style="color: #000"` render correctly in dark mode
-- [ ] Verify layout-related inline styles (margins, text-align) still apply
+Decision: do not sanitize inline `style` attributes. Inline styles are rare in well-formed EPUBs, and stripping them risks removing intentional author styling. Revisit if dark mode issues surface in practice. See [css-handling.md](../docs/css-handling.md) "Color stripping strategy".
 
 ---
 

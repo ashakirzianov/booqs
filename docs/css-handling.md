@@ -187,9 +187,9 @@ For the normal case (fragment with 1-3 chapters), this is negligible. For full-b
 
 ### Color stripping strategy
 
-Colors are stripped from EPUB CSS rules (non-global selectors) and from inline `style` attributes. This is necessary for dark mode — CSS custom properties can't help when the EPUB explicitly sets `background: #fff` or `color: #333`. The theme's colors flow through where author colors are stripped.
+Colors are stripped from EPUB CSS rules (non-global selectors). This is necessary for dark mode — CSS custom properties can't help when the EPUB explicitly sets `background: #fff` or `color: #333`. The theme's colors flow through where author colors are stripped.
 
-Inline `style` attribute sanitization: strip `color`, `background`, `background-color` (and potentially `font-family`) during processing. Keep layout properties (margins, alignment, etc.).
+Inline `style` attributes are **not** sanitized. The reasoning: inline styles are relatively rare in well-formed EPUBs, and stripping them risks removing intentional author styling (e.g., colored text for dialogue attribution, tinted backgrounds for callout boxes). If inline colors cause dark mode issues in practice, we can revisit with a more targeted approach.
 
 ### What changes from the "Recommended Architecture" section
 
