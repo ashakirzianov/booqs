@@ -99,7 +99,7 @@ type Booq {
     notes(username: String, limit: Int, offset: Int): [Note!]!
     preview(path: [Int!], end: [Int!], length: Int = 500): String
     chapter(path: [Int!]): BooqChapter
-    nodes: [BooqNode]
+    content: [BooqNode]
     styles: BooqNode
     tableOfContents: [TocItem!]
 }

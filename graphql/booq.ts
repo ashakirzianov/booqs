@@ -68,7 +68,7 @@ export const booqResolver: IResolvers<BooqParent, ResolverContext> = {
                 return preview?.trim()?.substring(0, length)
             }
         },
-        async nodes(parent, _, { booqLoader }) {
+        async content(parent, _, { booqLoader }) {
             const booq = await booqLoader.load(parent.booqId)
             return booq
                 ? booq.content
