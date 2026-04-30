@@ -13,9 +13,9 @@ export function usePageData({
     const length = meta.length
 
     return useMemo(() => {
-        const position = positionForPath(fragment.nodes, currentPath)
+        const position = positionForPath(fragment.content, currentPath)
         const nextChapter = next
-            ? positionForPath(fragment.nodes, next.path)
+            ? positionForPath(fragment.content, next.path)
             : length
         const currentPage = pageForPosition(position) + 1
         const totalPages = pageForPosition(length)

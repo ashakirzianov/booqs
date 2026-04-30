@@ -163,7 +163,7 @@ type BooqChapter {
 type BooqFragment {
     start: [Int!]!
     end: [Int!]!
-    nodes: [BooqNode]
+    content: [BooqNode]
     styles: BooqNode
 }
 

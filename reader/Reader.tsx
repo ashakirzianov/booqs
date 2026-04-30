@@ -233,7 +233,7 @@ export function Reader({
             fontSize: `${fontScale}%`,
         }}>
             <BooqContent
-                nodes={chapter.fragment.nodes}
+                nodes={chapter.fragment.content}
                 styles={chapter.fragment.styles}
                 range={range}
                 augmentations={augmentations}

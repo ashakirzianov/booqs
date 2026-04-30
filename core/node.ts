@@ -134,7 +134,7 @@ export function nodesForRange(nodes: BooqNode[], range: BooqRange, emptyStubs?: 
 }
 
 
-export function stubNode(length: number): BooqNode {
+export function stubNode(length: number): BooqStub {
     return length > 0
         ? { stub: length }
         : null

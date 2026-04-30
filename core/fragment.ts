@@ -5,7 +5,7 @@ import { nodeLength } from './position'
 export type BooqFragment = {
     start: BooqPath,
     end: BooqPath,
-    nodes: BooqNode[],
+    content: BooqNode[],
     styles: BooqStyles,
 }
 
@@ -15,7 +15,7 @@ export function buildFragment({ content, styles }: Pick<Booq, 'content' | 'style
     const actualStart = startDoc ?? 0
     const actualEnd = endDoc ?? content.length
 
-    const nodes: BooqNode[] = []
+    const fragmentContent: BooqNode[] = []
     for (let idx = 0; idx < content.length; idx++) {
         const doc = content[idx]
         const beforeRange = idx < actualStart
@@ -24,26 +24,26 @@ export function buildFragment({ content, styles }: Pick<Booq, 'content' | 'style
         const atEnd = idx === actualEnd && endTail.length > 0
 
         if (beforeRange || afterRange) {
-            nodes.push(stubDocument(doc))
+            fragmentContent.push(stubDocument(doc))
         } else if (!atStart && !atEnd) {
             // Fully inside range
-            nodes.push(doc)
+            fragmentContent.push(doc)
         } else {
             // Document is at the boundary — partially in range
             const childStart = atStart ? startTail : [0]
             const childEnd = atEnd ? endTail : [doc.children.length]
-            nodes.push({
+            fragmentContent.push({
                 ...doc,
                 children: sliceChildren(doc.children, { start: childStart, end: childEnd }),
             })
         }
     }
 
-    const referencedStyles = collectStyles(nodes, styles)
+    const referencedStyles = collectStyles(fragmentContent, styles)
     return {
         start: range.start,
         end: range.end,
-        nodes,
+        content: fragmentContent,
         styles: referencedStyles,
     }
 }
@@ -119,13 +119,14 @@ function isPreservedElement(node: BooqElement): boolean {
 }
 
 function stubChild(node: BooqChildNode): BooqChildNode {
-    return stubNode(nodeLength(node)) as BooqChildNode
+    return stubNode(nodeLength(node))
 }
 
 function stubDocument(doc: BooqDocument): BooqDocument {
+    const length = doc.children.reduce((sum, ch) => sum + nodeLength(ch), 0)
     return {
         ...doc,
-        children: doc.children.map(stubChild),
+        children: [stubNode(length)],
     }
 }
 

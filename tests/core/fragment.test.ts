@@ -37,13 +37,13 @@ function isStub(node: BooqChildNode): boolean {
 }
 
 function getBody(fragment: BooqFragment, docIndex: number): BooqElement | undefined {
-    const docNode = fragment.nodes[docIndex] as BooqDocument
+    const docNode = fragment.content[docIndex] as BooqDocument
     const html = docNode?.children?.[0] as BooqElement | undefined
     return html?.children?.[1] as BooqElement | undefined
 }
 
 function getHead(fragment: BooqFragment, docIndex: number): BooqElement | undefined {
-    const docNode = fragment.nodes[docIndex] as BooqDocument
+    const docNode = fragment.content[docIndex] as BooqDocument
     const html = docNode?.children?.[0] as BooqElement | undefined
     return html?.children?.[0] as BooqElement | undefined
 }
@@ -63,9 +63,9 @@ describe('buildFragment', () => {
                 end: [2],
             })
 
-            expect(fragment.nodes).toHaveLength(2)
-            expect((fragment.nodes[0] as BooqDocument).fileName).toBe('ch1.xhtml')
-            expect((fragment.nodes[1] as BooqDocument).fileName).toBe('ch2.xhtml')
+            expect(fragment.content).toHaveLength(2)
+            expect((fragment.content[0] as BooqDocument).fileName).toBe('ch1.xhtml')
+            expect((fragment.content[1] as BooqDocument).fileName).toBe('ch2.xhtml')
             expect(fragment.styles).toEqual(allStyles)
         })
     })
@@ -83,12 +83,12 @@ describe('buildFragment', () => {
             })
 
             // ch1 should be stubbed
-            const ch1 = fragment.nodes[0] as BooqDocument
+            const ch1 = fragment.content[0] as BooqDocument
             expect(ch1.fileName).toBe('ch1.xhtml')
             expect(ch1.children.every(isStub)).toBe(true)
 
             // ch2 should be present
-            const ch2 = fragment.nodes[1] as BooqDocument
+            const ch2 = fragment.content[1] as BooqDocument
             expect(ch2.fileName).toBe('ch2.xhtml')
             const body = getBody(fragment, 1)
             expect(body?.children[0]).toEqual(el('p', [text('Chapter 2')]))
@@ -104,7 +104,7 @@ describe('buildFragment', () => {
                 end: [1],
             })
 
-            const ch2 = fragment.nodes[1] as BooqDocument
+            const ch2 = fragment.content[1] as BooqDocument
             expect(ch2.fileName).toBe('ch2.xhtml')
             expect(ch2.children.every(isStub)).toBe(true)
         })
@@ -120,7 +120,7 @@ describe('buildFragment', () => {
                 end: [1],
             })
 
-            const ch2 = fragment.nodes[1] as BooqDocument
+            const ch2 = fragment.content[1] as BooqDocument
             expect(ch2.fileName).toBe('ch2.xhtml')
             // Fully outside range — everything stubbed, no styles collected
             expect(ch2.children.every(isStub)).toBe(true)
@@ -322,11 +322,11 @@ describe('buildFragment', () => {
             })
 
             // ch1 and ch2 should be fully present
-            expect((fragment.nodes[0] as BooqDocument).fileName).toBe('ch1.xhtml')
-            expect((fragment.nodes[1] as BooqDocument).fileName).toBe('ch2.xhtml')
+            expect((fragment.content[0] as BooqDocument).fileName).toBe('ch1.xhtml')
+            expect((fragment.content[1] as BooqDocument).fileName).toBe('ch2.xhtml')
 
             // ch3 is outside range — fully stubbed
-            const ch3 = fragment.nodes[2] as BooqDocument
+            const ch3 = fragment.content[2] as BooqDocument
             expect(ch3.fileName).toBe('ch3.xhtml')
             expect(ch3.children.every(isStub)).toBe(true)
 
@@ -348,7 +348,7 @@ describe('buildFragment', () => {
                 end: [1],
             })
 
-            expect(fragment.nodes).toHaveLength(1)
+            expect(fragment.content).toHaveLength(1)
             expect(fragment.styles).toEqual({})
         })
 

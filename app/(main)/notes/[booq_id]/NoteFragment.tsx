@@ -19,22 +19,22 @@ type NoteFragmentProps = ExpandedNoteFragmentData & {
 
 export type ExpandedNoteFragmentData = {
     note: BooqNote,
-    nodes?: BooqNode[],
+    content?: BooqNode[],
     styles?: BooqStyles,
     range: BooqRange,
 }
 
 export function NoteFragment({
-    note, nodes, styles, range,
+    note, content, styles, range,
     isExpanded, onToggle,
     onColorChange, onRemove,
 }: NoteFragmentProps) {
     const noteAugmentations = useMemo(() => {
-        if (!nodes) {
+        if (!content) {
             return []
         }
         return [augmentationForNote(note)]
-    }, [nodes, note])
+    }, [content, note])
 
     const viewInBooqHref = booqContentHref({ booqId: note.booqId, path: range.start })
 
@@ -76,13 +76,13 @@ export function NoteFragment({
             </div>
 
             {/* Fragment content — click to expand/collapse */}
-            {isExpanded && nodes ? (
+            {isExpanded && content ? (
                 <div
                     className="rounded shadow py-3 px-12 bg-background overflow-y-auto font-book text-primary cursor-pointer"
                     onClick={onToggle}
                 >
                     <BooqContent
-                        nodes={nodes}
+                        nodes={content}
                         styles={styles ?? {}}
                         range={range}
                         augmentations={noteAugmentations}

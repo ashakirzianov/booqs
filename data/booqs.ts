@@ -191,7 +191,7 @@ export async function fetchLanguageDisplayName(languageCode: string): Promise<st
     return getLanguageDisplayName(languageCode)
 }
 
-export type ExpandedFragment = { nodes: BooqNode[], styles: BooqStyles, range: BooqRange }
+export type ExpandedFragment = { content: BooqNode[], styles: BooqStyles, range: BooqRange }
 
 export async function getExpandedFragments(booqId: BooqId, ranges: BooqRange[]): Promise<Array<ExpandedFragment | undefined>> {
     const booq = await booqForId(booqId)
@@ -204,7 +204,7 @@ export async function getExpandedFragments(booqId: BooqId, ranges: BooqRange[]):
         const fragment = buildFragment(booq, expandedRange)
 
         return {
-            nodes: fragment.nodes,
+            content: fragment.content,
             styles: fragment.styles,
             range: expandedRange,
         }

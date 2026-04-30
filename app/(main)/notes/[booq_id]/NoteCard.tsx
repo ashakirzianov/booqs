@@ -17,7 +17,7 @@ export function NoteCard({
     onToggle: () => void,
     onColorChange?: (noteId: string, newKind: string) => void,
 }) {
-    const { note, nodes, range } = noteFragmentData
+    const { note, content, range } = noteFragmentData
     const { booqId } = note
     const [isEditing, setIsEditing] = useState(false)
     const [editContent, setEditContent] = useState(note.content || '')
@@ -97,7 +97,7 @@ export function NoteCard({
             <div className="mb-4 flex flex-col gap-3">
                 <NoteFragment
                     note={note}
-                    nodes={nodes}
+                    content={content}
                     range={range}
                     isExpanded={isExpanded}
                     onToggle={onToggle}

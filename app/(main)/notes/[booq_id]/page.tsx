@@ -88,7 +88,7 @@ export default async function NotesPage({ params }: {
         if (!note) return undefined
         return {
             note,
-            nodes: fragment?.nodes,
+            content: fragment?.content,
             styles: fragment?.styles,
             range: fragment?.range ?? note.range,
         }
