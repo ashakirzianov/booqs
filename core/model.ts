@@ -7,6 +7,13 @@ export type BooqRange = {
     start: BooqPath,
     end: BooqPath,
 }
+export type BooqLocator = {
+    start: BooqPath,
+    end?: BooqPath,
+    prefix: string,
+    text?: string,
+    suffix: string,
+}
 
 export type BooqElementAttributes = {
     [name in string]?: string;
