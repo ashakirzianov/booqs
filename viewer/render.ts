@@ -22,6 +22,7 @@ type RenderContext = {
     spineIndex?: number,
     parent?: BooqElement,
     withinAnchor?: boolean,
+    withinHead?: boolean,
     augmentations: Augmentation[],
     onAugmentationClick?: (id: string) => void,
     hrefForPath?: (path: BooqPath) => string,
@@ -50,21 +51,59 @@ function renderNode(node: BooqNode, ctx: RenderContext): ReactNode {
     } else if (isDocumentNode(node)) {
         return renderDocumentNode(node, ctx)
     } else if (isElementNode(node)) {
-        const scopedStyle = renderScopedStyle(node, ctx)
-        if (scopedStyle !== undefined) return scopedStyle
-        const mappedName = mapElementName(node.name, ctx)
-        if (mappedName === null) {
-            return null
-        }
-        return createElement(
-            mappedName,
-            getProps(node, ctx),
-            getChildren(node, ctx),
-        )
-    } else {
-        assertNever(node)
+        return renderElementNode(node, ctx)
+    }
+    assertNever(node)
+    return null
+}
+
+function renderElementNode(node: BooqElement, ctx: RenderContext): ReactNode {
+    if (node.name === 'link') {
+        return renderLinkNode(node, ctx)
+    } else if (node.name === 'style') {
+        return renderStyleNode(node, ctx)
+    }
+    const mappedName = mapElementName(node.name, ctx)
+    if (mappedName === null) {
         return null
     }
+    return createElement(
+        mappedName,
+        getProps(node, ctx),
+        getChildren(node, ctx),
+    )
+}
+
+function renderLinkNode(node: BooqElement, ctx: RenderContext): ReactNode {
+    const spineIndex = ctx.spineIndex
+    if (spineIndex === undefined) return null
+
+    const scopeSelector = `[${DATA_DOC}="${spineIndex}"]`
+
+    const href = node.attributes?.href
+    if (!href) return null
+    const css = ctx.styles[href]
+    if (!css) return null
+    return createElement(
+        'style',
+        { key: `${pathToString(ctx.path)}-link-style` },
+        wrapInScope(css, scopeSelector),
+    )
+}
+
+function renderStyleNode(node: BooqElement, ctx: RenderContext): ReactNode {
+    const spineIndex = ctx.spineIndex
+    if (spineIndex === undefined) return null
+
+    const scopeSelector = `[${DATA_DOC}="${spineIndex}"]`
+
+    const text = typeof node.children[0] === 'string' ? node.children[0] : undefined
+    if (!text) return null
+    return createElement(
+        'style',
+        { key: `${pathToString(ctx.path)}-inline-style` },
+        wrapInScope(text, scopeSelector),
+    )
 }
 
 function renderDocumentNode(node: BooqDocument, ctx: RenderContext): ReactNode {
@@ -164,6 +203,9 @@ function getProps(node: BooqElement, {
 
 // Converts XML attribute names to React prop names at render time.
 function mapElementName(name: string, ctx: RenderContext): string | null {
+    if (ctx.withinHead) {
+        return null
+    }
     switch (name) {
         case 'script': case 'meta': case 'title': return null
         case 'html': case 'head': case 'body': return 'div'
@@ -197,7 +239,8 @@ function getChildren(node: BooqElement, ctx: RenderContext) {
     const children = node.children && renderNodes(node.children, {
         ...ctx,
         parent: node,
-        withinAnchor: ctx.withinAnchor || node.name === 'a',
+        withinAnchor: node.name === 'a' ? true : ctx.withinAnchor,
+        withinHead: node.name === 'head' ? true : ctx.withinHead,
     })
     return (children?.length ?? 0) > 0
         ? children
@@ -293,39 +336,6 @@ function breakPath(path: BooqPath) {
 function parseRefPath(value: string | undefined): BooqPath | undefined {
     if (!value) return undefined
     return pathFromString(value)
-}
-
-// Renders <link rel="stylesheet"> and <style> elements as scoped <style> elements.
-// Returns undefined for elements that aren't style-related.
-function renderScopedStyle(node: BooqElement, ctx: RenderContext): ReactNode | undefined {
-    const spineIndex = ctx.spineIndex
-    if (spineIndex === undefined) return undefined
-
-    const scopeSelector = `[${DATA_DOC}="${spineIndex}"]`
-
-    if (node.name === 'link' && node.attributes?.rel?.toLowerCase() === 'stylesheet') {
-        const href = node.attributes?.href
-        if (!href) return null
-        const css = ctx.styles[href]
-        if (!css) return null
-        return createElement(
-            'style',
-            { key: `${pathToString(ctx.path)}-link-style` },
-            wrapInScope(css, scopeSelector),
-        )
-    }
-
-    if (node.name === 'style') {
-        const text = typeof node.children[0] === 'string' ? node.children[0] : undefined
-        if (!text) return null
-        return createElement(
-            'style',
-            { key: `${pathToString(ctx.path)}-inline-style` },
-            wrapInScope(text, scopeSelector),
-        )
-    }
-
-    return undefined
 }
 
 function wrapInScope(css: string, scopeSelector: string): string {
