@@ -1,11 +1,11 @@
-import { BooqDocument, BooqChildNode, BooqNode, BooqRange, BooqPath, BooqStyles, BooqElement, Booq } from './model'
+import { BooqDocument, BooqContent, BooqChildNode, BooqNode, BooqRange, BooqPath, BooqStyles, BooqElement, Booq } from './model'
 import { isElementNode, isContainerNode, stubNode, isStubNode } from './node'
 import { nodeLength } from './position'
 
 export type BooqFragment = {
     start: BooqPath,
     end: BooqPath,
-    content: BooqNode[],
+    content: BooqContent,
     styles: BooqStyles,
 }
 
@@ -15,7 +15,7 @@ export function buildFragment({ content, styles }: Pick<Booq, 'content' | 'style
     const actualStart = startDoc ?? 0
     const actualEnd = endDoc ?? content.length
 
-    const fragmentContent: BooqNode[] = []
+    const fragmentContent: BooqContent = []
     for (let idx = 0; idx < content.length; idx++) {
         const doc = content[idx]
         const beforeRange = idx < actualStart
@@ -131,7 +131,7 @@ function stubDocument(doc: BooqDocument): BooqDocument {
 }
 
 // Collect styles referenced by <link> elements in the fragment's documents.
-function collectStyles(nodes: BooqNode[], allStyles: BooqStyles): BooqStyles {
+function collectStyles(nodes: BooqContent, allStyles: BooqStyles): BooqStyles {
     const refs = new Set<string>()
     collectStyleRefs(nodes, refs)
     const styles: BooqStyles = {}

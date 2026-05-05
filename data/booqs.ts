@@ -7,7 +7,7 @@ import {
     TableOfContents,
     BooqChapter,
     BooqRange,
-    BooqNode,
+    BooqContent,
     getExpandedRange,
 } from '@/core'
 import { userForId } from '@/backend/users'
@@ -191,7 +191,7 @@ export async function fetchLanguageDisplayName(languageCode: string): Promise<st
     return getLanguageDisplayName(languageCode)
 }
 
-export type ExpandedFragment = { content: BooqNode[], styles: BooqStyles, range: BooqRange }
+export type ExpandedFragment = { content: BooqContent, styles: BooqStyles, range: BooqRange }
 
 export async function getExpandedFragments(booqId: BooqId, ranges: BooqRange[]): Promise<Array<ExpandedFragment | undefined>> {
     const booq = await booqForId(booqId)

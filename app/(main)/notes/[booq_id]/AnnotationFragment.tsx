@@ -2,8 +2,8 @@
 
 import { useMemo } from 'react'
 import { ExternalLinkIcon } from '@/components/Icons'
-import { BooqNode, BooqStyles, BooqRange } from '@/core'
-import { BooqContent } from '@/viewer'
+import { BooqContent, BooqStyles, BooqRange } from '@/core'
+import { default as BooqContentViewer } from '@/viewer/BooqContent'
 import { LightLink, RemoveButton } from '@/components/Buttons'
 import { ColorPicker } from '@/components/ColorPicker'
 import { booqContentHref } from '@/common/href'
@@ -19,7 +19,7 @@ type AnnotationFragmentProps = ExpandedAnnotationFragmentData & {
 
 export type ExpandedAnnotationFragmentData = {
     annotation: BooqAnnotation,
-    content?: BooqNode[],
+    content?: BooqContent,
     styles?: BooqStyles,
     range: BooqRange,
 }
@@ -81,7 +81,7 @@ export function AnnotationFragment({
                     className="rounded shadow py-3 px-12 bg-background overflow-y-auto font-book text-primary cursor-pointer"
                     onClick={onToggle}
                 >
-                    <BooqContent
+                    <BooqContentViewer
                         nodes={content}
                         styles={styles ?? {}}
                         range={range}

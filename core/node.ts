@@ -1,4 +1,4 @@
-import { BooqNode, BooqRange, BooqPath, BooqTextNode, BooqElement, BooqDocument, BooqStub, BooqChildNode } from './model'
+import { BooqNode, BooqContent, BooqContainerNode, BooqRange, BooqPath, BooqTextNode, BooqElement, BooqDocument, BooqStub, BooqChildNode } from './model'
 import { DATA_PARAGRAPH } from './attributes'
 import { nodeLength } from './position'
 
@@ -18,7 +18,7 @@ export function isElementNode(node: BooqNode | undefined): node is BooqElement {
     return node?.name !== undefined
 }
 
-export function isContainerNode(node: BooqNode | undefined): node is BooqElement | BooqDocument {
+export function isContainerNode(node: BooqNode | undefined): node is BooqContainerNode {
     return node?.children !== undefined
 }
 
@@ -26,16 +26,16 @@ export function isMarkedAsParagraph(node: BooqNode | undefined): boolean {
     return isElementNode(node) && node.attributes?.[DATA_PARAGRAPH] !== undefined
 }
 
+
 export function nodeChildren(node: BooqNode): BooqChildNode[] | undefined {
     return node?.children
 }
 
-export function visitNodes(nodes: BooqNode[], visitor: (node: BooqNode) => void): void {
+export function visitNodes(nodes: BooqChildNode[], visitor: (node: BooqChildNode) => void): void {
     for (const node of nodes) {
         visitor(node)
-        const children = nodeChildren(node)
-        if (children) {
-            visitNodes(children, visitor)
+        if (isContainerNode(node)) {
+            visitNodes(node.children, visitor)
         }
     }
 }
@@ -73,7 +73,11 @@ export async function mapChildNodesAsync(nodes: BooqChildNode[], transform: (nod
     }))
 }
 
-export function nodeForPath(nodes: BooqNode[], path: BooqPath): BooqNode | undefined {
+export function nodeForPath(nodes: BooqContent, path: BooqPath): BooqNode | undefined {
+    return nodeForPathImpl(nodes, path)
+}
+
+function nodeForPathImpl(nodes: BooqNode[], path: BooqPath): BooqNode | undefined {
     const [head, ...tail] = path
     if (head === undefined || head >= nodes.length || head < 0) {
         return undefined
@@ -82,11 +86,14 @@ export function nodeForPath(nodes: BooqNode[], path: BooqPath): BooqNode | undef
     if (tail.length === 0) {
         return node
     }
-    const children = nodeChildren(node)
-    return children ? nodeForPath(children, tail) : undefined
+    return isContainerNode(node) ? nodeForPathImpl(node.children, tail) : undefined
 }
 
-export function nodesForRange(nodes: BooqNode[], range: BooqRange, emptyStubs?: boolean): BooqNode[] {
+export function nodesForRange(nodes: BooqContent, range: BooqRange, emptyStubs?: boolean): BooqNode[] {
+    return nodesForRangeImpl(nodes, range, emptyStubs)
+}
+
+function nodesForRangeImpl(nodes: BooqNode[], range: BooqRange, emptyStubs?: boolean): BooqNode[] {
     const [startHead, ...startTail] = range.start
     const [endHead, ...endTail] = range.end ?? []
     const actualStart = startHead ?? 0
@@ -100,8 +107,7 @@ export function nodesForRange(nodes: BooqNode[], range: BooqRange, emptyStubs?: 
             if (isContainerNode(node)) {
                 result.push({
                     ...node,
-                    // as BooqChildNode[]: children never contain BooqDocument nodes
-                    children: nodesForRange(node.children, {
+                    children: nodesForRangeImpl(node.children, {
                         start: startTail,
                         end: actualEnd === idx && endTail.length > 0
                             ? endTail
@@ -117,8 +123,7 @@ export function nodesForRange(nodes: BooqNode[], range: BooqRange, emptyStubs?: 
             if (isContainerNode(node)) {
                 result.push({
                     ...node,
-                    // as BooqChildNode[]: children never contain BooqDocument nodes
-                    children: nodesForRange(node.children, {
+                    children: nodesForRangeImpl(node.children, {
                         start: [0],
                         end: endTail,
                     }) as BooqChildNode[],

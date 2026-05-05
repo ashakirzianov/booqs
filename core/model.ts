@@ -45,7 +45,9 @@ export type BooqStub = {
     name?: undefined,
 } | null
 export type BooqChildNode = BooqElement | BooqTextNode | BooqStub
+export type BooqContainerNode = BooqDocument | BooqElement
 export type BooqNode = BooqDocument | BooqChildNode
+export type BooqContent = BooqDocument[]
 
 export type TableOfContentsItem = {
     title: string | undefined,
@@ -80,7 +82,7 @@ export type BooqMetadata = {
 }
 export type BooqStyles = Record<string, string>
 export type Booq = {
-    content: BooqDocument[],
+    content: BooqContent,
     styles: BooqStyles,
     metadata: BooqMetadata,
     toc: TableOfContents,

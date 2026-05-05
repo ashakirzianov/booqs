@@ -1,8 +1,6 @@
-import { BooqElement, BooqDocument, BooqNode, BooqPath, BooqTextNode } from './model'
+import { BooqChildNode, BooqContent, BooqContainerNode, BooqElement, BooqNode, BooqPath, BooqTextNode } from './model'
 import { isContainerNode, isTextNode, nodeChildren } from './node'
 import { pathLessThan } from './path'
-
-type BooqContainerNode = BooqElement | BooqDocument
 
 export type BooqIterator = BooqContainerIterator | BooqTextIterator
 export type BooqContainerIterator = {
@@ -30,7 +28,7 @@ export function iteratorLessThan(a: BooqIterator, b: BooqIterator): boolean {
     return pathLessThan(aPath, bPath)
 }
 
-export function iteratorAtPath(nodes: BooqNode[], path: BooqPath): BooqIterator | undefined {
+export function iteratorAtPath(nodes: BooqContent, path: BooqPath): BooqIterator | undefined {
     function iteratorAtPathImpl(container: BooqContainerNode, path: BooqPath, parent: BooqContainerIterator | undefined): BooqIterator | undefined {
         const [head, ...tail] = path
         if (head === undefined || head >= (container.children?.length ?? 0)) {
@@ -59,11 +57,9 @@ export function iteratorAtPath(nodes: BooqNode[], path: BooqPath): BooqIterator 
             return undefined
         }
     }
-    // as BooqElement: synthetic root node to start traversal — not a real EPUB element
-    return iteratorAtPathImpl({
-        name: 'root',
-        children: nodes,
-    } as BooqElement, path, undefined)
+    // as BooqElement: synthetic root wrapping documents as children to start traversal
+    const syntheticRoot = { name: 'root', children: nodes as unknown as BooqChildNode[] } as BooqElement
+    return iteratorAtPathImpl(syntheticRoot, path, undefined)
 }
 
 export function iteratorsPath(iter: BooqIterator): BooqPath {

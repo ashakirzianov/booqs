@@ -131,7 +131,7 @@ function normalizeImageSrcsInBooq(booq: Booq): void {
 
 function collectUniqueSrcsFromBooq(booq: Booq): string[] {
     const srcs = new Set<string>()
-    visitNodes(booq.content, node => {
+    for (const doc of booq.content) visitNodes(doc.children, node => {
         if (isElementNode(node)) {
             if (node.attributes?.src) {
                 srcs.add(node.attributes.src)
