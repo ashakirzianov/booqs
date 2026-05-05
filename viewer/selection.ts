@@ -1,8 +1,10 @@
-import { BooqRange, pathLessThan, pathFromString, DATASET_PATH, DATA_AUGMENTATION_ID } from '@/core'
+import { BooqRange, BooqLocator, pathLessThan, pathFromString, DATASET_PATH, DATA_AUGMENTATION_ID } from '@/core'
 
 export type BooqSelection = {
     range: BooqRange,
     text: string,
+    prefix: string,
+    suffix: string,
 }
 
 // TODO: naming?
@@ -77,6 +79,32 @@ export function getAugmentationText(augmentationId: string): string {
     return text
 }
 
+const CONTEXT_LENGTH = 30
+
+export function locatorFromSelection(selection: BooqSelection): BooqLocator {
+    return {
+        start: selection.range.start,
+        end: selection.range.end,
+        prefix: selection.prefix,
+        text: selection.text,
+        suffix: selection.suffix,
+    }
+}
+
+function findBlockAncestor(node: Node): HTMLElement | null {
+    let current: Node | null = node
+    while (current && current !== document.body) {
+        if (current instanceof HTMLElement) {
+            const display = window.getComputedStyle(current).display
+            if (display === 'block' || display === 'flex' || display === 'grid') {
+                return current
+            }
+        }
+        current = current.parentNode
+    }
+    return document.body
+}
+
 export function getBooqSelection(): BooqSelection | undefined {
     const selection = window.getSelection()
     if (!selection || !selection.anchorNode || !selection.focusNode) {
@@ -92,13 +120,39 @@ export function getBooqSelection(): BooqSelection | undefined {
                 : undefined
         if (range) {
             const text = selection.toString()
+            const { prefix, suffix } = extractSelectionContext(selection)
             return {
-                range, text,
+                range, text, prefix, suffix,
             }
         }
 
     }
     return undefined
+}
+
+function extractSelectionContext(selection: Selection): { prefix: string, suffix: string } {
+    if (selection.rangeCount === 0) {
+        return { prefix: '', suffix: '' }
+    }
+    const domRange = selection.getRangeAt(0)
+    const container = domRange.commonAncestorContainer
+    const blockAncestor = findBlockAncestor(container)
+
+    if (!blockAncestor) {
+        return { prefix: '', suffix: '' }
+    }
+
+    const beforeRange = document.createRange()
+    beforeRange.selectNodeContents(blockAncestor)
+    beforeRange.setEnd(domRange.startContainer, domRange.startOffset)
+    const prefix = beforeRange.toString().slice(-CONTEXT_LENGTH)
+
+    const afterRange = document.createRange()
+    afterRange.selectNodeContents(blockAncestor)
+    afterRange.setStart(domRange.endContainer, domRange.endOffset)
+    const suffix = afterRange.toString().slice(0, CONTEXT_LENGTH)
+
+    return { prefix, suffix }
 }
 
 function getSelectionPath(node: Node, offset: number) {

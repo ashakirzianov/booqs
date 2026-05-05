@@ -54,6 +54,8 @@ export function useAugmentations({
                         selection: {
                             range: quote,
                             text: getAugmentationText(augmentationId),
+                            prefix: '',
+                            suffix: '',
                         },
                     }
                     : undefined
@@ -72,6 +74,8 @@ export function useAugmentations({
                     selection: {
                         range: annotation.range,
                         text: annotation.targetQuote,
+                        prefix: '',
+                        suffix: '',
                     },
                 }
             }
@@ -83,6 +87,8 @@ export function useAugmentations({
                         selection: {
                             range: temp.range,
                             text: getAugmentationText(augmentationId),
+                            prefix: '',
+                            suffix: '',
                         },
                     }
                     : undefined

@@ -38,6 +38,8 @@ export function AnnotationNodeComp({ booqId, annotation, user }: {
                             selection: {
                                 range: annotation.range,
                                 text: annotation.targetQuote,
+                                prefix: '',
+                                suffix: '',
                             },
                         }}
                     />

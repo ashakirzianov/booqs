@@ -61,6 +61,8 @@ export function AddHighlightItem({
             kind,
             range: selection.range,
             targetQuote: selection.text,
+            prefix: selection.prefix,
+            suffix: selection.suffix,
         })
         if (result) {
             setMenuState({

@@ -103,6 +103,8 @@ export function useBooqAnnotations({
         kind,
         content,
         targetQuote,
+        prefix,
+        suffix,
         privacy = 'private',
         id,
     }: {
@@ -110,6 +112,8 @@ export function useBooqAnnotations({
         kind: string,
         content?: string,
         targetQuote: string,
+        prefix?: string,
+        suffix?: string,
         privacy?: AnnotationPrivacy,
         id?: string,
     }) {
@@ -123,6 +127,8 @@ export function useBooqAnnotations({
             content,
             targetQuote,
             privacy,
+            prefix,
+            suffix,
         }
 
         const now = new Date().toISOString()

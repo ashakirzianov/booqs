@@ -23,6 +23,8 @@ const postBodySchema = z.object({
     content: z.string().max(10000).optional(),
     targetQuote: z.string().max(10000),
     privacy: z.enum(['private', 'public']) as z.ZodType<AnnotationPrivacy>,
+    prefix: z.string().max(100).optional(),
+    suffix: z.string().max(100).optional(),
 })
 
 const patchBodySchema = z.object({
