@@ -40,7 +40,7 @@ export function useGenerateReply({
                 setState({ status: 'error', noteId, error })
             },
             async onDone() {
-                await mutate(`/api/replies?note_id=${noteId}`)
+                await mutate(`/api/replies?annotation_id=${noteId}`)
                 mutate(`/api/annotations?booq_id=${booqId}`)
                 setState(prev =>
                     prev.status === 'streaming'

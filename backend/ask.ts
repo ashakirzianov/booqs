@@ -9,36 +9,36 @@ export type GenerateAiReplyResult =
     | { success: true, stream: ReadableStream<Uint8Array> }
     | { success: false, error: { message: string, code: string } }
 
-export async function generateAiReply(noteId: string): Promise<GenerateAiReplyResult> {
-    const note = await annotationForId(noteId)
-    if (!note) {
-        return { success: false, error: { message: 'Note not found', code: 'NOT_FOUND' } }
+export async function generateAiReply(annotationId: string): Promise<GenerateAiReplyResult> {
+    const annotation = await annotationForId(annotationId)
+    if (!annotation) {
+        return { success: false, error: { message: 'Annotation not found', code: 'NOT_FOUND' } }
     }
-    if (!note.content) {
-        return { success: false, error: { message: 'Note has no content', code: 'NO_CONTENT' } }
+    if (!annotation.content) {
+        return { success: false, error: { message: 'Annotation has no content', code: 'NO_CONTENT' } }
     }
 
-    const alreadyReplied = await hasReplyFromAuthor({ noteId, authorId: AI_USER_ID })
+    const alreadyReplied = await hasReplyFromAuthor({ annotationId, authorId: AI_USER_ID })
     if (alreadyReplied) {
         return { success: false, error: { message: 'AI reply already exists', code: 'ALREADY_EXISTS' } }
     }
 
     const result = await generateAnswerStreaming({
-        booqId: note.booq_id as BooqId,
-        range: { start: note.start_path, end: note.end_path },
-        question: note.content,
+        booqId: annotation.booq_id as BooqId,
+        range: { start: annotation.start_path, end: annotation.end_path },
+        question: annotation.content,
     })
     if (!result.success) {
         return result
     }
 
-    const stream = createReplySavingStream(result.stream, noteId)
+    const stream = createReplySavingStream(result.stream, annotationId)
     return { success: true, stream }
 }
 
 function createReplySavingStream(
     originalStream: ReadableStream<Uint8Array>,
-    noteId: string,
+    annotationId: string,
 ): ReadableStream<Uint8Array> {
     let accumulatedContent = ''
     const decoder = new TextDecoder()
@@ -54,7 +54,7 @@ function createReplySavingStream(
 
                         if (done) {
                             if (accumulatedContent) {
-                                await saveAiReply(noteId, accumulatedContent)
+                                await saveAiReply(annotationId, accumulatedContent)
                             }
                             controller.close()
                             break
@@ -77,14 +77,14 @@ function createReplySavingStream(
     })
 }
 
-async function saveAiReply(noteId: string, content: string): Promise<void> {
+async function saveAiReply(annotationId: string, content: string): Promise<void> {
     try {
         await ensureAiUser()
-        const alreadyReplied = await hasReplyFromAuthor({ noteId, authorId: AI_USER_ID })
+        const alreadyReplied = await hasReplyFromAuthor({ annotationId, authorId: AI_USER_ID })
         if (alreadyReplied) return
         await addReply({
             id: nanoid(10),
-            noteId,
+            annotationId,
             authorId: AI_USER_ID,
             content,
         })

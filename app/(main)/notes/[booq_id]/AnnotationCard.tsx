@@ -15,7 +15,7 @@ export function AnnotationCard({
     user: AnnotationAuthorData | undefined,
     isExpanded: boolean,
     onToggle: () => void,
-    onColorChange?: (annotationId: string, newKind: string) => void,
+    onColorChange?: (annotationId: string, newColor: string) => void,
 }) {
     const { annotation, content, range } = noteFragmentData
     const { booqId } = annotation
@@ -59,21 +59,23 @@ export function AnnotationCard({
         addAnnotation({
             range: removedAnnotation.range,
             kind: removedAnnotation.kind,
+            color: removedAnnotation.color,
             content: removedAnnotation.content || undefined,
             targetQuote: removedAnnotation.targetQuote,
+            prefix: removedAnnotation.prefix,
+            suffix: removedAnnotation.suffix,
             privacy: removedAnnotation.privacy || 'private',
             id: removedAnnotation.id
         })
         setRemovedAnnotation(null)
     }
 
-    function handleColorChange(kind: string) {
+    function handleColorChange(color: string) {
         updateAnnotation({
             annotationId: annotation.id,
-            kind: kind
+            color,
         })
-        // Notify parent component about the color change
-        onColorChange?.(annotation.id, kind)
+        onColorChange?.(annotation.id, color)
     }
 
     // Show removal message if note was removed
@@ -144,7 +146,7 @@ export function AnnotationCard({
                 )}
 
                 <div className="px-3">
-                    <NoteReplies noteId={annotation.id} user={user} collapsible />
+                    <NoteReplies annotationId={annotation.id} user={user} collapsible />
                 </div>
             </div>
         </div>

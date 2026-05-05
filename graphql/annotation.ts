@@ -12,7 +12,7 @@ export type AnnotationParent = DbAnnotation
 export const annotationResolver: IResolvers<AnnotationParent, ResolverContext> = {
     Annotation: {
         async author(parent, _, { userLoader }): Promise<DbUser | null> {
-            return userLoader.load(parent.author_id)
+            return userLoader.load(parent.user_id)
         },
         async booq(parent, _, { booqDataLoader }): Promise<BooqParent | undefined> {
             return booqDataLoader.load(parent.booq_id as BooqId)
@@ -54,7 +54,7 @@ export const annotationResolver: IResolvers<AnnotationParent, ResolverContext> =
             return parent.end_path
         },
         targetQuote(parent) {
-            return parent.target_quote
+            return parent.text
         },
         content(parent) {
             return parent.content

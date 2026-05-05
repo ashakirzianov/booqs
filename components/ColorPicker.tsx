@@ -1,21 +1,21 @@
 import { colorSchemeForBaseColor } from '@/application/common'
-import { HIGHLIGHT_KINDS } from '@/application/annotations'
+import { HIGHLIGHT_COLORS, HighlightColor } from '@/application/annotations'
 
 export function ColorPicker({
-    selectedKind,
+    selectedColor,
     onColorChange
 }: {
-    selectedKind: string,
-    onColorChange: (kind: string) => void,
+    selectedColor: string | undefined,
+    onColorChange: (color: HighlightColor) => void,
 }) {
     return (
         <div className="flex flex-row h-full items-stretch justify-between">
-            {HIGHLIGHT_KINDS.map((kind, idx) => (
+            {HIGHLIGHT_COLORS.map((color) => (
                 <ColorSelectionButton
-                    key={idx}
-                    selected={kind === selectedKind}
-                    color={`var(--color-${kind})`}
-                    callback={() => onColorChange(kind)}
+                    key={color}
+                    selected={color === selectedColor}
+                    color={`var(--color-highlight-${color})`}
+                    callback={() => onColorChange(color)}
                 />
             ))}
         </div>

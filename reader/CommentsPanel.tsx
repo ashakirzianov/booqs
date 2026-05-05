@@ -281,7 +281,7 @@ function CommentItem({ comment, booqId, user, streamingReply }: {
             )}
 
             {/* Replies */}
-            <NoteReplies noteId={comment.id} user={user} />
+            <NoteReplies annotationId={comment.id} user={user} />
         </div>
     )
 }

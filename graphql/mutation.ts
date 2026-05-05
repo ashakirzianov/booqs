@@ -101,32 +101,34 @@ export const mutationResolver: IResolvers<any, ResolverContext> = {
             if (!requireAuth(userId)) return fail('Authentication required')
             await addAnnotation({
                 id: annotation.id,
-                authorId: userId,
+                userId,
                 booqId: annotation.booqId,
                 range: {
                     start: annotation.start,
                     end: annotation.end,
                 },
+                prefix: annotation.prefix ?? '',
+                text: annotation.targetQuote ?? '',
+                suffix: annotation.suffix ?? '',
                 kind: annotation.kind,
-                targetQuote: annotation.targetQuote,
             })
             return ok()
         },
         async removeAnnotation(_, { id }, { userId }): Promise<MutationResult> {
             if (!requireAuth(userId)) return fail('Authentication required')
-            const result = await removeAnnotation({ authorId: userId, id })
+            const result = await removeAnnotation({ userId, id })
             return result ? ok() : fail('Annotation not found')
         },
         async updateAnnotation(_, { id, kind, content }, { userId }): Promise<MutationResult> {
             if (!requireAuth(userId)) return fail('Authentication required')
-            await updateAnnotation({ authorId: userId, id, kind, content })
+            await updateAnnotation({ userId, id, kind, content })
             return ok()
         },
         async addReply(_, { reply }, { userId }): Promise<MutationResult> {
             if (!requireAuth(userId)) return fail('Authentication required')
             await addReply({
                 id: reply.id,
-                noteId: reply.annotationId,
+                annotationId: reply.annotationId,
                 authorId: userId,
                 content: reply.content,
             })

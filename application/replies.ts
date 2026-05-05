@@ -8,13 +8,13 @@ import { useMemo } from 'react'
 import useSWR from 'swr'
 import useSWRMutation from 'swr/mutation'
 
-export function useNoteReplies({
-    noteId, user,
+export function useAnnotationReplies({
+    annotationId, user,
 }: {
-    noteId: string,
+    annotationId: string,
     user: AnnotationAuthorData | undefined,
 }) {
-    const repliesKey = `/api/replies?note_id=${noteId}`
+    const repliesKey = `/api/replies?annotation_id=${annotationId}`
 
     const { data, isLoading } = useSWR(
         repliesKey,
@@ -70,11 +70,11 @@ export function useNoteReplies({
         if (!user) return undefined
 
         const replyId = nanoid(10)
-        const body: PostBody = { noteId, content }
+        const body: PostBody = { annotationId, content }
         const now = new Date().toISOString()
         const optimisticResponse: PostResponse = {
             id: replyId,
-            noteId,
+            annotationId,
             author: user,
             content,
             createdAt: now,

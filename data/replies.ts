@@ -3,7 +3,7 @@ import {
     addReply,
     removeReply,
     updateReply,
-    repliesForNotes,
+    repliesForAnnotations,
     DbReply,
     DbReplyWithAuthor,
 } from '@/backend/replies'
@@ -11,7 +11,7 @@ import { AnnotationAuthorData } from './annotations'
 
 export type BooqReply = {
     id: string,
-    noteId: string,
+    annotationId: string,
     author: AnnotationAuthorData,
     content: string,
     createdAt: string,
@@ -22,24 +22,24 @@ export type UnresolvedBooqReply = Omit<BooqReply, 'author'> & {
     authorId: string,
 }
 
-export async function fetchReplies(noteIds: string[]): Promise<BooqReply[]> {
-    const dbReplies = await repliesForNotes(noteIds)
+export async function fetchReplies(annotationIds: string[]): Promise<BooqReply[]> {
+    const dbReplies = await repliesForAnnotations(annotationIds)
     return dbReplies.map(replyFromDbReplyWithAuthor)
 }
 
 export async function createReply({
     id,
-    noteId,
+    annotationId,
     authorId,
     content,
 }: {
     id: string,
-    noteId: string,
+    annotationId: string,
     authorId: string,
     content: string,
 }): Promise<UnresolvedBooqReply | undefined> {
     try {
-        const dbReply = await addReply({ id, noteId, authorId, content })
+        const dbReply = await addReply({ id, annotationId, authorId, content })
         return unresolvedBooqReply(dbReply)
     } catch (error) {
         console.error('Error creating reply:', error)
@@ -76,7 +76,7 @@ export async function modifyReply({
 function unresolvedBooqReply(reply: DbReply): UnresolvedBooqReply {
     return {
         id: reply.id,
-        noteId: reply.note_id,
+        annotationId: reply.annotation_id,
         authorId: reply.author_id,
         content: reply.content,
         createdAt: reply.created_at,
@@ -87,7 +87,7 @@ function unresolvedBooqReply(reply: DbReply): UnresolvedBooqReply {
 function replyFromDbReplyWithAuthor(dbReply: DbReplyWithAuthor): BooqReply {
     return {
         id: dbReply.id,
-        noteId: dbReply.note_id,
+        annotationId: dbReply.annotation_id,
         author: {
             id: dbReply.author_id,
             name: dbReply.author_name,

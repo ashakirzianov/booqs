@@ -20,15 +20,17 @@ const postBodySchema = z.object({
         end: booqPathSchema,
     }) as z.ZodType<BooqRange>,
     kind: z.string().min(1).max(50),
+    color: z.string().max(20).optional(),
     content: z.string().max(10000).optional(),
     targetQuote: z.string().max(10000),
+    prefix: z.string().max(100),
+    suffix: z.string().max(100),
     privacy: z.enum(['private', 'public']) as z.ZodType<AnnotationPrivacy>,
-    prefix: z.string().max(100).optional(),
-    suffix: z.string().max(100).optional(),
 })
 
 const patchBodySchema = z.object({
     kind: z.string().min(1).max(50).optional(),
+    color: z.string().max(20).nullish(),
     content: z.string().max(10000).nullish(),
 })
 
@@ -52,15 +54,18 @@ export async function POST(request: NextRequest, { params }: { params: Promise<P
     if (!parsed.success) {
         return Response.json({ error: 'Invalid request body', details: parsed.error.flatten() }, { status: 400 })
     }
-    const { booqId, range, kind, content, targetQuote, privacy } = parsed.data
+    const { booqId, range, kind, color, content, targetQuote, prefix, suffix, privacy } = parsed.data
     const annotation = await createAnnotation({
         id,
-        authorId: userId,
+        userId,
         booqId,
         range,
+        prefix,
+        text: targetQuote,
+        suffix,
         kind,
+        color,
         content,
-        targetQuote,
         privacy,
     })
     if (!annotation) {
@@ -77,6 +82,7 @@ export type PatchBody = z.infer<typeof patchBodySchema>
 export type PatchResponse = {
     id: string,
     kind: string,
+    color?: string,
     content?: string,
     targetQuote: string,
     createdAt: string,
@@ -92,11 +98,12 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     if (!parsed.success) {
         return Response.json({ error: 'Invalid request body', details: parsed.error.flatten() }, { status: 400 })
     }
-    const { kind, content } = parsed.data
+    const { kind, color, content } = parsed.data
     const annotation = await modifyAnnotation({
         id,
-        authorId: userId,
+        userId,
         kind,
+        color,
         content,
     })
     if (!annotation) {
@@ -113,7 +120,7 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
     }
     const { id } = await params
     const success = await deleteAnnotation({
-        id, authorId: userId,
+        id, userId,
     })
     if (success) {
         return new Response(undefined, { status: 204 })

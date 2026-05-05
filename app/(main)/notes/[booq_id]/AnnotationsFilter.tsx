@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react'
 import { AnnotationAuthorData } from '@/data/annotations'
 import { BooqId } from '@/core'
-import { HIGHLIGHT_KINDS, COMMENT_KIND, QUESTION_KIND, useBooqAnnotations } from '@/application/annotations'
+import { COMMENT_KIND, QUESTION_KIND, useBooqAnnotations } from '@/application/annotations'
 import { AnnotationCard } from './AnnotationCard'
 import clsx from 'clsx'
 import { ExpandedAnnotationFragmentData } from './AnnotationFragment'
@@ -47,18 +47,21 @@ export function AnnotationsFilter({ data, booqId, user }: {
 
     // Build filter groups in canonical order
     const filterGroups = useMemo(() => {
-        const presentKinds = new Set(mergedNoteData.map(d => d.annotation.kind))
+        const presentColors = new Set(
+            mergedNoteData
+                .filter(d => d.annotation.kind === 'highlight' && d.annotation.color)
+                .map(d => d.annotation.color!)
+        )
+        const hasComments = mergedNoteData.some(d => d.annotation.kind === COMMENT_KIND || d.annotation.kind === QUESTION_KIND)
         const filterGroups: FilterGroup[] = []
-        for (const kind of HIGHLIGHT_KINDS) {
-            if (presentKinds.has(kind)) {
-                filterGroups.push({
-                    key: kind,
-                    label: `Highlight ${HIGHLIGHT_KINDS.indexOf(kind) + 1}`,
-                    color: `var(--color-${kind})`,
-                })
-            }
+        for (const color of presentColors) {
+            filterGroups.push({
+                key: color,
+                label: color.charAt(0).toUpperCase() + color.slice(1),
+                color: `var(--color-highlight-${color})`,
+            })
         }
-        if (presentKinds.has(COMMENT_KIND) || presentKinds.has(QUESTION_KIND)) {
+        if (hasComments) {
             filterGroups.push({
                 key: 'comments',
                 label: 'Comments',
@@ -71,7 +74,7 @@ export function AnnotationsFilter({ data, booqId, user }: {
 
     const filteredNotes = useMemo(() => selectedFilter === 'all'
         ? mergedNoteData
-        : mergedNoteData.filter(d => filterKeyForKind(d.annotation.kind) === selectedFilter), [mergedNoteData, selectedFilter])
+        : mergedNoteData.filter(d => filterKeyForAnnotation(d.annotation) === selectedFilter), [mergedNoteData, selectedFilter])
 
     const hasAnyExpanded = filteredNotes.some(d => expandedNotes.has(d.annotation.id))
 
@@ -95,10 +98,10 @@ export function AnnotationsFilter({ data, booqId, user }: {
         })
     }
 
-    function handleNoteColorChange(_noteId: string, newKind: string) {
+    function handleNoteColorChange(_annotationId: string, newColor: string) {
         if (selectedFilter === 'all') return
-        if (filterKeyForKind(newKind) !== selectedFilter) {
-            setSelectedFilter(filterKeyForKind(newKind))
+        if (newColor !== selectedFilter) {
+            setSelectedFilter(newColor)
         }
     }
 
@@ -189,9 +192,9 @@ function FilterButton({
     )
 }
 
-function filterKeyForKind(kind: string): string {
-    if (kind === COMMENT_KIND || kind === QUESTION_KIND) {
+function filterKeyForAnnotation(annotation: { kind: string, color?: string }): string {
+    if (annotation.kind === COMMENT_KIND || annotation.kind === QUESTION_KIND) {
         return 'comments'
     }
-    return kind
+    return annotation.color ?? 'yellow'
 }

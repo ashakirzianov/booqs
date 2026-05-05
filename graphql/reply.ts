@@ -3,13 +3,13 @@ import { ResolverContext } from './context'
 import { DbReply } from '@/backend/replies'
 import { DbUser } from '@/backend/users'
 import { AnnotationParent } from './annotation'
-import { repliesForNotes } from '@/backend/replies'
+import { repliesForAnnotations } from '@/backend/replies'
 
 export type ReplyParent = DbReply
 export const replyResolver: IResolvers<ReplyParent | AnnotationParent, ResolverContext> = {
     Annotation: {
         async replies(parent: AnnotationParent): Promise<DbReply[]> {
-            const replies = await repliesForNotes([parent.id])
+            const replies = await repliesForAnnotations([parent.id])
             return replies
         },
     },
@@ -18,7 +18,7 @@ export const replyResolver: IResolvers<ReplyParent | AnnotationParent, ResolverC
             return userLoader.load(parent.author_id)
         },
         annotationId(parent: ReplyParent) {
-            return parent.note_id
+            return parent.annotation_id
         },
         createdAt(parent: ReplyParent) {
             return parent.created_at

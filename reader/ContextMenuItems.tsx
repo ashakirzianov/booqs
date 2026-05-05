@@ -56,9 +56,10 @@ export function AddHighlightItem({
         return null
     }
 
-    const handleColorChange = (kind: string) => {
+    const handleColorChange = (color: string) => {
         const result = addAnnotation({
-            kind,
+            kind: 'highlight',
+            color,
             range: selection.range,
             targetQuote: selection.text,
             prefix: selection.prefix,
@@ -77,7 +78,7 @@ export function AddHighlightItem({
     return (
         <div className='h-10'>
             <ColorPicker
-                selectedKind=""
+                selectedColor={undefined}
                 onColorChange={handleColorChange}
             />
         </div>

@@ -27,8 +27,11 @@ export type BooqAnnotation = {
     author: AnnotationAuthorData,
     range: BooqRange,
     kind: string,
+    color?: string,
     content?: string,
     targetQuote: string,
+    prefix: string,
+    suffix: string,
     privacy: AnnotationPrivacy,
     createdAt: string,
     updatedAt: string,
@@ -49,32 +52,41 @@ export async function fetchAnnotations({ booqId, authorId }: {
 
 export async function createAnnotation({
     id,
-    authorId,
+    userId,
     booqId,
     range,
+    prefix,
+    text,
+    suffix,
     kind,
+    color,
     content,
-    targetQuote,
     privacy = 'private',
 }: {
     id: string,
-    authorId: string,
+    userId: string,
     booqId: BooqId,
     range: BooqRange,
+    prefix: string,
+    text: string,
+    suffix: string,
     kind: string,
+    color?: string,
     content?: string,
-    targetQuote: string,
     privacy?: AnnotationPrivacy,
 }): Promise<UnresolvedBooqAnnotation | undefined> {
     try {
         const dbAnnotation = await addAnnotation({
             id,
-            authorId,
+            userId,
             booqId,
             range,
+            prefix,
+            text,
+            suffix,
             kind,
+            color,
             content,
-            targetQuote,
             privacy,
         })
         return unresolvedBooqAnnotation(dbAnnotation)
@@ -87,26 +99,28 @@ export async function createAnnotation({
 
 export async function deleteAnnotation({
     id,
-    authorId,
+    userId,
 }: {
     id: string,
-    authorId: string,
+    userId: string,
 }): Promise<boolean> {
-    return removeAnnotation({ id, authorId })
+    return removeAnnotation({ id, userId })
 }
 
 export async function modifyAnnotation({
     id,
-    authorId,
+    userId,
     kind,
+    color,
     content,
 }: {
     id: string,
-    authorId: string,
+    userId: string,
     kind?: string,
+    color?: string | null,
     content?: string | null,
 }): Promise<UnresolvedBooqAnnotation | undefined> {
-    const result = await updateAnnotation({ id, authorId, kind, content })
+    const result = await updateAnnotation({ id, userId, kind, color, content })
     if (result === null) {
         return undefined
     }
@@ -126,14 +140,17 @@ function unresolvedBooqAnnotation(annotation: DbAnnotation): UnresolvedBooqAnnot
     return {
         id: annotation.id,
         booqId: annotation.booq_id as BooqId,
-        authorId: annotation.author_id,
+        authorId: annotation.user_id,
         range: {
             start: annotation.start_path,
             end: annotation.end_path,
         },
         kind: annotation.kind,
+        color: annotation.color ?? undefined,
         content: annotation.content ?? undefined,
-        targetQuote: annotation.target_quote,
+        targetQuote: annotation.text,
+        prefix: annotation.prefix,
+        suffix: annotation.suffix,
         privacy: annotation.privacy,
         createdAt: annotation.created_at,
         updatedAt: annotation.updated_at,
@@ -145,7 +162,7 @@ function annotationFromDbAnnotationWithAuthor(dbAnnotation: DbAnnotationWithAuth
         id: dbAnnotation.id,
         booqId: dbAnnotation.booq_id as BooqId,
         author: {
-            id: dbAnnotation.author_id,
+            id: dbAnnotation.user_id,
             name: dbAnnotation.author_name,
             username: dbAnnotation.author_username,
             profilePictureURL: dbAnnotation.author_profile_picture_url ?? undefined,
@@ -156,8 +173,11 @@ function annotationFromDbAnnotationWithAuthor(dbAnnotation: DbAnnotationWithAuth
             end: dbAnnotation.end_path,
         },
         kind: dbAnnotation.kind,
+        color: dbAnnotation.color ?? undefined,
         content: dbAnnotation.content ?? undefined,
-        targetQuote: dbAnnotation.target_quote,
+        targetQuote: dbAnnotation.text,
+        prefix: dbAnnotation.prefix,
+        suffix: dbAnnotation.suffix,
         privacy: dbAnnotation.privacy,
         createdAt: dbAnnotation.created_at,
         updatedAt: dbAnnotation.updated_at,

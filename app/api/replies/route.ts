@@ -4,7 +4,7 @@ import { NextRequest } from 'next/server'
 
 export type ResolvedReply = {
     id: string,
-    noteId: string,
+    annotationId: string,
     author: AnnotationAuthorData,
     content: string,
     createdAt: string,
@@ -15,11 +15,11 @@ export type GetResponse = {
 }
 export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams
-    const noteId = searchParams.get('note_id')
-    if (!noteId) {
-        return Response.json({ error: 'Missing note_id' }, { status: 400 })
+    const annotationId = searchParams.get('annotation_id')
+    if (!annotationId) {
+        return Response.json({ error: 'Missing annotation_id' }, { status: 400 })
     }
-    const replies = await fetchReplies([noteId])
+    const replies = await fetchReplies([annotationId])
     const result: GetResponse = { replies }
     return Response.json(result)
 }

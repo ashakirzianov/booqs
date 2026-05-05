@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { BooqId, BooqRange, pathInRange, pathLessThan } from '@/core'
-import { HIGHLIGHT_KINDS, COMMENT_KIND, QUESTION_KIND, useBooqAnnotations } from '@/application/annotations'
+import { COMMENT_KIND, QUESTION_KIND, useBooqAnnotations } from '@/application/annotations'
 import { BooqAnnotation, AnnotationAuthorData } from '@/data/annotations'
 
 export function useAnnotationsData({
@@ -28,7 +28,7 @@ export function useAnnotationsData({
     }, [allAnnotations])
 
     const allHighlights = useMemo(() => {
-        return sortedAnnotations.filter(a => HIGHLIGHT_KINDS.includes(a.kind))
+        return sortedAnnotations.filter(a => a.kind === 'highlight')
     }, [sortedAnnotations])
 
     const allHighlightsAuthors = useMemo(() => {

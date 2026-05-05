@@ -13,7 +13,7 @@ import { COMMENT_KIND, QUESTION_KIND, augmentationForAnnotation } from '@/applic
 type AnnotationFragmentProps = ExpandedAnnotationFragmentData & {
     isExpanded: boolean,
     onToggle: () => void,
-    onColorChange: (kind: string) => void,
+    onColorChange: (color: string) => void,
     onRemove?: () => void,
 }
 
@@ -65,7 +65,7 @@ export function AnnotationFragment({
                             {!isCommentOrQuestion(annotation.kind) && (
                                 <div className='w-32 h-6 shadow rounded overflow-clip'>
                                     <ColorPicker
-                                        selectedKind={annotation.kind}
+                                        selectedColor={annotation.color}
                                         onColorChange={onColorChange}
                                     />
                                 </div>

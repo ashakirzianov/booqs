@@ -5,7 +5,7 @@ import { BooqId } from '@/core'
 import type { MenuState, AnnotationTarget } from './ContextMenuContent'
 import { ColorPicker } from '@/components/ColorPicker'
 import { formatRelativeTime } from '@/application/common'
-import { HIGHLIGHT_KINDS, useBooqAnnotations } from '@/application/annotations'
+import { useBooqAnnotations } from '@/application/annotations'
 import { ProfileBadge } from '@/components/ProfilePicture'
 import { CommentIcon, RemoveIcon, QuestionMarkIcon, ShareIcon } from '@/components/Icons'
 import { NoteReplies } from './NoteReplies'
@@ -28,14 +28,14 @@ export function AnnotationTargetMenu({
         annotations.find(a => a.id === annotationId), [annotations, annotationId])
     const isOwn = user?.id === annotation?.author?.id
     const isAuthenticated = !!user?.id
-    const hasColor = HIGHLIGHT_KINDS.includes(annotation?.kind || 'default')
+    const hasColor = annotation?.kind === 'highlight'
     const [editContent, setEditContent] = useState(annotation?.content || null)
     if (!annotation) {
         return null
     }
 
-    const handleColorChange = (kind: string) => {
-        updateAnnotation({ annotationId, kind })
+    const handleColorChange = (color: string) => {
+        updateAnnotation({ annotationId, color })
     }
 
     const handleRemove = () => {
@@ -89,7 +89,7 @@ export function AnnotationTargetMenu({
             {isOwn && isAuthenticated && hasColor && (
                 <div className='h-10'>
                     <ColorPicker
-                        selectedKind={annotation.kind}
+                        selectedColor={annotation.color}
                         onColorChange={handleColorChange}
                     />
                 </div>
@@ -185,7 +185,7 @@ export function AnnotationTargetMenu({
 
                         {/* Replies - shown for public comments */}
                         {annotation.privacy === 'public' && annotation.kind === 'comment' && (
-                            <NoteReplies noteId={annotation.id} user={user} />
+                            <NoteReplies annotationId={annotation.id} user={user} />
                         )}
 
                         {/* Author info and date */}

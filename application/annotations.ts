@@ -9,9 +9,8 @@ import { useMemo } from 'react'
 import useSWR from 'swr'
 import useSWRMutation from 'swr/mutation'
 
-export const HIGHLIGHT_KINDS = [
-    'highlight-0', 'highlight-1', 'highlight-2', 'highlight-3', 'highlight-4',
-]
+export const HIGHLIGHT_COLORS = ['yellow', 'blue', 'pink', 'purple', 'green'] as const
+export type HighlightColor = typeof HIGHLIGHT_COLORS[number]
 export const COMMENT_KIND = 'comment'
 export const QUESTION_KIND = 'question'
 
@@ -27,7 +26,7 @@ export function augmentationForAnnotation(annotation: BooqAnnotation): Annotatio
     return {
         id: `annotation/${annotation.id}`,
         range: annotation.range,
-        color: isCommentOrQuestion ? undefined : `var(--color-${annotation.kind})`,
+        color: isCommentOrQuestion ? undefined : `var(--color-highlight-${annotation.color ?? 'yellow'})`,
         underline: isCommentOrQuestion ? 'dashed' : undefined,
     }
 }
@@ -101,6 +100,7 @@ export function useBooqAnnotations({
     function addAnnotation({
         range,
         kind,
+        color,
         content,
         targetQuote,
         prefix,
@@ -110,10 +110,11 @@ export function useBooqAnnotations({
     }: {
         range: BooqRange,
         kind: string,
+        color?: string,
         content?: string,
         targetQuote: string,
-        prefix?: string,
-        suffix?: string,
+        prefix: string,
+        suffix: string,
         privacy?: AnnotationPrivacy,
         id?: string,
     }) {
@@ -123,6 +124,7 @@ export function useBooqAnnotations({
         const postBody: PostBody = {
             booqId,
             kind,
+            color,
             range,
             content,
             targetQuote,
@@ -232,15 +234,17 @@ export function useBooqAnnotations({
         }
     )
 
-    function updateAnnotation({ annotationId, kind, content }: {
+    function updateAnnotation({ annotationId, kind, color, content }: {
         annotationId: string,
         kind?: string,
+        color?: string | null,
         content?: string | null,
     }) {
         if (!user || !data) return undefined
 
         const body: PatchBody = {}
         if (kind !== undefined) body.kind = kind
+        if (color !== undefined) body.color = color
         if (content !== undefined) body.content = content
 
         const posted = updateAnnotationTrigger({ annotationId, body }, {
@@ -252,7 +256,7 @@ export function useBooqAnnotations({
                 return {
                     annotations: currentData.annotations.map(n =>
                         n.id === annotationId
-                            ? { ...n, ...body, content: body.content ?? undefined, updatedAt: now }
+                            ? { ...n, ...body, color: body.color ?? undefined, content: body.content ?? undefined, updatedAt: now }
                             : n
                     ),
                 }
