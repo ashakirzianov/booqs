@@ -1,4 +1,4 @@
-import { BooqElement, BooqChildNode, textNode, BooqDocument } from '../core'
+import { BooqChildNode, textNode, BooqDocument } from '../core'
 import { parseDocument as parseHtmlDocument } from 'htmlparser2'
 import { ChildNode, isTag, isText } from 'domhandler'
 
@@ -32,21 +32,13 @@ function convertNode(node: ChildNode): BooqChildNode {
     if (!isTag(node)) {
         return null
     }
-    if (node.name === 'script') {
-        return {
-            name: node.name,
-            attributes: attrsOrUndefined(node.attribs),
-            children: [],
-        }
-    }
-    const result: BooqElement = {
+    return {
         name: node.name,
         attributes: attrsOrUndefined(node.attribs),
         children: node.children.length > 0
             ? convertNodes(node.children as ChildNode[])
             : [],
     }
-    return result
 }
 
 function attrsOrUndefined(attribs: Record<string, string>): Record<string, string> | undefined {

@@ -11,7 +11,8 @@ export type ProcessResult = {
 }
 
 export async function processDocuments(documents: BooqDocument[], epub: Epub, diags: Diagnoser): Promise<ProcessResult> {
-    const { documents: styled, styles } = await processStyles(documents, epub, diags)
+    const sanitized = sanitizeDocuments(documents)
+    const { documents: styled, styles } = await processStyles(sanitized, epub, diags)
     const { documents: scoped, hrefToPathMap } = scopeIdsAndResolveHrefs(styled)
     const marked = markParagraphs(scoped)
     return {
@@ -25,6 +26,15 @@ function markParagraphs(documents: BooqDocument[]): BooqDocument[] {
     return mapDocumentNodes(documents, node => {
         if (isElementNode(node) && isParagraph(node)) {
             return { ...node, attributes: { ...node.attributes, [DATA_PARAGRAPH]: '' } }
+        }
+        return node
+    })
+}
+
+function sanitizeDocuments(documents: BooqDocument[]): BooqDocument[] {
+    return mapDocumentNodes(documents, node => {
+        if (isElementNode(node) && node.name === 'script') {
+            return { ...node, children: [] }
         }
         return node
     })
