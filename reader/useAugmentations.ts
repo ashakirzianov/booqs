@@ -1,5 +1,5 @@
 import { useMemo, useCallback } from 'react'
-import { getAugmentationText, Augmentation, BooqSelection } from '@/viewer'
+import { getAugmentationText, getAugmentationContext, Augmentation, BooqSelection } from '@/viewer'
 import { BooqRange } from '@/core'
 import { augmentationForAnnotation, COMMENT_KIND, QUESTION_KIND } from '@/application/annotations'
 import { MenuState } from './ContextMenuContent'
@@ -47,18 +47,19 @@ export function useAugmentations({
     const menuTargetForAugmentation = useCallback(function (augmentationId: string): MenuState | undefined {
         const [kind, id] = augmentationId.split('/')
         switch (kind) {
-            case 'quote':
-                return quote
-                    ? {
-                        kind: 'quote',
-                        selection: {
-                            range: quote,
-                            text: getAugmentationText(augmentationId),
-                            prefix: '',
-                            suffix: '',
-                        },
-                    }
-                    : undefined
+            case 'quote': {
+                if (!quote) return undefined
+                const ctx = getAugmentationContext(augmentationId)
+                return {
+                    kind: 'quote',
+                    selection: {
+                        range: quote,
+                        text: getAugmentationText(augmentationId),
+                        prefix: ctx.prefix,
+                        suffix: ctx.suffix,
+                    },
+                }
+            }
             case 'annotation': {
                 const annotation = annotations.find(function (a) { return a.id === id })
                 if (!annotation) return undefined
@@ -76,17 +77,17 @@ export function useAugmentations({
             }
             case 'temp': {
                 const temp = temporaryAugmentations.find(function (ta) { return ta.name === id })
-                return temp
-                    ? {
-                        kind: 'selection',
-                        selection: {
-                            range: temp.range,
-                            text: getAugmentationText(augmentationId),
-                            prefix: '',
-                            suffix: '',
-                        },
-                    }
-                    : undefined
+                if (!temp) return undefined
+                const tempCtx = getAugmentationContext(augmentationId)
+                return {
+                    kind: 'selection',
+                    selection: {
+                        range: temp.range,
+                        text: getAugmentationText(augmentationId),
+                        prefix: tempCtx.prefix,
+                        suffix: tempCtx.suffix,
+                    },
+                }
             }
             default:
                 return undefined
