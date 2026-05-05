@@ -115,20 +115,31 @@ Public profile page showing user info, follow button, social connections, and up
 - Follow button on user profile pages (not shown on own profile)
 - In the reader's comments panel, "Following" tab filters to followed users' comments
 
-### 6.2 Public Comments
+### 6.2 Annotation Model
 
-- Comments are public notes attached to specific text ranges in books
+Annotations are the umbrella concept for all user-created marks anchored to content. Each annotation has:
+- **Locator** (`BooqLocator`): `{ start, end, prefix, text, suffix }` — where in the content, with ~30 chars of surrounding text context for future healing
+- **Kind**: `'highlight'`, `'comment'`, or `'question'`
+- **Color** (highlights only): semantic name (`'yellow'`, `'blue'`, `'pink'`, `'purple'`, `'green'`)
+- **Content** (comments/questions only): the user's written text
+- **Privacy**: `'private'` or `'public'`
+
+The locator is constructed client-side at selection time. Context fields (`prefix`/`suffix`) enable future drift detection and healing when book content changes.
+
+### 6.3 Public Comments
+
+- Comments are public annotations attached to specific text ranges in books
 - Visible to all users reading the same book
 - Created via context menu on selected text
 
-### 6.3 Replies
+### 6.4 Replies
 
 - Replies are responses to public comments, stored in a separate `replies` table
-- Each reply has: author, content, timestamps, and a reference to the parent note
+- Each reply has: author, content, timestamps, and a reference to the parent annotation
 - Displayed as a flat list under the parent comment, ordered by creation date (oldest first)
 - UI supports single-level replies only (no reply-to-reply), but the data model can be extended for threading
-- Shown in both the reader's note detail view and the notes page
-- Deleting a parent note cascades to delete all its replies
+- Shown in both the reader's annotation detail view and the notes page
+- Deleting a parent annotation cascades to delete all its replies
 
 ---
 
@@ -276,7 +287,7 @@ All main pages are server components that fetch data directly from the data laye
 - `graphql/` - GraphQL API endpoint (graphql-yoga)
 - `images/` - Image serving with size variants
 - `me/` - Current user data
-- `notes/` - Notes CRUD
+- `annotations/` - Annotations CRUD (highlights, comments, questions)
 - `replies/` - Reply CRUD (replies to public comments)
 - `search/` - Search API
 - `upload/` - Presigned URL upload flow (request + confirm)
@@ -289,7 +300,7 @@ Used for mutations from client components:
 - `updateAccountAction` - Update profile
 - `reportBooqHistoryAction` - Record reading position
 - `removeHistoryEntryAction` - Remove history entry
-- Note operations (add, update, remove) via `useBooqNotes` hook
+- Annotation operations (add, update, remove) via `useBooqAnnotations` hook
 - Collection operations via `useCollection` hook
 - Follow/Unfollow operations
 
@@ -305,7 +316,7 @@ Schema-defined API at `/api/graphql` using graphql-yoga. Supports authentication
 - `author(name)` — Author with paginated book list
 - `search(query, limit)` — Full-text search returning books and authors
 - `libraryBrowse(library, kind, query, limit, offset)` — Browse books by author, subject, or language within a library (kind is an enum: `search`, `author`, `subject`, `language`)
-- `notes(username!, limit, offset)` — Notes by a specific user across all books
+- `annotations(username!, limit, offset)` — Annotations by a specific user across all books
 - `history(limit, offset)` — Current user's reading history with pagination
 - `collection(name)` — Named collection (e.g., `reading_list`) for current user
 - `featured(limit)` — Featured books
@@ -313,7 +324,7 @@ Schema-defined API at `/api/graphql` using graphql-yoga. Supports authentication
 **Mutations — Data:**
 Most data mutations return `MutationResult!` (`{ success: Boolean!, error: String }`) with a human-readable error on failure (e.g., `"Authentication required"`, `"Bookmark not found"`).
 - `addBookmark` / `removeBookmark` — Manage bookmarks
-- `addNote` / `removeNote` / `updateNote` — Manage highlights, notes, and comments
+- `addAnnotation` / `removeAnnotation` / `updateAnnotation` — Manage highlights, notes, and comments
 - `addBooqHistory` / `removeHistory` — Record and manage reading history
 - `addToCollection` / `removeFromCollection` — Manage collections
 - `follow` / `unfollow` — Social follow/unfollow
@@ -343,7 +354,7 @@ Mutations:
 - `deleteAccount` — Delete user account (revokes refresh token)
 
 **Subscriptions (SSE):**
-- `generateReply(noteId)` — Streams the AI-generated reply for a question note, saving it on completion
+- `generateReply(annotationId)` — Streams the AI-generated reply for a question annotation, saving it on completion
 
 ---
 

@@ -1,4 +1,4 @@
-import { BooqRange, BooqLocator, pathLessThan, pathFromString, DATASET_PATH, DATA_AUGMENTATION_ID } from '@/core'
+import { BooqRange, pathLessThan, pathFromString, DATASET_PATH, DATA_AUGMENTATION_ID } from '@/core'
 
 export type BooqSelection = {
     range: BooqRange,
@@ -80,16 +80,6 @@ export function getAugmentationText(augmentationId: string): string {
 }
 
 const CONTEXT_LENGTH = 30
-
-export function locatorFromSelection(selection: BooqSelection): BooqLocator {
-    return {
-        start: selection.range.start,
-        end: selection.range.end,
-        prefix: selection.prefix,
-        text: selection.text,
-        suffix: selection.suffix,
-    }
-}
 
 function findBlockAncestor(node: Node): HTMLElement | null {
     let current: Node | null = node

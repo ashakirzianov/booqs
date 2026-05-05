@@ -162,3 +162,37 @@ Currently only `color`, `background`, `background-color` are stripped from globa
 - [ ] Explicitly reject `../` segments in `parser/path.ts`
 
 Not exploitable since ZIP entries are keyed in memory (no filesystem traversal), but could be hardened as defense-in-depth.
+
+---
+
+## Bookmark migration to BooqLocator
+
+**Priority**: Low
+
+- [ ] Migrate bookmarks to use BooqLocator (point locator with prefix/suffix, no end/text)
+
+Bookmarks aren't exposed in the UI currently. When they are, consider adding locator context for healing resilience.
+
+---
+
+## New quote URL format with embedded locator
+
+**Priority**: Medium
+
+- [ ] Design and implement compact URL encoding for locators: `p=2.4.6.12-2.4.6.45&t=prefix|text|suffix`
+- [ ] Keep old path-only format as fallback
+- [ ] Client-side healing on share URL load
+
+See [booqs-locator-design.md](../docs/booqs-locator-design.md) "Quote sharing: stateless URLs" section.
+
+---
+
+## Annotation healing implementation
+
+**Priority**: Medium
+
+- [ ] Implement `resolveLocator()` algorithm (text comparison + fuzzy search)
+- [ ] Add tree hash infrastructure (compute per-book, store on annotations)
+- [ ] Wire healing into annotation fetch path (lazy, per-book)
+
+See [booqs-locator-design.md](../docs/booqs-locator-design.md) "Healing Design" section for full strategy.
