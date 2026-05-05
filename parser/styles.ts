@@ -1,19 +1,10 @@
-import { BooqDocument, BooqStyles, BooqChildNode, isElementNode, mapChildNodesAsync } from '../core'
+import { BooqStyles, BooqChildNode, isElementNode } from '../core'
 import { Epub } from './epub'
 import { resolveHref } from './href'
 import postcss, { Plugin } from 'postcss'
 import { Diagnoser } from 'booqs-epub'
 
-// Impure: mutates documents in place for memory efficiency (see CLAUDE.md)
-export async function processStyles(documents: BooqDocument[], epub: Epub, diags: Diagnoser): Promise<BooqStyles> {
-    const styles: BooqStyles = {}
-    for (const doc of documents) {
-        doc.children = await mapChildNodesAsync(doc.children, node => transformStyleNode(node, doc.fileName, styles, epub, diags))
-    }
-    return styles
-}
-
-async function transformStyleNode(node: BooqChildNode, docFileName: string, styles: BooqStyles, epub: Epub, diags: Diagnoser): Promise<BooqChildNode> {
+export async function transformStyleNode(node: BooqChildNode, docFileName: string, styles: BooqStyles, epub: Epub, diags: Diagnoser): Promise<BooqChildNode> {
     if (!isElementNode(node)) return node
 
     if (node.name === 'link') {
