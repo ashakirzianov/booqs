@@ -3,7 +3,7 @@ import { Epub } from './epub'
 import { EpubSection, parseDocument } from './section'
 import { buildToc } from './toc'
 import { processDocuments } from './process'
-import { extactBooqMeta } from './metadata'
+import { extractBooqMeta } from './metadata'
 import { Diagnoser } from 'booqs-epub'
 
 
@@ -35,7 +35,7 @@ export async function processEpub(epub: Epub, diags: Diagnoser): Promise<Booq | 
     const { documents: preprocessed, styles, hrefToPathMap } = await processDocuments(documents, epub, diags)
 
     const length = nodesLength(preprocessed)
-    const metaFromMetadata = await extactBooqMeta(epub, diags)
+    const metaFromMetadata = await extractBooqMeta(epub, diags)
     const meta = {
         ...metaFromMetadata,
         length,
