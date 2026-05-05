@@ -60,7 +60,11 @@ function sliceChildren(nodes: BooqChildNode[], range: BooqRange): BooqChildNode[
     for (let idx = 0; idx < nodes.length; idx++) {
         const node = nodes[idx]
 
-        if (idx >= actualStart && idx <= actualEnd) {
+        const inRange = endTail.length > 0
+            ? (idx >= actualStart && idx <= actualEnd)
+            : (idx >= actualStart && idx < actualEnd)
+
+        if (inRange) {
             // Node is in range — recurse into boundaries
             if (idx === actualStart && startTail.length > 0 && isContainerNode(node)) {
                 const childEnd = idx === actualEnd && endTail.length > 0
