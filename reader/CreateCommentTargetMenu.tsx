@@ -24,12 +24,15 @@ export function CreateCommentTargetMenu({
 
         const result = addAnnotation({
             kind: 'comment',
-            range: selection.range,
             content: comment.trim(),
             privacy: 'public',
-            targetQuote: selection.text,
-            prefix: selection.prefix,
-            suffix: selection.suffix,
+            locator: {
+                start: selection.range.start,
+                end: selection.range.end,
+                prefix: selection.prefix,
+                text: selection.text,
+                suffix: selection.suffix,
+            },
         })
 
         if (result) {

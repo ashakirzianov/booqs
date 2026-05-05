@@ -16,8 +16,8 @@ export function AnnotationNodeComp({ booqId, annotation, user }: {
         borderLeft: `3px solid var(--color-${annotation.kind})`,
     }}>
         <div className='w-full text-primary text-justify'>
-            <Link href={booqContentHref({ booqId, path: annotation.range.start })} className='text-primary hover:text-highlight'>
-                {annotation.targetQuote}
+            <Link href={booqContentHref({ booqId, path: annotation.locator.start })} className='text-primary hover:text-highlight'>
+                {annotation.locator.text}
             </Link>
         </div>
         <div className='flex flex-col justify-between items-stretch ml-lg'>
@@ -36,8 +36,8 @@ export function AnnotationNodeComp({ booqId, annotation, user }: {
                             kind: 'annotation',
                             annotationId: annotation.id,
                             selection: {
-                                range: annotation.range,
-                                text: annotation.targetQuote,
+                                range: { start: annotation.locator.start, end: annotation.locator.end ?? annotation.locator.start },
+                                text: annotation.locator.text ?? '',
                                 prefix: '',
                                 suffix: '',
                             },

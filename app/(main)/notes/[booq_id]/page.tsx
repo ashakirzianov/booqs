@@ -75,12 +75,15 @@ export default async function NotesPage({ params }: {
     }
 
     const userAnnotations = await fetchAnnotations({ booqId, authorId: userId })
-    const sortedAnnotations = userAnnotations.sort((a, b) => comparePaths(a.range.start, b.range.start))
+    const sortedAnnotations = userAnnotations.sort((a, b) => comparePaths(a.locator.start, b.locator.start))
     const currentUser = await getCurrentUser()
     const bookData = await booqCard(booqId)
 
     // Pre-load expanded fragments for all annotations
-    const annotationRanges = sortedAnnotations.map(a => a.range)
+    const annotationRanges = sortedAnnotations.map(a => ({
+        start: a.locator.start,
+        end: a.locator.end ?? a.locator.start,
+    }))
     const expandedFragments = await getExpandedFragments(booqId, annotationRanges)
 
     const annotationFragmentData: ExpandedAnnotationFragmentData[] = expandedFragments.map((fragment, index) => {
@@ -90,7 +93,7 @@ export default async function NotesPage({ params }: {
             annotation,
             content: fragment?.content,
             styles: fragment?.styles,
-            range: fragment?.range ?? annotation.range,
+            range: fragment?.range ?? { start: annotation.locator.start, end: annotation.locator.end ?? annotation.locator.start },
         }
     }).filter(datum => datum !== undefined)
 

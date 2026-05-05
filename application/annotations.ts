@@ -2,7 +2,7 @@
 
 import type { GetResponse } from '@/app/api/annotations/route'
 import type { PostBody, PostResponse, PatchBody, PatchResponse } from '@/app/api/annotations/[id]/route'
-import { BooqId, BooqRange } from '@/core'
+import { BooqId, BooqLocator, BooqRange } from '@/core'
 import { AnnotationAuthorData, BooqAnnotation, AnnotationPrivacy } from '@/data/annotations'
 import { nanoid } from 'nanoid'
 import { useMemo } from 'react'
@@ -23,9 +23,10 @@ export type AnnotationAugmentation = {
 
 export function augmentationForAnnotation(annotation: BooqAnnotation): AnnotationAugmentation {
     const isCommentOrQuestion = annotation.kind === COMMENT_KIND || annotation.kind === QUESTION_KIND
+    const { locator } = annotation
     return {
         id: `annotation/${annotation.id}`,
-        range: annotation.range,
+        range: { start: locator.start, end: locator.end ?? locator.start },
         color: isCommentOrQuestion ? undefined : `var(--color-highlight-${annotation.color ?? 'yellow'})`,
         underline: isCommentOrQuestion ? 'dashed' : undefined,
     }
@@ -98,50 +99,48 @@ export function useBooqAnnotations({
     )
 
     function addAnnotation({
-        range,
+        locator,
         kind,
         color,
         content,
-        targetQuote,
-        prefix,
-        suffix,
         privacy = 'private',
         id,
     }: {
-        range: BooqRange,
+        locator: BooqLocator,
         kind: string,
         color?: string,
         content?: string,
-        targetQuote: string,
-        prefix: string,
-        suffix: string,
         privacy?: AnnotationPrivacy,
         id?: string,
     }) {
         if (!user) return undefined
 
         const annotationId = id ?? nanoid(10)
+        const range: BooqRange = { start: locator.start, end: locator.end ?? locator.start }
         const postBody: PostBody = {
             booqId,
             kind,
             color,
             range,
             content,
-            targetQuote,
+            targetQuote: locator.text ?? '',
             privacy,
-            prefix,
-            suffix,
+            prefix: locator.prefix,
+            suffix: locator.suffix,
         }
 
         const now = new Date().toISOString()
         const optimisticResponse: PostResponse = {
-            ...postBody,
             id: annotationId,
+            booqId,
             author: user,
+            locator,
+            kind,
+            color,
+            content,
+            privacy,
             createdAt: now,
             updatedAt: now,
-            booqId,
-            privacy,
         }
 
         const posted = postAnnotationTrigger({

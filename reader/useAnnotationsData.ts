@@ -21,8 +21,8 @@ export function useAnnotationsData({
     const sortedAnnotations = useMemo(() => {
         return allAnnotations
             .sort((a, b) => {
-                if (pathLessThan(a.range.start, b.range.start)) return -1
-                if (pathLessThan(b.range.start, a.range.start)) return 1
+                if (pathLessThan(a.locator.start, b.locator.start)) return -1
+                if (pathLessThan(b.locator.start, a.locator.start)) return 1
                 return 0
             })
     }, [allAnnotations])
@@ -52,7 +52,7 @@ export function useAnnotationsData({
         if (!currentRange) return []
         return sortedAnnotations.filter(a =>
             (a.kind === COMMENT_KIND || a.kind === QUESTION_KIND)
-            && pathInRange(a.range.start, currentRange)
+            && pathInRange(a.locator.start, currentRange)
             && a.content
             && a.content.trim()?.length > 0
         )

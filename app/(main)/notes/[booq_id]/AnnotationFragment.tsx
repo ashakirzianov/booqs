@@ -95,7 +95,7 @@ export function AnnotationFragment({
                     title='Click to expand'
                 >
                     <span className="m-0" style={collapsedStyleForAnnotation(annotation)}>
-                        {annotation.targetQuote}
+                        {annotation.locator.text}
                     </span>
                 </div>
             )}

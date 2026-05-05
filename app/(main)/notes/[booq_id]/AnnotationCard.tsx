@@ -57,15 +57,12 @@ export function AnnotationCard({
     function handleRestore() {
         if (!removedAnnotation) return
         addAnnotation({
-            range: removedAnnotation.range,
+            locator: removedAnnotation.locator,
             kind: removedAnnotation.kind,
             color: removedAnnotation.color,
             content: removedAnnotation.content || undefined,
-            targetQuote: removedAnnotation.targetQuote,
-            prefix: removedAnnotation.prefix,
-            suffix: removedAnnotation.suffix,
             privacy: removedAnnotation.privacy || 'private',
-            id: removedAnnotation.id
+            id: removedAnnotation.id,
         })
         setRemovedAnnotation(null)
     }

@@ -72,8 +72,8 @@ export function useAugmentations({
                     kind: 'annotation',
                     annotationId: annotation.id,
                     selection: {
-                        range: annotation.range,
-                        text: annotation.targetQuote,
+                        range: { start: annotation.locator.start, end: annotation.locator.end ?? annotation.locator.start },
+                        text: annotation.locator.text ?? '',
                         prefix: '',
                         suffix: '',
                     },

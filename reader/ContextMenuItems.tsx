@@ -60,10 +60,13 @@ export function AddHighlightItem({
         const result = addAnnotation({
             kind: 'highlight',
             color,
-            range: selection.range,
-            targetQuote: selection.text,
-            prefix: selection.prefix,
-            suffix: selection.suffix,
+            locator: {
+                start: selection.range.start,
+                end: selection.range.end,
+                prefix: selection.prefix,
+                text: selection.text,
+                suffix: selection.suffix,
+            },
         })
         if (result) {
             setMenuState({

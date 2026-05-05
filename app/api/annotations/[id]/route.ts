@@ -1,4 +1,4 @@
-import { BooqId, BooqRange } from '@/core'
+import { BooqId, BooqLocator, BooqRange } from '@/core'
 import {
     modifyAnnotation, deleteAnnotation,
     AnnotationPrivacy,
@@ -55,14 +55,12 @@ export async function POST(request: NextRequest, { params }: { params: Promise<P
         return Response.json({ error: 'Invalid request body', details: parsed.error.flatten() }, { status: 400 })
     }
     const { booqId, range, kind, color, content, targetQuote, prefix, suffix, privacy } = parsed.data
+    const locator: BooqLocator = { start: range.start, end: range.end, prefix, text: targetQuote, suffix }
     const annotation = await createAnnotation({
         id,
         userId,
         booqId,
-        range,
-        prefix,
-        text: targetQuote,
-        suffix,
+        locator,
         kind,
         color,
         content,
@@ -84,7 +82,6 @@ export type PatchResponse = {
     kind: string,
     color?: string,
     content?: string,
-    targetQuote: string,
     createdAt: string,
     updatedAt: string,
 }

@@ -24,12 +24,15 @@ export function AskTargetMenu({
         const selection = target.selection
         const result = addAnnotation({
             kind: QUESTION_KIND,
-            range: selection.range,
             content: question.trim(),
             privacy: 'public',
-            targetQuote: selection.text,
-            prefix: selection.prefix,
-            suffix: selection.suffix,
+            locator: {
+                start: selection.range.start,
+                end: selection.range.end,
+                prefix: selection.prefix,
+                text: selection.text,
+                suffix: selection.suffix,
+            },
         })
 
         if (result) {

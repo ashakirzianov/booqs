@@ -213,10 +213,10 @@ function CommentItem({ comment, booqId, user, streamingReply }: {
         <div className='rounded-lg p-3 space-y-2 w-full max-w-md'>
 
             {/* Referenced text */}
-            <Link href={`#${pathToId(comment.range.start)}`}
+            <Link href={`#${pathToId(comment.locator.start)}`}
                 className='block p-2 rounded text-sm italic border-l-2 hover:bg-gray-50 transition-colors cursor-pointer'
                 style={{ borderLeftColor: `var(--color-quote)` }}>
-                &quot;{comment.targetQuote}&quot;
+                &quot;{comment.locator.text}&quot;
             </Link>
 
             {/* Note content */}

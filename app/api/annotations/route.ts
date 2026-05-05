@@ -3,20 +3,17 @@ import {
     fetchAnnotations,
     AnnotationPrivacy,
 } from '@/data/annotations'
-import { BooqId, BooqRange } from '@/core'
+import { BooqId, BooqLocator } from '@/core'
 import { NextRequest } from 'next/server'
 
 export type ResolvedAnnotation = {
     id: string,
     booqId: BooqId,
     author: AnnotationAuthorData,
-    range: BooqRange,
+    locator: BooqLocator,
     kind: string,
     color?: string,
     content?: string,
-    targetQuote: string,
-    prefix: string,
-    suffix: string,
     privacy: AnnotationPrivacy,
     createdAt: string,
     updatedAt: string,
