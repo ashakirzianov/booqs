@@ -70,25 +70,22 @@ export function getAugmentationElement(augmentationId: string): VirtualElement |
     }
 }
 
-export function getAugmentationText(augmentationId: string): string {
+export function getAugmentationContext(augmentationId: string): { text: string, prefix: string, suffix: string } {
     const elements = augmentationElements(augmentationId)
+    if (elements.length === 0) {
+        return { text: '', prefix: '', suffix: '' }
+    }
+
     let text = ''
     for (const element of elements) {
         text += element.textContent
     }
-    return text
-}
 
-export function getAugmentationContext(augmentationId: string): { prefix: string, suffix: string } {
-    const elements = augmentationElements(augmentationId)
-    if (elements.length === 0) {
-        return { prefix: '', suffix: '' }
-    }
     const first = elements[0]
     const last = elements[elements.length - 1]
     const blockAncestor = findBlockAncestor(first)
     if (!blockAncestor) {
-        return { prefix: '', suffix: '' }
+        return { text, prefix: '', suffix: '' }
     }
 
     const beforeRange = document.createRange()
@@ -101,7 +98,7 @@ export function getAugmentationContext(augmentationId: string): { prefix: string
     afterRange.setStartAfter(last)
     const suffix = afterRange.toString().slice(0, CONTEXT_LENGTH)
 
-    return { prefix, suffix }
+    return { text, prefix, suffix }
 }
 
 function augmentationElements(augmentationId: string): Element[] {

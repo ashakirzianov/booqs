@@ -1,5 +1,5 @@
 import { useMemo, useCallback } from 'react'
-import { getAugmentationText, getAugmentationContext, Augmentation, BooqSelection } from '@/viewer'
+import { getAugmentationContext, Augmentation, BooqSelection } from '@/viewer'
 import { BooqRange } from '@/core'
 import { augmentationForAnnotation, COMMENT_KIND, QUESTION_KIND } from '@/application/annotations'
 import { MenuState } from './ContextMenuContent'
@@ -49,15 +49,10 @@ export function useAugmentations({
         switch (kind) {
             case 'quote': {
                 if (!quote) return undefined
-                const ctx = getAugmentationContext(augmentationId)
+                const { text, prefix, suffix } = getAugmentationContext(augmentationId)
                 return {
                     kind: 'quote',
-                    selection: {
-                        range: quote,
-                        text: getAugmentationText(augmentationId),
-                        prefix: ctx.prefix,
-                        suffix: ctx.suffix,
-                    },
+                    selection: { range: quote, text, prefix, suffix },
                 }
             }
             case 'annotation': {
@@ -78,15 +73,10 @@ export function useAugmentations({
             case 'temp': {
                 const temp = temporaryAugmentations.find(function (ta) { return ta.name === id })
                 if (!temp) return undefined
-                const tempCtx = getAugmentationContext(augmentationId)
+                const { text, prefix, suffix } = getAugmentationContext(augmentationId)
                 return {
                     kind: 'selection',
-                    selection: {
-                        range: temp.range,
-                        text: getAugmentationText(augmentationId),
-                        prefix: tempCtx.prefix,
-                        suffix: tempCtx.suffix,
-                    },
+                    selection: { range: temp.range, text, prefix, suffix },
                 }
             }
             default:
