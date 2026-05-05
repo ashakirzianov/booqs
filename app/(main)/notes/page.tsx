@@ -12,7 +12,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function NotesPage() {
     const booqsWithAnnotations = await fetchBooqsWithOwnAnnotations()
     if (booqsWithAnnotations.length > 0) {
-        redirect(`/annotations/${booqsWithAnnotations[0]}`)
+        redirect(`/notes/${booqsWithAnnotations[0]}`)
     }
 
     return (

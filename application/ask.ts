@@ -41,7 +41,7 @@ export function useGenerateReply({
             },
             async onDone() {
                 await mutate(`/api/replies?note_id=${noteId}`)
-                mutate(`/api/notes?booq_id=${booqId}`)
+                mutate(`/api/annotations?booq_id=${booqId}`)
                 setState(prev =>
                     prev.status === 'streaming'
                         ? { status: 'done', noteId: prev.noteId, answer: prev.answer }
