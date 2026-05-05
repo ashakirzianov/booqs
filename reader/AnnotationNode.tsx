@@ -6,6 +6,7 @@ import { booqContentHref } from '@/common/href'
 import Link from 'next/link'
 import { BooqId } from '@/core'
 import { AnnotationAuthorData, BooqAnnotation } from '@/data/annotations'
+import { selectionFromAnnotation } from './useAugmentations'
 
 export function AnnotationNodeComp({ booqId, annotation, user }: {
     booqId: BooqId,
@@ -35,12 +36,7 @@ export function AnnotationNodeComp({ booqId, annotation, user }: {
                         target={{
                             kind: 'annotation',
                             annotationId: annotation.id,
-                            selection: {
-                                range: { start: annotation.locator.start, end: annotation.locator.end ?? annotation.locator.start },
-                                text: annotation.locator.text ?? '',
-                                prefix: '',
-                                suffix: '',
-                            },
+                            selection: selectionFromAnnotation(annotation),
                         }}
                     />
                 </div>}

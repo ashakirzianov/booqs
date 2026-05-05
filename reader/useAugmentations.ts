@@ -1,5 +1,5 @@
 import { useMemo, useCallback } from 'react'
-import { getAugmentationText, Augmentation } from '@/viewer'
+import { getAugmentationText, Augmentation, BooqSelection } from '@/viewer'
 import { BooqRange } from '@/core'
 import { augmentationForAnnotation, COMMENT_KIND, QUESTION_KIND } from '@/application/annotations'
 import { MenuState } from './ContextMenuContent'
@@ -71,12 +71,7 @@ export function useAugmentations({
                 return {
                     kind: 'annotation',
                     annotationId: annotation.id,
-                    selection: {
-                        range: { start: annotation.locator.start, end: annotation.locator.end ?? annotation.locator.start },
-                        text: annotation.locator.text ?? '',
-                        prefix: '',
-                        suffix: '',
-                    },
+                    selection: selectionFromAnnotation(annotation),
                 }
             }
             case 'temp': {
@@ -100,6 +95,15 @@ export function useAugmentations({
     return {
         augmentations,
         menuTargetForAugmentation,
+    }
+}
+
+export function selectionFromAnnotation(annotation: BooqAnnotation): BooqSelection {
+    return {
+        range: { start: annotation.locator.start, end: annotation.locator.end ?? annotation.locator.start },
+        text: annotation.locator.text ?? '',
+        prefix: annotation.locator.prefix,
+        suffix: annotation.locator.suffix,
     }
 }
 
