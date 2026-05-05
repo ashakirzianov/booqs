@@ -4,18 +4,13 @@ import { resolveHref } from './href'
 import postcss, { Plugin } from 'postcss'
 import { Diagnoser } from 'booqs-epub'
 
-export type ProcessStylesResult = {
-    documents: BooqDocument[],
-    styles: BooqStyles,
-}
-
-export async function processStyles(documents: BooqDocument[], epub: Epub, diags: Diagnoser): Promise<ProcessStylesResult> {
+// Impure: mutates documents in place for memory efficiency (see CLAUDE.md)
+export async function processStyles(documents: BooqDocument[], epub: Epub, diags: Diagnoser): Promise<BooqStyles> {
     const styles: BooqStyles = {}
-    const transformed = await Promise.all(documents.map(async doc => ({
-        ...doc,
-        children: await mapChildNodesAsync(doc.children, node => transformStyleNode(node, doc.fileName, styles, epub, diags)),
-    })))
-    return { documents: transformed, styles }
+    for (const doc of documents) {
+        doc.children = await mapChildNodesAsync(doc.children, node => transformStyleNode(node, doc.fileName, styles, epub, diags))
+    }
+    return styles
 }
 
 async function transformStyleNode(node: BooqChildNode, docFileName: string, styles: BooqStyles, epub: Epub, diags: Diagnoser): Promise<BooqChildNode> {

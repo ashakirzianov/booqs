@@ -1,43 +1,36 @@
-import { BooqDocument, BooqChildNode, BooqPath, isElementNode, pathToString, mapChildNodes, DATA_REF_PATH } from '../core'
+import { BooqDocument, BooqChildNode, BooqPath, isElementNode, pathToString, visitNodes, DATA_REF_PATH } from '../core'
 import { resolveHref, hrefToKey } from './href'
 
 // Maps "fileName#id" → BooqPath. Built from original unscoped IDs.
 export type HrefToPathMap = Map<string, BooqPath>
 
-export type ScopeIdsResult = {
-    documents: BooqDocument[],
-    hrefToPathMap: HrefToPathMap,
-}
-
-export function scopeIdsAndResolveHrefs(documents: BooqDocument[]): ScopeIdsResult {
+// Impure: mutates documents in place for memory efficiency (see CLAUDE.md)
+export function scopeIdsAndResolveHrefs(documents: BooqDocument[]): HrefToPathMap {
     const hrefToPathMap = buildHrefToPathMap(documents)
     const fileNameToIndex = new Map(documents.map((doc, i) => [doc.fileName, i]))
 
-    const scoped = documents.map((doc, index) => {
+    for (let index = 0; index < documents.length; index++) {
+        const doc = documents[index]
         const prefix = scopePrefix(index, doc.fileName)
-        return {
-            ...doc,
-            children: mapChildNodes(doc.children, node => {
-                if (!isElementNode(node)) return node
-                const originalId = node.attributes?.id
-                const scopedId = originalId ? `${prefix}--${originalId}` : undefined
-                const hrefResult = resolveInternalHref(node.attributes?.href, doc.fileName, hrefToPathMap, fileNameToIndex)
-                return {
-                    ...node,
-                    attributes: {
-                        ...node.attributes,
-                        ...(scopedId ? { id: scopedId } : {}),
-                        ...(hrefResult ? {
-                            href: `#${hrefResult.scopedId}`,
-                            [DATA_REF_PATH]: hrefResult.path,
-                        } : {}),
-                    },
+        visitNodes(doc.children, node => {
+            if (!isElementNode(node)) return
+            const originalId = node.attributes?.id
+            const scopedId = originalId ? `${prefix}--${originalId}` : undefined
+            const hrefResult = resolveInternalHref(node.attributes?.href, doc.fileName, hrefToPathMap, fileNameToIndex)
+            if (scopedId || hrefResult) {
+                node.attributes = {
+                    ...node.attributes,
+                    ...(scopedId ? { id: scopedId } : {}),
+                    ...(hrefResult ? {
+                        href: `#${hrefResult.scopedId}`,
+                        [DATA_REF_PATH]: hrefResult.path,
+                    } : {}),
                 }
-            }),
-        }
-    })
+            }
+        })
+    }
 
-    return { documents: scoped, hrefToPathMap }
+    return hrefToPathMap
 }
 
 // --- private ---

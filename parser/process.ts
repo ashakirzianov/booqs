@@ -1,4 +1,4 @@
-import { BooqDocument, BooqStyles, BooqChildNode, isElementNode, mapDocumentNodes, DATA_PARAGRAPH } from '../core'
+import { BooqDocument, BooqStyles, BooqChildNode, isElementNode, visitNodes, DATA_PARAGRAPH } from '../core'
 import { scopeIdsAndResolveHrefs, HrefToPathMap } from './scopeIds'
 import { processStyles } from './styles'
 import { Epub } from './epub'
@@ -10,34 +10,33 @@ export type ProcessResult = {
     hrefToPathMap: HrefToPathMap,
 }
 
+// Impure: mutates documents in place for memory efficiency (see CLAUDE.md)
 export async function processDocuments(documents: BooqDocument[], epub: Epub, diags: Diagnoser): Promise<ProcessResult> {
-    const sanitized = sanitizeDocuments(documents)
-    const { documents: styled, styles } = await processStyles(sanitized, epub, diags)
-    const { documents: scoped, hrefToPathMap } = scopeIdsAndResolveHrefs(styled)
-    const marked = markParagraphs(scoped)
-    return {
-        documents: marked,
-        styles,
-        hrefToPathMap,
+    sanitizeDocuments(documents)
+    const styles = await processStyles(documents, epub, diags)
+    const hrefToPathMap = scopeIdsAndResolveHrefs(documents)
+    markParagraphs(documents)
+    return { documents, styles, hrefToPathMap }
+}
+
+function markParagraphs(documents: BooqDocument[]): void {
+    for (const doc of documents) {
+        visitNodes(doc.children, node => {
+            if (isElementNode(node) && isParagraph(node)) {
+                node.attributes = { ...node.attributes, [DATA_PARAGRAPH]: '' }
+            }
+        })
     }
 }
 
-function markParagraphs(documents: BooqDocument[]): BooqDocument[] {
-    return mapDocumentNodes(documents, node => {
-        if (isElementNode(node) && isParagraph(node)) {
-            return { ...node, attributes: { ...node.attributes, [DATA_PARAGRAPH]: '' } }
-        }
-        return node
-    })
-}
-
-function sanitizeDocuments(documents: BooqDocument[]): BooqDocument[] {
-    return mapDocumentNodes(documents, node => {
-        if (isElementNode(node) && node.name === 'script') {
-            return { ...node, children: [] }
-        }
-        return node
-    })
+function sanitizeDocuments(documents: BooqDocument[]): void {
+    for (const doc of documents) {
+        visitNodes(doc.children, node => {
+            if (isElementNode(node) && node.name === 'script') {
+                node.children = []
+            }
+        })
+    }
 }
 
 function isParagraph(node: BooqChildNode) {
