@@ -1,4 +1,4 @@
-import { BooqId, BooqLocator, BooqRange } from '@/core'
+import { BooqId, BooqLocator, BooqPath } from '@/core'
 import {
     modifyAnnotation, deleteAnnotation,
     AnnotationPrivacy,
@@ -13,18 +13,20 @@ import { z } from 'zod'
 const booqIdSchema = z.string().regex(/^[a-z]+-\S+$/) as z.ZodType<BooqId>
 const booqPathSchema = z.array(z.number().int().min(0))
 
+const locatorSchema = z.object({
+    start: booqPathSchema as z.ZodType<BooqPath>,
+    end: booqPathSchema as z.ZodType<BooqPath>,
+    prefix: z.string().max(100),
+    text: z.string().max(10000),
+    suffix: z.string().max(100),
+}) as z.ZodType<BooqLocator>
+
 const postBodySchema = z.object({
     booqId: booqIdSchema,
-    range: z.object({
-        start: booqPathSchema,
-        end: booqPathSchema,
-    }) as z.ZodType<BooqRange>,
+    locator: locatorSchema,
     kind: z.string().min(1).max(50),
     color: z.string().max(20).optional(),
     content: z.string().max(10000).optional(),
-    targetQuote: z.string().max(10000),
-    prefix: z.string().max(100),
-    suffix: z.string().max(100),
     privacy: z.enum(['private', 'public']) as z.ZodType<AnnotationPrivacy>,
 })
 
@@ -54,8 +56,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<P
     if (!parsed.success) {
         return Response.json({ error: 'Invalid request body', details: parsed.error.flatten() }, { status: 400 })
     }
-    const { booqId, range, kind, color, content, targetQuote, prefix, suffix, privacy } = parsed.data
-    const locator: BooqLocator = { start: range.start, end: range.end, prefix, text: targetQuote, suffix }
+    const { booqId, locator, kind, color, content, privacy } = parsed.data
     const annotation = await createAnnotation({
         id,
         userId,

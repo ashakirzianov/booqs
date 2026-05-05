@@ -116,17 +116,13 @@ export function useBooqAnnotations({
         if (!user) return undefined
 
         const annotationId = id ?? nanoid(10)
-        const range: BooqRange = { start: locator.start, end: locator.end ?? locator.start }
         const postBody: PostBody = {
             booqId,
+            locator,
             kind,
             color,
-            range,
             content,
-            targetQuote: locator.text ?? '',
             privacy,
-            prefix: locator.prefix,
-            suffix: locator.suffix,
         }
 
         const now = new Date().toISOString()
