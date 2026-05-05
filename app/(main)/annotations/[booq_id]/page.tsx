@@ -1,4 +1,4 @@
-import { fetchNotes } from '@/data/notes'
+import { fetchAnnotations } from '@/data/annotations'
 import { parseIdOpt, type BooqId, comparePaths } from '@/core'
 import { notFound, redirect } from 'next/navigation'
 import { authHref } from '@/common/href'
@@ -7,8 +7,8 @@ import { booqContentHref, authorHref, booqImageUrl } from '@/common/href'
 import { getUserIdInsideRequest } from '@/data/request'
 import { getCurrentUser } from '@/data/user'
 import { booqCard, getExpandedFragments } from '@/data/booqs'
-import { NotesFilter } from './NotesFilter'
-import { ExpandedNoteFragmentData } from './NoteFragment'
+import { AnnotationsFilter } from './AnnotationsFilter'
+import { ExpandedAnnotationFragmentData } from './AnnotationFragment'
 import { Metadata } from 'next'
 
 type Params = {
@@ -74,23 +74,23 @@ export default async function NotesPage({ params }: {
         redirect(authHref({}))
     }
 
-    const userNotes = await fetchNotes({ booqId, authorId: userId })
-    const sortedNotes = userNotes.sort((a, b) => comparePaths(a.range.start, b.range.start))
+    const userAnnotations = await fetchAnnotations({ booqId, authorId: userId })
+    const sortedAnnotations = userAnnotations.sort((a, b) => comparePaths(a.range.start, b.range.start))
     const currentUser = await getCurrentUser()
     const bookData = await booqCard(booqId)
 
-    // Pre-load expanded fragments for all notes
-    const noteRanges = sortedNotes.map(note => note.range)
-    const expandedFragments = await getExpandedFragments(booqId, noteRanges)
+    // Pre-load expanded fragments for all annotations
+    const annotationRanges = sortedAnnotations.map(a => a.range)
+    const expandedFragments = await getExpandedFragments(booqId, annotationRanges)
 
-    const noteFragmentData: ExpandedNoteFragmentData[] = expandedFragments.map((fragment, index) => {
-        const note = sortedNotes[index]
-        if (!note) return undefined
+    const annotationFragmentData: ExpandedAnnotationFragmentData[] = expandedFragments.map((fragment, index) => {
+        const annotation = sortedAnnotations[index]
+        if (!annotation) return undefined
         return {
-            note,
+            annotation,
             content: fragment?.content,
             styles: fragment?.styles,
-            range: fragment?.range ?? note.range,
+            range: fragment?.range ?? annotation.range,
         }
     }).filter(datum => datum !== undefined)
 
@@ -127,7 +127,7 @@ export default async function NotesPage({ params }: {
                 </h1>
             </div>
 
-            {userNotes.length === 0 ? (
+            {userAnnotations.length === 0 ? (
                 <div className="text-center">
                     <p className="text-dimmed text-lg mb-4">No notes yet</p>
                     <p className="text-dimmed mb-6">Start reading and add notes to see them here</p>
@@ -139,8 +139,8 @@ export default async function NotesPage({ params }: {
                     </Link>
                 </div>
             ) : (
-                <NotesFilter
-                    data={noteFragmentData}
+                <AnnotationsFilter
+                    data={annotationFragmentData}
                     booqId={booqId}
                     user={currentUser ? {
                         id: currentUser.id,

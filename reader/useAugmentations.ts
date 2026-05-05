@@ -1,9 +1,9 @@
 import { useMemo, useCallback } from 'react'
 import { getAugmentationText, Augmentation } from '@/viewer'
 import { BooqRange } from '@/core'
-import { augmentationForNote, COMMENT_KIND, QUESTION_KIND } from '@/application/notes'
+import { augmentationForAnnotation, COMMENT_KIND, QUESTION_KIND } from '@/application/annotations'
 import { MenuState } from './ContextMenuContent'
-import { BooqNote } from '@/data/notes'
+import { BooqAnnotation } from '@/data/annotations'
 
 export type TemporaryAugmentation = {
     range: BooqRange,
@@ -13,14 +13,14 @@ export type TemporaryAugmentation = {
 }
 
 export function useAugmentations({
-    quote, notes, temporaryAugmentations = [],
+    quote, annotations, temporaryAugmentations = [],
 }: {
-    notes: BooqNote[],
+    annotations: BooqAnnotation[],
     quote?: BooqRange,
     temporaryAugmentations?: TemporaryAugmentation[],
 }) {
     const augmentations = useMemo(function () {
-        const noteAugmentations = notes.map<Augmentation>(augmentationForNote)
+        const annotationAugmentations = annotations.map<Augmentation>(augmentationForAnnotation)
 
         const tempAugmentations = temporaryAugmentations.map<Augmentation>(function (temp) {
             return {
@@ -31,7 +31,7 @@ export function useAugmentations({
             }
         })
 
-        let result = [...noteAugmentations, ...tempAugmentations]
+        let result = [...annotationAugmentations, ...tempAugmentations]
 
         if (quote) {
             const quoteAugmentation: Augmentation = {
@@ -43,7 +43,7 @@ export function useAugmentations({
         }
 
         return result
-    }, [quote, notes, temporaryAugmentations])
+    }, [quote, annotations, temporaryAugmentations])
     const menuTargetForAugmentation = useCallback(function (augmentationId: string): MenuState | undefined {
         const [kind, id] = augmentationId.split('/')
         switch (kind) {
@@ -57,21 +57,21 @@ export function useAugmentations({
                         },
                     }
                     : undefined
-            case 'note': {
-                const note = notes.find(function (n) { return n.id === id })
-                if (!note) return undefined
-                if (note.kind === COMMENT_KIND || note.kind === QUESTION_KIND) {
+            case 'annotation': {
+                const annotation = annotations.find(function (a) { return a.id === id })
+                if (!annotation) return undefined
+                if (annotation.kind === COMMENT_KIND || annotation.kind === QUESTION_KIND) {
                     return {
                         kind: 'comment',
-                        commentId: note.id,
+                        commentId: annotation.id,
                     }
                 }
                 return {
-                    kind: 'note',
-                    noteId: note.id,
+                    kind: 'annotation',
+                    annotationId: annotation.id,
                     selection: {
-                        range: note.range,
-                        text: note.targetQuote,
+                        range: annotation.range,
+                        text: annotation.targetQuote,
                     },
                 }
             }
@@ -90,15 +90,15 @@ export function useAugmentations({
             default:
                 return undefined
         }
-    }, [quote, notes, temporaryAugmentations])
+    }, [quote, annotations, temporaryAugmentations])
     return {
         augmentations,
         menuTargetForAugmentation,
     }
 }
 
-export function noteAugmentationId(noteId: string): string {
-    return `note/${noteId}`
+export function annotationAugmentationId(annotationId: string): string {
+    return `annotation/${annotationId}`
 }
 
 export function quoteAugmentationId(): string {

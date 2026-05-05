@@ -2,7 +2,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useNoteReplies } from '@/application/replies'
-import { NoteAuthorData } from '@/data/notes'
+import { AnnotationAuthorData } from '@/data/annotations'
 import { ProfileBadge } from '@/components/ProfilePicture'
 import { RemoveIcon, ReplyIcon } from '@/components/Icons'
 import { formatRelativeTime } from '@/application/common'
@@ -13,7 +13,7 @@ export function NoteReplies({
     noteId, user, collapsible = false,
 }: {
     noteId: string,
-    user: NoteAuthorData | undefined,
+    user: AnnotationAuthorData | undefined,
     collapsible?: boolean,
 }) {
     const { replies, addReply, removeReply } = useNoteReplies({ noteId, user })

@@ -6,7 +6,7 @@ import { collectionResolver } from './collection'
 import { booqResolver } from './booq'
 import { booqHistoryResolver } from './history'
 import { bookmarkResolver } from './bookmark'
-import { noteResolver } from './note'
+import { annotationResolver } from './annotation'
 import { replyResolver } from './reply'
 import { userResolver } from './user'
 import { aiResolver } from './ai'
@@ -21,7 +21,7 @@ export const resolvers: IResolvers = {
     ...authorResolver,
     ...booqHistoryResolver,
     ...bookmarkResolver,
-    ...noteResolver,
+    ...annotationResolver,
     ...replyResolver,
     ...userResolver,
     ...aiResolver,

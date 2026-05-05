@@ -1,9 +1,9 @@
 'use client'
 
-import type { GetResponse } from '@/app/api/notes/route'
-import type { PostBody, PostResponse, PatchBody, PatchResponse } from '@/app/api/notes/[id]/route'
+import type { GetResponse } from '@/app/api/annotations/route'
+import type { PostBody, PostResponse, PatchBody, PatchResponse } from '@/app/api/annotations/[id]/route'
 import { BooqId, BooqRange } from '@/core'
-import { NoteAuthorData, BooqNote, NotePrivacy } from '@/data/notes'
+import { AnnotationAuthorData, BooqAnnotation, AnnotationPrivacy } from '@/data/annotations'
 import { nanoid } from 'nanoid'
 import { useMemo } from 'react'
 import useSWR from 'swr'
@@ -15,34 +15,34 @@ export const HIGHLIGHT_KINDS = [
 export const COMMENT_KIND = 'comment'
 export const QUESTION_KIND = 'question'
 
-export type NoteAugmentation = {
+export type AnnotationAugmentation = {
     id: string,
     range: BooqRange,
     color?: string,
     underline?: 'solid' | 'dashed',
 }
 
-export function augmentationForNote(note: BooqNote): NoteAugmentation {
-    const isCommentOrQuestion = note.kind === COMMENT_KIND || note.kind === QUESTION_KIND
+export function augmentationForAnnotation(annotation: BooqAnnotation): AnnotationAugmentation {
+    const isCommentOrQuestion = annotation.kind === COMMENT_KIND || annotation.kind === QUESTION_KIND
     return {
-        id: `note/${note.id}`,
-        range: note.range,
-        color: isCommentOrQuestion ? undefined : `var(--color-${note.kind})`,
+        id: `annotation/${annotation.id}`,
+        range: annotation.range,
+        color: isCommentOrQuestion ? undefined : `var(--color-${annotation.kind})`,
         underline: isCommentOrQuestion ? 'dashed' : undefined,
     }
 }
 
-export function useBooqNotes({
-    booqId, user, initialNotes,
+export function useBooqAnnotations({
+    booqId, user, initialAnnotations,
 }: {
     booqId: BooqId,
-    user: NoteAuthorData | undefined,
-    initialNotes?: BooqNote[],
+    user: AnnotationAuthorData | undefined,
+    initialAnnotations?: BooqAnnotation[],
 }) {
-    const notesKey = `/api/notes?booq_id=${booqId}`
+    const annotationsKey = `/api/annotations?booq_id=${booqId}`
 
     const { data, isLoading } = useSWR(
-        notesKey,
+        annotationsKey,
         async (url: string) => {
             const res = await fetch(url, {
                 method: 'GET',
@@ -51,27 +51,27 @@ export function useBooqNotes({
                 },
             })
             if (!res.ok) {
-                throw new Error('Failed to fetch notes')
+                throw new Error('Failed to fetch annotations')
             }
             const result: GetResponse = await res.json()
             return result
         }
     )
 
-    const notes = useMemo(
-        () => (data?.notes) ?? initialNotes ?? [],
-        [data?.notes, initialNotes]
+    const annotations = useMemo(
+        () => (data?.annotations) ?? initialAnnotations ?? [],
+        [data?.annotations, initialAnnotations]
     )
 
-    const { trigger: postNoteTrigger } = useSWRMutation(
-        notesKey,
-        async (_url, { arg: { body, noteId } }: {
+    const { trigger: postAnnotationTrigger } = useSWRMutation(
+        annotationsKey,
+        async (_url, { arg: { body, annotationId } }: {
             arg: {
                 body: PostBody,
-                noteId: string,
+                annotationId: string,
             }
         }) => {
-            const res = await fetch(`/api/notes/${noteId}`, {
+            const res = await fetch(`/api/annotations/${annotationId}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -79,7 +79,7 @@ export function useBooqNotes({
                 body: JSON.stringify(body),
             })
             if (!res.ok) {
-                throw new Error('Failed to add note')
+                throw new Error('Failed to add annotation')
             }
             const result: PostResponse = await res.json()
             return result
@@ -87,10 +87,10 @@ export function useBooqNotes({
         {
             populateCache: (postResponse: PostResponse, currentData: GetResponse | undefined) => {
                 if (!currentData) {
-                    return { notes: [postResponse] }
+                    return { annotations: [postResponse] }
                 }
                 return {
-                    notes: [...currentData.notes, postResponse],
+                    annotations: [...currentData.annotations, postResponse],
                 }
             },
             rollbackOnError: true,
@@ -98,24 +98,24 @@ export function useBooqNotes({
         }
     )
 
-    function addNote({
+    function addAnnotation({
         range,
         kind,
         content,
         targetQuote,
-        privacy = 'private', // Default to private if not specified
+        privacy = 'private',
         id,
     }: {
         range: BooqRange,
         kind: string,
         content?: string,
         targetQuote: string,
-        privacy?: NotePrivacy,
+        privacy?: AnnotationPrivacy,
         id?: string,
     }) {
         if (!user) return undefined
 
-        const noteId = id ?? nanoid(10)
+        const annotationId = id ?? nanoid(10)
         const postBody: PostBody = {
             booqId,
             kind,
@@ -128,7 +128,7 @@ export function useBooqNotes({
         const now = new Date().toISOString()
         const optimisticResponse: PostResponse = {
             ...postBody,
-            id: noteId,
+            id: annotationId,
             author: user,
             createdAt: now,
             updatedAt: now,
@@ -136,37 +136,37 @@ export function useBooqNotes({
             privacy,
         }
 
-        const posted = postNoteTrigger({
+        const posted = postAnnotationTrigger({
             body: postBody,
-            noteId,
+            annotationId,
         }, {
             optimisticData: (currentData: GetResponse | undefined): GetResponse =>
                 currentData
-                    ? { notes: [...currentData.notes, optimisticResponse] }
-                    : { notes: [optimisticResponse] },
+                    ? { annotations: [...currentData.annotations, optimisticResponse] }
+                    : { annotations: [optimisticResponse] },
         })
 
         return { optimistic: optimisticResponse, posted }
     }
 
-    const { trigger: deleteNoteTrigger } = useSWRMutation(
-        notesKey,
-        async (_key: string, { arg: noteId }: { arg: string }) => {
-            const res = await fetch(`/api/notes/${noteId}`, {
+    const { trigger: deleteAnnotationTrigger } = useSWRMutation(
+        annotationsKey,
+        async (_key: string, { arg: annotationId }: { arg: string }) => {
+            const res = await fetch(`/api/annotations/${annotationId}`, {
                 method: 'DELETE',
             })
             if (!res.ok) {
-                throw new Error('Failed to delete note')
+                throw new Error('Failed to delete annotation')
             }
-            return noteId
+            return annotationId
         },
         {
             populateCache: (deleteResponse: string, currentData: GetResponse | undefined) => {
                 if (!currentData) {
-                    return { notes: [] }
+                    return { annotations: [] }
                 }
                 return {
-                    notes: currentData.notes.filter(n => n.id !== deleteResponse),
+                    annotations: currentData.annotations.filter(n => n.id !== deleteResponse),
                 }
             },
             rollbackOnError: true,
@@ -174,28 +174,28 @@ export function useBooqNotes({
         }
     )
 
-    function removeNote({ noteId }: { noteId: string }) {
+    function removeAnnotation({ annotationId }: { annotationId: string }) {
         if (!user || !data) return undefined
 
-        const posted = deleteNoteTrigger(noteId, {
+        const posted = deleteAnnotationTrigger(annotationId, {
             optimisticData: (currentData: GetResponse | undefined): GetResponse =>
                 currentData
-                    ? { notes: currentData.notes.filter(n => n.id !== noteId) }
-                    : { notes: [] },
+                    ? { annotations: currentData.annotations.filter(n => n.id !== annotationId) }
+                    : { annotations: [] },
         })
 
-        return { optimistic: { noteId }, posted }
+        return { optimistic: { annotationId }, posted }
     }
 
-    const { trigger: updateNoteTrigger } = useSWRMutation(
-        notesKey,
-        async (_key: string, { arg: { noteId, body } }: {
+    const { trigger: updateAnnotationTrigger } = useSWRMutation(
+        annotationsKey,
+        async (_key: string, { arg: { annotationId, body } }: {
             arg: {
-                noteId: string,
+                annotationId: string,
                 body: PatchBody,
             }
         }) => {
-            const res = await fetch(`/api/notes/${noteId}`, {
+            const res = await fetch(`/api/annotations/${annotationId}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
@@ -203,7 +203,7 @@ export function useBooqNotes({
                 body: JSON.stringify(body),
             })
             if (!res.ok) {
-                throw new Error('Failed to update note')
+                throw new Error('Failed to update annotation')
             }
             const result: PatchResponse = await res.json()
             return result
@@ -211,10 +211,10 @@ export function useBooqNotes({
         {
             populateCache: (patchResponse: PatchResponse, currentData: GetResponse | undefined) => {
                 if (!currentData) {
-                    return { notes: [] }
+                    return { annotations: [] }
                 }
                 return {
-                    notes: currentData.notes.map(n =>
+                    annotations: currentData.annotations.map(n =>
                         n.id === patchResponse.id
                             ? { ...n, ...patchResponse, content: patchResponse.content }
                             : n
@@ -226,8 +226,8 @@ export function useBooqNotes({
         }
     )
 
-    function updateNote({ noteId, kind, content }: {
-        noteId: string,
+    function updateAnnotation({ annotationId, kind, content }: {
+        annotationId: string,
         kind?: string,
         content?: string | null,
     }) {
@@ -237,15 +237,15 @@ export function useBooqNotes({
         if (kind !== undefined) body.kind = kind
         if (content !== undefined) body.content = content
 
-        const posted = updateNoteTrigger({ noteId, body }, {
+        const posted = updateAnnotationTrigger({ annotationId, body }, {
             optimisticData: (currentData: GetResponse | undefined): GetResponse => {
                 if (!currentData) {
-                    return { notes: [] }
+                    return { annotations: [] }
                 }
                 const now = new Date().toISOString()
                 return {
-                    notes: currentData.notes.map(n =>
-                        n.id === noteId
+                    annotations: currentData.annotations.map(n =>
+                        n.id === annotationId
                             ? { ...n, ...body, content: body.content ?? undefined, updatedAt: now }
                             : n
                     ),
@@ -253,14 +253,14 @@ export function useBooqNotes({
             },
         })
 
-        return { optimistic: { noteId, ...body }, posted }
+        return { optimistic: { annotationId, ...body }, posted }
     }
 
     return {
-        notes,
+        annotations,
         isLoading,
-        addNote,
-        removeNote,
-        updateNote,
+        addAnnotation,
+        removeAnnotation,
+        updateAnnotation,
     }
 }

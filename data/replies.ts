@@ -7,12 +7,12 @@ import {
     DbReply,
     DbReplyWithAuthor,
 } from '@/backend/replies'
-import { NoteAuthorData } from './notes'
+import { AnnotationAuthorData } from './annotations'
 
 export type BooqReply = {
     id: string,
     noteId: string,
-    author: NoteAuthorData,
+    author: AnnotationAuthorData,
     content: string,
     createdAt: string,
     updatedAt: string,

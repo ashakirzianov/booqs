@@ -1,13 +1,13 @@
 import { ReactNode } from 'react'
 import { ProfileBadge } from '@/components/ProfilePicture'
 import { NavigationSelection } from './useNavigationState'
-import { NoteAuthorData } from '@/data/notes'
+import { AnnotationAuthorData } from '@/data/annotations'
 
 export function NavigationFilter({
     selection, toggle, authors, self,
 }: {
-    self: NoteAuthorData | undefined,
-    authors: NoteAuthorData[],
+    self: AnnotationAuthorData | undefined,
+    authors: AnnotationAuthorData[],
     selection: NavigationSelection,
     toggle: (id: string) => void,
 }) {
@@ -24,8 +24,8 @@ export function NavigationFilter({
             <div className={itemClass}>
                 <FilterButton
                     text='Notes'
-                    selected={selection.notes}
-                    toggle={() => toggle('notes')}
+                    selected={selection.annotations}
+                    toggle={() => toggle('annotations')}
                 />
             </div>
         )}

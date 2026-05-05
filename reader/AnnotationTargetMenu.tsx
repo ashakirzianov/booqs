@@ -2,58 +2,58 @@ import Link from 'next/link'
 import { useMemo, useState } from 'react'
 import * as clipboard from 'clipboard-polyfill'
 import { BooqId } from '@/core'
-import type { MenuState, NoteTarget } from './ContextMenuContent'
+import type { MenuState, AnnotationTarget } from './ContextMenuContent'
 import { ColorPicker } from '@/components/ColorPicker'
 import { formatRelativeTime } from '@/application/common'
-import { HIGHLIGHT_KINDS, useBooqNotes } from '@/application/notes'
+import { HIGHLIGHT_KINDS, useBooqAnnotations } from '@/application/annotations'
 import { ProfileBadge } from '@/components/ProfilePicture'
 import { CommentIcon, RemoveIcon, QuestionMarkIcon, ShareIcon } from '@/components/Icons'
 import { NoteReplies } from './NoteReplies'
 import { generateQuote } from './ContextMenuItems'
-import { NoteAuthorData } from '@/data/notes'
+import { AnnotationAuthorData } from '@/data/annotations'
 import { userHref } from '@/common/href'
 import { MenuButton } from './MenuButton'
 
-export function NoteTargetMenu({
+export function AnnotationTargetMenu({
     target, booqId, user, setMenuState
 }: {
-    target: NoteTarget,
+    target: AnnotationTarget,
     booqId: BooqId,
-    user: NoteAuthorData | undefined,
+    user: AnnotationAuthorData | undefined,
     setMenuState: (target: MenuState) => void,
 }) {
-    const { noteId, editMode } = target
-    const { notes, updateNote, removeNote } = useBooqNotes({ booqId, user })
-    const note = useMemo(() =>
-        notes.find(n => n.id === noteId), [notes, noteId])
-    const isOwnNote = user?.id === note?.author?.id
+    const { annotationId, editMode } = target
+    const { annotations, updateAnnotation, removeAnnotation } = useBooqAnnotations({ booqId, user })
+    const annotation = useMemo(() =>
+        annotations.find(a => a.id === annotationId), [annotations, annotationId])
+    const isOwn = user?.id === annotation?.author?.id
     const isAuthenticated = !!user?.id
-    const hasColor = HIGHLIGHT_KINDS.includes(note?.kind || 'default')
-    const [editContent, setEditContent] = useState(note?.content || null)
-    if (!note) {
+    const hasColor = HIGHLIGHT_KINDS.includes(annotation?.kind || 'default')
+    const [editContent, setEditContent] = useState(annotation?.content || null)
+    if (!annotation) {
         return null
     }
 
     const handleColorChange = (kind: string) => {
-        updateNote({ noteId, kind })
+        updateAnnotation({ annotationId, kind })
     }
 
-    const handleRemoveNote = () => {
-        if (note) {
-            removeNote({ noteId: note.id })
+    const handleRemove = () => {
+        if (annotation) {
+            removeAnnotation({ annotationId: annotation.id })
             setMenuState({ kind: 'empty' })
         }
     }
 
-    const handleEditNote = () => {
+    const handleEdit = () => {
         setMenuState({
             ...target,
             editMode: true,
         })
     }
 
-    const handleSaveNote = () => {
-        updateNote({ noteId, content: editContent })
+    const handleSave = () => {
+        updateAnnotation({ annotationId, content: editContent })
         setMenuState({
             ...target,
             editMode: false,
@@ -61,7 +61,7 @@ export function NoteTargetMenu({
     }
 
     const handleCancelEdit = () => {
-        setEditContent(note.content ?? '')
+        setEditContent(annotation.content ?? '')
         setMenuState({
             ...target,
             editMode: false,
@@ -75,7 +75,7 @@ export function NoteTargetMenu({
         })
     }
 
-    const handleShareNote = () => {
+    const handleShare = () => {
         const quote = generateQuote(booqId, target.selection.text, target.selection.range)
         clipboard.writeText(quote)
         setMenuState({ kind: 'empty' })
@@ -85,11 +85,11 @@ export function NoteTargetMenu({
         <div
             className="flex flex-col"
         >
-            {/* Color picker - shown for own notes */}
-            {isOwnNote && isAuthenticated && hasColor && (
+            {/* Color picker - shown for own annotations */}
+            {isOwn && isAuthenticated && hasColor && (
                 <div className='h-10'>
                     <ColorPicker
-                        selectedKind={note.kind}
+                        selectedKind={annotation.kind}
                         onColorChange={handleColorChange}
                     />
                 </div>
@@ -109,7 +109,7 @@ export function NoteTargetMenu({
                             onKeyDown={(e) => {
                                 if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
                                     e.preventDefault()
-                                    handleSaveNote()
+                                    handleSave()
                                 }
                             }}
                             rows={3}
@@ -117,7 +117,7 @@ export function NoteTargetMenu({
                         />
                         <div className="flex flex-row justify-start gap-4">
                             <MenuButton
-                                onClick={handleSaveNote}
+                                onClick={handleSave}
                             >
                                 <div className="w-4 h-4"><CommentIcon /></div>
                                 Save note
@@ -134,15 +134,15 @@ export function NoteTargetMenu({
                     /* Display mode UI */
                     <>
                         {/* Note content or add note prompt */}
-                        {note.content ? (
+                        {annotation.content ? (
                             <div className="text-sm text-primary">
-                                {note.content}
+                                {annotation.content}
                             </div>
-                        ) : (isOwnNote && (
+                        ) : (isOwn && (
                             <div className="text-sm">
                                 <span
                                     className="cursor-pointer hover:underline text-dimmed"
-                                    onClick={handleEditNote}
+                                    onClick={handleEdit}
                                 >
                                     Add note
                                 </span>
@@ -151,9 +151,9 @@ export function NoteTargetMenu({
 
                         {/* Action buttons */}
                         <div className="flex flex-row flex-wrap justify-start gap-4">
-                            {isOwnNote && note.content && (
+                            {isOwn && annotation.content && (
                                 <MenuButton
-                                    onClick={handleEditNote}
+                                    onClick={handleEdit}
                                 >
                                     <div className="w-4 h-4"><CommentIcon /></div>
                                     Edit
@@ -168,14 +168,14 @@ export function NoteTargetMenu({
                                 </MenuButton>
                             )}
                             <MenuButton
-                                onClick={handleShareNote}
+                                onClick={handleShare}
                             >
                                 <div className="w-4 h-4"><ShareIcon /></div>
                                 Share
                             </MenuButton>
-                            {isOwnNote && (
+                            {isOwn && (
                                 <MenuButton
-                                    onClick={handleRemoveNote}
+                                    onClick={handleRemove}
                                 >
                                     <div className="w-4 h-4"><RemoveIcon /></div>
                                     Remove
@@ -184,26 +184,26 @@ export function NoteTargetMenu({
                         </div>
 
                         {/* Replies - shown for public comments */}
-                        {note.privacy === 'public' && note.kind === 'comment' && (
-                            <NoteReplies noteId={note.id} user={user} />
+                        {annotation.privacy === 'public' && annotation.kind === 'comment' && (
+                            <NoteReplies noteId={annotation.id} user={user} />
                         )}
 
                         {/* Author info and date */}
-                        {!isOwnNote && (<span className="text-xs text-dimmed flex flex-row items-center justify-start flex-wrap">
+                        {!isOwn && (<span className="text-xs text-dimmed flex flex-row items-center justify-start flex-wrap">
                             <Link
-                                href={userHref({ username: note.author.username })}
+                                href={userHref({ username: annotation.author.username })}
                                 className="flex justify-start cursor-pointer hover:text-highlight transition-opacity gap-0 min-w-0 max-w-[140px]"
                             >
                                 <ProfileBadge
                                     border={false}
                                     size={1}
-                                    name={note.author.name}
-                                    picture={note.author.profilePictureURL ?? undefined}
-                                    emoji={note.author.emoji}
+                                    name={annotation.author.name}
+                                    picture={annotation.author.profilePictureURL ?? undefined}
+                                    emoji={annotation.author.emoji}
                                 />
-                                <span className='hover:underline truncate' title={note.author.name}>{note.author.name}</span>
+                                <span className='hover:underline truncate' title={annotation.author.name}>{annotation.author.name}</span>
                             </Link>&nbsp;
-                            <span className="whitespace-nowrap">{note.createdAt === note.updatedAt ? 'created' : 'edited'} {formatRelativeTime(new Date(note.updatedAt))}</span>
+                            <span className="whitespace-nowrap">{annotation.createdAt === annotation.updatedAt ? 'created' : 'edited'} {formatRelativeTime(new Date(annotation.updatedAt))}</span>
                         </span>)}
                     </>
                 )}
@@ -211,4 +211,3 @@ export function NoteTargetMenu({
         </div>
     )
 }
-

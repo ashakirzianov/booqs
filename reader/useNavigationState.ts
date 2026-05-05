@@ -5,7 +5,7 @@ export function useNavigationState() {
     const [navigationOpen, setNavigationOpen] = useState(false)
     const [navigationSelection, setNavigationSelection] = useState<NavigationSelection>({
         chapters: true,
-        notes: true,
+        annotations: true,
     })
     return {
         navigationOpen,

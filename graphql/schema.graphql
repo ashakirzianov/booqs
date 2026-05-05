@@ -8,18 +8,18 @@ type Query {
     history(limit: Int, offset: Int): [BooqHistory]
     collection(name: String!): Collection
     featured(limit: Int!): [Booq]
-    notes(username: String!, limit: Int, offset: Int): [Note!]!
+    annotations(username: String!, limit: Int, offset: Int): [Annotation!]!
     libraryBrowse(library: String!, kind: LibraryBrowseKind!, query: String!, limit: Int, offset: Int): LibraryBrowseResult!
 }
 type Subscription {
-    generateReply(noteId: ID!): String!
+    generateReply(annotationId: ID!): String!
 }
 type Mutation {
     addBookmark(bookmark: BookmarkInput!): MutationResult!
     removeBookmark(id: ID!): MutationResult!
-    addNote(note: NoteInput!): MutationResult!
-    removeNote(id: ID!): MutationResult!
-    updateNote(id: ID!, kind: String, content: String): MutationResult!
+    addAnnotation(annotation: AnnotationInput!): MutationResult!
+    removeAnnotation(id: ID!): MutationResult!
+    updateAnnotation(id: ID!, kind: String, content: String): MutationResult!
     addReply(reply: ReplyInput!): MutationResult!
     removeReply(id: ID!): MutationResult!
     updateReply(id: ID!, content: String!): MutationResult!
@@ -96,7 +96,7 @@ type Booq {
     subjects: [String!]
     coverSrc: String
     bookmarks: [Bookmark]
-    notes(username: String, limit: Int, offset: Int): [Note!]!
+    annotations(username: String, limit: Int, offset: Int): [Annotation!]!
     preview(path: [Int!], end: [Int!], length: Int = 500): String
     chapter(path: [Int!]): BooqChapter
     content: [BooqNode]
@@ -121,7 +121,7 @@ type User {
     followers: [User!]!
     following: [User!]!
     isFollowing: Boolean
-    booqsWithNotes: [Booq!]!
+    booqsWithAnnotations: [Booq!]!
     passkeys: [Passkey!]
 }
 
@@ -138,7 +138,7 @@ input BookmarkInput {
     booqId: ID!
     path: [Int!]!
 }
-input NoteInput {
+input AnnotationInput {
     id: ID
     booqId: ID!
     kind: String!
@@ -208,7 +208,7 @@ type Bookmark {
     id: ID!
     path: [Int!]!
 }
-type Note {
+type Annotation {
     author: User
     booq: Booq
     id: ID!
@@ -227,7 +227,7 @@ type Note {
 }
 type Reply {
     id: ID!
-    noteId: ID!
+    annotationId: ID!
     author: User
     content: String!
     createdAt: String!
@@ -235,7 +235,7 @@ type Reply {
 }
 input ReplyInput {
     id: ID!
-    noteId: ID!
+    annotationId: ID!
     content: String!
 }
 type BooqHistory {

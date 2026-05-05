@@ -2,7 +2,7 @@ import { BooqId } from '@/core'
 import { nanoid } from 'nanoid'
 import { addReply, hasReplyFromAuthor } from './replies'
 import { generateAnswerStreaming } from './ai'
-import { noteForId } from './notes'
+import { annotationForId } from './annotations'
 import { AI_USER_ID, ensureAiUser } from './aiUser'
 
 export type GenerateAiReplyResult =
@@ -10,7 +10,7 @@ export type GenerateAiReplyResult =
     | { success: false, error: { message: string, code: string } }
 
 export async function generateAiReply(noteId: string): Promise<GenerateAiReplyResult> {
-    const note = await noteForId(noteId)
+    const note = await annotationForId(noteId)
     if (!note) {
         return { success: false, error: { message: 'Note not found', code: 'NOT_FOUND' } }
     }

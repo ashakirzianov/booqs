@@ -43,7 +43,16 @@
       "WebFetch(domain:platform.openai.com)",
       "WebFetch(domain:help.openai.com)",
       "Bash(git checkout:*)",
-      "Bash(npx jest:*)"
+      "Bash(npx jest:*)",
+      "Bash(ls app/\\\\\\(main\\\\\\)/notes/)",
+      "Bash(ls app/\\\\\\(main\\\\\\)/notes/[booq_id]/)",
+      "Bash(cd app/\\\\\\(main\\\\\\)/notes/[booq_id])",
+      "Bash(mv NoteCard.tsx AnnotationCard.tsx)",
+      "Bash(mv NoteFragment.tsx AnnotationFragment.tsx)",
+      "Bash(mv NotesFilter.tsx AnnotationsFilter.tsx)",
+      "Bash(ls app/\\\\\\(main\\\\\\)/annotations/)",
+      "Bash(ls \"app/\\(main\\)/notes/\")",
+      "Bash(grep -rn \"kind: ''''note''''\" reader/)"
     ]
   },
   "enableAllProjectMcpServers": false

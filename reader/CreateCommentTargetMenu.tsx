@@ -1,20 +1,20 @@
-import { useBooqNotes } from '@/application/notes'
+import { useBooqAnnotations } from '@/application/annotations'
 import { BooqId } from '@/core'
 import { BooqSelection } from '@/viewer'
 import { useState } from 'react'
 import type { CreateCommentTarget, MenuState } from './ContextMenuContent'
-import { NoteAuthorData } from '@/data/notes'
+import { AnnotationAuthorData } from '@/data/annotations'
 
 export function CreateCommentTargetMenu({
     target: { parent }, booqId, user, setMenuState,
 }: {
     target: CreateCommentTarget,
     booqId: BooqId,
-    user: NoteAuthorData | undefined,
+    user: AnnotationAuthorData | undefined,
     setMenuState: (target: MenuState) => void,
 }) {
     const [comment, setComment] = useState('')
-    const { addNote } = useBooqNotes({ booqId, user })
+    const { addAnnotation } = useBooqAnnotations({ booqId, user })
 
     // Extract selection from parent target
     const selection: BooqSelection = parent.selection
@@ -22,7 +22,7 @@ export function CreateCommentTargetMenu({
     const handlePost = () => {
         if (!user?.id || !comment.trim()) return
 
-        const result = addNote({
+        const result = addAnnotation({
             kind: 'comment',
             range: selection.range,
             content: comment.trim(),

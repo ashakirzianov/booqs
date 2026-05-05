@@ -1,10 +1,10 @@
 'use client'
 
 import type { GetResponse } from '@/app/api/users/[username]/following/route'
-import { NoteAuthorData } from '@/data/notes'
+import { AnnotationAuthorData } from '@/data/annotations'
 import useSWR from 'swr'
 
-export function useFollowingData({ user }: { user: NoteAuthorData | undefined }) {
+export function useFollowingData({ user }: { user: AnnotationAuthorData | undefined }) {
     const { data: followingData, isLoading } = useSWR(
         user ? `/api/users/${user.username}/following` : null,
         async (url: string) => {

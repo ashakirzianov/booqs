@@ -1,43 +1,43 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { NoteAuthorData } from '@/data/notes'
-import { useBooqNotes } from '@/application/notes'
+import { AnnotationAuthorData } from '@/data/annotations'
+import { useBooqAnnotations } from '@/application/annotations'
 import { ActionButton, LightButton } from '@/components/Buttons'
-import { ExpandedNoteFragmentData, NoteFragment } from './NoteFragment'
+import { ExpandedAnnotationFragmentData, AnnotationFragment } from './AnnotationFragment'
 import { RetryIcon } from '@/components/Icons'
 import { NoteReplies } from '@/reader/NoteReplies'
 
-export function NoteCard({
+export function AnnotationCard({
     noteFragmentData, user, isExpanded, onToggle, onColorChange,
 }: {
-    noteFragmentData: ExpandedNoteFragmentData,
-    user: NoteAuthorData | undefined,
+    noteFragmentData: ExpandedAnnotationFragmentData,
+    user: AnnotationAuthorData | undefined,
     isExpanded: boolean,
     onToggle: () => void,
-    onColorChange?: (noteId: string, newKind: string) => void,
+    onColorChange?: (annotationId: string, newKind: string) => void,
 }) {
-    const { note, content, range } = noteFragmentData
-    const { booqId } = note
+    const { annotation, content, range } = noteFragmentData
+    const { booqId } = annotation
     const [isEditing, setIsEditing] = useState(false)
-    const [editContent, setEditContent] = useState(note.content || '')
-    const [removedNote, setRemovedNote] = useState<typeof note | null>(null)
-    const { updateNote, removeNote, addNote } = useBooqNotes({ booqId, user })
+    const [editContent, setEditContent] = useState(annotation.content || '')
+    const [removedAnnotation, setRemovedAnnotation] = useState<typeof annotation | null>(null)
+    const { updateAnnotation, removeAnnotation, addAnnotation } = useBooqAnnotations({ booqId, user })
 
-    const isNoteRemoved = removedNote !== null
+    const isNoteRemoved = removedAnnotation !== null
 
     // Update editContent when note content changes (but not when editing)
     useEffect(() => {
         if (!isEditing) {
-            setEditContent(note.content || '')
+            setEditContent(annotation.content || '')
         }
-    }, [note.content, isEditing])
+    }, [annotation.content, isEditing])
 
     function handleEditToggle() {
         if (isEditing) {
             // Save the changes
-            updateNote({
-                noteId: note.id,
+            updateAnnotation({
+                annotationId: annotation.id,
                 content: editContent.trim() || null
             })
         }
@@ -45,35 +45,35 @@ export function NoteCard({
     }
 
     function handleCancel() {
-        setEditContent(note.content || '')
+        setEditContent(annotation.content || '')
         setIsEditing(false)
     }
 
     function handleRemove() {
-        setRemovedNote(note)
-        removeNote({ noteId: note.id })
+        setRemovedAnnotation(annotation)
+        removeAnnotation({ annotationId: annotation.id })
     }
 
     function handleRestore() {
-        if (!removedNote) return
-        addNote({
-            range: removedNote.range,
-            kind: removedNote.kind,
-            content: removedNote.content || undefined,
-            targetQuote: removedNote.targetQuote,
-            privacy: removedNote.privacy || 'private',
-            id: removedNote.id
+        if (!removedAnnotation) return
+        addAnnotation({
+            range: removedAnnotation.range,
+            kind: removedAnnotation.kind,
+            content: removedAnnotation.content || undefined,
+            targetQuote: removedAnnotation.targetQuote,
+            privacy: removedAnnotation.privacy || 'private',
+            id: removedAnnotation.id
         })
-        setRemovedNote(null)
+        setRemovedAnnotation(null)
     }
 
     function handleColorChange(kind: string) {
-        updateNote({
-            noteId: note.id,
+        updateAnnotation({
+            annotationId: annotation.id,
             kind: kind
         })
         // Notify parent component about the color change
-        onColorChange?.(note.id, kind)
+        onColorChange?.(annotation.id, kind)
     }
 
     // Show removal message if note was removed
@@ -95,8 +95,8 @@ export function NoteCard({
     return (
         <div className="bg-background py-6 transition-shadow duration-200">
             <div className="mb-4 flex flex-col gap-3">
-                <NoteFragment
-                    note={note}
+                <AnnotationFragment
+                    annotation={annotation}
                     content={content}
                     range={range}
                     isExpanded={isExpanded}
@@ -139,12 +139,12 @@ export function NoteCard({
                         className="text-primary px-3 cursor-pointer hover:opacity-80 transition-opacity italic"
                         onClick={handleEditToggle}
                     >
-                        {note.content || <span className="text-dimmed">Add note…</span>}
+                        {annotation.content || <span className="text-dimmed">Add note…</span>}
                     </div>
                 )}
 
                 <div className="px-3">
-                    <NoteReplies noteId={note.id} user={user} collapsible />
+                    <NoteReplies noteId={annotation.id} user={user} collapsible />
                 </div>
             </div>
         </div>

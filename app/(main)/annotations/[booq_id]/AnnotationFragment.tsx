@@ -7,36 +7,36 @@ import { BooqContent } from '@/viewer'
 import { LightLink, RemoveButton } from '@/components/Buttons'
 import { ColorPicker } from '@/components/ColorPicker'
 import { booqContentHref } from '@/common/href'
-import { BooqNote } from '@/data/notes'
-import { COMMENT_KIND, QUESTION_KIND, augmentationForNote } from '@/application/notes'
+import { BooqAnnotation } from '@/data/annotations'
+import { COMMENT_KIND, QUESTION_KIND, augmentationForAnnotation } from '@/application/annotations'
 
-type NoteFragmentProps = ExpandedNoteFragmentData & {
+type AnnotationFragmentProps = ExpandedAnnotationFragmentData & {
     isExpanded: boolean,
     onToggle: () => void,
     onColorChange: (kind: string) => void,
     onRemove?: () => void,
 }
 
-export type ExpandedNoteFragmentData = {
-    note: BooqNote,
+export type ExpandedAnnotationFragmentData = {
+    annotation: BooqAnnotation,
     content?: BooqNode[],
     styles?: BooqStyles,
     range: BooqRange,
 }
 
-export function NoteFragment({
-    note, content, styles, range,
+export function AnnotationFragment({
+    annotation, content, styles, range,
     isExpanded, onToggle,
     onColorChange, onRemove,
-}: NoteFragmentProps) {
+}: AnnotationFragmentProps) {
     const noteAugmentations = useMemo(() => {
         if (!content) {
             return []
         }
-        return [augmentationForNote(note)]
-    }, [content, note])
+        return [augmentationForAnnotation(annotation)]
+    }, [content, annotation])
 
-    const viewInBooqHref = booqContentHref({ booqId: note.booqId, path: range.start })
+    const viewInBooqHref = booqContentHref({ booqId: annotation.booqId, path: range.start })
 
     return (
         <>
@@ -62,10 +62,10 @@ export function NoteFragment({
                                     isRemoving={false}
                                 />
                             )}
-                            {!isCommentOrQuestion(note.kind) && (
+                            {!isCommentOrQuestion(annotation.kind) && (
                                 <div className='w-32 h-6 shadow rounded overflow-clip'>
                                     <ColorPicker
-                                        selectedKind={note.kind}
+                                        selectedKind={annotation.kind}
                                         onColorChange={onColorChange}
                                     />
                                 </div>
@@ -94,8 +94,8 @@ export function NoteFragment({
                     onClick={onToggle}
                     title='Click to expand'
                 >
-                    <span className="m-0" style={collapsedStyleForNote(note)}>
-                        {note.targetQuote}
+                    <span className="m-0" style={collapsedStyleForAnnotation(annotation)}>
+                        {annotation.targetQuote}
                     </span>
                 </div>
             )}
@@ -107,8 +107,8 @@ function isCommentOrQuestion(kind: string): boolean {
     return kind === COMMENT_KIND || kind === QUESTION_KIND
 }
 
-function collapsedStyleForNote(note: BooqNote): React.CSSProperties {
-    const aug = augmentationForNote(note)
+function collapsedStyleForAnnotation(annotation: BooqAnnotation): React.CSSProperties {
+    const aug = augmentationForAnnotation(annotation)
     return {
         backgroundColor: aug.color,
         textDecoration: aug.underline ? 'underline' : undefined,

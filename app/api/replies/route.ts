@@ -1,11 +1,11 @@
-import { NoteAuthorData } from '@/data/notes'
+import { AnnotationAuthorData } from '@/data/annotations'
 import { fetchReplies } from '@/data/replies'
 import { NextRequest } from 'next/server'
 
 export type ResolvedReply = {
     id: string,
     noteId: string,
-    author: NoteAuthorData,
+    author: AnnotationAuthorData,
     content: string,
     createdAt: string,
     updatedAt: string,

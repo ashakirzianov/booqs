@@ -1,5 +1,5 @@
 import { colorSchemeForBaseColor } from '@/application/common'
-import { HIGHLIGHT_KINDS } from '@/application/notes'
+import { HIGHLIGHT_KINDS } from '@/application/annotations'
 
 export function ColorPicker({
     selectedKind,

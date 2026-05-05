@@ -1,9 +1,9 @@
 import { BooqId, BooqRange } from '@/core'
 import { sql } from './db'
 
-export type DbNotePrivacy = 'private' | 'public'
+export type DbAnnotationPrivacy = 'private' | 'public'
 
-export type DbNote = {
+export type DbAnnotation = {
   id: string,
   author_id: string,
   booq_id: string,
@@ -12,12 +12,12 @@ export type DbNote = {
   kind: string,
   content: string | null,
   target_quote: string,
-  privacy: DbNotePrivacy,
+  privacy: DbAnnotationPrivacy,
   created_at: string,
   updated_at: string,
 }
 
-export type DbNoteWithAuthor = DbNote & {
+export type DbAnnotationWithAuthor = DbAnnotation & {
   author_id: string,
   author_name: string,
   author_username: string,
@@ -25,22 +25,22 @@ export type DbNoteWithAuthor = DbNote & {
   author_emoji: string,
 }
 
-export async function noteForId(id: string): Promise<DbNote | null> {
-  const [note] = await sql`
+export async function annotationForId(id: string): Promise<DbAnnotation | null> {
+  const [row] = await sql`
       SELECT * FROM notes
       WHERE id = ${id}
     `
-  return note ? (note as DbNote) : null
+  return row ? (row as DbAnnotation) : null
 }
 
-export async function notesWithAuthorFor({ booqId, authorId, userId, limit, offset }: {
+export async function annotationsWithAuthorFor({ booqId, authorId, userId, limit, offset }: {
   booqId?: BooqId,
   authorId?: string,
   userId: string | undefined,
   limit?: number,
   offset?: number,
-}): Promise<DbNoteWithAuthor[]> {
-  const notes = await sql`
+}): Promise<DbAnnotationWithAuthor[]> {
+  const rows = await sql`
       SELECT n.*, u.name AS author_name, u.username AS author_username, u.profile_picture_url AS author_profile_picture_url, u.emoji AS author_emoji
       FROM notes n
       JOIN users u ON u.id = n.author_id
@@ -53,12 +53,12 @@ export async function notesWithAuthorFor({ booqId, authorId, userId, limit, offs
       ${offset !== undefined ? sql`OFFSET ${offset}` : sql``}
       `
 
-  return notes as DbNoteWithAuthor[]
+  return rows as DbAnnotationWithAuthor[]
 }
 
 
 
-export async function addNote({
+export async function addAnnotation({
   id,
   authorId,
   booqId,
@@ -75,9 +75,9 @@ export async function addNote({
   kind: string,
   content?: string,
   targetQuote?: string,
-  privacy?: DbNotePrivacy,
-}): Promise<DbNote> {
-  const [note] = await sql`
+  privacy?: DbAnnotationPrivacy,
+}): Promise<DbAnnotation> {
+  const [row] = await sql`
       INSERT INTO notes (
         id, author_id, booq_id, start_path, end_path, kind, content, target_quote, privacy
       )
@@ -86,10 +86,10 @@ export async function addNote({
       )
       RETURNING *
     `
-  return note as DbNote
+  return row as DbAnnotation
 }
 
-export async function removeNote({ id, authorId }: {
+export async function removeAnnotation({ id, authorId }: {
   id: string,
   authorId: string,
 }): Promise<boolean> {
@@ -101,15 +101,15 @@ export async function removeNote({ id, authorId }: {
   return rows.length > 0
 }
 
-export async function updateNote({
+export async function updateAnnotation({
   id, authorId, kind, content, privacy,
 }: {
   id: string,
   authorId: string,
   kind?: string,
   content?: string | null,
-  privacy?: DbNotePrivacy,
-}): Promise<DbNote | null> {
+  privacy?: DbAnnotationPrivacy,
+}): Promise<DbAnnotation | null> {
   if (kind === undefined && content === undefined && privacy === undefined) return null
 
   const [row] = await sql`
@@ -122,10 +122,10 @@ export async function updateNote({
       WHERE id = ${id} AND author_id = ${authorId}
       RETURNING *
     `
-  return (row as DbNote) ?? null
+  return (row as DbAnnotation) ?? null
 }
 
-export async function getBooqsWithOwnNotes(userId: string): Promise<string[]> {
+export async function getBooqsWithOwnAnnotations(userId: string): Promise<string[]> {
   const result = await sql`
       SELECT DISTINCT booq_id
       FROM notes

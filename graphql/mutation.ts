@@ -3,7 +3,7 @@ import { IResolvers } from '@graphql-tools/utils'
 import { authResultFromTokenPair, ResolverContext } from './context'
 import { rotateTokenPair } from '@/backend/token'
 import { deleteUserForId, updateUser, userForUsername } from '@/backend/users'
-import { addNote, removeNote, updateNote } from '@/backend/notes'
+import { addAnnotation, removeAnnotation, updateAnnotation } from '@/backend/annotations'
 import { addReply, removeReply, updateReply } from '@/backend/replies'
 import { initiatePasskeyLogin, initiatePasskeyRegistration, verifyPasskeyLogin, verifyPasskeyRegistration } from '@/backend/passkey'
 import { initiateSignRequest, completeSignInRequest, completeSignUp } from '@/backend/sign'
@@ -97,36 +97,36 @@ export const mutationResolver: IResolvers<any, ResolverContext> = {
             const result = await deleteBookmark({ id, userId })
             return result ? ok() : fail('Bookmark not found')
         },
-        async addNote(_, { note }, { userId }): Promise<MutationResult> {
+        async addAnnotation(_, { annotation }, { userId }): Promise<MutationResult> {
             if (!requireAuth(userId)) return fail('Authentication required')
-            await addNote({
-                id: note.id,
+            await addAnnotation({
+                id: annotation.id,
                 authorId: userId,
-                booqId: note.booqId,
+                booqId: annotation.booqId,
                 range: {
-                    start: note.start,
-                    end: note.end,
+                    start: annotation.start,
+                    end: annotation.end,
                 },
-                kind: note.kind,
-                targetQuote: note.targetQuote,
+                kind: annotation.kind,
+                targetQuote: annotation.targetQuote,
             })
             return ok()
         },
-        async removeNote(_, { id }, { userId }): Promise<MutationResult> {
+        async removeAnnotation(_, { id }, { userId }): Promise<MutationResult> {
             if (!requireAuth(userId)) return fail('Authentication required')
-            const result = await removeNote({ authorId: userId, id })
-            return result ? ok() : fail('Note not found')
+            const result = await removeAnnotation({ authorId: userId, id })
+            return result ? ok() : fail('Annotation not found')
         },
-        async updateNote(_, { id, kind, content }, { userId }): Promise<MutationResult> {
+        async updateAnnotation(_, { id, kind, content }, { userId }): Promise<MutationResult> {
             if (!requireAuth(userId)) return fail('Authentication required')
-            await updateNote({ authorId: userId, id, kind, content })
+            await updateAnnotation({ authorId: userId, id, kind, content })
             return ok()
         },
         async addReply(_, { reply }, { userId }): Promise<MutationResult> {
             if (!requireAuth(userId)) return fail('Authentication required')
             await addReply({
                 id: reply.id,
-                noteId: reply.noteId,
+                noteId: reply.annotationId,
                 authorId: userId,
                 content: reply.content,
             })

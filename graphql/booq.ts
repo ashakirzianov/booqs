@@ -1,12 +1,12 @@
 import { IResolvers } from '@graphql-tools/utils'
 import { BookmarkParent } from './bookmark'
-import { NoteParent } from './note'
+import { AnnotationParent } from './annotation'
 import { ResolverContext } from './context'
 import {
     BooqId, buildChapter, previewForPath, textForRange,
 } from '@/core'
 import { getBookmarks } from '@/backend/bookmarks'
-import { notesWithAuthorFor } from '@/backend/notes'
+import { annotationsWithAuthorFor } from '@/backend/annotations'
 import { userForUsername } from '@/backend/users'
 
 export type BooqParent = {
@@ -42,16 +42,16 @@ export const booqResolver: IResolvers<BooqParent, ResolverContext> = {
                 })
                 : []
         },
-        async notes(parent, { username, limit, offset }: {
+        async annotations(parent, { username, limit, offset }: {
             username?: string, limit?: number, offset?: number,
-        }, { userId }): Promise<NoteParent[]> {
+        }, { userId }): Promise<AnnotationParent[]> {
             let authorId: string | undefined
             if (username) {
                 const user = await userForUsername(username)
                 if (!user) return []
                 authorId = user.id
             }
-            return notesWithAuthorFor({ booqId: parent.booqId, authorId, userId, limit, offset })
+            return annotationsWithAuthorFor({ booqId: parent.booqId, authorId, userId, limit, offset })
         },
         async preview(parent, { path, end, length }, { booqLoader }) {
             const booq = await booqLoader.load(parent.booqId)

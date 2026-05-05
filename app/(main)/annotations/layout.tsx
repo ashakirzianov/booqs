@@ -1,7 +1,7 @@
-import { fetchBooqsWithOwnNotes } from '@/data/notes'
+import { fetchBooqsWithOwnAnnotations } from '@/data/annotations'
 import { booqCard, BooqCardData } from '@/data/booqs'
 import { BooqId } from '@/core'
-import { NotesNavigationItem } from './NotesNavigationItem'
+import { AnnotationsNavigationItem } from './AnnotationsNavigationItem'
 import styles from '@/app/(main)/MainLayout.module.css'
 
 export default async function NotesLayout({
@@ -22,16 +22,16 @@ export default async function NotesLayout({
 }
 
 async function NotesRightPanel() {
-    const uniqueBooqIds = await fetchBooqsWithOwnNotes()
+    const uniqueBooqIds = await fetchBooqsWithOwnAnnotations()
 
-    const booqsWithNotes = await Promise.all(
+    const booqsWithAnnotations = await Promise.all(
         uniqueBooqIds.map(async (booqId) => {
             const card = await booqCard(booqId)
             return card ? { booqId, card } : null
         })
     )
 
-    const validBooqs = booqsWithNotes.filter(Boolean) as { booqId: BooqId, card: BooqCardData }[]
+    const validBooqs = booqsWithAnnotations.filter(Boolean) as { booqId: BooqId, card: BooqCardData }[]
 
     return (
         <div className="p-4 h-full bg-background">
@@ -40,7 +40,7 @@ async function NotesRightPanel() {
             ) : (
                 <div className="space-y-3">
                     {validBooqs.map(({ booqId, card }) => (
-                        <NotesNavigationItem
+                        <AnnotationsNavigationItem
                             key={booqId}
                             booqId={booqId}
                             card={card}

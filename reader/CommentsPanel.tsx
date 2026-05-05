@@ -4,9 +4,9 @@ import { BooqId, pathToId } from '@/core'
 import { TabButton } from './TabButton'
 import { formatRelativeTime } from '@/application/common'
 import { userHref } from '@/common/href'
-import { BooqNote, NoteAuthorData } from '@/data/notes'
+import { BooqAnnotation, AnnotationAuthorData } from '@/data/annotations'
 import { NoteReplies } from './NoteReplies'
-import { useBooqNotes } from '@/application/notes'
+import { useBooqAnnotations } from '@/application/annotations'
 import { BackIcon, PencilIcon, RemoveIcon } from '@/components/Icons'
 import { MenuButton } from './MenuButton'
 import { MenuState } from './ContextMenuContent'
@@ -14,8 +14,8 @@ import { useGenerateReply } from '@/application/ask'
 
 export function CommentsPanel({ booqId, comments, currentUser, followingUserIds, isFollowingLoading, target, setMenuState }: {
     booqId: BooqId,
-    comments: BooqNote[],
-    currentUser?: NoteAuthorData,
+    comments: BooqAnnotation[],
+    currentUser?: AnnotationAuthorData,
     followingUserIds?: string[],
     isFollowingLoading?: boolean,
     target: MenuState,
@@ -70,8 +70,8 @@ type StreamingReply = {
 
 function CommentsList({ booqId, comments, currentUser, followingUserIds, isFollowingLoading, onSelectComment }: {
     booqId: BooqId,
-    comments: BooqNote[],
-    currentUser?: NoteAuthorData,
+    comments: BooqAnnotation[],
+    currentUser?: AnnotationAuthorData,
     followingUserIds?: string[],
     isFollowingLoading?: boolean,
     onSelectComment: (commentId: string) => void,
@@ -138,9 +138,9 @@ function CommentsList({ booqId, comments, currentUser, followingUserIds, isFollo
 
 function CommentDetail({ booqId, comments, selectedCommentId, currentUser, onBack, streamingReply }: {
     booqId: BooqId,
-    comments: BooqNote[],
+    comments: BooqAnnotation[],
     selectedCommentId: string,
-    currentUser?: NoteAuthorData,
+    currentUser?: AnnotationAuthorData,
     onBack: () => void,
     streamingReply?: StreamingReply,
 }) {
@@ -183,18 +183,18 @@ function CommentDetail({ booqId, comments, selectedCommentId, currentUser, onBac
 }
 
 function CommentItem({ comment, booqId, user, streamingReply }: {
-    comment: BooqNote,
+    comment: BooqAnnotation,
     booqId: BooqId,
-    user?: NoteAuthorData,
+    user?: AnnotationAuthorData,
     streamingReply?: StreamingReply,
 }) {
     const isOwnComment = user?.id === comment.author.id
-    const { updateNote, removeNote } = useBooqNotes({ booqId, user })
+    const { updateAnnotation, removeAnnotation } = useBooqAnnotations({ booqId, user })
     const [isEditing, setIsEditing] = useState(false)
     const [editContent, setEditContent] = useState(comment.content ?? '')
 
     const handleSave = () => {
-        updateNote({ noteId: comment.id, content: editContent.trim() || null })
+        updateAnnotation({ annotationId: comment.id, content: editContent.trim() || null })
         setIsEditing(false)
     }
 
@@ -204,7 +204,7 @@ function CommentItem({ comment, booqId, user, streamingReply }: {
     }
 
     const handleRemove = () => {
-        removeNote({ noteId: comment.id })
+        removeAnnotation({ annotationId: comment.id })
     }
 
     const showStreamingReply = streamingReply && streamingReply.noteId === comment.id
@@ -307,7 +307,7 @@ function StreamingReplyDisplay({ answer }: {
     )
 }
 
-function Avatar({ user }: { user?: NoteAuthorData }) {
+function Avatar({ user }: { user?: AnnotationAuthorData }) {
     const display = user?.emoji || (user?.name ? user.name.charAt(0).toUpperCase() : 'X')
 
     return (

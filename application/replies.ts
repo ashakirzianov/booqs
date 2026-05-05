@@ -2,7 +2,7 @@
 
 import type { GetResponse } from '@/app/api/replies/route'
 import type { PostBody, PostResponse, PatchBody, PatchResponse } from '@/app/api/replies/[id]/route'
-import { NoteAuthorData } from '@/data/notes'
+import { AnnotationAuthorData } from '@/data/annotations'
 import { nanoid } from 'nanoid'
 import { useMemo } from 'react'
 import useSWR from 'swr'
@@ -12,7 +12,7 @@ export function useNoteReplies({
     noteId, user,
 }: {
     noteId: string,
-    user: NoteAuthorData | undefined,
+    user: AnnotationAuthorData | undefined,
 }) {
     const repliesKey = `/api/replies?note_id=${noteId}`
 

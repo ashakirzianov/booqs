@@ -1,16 +1,16 @@
 import { IResolvers } from '@graphql-tools/utils'
 import { BooqParent } from './booq'
 import { ResolverContext } from './context'
-import { DbNote } from '@/backend/notes'
+import { DbAnnotation } from '@/backend/annotations'
 import { DbUser } from '@/backend/users'
 import {
     BooqId, positionForPath, textForRange,
     getExpandedRange, buildFragment,
 } from '@/core'
 
-export type NoteParent = DbNote
-export const noteResolver: IResolvers<NoteParent, ResolverContext> = {
-    Note: {
+export type AnnotationParent = DbAnnotation
+export const annotationResolver: IResolvers<AnnotationParent, ResolverContext> = {
+    Annotation: {
         async author(parent, _, { userLoader }): Promise<DbUser | null> {
             return userLoader.load(parent.author_id)
         },
