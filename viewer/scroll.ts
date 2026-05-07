@@ -1,6 +1,8 @@
 'use client'
 import { useEffect } from 'react'
-import { BooqPath, pathFromId } from '@/core'
+import { BooqPath, pathFromString, DATASET_PATH } from '@/core'
+import { BOOQ_CONTENT_ID } from './BooqContent'
+import { PARAGRAPH_CLASS } from './render'
 
 export type BooqScrollContext = {
     getCurrentPath?: () => BooqPath | undefined,
@@ -26,17 +28,17 @@ export function useOnBooqScroll(callback?: (path: BooqPath) => void, options?: {
 }
 
 function getCurrentPath() {
-    const root = window.document.getElementById('booq-root')
+    const root = window.document.getElementById(BOOQ_CONTENT_ID)
     const current = root && getCurrent(root)
     return current
-        ? pathFromId(current.id)
+        ? pathFromString((current as HTMLElement).dataset?.[DATASET_PATH] ?? '')
         : undefined
 }
 
 function getCurrent(element: Element): Element | undefined {
     if (!isPartiallyVisible(element)) {
         return undefined
-    } else if (element.className?.includes?.('booqs-pph')) {
+    } else if (element.className?.includes?.(PARAGRAPH_CLASS)) {
         return element
     }
     const children = element.children

@@ -1,6 +1,7 @@
-import { Booq, BooqId, isElementNode, visitNodes, mapNodes } from '@/core'
+import { Booq, BooqId, isElementNode, visitNodes, mapDocumentNodes } from '@/core'
 import { parseEpub } from '@/parser'
 import { Epub, openEpubFile } from '@/parser/epub'
+import { resolveHref } from '@/parser/href'
 import { Diagnoser, Diagnostic } from 'booqs-epub'
 import { BooqImages, BooqImageDimensions, imageDimensions } from './images'
 import { BooqFile } from './library'
@@ -100,43 +101,43 @@ async function loadImages(booq: Booq, epub: Epub): Promise<BooqImages> {
     }
 }
 
-// Epub image srcs are relative to the XHTML file (e.g., "../Images/fig.jpg" from "Text/chapter.xhtml").
-// booqs-epub's resolveHref just concatenates basePath + href without resolving "..", so we strip
-// the prefix here. This works for the standard epub layout where all content lives under one root
-// directory (e.g., OEBPS/). It would break for deeply nested structures where "../" traverses
-// multiple levels — but that's uncommon in practice.
-function normalizeImageSrc(src: string): string {
-    while (src.startsWith('../')) {
-        src = src.substring('../'.length)
-    }
-    return src
-}
-
+// Resolve image srcs relative to each document's fileName using resolveHref.
 function normalizeImageSrcsInBooq(booq: Booq): void {
-    visitNodes(booq.nodes, node => {
-        if (isElementNode(node)) {
-            if (node.attrs?.src) {
-                node.attrs.src = normalizeImageSrc(node.attrs.src)
+    for (const doc of booq.content) {
+        visitNodes(doc.children, node => {
+            if (isElementNode(node)) {
+                if (node.attributes?.src) {
+                    const resolved = resolveHref(node.attributes.src, doc.fileName)
+                    if (resolved) {
+                        node.attributes.src = resolved.fileName
+                    }
+                }
+                if (node.attributes?.['xlink:href']) {
+                    const resolved = resolveHref(node.attributes['xlink:href'], doc.fileName)
+                    if (resolved) {
+                        node.attributes['xlink:href'] = resolved.fileName
+                    }
+                }
             }
-            if (node.attrs?.xlinkHref) {
-                node.attrs.xlinkHref = normalizeImageSrc(node.attrs.xlinkHref)
-            }
-        }
-    })
+        })
+    }
     if (booq.metadata.coverSrc) {
-        booq.metadata.coverSrc = normalizeImageSrc(booq.metadata.coverSrc)
+        const resolved = resolveHref(booq.metadata.coverSrc, '')
+        if (resolved) {
+            booq.metadata.coverSrc = resolved.fileName
+        }
     }
 }
 
 function collectUniqueSrcsFromBooq(booq: Booq): string[] {
     const srcs = new Set<string>()
-    visitNodes(booq.nodes, node => {
+    for (const doc of booq.content) visitNodes(doc.children, node => {
         if (isElementNode(node)) {
-            if (node.attrs?.src) {
-                srcs.add(node.attrs.src)
+            if (node.attributes?.src) {
+                srcs.add(node.attributes.src)
             }
-            if (node.attrs?.xlinkHref) {
-                srcs.add(node.attrs.xlinkHref)
+            if (node.attributes?.['xlink:href']) {
+                srcs.add(node.attributes['xlink:href'])
             }
         }
     })
@@ -175,31 +176,32 @@ export async function openEpubImageLoader(file: BooqFile): Promise<EpubImageLoad
 }
 
 function preprocessBooq(booq: Booq, booqId: BooqId, imageDimensions: BooqImageDimensions): Booq {
-    const nodes = mapNodes(booq.nodes, node => {
+    const documents = mapDocumentNodes(booq.content, node => {
         if (!isElementNode(node)) {
             return node
         }
-        if (node.attrs?.src) {
-            const resolved = imageDimensions[node.attrs.src]
+        if (node.attributes?.src) {
+            const resolved = imageDimensions[node.attributes.src]
             if (resolved) {
                 return {
                     ...node,
-                    attrs: {
-                        ...node.attrs,
-                        src: booqImageUrl({ booqId, imageId: node.attrs.src }),
+                    attributes: {
+                        ...node.attributes,
+                        src: booqImageUrl({ booqId, imageId: node.attributes.src }),
                         width: resolved.width.toString(),
                         height: resolved.height.toString(),
                     },
                 }
             }
-        } else if (node.attrs?.xlinkHref) {
-            const resolved = imageDimensions[node.attrs.xlinkHref]
+        } else if (node.attributes?.['xlink:href']) {
+            const xlinkHref = node.attributes['xlink:href']
+            const resolved = imageDimensions[xlinkHref]
             if (resolved) {
                 return {
                     ...node,
-                    attrs: {
-                        ...node.attrs,
-                        xlinkHref: booqImageUrl({ booqId, imageId: node.attrs.xlinkHref }),
+                    attributes: {
+                        ...node.attributes,
+                        'xlink:href': booqImageUrl({ booqId, imageId: xlinkHref }),
                         width: resolved.width.toString(),
                         height: resolved.height.toString(),
                     },
@@ -208,5 +210,5 @@ function preprocessBooq(booq: Booq, booqId: BooqId, imageDimensions: BooqImageDi
         }
         return node
     })
-    return { ...booq, nodes }
+    return { ...booq, content: documents }
 }

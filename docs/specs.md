@@ -115,20 +115,31 @@ Public profile page showing user info, follow button, social connections, and up
 - Follow button on user profile pages (not shown on own profile)
 - In the reader's comments panel, "Following" tab filters to followed users' comments
 
-### 6.2 Public Comments
+### 6.2 Annotation Model
 
-- Comments are public notes attached to specific text ranges in books
+Annotations are the umbrella concept for all user-created marks anchored to content. Each annotation has:
+- **Locator** (`BooqLocator`): `{ start, end, prefix, text, suffix }` — where in the content, with ~30 chars of surrounding text context for future healing
+- **Kind**: `'highlight'`, `'comment'`, or `'question'`
+- **Color** (highlights only): semantic name (`'yellow'`, `'blue'`, `'pink'`, `'purple'`, `'green'`)
+- **Content** (comments/questions only): the user's written text
+- **Privacy**: `'private'` or `'public'`
+
+The locator is constructed client-side at selection time. Context fields (`prefix`/`suffix`) enable future drift detection and healing when book content changes.
+
+### 6.3 Public Comments
+
+- Comments are public annotations attached to specific text ranges in books
 - Visible to all users reading the same book
 - Created via context menu on selected text
 
-### 6.3 Replies
+### 6.4 Replies
 
 - Replies are responses to public comments, stored in a separate `replies` table
-- Each reply has: author, content, timestamps, and a reference to the parent note
+- Each reply has: author, content, timestamps, and a reference to the parent annotation
 - Displayed as a flat list under the parent comment, ordered by creation date (oldest first)
 - UI supports single-level replies only (no reply-to-reply), but the data model can be extended for threading
-- Shown in both the reader's note detail view and the notes page
-- Deleting a parent note cascades to delete all its replies
+- Shown in both the reader's annotation detail view and the notes page
+- Deleting a parent annotation cascades to delete all its replies
 
 ---
 
@@ -276,7 +287,7 @@ All main pages are server components that fetch data directly from the data laye
 - `graphql/` - GraphQL API endpoint (graphql-yoga)
 - `images/` - Image serving with size variants
 - `me/` - Current user data
-- `notes/` - Notes CRUD
+- `annotations/` - Annotations CRUD (highlights, comments, questions)
 - `replies/` - Reply CRUD (replies to public comments)
 - `search/` - Search API
 - `upload/` - Presigned URL upload flow (request + confirm)
@@ -289,7 +300,7 @@ Used for mutations from client components:
 - `updateAccountAction` - Update profile
 - `reportBooqHistoryAction` - Record reading position
 - `removeHistoryEntryAction` - Remove history entry
-- Note operations (add, update, remove) via `useBooqNotes` hook
+- Annotation operations (add, update, remove) via `useBooqAnnotations` hook
 - Collection operations via `useCollection` hook
 - Follow/Unfollow operations
 
@@ -301,11 +312,11 @@ Schema-defined API at `/api/graphql` using graphql-yoga. Supports authentication
 - `ping` — Health check
 - `me` — Current authenticated user
 - `user(username)` — Public user profile
-- `booq(id)` — Book by ID, including metadata, content nodes, styles map, chapters (with scoped fragment styles), table of contents, bookmarks, and notes
+- `booq(id)` — Book by ID, including metadata, content, styles map, chapters (with scoped fragment styles), table of contents, bookmarks, and annotations
 - `author(name)` — Author with paginated book list
 - `search(query, limit)` — Full-text search returning books and authors
 - `libraryBrowse(library, kind, query, limit, offset)` — Browse books by author, subject, or language within a library (kind is an enum: `search`, `author`, `subject`, `language`)
-- `notes(username!, limit, offset)` — Notes by a specific user across all books
+- `annotations(username!, limit, offset)` — Annotations by a specific user across all books
 - `history(limit, offset)` — Current user's reading history with pagination
 - `collection(name)` — Named collection (e.g., `reading_list`) for current user
 - `featured(limit)` — Featured books
@@ -313,7 +324,7 @@ Schema-defined API at `/api/graphql` using graphql-yoga. Supports authentication
 **Mutations — Data:**
 Most data mutations return `MutationResult!` (`{ success: Boolean!, error: String }`) with a human-readable error on failure (e.g., `"Authentication required"`, `"Bookmark not found"`).
 - `addBookmark` / `removeBookmark` — Manage bookmarks
-- `addNote` / `removeNote` / `updateNote` — Manage highlights, notes, and comments
+- `addAnnotation` / `removeAnnotation` / `updateAnnotation` — Manage highlights, notes, and comments
 - `addBooqHistory` / `removeHistory` — Record and manage reading history
 - `addToCollection` / `removeFromCollection` — Manage collections
 - `follow` / `unfollow` — Social follow/unfollow
@@ -343,7 +354,7 @@ Mutations:
 - `deleteAccount` — Delete user account (revokes refresh token)
 
 **Subscriptions (SSE):**
-- `generateReply(noteId)` — Streams the AI-generated reply for a question note, saving it on completion
+- `generateReply(annotationId)` — Streams the AI-generated reply for a question annotation, saving it on completion
 
 ---
 
@@ -354,73 +365,75 @@ Mutations:
 - **Discriminated State Objects**: Mutually exclusive states combined into single objects with `state` discriminator (e.g., `{ state: 'loading' } | { state: 'error', error: string }`)
 - **Optimistic Updates**: Collection adds/removes and note operations update UI immediately
 - **React Context**: `AppProvider` wraps the entire app for shared state
-- **Custom Hooks**: `useCollection`, `useBooqNotes`, `useFontScale`, `useSearch`, `useControlsVisibility`, etc.
+- **Custom Hooks**: `useCollection`, `useBooqAnnotations`, `useFontScale`, `useSearch`, `useControlsVisibility`, etc.
 - **Debouncing**: Search input debounced at 300ms via `useDebouncedValue`
 
 ---
 
 ## 13. Content Model
 
-The internal representation of book content. These structures are serialized as JSON and exposed through the GraphQL API via the `BooqNode` scalar.
+The internal representation of book content (the "IR"). For full design rationale, invariants, and processing pipeline details, see [ir-design.md](ir-design.md).
 
 ### 13.1 Identifiers and Paths
 
 - **BooqId**: A string of the form `{library}-{id}` (e.g., `pg-55201`, `uu-abc123`). The library prefix identifies the source (`pg` = Project Gutenberg, `uu` = user uploads).
-- **BooqPath**: An array of integers representing a position in the node tree. Each integer is a child index at that depth. For example, `[2, 0, 3]` means: 3rd child of root → 1st child → 4th child.
+- **BooqPath**: An array of integers representing a position in the node tree. Each integer is a child index at that depth. For example, `[2, 0, 3]` means: document at index 2 → its child at index 0 → that child's child at index 3.
 - **BooqRange**: An object `{ start: BooqPath, end: BooqPath }` representing a span of content between two paths.
 
 ### 13.2 Node Types
 
 Book content is a tree of `BooqNode` values. A `BooqNode` is a discriminated union of four types, distinguished by their fields:
 
-**BooqSectionNode** — A top-level structural container (typically one per XHTML file in the source document).
+**BooqDocument** — A top-level container (one per EPUB spine item / XHTML file).
 | Field | Type | Description |
 |-------|------|-------------|
-| `section` | `string` | Identifier for this section (e.g., `"Text/chapter-1.xhtml"`) |
-| `styleRefs` | `string[]?` | Keys into the styles map for CSS that applies to this section |
-| `children` | `BooqNode[]` | Child nodes |
+| `fileName` | `string` | EPUB-internal path (e.g., `"OEBPS/chapter1.xhtml"`) |
+| `children` | `BooqChildNode[]` | Child nodes |
+| `error` | `string?` | Parser error, if any |
 
-**BooqElementNode** — An HTML-like element (e.g., `div`, `p`, `span`, `img`).
+**BooqElement** — An HTML/XML element, stored faithfully (no tag renaming, no attribute camelCasing).
 | Field | Type | Description |
 |-------|------|-------------|
-| `name` | `string` | Element tag name (e.g., `"p"`, `"div"`, `"img"`) |
-| `children` | `BooqNode[]` | Child nodes |
-| `id` | `string?` | Element ID (for internal linking and anchor resolution) |
-| `attrs` | `Record<string, string>?` | HTML attributes (e.g., `src`, `href`, `class`) |
-| `ref` | `BooqPath?` | Resolved path for internal book links |
-| `pph` | `boolean?` | "Paragraph-level" flag — marks nodes that are natural content boundaries for range expansion |
+| `name` | `string` | Tag name, lowercase (e.g., `"p"`, `"div"`, `"html"`) |
+| `children` | `BooqChildNode[]` | Child nodes |
+| `attributes` | `Record<string, string>?` | XML attributes as-is (e.g., `class`, `href`, `id`) |
 
 **BooqTextNode** — A plain string. Text nodes are represented as bare strings, not objects.
 
-**BooqStubNode** — A placeholder for content outside the current range. Either `null` (zero-length) or `{ stub: number }` where `number` is the text length of the omitted content. Used when extracting a sub-range of the tree to preserve path alignment.
+**BooqStub** — A placeholder for content outside the current range. Either `null` (zero-length) or `{ stub: number }` where `number` is the text length of the omitted content. Used when extracting a sub-range of the tree to preserve path alignment.
 
 ### 13.3 Discriminating Node Types
 
 Since the union uses structural discrimination (not a `type` field), nodes are identified by checking for distinguishing fields:
-- Has `section` → `BooqSectionNode`
-- Has `name` → `BooqElementNode`
+- Has `fileName` → `BooqDocument`
+- Has `name` → `BooqElement`
 - Is a `string` → `BooqTextNode`
-- Is `null` or has `stub` → `BooqStubNode`
+- Is `null` or has `stub` → `BooqStub`
+
+All union members carry `?: undefined` for fields they don't have, enabling safe property access without type assertions (e.g., `node.name` is `string | undefined` on any `BooqNode`).
 
 ### 13.4 Styles
 
-**BooqStyles** is a `Record<string, string>` — a map from style reference keys to CSS rule strings.
+**BooqStyles** is a `Record<string, string>` — a map from canonical CSS file name (EPUB-internal path) to processed CSS text.
 
-Section nodes reference styles via `styleRefs`. At render time, CSS is hydrated by:
-1. Looking up each ref in the styles map
-2. Namespacing all selectors with the section's identifier (e.g., `.booqs-Text-chapter-1-xhtml`) to prevent cross-section style collisions
-3. Injecting `<style>` tags into the rendered output
+CSS processing (at parse time):
+- Root selectors (`html`, `body`, `:root`) rewritten to `:scope`
+- Global color declarations stripped to prevent theme overrides
 
-The full styles map lives on `Booq.styles`. When a chapter or fragment is built, only the styles referenced by nodes in that slice are included — this avoids sending the entire stylesheet for every fragment.
+CSS scoping (at render time):
+- Each document's styles are wrapped in `@scope ([data-booqs-doc="N"])` for containment
+- Scoping is applied dynamically — the stored CSS is shared across documents that reference the same stylesheet
+
+The full styles map lives on `Booq.styles`. When a fragment is built, only styles referenced by in-range documents are included.
 
 ### 13.5 Booq (Complete Book)
 
 The top-level book model:
 | Field | Type | Description |
 |-------|------|-------------|
-| `nodes` | `BooqNode[]` | Complete content tree |
+| `content` | `BooqDocument[]` | Complete content tree (one document per spine item) |
 | `styles` | `BooqStyles` | Full deduplicated styles map |
-| `metadata` | `BooqMetadata` | Title, authors, subjects, cover, length |
+| `metadata` | `BooqMetadata` | Title, authors, cover, length |
 | `toc` | `TableOfContents` | Table of contents with items (title, level, path, position) |
 
 ### 13.6 BooqFragment
@@ -430,10 +443,10 @@ A renderable content slice with boundary paths and scoped styles:
 |-------|------|-------------|
 | `start` | `BooqPath` | Start boundary of the content |
 | `end` | `BooqPath` | End boundary of the content |
-| `nodes` | `BooqNode[]` | Content nodes (may contain stubs outside the range) |
-| `styles` | `BooqStyles` | Only styles referenced by nodes in this fragment |
+| `content` | `BooqDocument[]` | Content (out-of-range documents are stubs, boundary documents are sliced) |
+| `styles` | `BooqStyles` | Only styles referenced by in-range documents |
 
-Used for chapter content and note surrounding fragments.
+Used for chapter content and annotation surrounding fragments.
 
 ### 13.7 BooqChapter
 
@@ -461,3 +474,16 @@ Each node has an implicit text length (the sum of its text content). **Position*
 - Reading progress tracking
 - Table of contents entries
 - Anchor points in chapters
+
+### 13.9 BooqLocator
+
+An annotation anchor that combines a path with textual context for resilience:
+| Field | Type | Description |
+|-------|------|-------------|
+| `start` | `BooqPath` | Start of the annotated range |
+| `end` | `BooqPath?` | End of the annotated range |
+| `prefix` | `string` | ~30 chars of text before the selection (for healing) |
+| `text` | `string?` | Selected text content |
+| `suffix` | `string` | ~30 chars of text after the selection (for healing) |
+
+Constructed client-side at selection time. The `prefix`/`suffix` fields enable future locator healing when book content changes across editions.

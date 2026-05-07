@@ -1,12 +1,12 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import { NoteAuthorData } from '@/data/notes'
+import { AnnotationAuthorData } from '@/data/annotations'
 import { BooqId } from '@/core'
-import { HIGHLIGHT_KINDS, COMMENT_KIND, QUESTION_KIND, useBooqNotes } from '@/application/notes'
-import { NoteCard } from './NoteCard'
+import { COMMENT_KIND, QUESTION_KIND, useBooqAnnotations } from '@/application/annotations'
+import { AnnotationCard } from './AnnotationCard'
 import clsx from 'clsx'
-import { ExpandedNoteFragmentData } from './NoteFragment'
+import { ExpandedAnnotationFragmentData } from './AnnotationFragment'
 import { CommentIcon } from '@/components/Icons'
 import { LightButton } from '@/components/Buttons'
 
@@ -17,18 +17,18 @@ type FilterGroup = {
     icon?: React.ReactNode,
 }
 
-export function NotesFilter({ data, booqId, user }: {
-    data: ExpandedNoteFragmentData[],
+export function AnnotationsFilter({ data, booqId, user }: {
+    data: ExpandedAnnotationFragmentData[],
     booqId: BooqId,
-    user: NoteAuthorData | undefined,
+    user: AnnotationAuthorData | undefined,
 }) {
-    const initialNotes = useMemo(() => {
-        return data.map(datum => datum.note)
+    const initialAnnotations = useMemo(() => {
+        return data.map(datum => datum.annotation)
     }, [data])
-    const { notes: currentNotes } = useBooqNotes({
+    const { annotations: currentAnnotations } = useBooqAnnotations({
         booqId,
         user,
-        initialNotes,
+        initialAnnotations,
     })
 
     const [selectedFilter, setSelectedFilter] = useState<string>('all')
@@ -37,28 +37,31 @@ export function NotesFilter({ data, booqId, user }: {
     // Merge server data with SWR-updated notes
     const mergedNoteData = useMemo(() => {
         return data.map(datum => {
-            const currentNote = currentNotes.find(n => n.id === datum.note.id)
+            const currentAnnotation = currentAnnotations.find(a => a.id === datum.annotation.id)
             return {
                 ...datum,
-                note: currentNote ?? datum.note,
+                annotation: currentAnnotation ?? datum.annotation,
             }
         })
-    }, [data, currentNotes])
+    }, [data, currentAnnotations])
 
     // Build filter groups in canonical order
     const filterGroups = useMemo(() => {
-        const presentKinds = new Set(mergedNoteData.map(d => d.note.kind))
+        const presentColors = new Set(
+            mergedNoteData
+                .filter(d => d.annotation.kind === 'highlight' && d.annotation.color)
+                .map(d => d.annotation.color!)
+        )
+        const hasComments = mergedNoteData.some(d => d.annotation.kind === COMMENT_KIND || d.annotation.kind === QUESTION_KIND)
         const filterGroups: FilterGroup[] = []
-        for (const kind of HIGHLIGHT_KINDS) {
-            if (presentKinds.has(kind)) {
-                filterGroups.push({
-                    key: kind,
-                    label: `Highlight ${HIGHLIGHT_KINDS.indexOf(kind) + 1}`,
-                    color: `var(--color-${kind})`,
-                })
-            }
+        for (const color of presentColors) {
+            filterGroups.push({
+                key: color,
+                label: color.charAt(0).toUpperCase() + color.slice(1),
+                color: `var(--color-highlight-${color})`,
+            })
         }
-        if (presentKinds.has(COMMENT_KIND) || presentKinds.has(QUESTION_KIND)) {
+        if (hasComments) {
             filterGroups.push({
                 key: 'comments',
                 label: 'Comments',
@@ -71,15 +74,15 @@ export function NotesFilter({ data, booqId, user }: {
 
     const filteredNotes = useMemo(() => selectedFilter === 'all'
         ? mergedNoteData
-        : mergedNoteData.filter(d => filterKeyForKind(d.note.kind) === selectedFilter), [mergedNoteData, selectedFilter])
+        : mergedNoteData.filter(d => filterKeyForAnnotation(d.annotation) === selectedFilter), [mergedNoteData, selectedFilter])
 
-    const hasAnyExpanded = filteredNotes.some(d => expandedNotes.has(d.note.id))
+    const hasAnyExpanded = filteredNotes.some(d => expandedNotes.has(d.annotation.id))
 
     function handleToggleAll() {
         if (hasAnyExpanded) {
             setExpandedNotes(new Set())
         } else {
-            setExpandedNotes(new Set(filteredNotes.map(d => d.note.id)))
+            setExpandedNotes(new Set(filteredNotes.map(d => d.annotation.id)))
         }
     }
 
@@ -95,10 +98,10 @@ export function NotesFilter({ data, booqId, user }: {
         })
     }
 
-    function handleNoteColorChange(_noteId: string, newKind: string) {
+    function handleNoteColorChange(_annotationId: string, newColor: string) {
         if (selectedFilter === 'all') return
-        if (filterKeyForKind(newKind) !== selectedFilter) {
-            setSelectedFilter(filterKeyForKind(newKind))
+        if (newColor !== selectedFilter) {
+            setSelectedFilter(newColor)
         }
     }
 
@@ -138,12 +141,12 @@ export function NotesFilter({ data, booqId, user }: {
             {/* Notes list */}
             <div className="space-y-6">
                 {filteredNotes.length > 0 ? filteredNotes.map((datum) => (
-                    <NoteCard
-                        key={datum.note.id}
+                    <AnnotationCard
+                        key={datum.annotation.id}
                         noteFragmentData={datum}
                         user={user}
-                        isExpanded={expandedNotes.has(datum.note.id)}
-                        onToggle={() => handleToggleNote(datum.note.id)}
+                        isExpanded={expandedNotes.has(datum.annotation.id)}
+                        onToggle={() => handleToggleNote(datum.annotation.id)}
                         onColorChange={handleNoteColorChange}
                     />
                 )) : (
@@ -189,9 +192,9 @@ function FilterButton({
     )
 }
 
-function filterKeyForKind(kind: string): string {
-    if (kind === COMMENT_KIND || kind === QUESTION_KIND) {
+function filterKeyForAnnotation(annotation: { kind: string, color?: string }): string {
+    if (annotation.kind === COMMENT_KIND || annotation.kind === QUESTION_KIND) {
         return 'comments'
     }
-    return kind
+    return annotation.color ?? 'yellow'
 }

@@ -7,12 +7,12 @@ import { BooqId } from '@/core'
 import { BooqCover } from '@/components/BooqCover'
 import { BooqCardData } from '@/data/booqs'
 
-interface NotesNavigationItemProps {
+interface AnnotationsNavigationItemProps {
     booqId: BooqId
     card: BooqCardData
 }
 
-export function NotesNavigationItem({ booqId, card }: NotesNavigationItemProps) {
+export function AnnotationsNavigationItem({ booqId, card }: AnnotationsNavigationItemProps) {
     const pathname = usePathname()
     const isSelected = pathname === `/notes/${booqId}`
 

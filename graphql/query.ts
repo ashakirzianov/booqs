@@ -9,7 +9,7 @@ import { userForUsername } from '@/backend/users'
 import { CollectionParent } from './collection'
 import { BooqId } from '@/core'
 import { booqQuery, featuredBooqIds, LibraryQuery } from '@/backend/library'
-import { notesWithAuthorFor } from '@/backend/notes'
+import { annotationsWithAuthorFor } from '@/backend/annotations'
 
 type SearchResultParent = BooqParent | AuthorParent
 
@@ -71,14 +71,14 @@ export const queryResolver: IResolvers<unknown, ResolverContext> = {
             const booqIds: BooqId[] = await booqIdsInCollections(userId, name) as BooqId[]
             return { name, booqIds }
         },
-        async notes(_, { username, limit, offset }: {
+        async annotations(_, { username, limit, offset }: {
             username: string, limit?: number, offset?: number,
         }, { userId }) {
             const user = await userForUsername(username)
             if (!user) {
                 return []
             }
-            return notesWithAuthorFor({ authorId: user.id, userId, limit: clampLimit(limit, MAX_LIMIT), offset })
+            return annotationsWithAuthorFor({ authorId: user.id, userId, limit: clampLimit(limit, MAX_LIMIT), offset })
         },
         async libraryBrowse(_, { library, kind, query, limit, offset }: {
             library: string, kind: LibraryQuery['kind'], query: string, limit?: number, offset?: number,

@@ -1,16 +1,14 @@
 'use server'
 import {
-    BooqPath, buildChapter,
+    BooqPath, buildChapter, buildFragment,
     BooqId,
     BooqMetadata,
     BooqStyles,
     TableOfContents,
     BooqChapter,
     BooqRange,
-    BooqNode,
+    BooqContent,
     getExpandedRange,
-    nodesForRange,
-    collectReferencedStyles,
 } from '@/core'
 import { userForId } from '@/backend/users'
 import { booqIdsInCollections } from '@/backend/collections'
@@ -193,7 +191,7 @@ export async function fetchLanguageDisplayName(languageCode: string): Promise<st
     return getLanguageDisplayName(languageCode)
 }
 
-export type ExpandedFragment = { nodes: BooqNode[], styles: BooqStyles, range: BooqRange }
+export type ExpandedFragment = { content: BooqContent, styles: BooqStyles, range: BooqRange }
 
 export async function getExpandedFragments(booqId: BooqId, ranges: BooqRange[]): Promise<Array<ExpandedFragment | undefined>> {
     const booq = await booqForId(booqId)
@@ -202,12 +200,12 @@ export async function getExpandedFragments(booqId: BooqId, ranges: BooqRange[]):
     }
 
     return ranges.map(range => {
-        const expandedRange = getExpandedRange(booq.nodes, range)
-        const nodes = nodesForRange(booq.nodes, expandedRange)
+        const expandedRange = getExpandedRange(booq.content, range)
+        const fragment = buildFragment(booq, expandedRange)
 
         return {
-            nodes,
-            styles: collectReferencedStyles(nodes, booq.styles),
+            content: fragment.content,
+            styles: fragment.styles,
             range: expandedRange,
         }
     })

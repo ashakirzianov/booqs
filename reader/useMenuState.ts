@@ -2,7 +2,7 @@
 import { useCallback, useMemo, useState } from 'react'
 import { getAugmentationElement, getSelectionElement, VirtualElement } from '@/viewer'
 import { MenuState } from './ContextMenuContent'
-import { noteAugmentationId, quoteAugmentationId, TemporaryAugmentation, temporaryAugmentationId } from './useAugmentations'
+import { annotationAugmentationId, quoteAugmentationId, TemporaryAugmentation, temporaryAugmentationId } from './useAugmentations'
 
 export type MenuStateSetter = (setterOrValue: MenuState | ((prev: MenuState) => MenuState)) => void
 export type DisplayTarget = 'floater' | 'side-panel' | 'none'
@@ -22,7 +22,7 @@ export function useMenuState() {
                 return prev
             }
             const newAnchor = getAnchorForState(next)
-            if (newAnchor === undefined && (next.kind === 'note' || next.kind === 'create-comment' || next.kind === 'ask')) {
+            if (newAnchor === undefined && (next.kind === 'annotation' || next.kind === 'create-comment' || next.kind === 'ask')) {
                 setTimeout(() => {
                     setAnchor(getAnchorForState(next))
                 }, 0)
@@ -89,8 +89,8 @@ function getAnchorForState(state: MenuState): VirtualElement | undefined {
             return undefined
         case 'selection':
             return getSelectionElement()
-        case 'note': {
-            const augmentationId = noteAugmentationId(state.noteId)
+        case 'annotation': {
+            const augmentationId = annotationAugmentationId(state.annotationId)
             return getAugmentationElement(augmentationId)
         }
         case 'quote': {

@@ -6,7 +6,7 @@ import { ResolvedReply } from '../route'
 import { z } from 'zod'
 
 const postBodySchema = z.object({
-    noteId: z.string().min(1),
+    annotationId: z.string().min(1),
     content: z.string().min(1).max(10000),
 })
 
@@ -34,10 +34,10 @@ export async function POST(request: NextRequest, { params }: { params: Promise<P
     if (!parsed.success) {
         return Response.json({ error: 'Invalid request body', details: parsed.error.flatten() }, { status: 400 })
     }
-    const { noteId, content } = parsed.data
+    const { annotationId, content } = parsed.data
     const reply = await createReply({
         id,
-        noteId,
+        annotationId,
         authorId: userId,
         content,
     })

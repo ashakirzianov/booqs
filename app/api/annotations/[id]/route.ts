@@ -1,32 +1,38 @@
-import { BooqId, BooqRange } from '@/core'
+import { BooqId, BooqLocator, BooqPath } from '@/core'
 import {
-    modifyNote, deleteNote,
-    NotePrivacy,
-    createNote,
-} from '@/data/notes'
+    modifyAnnotation, deleteAnnotation,
+    AnnotationPrivacy,
+    createAnnotation,
+} from '@/data/annotations'
 import { getUserIdInsideRequest } from '@/data/request'
 import { NextRequest } from 'next/server'
-import { ResolvedNote } from '../route'
+import { ResolvedAnnotation } from '../route'
 import { getUserById } from '@/data/user'
 import { z } from 'zod'
 
 const booqIdSchema = z.string().regex(/^[a-z]+-\S+$/) as z.ZodType<BooqId>
 const booqPathSchema = z.array(z.number().int().min(0))
 
+const locatorSchema = z.object({
+    start: booqPathSchema as z.ZodType<BooqPath>,
+    end: booqPathSchema as z.ZodType<BooqPath>,
+    prefix: z.string().max(100),
+    text: z.string().max(10000),
+    suffix: z.string().max(100),
+}) as z.ZodType<BooqLocator>
+
 const postBodySchema = z.object({
     booqId: booqIdSchema,
-    range: z.object({
-        start: booqPathSchema,
-        end: booqPathSchema,
-    }) as z.ZodType<BooqRange>,
+    locator: locatorSchema,
     kind: z.string().min(1).max(50),
+    color: z.string().max(20).optional(),
     content: z.string().max(10000).optional(),
-    targetQuote: z.string().max(10000),
-    privacy: z.enum(['private', 'public']) as z.ZodType<NotePrivacy>,
+    privacy: z.enum(['private', 'public']) as z.ZodType<AnnotationPrivacy>,
 })
 
 const patchBodySchema = z.object({
     kind: z.string().min(1).max(50).optional(),
+    color: z.string().max(20).nullish(),
     content: z.string().max(10000).nullish(),
 })
 
@@ -35,7 +41,7 @@ type Params = {
 }
 
 export type PostBody = z.infer<typeof postBodySchema>
-export type PostResponse = ResolvedNote
+export type PostResponse = ResolvedAnnotation
 export async function POST(request: NextRequest, { params }: { params: Promise<Params> }) {
     const userId = await getUserIdInsideRequest()
     if (!userId) {
@@ -50,22 +56,22 @@ export async function POST(request: NextRequest, { params }: { params: Promise<P
     if (!parsed.success) {
         return Response.json({ error: 'Invalid request body', details: parsed.error.flatten() }, { status: 400 })
     }
-    const { booqId, range, kind, content, targetQuote, privacy } = parsed.data
-    const note = await createNote({
+    const { booqId, locator, kind, color, content, privacy } = parsed.data
+    const annotation = await createAnnotation({
         id,
-        authorId: userId,
+        userId,
         booqId,
-        range,
+        locator,
         kind,
+        color,
         content,
-        targetQuote,
         privacy,
     })
-    if (!note) {
-        return Response.json({ error: 'Failed to create note' }, { status: 500 })
+    if (!annotation) {
+        return Response.json({ error: 'Failed to create annotation' }, { status: 500 })
     }
     const result: PostResponse = {
-        ...note,
+        ...annotation,
         author,
     }
     return Response.json(result)
@@ -75,8 +81,8 @@ export type PatchBody = z.infer<typeof patchBodySchema>
 export type PatchResponse = {
     id: string,
     kind: string,
+    color?: string,
     content?: string,
-    targetQuote: string,
     createdAt: string,
     updatedAt: string,
 }
@@ -90,17 +96,18 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     if (!parsed.success) {
         return Response.json({ error: 'Invalid request body', details: parsed.error.flatten() }, { status: 400 })
     }
-    const { kind, content } = parsed.data
-    const note = await modifyNote({
+    const { kind, color, content } = parsed.data
+    const annotation = await modifyAnnotation({
         id,
-        authorId: userId,
+        userId,
         kind,
+        color,
         content,
     })
-    if (!note) {
-        return Response.json({ error: 'Note not found' }, { status: 404 })
+    if (!annotation) {
+        return Response.json({ error: 'Annotation not found' }, { status: 404 })
     }
-    const result: PatchResponse = note
+    const result: PatchResponse = annotation
     return Response.json(result)
 }
 
@@ -110,12 +117,12 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
         return Response.json({ error: 'Unauthorized' }, { status: 401 })
     }
     const { id } = await params
-    const success = await deleteNote({
-        id, authorId: userId,
+    const success = await deleteAnnotation({
+        id, userId,
     })
     if (success) {
         return new Response(undefined, { status: 204 })
     } else {
-        return Response.json({ error: 'Note not found' }, { status: 404 })
+        return Response.json({ error: 'Annotation not found' }, { status: 404 })
     }
 }

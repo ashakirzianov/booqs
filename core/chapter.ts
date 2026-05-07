@@ -1,18 +1,12 @@
 import {
-    BooqNode, BooqStyles, Booq, BooqPath, nodesForRange, pathLessThan, isSectionNode, visitNodes,
+    Booq, BooqPath, pathLessThan,
 } from '@/core'
+import { BooqFragment, buildFragment } from './fragment'
 
 export type BooqAnchor = {
     path: BooqPath,
     title: string | undefined,
     position: number,
-}
-
-export type BooqFragment = {
-    start: BooqPath,
-    end: BooqPath,
-    nodes: BooqNode[],
-    styles: BooqStyles,
 }
 
 export type BooqChapter = {
@@ -31,24 +25,6 @@ export function buildChapter({ booq, path }: {
         : fullBooqChapter(booq)
 }
 
-export function collectReferencedStyles(nodes: BooqNode[], allStyles: BooqStyles): BooqStyles {
-    const refs = new Set<string>()
-    visitNodes(nodes, node => {
-        if (isSectionNode(node) && node.styleRefs) {
-            for (const ref of node.styleRefs) {
-                refs.add(ref)
-            }
-        }
-    })
-    const styles: BooqStyles = {}
-    for (const ref of refs) {
-        if (allStyles[ref] !== undefined) {
-            styles[ref] = allStyles[ref]
-        }
-    }
-    return styles
-}
-
 function fullBooqChapter(booq: Booq): BooqChapter {
     return {
         previous: undefined,
@@ -58,12 +34,10 @@ function fullBooqChapter(booq: Booq): BooqChapter {
             title: undefined,
             position: 0,
         },
-        fragment: {
+        fragment: buildFragment(booq, {
             start: [0],
-            end: [booq.nodes.length],
-            nodes: booq.nodes,
-            styles: booq.styles,
-        },
+            end: [booq.content.length],
+        }),
     }
 }
 
@@ -86,21 +60,14 @@ function chapterForPath(booq: Booq, path: BooqPath): BooqChapter {
         }
     }
 
-    const end = next?.path ?? [booq.nodes.length]
-    const nodes = nodesForRange(booq.nodes, {
-        start: current.path,
-        end,
-    })
-    const styles = collectReferencedStyles(nodes, booq.styles)
+    const end = next?.path ?? [booq.content.length]
 
     return {
         previous, current, next,
-        fragment: {
+        fragment: buildFragment(booq, {
             start: current.path,
             end,
-            nodes,
-            styles,
-        },
+        }),
     }
 }
 

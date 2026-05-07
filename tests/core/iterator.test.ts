@@ -18,21 +18,20 @@ import {
   textBefore,
   textStartingAt,
 } from '../../core/iterator'
-import { BooqNode, BooqElementNode, BooqTextNode } from '../../core/model'
+import { BooqNode, BooqElement, BooqTextNode, BooqChildNode } from '../../core/model'
 
 describe('core/iterator', () => {
   // Test data setup helpers
   const createTextNode = (content: string): BooqTextNode => (content)
 
-  const createElement = (name: string, children?: BooqNode[]): BooqElementNode => ({
-    kind: 'element',
+  const createElement = (name: string, children?: BooqChildNode[]): BooqElement => ({
     name,
-    children,
+    children: children ?? [],
   })
 
   // Test data structures
   const simpleTextNode = createTextNode('Hello World')
-  const stubNode: BooqNode = { kind: 'stub', length: 10 }
+  const stubNode: BooqNode = { stub: 10 }
   const nullNode: BooqNode = null
 
   const simpleElement = createElement('p', [
@@ -68,7 +67,7 @@ describe('core/iterator', () => {
 
   // Helper to create node iterators
   function createNodeIterator(
-    node: BooqElementNode,
+    node: BooqElement,
     index: number,
     parent?: BooqContainerIterator
   ): BooqContainerIterator {
@@ -137,7 +136,7 @@ describe('core/iterator', () => {
       expect(isTextIterator(result!)).toBe(true)
       const textIter = result as BooqTextIterator
       expect(textIter.index).toBe(5)
-      expect(textIter.node.content).toBe('Root text. ')
+      expect(textIter.node).toBe('Root text. ')
     })
 
     it('returns iterator for nested element path', () => {
@@ -226,9 +225,8 @@ describe('core/iterator', () => {
       const iter = iteratorAtPath(complexNodes, [0])!
       const node = iteratorsNode(iter)
       expect(node).toBeDefined()
-      expect(node!.kind).toBe('element')
-      const elementNode = node as BooqElementNode
-      expect(elementNode.name).toBe('p')
+      expect((node as BooqElement).name).toBe('p')
+      // name already checked above
     })
 
     it('returns undefined for text iterator', () => {

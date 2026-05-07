@@ -1,25 +1,25 @@
 import {
-    NoteAuthorData,
-    fetchNotes,
-    NotePrivacy,
-} from '@/data/notes'
-import { BooqId, BooqRange } from '@/core'
+    AnnotationAuthorData,
+    fetchAnnotations,
+    AnnotationPrivacy,
+} from '@/data/annotations'
+import { BooqId, BooqLocator } from '@/core'
 import { NextRequest } from 'next/server'
 
-export type ResolvedNote = {
+export type ResolvedAnnotation = {
     id: string,
     booqId: BooqId,
-    author: NoteAuthorData,
-    range: BooqRange,
+    author: AnnotationAuthorData,
+    locator: BooqLocator,
     kind: string,
+    color?: string,
     content?: string,
-    targetQuote: string,
-    privacy: NotePrivacy,
+    privacy: AnnotationPrivacy,
     createdAt: string,
     updatedAt: string,
 }
 export type GetResponse = {
-    notes: ResolvedNote[],
+    annotations: ResolvedAnnotation[],
 }
 export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams
@@ -28,9 +28,9 @@ export async function GET(request: NextRequest) {
         return Response.json({ error: 'Missing booq_id' }, { status: 400 })
     }
     const booqId: BooqId = booq_id as BooqId
-    const notes = await fetchNotes({ booqId })
+    const annotations = await fetchAnnotations({ booqId })
     const result: GetResponse = {
-        notes,
+        annotations,
     }
     return Response.json(result)
 }

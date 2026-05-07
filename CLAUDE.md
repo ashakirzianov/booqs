@@ -63,6 +63,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Prefer `function name(...) { ... }` style to `const name = (...) => { ... }` style.
 - Always put private (non-exported) functions at the bottom of the file, after all exports.
 - Prefer pure functions. In layers where purity is expected (`core/`, `parser/`, `viewer/`, `common/`), impure functions must have a short `// Impure: <reason>` comment above the declaration. Impurity in `backend/`, `data/`, `application/`, `app/` is expected and doesn't need annotation. Note: the `parser/` layer uses a diagnostic accumulator pattern (`diags` array passed through and mutated) — this is a deliberate design choice and does not need per-function annotation.
+- **Exception — parser processing pipeline**: functions in `parser/process.ts` and `parser/styles.ts` mutate documents in place rather than returning copies. This is a deliberate choice for memory efficiency — each parsed book's tree is the dominant memory consumer, and the serverless environment (Vercel) has limited memory that is better spent on in-memory caches. Mutation is safe here because the pipeline is linear (no shared references to intermediate results).
 - In user-facing names (GraphQL schema fields/types, URL routes, UI labels), always use "booq" instead of "book" for consistency with the product name. For example: `booqsWithNotes` not `booksWithNotes`, `/booq/[id]` not `/book/[id]`. Internal variable names and backend function names may use "book" where it reads more naturally (e.g., `getBookmarks`).
 
 ### Nullability
@@ -76,6 +77,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### Types
 - Inline prop/parameter types unless the type is referenced from other places. Extract a named type only when it's used in multiple locations (e.g., composed via intersection, passed as a generic argument).
+- **Union discriminant fields**: when a union has members that share some fields but not others (e.g., `BooqElement` has `name` but `BooqDocument` does not), add `fieldName?: undefined` to the members that lack the field. This allows safe property access without type assertions (e.g., `node.name` works on any `BooqNode` — it's `string` for elements, `undefined` for documents/text/stubs). Apply this pattern to all fields used for discrimination in the union.
+- **Type assertions (`as`)**: every `as Type` cast must have a comment on the preceding line explaining why the cast is necessary and why it's safe. Prefer type guards, narrowing, or restructuring over casts. If a cast keeps recurring, consider whether the types can be redesigned to eliminate it.
+
+### Data attributes
+- All custom `data-*` attributes are defined in `core/attributes.ts`. Check there before introducing new ones to avoid collisions with EPUB content or other parts of the app.
 
 ### Data layer
 - Do not access `backend/*`, `parser/*`, or `graphql/*` files directly from frontend code. Instead, create an indirection layer in `data/*` directory to abstract backend functionality.
@@ -157,6 +163,8 @@ EPUB files are processed through the `parser/` directory which handles:
 - Content extraction
 - Image processing
 - Table of contents generation
+
+Content parsing uses `htmlparser2` (not `fast-xml-parser`). This is a deliberate choice: `htmlparser2` faithfully preserves document structure (comments, whitespace text nodes, processing instructions), which is essential for stable tree shapes and path-based references. `fast-xml-parser` (used by `booqs-epub` for metadata/manifest extraction) is designed for data extraction and produces different tree shapes — do not attempt to switch.
 
 ### TypeScript Configuration
 Uses strict TypeScript with path aliases (`@/*` maps to `./`). ESLint runs on specific directories as defined in `next.config.js`.

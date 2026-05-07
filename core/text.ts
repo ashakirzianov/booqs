@@ -1,4 +1,4 @@
-import { BooqNode, BooqRange, BooqPath } from './model'
+import { BooqNode, BooqContent, BooqRange, BooqPath } from './model'
 import {
     iteratorAtPath,
     firstLeafNode,
@@ -12,9 +12,9 @@ import {
     iteratorsNode,
 } from './iterator'
 import { assertNever } from './misc'
-import { isContainerNode, isElementNode, isStubNode, isTextNode, nodeForPath } from './node'
+import { isContainerNode, isStubNode, isTextNode, nodeForPath, isMarkedAsParagraph } from './node'
 
-export function nodeText(node: BooqNode): string {
+export function nodeText(node: BooqNode | null): string {
     if (isContainerNode(node)) {
         return node.children?.map(nodeText).join('') ?? ''
     } else if (isTextNode(node)) {
@@ -27,12 +27,12 @@ export function nodeText(node: BooqNode): string {
     }
 }
 
-export function nodesText(nodes: BooqNode[]): string {
+export function nodesText(nodes: BooqContent): string {
     return nodes.map(nodeText).join('')
 }
 
 // length is the minimum length of the preview (provided that nodes have enough content). The previewForPath does not truncate resulting string to the length, instead the returned string includes all the text content from the last node appended to the preview.
-export function previewForPath(nodes: BooqNode[], path: BooqPath, length: number) {
+export function previewForPath(nodes: BooqContent, path: BooqPath, length: number) {
     const found = iteratorAtPath(nodes, path)
     if (!found) {
         return undefined
@@ -57,7 +57,7 @@ export function previewForPath(nodes: BooqNode[], path: BooqPath, length: number
 }
 
 // length is the minimum length of the contextBefore and contextAfter (provided that nodes have enough content). The getQuoteAndContext does not truncate resulting strings to the length, instead it respects the node boundaries and returns all the text content from the last node appended to the context.
-export function getQuoteAndContext(nodes: BooqNode[], range: BooqRange, length: number): { quote: string, contextBefore: string, contextAfter: string } {
+export function getQuoteAndContext(nodes: BooqContent, range: BooqRange, length: number): { quote: string, contextBefore: string, contextAfter: string } {
     const quote = textForRange(nodes, range) ?? ''
 
     // Get context before the range
@@ -100,7 +100,11 @@ export function getQuoteAndContext(nodes: BooqNode[], range: BooqRange, length: 
 }
 
 // Returns the text content for the given range in the nodes. The range is defined by start and end paths, which are arrays of numbers representing the path to the node in the BooqNode structure. The end path is exclusive, meaning the text content at the end path is not included in the result. If the end path points to a character within a string, that character is not included. If the range is invalid or does not correspond to any text content, it returns undefined.
-export function textForRange(nodes: BooqNode[], { start, end }: BooqRange): string | undefined {
+export function textForRange(nodes: BooqContent, range: BooqRange): string | undefined {
+    return textForRangeImpl(nodes, range)
+}
+
+function textForRangeImpl(nodes: BooqNode[], { start, end }: BooqRange): string | undefined {
     const [startHead, ...startTail] = start
     const [endHead, ...endTail] = end
     if (startHead === undefined || endHead === undefined || startHead >= nodes.length || endHead < startHead || endHead > nodes.length) {
@@ -114,7 +118,7 @@ export function textForRange(nodes: BooqNode[], { start, end }: BooqRange): stri
             // No sub-path specified, include all content from this element
             result += nodeText(startNode)
         } else {
-            const startText = textForRange(startNode.children ?? [], {
+            const startText = textForRangeImpl(startNode.children ?? [], {
                 start: startTail,
                 end: startHead === endHead
                     ? endTail
@@ -146,7 +150,7 @@ export function textForRange(nodes: BooqNode[], { start, end }: BooqRange): stri
     const endNode = nodes[endHead]
     if (startHead !== endHead && endNode) {
         if (isContainerNode(endNode)) {
-            const endText = textForRange(endNode.children ?? [], {
+            const endText = textForRangeImpl(endNode.children ?? [], {
                 start: [0],
                 end: endTail,
             })
@@ -163,7 +167,7 @@ export function textForRange(nodes: BooqNode[], { start, end }: BooqRange): stri
     return result
 }
 
-export function getExpandedRange(nodes: BooqNode[], range: BooqRange): BooqRange {
+export function getExpandedRange(nodes: BooqContent, range: BooqRange): BooqRange {
     const expandedStart = getExpandedStartPath(nodes, range.start)
     const expandedEnd = getExpandedEndPath(nodes, range.end, expandedStart)
 
@@ -173,10 +177,10 @@ export function getExpandedRange(nodes: BooqNode[], range: BooqRange): BooqRange
     }
 }
 
-function getExpandedStartPath(nodes: BooqNode[], startPath: BooqPath): BooqPath {
+function getExpandedStartPath(nodes: BooqContent, startPath: BooqPath): BooqPath {
     // Check if the start element itself has pph=true
     const startNode = nodeForPath(nodes, startPath)
-    if (isElementNode(startNode) && startNode.pph === true) {
+    if (isMarkedAsParagraph(startNode)) {
         return startPath
     }
 
@@ -184,7 +188,7 @@ function getExpandedStartPath(nodes: BooqNode[], startPath: BooqPath): BooqPath 
     for (let depth = startPath.length - 1; depth > 0; depth--) {
         const parentPath = startPath.slice(0, depth)
         const parentNode = nodeForPath(nodes, parentPath)
-        if (isElementNode(parentNode) && parentNode.pph === true) {
+        if (isMarkedAsParagraph(parentNode)) {
             return parentPath
         }
     }
@@ -193,7 +197,7 @@ function getExpandedStartPath(nodes: BooqNode[], startPath: BooqPath): BooqPath 
     return startPath
 }
 
-function getExpandedEndPath(nodes: BooqNode[], endPath: BooqPath, expandedStart: BooqPath): BooqPath {
+function getExpandedEndPath(nodes: BooqContent, endPath: BooqPath, expandedStart: BooqPath): BooqPath {
     if (!endPath || endPath.length === 0) {
         // If no end path, create one based on expanded start
         return [expandedStart[0] + 1]
@@ -201,7 +205,7 @@ function getExpandedEndPath(nodes: BooqNode[], endPath: BooqPath, expandedStart:
 
     // Check if the end element itself has pph=true
     const endNode = nodeForPath(nodes, endPath)
-    if (isElementNode(endNode) && endNode.pph === true) {
+    if (isMarkedAsParagraph(endNode)) {
         // Return next sibling of the end element
         const nextSiblingPath = [...endPath]
         nextSiblingPath[nextSiblingPath.length - 1] += 1
@@ -213,7 +217,7 @@ function getExpandedEndPath(nodes: BooqNode[], endPath: BooqPath, expandedStart:
     for (let depth = endPath.length - 1; depth > 0; depth--) {
         const parentPath = endPath.slice(0, depth)
         const parentNode = nodeForPath(nodes, parentPath)
-        if (isElementNode(parentNode) && parentNode.pph === true) {
+        if (isMarkedAsParagraph(parentNode)) {
             parentWithPph = parentPath
             break
         }

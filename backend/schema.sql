@@ -98,37 +98,36 @@ CREATE INDEX IF NOT EXISTS user_collections_booqs_booq_id_idx ON user_collection
 -- Notes privacy enum
 CREATE TYPE note_privacy AS ENUM ('private', 'public');
 
--- Notes
-CREATE TABLE IF NOT EXISTS notes (
+-- Annotations
+CREATE TABLE IF NOT EXISTS annotations (
   id TEXT PRIMARY KEY DEFAULT uuid_generate_v4()::TEXT,
-  author_id TEXT REFERENCES users(id) ON DELETE CASCADE,
+  user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   booq_id TEXT NOT NULL,
   start_path INTEGER[] NOT NULL,
   end_path INTEGER[] NOT NULL,
+  prefix TEXT NOT NULL,
+  text TEXT NOT NULL,
+  suffix TEXT NOT NULL,
   kind TEXT NOT NULL,
+  color TEXT,
   content TEXT,
-  target_quote TEXT NOT NULL,
-  privacy note_privacy NOT NULL DEFAULT 'private',
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
+  privacy TEXT NOT NULL DEFAULT 'private',
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
-CREATE INDEX IF NOT EXISTS notes_author_id_idx ON notes(author_id);
-CREATE INDEX IF NOT EXISTS notes_booq_id_idx ON notes(booq_id);
-CREATE INDEX IF NOT EXISTS notes_user_id_booq_id_idx ON notes(author_id, booq_id);
-CREATE INDEX IF NOT EXISTS notes_created_at_idx ON notes(created_at);
-CREATE INDEX IF NOT EXISTS notes_privacy_idx ON notes(privacy);
-CREATE INDEX IF NOT EXISTS notes_booq_id_privacy_idx ON notes(booq_id, privacy);
+CREATE INDEX IF NOT EXISTS idx_annotations_user_booq ON annotations(user_id, booq_id);
+CREATE INDEX IF NOT EXISTS idx_annotations_booq ON annotations(booq_id);
 
 -- Replies
 CREATE TABLE IF NOT EXISTS replies (
   id TEXT PRIMARY KEY DEFAULT uuid_generate_v4()::TEXT,
-  note_id TEXT NOT NULL REFERENCES notes(id) ON DELETE CASCADE,
+  annotation_id TEXT NOT NULL REFERENCES annotations(id) ON DELETE CASCADE,
   author_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   content TEXT NOT NULL,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
-CREATE INDEX IF NOT EXISTS replies_note_id_idx ON replies(note_id);
+CREATE INDEX IF NOT EXISTS replies_annotation_id_idx ON replies(annotation_id);
 CREATE INDEX IF NOT EXISTS replies_author_id_idx ON replies(author_id);
 CREATE INDEX IF NOT EXISTS replies_created_at_idx ON replies(created_at);
 

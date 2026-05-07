@@ -5,13 +5,13 @@ import { ResolverContext } from './context'
 export const aiResolver: IResolvers = {
     Subscription: {
         generateReply: {
-            async *subscribe(_: unknown, { noteId }: {
-                noteId: string,
+            async *subscribe(_: unknown, { annotationId }: {
+                annotationId: string,
             }, { userId }: ResolverContext) {
                 if (!userId) {
                     return
                 }
-                const result = await generateAiReply(noteId)
+                const result = await generateAiReply(annotationId)
                 if (!result.success) {
                     return
                 }

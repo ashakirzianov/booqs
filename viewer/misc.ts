@@ -1,7 +1,7 @@
 'use client'
-import { pathFromId } from '@/core'
 import { useEffect } from 'react'
-import { BooqContentID } from './BooqContent'
+import { DATASET_PATH } from '@/core'
+import { BOOQ_CONTENT_ID } from './BooqContent'
 
 // TODO: remove this
 export function useOnBooqClick(callback?: () => void) {
@@ -21,13 +21,9 @@ export function useOnBooqClick(callback?: () => void) {
 }
 
 function isEventOnContent(event: Event): boolean {
-    const id: string | undefined = (event.target as any).id
-    if (id === undefined) {
-        return false
-    }
-    const path = pathFromId(id)
-    if (path) {
+    const target = event.target as HTMLElement
+    if (target.dataset?.[DATASET_PATH]) {
         return true
     }
-    return id === BooqContentID
+    return target.id === BOOQ_CONTENT_ID
 }

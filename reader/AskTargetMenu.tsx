@@ -4,8 +4,8 @@ import type { AskTarget, MenuState } from './ContextMenuContent'
 import type { BooqId } from '@/core/model'
 import { AskIcon, RemoveIcon } from '@/components/Icons'
 import { MenuButton } from './MenuButton'
-import { useBooqNotes, QUESTION_KIND } from '@/application/notes'
-import { NoteAuthorData } from '@/data/notes'
+import { useBooqAnnotations, QUESTION_KIND } from '@/application/annotations'
+import { AnnotationAuthorData } from '@/data/annotations'
 
 export function AskTargetMenu({
     target, setMenuState, booqId, user,
@@ -13,21 +13,26 @@ export function AskTargetMenu({
     booqId: BooqId,
     target: AskTarget,
     setMenuState: (target: MenuState) => void,
-    user: NoteAuthorData | undefined,
+    user: AnnotationAuthorData | undefined,
 }) {
     const [question, setQuestion] = useState('')
-    const { addNote } = useBooqNotes({ booqId, user })
+    const { addAnnotation } = useBooqAnnotations({ booqId, user })
 
     async function handleAsk() {
         if (!question.trim() || !user) return
 
         const selection = target.selection
-        const result = addNote({
+        const result = addAnnotation({
             kind: QUESTION_KIND,
-            range: selection.range,
             content: question.trim(),
             privacy: 'public',
-            targetQuote: selection.text,
+            locator: {
+                start: selection.range.start,
+                end: selection.range.end,
+                prefix: selection.prefix,
+                text: selection.text,
+                suffix: selection.suffix,
+            },
         })
 
         if (result) {

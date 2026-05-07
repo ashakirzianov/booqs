@@ -1,6 +1,6 @@
 import { pathInRange, TableOfContentsItem } from '@/core'
 import { NavigationSelection } from './useNavigationState'
-import { NoteAuthorData, BooqNote } from '@/data/notes'
+import { AnnotationAuthorData, BooqAnnotation } from '@/data/annotations'
 
 export type TocNode = {
     kind: 'toc',
@@ -8,66 +8,66 @@ export type TocNode = {
 }
 export type NoteNode = {
     kind: 'note',
-    note: BooqNote,
+    annotation: BooqAnnotation,
 }
 export type PathNotesNode = {
-    kind: 'notes',
+    kind: 'annotations',
     items: Array<TableOfContentsItem | undefined>,
-    notes: BooqNote[],
+    annotations: BooqAnnotation[],
 }
 export type NavigationNode = TocNode | NoteNode | PathNotesNode
 
 export function buildNavigationNodes({
-    title, toc, selection, notes, user,
+    title, toc, selection, annotations, user,
 }: {
     title: string
     toc: TableOfContentsItem[],
-    notes: BooqNote[],
+    annotations: BooqAnnotation[],
     selection: NavigationSelection,
-    user?: NoteAuthorData,
+    user?: AnnotationAuthorData,
 }) {
     const showChapters = selection.chapters
-    const showNotes = selection.notes
+    const showNotes = selection.annotations
     const filteredNotes = filterNotes({
-        notes, selection, user,
+        annotations, selection, user,
     })
 
     const filter = showChapters
         ? (showNotes ? 'all' : 'contents')
-        : (showNotes ? 'notes' : 'none')
+        : (showNotes ? 'annotations' : 'none')
     const nodes = buildNodes({
         filter, title, toc,
-        notes: filteredNotes,
+        annotations: filteredNotes,
     })
 
     return nodes
 }
 
 export function filterNotes({
-    notes, selection, user,
+    annotations, selection, user,
 }: {
-    notes: BooqNote[],
+    annotations: BooqAnnotation[],
     selection: NavigationSelection,
-    user: NoteAuthorData | undefined,
+    user: AnnotationAuthorData | undefined,
 }) {
-    const showNotes = selection.notes
+    const showNotes = selection.annotations
     const showAuthors = Object.entries(selection)
         .filter(([key]) => key.startsWith('author:'))
         .map(([key]) => key.split(':')[1])
     const allAuthors = showNotes && user?.id
         ? [user.id, ...showAuthors]
         : showAuthors
-    const filteredNotes = notes.filter(
+    const filteredNotes = annotations.filter(
         note => allAuthors.some(authorId => note.author.id === authorId)
     )
     return filteredNotes
 }
 
-function buildNodes({ toc, filter, notes, title }: {
+function buildNodes({ toc, filter, annotations, title }: {
     title?: string,
     filter: string,
     toc: TableOfContentsItem[],
-    notes: BooqNote[],
+    annotations: BooqAnnotation[],
 }): NavigationNode[] {
     const nodes: NavigationNode[] = []
     let prev: TableOfContentsItem = {
@@ -80,16 +80,16 @@ function buildNodes({ toc, filter, notes, title }: {
     for (const next of toc) {
         prevPath = prevPath.slice(0, prev.level)
         prevPath[prev.level] = prev
-        const inside = notes.filter(
-            note => pathInRange(note.range.start, {
+        const inside = annotations.filter(
+            note => pathInRange(note.locator.start, {
                 start: prev?.path ?? [0],
                 end: next.path,
             }),
         )
         if (filter === 'all') {
-            nodes.push(...inside.map(note => ({
+            nodes.push(...inside.map(annotation => ({
                 kind: 'note' as const,
-                note,
+                annotation,
             })))
             nodes.push({
                 kind: 'toc',
@@ -100,12 +100,12 @@ function buildNodes({ toc, filter, notes, title }: {
                 kind: 'toc',
                 item: next,
             })
-        } else if (filter === 'notes') {
+        } else if (filter === 'annotations') {
             if (inside.length !== 0) {
                 nodes.push({
-                    kind: 'notes',
+                    kind: 'annotations',
                     items: prevPath,
-                    notes: inside,
+                    annotations: inside,
                 })
             }
         }

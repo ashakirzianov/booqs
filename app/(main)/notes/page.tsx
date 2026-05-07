@@ -1,4 +1,4 @@
-import { fetchBooqsWithOwnNotes } from '@/data/notes'
+import { fetchBooqsWithOwnAnnotations } from '@/data/annotations'
 import { redirect } from 'next/navigation'
 import { Metadata } from 'next'
 
@@ -10,9 +10,9 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function NotesPage() {
-    const booqsWithNotes = await fetchBooqsWithOwnNotes()
-    if (booqsWithNotes.length > 0) {
-        redirect(`/notes/${booqsWithNotes[0]}`)
+    const booqsWithAnnotations = await fetchBooqsWithOwnAnnotations()
+    if (booqsWithAnnotations.length > 0) {
+        redirect(`/notes/${booqsWithAnnotations[0]}`)
     }
 
     return (

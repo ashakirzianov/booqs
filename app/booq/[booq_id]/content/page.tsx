@@ -4,7 +4,7 @@ import { reportBooqHistory } from '@/data/history'
 import { Reader } from '@/reader/Reader'
 import { Metadata } from 'next'
 import { notFound, redirect } from 'next/navigation'
-import { fetchNotes } from '@/data/notes'
+import { fetchAnnotations } from '@/data/annotations'
 import { getCurrentUser } from '@/data/user'
 import { booqImageUrl } from '@/common/href'
 
@@ -83,9 +83,9 @@ export default async function BooqPathPage({
     if (!user) {
         redirect(`/auth?return_to=${returnTo}`)
     }
-    const [booqData, notes] = await Promise.all([
+    const [booqData, annotations] = await Promise.all([
         fetchBooqChapter(booqId, booqPath),
-        fetchNotes({ booqId }),
+        fetchAnnotations({ booqId }),
     ])
     if (!booqData)
         return notFound()
@@ -103,7 +103,7 @@ export default async function BooqPathPage({
         chapter={booqData.chapter}
         metadata={booqData.metadata}
         toc={booqData.toc}
-        notes={notes}
+        annotations={annotations}
         user={user}
     />
 }

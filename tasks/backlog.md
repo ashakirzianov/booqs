@@ -4,6 +4,17 @@ Low-priority improvements and technical debt.
 
 ---
 
+## TOC href resolution: proper base path
+
+**Priority**: Medium
+
+- [ ] Expose TOC file location from `booqs-epub` (NCX path or nav document path)
+- [ ] Pass TOC file path as base to `resolveHref` in `toc.ts` instead of empty string
+
+TOC hrefs are relative to the TOC file's own location, not the EPUB root or the OPF. Currently we assume they're in the same coordinate space as document fileNames, which works for most EPUBs (where TOC is in the same directory as content). Breaks when the TOC file is in a different directory (e.g., `OEBPS/nav/toc.ncx` referencing `../Text/ch1.xhtml`). Additional considerations: percent-decode paths before matching, handle absolute paths starting with `/`, consider case-insensitive matching for malformed EPUBs.
+
+---
+
 ## Epub relative path resolution
 
 **Priority**: Low
@@ -104,6 +115,46 @@ For books like War and Peace, the full nodes/styles JSON can exceed 200KB. Not a
 
 ---
 
+## Per-spine-item style isolation
+
+**Priority**: Low
+
+- [ ] Investigate whether per-document `@scope` isolation is sufficient or if per-spine-item isolation is needed
+
+Current per-document `@scope ([data-booqs-doc="N"])` isolation may be insufficient if chapters within a single spine item have conflicting styles. Revisit if real-world EPUBs surface this issue.
+
+---
+
+## Shared stylesheet deduplication
+
+**Priority**: Low
+
+- [ ] Emit shared CSS once with combined scope selector instead of once per document
+
+When multiple documents reference the same CSS file (e.g., `book.css`), it's currently rendered once per document with different `@scope` selectors. For full-book rendering (30+ chapters), this is wasteful. Optimization: `@scope ([data-booqs-doc="0"]), ([data-booqs-doc="1"]) { ... }`. Only worth doing if full-book rendering shows measurable slowness.
+
+---
+
+## Donut scoping for annotation UI
+
+**Priority**: Low
+
+- [ ] Use `@scope (.booqs-content) to (.booqs-annotation)` to exclude annotation UI from EPUB styles
+
+Would prevent EPUB styles from affecting annotation overlays nested inside content. Consider when annotation rendering is revisited.
+
+---
+
+## EPUB CSS sanitization list
+
+**Priority**: Low
+
+- [ ] Enumerate full list of EPUB CSS properties to sanitize for Next.js (beyond color stripping)
+
+Currently only `color`, `background`, `background-color` are stripped from global selectors. Other properties may need sanitization (e.g., `position: fixed`, `z-index`, `overflow` on global selectors). May differ for native rendering.
+
+---
+
 ## EPUB path hardening
 
 **Priority**: Low
@@ -111,3 +162,37 @@ For books like War and Peace, the full nodes/styles JSON can exceed 200KB. Not a
 - [ ] Explicitly reject `../` segments in `parser/path.ts`
 
 Not exploitable since ZIP entries are keyed in memory (no filesystem traversal), but could be hardened as defense-in-depth.
+
+---
+
+## Bookmark migration to BooqLocator
+
+**Priority**: Low
+
+- [ ] Migrate bookmarks to use BooqLocator (point locator with prefix/suffix, no end/text)
+
+Bookmarks aren't exposed in the UI currently. When they are, consider adding locator context for healing resilience.
+
+---
+
+## New quote URL format with embedded locator
+
+**Priority**: Medium
+
+- [ ] Design and implement compact URL encoding for locators: `p=2.4.6.12-2.4.6.45&t=prefix|text|suffix`
+- [ ] Keep old path-only format as fallback
+- [ ] Client-side healing on share URL load
+
+See [booqs-locator-design.md](../docs/booqs-locator-design.md) "Quote sharing: stateless URLs" section.
+
+---
+
+## Annotation healing implementation
+
+**Priority**: Medium
+
+- [ ] Implement `resolveLocator()` algorithm (text comparison + fuzzy search)
+- [ ] Add tree hash infrastructure (compute per-book, store on annotations)
+- [ ] Wire healing into annotation fetch path (lazy, per-book)
+
+See [booqs-locator-design.md](../docs/booqs-locator-design.md) "Healing Design" section for full strategy.

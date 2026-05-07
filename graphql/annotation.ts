@@ -1,18 +1,18 @@
 import { IResolvers } from '@graphql-tools/utils'
 import { BooqParent } from './booq'
 import { ResolverContext } from './context'
-import { DbNote } from '@/backend/notes'
+import { DbAnnotation } from '@/backend/annotations'
 import { DbUser } from '@/backend/users'
 import {
     BooqId, positionForPath, textForRange,
-    getExpandedRange, nodesForRange, collectReferencedStyles,
+    getExpandedRange, buildFragment,
 } from '@/core'
 
-export type NoteParent = DbNote
-export const noteResolver: IResolvers<NoteParent, ResolverContext> = {
-    Note: {
+export type AnnotationParent = DbAnnotation
+export const annotationResolver: IResolvers<AnnotationParent, ResolverContext> = {
+    Annotation: {
         async author(parent, _, { userLoader }): Promise<DbUser | null> {
-            return userLoader.load(parent.author_id)
+            return userLoader.load(parent.user_id)
         },
         async booq(parent, _, { booqDataLoader }): Promise<BooqParent | undefined> {
             return booqDataLoader.load(parent.booq_id as BooqId)
@@ -20,7 +20,7 @@ export const noteResolver: IResolvers<NoteParent, ResolverContext> = {
         async text(parent, _, { booqLoader }) {
             const booq = await booqLoader.load(parent.booq_id as BooqId)
             if (booq) {
-                const text = textForRange(booq.nodes, {
+                const text = textForRange(booq.content, {
                     start: parent.start_path,
                     end: parent.end_path,
                 })
@@ -33,25 +33,18 @@ export const noteResolver: IResolvers<NoteParent, ResolverContext> = {
             if (!booq) {
                 return undefined
             }
-            const expandedRange = getExpandedRange(booq.nodes, {
+            const expandedRange = getExpandedRange(booq.content, {
                 start: parent.start_path,
                 end: parent.end_path,
             })
-            const nodes = nodesForRange(booq.nodes, expandedRange)
-            const styles = collectReferencedStyles(nodes, booq.styles)
-            return {
-                start: expandedRange.start,
-                end: expandedRange.end,
-                nodes,
-                styles,
-            }
+            return buildFragment(booq, expandedRange)
         },
         async position(parent, _, { booqLoader }) {
             const booq = await booqLoader.load(parent.booq_id as BooqId)
             if (!booq) {
                 return undefined
             }
-            const position = positionForPath(booq.nodes, parent.start_path)
+            const position = positionForPath(booq.content, parent.start_path)
             return position
         },
         start(parent) {
@@ -61,7 +54,7 @@ export const noteResolver: IResolvers<NoteParent, ResolverContext> = {
             return parent.end_path
         },
         targetQuote(parent) {
-            return parent.target_quote
+            return parent.text
         },
         content(parent) {
             return parent.content

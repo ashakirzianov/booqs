@@ -1,4 +1,6 @@
 export * from './chapter'
+export * from './fragment'
+export * from './attributes'
 export * from './misc'
 export * from './model'
 export * from './node'

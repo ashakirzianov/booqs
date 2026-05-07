@@ -1,8 +1,8 @@
 'use client'
 import { useState } from 'react'
 import Link from 'next/link'
-import { useNoteReplies } from '@/application/replies'
-import { NoteAuthorData } from '@/data/notes'
+import { useAnnotationReplies } from '@/application/replies'
+import { AnnotationAuthorData } from '@/data/annotations'
 import { ProfileBadge } from '@/components/ProfilePicture'
 import { RemoveIcon, ReplyIcon } from '@/components/Icons'
 import { formatRelativeTime } from '@/application/common'
@@ -10,13 +10,13 @@ import { userHref } from '@/common/href'
 import { MenuButton } from './MenuButton'
 
 export function NoteReplies({
-    noteId, user, collapsible = false,
+    annotationId, user, collapsible = false,
 }: {
-    noteId: string,
-    user: NoteAuthorData | undefined,
+    annotationId: string,
+    user: AnnotationAuthorData | undefined,
     collapsible?: boolean,
 }) {
-    const { replies, addReply, removeReply } = useNoteReplies({ noteId, user })
+    const { replies, addReply, removeReply } = useAnnotationReplies({ annotationId, user })
     const [showForm, setShowForm] = useState(false)
     const [replyContent, setReplyContent] = useState('')
     const [isExpanded, setIsExpanded] = useState(false)

@@ -1,8 +1,6 @@
-import { BooqElementNode, BooqSectionNode, BooqNode, BooqPath, BooqTextNode } from './model'
+import { BooqChildNode, BooqContent, BooqContainerNode, BooqElement, BooqNode, BooqPath, BooqTextNode } from './model'
 import { isContainerNode, isTextNode, nodeChildren } from './node'
 import { pathLessThan } from './path'
-
-type BooqContainerNode = BooqElementNode | BooqSectionNode
 
 export type BooqIterator = BooqContainerIterator | BooqTextIterator
 export type BooqContainerIterator = {
@@ -30,7 +28,7 @@ export function iteratorLessThan(a: BooqIterator, b: BooqIterator): boolean {
     return pathLessThan(aPath, bPath)
 }
 
-export function iteratorAtPath(nodes: BooqNode[], path: BooqPath): BooqIterator | undefined {
+export function iteratorAtPath(nodes: BooqContent, path: BooqPath): BooqIterator | undefined {
     function iteratorAtPathImpl(container: BooqContainerNode, path: BooqPath, parent: BooqContainerIterator | undefined): BooqIterator | undefined {
         const [head, ...tail] = path
         if (head === undefined || head >= (container.children?.length ?? 0)) {
@@ -59,10 +57,9 @@ export function iteratorAtPath(nodes: BooqNode[], path: BooqPath): BooqIterator 
             return undefined
         }
     }
-    return iteratorAtPathImpl({
-        name: 'root',
-        children: nodes,
-    }, path, undefined)
+    // as BooqElement: synthetic root wrapping documents as children to start traversal
+    const syntheticRoot = { name: 'root', children: nodes as unknown as BooqChildNode[] } as BooqElement
+    return iteratorAtPathImpl(syntheticRoot, path, undefined)
 }
 
 export function iteratorsPath(iter: BooqIterator): BooqPath {
@@ -83,7 +80,7 @@ export function firstLeafNode(iter: BooqContainerIterator): BooqContainerIterato
         return firstLeafNode({
             parent: iter,
             index: 0,
-            node,
+            node: node
         })
     } else {
         return iter
@@ -96,7 +93,7 @@ export function lastLeafNode(iter: BooqContainerIterator): BooqContainerIterator
         return lastLeafNode({
             parent: iter,
             index: node.children.length - 1,
-            node,
+            node: node,
         })
     } else {
         return iter

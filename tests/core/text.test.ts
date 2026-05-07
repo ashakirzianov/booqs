@@ -6,31 +6,27 @@ import {
   textForRange,
   getExpandedRange,
 } from '../../core/text'
-import { BooqNode, BooqElementNode, BooqTextNode, BooqRange } from '../../core/model'
+import { BooqNode, BooqElement, BooqTextNode, BooqRange, BooqChildNode } from '../../core/model'
+import { DATA_PARAGRAPH } from '../../core/attributes'
 
 describe('core/text', () => {
   // Test data setup helpers
-  const createTextNode = (content: string): BooqTextNode => ({
-    kind: 'text',
-    content,
+  const createTextNode = (content: string): BooqTextNode => content
+
+  const createElement = (name: string, children?: BooqChildNode[]): BooqElement => ({
+    name,
+    children: children ?? [],
   })
 
-  const createElement = (name: string, children?: BooqNode[]): BooqElementNode => ({
-    kind: 'element',
+  const createParagraph = (name: string, children?: BooqChildNode[]): BooqElement => ({
     name,
-    children,
-  })
-
-  const createParagraph = (name: string, children?: BooqNode[]): BooqElementNode => ({
-    kind: 'element',
-    name,
-    children,
-    pph: true,
+    children: children ?? [],
+    attributes: { [DATA_PARAGRAPH]: '' },
   })
 
   // Test data structures
   const simpleTextNode = createTextNode('Hello World')
-  const stubNode: BooqNode = { kind: 'stub', length: 10 }
+  const stubNode: BooqNode = { stub: 10 }
   const nullNode: BooqNode = null
 
   const simpleElement = createElement('p', [

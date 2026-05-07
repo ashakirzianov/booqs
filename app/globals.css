@@ -11,11 +11,11 @@
   --color-alert: #f00;
   --color-light: #fff;
 
-  --color-highlight-0: rgba(255, 215, 0, 0.6);
-  --color-highlight-1: rgba(135, 206, 235, 0.6);
-  --color-highlight-2: rgba(240, 128, 128, 0.6);
-  --color-highlight-3: rgba(75, 0, 130, 0.6);
-  --color-highlight-4: rgba(34, 139, 34, 0.6);
+  --color-highlight-yellow: rgba(255, 215, 0, 0.6);
+  --color-highlight-blue: rgba(135, 206, 235, 0.6);
+  --color-highlight-pink: rgba(240, 128, 128, 0.6);
+  --color-highlight-purple: rgba(75, 0, 130, 0.6);
+  --color-highlight-green: rgba(34, 139, 34, 0.6);
   --color-comment: transparent;
 
   --color-quote: rgba(255, 165, 0, 0.6);

@@ -1,29 +1,29 @@
 import { Fragment } from 'react'
-import { NoteNodeComp } from './NoteNode'
+import { AnnotationNodeComp } from './AnnotationNode'
 import { PathNotesNode } from './nodes'
 import { booqContentHref } from '@/common/href'
 import Link from 'next/link'
 import { BooqId, TableOfContentsItem } from '@/core'
-import { NoteAuthorData } from '@/data/notes'
+import { AnnotationAuthorData } from '@/data/annotations'
 
 export function PathNotesNodeComp({
     booqId, user,
-    node: { items, notes },
+    node: { items, annotations },
 }: {
     booqId: BooqId,
-    user: NoteAuthorData | undefined,
+    user: AnnotationAuthorData | undefined,
     node: PathNotesNode,
 }) {
     return <div>
         <Path booqId={booqId} items={items} />
         {
-            notes.map(
+            annotations.map(
                 (hl) =>
                     <div key={hl.id} className='my-base'>
-                        <NoteNodeComp
+                        <AnnotationNodeComp
                             booqId={booqId}
                             user={user}
-                            note={hl}
+                            annotation={hl}
                         />
                     </div>
             )

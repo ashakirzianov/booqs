@@ -12,10 +12,10 @@ import {
 } from './ContextMenuItems'
 import { useRouter } from 'next/navigation'
 import { quoteHref } from '@/common/href'
-import { NoteTargetMenu } from './NoteTargetMenu'
+import { AnnotationTargetMenu } from './AnnotationTargetMenu'
 import { CreateCommentTargetMenu } from './CreateCommentTargetMenu'
 import { AskTargetMenu } from './AskTargetMenu'
-import { NoteAuthorData } from '@/data/notes'
+import { AnnotationAuthorData } from '@/data/annotations'
 
 type EmptyTarget = {
     kind: 'empty',
@@ -28,15 +28,15 @@ export type QuoteTarget = {
     kind: 'quote',
     selection: BooqSelection,
 }
-export type NoteTarget = {
-    kind: 'note',
-    noteId: string,
+export type AnnotationTarget = {
+    kind: 'annotation',
+    annotationId: string,
     selection: BooqSelection,
     editMode?: boolean,
 }
 export type CreateCommentTarget = {
     kind: 'create-comment',
-    parent: SelectionTarget | QuoteTarget | NoteTarget,
+    parent: SelectionTarget | QuoteTarget | AnnotationTarget,
 }
 export type AskTarget = {
     kind: 'ask',
@@ -54,7 +54,7 @@ export type QuestionAskedTarget = {
     commentId: string,
 }
 export type MenuState =
-    | EmptyTarget | SelectionTarget | QuoteTarget | NoteTarget | CreateCommentTarget | AskTarget
+    | EmptyTarget | SelectionTarget | QuoteTarget | AnnotationTarget | CreateCommentTarget | AskTarget
     | CommentsListTarget | CommentTarget | QuestionAskedTarget
 
 export function isStateDismissable(state: MenuState): boolean {
@@ -76,7 +76,7 @@ export function ContextMenuContent({
 }: {
     target: MenuState,
     booqId: BooqId,
-    user: NoteAuthorData | undefined,
+    user: AnnotationAuthorData | undefined,
     setMenuState: (target: MenuState) => void,
 }) {
     switch (target.kind) {
@@ -84,8 +84,8 @@ export function ContextMenuContent({
             return <SelectionTargetMenu target={target} booqId={booqId} user={user} setMenuState={setMenuState} />
         case 'quote':
             return <QuoteTargetMenu target={target} booqId={booqId} user={user} setMenuState={setMenuState} />
-        case 'note':
-            return <NoteTargetMenu target={target} booqId={booqId} user={user} setMenuState={setMenuState} />
+        case 'annotation':
+            return <AnnotationTargetMenu target={target} booqId={booqId} user={user} setMenuState={setMenuState} />
         case 'create-comment':
             return <CreateCommentTargetMenu target={target} booqId={booqId} user={user} setMenuState={setMenuState} />
         case 'ask':
@@ -100,7 +100,7 @@ function SelectionTargetMenu({
 }: {
     target: SelectionTarget,
     booqId: BooqId,
-    user: NoteAuthorData | undefined,
+    user: AnnotationAuthorData | undefined,
     setMenuState: (target: MenuState) => void,
 }) {
     const { selection } = target
@@ -118,7 +118,7 @@ function QuoteTargetMenu({
 }: {
     target: QuoteTarget,
     booqId: BooqId,
-    user: NoteAuthorData | undefined,
+    user: AnnotationAuthorData | undefined,
     setMenuState: (target: MenuState) => void,
 }) {
     const { selection } = target

@@ -1,8 +1,10 @@
-import { BooqRange, pathLessThan, pathFromId } from '@/core'
+import { BooqRange, pathLessThan, pathFromString, DATASET_PATH, DATA_AUGMENTATION_ID } from '@/core'
 
 export type BooqSelection = {
     range: BooqRange,
     text: string,
+    prefix: string,
+    suffix: string,
 }
 
 // TODO: naming?
@@ -47,7 +49,7 @@ export function getSelectionElement(): VirtualElement | undefined {
 }
 
 export function getAugmentationElement(augmentationId: string): VirtualElement | undefined {
-    const elementsList = window.document.querySelectorAll(`span[data-augmentation-id='${augmentationId}']`)
+    const elementsList = window.document.querySelectorAll(`span[${DATA_AUGMENTATION_ID}='${augmentationId}']`)
     const elements = Array.from(elementsList)
     if (elements.length === 0) {
         return undefined
@@ -68,13 +70,55 @@ export function getAugmentationElement(augmentationId: string): VirtualElement |
     }
 }
 
-export function getAugmentationText(augmentationId: string): string {
-    const elements = Array.from(window.document.querySelectorAll(`span[data-augmentation-id='${augmentationId}']`))
+export function getAugmentationContext(augmentationId: string): { text: string, prefix: string, suffix: string } {
+    const elements = augmentationElements(augmentationId)
+    if (elements.length === 0) {
+        return { text: '', prefix: '', suffix: '' }
+    }
+
     let text = ''
     for (const element of elements) {
         text += element.textContent
     }
-    return text
+
+    const first = elements[0]
+    const last = elements[elements.length - 1]
+    const blockAncestor = findBlockAncestor(first)
+    if (!blockAncestor) {
+        return { text, prefix: '', suffix: '' }
+    }
+
+    const beforeRange = document.createRange()
+    beforeRange.selectNodeContents(blockAncestor)
+    beforeRange.setEndBefore(first)
+    const prefix = beforeRange.toString().slice(-CONTEXT_LENGTH)
+
+    const afterRange = document.createRange()
+    afterRange.selectNodeContents(blockAncestor)
+    afterRange.setStartAfter(last)
+    const suffix = afterRange.toString().slice(0, CONTEXT_LENGTH)
+
+    return { text, prefix, suffix }
+}
+
+function augmentationElements(augmentationId: string): Element[] {
+    return Array.from(window.document.querySelectorAll(`span[${DATA_AUGMENTATION_ID}='${augmentationId}']`))
+}
+
+const CONTEXT_LENGTH = 30
+
+function findBlockAncestor(node: Node): HTMLElement | null {
+    let current: Node | null = node
+    while (current && current !== document.body) {
+        if (current instanceof HTMLElement) {
+            const display = window.getComputedStyle(current).display
+            if (display === 'block' || display === 'flex' || display === 'grid') {
+                return current
+            }
+        }
+        current = current.parentNode
+    }
+    return document.body
 }
 
 export function getBooqSelection(): BooqSelection | undefined {
@@ -92,8 +136,9 @@ export function getBooqSelection(): BooqSelection | undefined {
                 : undefined
         if (range) {
             const text = selection.toString()
+            const { prefix, suffix } = extractSelectionContext(selection)
             return {
-                range, text,
+                range, text, prefix, suffix,
             }
         }
 
@@ -101,18 +146,46 @@ export function getBooqSelection(): BooqSelection | undefined {
     return undefined
 }
 
+function extractSelectionContext(selection: Selection): { prefix: string, suffix: string } {
+    if (selection.rangeCount === 0) {
+        return { prefix: '', suffix: '' }
+    }
+    const domRange = selection.getRangeAt(0)
+    const container = domRange.commonAncestorContainer
+    const blockAncestor = findBlockAncestor(container)
+
+    if (!blockAncestor) {
+        return { prefix: '', suffix: '' }
+    }
+
+    const beforeRange = document.createRange()
+    beforeRange.selectNodeContents(blockAncestor)
+    beforeRange.setEnd(domRange.startContainer, domRange.startOffset)
+    const prefix = beforeRange.toString().slice(-CONTEXT_LENGTH)
+
+    const afterRange = document.createRange()
+    afterRange.selectNodeContents(blockAncestor)
+    afterRange.setStart(domRange.endContainer, domRange.endOffset)
+    const suffix = afterRange.toString().slice(0, CONTEXT_LENGTH)
+
+    return { prefix, suffix }
+}
+
 function getSelectionPath(node: Node, offset: number) {
-    // Note: hackie
-    if ((node as any).id) {
-        const path = pathFromId((node as any).id)
+    const pathAttr = (node as HTMLElement).dataset?.[DATASET_PATH]
+    if (pathAttr) {
+        const path = pathFromString(pathAttr)
         if (path) {
             return [...path, offset, 0]
         }
     } else if (node.parentElement) {
-        const path = pathFromId(node.parentElement.id)
-        if (path) {
-            path[path.length - 1] += offset
-            return path
+        const parentPathAttr = node.parentElement.dataset?.[DATASET_PATH]
+        if (parentPathAttr) {
+            const path = pathFromString(parentPathAttr)
+            if (path) {
+                path[path.length - 1] += offset
+                return path
+            }
         }
     }
     return undefined

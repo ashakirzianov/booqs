@@ -7,10 +7,10 @@ import { quoteHref, userHref } from '@/common/href'
 import { BooqSelection } from '@/viewer'
 import { ProfileBadge } from '@/components/ProfilePicture'
 import { ColorPicker } from '@/components/ColorPicker'
-import { useBooqNotes } from '@/application/notes'
+import { useBooqAnnotations } from '@/application/annotations'
 import { CommentIcon, CopyIcon, LinkIcon, RemoveIcon, ShareIcon, QuestionMarkIcon, SmallSpinner } from '@/components/Icons'
-import type { MenuState, SelectionTarget, QuoteTarget, NoteTarget } from './ContextMenuContent'
-import { BooqNote, NoteAuthorData } from '@/data/notes'
+import type { MenuState, SelectionTarget, QuoteTarget, AnnotationTarget } from './ContextMenuContent'
+import { BooqAnnotation, AnnotationAuthorData } from '@/data/annotations'
 import { ReactNode } from 'react'
 
 export function AuthorItem({ name, pictureUrl, emoji, username }: {
@@ -48,24 +48,30 @@ export function AddHighlightItem({
 }: {
     selection: BooqSelection,
     booqId: BooqId,
-    user: NoteAuthorData | undefined,
+    user: AnnotationAuthorData | undefined,
     setMenuState: (target: MenuState) => void,
 }) {
-    const { addNote } = useBooqNotes({ booqId, user })
+    const { addAnnotation } = useBooqAnnotations({ booqId, user })
     if (!user?.id) {
         return null
     }
 
-    const handleColorChange = (kind: string) => {
-        const result = addNote({
-            kind,
-            range: selection.range,
-            targetQuote: selection.text,
+    const handleColorChange = (color: string) => {
+        const result = addAnnotation({
+            kind: 'highlight',
+            color,
+            locator: {
+                start: selection.range.start,
+                end: selection.range.end,
+                prefix: selection.prefix,
+                text: selection.text,
+                suffix: selection.suffix,
+            },
         })
         if (result) {
             setMenuState({
-                kind: 'note',
-                noteId: result.optimistic.id,
+                kind: 'annotation',
+                annotationId: result.optimistic.id,
                 selection: selection,
             })
             window.getSelection()?.empty()
@@ -75,7 +81,7 @@ export function AddHighlightItem({
     return (
         <div className='h-10'>
             <ColorPicker
-                selectedKind=""
+                selectedColor={undefined}
                 onColorChange={handleColorChange}
             />
         </div>
@@ -85,8 +91,8 @@ export function AddHighlightItem({
 export function AddCommentItem({
     target, user, setMenuState,
 }: {
-    target: SelectionTarget | QuoteTarget | NoteTarget,
-    user: NoteAuthorData | undefined,
+    target: SelectionTarget | QuoteTarget | AnnotationTarget,
+    user: AnnotationAuthorData | undefined,
     setMenuState: (target: MenuState) => void,
 }) {
     if (!user?.id) {
@@ -107,17 +113,17 @@ export function AddCommentItem({
 export function RemoveNoteItem({
     note, booqId, setMenuState, user,
 }: {
-    note: BooqNote,
+    note: BooqAnnotation,
     booqId: BooqId,
-    user: NoteAuthorData | undefined,
+    user: AnnotationAuthorData | undefined,
     setMenuState: (target: MenuState) => void,
 }) {
-    const { removeNote } = useBooqNotes({ booqId, user })
+    const { removeAnnotation } = useBooqAnnotations({ booqId, user })
     return <MenuItem
         text='Remove'
         icon={<ContextMenuIcon><RemoveIcon /></ContextMenuIcon>}
         callback={() => {
-            removeNote({ noteId: note.id })
+            removeAnnotation({ annotationId: note.id })
             setMenuState({ kind: 'empty' })
         }}
     />
@@ -203,7 +209,7 @@ export function AskMenuItem({
     target, user, setMenuState,
 }: {
     target: SelectionTarget | QuoteTarget,
-    user: NoteAuthorData | undefined,
+    user: AnnotationAuthorData | undefined,
     setMenuState: (target: MenuState) => void,
 }) {
     if (!user?.id) {

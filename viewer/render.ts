@@ -1,8 +1,9 @@
 import { ReactNode, createElement } from 'react'
 import {
-    BooqElementNode, BooqSectionNode, BooqNode, BooqStyles, pathToString,
+    BooqElement, BooqDocument, BooqNode, BooqStyles, pathToString, pathFromString,
     pathInRange, samePath, pathLessThan, BooqPath, BooqRange, pathToId,
-    assertNever, isTextNode, isStubNode, isElementNode, isSectionNode,
+    assertNever, isTextNode, isStubNode, isElementNode, isDocumentNode,
+    DATA_PATH, DATA_REF_PATH, DATA_AUGMENTATION_ID, DATA_DOC, isMarkedAsParagraph,
 } from '@/core'
 
 export type Augmentation = {
@@ -12,12 +13,16 @@ export type Augmentation = {
     underline?: 'solid' | 'dashed',
 }
 
+export const PARAGRAPH_CLASS = 'booqs-pph'
+
 type RenderContext = {
     path: BooqPath,
     range: BooqRange,
     styles: BooqStyles,
-    parent?: BooqElementNode,
+    spineIndex?: number,
+    parent?: BooqElement,
     withinAnchor?: boolean,
+    withinHead?: boolean,
     augmentations: Augmentation[],
     onAugmentationClick?: (id: string) => void,
     hrefForPath?: (path: BooqPath) => string,
@@ -43,44 +48,79 @@ function renderNode(node: BooqNode, ctx: RenderContext): ReactNode {
         }
     } else if (isStubNode(node)) {
         return null
-    } else if (isSectionNode(node)) {
-        return renderSectionNode(node, ctx)
+    } else if (isDocumentNode(node)) {
+        return renderDocumentNode(node, ctx)
     } else if (isElementNode(node)) {
-        return createElement(
-            node.name === 'a' && ctx.withinAnchor
-                ? 'span' // Do not nest anchors
-                : node.name,
-            getProps(node, ctx),
-            getChildren(node, ctx),
-        )
-    } else {
-        assertNever(node)
-        return null
+        return renderElementNode(node, ctx)
     }
+    assertNever(node)
+    return null
 }
 
-function renderSectionNode(node: BooqSectionNode, ctx: RenderContext): ReactNode {
+function renderElementNode(node: BooqElement, ctx: RenderContext): ReactNode {
+    if (node.name === 'link') {
+        return renderLinkNode(node, ctx)
+    } else if (node.name === 'style') {
+        return renderStyleNode(node, ctx)
+    }
+    const mappedName = mapElementName(node.name, ctx)
+    if (mappedName === null) {
+        return null
+    }
+    return createElement(
+        mappedName,
+        getProps(node, ctx),
+        getChildren(node, ctx),
+    )
+}
+
+function renderLinkNode(node: BooqElement, ctx: RenderContext): ReactNode {
+    const spineIndex = ctx.spineIndex
+    if (spineIndex === undefined) return null
+
+    const scopeSelector = `[${DATA_DOC}="${spineIndex}"]`
+
+    const href = node.attributes?.href
+    if (!href) return null
+    const css = ctx.styles[href]
+    if (!css) return null
+    return createElement(
+        'style',
+        { key: `${pathToString(ctx.path)}-link-style` },
+        wrapInScope(css, scopeSelector),
+    )
+}
+
+function renderStyleNode(node: BooqElement, ctx: RenderContext): ReactNode {
+    const spineIndex = ctx.spineIndex
+    if (spineIndex === undefined) return null
+
+    const scopeSelector = `[${DATA_DOC}="${spineIndex}"]`
+
+    const text = typeof node.children[0] === 'string' ? node.children[0] : undefined
+    if (!text) return null
+    return createElement(
+        'style',
+        { key: `${pathToString(ctx.path)}-inline-style` },
+        wrapInScope(text, scopeSelector),
+    )
+}
+
+function renderDocumentNode(node: BooqDocument, ctx: RenderContext): ReactNode {
+    const spineIndex = ctx.path[0] ?? 0
     const children = node.children ? renderNodes(node.children, {
         ...ctx,
+        spineIndex,
         parent: undefined,
     }) : null
-    const styleNodes = (node.styleRefs ?? [])
-        .map((ref: string) => ctx.styles[ref])
-        .filter(Boolean)
-        .map((css: string, i: number) => createElement(
-            'style',
-            { key: `${pathToString(ctx.path)}-style-${i}` },
-            css,
-        ))
-    const className = node.styleRefs?.join(' ')
     return createElement(
         'section',
         {
             key: pathToString(ctx.path),
-            id: pathToId(ctx.path),
-            className,
+            [DATA_PATH]: pathToString(ctx.path),
+            [DATA_DOC]: String(spineIndex),
         },
-        [...styleNodes, ...(children ?? [])],
+        children,
     )
 }
 
@@ -102,12 +142,12 @@ function renderTextNode(text: string, {
         'span',
         {
             key: pathToId(path),
-            id: pathToId(path),
+            [DATA_PATH]: pathToString(path),
         },
         spans.map(span => {
             const augmentationId = span.id
             const augmentationProps = augmentationId ? {
-                'data-augmentation-id': augmentationId,
+                [DATA_AUGMENTATION_ID]: augmentationId,
                 style: {
                     background: span.color,
                     cursor: 'pointer',
@@ -125,6 +165,7 @@ function renderTextNode(text: string, {
                 {
                     key: pathToId(span.path),
                     id: pathToId(span.path),
+                    [DATA_PATH]: pathToString(span.path),
                     ...augmentationProps,
                 },
                 span.text,
@@ -133,35 +174,73 @@ function renderTextNode(text: string, {
     )
 }
 
-function getProps(node: BooqElementNode, {
+function getProps(node: BooqElement, {
     path, range, hrefForPath,
 }: RenderContext) {
-    const className = node.pph
-        ? (node.attrs?.className ? `booqs-pph ${node.attrs.className}` : 'booqs-pph')
-        : node.attrs?.className
+    const normalized = normalizeAttributes(node.attributes)
+    const className = isMarkedAsParagraph(node)
+        ? (normalized?.className ? `${PARAGRAPH_CLASS} ${normalized.className}` : PARAGRAPH_CLASS)
+        : normalized?.className
+    const refPath = parseRefPath(node.attributes?.[DATA_REF_PATH])
     return {
-        ...node.attrs,
-        id: pathToId(path),
+        ...normalized,
+        [DATA_PATH]: pathToString(path),
+        [DATA_REF_PATH]: undefined,
         className,
         key: pathToString(path),
-        style: node.attrs?.style ? parseInlineStyle(node.attrs.style) : undefined,
-        href: node.ref
+        style: node.attributes?.style ? parseInlineStyle(node.attributes.style) : undefined,
+        href: refPath
             ? (
-                pathInRange(node.ref, range)
-                    ? `#${pathToId(node.ref)}`
+                pathInRange(refPath, range)
+                    ? normalized?.href
                     : hrefForPath ?
-                        hrefForPath(node.ref)
-                        : node.attrs?.href
+                        hrefForPath(refPath)
+                        : node.attributes?.href
             )
-            : node.attrs?.href,
+            : node.attributes?.href,
     }
 }
 
-function getChildren(node: BooqElementNode, ctx: RenderContext) {
+// Converts XML attribute names to React prop names at render time.
+function mapElementName(name: string, ctx: RenderContext): string | null {
+    if (ctx.withinHead) {
+        return null
+    }
+    switch (name) {
+        case 'script': case 'meta': case 'title': return null
+        case 'html': case 'head': case 'body': return 'div'
+        case 'a': return ctx.withinAnchor ? 'span' : 'a'
+        default: return name
+    }
+}
+
+const attributeNameMap: Record<string, string> = {
+    'class': 'className',
+    'colspan': 'colSpan',
+    'rowspan': 'rowSpan',
+    'cellspacing': 'cellSpacing',
+    'cellpadding': 'cellPadding',
+    'xml:space': 'xmlSpace',
+    'xml:lang': 'xmlLang',
+    'xmlns:xlink': 'xmlnsXlink',
+    'xlink:href': 'xlinkHref',
+}
+
+function normalizeAttributes(attributes: BooqElement['attributes']): Record<string, string | undefined> | undefined {
+    if (!attributes) return undefined
+    const entries = Object.entries(attributes).map(([key, value]) => {
+        const reactKey = attributeNameMap[key] ?? key
+        return [reactKey, value]
+    })
+    return Object.fromEntries(entries)
+}
+
+function getChildren(node: BooqElement, ctx: RenderContext) {
     const children = node.children && renderNodes(node.children, {
         ...ctx,
         parent: node,
-        withinAnchor: ctx.withinAnchor || node.name === 'a',
+        withinAnchor: node.name === 'a' ? true : ctx.withinAnchor,
+        withinHead: node.name === 'head' ? true : ctx.withinHead,
     })
     return (children?.length ?? 0) > 0
         ? children
@@ -252,6 +331,15 @@ function breakPath(path: BooqPath) {
     const head = path.slice(0, path.length - 1)
     const tail = path[path.length - 1]
     return [head, tail] as const
+}
+
+function parseRefPath(value: string | undefined): BooqPath | undefined {
+    if (!value) return undefined
+    return pathFromString(value)
+}
+
+function wrapInScope(css: string, scopeSelector: string): string {
+    return `@scope (${scopeSelector}) { ${css} }`
 }
 
 function parseInlineStyle(style: string): Record<string, string> {

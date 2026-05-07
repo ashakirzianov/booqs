@@ -1,36 +1,36 @@
 'use client'
 import React, { useMemo } from 'react'
 import { TocNodeComp } from './TocNode'
-import { NoteNodeComp } from './NoteNode'
+import { AnnotationNodeComp } from './AnnotationNode'
 import { PathNotesNodeComp } from './PathNotesNode'
 import { NavigationFilter } from './NavigationFilter'
 import { buildNavigationNodes, NavigationNode } from './nodes'
 import { BooqId, TableOfContentsItem } from '@/core'
 import { NavigationSelection } from './useNavigationState'
-import { NoteAuthorData, BooqNote } from '@/data/notes'
+import { AnnotationAuthorData, BooqAnnotation } from '@/data/annotations'
 
 export function NavigationPanel({
-    booqId, user, title, toc, notes,
+    booqId, user, title, toc, annotations,
     selection, highlightAuthors,
     toggleSelection, closeSelf,
 }: {
     booqId: BooqId,
     title: string
     toc: TableOfContentsItem[],
-    notes: BooqNote[],
+    annotations: BooqAnnotation[],
     selection: NavigationSelection,
-    user?: NoteAuthorData,
-    highlightAuthors: NoteAuthorData[],
+    user?: AnnotationAuthorData,
+    highlightAuthors: AnnotationAuthorData[],
     toggleSelection: (item: string) => void,
     closeSelf: () => void,
 }) {
     const nodes = useMemo(() => {
         return buildNavigationNodes({
-            title, toc, notes,
+            title, toc, annotations,
             selection,
             user,
         })
-    }, [title, toc, notes, selection, user])
+    }, [title, toc, annotations, selection, user])
     return useMemo(() => {
         return <div className='flex flex-1' style={{
             padding: '0 env(safe-area-inset-right) 0 env(safe-area-inset-left)',
@@ -73,7 +73,7 @@ export function NavigationPanel({
 
 function NavigationNodeComp({ booqId, user, node }: {
     booqId: BooqId,
-    user: NoteAuthorData | undefined,
+    user: AnnotationAuthorData | undefined,
     node: NavigationNode,
 }) {
     switch (node.kind) {
@@ -83,12 +83,12 @@ function NavigationNodeComp({ booqId, user, node }: {
                 node={node}
             />
         case 'note':
-            return <NoteNodeComp
+            return <AnnotationNodeComp
                 booqId={booqId}
                 user={user}
-                note={node.note}
+                annotation={node.annotation}
             />
-        case 'notes':
+        case 'annotations':
             return <PathNotesNodeComp
                 booqId={booqId}
                 user={user}

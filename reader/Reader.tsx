@@ -14,7 +14,7 @@ import { NavigationPanel } from './NavigationPanel'
 import { CommentsPanel } from './CommentsPanel'
 import { ThemerButton } from './Themer'
 import { useFontScale } from '@/application/theme'
-import { useNotesData } from './useNotesData'
+import { useAnnotationsData } from './useAnnotationsData'
 import { useFollowingData } from './useFollowingData'
 import { AccountButton } from '@/components/AccountButton'
 import { usePathname, useSearchParams } from 'next/navigation'
@@ -29,17 +29,17 @@ import { ContextMenuContent } from './ContextMenuContent'
 import { usePageData } from './usePageData'
 import { useNavigationState } from './useNavigationState'
 import clsx from 'clsx'
-import { BooqNote } from '@/data/notes'
+import { BooqAnnotation } from '@/data/annotations'
 import { AccountData } from '@/data/user'
 
 export function Reader({
-    booqId, chapter, metadata, toc, notes: initialNotes, user,
+    booqId, chapter, metadata, toc, annotations: initialAnnotations, user,
 }: {
     booqId: BooqId,
     chapter: BooqChapter,
     metadata: BooqMetadata,
     toc: TableOfContents,
-    notes: BooqNote[],
+    annotations: BooqAnnotation[],
     user: AccountData | undefined,
 }) {
     const { quote, path } = useBooqSearchParams()
@@ -71,7 +71,7 @@ export function Reader({
 
     const highlightsAuthorIds = useMemo(() => {
         const set = new Set<string>()
-        if (navigationSelection.notes && user?.id) {
+        if (navigationSelection.annotations && user?.id) {
             set.add(user.id)
         }
         for (const [key, value] of Object.entries(navigationSelection)) {
@@ -85,12 +85,12 @@ export function Reader({
 
     const {
         filteredHighlights, allHighlightsAuthors, comments,
-    } = useNotesData({
+    } = useAnnotationsData({
         booqId,
         user,
         currentRange: range,
         highlightsAuthorIds,
-        initialNotes,
+        initialAnnotations,
     })
 
     const { followingUserIds, isLoading: isFollowingLoading } = useFollowingData({ user })
@@ -125,7 +125,7 @@ export function Reader({
         booqId={booqId}
         title={metadata.title ?? 'Untitled'}
         toc={toc.items}
-        notes={filteredHighlights}
+        annotations={filteredHighlights}
         selection={navigationSelection}
         user={user}
         highlightAuthors={allHighlightsAuthors}
@@ -177,7 +177,7 @@ export function Reader({
 
 
     const { augmentations, menuTargetForAugmentation } = useAugmentations({
-        notes: [...filteredHighlights, ...comments],
+        annotations: [...filteredHighlights, ...comments],
         quote: quote,
         temporaryAugmentations: contextMenuAugmentations,
     })
@@ -233,7 +233,7 @@ export function Reader({
             fontSize: `${fontScale}%`,
         }}>
             <BooqContent
-                nodes={chapter.fragment.nodes}
+                nodes={chapter.fragment.content}
                 styles={chapter.fragment.styles}
                 range={range}
                 augmentations={augmentations}
