@@ -1,261 +1,62 @@
 # Backlog
 
-Low-priority improvements and technical debt.
+Low-priority improvements and technical debt. Grouped by domain.
 
----
+Conventions beyond TASKS.md: items carry a `#priority:low`/`#priority:medium` tag at the end of the title line since they may sit for months, and an optional indented context line for picking up cold.
 
-## TOC href resolution: proper base path
+### EPUB parsing and path resolution
 
-**Priority**: Medium
+- [ ] TOC href resolution: expose TOC file location from `booqs-epub`, pass as base to `resolveHref` in `toc.ts` #priority:medium
+  Currently assumes TOC hrefs are in the same coordinate space as spine fileNames. Breaks when TOC is in a different directory.
+- [ ] Proper relative path resolution for EPUB image srcs instead of stripping `../` prefixes #priority:low
+  `normalizeImageSrc` in `backend/parse.ts` uses a hack. Needs proper `..` traversal in `booqs-epub` or here.
+- [ ] Support internal book links that point to whole sections (e.g., `href="chapter3.xhtml"` without `#fragment`) #priority:low
+  `findPathForId` only matches by `id`; section nodes don't have one. Also needs path normalization for relative hrefs.
+- [ ] Explicitly reject `../` segments in parser path handling #priority:low
+  Not exploitable (ZIP entries are keyed in memory), but defense-in-depth.
 
-- [ ] Expose TOC file location from `booqs-epub` (NCX path or nav document path)
-- [ ] Pass TOC file path as base to `resolveHref` in `toc.ts` instead of empty string
+### CSS and styling
 
-TOC hrefs are relative to the TOC file's own location, not the EPUB root or the OPF. Currently we assume they're in the same coordinate space as document fileNames, which works for most EPUBs (where TOC is in the same directory as content). Breaks when the TOC file is in a different directory (e.g., `OEBPS/nav/toc.ncx` referencing `../Text/ch1.xhtml`). Additional considerations: percent-decode paths before matching, handle absolute paths starting with `/`, consider case-insensitive matching for malformed EPUBs.
+- [ ] Per-spine-item style isolation: investigate whether per-document `@scope` is sufficient or per-spine-item isolation is needed #priority:low
+  Revisit if real-world EPUBs surface conflicting styles within a single spine item.
+- [ ] Shared stylesheet deduplication: emit shared CSS once with combined scope selector instead of once per document #priority:low
+  Only worth doing if full-book rendering (30+ chapters) shows measurable slowness.
+- [ ] Donut scoping: use `@scope (.booqs-content) to (.booqs-annotation)` to exclude annotation UI from EPUB styles #priority:low
+- [ ] EPUB CSS sanitization: enumerate full list of properties to sanitize beyond color stripping #priority:low
+  Currently only `color`, `background`, `background-color` are stripped. May need `position: fixed`, `z-index`, `overflow` on global selectors.
 
----
+### Reader rendering
 
-## Epub relative path resolution
+- [ ] Web frontend performance audit: profile initial load, reader rendering, and large book handling #priority:medium
+- [ ] Remove redundant span wrapping: skip augmentation wrappers for nodes with no augmentations; consider `data-booqs-path` only on paragraph-level elements #priority:low
 
-**Priority**: Low
+### Search
 
-- [ ] Implement proper relative path resolution for epub image srcs instead of stripping `../` prefixes
+- [ ] Unified search across library providers: create a `book_metadata` table all providers populate, replace per-library dispatch #priority:low
+  Currently only PG is searchable; UU has no search. GraphQL `search` is hardcoded to `pg`.
+- [ ] Full-text search upgrade: replace `LIKE` with `tsvector`/`tsquery`, add `unaccent` and `ts_rank` #priority:low
+  Extensions are already enabled but unused. Independent of unified search.
 
-Currently `normalizeImageSrc` in `backend/parse.ts` strips `../` prefixes from image srcs. This works for the standard epub layout where all content lives under one root directory (e.g., `OEBPS/`), but would break for deeply nested structures where `../` traverses multiple levels. The root cause is that `booqs-epub`'s `resolveHref` just concatenates `basePath + href` without resolving `..`. A proper fix would either resolve paths correctly in `booqs-epub` or do full path resolution here.
+### Annotations and locators
 
----
+- [ ] New quote URL format with embedded locator: `p=2.4.6.12-2.4.6.45&t=prefix|text|suffix` #priority:medium
+  See [booqs-locator-design.md](../archive/booqs-locator-design.md) "Quote sharing" section.
+- [ ] Annotation healing: implement `resolveLocator()` algorithm, tree hash infrastructure, lazy per-book healing #priority:medium
+  See [booqs-locator-design.md](../archive/booqs-locator-design.md) "Healing Design" section.
+- [ ] Bookmark migration to BooqLocator (point locator with prefix/suffix) #priority:low
+  Bookmarks aren't exposed in UI yet. Add locator context when they are.
+- [ ] Annotations table partitioning: monitor index sizes, consider date-based partitioning at scale #priority:low
 
-## Internal links to section nodes
+### API and infrastructure
 
-**Priority**: Low
+- [ ] Rate limiting: design per-user strategy, tiered limits (auth/API/uploads), decide userId extraction approach #priority:medium
+  `@upstash/ratelimit` installed. Key challenge: GraphQL auth happens inside yoga context, so route handler doesn't know userId before dispatch.
+- [ ] Large payload pagination: consider streaming/chunking for very large books, max-items limit on TOC queries #priority:low
+- [ ] Reading history: replace Redis hash with sorted set for server-side pagination; optionally add PostgreSQL backup #priority:low
 
-- [ ] Support resolving internal book links that point to whole sections (e.g., `href="chapter3.xhtml"`)
+### Code quality
 
-Currently `findPathForId` in `core/node.ts` only matches element nodes by `id`. Section nodes don't have `id`, so links pointing to a chapter file (without a `#fragment`) fail to resolve. Additionally, href values may be relative (e.g., `chapter3.xhtml`) while section names include the directory prefix (e.g., `Text/chapter3.xhtml`), so even adding `id` to section nodes would require path normalization to match correctly.
-
----
-
-## Reading history: sorted sets + PostgreSQL backup
-
-**Priority**: Low
-
-- [ ] Replace Redis hash (`hset`/`hgetall`) with sorted set (`ZADD`/`ZREVRANGE`) for server-side pagination
-- [ ] Optionally add a `reading_history` PostgreSQL table for durability
-
-Currently `booqHistoryForUser` loads the entire hash into memory and paginates client-side. This is fine for now (no live traffic, small histories) but will become a problem at scale. Upstash Redis persists data durably, so the PostgreSQL backup is not urgent.
-
----
-
-## Unified search across library providers
-
-**Priority**: Low
-
-- [ ] Create a unified `book_metadata` table that all providers (pg, uu, future) populate with searchable fields (title, authors, subjects, languages, library_id, booq_id)
-- [ ] Migrate existing `pg_metadata` search fields into the unified table
-- [ ] Extract metadata from `uu_assets.meta` JSONB into the unified table on upload
-- [ ] Replace per-library `query()` dispatch with a single cross-library search query
-- [ ] Respect privacy semantics: PG books are public (visible to all), UU books are private (visible only to the uploader). The search query must filter by visibility — a user searching should see all PG results plus only their own UU uploads, never another user's uploads.
-- [ ] Update GraphQL `search` query (currently hardcoded to `pg`) to use the unified search
-- [ ] Consider whether the `Library.query()` interface should remain for library-specific browsing (e.g., browse by subject within PG) while unified search handles the cross-library case
-
-Currently search only works for Project Gutenberg books via `LIKE` on `pg_metadata.title` and `pg_metadata.authors_text`. User uploads (`uu`) have metadata stored in JSONB but no search implementation (`// TODO: implement` in `backend/uu.ts`). The `search` GraphQL query is hardcoded to `pg`. Each library implements its own `query()` method independently with no cross-library aggregation.
-
----
-
-## Full-text search upgrade
-
-**Priority**: Low
-
-- [ ] Replace `LIKE`-based search with PostgreSQL `tsvector`/`tsquery` for proper full-text search
-- [ ] Use the `unaccent` extension (already loaded but unused) for diacritic-insensitive search
-- [ ] Add relevance ranking to search results via `ts_rank`
-- [ ] Consider stemming and language-aware search configuration
-- [ ] Optionally extend to content search (searching within book text, not just metadata)
-
-Currently search uses `lower(title) LIKE '%query%'` which has no ranking, no diacritic normalization, and no stemming. PostgreSQL's full-text search infrastructure (`tsvector`, `tsquery`, `ts_rank`) would provide all of these. The `unaccent` and `pg_trgm` extensions are already enabled in the schema but unused by search queries. This task is independent of the unified search table — it improves search quality regardless of whether search is per-library or unified.
-
----
-
-## Rate limiting
-
-**Priority**: Medium
-
-- [ ] Design per-user rate limiting strategy for authenticated endpoints
-- [ ] Decide how to extract userId before GraphQL resolution (currently auth happens inside yoga's `context()` function — could extract token/cookie earlier in the route handler)
-- [ ] Implement tiered limits: strict for auth mutations (per IP), moderate for general API (per userId), tight for uploads (per userId)
-- [ ] Handle unauthenticated endpoints (search) with IP-based limiting, accepting the VPN/NAT shared-quota tradeoff
-- [ ] Consider: extracting auth before yoga would mean duplicating token verification logic or refactoring `context()` to separate auth from context creation
-
-`@upstash/ratelimit` is already installed. The key design challenge is that GraphQL auth currently happens inside the yoga context function, so the route handler doesn't know the userId before dispatching to yoga. Options:
-- (a) Extract token from cookie/header and verify it in the route handler before calling `handleRequest` — simple but duplicates auth logic
-- (b) Move rate limiting into a yoga plugin that runs after context creation — cleaner but more complex
-- (c) Add rate limiting at the resolver level for specific sensitive mutations only — most targeted but scattered
-
----
-
-## Notes table partitioning
-
-**Priority**: Low
-
-- [ ] Monitor index sizes on the notes table as data grows
-- [ ] Consider date-based partitioning when approaching millions of rows
-
-Currently each note is indexed 5+ ways. No action needed until there's significant traffic.
-
----
-
-## Large payload pagination
-
-**Priority**: Low
-
-- [ ] Consider streaming or chunking `Booq.nodes()` and `Booq.styles()` responses for very large books
-- [ ] Add a max-items limit to TOC queries
-
-For books like War and Peace, the full nodes/styles JSON can exceed 200KB. Not a problem in practice yet.
-
----
-
-## Per-spine-item style isolation
-
-**Priority**: Low
-
-- [ ] Investigate whether per-document `@scope` isolation is sufficient or if per-spine-item isolation is needed
-
-Current per-document `@scope ([data-booqs-doc="N"])` isolation may be insufficient if chapters within a single spine item have conflicting styles. Revisit if real-world EPUBs surface this issue.
-
----
-
-## Shared stylesheet deduplication
-
-**Priority**: Low
-
-- [ ] Emit shared CSS once with combined scope selector instead of once per document
-
-When multiple documents reference the same CSS file (e.g., `book.css`), it's currently rendered once per document with different `@scope` selectors. For full-book rendering (30+ chapters), this is wasteful. Optimization: `@scope ([data-booqs-doc="0"]), ([data-booqs-doc="1"]) { ... }`. Only worth doing if full-book rendering shows measurable slowness.
-
----
-
-## Donut scoping for annotation UI
-
-**Priority**: Low
-
-- [ ] Use `@scope (.booqs-content) to (.booqs-annotation)` to exclude annotation UI from EPUB styles
-
-Would prevent EPUB styles from affecting annotation overlays nested inside content. Consider when annotation rendering is revisited.
-
----
-
-## EPUB CSS sanitization list
-
-**Priority**: Low
-
-- [ ] Enumerate full list of EPUB CSS properties to sanitize for Next.js (beyond color stripping)
-
-Currently only `color`, `background`, `background-color` are stripped from global selectors. Other properties may need sanitization (e.g., `position: fixed`, `z-index`, `overflow` on global selectors). May differ for native rendering.
-
----
-
-## EPUB path hardening
-
-**Priority**: Low
-
-- [ ] Explicitly reject `../` segments in `parser/path.ts`
-
-Not exploitable since ZIP entries are keyed in memory (no filesystem traversal), but could be hardened as defense-in-depth.
-
----
-
-## Bookmark migration to BooqLocator
-
-**Priority**: Low
-
-- [ ] Migrate bookmarks to use BooqLocator (point locator with prefix/suffix, no end/text)
-
-Bookmarks aren't exposed in the UI currently. When they are, consider adding locator context for healing resilience.
-
----
-
-## New quote URL format with embedded locator
-
-**Priority**: Medium
-
-- [ ] Design and implement compact URL encoding for locators: `p=2.4.6.12-2.4.6.45&t=prefix|text|suffix`
-- [ ] Keep old path-only format as fallback
-- [ ] Client-side healing on share URL load
-
-See [booqs-locator-design.md](../archive/booqs-locator-design.md) "Quote sharing: stateless URLs" section.
-
----
-
-## Annotation healing implementation
-
-**Priority**: Medium
-
-- [ ] Implement `resolveLocator()` algorithm (text comparison + fuzzy search)
-- [ ] Add tree hash infrastructure (compute per-book, store on annotations)
-- [ ] Wire healing into annotation fetch path (lazy, per-book)
-
-See [booqs-locator-design.md](../archive/booqs-locator-design.md) "Healing Design" section for full strategy.
-
----
-
-## Web frontend performance audit
-
-**Priority**: Medium
-
-- [ ] Profile initial page load, reader rendering, and large book handling
-- [ ] Identify and address bottlenecks
-
-Audit web frontend performance across key scenarios: initial load, reader rendering, and large books. Profile and identify bottlenecks.
-
----
-
-## Remove redundant span wrapping in reader
-
-**Priority**: Low
-
-- [ ] Skip augmentation span wrapping for nodes with no augmentations
-- [ ] Consider emitting `data-booqs-path` only on paragraph-level elements instead of every node
-
-Currently every rendered node gets an augmentation wrapper span and a `data-booqs-path` attribute, even when there's nothing to augment. Reducing this would simplify the DOM and improve rendering performance.
-
----
-
-## Review `as Type` assertions
-
-**Priority**: Low
-
-- [ ] Audit all `as Type` casts across the codebase
-- [ ] Remove where narrowing or restructuring can replace them
-- [ ] Document remaining ones per CLAUDE.md convention
-
----
-
-## Document codebase layer by layer
-
-**Priority**: Medium
-
-- [ ] Write per-layer documentation describing purpose, key files, public API, and invariants for each layer in the hierarchy
-
----
-
-## Expand test coverage
-
-**Priority**: Medium
-
-- [ ] Identify layers and modules with lowest coverage
-- [ ] Add tests, starting with core/ and parser/
-- [ ] Introduce dependency injection for DB-access layers where needed
-
-The codebase is stable enough that tests won't be churned by frequent edits. DI in the data/backend layers would enable testing without live database connections.
-
----
-
-## Bot traffic mitigation
-
-**Priority**: Low
-
-- [ ] Review `robots.txt` effectiveness
-- [ ] Investigate alternatives to requiring auth on all pages as the sole bot mitigation
-
-Previously saw significant bot traffic on production before making auth required on most pages. This is not ideal as a long-term solution.
+- [ ] Review all `as Type` assertions: remove where narrowing can replace them, document remaining per CLAUDE.md convention #priority:low
+- [ ] Document codebase layer by layer: purpose, key files, public API, and invariants per layer #priority:medium
+- [ ] Expand test coverage starting with core/ and parser/; introduce DI for DB-access layers where needed #priority:medium
+- [ ] Bot traffic mitigation: review `robots.txt` effectiveness, find alternatives to auth-gating as sole bot defense #priority:low
