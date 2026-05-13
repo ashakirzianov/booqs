@@ -35,7 +35,6 @@
   --spacing-xl: 2rem;
   --spacing-2xl: 4rem;
   --spacing-header: var(--header-height);
-  --spacing-panel: var(--panel-width);
 
   --width-content-main: 780px;
   --width-content-reader: 720px;
@@ -77,7 +76,6 @@ body {
 
 :root {
   --header-height: 3rem;
-  --panel-width: 420pt;
 }
 
 @media (prefers-color-scheme: dark) {
