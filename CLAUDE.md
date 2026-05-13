@@ -5,17 +5,29 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Collaboration Workflow
 
 ### Documentation Organization
-- Top-level `.md` files: `CLAUDE.md`, `IDEAS.md`, `SCRATCHPAD.md`.
-- `CLAUDE.md` — conventions and guidance for Claude Code (this file).
-- `IDEAS.md` — medium to long-term ideas.
-- `SCRATCHPAD.md` — untracked scratch space for drafting prompts and half-formed ideas. Do not act on its contents unless explicitly asked.
-- `docs/` — project documentation: specs (`docs/specs.md`), UX (`docs/ux.md`), design docs, and reference material. Lowercase kebab-case names.
-- `tasks/` — task lists and checklists. Lowercase kebab-case names. Includes `tasks/backlog.md`.
+
+State and control documents live at root as UPPERCASE `.md` files. Per-effort designs and companion docs live in `docs/` as lowercase-kebab `.md` files. Completed work moves to `archive/`.
+
+**Root-level slots:**
+- `CLAUDE.md` — agent entry point: conventions, architecture, workflow (this file).
+- `AGENTS.md` — one-line redirect to `CLAUDE.md` for runtimes that look there first.
+- `SPEC.md` — current functional state of the app. Companions: `docs/ux.md` (visual design), `docs/ir-design.md` (content model). When making functional changes, update `SPEC.md`. When making visual/layout changes, update `docs/ux.md`. **Do not skip this** — these files are the source of truth.
+- `TASKS.md` — work state: Active, Backlog (see `docs/backlog.md`), Deferred.
+- `IDEAS.md` — pre-decision: things we might do, no commitment yet.
+- `SCRATCHPAD.md` — untracked drafting space. Do not act on its contents unless explicitly asked.
+
+**Other prescribed slots (not currently in use):**
+- `ROADMAP.md` — long-horizon vision and direction for the repo's evolution.
+- `SPRINT.md` — current focused push, narrower than TASKS.md Active.
+- `HANDOFFS.md` — queue of items requiring human action (blockers/asks, not work).
+
+**Directories:**
+- `docs/` — companion docs to root entry points and per-effort design docs. Lowercase kebab-case names.
+- `archive/` — completed effort docs and task lists, moved from `docs/` and root when work wraps.
 
 ### Task Management
-- Work is driven through a combination of direct prompts and task files.
-- Task files live in `tasks/` as `.md` files using checklist format, optionally divided into categories.
-- Tasks in a file are pre-approved — execute them without presenting the approach first.
+- Work is driven through a combination of direct prompts and `TASKS.md`.
+- Tasks in `TASKS.md` are pre-approved — execute them without presenting the approach first.
 
 ### Planning & Scope
 - Just do it — no upfront planning unless explicitly requested.
@@ -27,7 +39,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - The user makes all commits — do NOT commit unless explicitly asked.
 - Propose a commit message after each change.
 - Only add tests when explicitly asked.
-- When making functional changes (new features, new API endpoints, changed behavior), update `docs/specs.md` to reflect the change. When making visual/layout changes, update `docs/ux.md`. **Do not skip this** — these files are the source of truth for what the app looks like and does.
+- When making functional changes (new features, new API endpoints, changed behavior), update `SPEC.md` to reflect the change. When making visual/layout changes, update `docs/ux.md`. **Do not skip this** — these files are the source of truth for what the app looks like and does.
 - Always run `npm run build` after completing a change. Fix any errors before presenting the summary. Don't present work as done without a passing build.
 
 ### Communication Style
@@ -131,7 +143,7 @@ This is a Next.js application for reading and managing ebooks (called "booqs"). 
 - **Booq**: Core book model with nodes, deduplicated styles map, metadata, and table of contents
 - **Chapter**: A navigable chunk of a book with previous/current/next anchors and a nested fragment
 - **Fragment**: A renderable subset of a book's content with boundary paths, nodes, and scoped styles
-- **Note**: User annotations on book content
+- **Annotation**: User annotations on book content (highlights, comments, questions)
 - **Bookmark**: User bookmarks within books
 - **Collection**: User-created book collections
 - **User**: Authentication and user data
@@ -142,7 +154,7 @@ PostgreSQL database with main tables:
 - `uu_assets`/`uploads` - User-uploaded books
 - `pg_assets`/`pg_metadata` - Project Gutenberg books
 - `bookmarks` - User bookmarks
-- `notes` - User notes
+- `annotations` - User annotations (highlights, comments, questions)
 - `collections` - User collections
 - `history` - Reading history
 

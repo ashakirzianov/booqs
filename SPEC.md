@@ -2,7 +2,7 @@
 
 > "Your personal reading assistant" - A web application for reading, annotating, and collecting ebooks.
 
-> Visual design, layout, and component details are in [UX](ux.md).
+> Visual design, layout, and component details are in [docs/ux.md](docs/ux.md). IR design rationale and invariants in [docs/ir-design.md](docs/ir-design.md).
 
 ## 1. Overview
 
@@ -25,7 +25,7 @@ Displays book metadata (cover, title, authors, tags), action buttons ("Start Rea
 
 **Access**: Requires authentication (redirects to `/auth` with return URL).
 
-Full-screen reading interface with highlights, notes, comments, AI questions, font scaling, and chapter navigation. See [UX §4](ux.md) for detailed layout and interaction design.
+Full-screen reading interface with highlights, notes, comments, AI questions, font scaling, and chapter navigation. See [UX §4](docs/ux.md) for detailed layout and interaction design.
 
 ### 2.4 Search Results (`/search/[query]`)
 
@@ -372,7 +372,7 @@ Mutations:
 
 ## 13. Content Model
 
-The internal representation of book content (the "IR"). For full design rationale, invariants, and processing pipeline details, see [ir-design.md](ir-design.md).
+The internal representation of book content (the "IR"). For full design rationale, invariants, and processing pipeline details, see [docs/ir-design.md](docs/ir-design.md).
 
 ### 13.1 Identifiers and Paths
 

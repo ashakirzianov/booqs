@@ -183,7 +183,7 @@ Bookmarks aren't exposed in the UI currently. When they are, consider adding loc
 - [ ] Keep old path-only format as fallback
 - [ ] Client-side healing on share URL load
 
-See [booqs-locator-design.md](../docs/booqs-locator-design.md) "Quote sharing: stateless URLs" section.
+See [booqs-locator-design.md](../archive/booqs-locator-design.md) "Quote sharing: stateless URLs" section.
 
 ---
 
@@ -195,4 +195,4 @@ See [booqs-locator-design.md](../docs/booqs-locator-design.md) "Quote sharing: s
 - [ ] Add tree hash infrastructure (compute per-book, store on annotations)
 - [ ] Wire healing into annotation fetch path (lazy, per-book)
 
-See [booqs-locator-design.md](../docs/booqs-locator-design.md) "Healing Design" section for full strategy.
+See [booqs-locator-design.md](../archive/booqs-locator-design.md) "Healing Design" section for full strategy.
