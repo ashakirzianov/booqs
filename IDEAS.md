@@ -53,10 +53,14 @@
 ### Rendering
 - Consider use new CSS Highlight API for rendering annotations:
     * Current limitation: highlightsFromPoint API is not supported by Safari and without it handling highligh clicks is hacky (need to rely on caretPositionFromPoint and DOM-to-augmentation resolution)
+- Replace `data-booqs-pph=''` with a more general `data-booqs-role='paragraph'` attribute, allowing future roles without new attributes
+- Add a tree visitor that tracks the current `BooqPath` during traversal, avoiding manual path bookkeeping in callers
 
 ### Reader
 - Infinite scroll
 - Page view rendering
+- Switch ToC-based navigation and fragment retrieval to use scoped element IDs instead of BooqPath. Would simplify URL routing and align with browser-native `#id` navigation introduced in Phase 1
+- Navigate to augmentations (highlights, comments) via a dedicated augmentation ID instead of `pathToId`. Would need changes in both link creation and click handling
 
 ### Feature Ideas
 - Design "feed" feature

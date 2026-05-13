@@ -2,7 +2,7 @@
 
 The intermediate representation (IR) used by Booqs to represent parsed EPUB content. This document describes the final state of the IR after the Big Model Migration.
 
-For migration history and divergences from earlier designs, see [ir-design-migration.md](ir-design-migration.md).
+For migration history and divergences from earlier designs, see [ir-design-migration.md](../archive/ir-design-migration.md).
 
 ## Design Goals
 
