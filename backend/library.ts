@@ -57,9 +57,8 @@ const libraries: {
 }
 
 export async function booqForId(booqId: BooqId): Promise<Booq | undefined> {
-    // const [library] = parseId(booqId)
-    // const useCache = library !== 'lo'
-    const useCache = false
+    const [library] = parseId(booqId)
+    const useCache = library !== 'lo'
     if (useCache) {
         const cached = await getCachedBooq(booqId)
         if (cached) {

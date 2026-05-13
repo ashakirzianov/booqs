@@ -2,10 +2,6 @@
 
 ## Active
 
-### Post-migration follow-up
-
-- [ ] Re-enable booq-level cache (disabled during model migration; see `backend/parse.ts`)
-
 ### Bugs
 
 - [ ] Quote links load the entire book instead of the containing fragment

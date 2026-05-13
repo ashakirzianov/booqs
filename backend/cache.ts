@@ -59,7 +59,7 @@ export function createRedisCachingStream(originalStream: ReadableStream<Uint8Arr
 // --- S3 booq cache ---
 
 const BOOQ_CACHE_BUCKET = 'booqs-cache'
-const BOOQ_CACHE_PATH = 'booqs'
+const BOOQ_CACHE_PATH = 'v2'
 
 export async function getCachedBooq(booqId: BooqId): Promise<Booq | undefined> {
     const buffer = await downloadAsset(BOOQ_CACHE_BUCKET, `${BOOQ_CACHE_PATH}/${booqId}.json`)
