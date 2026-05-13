@@ -73,10 +73,13 @@ export default async function BooqPathPage({
     }
 
     const booqId: BooqId = `${library}-${id}`
-    const { path } = await searchParams
+    const { path, quote } = await searchParams
+    const quoteRange = quote !== undefined
+        ? rangeFromString(quote)
+        : undefined
     const booqPath = path !== undefined
         ? pathFromString(path)
-        : undefined
+        : quoteRange?.start
 
     const returnTo = encodeURIComponent(`/booq/${booqId}/content${path ? `?path=${path}#path:${path}` : ''}`)
     const user = await getCurrentUser()

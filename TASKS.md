@@ -4,7 +4,6 @@
 
 ### Bugs
 
-- [ ] Quote links load the entire book instead of the containing fragment
 - [ ] New highlight creation causes a momentary visual flicker — investigate and fix
 
 ## Backlog
