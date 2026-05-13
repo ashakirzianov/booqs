@@ -74,7 +74,10 @@ export function AddHighlightItem({
                 annotationId: result.optimistic.id,
                 selection: selection,
             })
-            window.getSelection()?.empty()
+            // Defer clearing the selection until after the highlight renders,
+            // so there's no visual gap between the blue selection disappearing
+            // and the colored highlight appearing.
+            requestAnimationFrame(() => window.getSelection()?.empty())
         }
     }
 
