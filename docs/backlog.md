@@ -196,3 +196,66 @@ See [booqs-locator-design.md](../archive/booqs-locator-design.md) "Quote sharing
 - [ ] Wire healing into annotation fetch path (lazy, per-book)
 
 See [booqs-locator-design.md](../archive/booqs-locator-design.md) "Healing Design" section for full strategy.
+
+---
+
+## Web frontend performance audit
+
+**Priority**: Medium
+
+- [ ] Profile initial page load, reader rendering, and large book handling
+- [ ] Identify and address bottlenecks
+
+Audit web frontend performance across key scenarios: initial load, reader rendering, and large books. Profile and identify bottlenecks.
+
+---
+
+## Remove redundant span wrapping in reader
+
+**Priority**: Low
+
+- [ ] Skip augmentation span wrapping for nodes with no augmentations
+- [ ] Consider emitting `data-booqs-path` only on paragraph-level elements instead of every node
+
+Currently every rendered node gets an augmentation wrapper span and a `data-booqs-path` attribute, even when there's nothing to augment. Reducing this would simplify the DOM and improve rendering performance.
+
+---
+
+## Review `as Type` assertions
+
+**Priority**: Low
+
+- [ ] Audit all `as Type` casts across the codebase
+- [ ] Remove where narrowing or restructuring can replace them
+- [ ] Document remaining ones per CLAUDE.md convention
+
+---
+
+## Document codebase layer by layer
+
+**Priority**: Medium
+
+- [ ] Write per-layer documentation describing purpose, key files, public API, and invariants for each layer in the hierarchy
+
+---
+
+## Expand test coverage
+
+**Priority**: Medium
+
+- [ ] Identify layers and modules with lowest coverage
+- [ ] Add tests, starting with core/ and parser/
+- [ ] Introduce dependency injection for DB-access layers where needed
+
+The codebase is stable enough that tests won't be churned by frequent edits. DI in the data/backend layers would enable testing without live database connections.
+
+---
+
+## Bot traffic mitigation
+
+**Priority**: Low
+
+- [ ] Review `robots.txt` effectiveness
+- [ ] Investigate alternatives to requiring auth on all pages as the sole bot mitigation
+
+Previously saw significant bot traffic on production before making auth required on most pages. This is not ideal as a long-term solution.
