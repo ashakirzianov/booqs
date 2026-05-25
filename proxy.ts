@@ -6,7 +6,14 @@ const REFRESH_COOKIE = 'refresh_token'
 
 const PROTECTED_ROUTES = ['/profile', '/collections', '/followers', '/history', '/notes']
 
+const BOT_PATTERN = /bot|crawler|spider|crawl|scraper|facebookexternalhit|meta-externalagent|slurp|duckduckbot|baiduspider|yandexbot|sogou|exabot|ia_archiver/i
+
 export async function proxy(request: NextRequest) {
+    const userAgent = request.headers.get('user-agent') ?? ''
+    if (BOT_PATTERN.test(userAgent)) {
+        return new NextResponse(null, { status: 403 })
+    }
+
     const accessToken = request.cookies.get(ACCESS_COOKIE)?.value
     const refreshToken = request.cookies.get(REFRESH_COOKIE)?.value
 
