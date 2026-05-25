@@ -3,7 +3,7 @@ import { fetchBooqPreview, fetchBooqChapter } from '@/data/booqs'
 import { reportBooqHistory } from '@/data/history'
 import { Reader } from '@/reader/Reader'
 import { Metadata } from 'next'
-import { notFound, redirect } from 'next/navigation'
+import { notFound } from 'next/navigation'
 import { fetchAnnotations } from '@/data/annotations'
 import { getCurrentUser } from '@/data/user'
 import { booqImageUrl } from '@/common/href'
@@ -81,11 +81,7 @@ export default async function BooqPathPage({
         ? pathFromString(path)
         : quoteRange?.start
 
-    const returnTo = encodeURIComponent(`/booq/${booqId}/content${path ? `?path=${path}#path:${path}` : ''}`)
     const user = await getCurrentUser()
-    if (!user) {
-        redirect(`/auth?return_to=${returnTo}`)
-    }
     const [booqData, annotations] = await Promise.all([
         fetchBooqChapter(booqId, booqPath),
         fetchAnnotations({ booqId }),
