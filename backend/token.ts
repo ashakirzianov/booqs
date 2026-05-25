@@ -1,4 +1,5 @@
 import { SignJWT, jwtVerify } from 'jose'
+import { createHash } from 'crypto'
 import { nanoid } from 'nanoid'
 import { config } from './config'
 import { redis } from './db'
@@ -24,8 +25,8 @@ export async function rotateTokenPair(oldRefreshToken: string): Promise<TokenPai
     // Pipeline: revoke old + store new refresh token in one round trip
     const newRefreshToken = nanoid(64)
     const pipeline = redis.pipeline()
-    pipeline.del(`${REFRESH_TOKEN_PREFIX}${oldRefreshToken}`)
-    pipeline.set(`${REFRESH_TOKEN_PREFIX}${newRefreshToken}`, userId, { ex: REFRESH_TOKEN_TTL })
+    pipeline.del(`${REFRESH_TOKEN_PREFIX}${hashToken(oldRefreshToken)}`)
+    pipeline.set(`${REFRESH_TOKEN_PREFIX}${hashToken(newRefreshToken)}`, userId, { ex: REFRESH_TOKEN_TTL })
     const [accessToken] = await Promise.all([
         issueAccessToken(userId),
         pipeline.exec(),
@@ -44,7 +45,7 @@ export async function userIdFromAccessToken(token: string): Promise<string | und
 }
 
 export async function revokeRefreshToken(token: string): Promise<void> {
-    await redis.del(`${REFRESH_TOKEN_PREFIX}${token}`)
+    await redis.del(`${REFRESH_TOKEN_PREFIX}${hashToken(token)}`)
 }
 
 async function issueAccessToken(userId: string): Promise<string> {
@@ -58,11 +59,15 @@ async function issueAccessToken(userId: string): Promise<string> {
 
 async function issueRefreshToken(userId: string): Promise<string> {
     const token = nanoid(64)
-    await redis.set(`${REFRESH_TOKEN_PREFIX}${token}`, userId, { ex: REFRESH_TOKEN_TTL })
+    await redis.set(`${REFRESH_TOKEN_PREFIX}${hashToken(token)}`, userId, { ex: REFRESH_TOKEN_TTL })
     return token
 }
 
 async function validateRefreshToken(token: string): Promise<string | undefined> {
-    const userId = await redis.get<string>(`${REFRESH_TOKEN_PREFIX}${token}`)
+    const userId = await redis.get<string>(`${REFRESH_TOKEN_PREFIX}${hashToken(token)}`)
     return userId ?? undefined
+}
+
+function hashToken(token: string): string {
+    return createHash('sha256').update(token).digest('hex')
 }
