@@ -144,6 +144,7 @@ input AnnotationInput {
     kind: String!
     color: String
     content: String
+    privacy: String
     start: [Int!]
     end: [Int!]
     targetQuote: String

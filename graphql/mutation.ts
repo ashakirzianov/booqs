@@ -113,6 +113,8 @@ export const mutationResolver: IResolvers<any, ResolverContext> = {
                 kind: annotation.kind,
                 color: annotation.color ?? undefined,
                 content: annotation.content ?? undefined,
+                privacy: annotation.privacy === 'public' || annotation.privacy === 'private'
+                    ? annotation.privacy : undefined,
             })
             return ok()
         },
