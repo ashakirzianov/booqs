@@ -111,6 +111,8 @@ export const mutationResolver: IResolvers<any, ResolverContext> = {
                 text: annotation.targetQuote ?? '',
                 suffix: annotation.suffix ?? '',
                 kind: annotation.kind,
+                color: annotation.color ?? undefined,
+                content: annotation.content ?? undefined,
             })
             return ok()
         },
@@ -119,9 +121,9 @@ export const mutationResolver: IResolvers<any, ResolverContext> = {
             const result = await removeAnnotation({ userId, id })
             return result ? ok() : fail('Annotation not found')
         },
-        async updateAnnotation(_, { id, kind, content }, { userId }): Promise<MutationResult> {
+        async updateAnnotation(_, { id, kind, color, content }, { userId }): Promise<MutationResult> {
             if (!requireAuth(userId)) return fail('Authentication required')
-            await updateAnnotation({ userId, id, kind, content })
+            await updateAnnotation({ userId, id, kind, color, content })
             return ok()
         },
         async addReply(_, { reply }, { userId }): Promise<MutationResult> {

@@ -19,7 +19,7 @@ type Mutation {
     removeBookmark(id: ID!): MutationResult!
     addAnnotation(annotation: AnnotationInput!): MutationResult!
     removeAnnotation(id: ID!): MutationResult!
-    updateAnnotation(id: ID!, kind: String, content: String): MutationResult!
+    updateAnnotation(id: ID!, kind: String, color: String, content: String): MutationResult!
     addReply(reply: ReplyInput!): MutationResult!
     removeReply(id: ID!): MutationResult!
     updateReply(id: ID!, content: String!): MutationResult!
@@ -142,9 +142,13 @@ input AnnotationInput {
     id: ID
     booqId: ID!
     kind: String!
+    color: String
+    content: String
     start: [Int!]
     end: [Int!]
     targetQuote: String
+    prefix: String
+    suffix: String
 }
 input BooqHistoryInput {
     booqId: ID!
@@ -215,6 +219,7 @@ type Annotation {
     start: [Int!]!
     end: [Int!]!
     kind: String
+    color: String
     text: String
     content: String
     targetQuote: String!
