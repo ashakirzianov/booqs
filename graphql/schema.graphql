@@ -122,6 +122,7 @@ type User {
     following: [User!]!
     isFollowing: Boolean
     booqsWithAnnotations: [Booq!]!
+    uploads: [Booq!]!
     passkeys: [Passkey!]
 }
 
