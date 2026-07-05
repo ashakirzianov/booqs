@@ -20,6 +20,13 @@ const nextConfig = {
         return [{
             source: '/(.*)',
             headers,
+        }, {
+            // Apple requires application/json for the associated-domains
+            // file (native app passkeys); nosniff above makes it mandatory.
+            source: '/.well-known/apple-app-site-association',
+            headers: [
+                { key: 'Content-Type', value: 'application/json' },
+            ],
         }]
     },
 }
