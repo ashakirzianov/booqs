@@ -30,7 +30,7 @@
     "@vercel/speed-insights": "^2.0.0",
     "@welldone-software/why-did-you-render": "^10.0.1",
     "ai": "^6.0.158",
-    "body-parser": "^1.20.3",
+    "body-parser": "^1.20.6",
     "booqs-epub": "^1.1.2",
     "clipboard-polyfill": "^4.1.1",
     "clsx": "^2.1.1",
