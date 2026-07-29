@@ -10,10 +10,12 @@
 > **The decision is Anton's; nothing here changes production config, code,
 > or secrets. No secret values appear in this doc — placeholders only.**
 >
-> Status: **direction set — Option B first** (Anton's review, 2026-07-29):
-> path-scoped bypass now, Option A held as the pre-designed escalation on
-> evidence of GraphQL abuse. §8–§10 revised accordingly. Dashboard
-> execution pending (§9).
+> Status: **LIVE in production** (2026-07-29). Option B executed per §9:
+> rule `native-app-access` (Bypass) exempts `/api/graphql`,
+> `/api/images`, `/api/upload`, and the AASA path; verified end-to-end
+> (GraphQL JSON for non-browser clients, web pages still challenged —
+> §9 progress note). Option A remains the pre-designed escalation on
+> evidence of GraphQL abuse; §9 step 6 is the standing watch.
 
 ## 1. The problem and the evidence
 
@@ -75,8 +77,12 @@ Vercel's documented answer in each case. The bypass-vs-Attack-Mode
 interaction specifically is stated less explicitly in the docs than for
 the bot-protection ruleset (the Attack Mode page says custom rules give
 "more control over what traffic is challenged" without spelling out the
-bypass action) — **flagged unverified; the log-mode test in §9 settles
-it empirically in minutes either way**.
+bypass action) — ~~flagged unverified~~ **moot: recon settled it**.
+
+**Recon result (2026-07-29, §9 step 1): the Bot Protection managed
+ruleset is what's enabled; Attack Mode is not.** Best case — the bypass
+interaction in play is the one Vercel documents verbatim (bullet 1
+above).
 
 ## 3. What the native client's traffic looks like today
 
@@ -99,12 +105,14 @@ implementation):
 - **Images**: covers and avatars are fetched with hand-built
   `URLRequest`s (`Views/Shared/BooqCoverView.swift:72`,
   `Views/Shared/AvatarView.swift:49`) from `imageBaseURL` =
-  `https://img.booqs.app` in production. Dev maps `imageBaseURL` to
-  `localhost:3000/api/images`, so `img.booqs.app` is **presumably a
-  domain on this same Vercel project** (serving `app/api/images/`) and
-  therefore covered by the same firewall — **unverified, dashboard
-  check**. If it is, native image GETs are challengeable too and must be
-  covered by the exemption.
+  `https://img.booqs.app` in production. **Settled by recon
+  (2026-07-29): `img.booqs.app` is a CloudFront distribution (S3
+  origin, with the booqs.app variant-generation API as fallback), not
+  a domain on the Vercel project — native image GETs are not
+  challenged directly.** The `/api/images` path stays in the exemption
+  for a different client: **CloudFront's fallback origin-fetch** on
+  cache miss is itself non-browser traffic hitting Vercel, exactly
+  what the bot-protection ruleset challenges.
 - **Uploads**: `Booqs/Data/UploadState.swift` builds its own
   `URLRequest` against the upload endpoint (`app/api/upload/`).
 - Only **Release builds target production** (`NetworkConfiguration.swift`:
@@ -142,9 +150,9 @@ networking stack in the way.
   **unverified, confirmed the moment the rule form accepts it**.
 - **Rule-count limits**: Hobby — 3 custom rules total, 1 rate-limit rule;
   Pro — 40 rate-limit rules; Enterprise — 1000
-  ([Rate limiting][rate-limiting], 2026-06-16). **The account's plan
-  tier is unknown to this repo — unverified**; the recommended setup
-  fits within Hobby's 3-rule budget, barely (§8).
+  ([Rate limiting][rate-limiting], 2026-06-16). **Settled by recon
+  (2026-07-29): Hobby.** The B rule uses 1 of the 3 custom-rule slots;
+  the single rate-limit slot stays free for the A escalation (§8).
 - **Rate limiting** is a priced feature (Hobby: 1M allowed requests
   included; Pro: usage-based). Counting keys on Hobby/Pro: **IP and JA4
   only** (arbitrary header keys are Enterprise-only). Fixed window
@@ -310,6 +318,18 @@ Safe against production by construction: log-first (Vercel's own
 recommended practice), no deploys, every step reversible by deleting or
 disabling a rule.
 
+> Progress (2026-07-29): **steps 1–5 done — rollout complete.** Recon
+> settled the flagged unknowns (Bot Protection ruleset enabled, Hobby
+> plan, `img.booqs.app` on CloudFront — §2/§3/§4 updated). Log-mode
+> probes returned 429 + checkpoint as expected; after Anton's safety
+> glance the rule flipped to **Bypass**, and verification passed on all
+> three axes: `POST /api/graphql` from curl → **200 + GraphQL JSON**
+> (the native app's exact blocker, gone); the AASA path → app-rendered
+> 404, not the checkpoint (will serve the real file once the
+> associated-domains commit deploys — re-verify then); `GET /` →
+> **429 + checkpoint unchanged** (web posture preserved). Step 6
+> (escalation watch) is the standing state.
+
 1. **Recon** — Firewall → Bot Management: note which of Attack Mode /
    Bot Protection ruleset is enabled (settles §2), and the plan tier
    (settles §4's limits). Domains: confirm `img.booqs.app` is on this
@@ -411,10 +431,11 @@ Environment; [docs/quire-integration.md](../../swiftui-app/docs/quire-integratio
 §7; this repo's [proxy.ts](../proxy.ts) and
 [app/api/graphql/route.ts](../app/api/graphql/route.ts).
 
-Unverified items, collected: plan tier; which challenge layer is
-enabled; bypass-vs-Attack-Mode interaction (empirical in §9.4);
-header-value conditions on Hobby; `img.booqs.app` project membership;
-App Attest on macOS.
+Unverified items remaining: header-value rule conditions on Hobby
+(matters only at the A escalation); App Attest on macOS. Settled by
+recon 2026-07-29: plan = Hobby; enabled layer = Bot Protection managed
+ruleset (Attack Mode off — the bypass-vs-Attack-Mode question is moot);
+`img.booqs.app` = CloudFront distribution, off-project.
 
 [attack-mode]: https://vercel.com/docs/vercel-firewall/attack-mode
 [bot-mgmt]: https://vercel.com/docs/bot-management
