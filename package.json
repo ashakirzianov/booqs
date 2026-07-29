@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "eslint . --max-warnings 0 && next build",
+    "build": "eslint . --max-warnings 0 && NODE_ENV=production next build",
     "start": "next start",
     "lint": "eslint .",
     "test": "jest",

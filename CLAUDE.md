@@ -59,7 +59,7 @@ State and control documents live at root as UPPERCASE `.md` files. Per-effort de
 
 ### Build, Lint, and Test
 - `npm run dev` - Start development server
-- `npm run build` - Build for production
+- `npm run build` - Build for production. The script pins `NODE_ENV=production` for `next build`: an inherited `NODE_ENV=development` (agent harnesses have shipped with it) makes Next's prerender/export phase resolve development React against production chunks, and every page with client components fails with `TypeError: Cannot read properties of null (reading 'useContext')`.
 - `npm run start` - Start production server
 - `npm run lint` - Run ESLint
 - `npm run test` - Run tests with Jest
