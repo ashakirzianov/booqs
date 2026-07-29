@@ -7,6 +7,8 @@
 
 ## Active
 
+- [ ] Native API access under Vercel bot protection — direction set (2026-07-29): Option B first, per [docs/native-api-access.md](docs/native-api-access.md) §8. Path-scoped WAF bypass (`/api/graphql`, `/api/images`, `/api/upload`, AASA), no secret; Option A (secret header + rate limit) is the pre-designed escalation on evidence of GraphQL abuse. Next step: Anton's dashboard checklist (§9). Client side ships a dormant `x-booqs-client` header (Track B, future) so escalation needs no app release. Server needs no code changes.
+
 ## Backlog
 
 See [docs/backlog.md](docs/backlog.md) for detailed backlog items.
